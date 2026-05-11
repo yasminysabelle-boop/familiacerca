@@ -70,7 +70,6 @@ export default function FamilyProfile() {
         age: form.age ? parseInt(form.age) : null,
         medical_notes: form.medical_notes || null,
         photo_url,
-        updated_at: new Date().toISOString(),
       },
       { onConflict: 'user_id' }
     )

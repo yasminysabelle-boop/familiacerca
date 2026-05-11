@@ -26,7 +26,7 @@ export default function Onboarding() {
     setSaving(true)
     setSaveError('')
     const { error } = await supabase.from('care_profiles').upsert(
-      { user_id: user.id, name: name.trim(), updated_at: new Date().toISOString() },
+      { user_id: user.id, name: name.trim() },
       { onConflict: 'user_id' }
     )
     if (error) {
