@@ -4,6 +4,8 @@
 
 [build.environment]
   NODE_VERSION = "20"
+  VITE_SUPABASE_URL = "https://ofubzbqaxaepxjicyegz.supabase.co"
+  VITE_SUPABASE_ANON_KEY = "sb_publishable_xbbhMRO6XcgVu3yod6X1cA_63CwhlTM"
 
 # Cache hashed assets forever (Vite fingerprints all filenames)
 [[headers]]
