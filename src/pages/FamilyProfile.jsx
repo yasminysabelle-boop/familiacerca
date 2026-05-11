@@ -14,6 +14,7 @@ export default function FamilyProfile() {
   const [photoPreview, setPhotoPreview] = useState(null)
   const [saving, setSaving] = useState(false)
   const [success, setSuccess] = useState(false)
+  const [saveError, setSaveError] = useState('')
 
   useEffect(() => {
     if (profile) {
@@ -41,6 +42,7 @@ export default function FamilyProfile() {
     e.preventDefault()
     setSaving(true)
     setSuccess(false)
+    setSaveError('')
 
     let photo_url = profile?.photo_url ?? null
 
@@ -51,7 +53,9 @@ export default function FamilyProfile() {
         .from('profile-photos')
         .upload(path, photoFile, { upsert: true, contentType: photoFile.type })
 
-      if (!uploadError) {
+      if (uploadError) {
+        setSaveError('La foto no se pudo subir, pero el perfil se guardará sin ella.')
+      } else {
         const { data: { publicUrl } } = supabase.storage
           .from('profile-photos')
           .getPublicUrl(path)
@@ -59,7 +63,7 @@ export default function FamilyProfile() {
       }
     }
 
-    await supabase.from('care_profiles').upsert(
+    const { error: upsertError } = await supabase.from('care_profiles').upsert(
       {
         user_id: user.id,
         name: form.name,
@@ -71,8 +75,14 @@ export default function FamilyProfile() {
       { onConflict: 'user_id' }
     )
 
-    await refresh()
     setSaving(false)
+
+    if (upsertError) {
+      setSaveError('Error al guardar el perfil: ' + upsertError.message)
+      return
+    }
+
+    await refresh()
     setSuccess(true)
     setTimeout(() => setSuccess(false), 3000)
   }
@@ -163,6 +173,12 @@ export default function FamilyProfile() {
               className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none"
             />
           </div>
+
+          {saveError && (
+            <div className="px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+              ⚠ {saveError}
+            </div>
+          )}
 
           {success && (
             <div className="px-4 py-3 bg-primary-light border border-green-200 rounded-lg text-sm text-primary font-medium">

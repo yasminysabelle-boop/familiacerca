@@ -14,6 +14,7 @@ export default function VoiceDiary() {
   const [loading, setLoading] = useState(true)
   const [recording, setRecording] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState('')
   const [elapsed, setElapsed] = useState(0)
   const [title, setTitle] = useState('')
   const recorderRef = useRef(null)
@@ -65,17 +66,34 @@ export default function VoiceDiary() {
     const duration = elapsed
     const blob = new Blob(chunksRef.current, { type: 'audio/webm' })
     const path = `${user.id}/${Date.now()}.webm`
-    await supabase.storage.from('voice-diary').upload(path, blob, { contentType: 'audio/webm' })
+
+    const { error: uploadError } = await supabase.storage
+      .from('voice-diary')
+      .upload(path, blob, { contentType: 'audio/webm' })
+
+    if (uploadError) {
+      setSaveError('Error al subir el audio. Verifica tu conexión e inténtalo de nuevo.')
+      setSaving(false)
+      return
+    }
+
     const { data: { publicUrl } } = supabase.storage.from('voice-diary').getPublicUrl(path)
 
     const defaultTitle = `Nota del ${new Date().toLocaleDateString('es-US', { weekday: 'long', day: 'numeric', month: 'long' })}`
-    await supabase.from('voice_diary').insert({
+    const { error: insertError } = await supabase.from('voice_diary').insert({
       user_id: user.id,
       audio_url: publicUrl,
       title: title.trim() || defaultTitle,
       duration_seconds: duration,
     })
 
+    if (insertError) {
+      setSaveError('El audio se subió pero no se pudo guardar el registro: ' + insertError.message)
+      setSaving(false)
+      return
+    }
+
+    setSaveError('')
     setTitle(''); setElapsed(0); setSaving(false)
     fetchRecordings()
   }
@@ -149,6 +167,12 @@ export default function VoiceDiary() {
             </div>
           )}
         </div>
+
+        {saveError && (
+          <div className="mt-3 px-4 py-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">
+            ⚠ {saveError}
+          </div>
+        )}
 
         {/* Recordings list */}
         {loading ? (

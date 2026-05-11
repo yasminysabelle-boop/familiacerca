@@ -13,6 +13,7 @@ export default function Onboarding() {
   const navigate = useNavigate()
   const [name, setName] = useState('')
   const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState('')
   const firstName = user?.user_metadata?.full_name?.split(' ')[0] ?? ''
 
   useEffect(() => {
@@ -23,10 +24,16 @@ export default function Onboarding() {
     e.preventDefault()
     if (!name.trim()) return
     setSaving(true)
-    await supabase.from('care_profiles').upsert(
+    setSaveError('')
+    const { error } = await supabase.from('care_profiles').upsert(
       { user_id: user.id, name: name.trim(), updated_at: new Date().toISOString() },
       { onConflict: 'user_id' }
     )
+    if (error) {
+      setSaveError('No se pudo guardar: ' + error.message)
+      setSaving(false)
+      return
+    }
     await refresh()
     navigate('/dashboard', { replace: true })
   }
@@ -101,6 +108,13 @@ export default function Onboarding() {
               Solo su nombre por ahora. La foto, edad y medicamentos los agregas después.
             </p>
           </div>
+
+          {saveError && (
+            <div style={{ marginBottom: 8, padding: '10px 14px', background: '#FFF0F0',
+              border: '1px solid #FFBABA', borderRadius: 10, fontSize: 13, color: '#D63031' }}>
+              ⚠ {saveError}
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             <input

@@ -23,6 +23,7 @@ export default function Chat() {
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
   const [sending, setSending] = useState(false)
+  const [sendError, setSendError] = useState('')
   const bottomRef = useRef(null)
   const inputRef = useRef(null)
 
@@ -67,13 +68,19 @@ export default function Chat() {
     if (!content) return
 
     setSending(true)
+    setSendError('')
     setInput('')
 
-    await supabase.from('chat_messages').insert({
+    const { error } = await supabase.from('chat_messages').insert({
       user_id: user.id,
       user_name: displayName,
       content,
     })
+
+    if (error) {
+      setSendError('No se pudo enviar el mensaje. Inténtalo de nuevo.')
+      setInput(content)
+    }
 
     setSending(false)
     inputRef.current?.focus()
@@ -152,6 +159,9 @@ export default function Chat() {
 
         {/* Input */}
         <div className="px-4 py-3 bg-white border-t border-green-100 flex-shrink-0">
+          {sendError && (
+            <p className="text-xs text-red-500 mb-2 px-1">⚠ {sendError}</p>
+          )}
           <form onSubmit={handleSend} className="flex gap-2">
             <textarea
               ref={inputRef}

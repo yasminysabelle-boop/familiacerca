@@ -11,6 +11,7 @@ export default function MemoryAlbum() {
   const [memories, setMemories] = useState([])
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
+  const [uploadError, setUploadError] = useState('')
   const [selectedFile, setSelectedFile] = useState(null)
   const [preview, setPreview] = useState(null)
   const [caption, setCaption] = useState('')
@@ -37,14 +38,24 @@ export default function MemoryAlbum() {
   async function handleUpload(e) {
     e.preventDefault(); if (!selectedFile) return
     setUploading(true)
+    setUploadError('')
     const isVideo = selectedFile.type.startsWith('video/')
     const ext = selectedFile.name.split('.').pop()
     const path = `${user.id}/${Date.now()}.${ext}`
 
-    await supabase.storage.from('memories').upload(path, selectedFile, { contentType: selectedFile.type })
+    const { error: storageError } = await supabase.storage
+      .from('memories')
+      .upload(path, selectedFile, { contentType: selectedFile.type })
+
+    if (storageError) {
+      setUploadError('Error al subir el archivo: ' + storageError.message)
+      setUploading(false)
+      return
+    }
+
     const { data: { publicUrl } } = supabase.storage.from('memories').getPublicUrl(path)
 
-    await supabase.from('memories').insert({
+    const { error: insertError } = await supabase.from('memories').insert({
       user_id: user.id,
       uploader_name: displayName,
       file_url: publicUrl,
@@ -52,6 +63,12 @@ export default function MemoryAlbum() {
       caption: caption.trim() || null,
       reactions: {},
     })
+
+    if (insertError) {
+      setUploadError('El archivo se subió pero no se pudo guardar: ' + insertError.message)
+      setUploading(false)
+      return
+    }
 
     setSelectedFile(null); setPreview(null); setCaption('')
     setUploading(false); fetchMemories()
@@ -110,6 +127,12 @@ export default function MemoryAlbum() {
             </div>
           )}
         </form>
+
+        {uploadError && (
+          <div className="mb-4 px-4 py-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">
+            ⚠ {uploadError}
+          </div>
+        )}
 
         {/* Grid */}
         {loading ? (
