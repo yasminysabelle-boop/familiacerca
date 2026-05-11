@@ -61,7 +61,7 @@ export default function Calendar() {
 
   async function handleSubmit(e) {
     e.preventDefault(); setSaving(true)
-    await supabase.from('events').insert({ ...form, user_id: user.id })
+    await supabase.from('events').insert({ ...form, time: form.time || null, user_id: user.id })
     setForm(emptyForm); setShowForm(false); setSaving(false); fetchEvents()
   }
 

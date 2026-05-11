@@ -35,7 +35,12 @@ export default function Medications() {
   async function handleSubmit(e) {
     e.preventDefault()
     setSaving(true)
-    await supabase.from('medications').insert({ ...form, user_id: user.id })
+    const payload = {
+      ...form,
+      time: form.time || null,
+      user_id: user.id,
+    }
+    await supabase.from('medications').insert(payload)
     setForm(emptyForm)
     setShowForm(false)
     setSaving(false)
