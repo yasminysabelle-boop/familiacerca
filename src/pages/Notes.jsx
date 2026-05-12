@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
+import MicButton from '../components/MicButton'
+import { useSpeechToText } from '../hooks/useSpeechToText'
 
 const TAG_OPTIONS = ['Salud', 'Médico', 'Familia', 'Dieta', 'Ejercicio', 'Otro']
 const emptyForm = { title: '', content: '', tags: [] }
@@ -15,6 +17,11 @@ export default function Notes() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [search, setSearch] = useState('')
+
+  const { recording, interim, error: speechError, start, stop, clearError } =
+    useSpeechToText(text =>
+      setForm(prev => ({ ...prev, content: prev.content ? prev.content + ' ' + text : text }))
+    )
 
   useEffect(() => { if (user) fetchNotes() }, [user])
 
@@ -52,6 +59,11 @@ export default function Notes() {
     fetchNotes()
   }
 
+  function handleCancel() {
+    stop()
+    setShowForm(false)
+  }
+
   async function handleDelete(id) {
     await supabase.from('notes').delete().eq('id', id)
     setNotes(prev => prev.filter(n => n.id !== id))
@@ -71,8 +83,10 @@ export default function Notes() {
             <h2 className="text-2xl font-bold text-gray-900">Notas</h2>
             <p className="text-gray-500 mt-1">Observaciones del cuidado diario</p>
           </div>
-          <button onClick={() => setShowForm(!showForm)}
-            className="px-4 py-2 bg-primary hover:bg-primary-dark text-white text-sm font-medium rounded-lg transition-colors">
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className="px-4 py-2 bg-primary hover:bg-primary-dark text-white text-sm font-medium rounded-lg transition-colors"
+          >
             + Nueva nota
           </button>
         </div>
@@ -80,40 +94,100 @@ export default function Notes() {
         {showForm && (
           <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-green-100 p-6 mb-6 space-y-4">
             <h3 className="font-semibold text-gray-900">Nueva nota</h3>
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Título *</label>
-              <input name="title" required value={form.title} onChange={handleChange}
+              <input
+                name="title"
+                required
+                value={form.title}
+                onChange={handleChange}
                 placeholder="ej. Visita al médico hoy"
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              />
             </div>
+
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Contenido *</label>
-              <textarea name="content" required value={form.content} onChange={handleChange} rows={4}
-                placeholder="Escribe aquí las observaciones..."
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none" />
+              {/* Label row with mic button */}
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-sm font-medium text-gray-700">
+                  Contenido *
+                </label>
+                <div className="flex items-center gap-2">
+                  {recording && (
+                    <span className="text-xs font-semibold" style={{ color: '#D63031' }}>
+                      🔴 Escuchando...
+                    </span>
+                  )}
+                  <MicButton recording={recording} onStart={start} onStop={stop} size="sm" />
+                </div>
+              </div>
+
+              <textarea
+                name="content"
+                required
+                value={form.content}
+                onChange={handleChange}
+                rows={4}
+                placeholder="Escribe o dicta las observaciones..."
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+              />
+
+              {/* Live interim preview */}
+              {recording && interim && (
+                <p className="text-xs mt-1.5 px-1" style={{ color: '#9CA3AF', fontStyle: 'italic' }}>
+                  🎤 {interim}
+                </p>
+              )}
+
+              {/* Speech error */}
+              {speechError && (
+                <div className="mt-2 px-3 py-2 rounded-lg text-xs" style={{ background: '#FFF0F0', border: '1px solid #FFBABA', color: '#D63031' }}>
+                  ⚠ {speechError}{' '}
+                  <button
+                    type="button"
+                    onClick={clearError}
+                    style={{ textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'inherit', color: 'inherit' }}
+                  >
+                    Cerrar
+                  </button>
+                </div>
+              )}
             </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Etiquetas</label>
               <div className="flex flex-wrap gap-2">
                 {TAG_OPTIONS.map(tag => (
-                  <button key={tag} type="button" onClick={() => toggleTag(tag)}
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => toggleTag(tag)}
                     className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
                       form.tags.includes(tag)
                         ? 'bg-primary text-white'
                         : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                    }`}>
+                    }`}
+                  >
                     {tag}
                   </button>
                 ))}
               </div>
             </div>
+
             <div className="flex gap-3">
-              <button type="submit" disabled={saving}
-                className="px-4 py-2 bg-primary hover:bg-primary-dark disabled:opacity-60 text-white text-sm font-medium rounded-lg transition-colors">
+              <button
+                type="submit"
+                disabled={saving}
+                className="px-4 py-2 bg-primary hover:bg-primary-dark disabled:opacity-60 text-white text-sm font-medium rounded-lg transition-colors"
+              >
                 {saving ? 'Guardando...' : 'Guardar nota'}
               </button>
-              <button type="button" onClick={() => setShowForm(false)}
-                className="px-4 py-2 border border-gray-200 text-gray-600 hover:bg-gray-50 text-sm font-medium rounded-lg transition-colors">
+              <button
+                type="button"
+                onClick={handleCancel}
+                className="px-4 py-2 border border-gray-200 text-gray-600 hover:bg-gray-50 text-sm font-medium rounded-lg transition-colors"
+              >
                 Cancelar
               </button>
             </div>
@@ -167,8 +241,10 @@ export default function Notes() {
                 {expanded === note.id && (
                   <div className="px-5 pb-4 border-t border-gray-50">
                     <p className="text-sm text-gray-700 mt-3 whitespace-pre-wrap">{note.content}</p>
-                    <button onClick={() => handleDelete(note.id)}
-                      className="mt-4 text-xs text-red-400 hover:text-red-600 transition-colors">
+                    <button
+                      onClick={() => handleDelete(note.id)}
+                      className="mt-4 text-xs text-red-400 hover:text-red-600 transition-colors"
+                    >
                       Eliminar nota
                     </button>
                   </div>

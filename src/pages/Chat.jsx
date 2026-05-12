@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
+import MicButton from '../components/MicButton'
+import { useSpeechToText } from '../hooks/useSpeechToText'
 
 function formatTime(ts) {
   return new Date(ts).toLocaleTimeString('es-US', { hour: '2-digit', minute: '2-digit' })
@@ -28,6 +30,9 @@ export default function Chat() {
   const inputRef = useRef(null)
 
   const displayName = user?.user_metadata?.full_name ?? user?.email ?? 'Familiar'
+
+  const { recording, interim, error: speechError, start, stop, clearError } =
+    useSpeechToText(text => setInput(prev => prev ? prev + ' ' + text : text))
 
   useEffect(() => {
     loadMessages()
@@ -157,12 +162,30 @@ export default function Chat() {
           <div ref={bottomRef} />
         </div>
 
-        {/* Input */}
+        {/* Input area */}
         <div className="px-4 py-3 bg-white border-t border-green-100 flex-shrink-0">
           {sendError && (
             <p className="text-xs text-red-500 mb-2 px-1">⚠ {sendError}</p>
           )}
-          <form onSubmit={handleSend} className="flex gap-2">
+          {speechError && (
+            <p className="text-xs mb-2 px-1" style={{ color: '#D63031' }}>
+              ⚠ {speechError}{' '}
+              <button onClick={clearError} style={{ textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'inherit', color: 'inherit' }}>
+                Cerrar
+              </button>
+            </p>
+          )}
+          {recording && interim && (
+            <p className="text-xs mb-2 px-1" style={{ color: '#9CA3AF', fontStyle: 'italic' }}>
+              🎤 {interim}
+            </p>
+          )}
+          {recording && !interim && (
+            <p className="text-xs mb-2 px-1" style={{ color: '#D63031', fontWeight: 600 }}>
+              🔴 Escuchando... suelta para enviar
+            </p>
+          )}
+          <form onSubmit={handleSend} className="flex gap-2 items-end">
             <textarea
               ref={inputRef}
               value={input}
@@ -172,6 +195,7 @@ export default function Chat() {
               rows={1}
               className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none"
             />
+            <MicButton recording={recording} onStart={start} onStop={stop} />
             <button
               type="submit"
               disabled={sending || !input.trim()}
