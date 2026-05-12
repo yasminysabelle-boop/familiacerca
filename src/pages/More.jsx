@@ -69,7 +69,7 @@ export default function More() {
       return
     }
 
-    setInviteLink(`https://familiacerca.netlify.app/join?token=${token}`)
+    setInviteLink(`${window.location.origin}/join?token=${token}`)
     setStatus('success')
   }
 
