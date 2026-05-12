@@ -70,24 +70,20 @@ export default function JoinFamily() {
     setAccepting(true)
     setAcceptError('')
 
-    const { error: memberError } = await supabase
-      .from('family_members')
-      .insert({
-        user_id:        invitation.user_id,
-        member_user_id: user.id,
-        member_email:   user.email,
-      })
+    const { data: result, error } = await supabase
+      .rpc('accept_family_invitation', { p_token: token })
 
-    if (memberError && memberError.code !== '23505') {
-      setAcceptError('No se pudo unir a la familia: ' + memberError.message)
+    if (error) {
+      setAcceptError('No se pudo unir a la familia: ' + error.message)
       setAccepting(false)
       return
     }
 
-    await supabase
-      .from('family_invitations')
-      .update({ status: 'accepted' })
-      .eq('token', token)
+    if (result === 'invalid') {
+      setAcceptError('Esta invitación ya no es válida o ha expirado.')
+      setAccepting(false)
+      return
+    }
 
     setAccepting(false)
     setAccepted(true)

@@ -57,15 +57,11 @@ export default function More() {
 
     const displayName = user?.user_metadata?.full_name ?? user?.email ?? 'Un familiar'
 
-    const { data, error } = await supabase
-      .from('family_invitations')
-      .insert({
-        user_id:       user.id,
-        invited_email: inviteEmail.trim().toLowerCase(),
-        invited_by:    displayName,
+    const { data: token, error } = await supabase
+      .rpc('create_family_invitation', {
+        p_invited_email: inviteEmail.trim().toLowerCase(),
+        p_invited_by:    displayName,
       })
-      .select('token')
-      .single()
 
     if (error) {
       setInviteError('No se pudo crear la invitación: ' + error.message)
@@ -73,7 +69,7 @@ export default function More() {
       return
     }
 
-    setInviteLink(`https://familiacerca.netlify.app/join?token=${data.token}`)
+    setInviteLink(`https://familiacerca.netlify.app/join?token=${token}`)
     setStatus('success')
   }
 
