@@ -74,7 +74,7 @@ export default function Chat() {
     const { error } = await supabase.from('chat_messages').insert({
       user_id: user.id,
       user_name: displayName,
-      content,
+      message: content,
     })
 
     if (error) {
@@ -142,7 +142,7 @@ export default function Chat() {
                             ? 'bg-primary text-white rounded-br-sm'
                             : 'bg-white border border-green-100 text-gray-800 rounded-bl-sm shadow-sm'
                         }`}>
-                          {msg.content}
+                          {msg.message}
                         </div>
                         <span className={`text-xs text-gray-400 mt-1 ${isMe ? 'mr-1' : 'ml-1'}`}>
                           {formatTime(msg.created_at)}
