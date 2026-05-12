@@ -73,7 +73,7 @@ export default function JoinFamily() {
     const { error: memberError } = await supabase
       .from('family_members')
       .insert({
-        family_id:      invitation.family_id,
+        user_id:        invitation.user_id,
         member_user_id: user.id,
         member_email:   user.email,
       })

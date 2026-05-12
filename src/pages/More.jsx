@@ -60,7 +60,7 @@ export default function More() {
     const { data, error } = await supabase
       .from('family_invitations')
       .insert({
-        family_id:     user.id,
+        user_id:       user.id,
         invited_email: inviteEmail.trim().toLowerCase(),
         invited_by:    displayName,
       })

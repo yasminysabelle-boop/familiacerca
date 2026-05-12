@@ -1,14 +1,23 @@
 -- ================================================================
 -- FamiliaCerca — Family invitations & members
 -- Run this in the Supabase SQL Editor (safe to re-run)
+-- Drops and recreates both tables to ensure a clean state
 -- ================================================================
 
 -- ----------------------------------------------------------------
--- family_invitations
+-- Clean slate (drop in reverse dependency order)
 -- ----------------------------------------------------------------
-create table if not exists public.family_invitations (
+drop table if exists public.family_members    cascade;
+drop table if exists public.family_invitations cascade;
+
+-- ----------------------------------------------------------------
+-- family_invitations
+-- user_id  = auth.uid() of the person who sent the invitation
+-- invited_by = display name of that person (shown on the join page)
+-- ----------------------------------------------------------------
+create table public.family_invitations (
   id            uuid primary key default gen_random_uuid(),
-  family_id     uuid not null,
+  user_id       uuid not null,
   invited_email text not null,
   invited_by    text not null,
   status        text not null default 'pending'
@@ -20,14 +29,11 @@ create table if not exists public.family_invitations (
 
 alter table public.family_invitations enable row level security;
 
-drop policy if exists "family_invitations: owner manage" on public.family_invitations;
-drop policy if exists "family_invitations: public read"  on public.family_invitations;
-
--- The family owner (inviter) can insert, update, and delete their invitations
+-- The inviting user can insert, update, and delete their own invitations
 create policy "family_invitations: owner manage"
   on public.family_invitations for all
-  using  (auth.uid() = family_id)
-  with check (auth.uid() = family_id);
+  using  (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
 
 -- Anyone (including unauthenticated) can read an invitation to validate a token
 create policy "family_invitations: public read"
@@ -36,27 +42,25 @@ create policy "family_invitations: public read"
 
 -- ----------------------------------------------------------------
 -- family_members
+-- user_id        = auth.uid() of the family owner (same as family_invitations.user_id)
+-- member_user_id = auth.uid() of the person who accepted the invite
 -- ----------------------------------------------------------------
-create table if not exists public.family_members (
+create table public.family_members (
   id             uuid primary key default gen_random_uuid(),
-  family_id      uuid not null,
+  user_id        uuid not null,
   member_user_id uuid,
   member_email   text not null,
   joined_at      timestamptz not null default now(),
-  unique (family_id, member_user_id)
+  unique (user_id, member_user_id)
 );
 
 alter table public.family_members enable row level security;
 
-drop policy if exists "family_members: owner manage"        on public.family_members;
-drop policy if exists "family_members: member read own"     on public.family_members;
-drop policy if exists "family_members: authenticated insert" on public.family_members;
-
 -- The family owner can see and manage all members of their group
 create policy "family_members: owner manage"
   on public.family_members for all
-  using  (auth.uid() = family_id)
-  with check (auth.uid() = family_id);
+  using  (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
 
 -- Each member can see their own row
 create policy "family_members: member read own"
