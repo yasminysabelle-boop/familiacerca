@@ -213,6 +213,31 @@ export function Camera({ size, color, strokeWidth }) {
   )
 }
 
+export function ChevronLeft({ size, color, strokeWidth }) {
+  return (
+    <Svg size={size} color={color} strokeWidth={strokeWidth}>
+      <path d="M15 18l-6-6 6-6" />
+    </Svg>
+  )
+}
+
+export function Plus({ size, color, strokeWidth }) {
+  return (
+    <Svg size={size} color={color} strokeWidth={strokeWidth}>
+      <path d="M12 5v14M5 12h14" />
+    </Svg>
+  )
+}
+
+export function Receipt({ size, color, strokeWidth }) {
+  return (
+    <Svg size={size} color={color} strokeWidth={strokeWidth}>
+      <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1z" />
+      <path d="M8 8h8M8 12h8M8 16h4" />
+    </Svg>
+  )
+}
+
 export function UserPlus({ size, color, strokeWidth }) {
   return (
     <Svg size={size} color={color} strokeWidth={strokeWidth}>

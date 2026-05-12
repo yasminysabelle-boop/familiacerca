@@ -15,6 +15,7 @@ const PAGE_TITLES = {
   '/reportes':    'Reportes',
   '/perfil':      'Perfil familiar',
   '/mas':         'Más opciones',
+  '/gastos':      'Cuentas Claras',
 }
 
 const BOTTOM_TABS = [

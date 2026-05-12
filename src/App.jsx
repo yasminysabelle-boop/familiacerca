@@ -17,6 +17,7 @@ import MemoryAlbum from './pages/MemoryAlbum'
 import VoiceDiary from './pages/VoiceDiary'
 import Reports from './pages/Reports'
 import More from './pages/More'
+import Expenses from './pages/Expenses'
 import TermsOfService from './pages/TermsOfService'
 import PrivacyPolicy from './pages/PrivacyPolicy'
 import JoinFamily from './pages/JoinFamily'
@@ -174,6 +175,7 @@ export default function App() {
               <Route path="/reportes"    element={<P><Reports /></P>} />
               <Route path="/perfil"      element={<P><FamilyProfile /></P>} />
               <Route path="/mas"         element={<P><More /></P>} />
+              <Route path="/gastos"      element={<P><Expenses /></P>} />
               <Route path="/join"        element={<JoinFamily />} />
               <Route path="/terminos"    element={<TermsOfService />} />
               <Route path="/privacidad"  element={<PrivacyPolicy />} />

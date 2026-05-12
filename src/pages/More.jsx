@@ -6,12 +6,13 @@ import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import {
   ClipboardCheck, FileText, Image, Mic, BarChart, User,
-  UserPlus, LogOut, ChevronRight, XIcon,
+  Receipt, UserPlus, LogOut, ChevronRight, XIcon,
 } from '../components/Icons'
 
 const MORE_ITEMS = [
+  { to: '/gastos',     Icon: Receipt,        label: 'Cuentas Claras',      desc: 'Gastos del cuidado familiar',           color: '#4A7C59' },
   { to: '/historial',  Icon: ClipboardCheck, label: 'Control de dosis',    desc: 'Historial y foto-pruebas selladas',      color: '#C4623A' },
-  { to: '/notes',      Icon: FileText,        label: 'Notas',               desc: 'Observaciones del cuidado diario',      color: '#4A7C59' },
+  { to: '/notes',      Icon: FileText,        label: 'Notas',               desc: 'Observaciones del cuidado diario',      color: '#C4623A' },
   { to: '/album',      Icon: Image,           label: 'Álbum familiar',      desc: 'Fotos y videos de momentos especiales', color: '#D4A853' },
   { to: '/diario-voz', Icon: Mic,             label: 'Diario de voz',       desc: 'Notas de voz del familiar',             color: '#7C5CBF' },
   { to: '/reportes',   Icon: BarChart,        label: 'Reportes',            desc: 'Análisis semanal y PDF médico',          color: '#2D86A0' },
