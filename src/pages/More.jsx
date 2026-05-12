@@ -1,19 +1,21 @@
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
+import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import {
   ClipboardCheck, FileText, Image, Mic, BarChart, User,
-  LogOut, ChevronRight,
+  UserPlus, LogOut, ChevronRight, XIcon,
 } from '../components/Icons'
 
 const MORE_ITEMS = [
-  { to: '/historial',  Icon: ClipboardCheck, label: 'Control de dosis',    desc: 'Historial y foto-pruebas selladas',    color: '#C4623A' },
-  { to: '/notes',      Icon: FileText,        label: 'Notas',               desc: 'Observaciones del cuidado diario',    color: '#4A7C59' },
+  { to: '/historial',  Icon: ClipboardCheck, label: 'Control de dosis',    desc: 'Historial y foto-pruebas selladas',      color: '#C4623A' },
+  { to: '/notes',      Icon: FileText,        label: 'Notas',               desc: 'Observaciones del cuidado diario',      color: '#4A7C59' },
   { to: '/album',      Icon: Image,           label: 'Álbum familiar',      desc: 'Fotos y videos de momentos especiales', color: '#D4A853' },
-  { to: '/diario-voz', Icon: Mic,             label: 'Diario de voz',       desc: 'Notas de voz del familiar',           color: '#7C5CBF' },
-  { to: '/reportes',   Icon: BarChart,        label: 'Reportes',            desc: 'Análisis semanal y PDF médico',        color: '#2D86A0' },
-  { to: '/perfil',     Icon: User,            label: 'Perfil familiar',     desc: 'Datos de la persona a cuidar',        color: '#C4623A' },
+  { to: '/diario-voz', Icon: Mic,             label: 'Diario de voz',       desc: 'Notas de voz del familiar',             color: '#7C5CBF' },
+  { to: '/reportes',   Icon: BarChart,        label: 'Reportes',            desc: 'Análisis semanal y PDF médico',          color: '#2D86A0' },
+  { to: '/perfil',     Icon: User,            label: 'Perfil familiar',     desc: 'Datos de la persona a cuidar',          color: '#C4623A' },
 ]
 
 export default function More() {
@@ -22,9 +24,74 @@ export default function More() {
   const navigate = useNavigate()
   const caretakerName = user?.user_metadata?.full_name ?? user?.email ?? ''
 
+  const [showModal, setShowModal]     = useState(false)
+  const [inviteEmail, setInviteEmail] = useState('')
+  const [status, setStatus]           = useState('idle') // idle | sending | success | error
+  const [inviteLink, setInviteLink]   = useState('')
+  const [inviteError, setInviteError] = useState('')
+  const [copied, setCopied]           = useState(false)
+
   async function handleSignOut() {
     await signOut()
     navigate('/login')
+  }
+
+  function openModal() {
+    setInviteEmail('')
+    setStatus('idle')
+    setInviteLink('')
+    setInviteError('')
+    setCopied(false)
+    setShowModal(true)
+  }
+
+  function closeModal() {
+    setShowModal(false)
+  }
+
+  async function handleInvite(e) {
+    e.preventDefault()
+    if (!inviteEmail.trim()) return
+    setStatus('sending')
+    setInviteError('')
+
+    const displayName = user?.user_metadata?.full_name ?? user?.email ?? 'Un familiar'
+
+    const { data, error } = await supabase
+      .from('family_invitations')
+      .insert({
+        family_id:     user.id,
+        invited_email: inviteEmail.trim().toLowerCase(),
+        invited_by:    displayName,
+      })
+      .select('token')
+      .single()
+
+    if (error) {
+      setInviteError('No se pudo crear la invitación: ' + error.message)
+      setStatus('error')
+      return
+    }
+
+    setInviteLink(`https://familiacerca.netlify.app/join?token=${data.token}`)
+    setStatus('success')
+  }
+
+  async function copyLink() {
+    try {
+      await navigator.clipboard.writeText(inviteLink)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2500)
+    } catch {
+      // fallback: select the text
+    }
+  }
+
+  const fieldBase = {
+    width: '100%', padding: '12px 14px',
+    border: '1.5px solid #EDE5D8', borderRadius: 12,
+    fontSize: 14, outline: 'none', background: '#FDFAF7',
+    boxSizing: 'border-box', transition: 'all 0.15s',
   }
 
   return (
@@ -98,19 +165,12 @@ export default function More() {
             >
               <div
                 className="flex items-center justify-center flex-shrink-0"
-                style={{
-                  width: 48, height: 48,
-                  borderRadius: 15,
-                  background: `${color}12`,
-                }}
+                style={{ width: 48, height: 48, borderRadius: 15, background: `${color}12` }}
               >
                 <IconComp size={22} color={color} strokeWidth={1.5} />
               </div>
               <div className="flex-1 min-w-0">
-                <p
-                  className="font-bold text-gray-900 text-sm"
-                  style={{ fontFamily: 'Georgia, serif' }}
-                >
+                <p className="font-bold text-gray-900 text-sm" style={{ fontFamily: 'Georgia, serif' }}>
                   {label}
                 </p>
                 <p className="text-xs text-gray-400 mt-0.5">{desc}</p>
@@ -119,6 +179,16 @@ export default function More() {
             </Link>
           ))}
         </div>
+
+        {/* Invite button */}
+        <button
+          onClick={openModal}
+          className="w-full py-3.5 rounded-2xl font-semibold text-sm flex items-center justify-center gap-2.5 mb-3 active:scale-[0.98] transition-transform"
+          style={{ border: '1.5px solid #C4623A', background: '#FFF8F4', color: '#C4623A' }}
+        >
+          <UserPlus size={17} color="#C4623A" strokeWidth={1.75} />
+          Invitar familiar
+        </button>
 
         {/* Sign out */}
         <button
@@ -130,6 +200,148 @@ export default function More() {
           Cerrar sesión
         </button>
       </div>
+
+      {/* Invite modal */}
+      {showModal && (
+        <div
+          style={{
+            position: 'fixed', inset: 0, zIndex: 50,
+            background: 'rgba(0,0,0,0.55)',
+            display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
+            padding: '0 0 env(safe-area-inset-bottom)',
+          }}
+          onClick={e => { if (e.target === e.currentTarget) closeModal() }}
+        >
+          <div style={{
+            width: '100%', maxWidth: 480,
+            background: 'white',
+            borderRadius: '24px 24px 0 0',
+            padding: '28px 24px 40px',
+            boxShadow: '0 -8px 48px rgba(0,0,0,0.2)',
+          }}>
+            {/* Header */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+              <div>
+                <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#1A1A1A' }}>
+                  Invitar familiar
+                </p>
+                <p style={{ fontSize: 12, color: '#9CA3AF', marginTop: 2 }}>
+                  El enlace expira en 24 horas
+                </p>
+              </div>
+              <button
+                onClick={closeModal}
+                style={{ padding: 8, borderRadius: 10, background: '#F3F4F6', border: 'none', cursor: 'pointer' }}
+              >
+                <XIcon size={16} color="#6B7280" strokeWidth={2} />
+              </button>
+            </div>
+
+            {status === 'success' ? (
+              <div>
+                {/* Success state */}
+                <div style={{
+                  padding: '16px', background: '#F0FDF4', border: '1px solid #BBF7D0',
+                  borderRadius: 14, marginBottom: 16,
+                }}>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: '#15803D', marginBottom: 4 }}>
+                    ✓ Invitación creada
+                  </p>
+                  <p style={{ fontSize: 12, color: '#4B7A5D', lineHeight: 1.5 }}>
+                    Comparte este enlace con {inviteEmail}
+                  </p>
+                </div>
+
+                <div style={{
+                  padding: '12px 14px', background: '#F9F5F1',
+                  border: '1.5px solid #EDE5D8', borderRadius: 12, marginBottom: 12,
+                }}>
+                  <p style={{ fontSize: 12, color: '#6B7280', wordBreak: 'break-all', lineHeight: 1.5 }}>
+                    {inviteLink}
+                  </p>
+                </div>
+
+                <button
+                  onClick={copyLink}
+                  style={{
+                    width: '100%', padding: '13px',
+                    background: copied
+                      ? 'linear-gradient(135deg, #4A7C59, #3A6147)'
+                      : 'linear-gradient(135deg, #C4623A, #A85130)',
+                    color: 'white', fontWeight: 700, fontSize: 14,
+                    borderRadius: 14, border: 'none', cursor: 'pointer',
+                    boxShadow: '0 6px 20px rgba(196,98,58,0.3)',
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  {copied ? '¡Copiado!' : 'Copiar enlace'}
+                </button>
+
+                <button
+                  onClick={closeModal}
+                  style={{
+                    width: '100%', marginTop: 10, padding: '12px',
+                    background: 'none', border: 'none', color: '#9CA3AF',
+                    fontSize: 13, cursor: 'pointer',
+                  }}
+                >
+                  Cerrar
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleInvite} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                <div>
+                  <label style={{
+                    display: 'block', fontSize: 11, fontWeight: 700,
+                    color: '#6B7280', letterSpacing: '0.08em',
+                    textTransform: 'uppercase', marginBottom: 6,
+                  }}>
+                    Correo del familiar
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={inviteEmail}
+                    onChange={e => setInviteEmail(e.target.value)}
+                    placeholder="familiar@correo.com"
+                    autoFocus
+                    style={fieldBase}
+                    onFocus={e => { e.target.style.borderColor = '#C4623A'; e.target.style.boxShadow = '0 0 0 3px rgba(196,98,58,0.1)' }}
+                    onBlur={e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.boxShadow = 'none' }}
+                  />
+                </div>
+
+                {inviteError && (
+                  <div style={{
+                    padding: '10px 14px', background: '#FFF0F0',
+                    border: '1px solid #FFBABA', borderRadius: 10, fontSize: 13, color: '#D63031',
+                  }}>
+                    ⚠ {inviteError}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={status === 'sending' || !inviteEmail.trim()}
+                  style={{
+                    width: '100%', padding: '14px',
+                    background: inviteEmail.trim() && status !== 'sending'
+                      ? 'linear-gradient(135deg, #C4623A, #A85130)'
+                      : '#D4C4B8',
+                    color: 'white', fontWeight: 700, fontSize: 14,
+                    borderRadius: 14, border: 'none',
+                    cursor: inviteEmail.trim() && status !== 'sending' ? 'pointer' : 'not-allowed',
+                    boxShadow: inviteEmail.trim() ? '0 6px 20px rgba(196,98,58,0.3)' : 'none',
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  {status === 'sending' ? 'Creando invitación...' : 'Enviar invitación →'}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </Layout>
   )
 }
