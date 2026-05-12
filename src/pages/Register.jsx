@@ -29,7 +29,7 @@ export default function Register() {
     if (err) {
       setError(err.message)
     } else {
-      navigate('/onboarding', { replace: true })
+      navigate('/permisos?next=/onboarding', { replace: true })
     }
   }
 

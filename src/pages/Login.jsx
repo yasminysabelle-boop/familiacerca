@@ -21,7 +21,7 @@ export default function Login() {
     if (err) {
       setError('Correo o contraseña incorrectos.')
     } else {
-      navigate('/dashboard')
+      navigate('/permisos')
     }
   }
 
