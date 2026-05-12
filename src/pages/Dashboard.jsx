@@ -165,23 +165,27 @@ export default function Dashboard() {
               {/* Avatar */}
               <div className="relative flex-shrink-0">
                 <div className="overflow-hidden"
-                  style={{ width: 80, height: 80, borderRadius: '50%',
+                  style={{ width: 56, height: 56, borderRadius: '50%',
                     border: '2.5px solid rgba(212,168,83,0.55)',
                     background: 'rgba(255,255,255,0.12)',
                     boxShadow: '0 4px 24px rgba(0,0,0,0.25)' }}>
                   {profile?.photo_url ? (
                     <img src={profile.photo_url} alt={profile.name} className="w-full h-full object-cover" />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <User size={32} color="rgba(255,255,255,0.55)" strokeWidth={1.2} />
+                    <div className="w-full h-full flex items-center justify-center"
+                      style={{ fontSize: 18, fontWeight: 700, color: 'rgba(255,255,255,0.85)',
+                        letterSpacing: '0.02em', lineHeight: 1, userSelect: 'none' }}>
+                      {profile?.name
+                        ? profile.name.trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase()
+                        : '?'}
                     </div>
                   )}
                 </div>
                 {/* Heart badge */}
                 <div className="absolute -bottom-1 -right-1 flex items-center justify-center animate-heartbeat"
-                  style={{ width: 26, height: 26, borderRadius: '50%', background: 'white',
+                  style={{ width: 22, height: 22, borderRadius: '50%', background: 'white',
                     boxShadow: '0 2px 10px rgba(0,0,0,0.2)' }}>
-                  <Heart size={13} color="#C4623A" strokeWidth={1.5} filled />
+                  <Heart size={11} color="#C4623A" strokeWidth={1.5} filled />
                 </div>
               </div>
 
