@@ -34,6 +34,7 @@ const catFor = id => CATEGORIES.find(c => c.id === id) ?? CATEGORIES[5]
 export default function Expenses() {
   const { user } = useAuth()
   const fileRef = useRef(null)
+  const galleryRef = useRef(null)
   const displayName = user?.user_metadata?.full_name?.split(' ')[0] ?? user?.email ?? ''
 
   const now = new Date()
@@ -555,27 +556,47 @@ export default function Expenses() {
                     </button>
                   </div>
                 ) : (
-                  <button
-                    type="button"
-                    onClick={() => fileRef.current?.click()}
-                    style={{
-                      display: 'flex', alignItems: 'center', gap: 8,
-                      padding: '10px 16px', borderRadius: 12,
-                      border: '1.5px dashed #D4C4B8', background: '#FDF8F4',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    <Camera size={16} color="#C4623A" strokeWidth={1.5} />
-                    <span style={{ fontSize: 13, color: '#C4623A', fontWeight: 600 }}>
-                      Adjuntar recibo
-                    </span>
-                  </button>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button
+                      type="button"
+                      onClick={() => fileRef.current?.click()}
+                      style={{
+                        flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                        padding: '10px 12px', borderRadius: 12,
+                        border: '1.5px dashed #D4C4B8', background: '#FDF8F4',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <span style={{ fontSize: 15 }}>📷</span>
+                      <span style={{ fontSize: 12, color: '#C4623A', fontWeight: 600 }}>Tomar foto</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => galleryRef.current?.click()}
+                      style={{
+                        flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                        padding: '10px 12px', borderRadius: 12,
+                        border: '1.5px dashed #D4C4B8', background: '#FDF8F4',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <span style={{ fontSize: 15 }}>🖼️</span>
+                      <span style={{ fontSize: 12, color: '#C4623A', fontWeight: 600 }}>Elegir de galería</span>
+                    </button>
+                  </div>
                 )}
                 <input
                   ref={fileRef}
                   type="file"
                   accept="image/*"
                   capture="environment"
+                  style={{ display: 'none' }}
+                  onChange={handlePhotoChange}
+                />
+                <input
+                  ref={galleryRef}
+                  type="file"
+                  accept="image/*"
                   style={{ display: 'none' }}
                   onChange={handlePhotoChange}
                 />
