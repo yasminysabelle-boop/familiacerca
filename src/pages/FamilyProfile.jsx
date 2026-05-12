@@ -50,14 +50,16 @@ export default function FamilyProfile() {
       const ext = photoFile.name.split('.').pop()
       const path = `${user.id}/avatar.${ext}`
       const { error: uploadError } = await supabase.storage
-        .from('profile-photos')
+        .from('care-photos')
         .upload(path, photoFile, { upsert: true, contentType: photoFile.type })
 
       if (uploadError) {
-        setSaveError('La foto no se pudo subir, pero el perfil se guardará sin ella.')
+        setSaveError('La foto no se pudo subir: ' + uploadError.message)
+        setSaving(false)
+        return
       } else {
         const { data: { publicUrl } } = supabase.storage
-          .from('profile-photos')
+          .from('care-photos')
           .getPublicUrl(path)
         photo_url = publicUrl
       }
