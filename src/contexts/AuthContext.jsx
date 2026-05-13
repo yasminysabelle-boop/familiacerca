@@ -20,6 +20,22 @@ export function AuthProvider({ children }) {
     return () => subscription.unsubscribe()
   }, [])
 
+  // Update last_seen on login and every 2 minutes while active
+  useEffect(() => {
+    if (!user) return
+
+    const ping = () =>
+      supabase
+        .from('user_profiles')
+        .update({ last_seen: new Date().toISOString() })
+        .eq('id', user.id)
+        .then()
+
+    ping()
+    const interval = setInterval(ping, 2 * 60 * 1000)
+    return () => clearInterval(interval)
+  }, [user])
+
   const signIn = (email, password) =>
     supabase.auth.signInWithPassword({ email, password })
 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import { useFamily } from '../contexts/FamilyContext'
 import { supabase } from '../lib/supabase'
 import Logo from '../components/Logo'
 import { Heart, UserPlus } from '../components/Icons'
@@ -11,6 +12,7 @@ export default function JoinFamily() {
   const token = searchParams.get('token')
   const navigate = useNavigate()
   const { user, signIn, signUp } = useAuth()
+  const { refresh: refreshFamily } = useFamily()
 
   const [invitation, setInvitation] = useState(null)
   const [invLoading, setInvLoading] = useState(true)
@@ -87,6 +89,7 @@ export default function JoinFamily() {
 
     setAccepting(false)
     setAccepted(true)
+    refreshFamily() // connect member to family group immediately
   }
 
   async function handleAuth(e) {

@@ -20,11 +20,31 @@ export function FamilyProvider({ children }) {
 
   async function fetchProfile() {
     setLoading(true)
-    const { data } = await supabase
+
+    let { data } = await supabase
       .from('care_profiles')
       .select('*')
       .eq('user_id', user.id)
       .maybeSingle()
+
+    if (!data) {
+      // User is an invited member — look up the family owner's care profile
+      const { data: membership } = await supabase
+        .from('family_members')
+        .select('user_id')
+        .eq('member_user_id', user.id)
+        .maybeSingle()
+
+      if (membership) {
+        const { data: ownerProfile } = await supabase
+          .from('care_profiles')
+          .select('*')
+          .eq('user_id', membership.user_id)
+          .maybeSingle()
+        data = ownerProfile
+      }
+    }
+
     setProfile(data ?? null)
     setLoading(false)
   }

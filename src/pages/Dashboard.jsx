@@ -74,6 +74,8 @@ export default function Dashboard() {
   const [stats, setStats] = useState({ medications: 0, events: 0, notes: 0 })
   const [recentNotes, setRecentNotes] = useState([])
   const [logs7, setLogs7] = useState([])
+  const [members, setMembers] = useState([])
+  const [memberProfiles, setMemberProfiles] = useState({})
   const [day10Dismissed, setDay10Dismissed] = useState(
     () => !!localStorage.getItem('fc_day10_dismissed')
   )
@@ -102,6 +104,32 @@ export default function Dashboard() {
       setRecentNotes(latest ?? [])
       setLogs7(logs ?? [])
     })
+
+    async function fetchMembers() {
+      const { data: memberRows } = await supabase
+        .from('family_members')
+        .select('member_user_id, member_email, joined_at')
+        .eq('user_id', user.id)
+
+      if (!memberRows?.length) return
+      setMembers(memberRows)
+
+      const ids = memberRows.map(m => m.member_user_id).filter(Boolean)
+      if (!ids.length) return
+
+      const { data: profiles } = await supabase
+        .from('user_profiles')
+        .select('id, full_name, avatar_url, last_seen')
+        .in('id', ids)
+
+      if (profiles) {
+        const map = {}
+        profiles.forEach(p => { map[p.id] = p })
+        setMemberProfiles(map)
+      }
+    }
+
+    fetchMembers()
   }, [user])
 
   const confirmed7 = logs7.filter(l => l.status === 'confirmed').length
@@ -365,6 +393,44 @@ export default function Dashboard() {
           <StatCard Icon={Calendar} label="Eventos"      value={stats.events}      to="/calendar"    accentColor="#4A7C59" />
           <StatCard Icon={FileText} label="Notas"        value={stats.notes}       to="/notes"       accentColor="#D4A853" />
         </div>
+
+        {/* ── Family members ── */}
+        {members.length > 0 && (
+          <div className="bg-white rounded-2xl p-5 mb-5"
+            style={{ boxShadow: '0 3px 20px rgba(0,0,0,0.06)', border: '1px solid #EDE5D8' }}>
+            <p className="font-bold text-gray-900 text-sm mb-4" style={{ fontFamily: 'Georgia, serif' }}>
+              Familia
+            </p>
+            <div className="flex gap-5 flex-wrap">
+              {members.map(member => {
+                const mp = memberProfiles[member.member_user_id]
+                const isOnline = mp?.last_seen &&
+                  Date.now() - new Date(mp.last_seen).getTime() < 5 * 60 * 1000
+                const initials = (mp?.full_name || member.member_email || '?').charAt(0).toUpperCase()
+                const displayName = mp?.full_name?.split(' ')[0] || member.member_email?.split('@')[0] || '—'
+                return (
+                  <div key={member.member_user_id || member.member_email} className="flex flex-col items-center gap-1.5">
+                    <div className="relative">
+                      <div className="w-11 h-11 rounded-full overflow-hidden flex items-center justify-center flex-shrink-0"
+                        style={{ background: '#FDF0EB', border: '2px solid #EDE5D8' }}>
+                        {mp?.avatar_url ? (
+                          <img src={mp.avatar_url} alt={mp.full_name} className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="text-sm font-bold" style={{ color: '#C4623A' }}>{initials}</span>
+                        )}
+                      </div>
+                      <div className="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white"
+                        style={{ background: isOnline ? '#22C55E' : '#9CA3AF' }} />
+                    </div>
+                    <p className="text-xs text-gray-600 text-center truncate" style={{ maxWidth: 56 }}>
+                      {displayName}
+                    </p>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
 
         {/* ── Wellness summary ── */}
         {(logs7.length > 0 || concerns.length > 0) && (
