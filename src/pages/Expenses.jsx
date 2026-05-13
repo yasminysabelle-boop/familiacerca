@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
+import { useFamily } from '../contexts/FamilyContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import { ChevronLeft, ChevronRight, Plus, XIcon, Camera } from '../components/Icons'
@@ -33,6 +34,7 @@ const catFor = id => CATEGORIES.find(c => c.id === id) ?? CATEGORIES[5]
 
 export default function Expenses() {
   const { user } = useAuth()
+  const { ownerId } = useFamily()
   const fileRef = useRef(null)
   const galleryRef = useRef(null)
   const displayName = user?.user_metadata?.full_name?.split(' ')[0] ?? user?.email ?? ''
@@ -66,7 +68,7 @@ export default function Expenses() {
     const { data } = await supabase
       .from('care_expenses')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('user_id', ownerId)
       .gte('date', from)
       .lte('date', to)
       .order('date', { ascending: false })
@@ -132,7 +134,7 @@ export default function Expenses() {
     }
 
     const { error } = await supabase.from('care_expenses').insert({
-      user_id:           user.id,
+      user_id:           ownerId,
       amount:            parseFloat(form.amount),
       category:          form.category,
       description:       form.description.trim() || null,
@@ -153,7 +155,7 @@ export default function Expenses() {
   }
 
   async function handleDelete(id) {
-    await supabase.from('care_expenses').delete().eq('id', id).eq('user_id', user.id)
+    await supabase.from('care_expenses').delete().eq('id', id).eq('user_id', ownerId)
     setExpenses(prev => prev.filter(e => e.id !== id))
   }
 

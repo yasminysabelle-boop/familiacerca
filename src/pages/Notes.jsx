@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
+import { useFamily } from '../contexts/FamilyContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import MicButton from '../components/MicButton'
@@ -10,6 +11,7 @@ const emptyForm = { title: '', content: '', tags: [] }
 
 export default function Notes() {
   const { user } = useAuth()
+  const { ownerId } = useFamily()
   const [notes, setNotes] = useState([])
   const [form, setForm] = useState(emptyForm)
   const [showForm, setShowForm] = useState(false)
@@ -23,14 +25,14 @@ export default function Notes() {
       setForm(prev => ({ ...prev, content: prev.content ? prev.content + ' ' + text : text }))
     )
 
-  useEffect(() => { if (user) fetchNotes() }, [user])
+  useEffect(() => { if (user && ownerId) fetchNotes() }, [user, ownerId])
 
   async function fetchNotes() {
     setLoading(true)
     const { data } = await supabase
       .from('notes')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('user_id', ownerId)
       .order('created_at', { ascending: false })
     setNotes(data ?? [])
     setLoading(false)
@@ -52,7 +54,7 @@ export default function Notes() {
   async function handleSubmit(e) {
     e.preventDefault()
     setSaving(true)
-    await supabase.from('notes').insert({ ...form, user_id: user.id })
+    await supabase.from('notes').insert({ ...form, user_id: ownerId })
     setForm(emptyForm)
     setShowForm(false)
     setSaving(false)

@@ -6,12 +6,41 @@ import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import { CheckIcon, User } from '../components/Icons'
 
+// Mood lookup — handles both stored text values and emoji values
+const MOOD_MAP = {
+  good:    { emoji: '😊', color: '#22C55E' },
+  regular: { emoji: '😐', color: '#D4A853' },
+  hard:    { emoji: '😔', color: '#D63031' },
+  '😊':   { emoji: '😊', color: '#22C55E' },
+  '😐':   { emoji: '😐', color: '#D4A853' },
+  '😔':   { emoji: '😔', color: '#D63031' },
+}
+
+function getMoodEmoji(val) { return MOOD_MAP[val]?.emoji ?? '🎙️' }
+function getMoodColor(val) { return MOOD_MAP[val]?.color ?? '#7C5CBF' }
+
 function fmtTime(t) {
   if (!t) return ''
   const [h, m] = t.split(':').map(Number)
   const ampm = h >= 12 ? 'pm' : 'am'
   const h12 = h % 12 || 12
   return `${h12}:${String(m).padStart(2, '0')}${ampm}`
+}
+
+function fmtTimestamp(date) {
+  if (!date) return ''
+  return date.toLocaleTimeString('es-US', { hour: 'numeric', minute: '2-digit', hour12: true })
+}
+
+function minutesAgo(timeStr, todayKey) {
+  if (!timeStr) return null
+  const [h, m] = timeStr.split(':').map(Number)
+  const scheduled = new Date(`${todayKey}T${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:00`)
+  const diff = Math.floor((Date.now() - scheduled) / 60000)
+  if (diff <= 0) return null
+  if (diff < 60) return `hace ${diff} min`
+  const hrs = Math.floor(diff / 60)
+  return `hace ${hrs} hora${hrs !== 1 ? 's' : ''}`
 }
 
 function dateLabelFor(dateKey, todayKey, yesterdayKey) {
@@ -30,10 +59,11 @@ function sortSection(events) {
   })
 }
 
-// ── Sub-components ────────────────────────────────────────────────────────────
+// ── Card components ───────────────────────────────────────────────────────────
 
-function PendingCard({ evt, confirming, onConfirm }) {
+function PendingCard({ evt, confirming, onConfirm, todayKey }) {
   const busy = confirming === evt.medicationId
+  const ago = minutesAgo(evt.medTime, todayKey)
   return (
     <div style={{
       background: '#FFFBEB', borderRadius: 16,
@@ -41,16 +71,18 @@ function PendingCard({ evt, confirming, onConfirm }) {
       padding: '12px 14px',
       boxShadow: '0 2px 8px rgba(196,98,58,0.06)',
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        <span style={{ fontSize: 20, flexShrink: 0 }}>⚠️</span>
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+        <span style={{ fontSize: 20, flexShrink: 0, marginTop: 1 }}>⚠️</span>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ fontSize: 14, fontWeight: 700, color: '#92400E', margin: 0 }}>
-            {evt.medName}
+          <p style={{ fontSize: 14, fontWeight: 700, color: '#92400E', margin: 0, lineHeight: 1.4 }}>
+            {evt.medName}{evt.medDosage ? ` · ${evt.medDosage}` : ''} pendiente
+            {ago && <span style={{ fontWeight: 400, color: '#B45309' }}> — {ago}</span>}
           </p>
-          <p style={{ fontSize: 11, color: '#B45309', marginTop: 2 }}>
-            {evt.medDosage && `${evt.medDosage} · `}
-            {evt.medTime ? `Pendiente desde las ${fmtTime(evt.medTime)}` : 'Sin horario asignado'}
-          </p>
+          {evt.medTime && (
+            <p style={{ fontSize: 11, color: '#B45309', marginTop: 2 }}>
+              Programado a las {fmtTime(evt.medTime)}
+            </p>
+          )}
         </div>
       </div>
       <button
@@ -66,9 +98,7 @@ function PendingCard({ evt, confirming, onConfirm }) {
           transition: 'all 0.2s',
         }}
       >
-        {busy ? (
-          'Guardando...'
-        ) : (
+        {busy ? 'Guardando...' : (
           <>
             <CheckIcon size={14} color="white" strokeWidth={2.5} />
             Marcar como dado
@@ -80,9 +110,8 @@ function PendingCard({ evt, confirming, onConfirm }) {
 }
 
 function ConfirmedCard({ evt }) {
-  const time = evt.timestamp
-    ? evt.timestamp.toLocaleTimeString('es-US', { hour: 'numeric', minute: '2-digit' })
-    : null
+  const time = evt.timestamp ? fmtTimestamp(evt.timestamp) : null
+  const name = evt.confirmedBy ? evt.confirmedBy.split(' ')[0] : null
   return (
     <div style={{
       background: '#F0FDF4', borderRadius: 16,
@@ -92,38 +121,28 @@ function ConfirmedCard({ evt }) {
     }}>
       <span style={{ fontSize: 16, flexShrink: 0 }}>💊</span>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ fontSize: 13, fontWeight: 600, color: '#15803D', margin: 0 }}>
-          {evt.medName}
-          {evt.medDosage && (
-            <span style={{ fontWeight: 400, color: '#4B7A5D' }}> · {evt.medDosage}</span>
-          )}
+        <p style={{ fontSize: 13, fontWeight: 600, color: '#15803D', margin: 0, lineHeight: 1.4 }}>
+          {time && <span style={{ fontWeight: 400, color: '#4B7A5D' }}>{time} — </span>}
+          {name ? `${name} dio ${evt.medName}` : evt.medName}
+          {evt.medDosage ? <span style={{ fontWeight: 400, color: '#4B7A5D' }}> {evt.medDosage}</span> : ''}
         </p>
-        {(evt.confirmedBy || time) && (
-          <p style={{ fontSize: 11, color: '#4ADE80', marginTop: 2 }}>
-            ✓ {evt.confirmedBy ? `${evt.confirmedBy.split(' ')[0]} lo dio` : 'Dado'}
-            {time && ` · ${time}`}
-          </p>
-        )}
       </div>
-      <span style={{
-        fontSize: 10, fontWeight: 700, color: '#16A34A',
-        background: '#DCFCE7', padding: '3px 8px', borderRadius: 6, flexShrink: 0,
-      }}>
-        ✓ Dado
-      </span>
+      <span style={{ fontSize: 16, flexShrink: 0 }}>✅</span>
     </div>
   )
 }
 
 function MemoryCard({ evt, isExpanded, onToggle }) {
-  const moodColor = evt.mood === '😊' ? '#7C5CBF' : evt.mood === '😔' ? '#9CA3AF' : '#C4623A'
+  const color = getMoodColor(evt.mood)
+  const emoji = getMoodEmoji(evt.mood)
+  const name = evt.recorderName ? evt.recorderName.split(' ')[0] : null
   return (
     <div
       onClick={onToggle}
       style={{
         background: 'white', borderRadius: 16,
         border: '1px solid #EDE5D8',
-        borderLeft: `3px solid ${moodColor}`,
+        borderLeft: `3px solid ${color}`,
         padding: '12px 14px',
         cursor: 'pointer',
         boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
@@ -133,10 +152,8 @@ function MemoryCard({ evt, isExpanded, onToggle }) {
         <span style={{ fontSize: 16, flexShrink: 0 }}>🎙️</span>
         <div style={{ flex: 1, minWidth: 0 }}>
           <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', margin: 0 }}>
-            {evt.recorderName
-              ? `${evt.recorderName.split(' ')[0]} dejó una memoria`
-              : 'Memoria de voz'}
-            {evt.mood && <span style={{ marginLeft: 5 }}>{evt.mood}</span>}
+            {name ? `${name} dejó una memoria` : 'Memoria de voz'}
+            {evt.mood && <span style={{ marginLeft: 5 }}>{emoji}</span>}
           </p>
           {evt.transcription && !isExpanded && (
             <p style={{
@@ -170,7 +187,42 @@ function MemoryCard({ evt, isExpanded, onToggle }) {
   )
 }
 
+function PhotoCard({ evt }) {
+  const name = evt.uploaderName ? evt.uploaderName.split(' ')[0] : null
+  return (
+    <div style={{
+      background: 'white', borderRadius: 16,
+      border: '1px solid #EDE5D8',
+      overflow: 'hidden',
+      boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+    }}>
+      <img
+        src={evt.fileUrl}
+        alt={evt.caption ?? 'Foto familiar'}
+        style={{ width: '100%', height: 180, objectFit: 'cover', display: 'block' }}
+      />
+      <div style={{ padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
+        <span style={{ fontSize: 16, flexShrink: 0 }}>📸</span>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', margin: 0 }}>
+            {name ? `${name} subió una foto` : 'Nueva foto'}
+          </p>
+          {evt.caption && (
+            <p style={{
+              fontSize: 11, color: '#9CA3AF', marginTop: 2,
+              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+            }}>
+              {evt.caption}
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function ExpenseCard({ evt }) {
+  const name = evt.paidBy ? evt.paidBy.split(' ')[0] : null
   return (
     <div style={{
       background: 'white', borderRadius: 16,
@@ -182,13 +234,8 @@ function ExpenseCard({ evt }) {
       <span style={{ fontSize: 16, flexShrink: 0 }}>💰</span>
       <div style={{ flex: 1, minWidth: 0 }}>
         <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', margin: 0 }}>
-          {evt.description}
+          {name ? `${name} pagó ${evt.description}` : evt.description}
         </p>
-        {evt.paidBy && (
-          <p style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>
-            Pagado por {evt.paidBy.split(' ')[0]}
-          </p>
-        )}
       </div>
       {evt.amount != null && (
         <span style={{ fontSize: 14, fontWeight: 700, color: '#4A7C59', flexShrink: 0 }}>
@@ -199,7 +246,13 @@ function ExpenseCard({ evt }) {
   )
 }
 
-function AppointmentCard({ evt }) {
+function AppointmentCard({ evt, todayKey, tomorrowKey }) {
+  const isToday = evt.dateKey === todayKey
+  const isTomorrow = evt.dateKey === tomorrowKey
+  const whenLabel = isToday ? 'hoy' : isTomorrow ? 'mañana' : null
+  const timeText = evt.appointmentTime
+    ? (whenLabel ? `${whenLabel} a las ${fmtTime(evt.appointmentTime)}` : fmtTime(evt.appointmentTime))
+    : 'Ver en calendario'
   return (
     <Link
       to="/calendar"
@@ -217,9 +270,7 @@ function AppointmentCard({ evt }) {
         <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', margin: 0 }}>
           {evt.appointmentTitle}
         </p>
-        <p style={{ fontSize: 11, color: '#3B82F6', marginTop: 2 }}>
-          {evt.appointmentTime ? fmtTime(evt.appointmentTime) : 'Ver en calendario'}
-        </p>
+        <p style={{ fontSize: 11, color: '#3B82F6', marginTop: 2 }}>{timeText}</p>
       </div>
       <span style={{ color: '#BBBBBB', fontSize: 14 }}>›</span>
     </Link>
@@ -240,19 +291,17 @@ function CaregiverCard({ evt }) {
       <p style={{ fontSize: 13, color: '#6D28D9', lineHeight: 1.5, margin: 0 }}>
         {evt.caregiverName.split(' ')[0]} coordinó{' '}
         <strong>{evt.weekCount} dosis</strong> esta semana.
-        ¡Gracias por tu dedicación!
+        El cuidado invisible merece ser visto. 💙
       </p>
     </div>
   )
 }
 
-function TimelineEvent({ evt, confirming, expandedAudio, onConfirm, onToggleAudio }) {
+function TimelineEvent({ evt, confirming, expandedAudio, onConfirm, onToggleAudio, todayKey, tomorrowKey }) {
   if (evt.type === 'MED_PENDING') {
-    return <PendingCard evt={evt} confirming={confirming} onConfirm={onConfirm} />
+    return <PendingCard evt={evt} confirming={confirming} onConfirm={onConfirm} todayKey={todayKey} />
   }
-  if (evt.type === 'MED_CONFIRMED') {
-    return <ConfirmedCard evt={evt} />
-  }
+  if (evt.type === 'MED_CONFIRMED') return <ConfirmedCard evt={evt} />
   if (evt.type === 'VOICE_MEMORY') {
     return (
       <MemoryCard
@@ -262,15 +311,12 @@ function TimelineEvent({ evt, confirming, expandedAudio, onConfirm, onToggleAudi
       />
     )
   }
-  if (evt.type === 'EXPENSE') {
-    return <ExpenseCard evt={evt} />
-  }
+  if (evt.type === 'PHOTO') return <PhotoCard evt={evt} />
+  if (evt.type === 'EXPENSE') return <ExpenseCard evt={evt} />
   if (evt.type === 'APPOINTMENT') {
-    return <AppointmentCard evt={evt} />
+    return <AppointmentCard evt={evt} todayKey={todayKey} tomorrowKey={tomorrowKey} />
   }
-  if (evt.type === 'CAREGIVER_CARD') {
-    return <CaregiverCard evt={evt} />
-  }
+  if (evt.type === 'CAREGIVER_CARD') return <CaregiverCard evt={evt} />
   return null
 }
 
@@ -323,6 +369,8 @@ export default function Dashboard() {
   const todayKey = now.toISOString().split('T')[0]
   const yesterday = new Date(now); yesterday.setDate(yesterday.getDate() - 1)
   const yesterdayKey = yesterday.toISOString().split('T')[0]
+  const tomorrow = new Date(now); tomorrow.setDate(tomorrow.getDate() + 1)
+  const tomorrowKey = tomorrow.toISOString().split('T')[0]
   const sevenAgo = new Date(now); sevenAgo.setDate(sevenAgo.getDate() - 6)
   const sevenAgoKey = sevenAgo.toISOString().split('T')[0]
 
@@ -339,10 +387,54 @@ export default function Dashboard() {
     if (user && ownerId) fetchTimeline()
   }, [user, ownerId])
 
+  // Schedule daily browser notifications (fires when app is open/in background)
+  useEffect(() => {
+    if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return
+
+    const patientName = profile?.name ?? 'el familiar'
+
+    function msUntil(targetH, targetM) {
+      const n = new Date()
+      const t = new Date(n)
+      t.setHours(targetH, targetM, 0, 0)
+      if (t <= n) t.setDate(t.getDate() + 1)
+      return t - n
+    }
+
+    // 7:30am — morning ritual
+    const morningTimer = setTimeout(() => {
+      new Notification('Buenos días 🌅', {
+        body: `Hoy toca dar medicamentos. ${firstName} cuida hoy.`,
+        icon: '/icon-192.png',
+        tag: 'morning-ritual',
+      })
+    }, msUntil(7, 30))
+
+    // 9pm — evening tranquility
+    const eveningTimer = setTimeout(() => {
+      const todaySec = sections.find(s => s.dateKey === todayKey)
+      const confirmed = todaySec?.events.filter(e => e.type === 'MED_CONFIRMED').length ?? 0
+      const pending = todaySec?.events.filter(e => e.type === 'MED_PENDING').length ?? 0
+      const body = pending > 0
+        ? `Faltó ${pending} medicamento${pending !== 1 ? 's' : ''} hoy. Mañana es un nuevo día 💙`
+        : `Todo en orden hoy 💙 — ${confirmed} medicamento${confirmed !== 1 ? 's' : ''} dado${confirmed !== 1 ? 's' : ''}, ${firstName} estuvo con ${patientName}`
+      new Notification('FamiliaCerca', {
+        body,
+        icon: '/icon-192.png',
+        tag: 'evening-summary',
+      })
+    }, msUntil(21, 0))
+
+    return () => {
+      clearTimeout(morningTimer)
+      clearTimeout(eveningTimer)
+    }
+  }, [profile?.name, firstName, sections, todayKey])
+
   async function fetchTimeline() {
     setLoading(true)
 
-    // Step 1: get all family member IDs so we can include their voice memories
+    // Get all family member IDs for shared data queries
     const { data: familyMembers } = await supabase
       .from('family_members')
       .select('member_user_id')
@@ -353,12 +445,12 @@ export default function Dashboard() {
       ...(familyMembers ?? []).map(m => m.member_user_id).filter(Boolean),
     ]
 
-    // Step 2: parallel queries
     const [
       { data: meds },
       { data: todayLogs },
       { data: confirmedLogs },
-      { data: memories },
+      { data: voiceMemories },
+      { data: photoMemories },
       { data: expenses },
       { data: events },
     ] = await Promise.all([
@@ -382,7 +474,14 @@ export default function Dashboard() {
         .order('created_at', { ascending: false })
         .limit(20),
 
-      supabase.from('expenses')
+      supabase.from('memories')
+        .select('*')
+        .in('user_id', allFamilyIds)
+        .gte('created_at', sevenAgoKey + 'T00:00:00Z')
+        .order('created_at', { ascending: false })
+        .limit(10),
+
+      supabase.from('care_expenses')
         .select('*')
         .eq('user_id', ownerId)
         .gte('created_at', sevenAgoKey + 'T00:00:00Z')
@@ -392,18 +491,17 @@ export default function Dashboard() {
       supabase.from('events')
         .select('*')
         .eq('user_id', ownerId)
-        .gte('start_date', todayKey)
-        .order('start_date', { ascending: true })
+        .gte('date', todayKey)
+        .order('date', { ascending: true })
         .limit(5),
     ])
 
-    // Build today's confirmed map
     const todayLogMap = {}
     ;(todayLogs ?? []).forEach(l => { todayLogMap[l.medication_id] = l })
 
     const allEvents = []
 
-    // ── Pending medications (scheduled time has passed, not confirmed) ──
+    // ── Pending medications (scheduled time passed, not confirmed) ──
     for (const med of (meds ?? [])) {
       if (todayLogMap[med.id]?.status === 'confirmed') continue
       const times = med.scheduled_times?.length
@@ -413,7 +511,6 @@ export default function Dashboard() {
         const [th, tm] = t.split(':').map(Number)
         return th * 60 + tm <= nowMinutes
       })
-      // Show if any scheduled time passed, or if no times at all (show all day)
       if (pastTimes.length > 0 || times.length === 0) {
         allEvents.push({
           id: `pending-${med.id}`,
@@ -446,23 +543,38 @@ export default function Dashboard() {
     }
 
     // ── Voice memories ──
-    for (const mem of (memories ?? [])) {
+    for (const mem of (voiceMemories ?? [])) {
       const dateKey = mem.created_at.split('T')[0]
       allEvents.push({
         id: `mem-${mem.id}`,
         type: 'VOICE_MEMORY',
         timestamp: new Date(mem.created_at),
         dateKey,
-        audioUrl: mem.file_url,
+        audioUrl: mem.audio_url,
         transcription: mem.transcription,
         recorderName: mem.user_profiles?.full_name ?? null,
         mood: mem.mood ?? null,
       })
     }
 
+    // ── Photo memories ──
+    for (const photo of (photoMemories ?? [])) {
+      const dateKey = photo.created_at.split('T')[0]
+      allEvents.push({
+        id: `photo-${photo.id}`,
+        type: 'PHOTO',
+        timestamp: new Date(photo.created_at),
+        dateKey,
+        fileUrl: photo.file_url,
+        fileType: photo.file_type,
+        uploaderName: photo.uploader_name ?? null,
+        caption: photo.caption ?? null,
+      })
+    }
+
     // ── Expenses ──
     for (const exp of (expenses ?? [])) {
-      const ts = exp.created_at ?? exp.date ?? todayKey
+      const ts = exp.created_at ?? (exp.date ? exp.date + 'T12:00:00' : todayKey)
       const dateKey = ts.split('T')[0]
       allEvents.push({
         id: `exp-${exp.id}`,
@@ -470,20 +582,22 @@ export default function Dashboard() {
         timestamp: new Date(ts),
         dateKey,
         amount: exp.amount,
-        description: exp.description ?? exp.title ?? 'Gasto',
-        paidBy: exp.paid_by_name ?? null,
+        description: exp.description ?? exp.category ?? 'Gasto',
+        paidBy: exp.paid_by ?? null,
       })
     }
 
     // ── Upcoming appointments ──
     for (const ev of (events ?? [])) {
+      const evDate = ev.date
+      const evTime = ev.time
       allEvents.push({
         id: `evt-${ev.id}`,
         type: 'APPOINTMENT',
-        timestamp: new Date(`${ev.start_date}T${ev.start_time ?? '09:00'}:00`),
-        dateKey: ev.start_date,
+        timestamp: new Date(`${evDate}T${evTime ?? '09:00'}:00`),
+        dateKey: evDate,
         appointmentTitle: ev.title,
-        appointmentTime: ev.start_time ?? null,
+        appointmentTime: evTime ?? null,
       })
     }
 
@@ -551,7 +665,6 @@ export default function Dashboard() {
     setConfirming(null)
   }
 
-  // Summary counts for the header
   const todaySection = sections.find(s => s.dateKey === todayKey)
   const pendingCount = todaySection?.events.filter(e => e.type === 'MED_PENDING').length ?? 0
   const confirmedTodayCount = todaySection?.events.filter(e => e.type === 'MED_CONFIRMED').length ?? 0
@@ -560,7 +673,7 @@ export default function Dashboard() {
     <Layout>
       <div style={{ padding: '12px 16px 24px', maxWidth: 600 }}>
 
-        {/* ── Greeting header ── */}
+        {/* Greeting header */}
         <div style={{
           background: 'linear-gradient(135deg, #BF5E37 0%, #7A3418 100%)',
           borderRadius: 20, padding: '16px 18px', marginBottom: 16,
@@ -621,7 +734,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* ── Timeline ── */}
+        {/* Family timeline */}
         {loading ? (
           <div style={{ display: 'flex', justifyContent: 'center', padding: 48 }}>
             <div style={{
@@ -650,9 +763,9 @@ export default function Dashboard() {
                     confirming={confirming}
                     expandedAudio={expandedAudio}
                     onConfirm={quickConfirm}
-                    onToggleAudio={id =>
-                      setExpandedAudio(prev => (prev === id ? null : id))
-                    }
+                    onToggleAudio={id => setExpandedAudio(prev => prev === id ? null : id)}
+                    todayKey={todayKey}
+                    tomorrowKey={tomorrowKey}
                   />
                 ))}
               </div>

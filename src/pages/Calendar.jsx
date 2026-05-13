@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
+import { useFamily } from '../contexts/FamilyContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 
@@ -18,6 +19,7 @@ const typeLabel = t => EVENT_TYPES.find(x => x.value === t)?.label ?? t
 
 export default function Calendar() {
   const { user } = useAuth()
+  const { ownerId } = useFamily()
   const fileRef  = useRef(null)
   const today    = new Date()
 
@@ -37,13 +39,13 @@ export default function Calendar() {
   const [proofSaving, setProofSaving] = useState(false)
   const [proofs, setProofs]           = useState({}) // eventId -> proof
 
-  useEffect(() => { if (user) fetchEvents() }, [user, year, month])
+  useEffect(() => { if (user && ownerId) fetchEvents() }, [user, ownerId, year, month])
 
   async function fetchEvents() {
     const start = `${year}-${String(month + 1).padStart(2, '0')}-01`
     const end   = `${year}-${String(month + 1).padStart(2, '0')}-31`
     const { data } = await supabase
-      .from('events').select('*').eq('user_id', user.id)
+      .from('events').select('*').eq('user_id', ownerId)
       .gte('date', start).lte('date', end).order('date')
     setEvents(data ?? [])
 
@@ -61,7 +63,7 @@ export default function Calendar() {
 
   async function handleSubmit(e) {
     e.preventDefault(); setSaving(true)
-    await supabase.from('events').insert({ ...form, time: form.time || null, user_id: user.id })
+    await supabase.from('events').insert({ ...form, time: form.time || null, user_id: ownerId })
     setForm(emptyForm); setShowForm(false); setSaving(false); fetchEvents()
   }
 
@@ -102,7 +104,7 @@ export default function Calendar() {
 
     await supabase.from('appointment_proofs').upsert({
       event_id: proofEvent.id,
-      user_id: user.id,
+      user_id: user.id, // proof uploader stays as the actual user (not owner)
       photo_url,
       notes: proofNote || null,
       attended: true,
