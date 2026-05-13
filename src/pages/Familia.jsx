@@ -1,0 +1,446 @@
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext'
+import { useFamily } from '../contexts/FamilyContext'
+import { supabase } from '../lib/supabase'
+import Layout from '../components/Layout'
+import { UserPlus, Phone, Mail, MapPin, XIcon, BookOpen, Users } from '../components/Icons'
+
+export default function Familia() {
+  const { user } = useAuth()
+  const { profile, ownerId } = useFamily()
+  const [members, setMembers] = useState([])
+  const [memberProfiles, setMemberProfiles] = useState({})
+  const [loading, setLoading] = useState(true)
+  const [memberModal, setMemberModal] = useState(null)
+  const [memberContact, setMemberContact] = useState(undefined)
+  const [showInvite, setShowInvite] = useState(false)
+  const [inviteEmail, setInviteEmail] = useState('')
+  const [inviteStatus, setInviteStatus] = useState('idle')
+  const [inviteLink, setInviteLink] = useState('')
+  const [copied, setCopied] = useState(false)
+
+  const displayName = user?.user_metadata?.full_name ?? user?.email ?? 'Familiar'
+
+  useEffect(() => {
+    if (user && ownerId) fetchMembers()
+  }, [user, ownerId])
+
+  async function fetchMembers() {
+    setLoading(true)
+    const { data: memberRows } = await supabase
+      .from('family_members')
+      .select('member_user_id, member_email, joined_at')
+      .eq('user_id', ownerId)
+
+    setMembers(memberRows ?? [])
+
+    const ids = (memberRows ?? []).map(m => m.member_user_id).filter(Boolean)
+    if (ids.length) {
+      const { data: profiles } = await supabase
+        .from('user_profiles')
+        .select('id, full_name, avatar_url, last_seen')
+        .in('id', ids)
+      const map = {}
+      ;(profiles ?? []).forEach(p => { map[p.id] = p })
+      setMemberProfiles(map)
+    }
+    setLoading(false)
+  }
+
+  function isOnline(mp) {
+    return mp?.last_seen && Date.now() - new Date(mp.last_seen).getTime() < 5 * 60 * 1000
+  }
+
+  function openModal(member, mp) {
+    setMemberModal({ member, profile: mp })
+    setMemberContact(undefined)
+    supabase
+      .from('contacts')
+      .select('*')
+      .eq('user_id', ownerId)
+      .ilike('email', member.member_email ?? '')
+      .maybeSingle()
+      .then(({ data }) => setMemberContact(data ?? null))
+  }
+
+  async function handleInvite(e) {
+    e.preventDefault()
+    setInviteStatus('sending')
+    const { data: token, error } = await supabase.rpc('create_family_invitation', {
+      p_invited_email: inviteEmail.trim().toLowerCase(),
+      p_invited_by: displayName,
+    })
+    if (error) { setInviteStatus('error'); return }
+    setInviteLink(`${window.location.origin}/join?token=${token}`)
+    setInviteStatus('success')
+  }
+
+  async function copyLink() {
+    try { await navigator.clipboard.writeText(inviteLink) } catch { return }
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2500)
+  }
+
+  function openInvite() {
+    setInviteEmail(''); setInviteStatus('idle'); setInviteLink(''); setCopied(false)
+    setShowInvite(true)
+  }
+
+  const fieldStyle = {
+    width: '100%', padding: '12px 14px', borderRadius: 12,
+    border: '1.5px solid #EDE5D8', background: '#FDFAF7',
+    fontSize: 14, outline: 'none', boxSizing: 'border-box', transition: 'all 0.15s',
+  }
+
+  return (
+    <Layout>
+      <div style={{ padding: '16px 16px 0', maxWidth: 600 }}>
+
+        {/* Care profile summary */}
+        {profile && (
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 14,
+            background: 'linear-gradient(135deg, #BF5E37, #8C3E22)',
+            borderRadius: 20, padding: '16px 18px', marginBottom: 16,
+          }}>
+            {profile.photo_url ? (
+              <img src={profile.photo_url} alt={profile.name}
+                style={{ width: 52, height: 52, borderRadius: '50%', objectFit: 'cover',
+                  border: '2px solid rgba(255,255,255,0.4)', flexShrink: 0 }} />
+            ) : (
+              <div style={{
+                width: 52, height: 52, borderRadius: '50%', flexShrink: 0,
+                background: 'rgba(255,255,255,0.15)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 20, fontWeight: 700, color: 'white',
+              }}>
+                {profile.name?.charAt(0) ?? '?'}
+              </div>
+            )}
+            <div>
+              <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: 11, margin: '0 0 2px' }}>
+                Familiar a cuidar
+              </p>
+              <p style={{ color: 'white', fontSize: 18, fontWeight: 700, fontFamily: 'Georgia, serif', margin: 0 }}>
+                {profile.name}
+              </p>
+              {profile.age && (
+                <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 12, margin: '2px 0 0' }}>
+                  {profile.age} años
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Members section */}
+        <div style={{
+          background: 'white', borderRadius: 20, border: '1px solid #EDE5D8',
+          padding: '18px 18px', marginBottom: 12,
+          boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+            <p style={{ fontFamily: 'Georgia, serif', fontSize: 15, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>
+              Equipo de cuidado
+            </p>
+            <button
+              onClick={openInvite}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 6,
+                padding: '6px 14px', borderRadius: 10,
+                border: '1.5px solid #C4623A', background: '#FFF8F4',
+                color: '#C4623A', fontSize: 12, fontWeight: 700, cursor: 'pointer',
+              }}
+            >
+              <UserPlus size={14} color="#C4623A" strokeWidth={1.75} />
+              Invitar
+            </button>
+          </div>
+
+          {loading ? (
+            <div style={{ display: 'flex', justifyContent: 'center', padding: 24 }}>
+              <div style={{
+                width: 24, height: 24, borderRadius: '50%',
+                border: '3px solid #EDE5D8', borderTopColor: '#C4623A',
+                animation: 'spin 0.8s linear infinite',
+              }} />
+            </div>
+          ) : members.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '24px 0' }}>
+              <div style={{
+                width: 56, height: 56, borderRadius: '50%', margin: '0 auto 14px',
+                background: '#FDF0EB',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <Users size={24} color="#C4623A" strokeWidth={1.5} />
+              </div>
+              <p style={{ fontSize: 14, fontWeight: 600, color: '#1A1A1A', marginBottom: 6 }}>
+                Eres el único cuidador
+              </p>
+              <p style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 0 }}>
+                Invita a familiares para compartir el cuidado.
+              </p>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {members.map(member => {
+                const mp = memberProfiles[member.member_user_id]
+                const online = isOnline(mp)
+                const name = mp?.full_name ?? member.member_email?.split('@')[0] ?? '—'
+                const initials = name.charAt(0).toUpperCase()
+                const joined = member.joined_at
+                  ? new Date(member.joined_at).toLocaleDateString('es-US', { day: 'numeric', month: 'short', year: 'numeric' })
+                  : null
+                return (
+                  <div
+                    key={member.member_user_id ?? member.member_email}
+                    onClick={() => openModal(member, mp)}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 12,
+                      padding: '12px 14px', borderRadius: 14,
+                      background: '#FDFAF7', border: '1px solid #EDE5D8',
+                      cursor: 'pointer', transition: 'all 0.15s',
+                    }}
+                  >
+                    <div style={{ position: 'relative', flexShrink: 0 }}>
+                      <div style={{
+                        width: 44, height: 44, borderRadius: '50%', overflow: 'hidden',
+                        background: '#FDF0EB', border: '2px solid #EDE5D8',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      }}>
+                        {mp?.avatar_url ? (
+                          <img src={mp.avatar_url} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        ) : (
+                          <span style={{ fontSize: 16, fontWeight: 700, color: '#C4623A' }}>{initials}</span>
+                        )}
+                      </div>
+                      <div style={{
+                        position: 'absolute', bottom: 0, right: 0,
+                        width: 12, height: 12, borderRadius: '50%',
+                        border: '2px solid white',
+                        background: online ? '#22C55E' : '#9CA3AF',
+                      }} />
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ fontSize: 14, fontWeight: 600, color: '#1A1A1A', margin: '0 0 2px', truncate: true }}>
+                        {name.split(' ')[0]}
+                      </p>
+                      <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>
+                        {online ? '🟢 En línea' : '⚫ Desconectado'}
+                        {joined ? ` · Desde ${joined}` : ''}
+                      </p>
+                    </div>
+                    <span style={{ color: '#D1D5DB', fontSize: 18 }}>›</span>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Directory shortcut */}
+        <Link
+          to="/directorio"
+          style={{
+            display: 'flex', alignItems: 'center', gap: 14,
+            background: 'white', borderRadius: 16, border: '1px solid #EDE5D8',
+            padding: '14px 16px', marginBottom: 12, textDecoration: 'none',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+          }}
+        >
+          <div style={{
+            width: 40, height: 40, borderRadius: 12, flexShrink: 0,
+            background: '#F0F8F4', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <BookOpen size={20} color="#4A7C59" strokeWidth={1.5} />
+          </div>
+          <div style={{ flex: 1 }}>
+            <p style={{ fontSize: 14, fontWeight: 600, color: '#1A1A1A', margin: '0 0 2px' }}>Directorio</p>
+            <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>Médicos, contactos y emergencias</p>
+          </div>
+          <span style={{ color: '#D1D5DB', fontSize: 18 }}>›</span>
+        </Link>
+      </div>
+
+      {/* Member contact modal */}
+      {memberModal && (() => {
+        const { member, profile: mp } = memberModal
+        const mc = memberContact
+        const online = mp?.last_seen && Date.now() - new Date(mp.last_seen).getTime() < 5 * 60 * 1000
+        const name = mp?.full_name ?? member.member_email?.split('@')[0] ?? '—'
+        return (
+          <div
+            style={{ position: 'fixed', inset: 0, zIndex: 50, background: 'rgba(0,0,0,0.55)',
+              display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
+            onClick={e => { if (e.target === e.currentTarget) setMemberModal(null) }}
+          >
+            <div style={{
+              width: '100%', maxWidth: 480,
+              background: 'white', borderRadius: '24px 24px 0 0',
+              padding: '28px 24px 40px',
+              boxShadow: '0 -8px 48px rgba(0,0,0,0.2)',
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
+                <button onClick={() => setMemberModal(null)}
+                  style={{ padding: 8, borderRadius: 10, background: '#F3F4F6', border: 'none', cursor: 'pointer' }}>
+                  <XIcon size={16} color="#6B7280" strokeWidth={2} />
+                </button>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 20 }}>
+                <div style={{ position: 'relative', marginBottom: 12 }}>
+                  <div style={{ width: 64, height: 64, borderRadius: '50%', overflow: 'hidden',
+                    background: '#FDF0EB', border: '3px solid #EDE5D8',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {mp?.avatar_url
+                      ? <img src={mp.avatar_url} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      : <span style={{ fontSize: 24, fontWeight: 700, color: '#C4623A' }}>{name.charAt(0)}</span>
+                    }
+                  </div>
+                  <div style={{ position: 'absolute', bottom: 0, right: 0, width: 16, height: 16,
+                    borderRadius: '50%', border: '2px solid white', background: online ? '#22C55E' : '#9CA3AF' }} />
+                </div>
+                <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>{name}</p>
+                {mc?.relationship && <p style={{ fontSize: 13, color: '#9CA3AF', margin: '4px 0 0' }}>{mc.relationship}</p>}
+                <p style={{ fontSize: 11, color: '#9CA3AF', margin: '6px 0 0' }}>
+                  {online ? '🟢 En línea' : '⚫ Desconectado'}
+                </p>
+              </div>
+              <div style={{ borderRadius: 16, background: '#F9F5F1', border: '1px solid #EDE5D8', padding: '4px 16px', marginBottom: 16 }}>
+                {member.member_email && (
+                  <a href={`mailto:${member.member_email}`} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 0', borderBottom: '1px solid #EDE5D8', textDecoration: 'none' }}>
+                    <Mail size={15} color="#9CA3AF" strokeWidth={1.5} />
+                    <span style={{ fontSize: 13, color: '#374151' }}>{member.member_email}</span>
+                  </a>
+                )}
+                {mc === undefined ? (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 0' }}>
+                    <Phone size={15} color="#D4C4B8" strokeWidth={1.5} />
+                    <span style={{ fontSize: 13, color: '#D4C4B8' }}>Cargando...</span>
+                  </div>
+                ) : mc?.phone ? (
+                  <a href={`tel:${mc.phone}`} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 0', borderBottom: mc?.address ? '1px solid #EDE5D8' : 'none', textDecoration: 'none' }}>
+                    <Phone size={15} color="#9CA3AF" strokeWidth={1.5} />
+                    <span style={{ fontSize: 13, color: '#374151' }}>{mc.phone}</span>
+                  </a>
+                ) : null}
+                {mc?.address && (
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '12px 0' }}>
+                    <MapPin size={15} color="#9CA3AF" strokeWidth={1.5} style={{ marginTop: 2, flexShrink: 0 }} />
+                    <span style={{ fontSize: 13, color: '#374151', lineHeight: 1.4 }}>{mc.address}</span>
+                  </div>
+                )}
+              </div>
+              {mc?.phone && (
+                <a href={`tel:${mc.phone}`} style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+                  width: '100%', padding: '13px', borderRadius: 16, marginBottom: 10,
+                  background: 'linear-gradient(135deg, #22C55E, #16A34A)',
+                  color: 'white', fontWeight: 700, fontSize: 14, textDecoration: 'none',
+                  boxShadow: '0 4px 16px rgba(34,197,94,0.3)',
+                }}>
+                  <Phone size={16} color="white" strokeWidth={2} />
+                  Llamar
+                </a>
+              )}
+              <Link to="/directorio" onClick={() => setMemberModal(null)} style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                width: '100%', padding: '12px', borderRadius: 14,
+                background: '#F9F5F1', border: '1px solid #EDE5D8',
+                color: '#9CA3AF', fontSize: 13, fontWeight: 600, textDecoration: 'none',
+              }}>
+                {mc === null ? 'Agregar al directorio →' : 'Ver en directorio →'}
+              </Link>
+            </div>
+          </div>
+        )
+      })()}
+
+      {/* Invite modal */}
+      {showInvite && (
+        <div
+          style={{ position: 'fixed', inset: 0, zIndex: 50, background: 'rgba(0,0,0,0.55)',
+            display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
+          onClick={e => { if (e.target === e.currentTarget) setShowInvite(false) }}
+        >
+          <div style={{
+            width: '100%', maxWidth: 480,
+            background: 'white', borderRadius: '24px 24px 0 0',
+            padding: '28px 24px 40px',
+            boxShadow: '0 -8px 48px rgba(0,0,0,0.2)',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+              <div>
+                <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>
+                  Invitar familiar
+                </p>
+                <p style={{ fontSize: 12, color: '#9CA3AF', margin: '4px 0 0' }}>El enlace expira en 24 horas</p>
+              </div>
+              <button onClick={() => setShowInvite(false)}
+                style={{ padding: 8, borderRadius: 10, background: '#F3F4F6', border: 'none', cursor: 'pointer' }}>
+                <XIcon size={16} color="#6B7280" strokeWidth={2} />
+              </button>
+            </div>
+
+            {inviteStatus === 'success' ? (
+              <div>
+                <div style={{ padding: 14, background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 12, marginBottom: 14 }}>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: '#15803D', margin: '0 0 4px' }}>✓ Invitación creada</p>
+                  <p style={{ fontSize: 12, color: '#4B7A5D', margin: 0 }}>Comparte este enlace con {inviteEmail}</p>
+                </div>
+                <div style={{ padding: '12px 14px', background: '#F9F5F1', border: '1.5px solid #EDE5D8', borderRadius: 12, marginBottom: 12 }}>
+                  <p style={{ fontSize: 11, color: '#6B7280', wordBreak: 'break-all', margin: 0 }}>{inviteLink}</p>
+                </div>
+                <button onClick={copyLink} style={{
+                  width: '100%', padding: 13, borderRadius: 14, border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 14, color: 'white',
+                  background: copied ? 'linear-gradient(135deg, #4A7C59, #3A6147)' : 'linear-gradient(135deg, #C4623A, #A85130)',
+                  transition: 'all 0.2s', marginBottom: 10,
+                }}>
+                  {copied ? '¡Copiado!' : 'Copiar enlace'}
+                </button>
+                <button onClick={() => setShowInvite(false)} style={{ width: '100%', padding: 12, background: 'none', border: 'none', color: '#9CA3AF', fontSize: 13, cursor: 'pointer' }}>
+                  Cerrar
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleInvite} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#6B7280', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>
+                    Correo del familiar
+                  </label>
+                  <input
+                    type="email" required value={inviteEmail}
+                    onChange={e => setInviteEmail(e.target.value)}
+                    placeholder="familiar@correo.com" autoFocus
+                    style={fieldStyle}
+                    onFocus={e => { e.target.style.borderColor = '#C4623A'; e.target.style.boxShadow = '0 0 0 3px rgba(196,98,58,0.1)' }}
+                    onBlur={e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.boxShadow = 'none' }}
+                  />
+                </div>
+                {inviteStatus === 'error' && (
+                  <p style={{ padding: '10px 14px', background: '#FFF0F0', border: '1px solid #FFBABA', borderRadius: 10, fontSize: 13, color: '#D63031', margin: 0 }}>
+                    ⚠ No se pudo crear la invitación
+                  </p>
+                )}
+                <button
+                  type="submit"
+                  disabled={inviteStatus === 'sending' || !inviteEmail.trim()}
+                  style={{
+                    width: '100%', padding: 14, borderRadius: 14, border: 'none',
+                    fontWeight: 700, fontSize: 14, color: 'white', cursor: 'pointer',
+                    background: inviteEmail.trim() && inviteStatus !== 'sending'
+                      ? 'linear-gradient(135deg, #C4623A, #A85130)' : '#D4C4B8',
+                    boxShadow: inviteEmail.trim() ? '0 6px 20px rgba(196,98,58,0.3)' : 'none',
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  {inviteStatus === 'sending' ? 'Creando...' : 'Enviar invitación →'}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
+    </Layout>
+  )
+}

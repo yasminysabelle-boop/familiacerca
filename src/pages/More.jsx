@@ -14,7 +14,7 @@ const MORE_ITEMS = [
   { to: '/historial',  Icon: ClipboardCheck, label: 'Control de dosis',    desc: 'Historial y foto-pruebas selladas',      color: '#C4623A' },
   { to: '/notes',      Icon: FileText,        label: 'Notas',               desc: 'Observaciones del cuidado diario',      color: '#C4623A' },
   { to: '/album',      Icon: Image,           label: 'Álbum familiar',      desc: 'Fotos y videos de momentos especiales', color: '#D4A853' },
-  { to: '/diario-voz', Icon: Mic,             label: 'Diario de voz',       desc: 'Notas de voz del familiar',             color: '#7C5CBF' },
+  { to: '/memorias',   Icon: Mic,             label: 'Memorias',            desc: 'Memorias de voz del familiar',          color: '#7C5CBF' },
   { to: '/reportes',   Icon: BarChart,        label: 'Reportes',            desc: 'Análisis semanal y PDF médico',          color: '#2D86A0' },
   { to: '/perfil',     Icon: User,            label: 'Perfil familiar',     desc: 'Datos de la persona a cuidar',          color: '#C4623A' },
 ]

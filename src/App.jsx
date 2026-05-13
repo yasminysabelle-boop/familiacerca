@@ -15,6 +15,9 @@ import FamilyProfile from './pages/FamilyProfile'
 import Chat from './pages/Chat'
 import MemoryAlbum from './pages/MemoryAlbum'
 import VoiceDiary from './pages/VoiceDiary'
+import Memorias from './pages/Memorias'
+import Hoy from './pages/Hoy'
+import Familia from './pages/Familia'
 import Reports from './pages/Reports'
 import More from './pages/More'
 import Expenses from './pages/Expenses'
@@ -173,7 +176,10 @@ export default function App() {
               <Route path="/notes"       element={<P><Notes /></P>} />
               <Route path="/chat"        element={<P><Chat /></P>} />
               <Route path="/album"       element={<P><MemoryAlbum /></P>} />
-              <Route path="/diario-voz"  element={<P><VoiceDiary /></P>} />
+              <Route path="/diario-voz"  element={<P><Memorias /></P>} />
+              <Route path="/memorias"   element={<P><Memorias /></P>} />
+              <Route path="/hoy"        element={<P><Hoy /></P>} />
+              <Route path="/familia"    element={<P><Familia /></P>} />
               <Route path="/reportes"    element={<P><Reports /></P>} />
               <Route path="/perfil"      element={<P><FamilyProfile /></P>} />
               <Route path="/mas"         element={<P><More /></P>} />

@@ -4,700 +4,662 @@ import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
-import EmergencyAlert from '../components/EmergencyAlert'
-import {
-  Pill, Calendar, FileText, ClipboardCheck, Image, Mic,
-  AlertTriangle, Heart, User, Clock, Gift, Info, CheckIcon, UserPlus,
-  Phone, Mail, MapPin, XIcon,
-} from '../components/Icons'
+import { CheckIcon, User } from '../components/Icons'
 
-const CONCERN_KEYWORDS = ['dolor', 'caída', 'fiebre', 'triste', 'deprimido', 'sin apetito', 'no comió', 'confundido', 'peor', 'mal']
-
-function getDynamicGreeting(adherence, missed7, profileName) {
-  const h = new Date().getHours()
-  const base = h < 12 ? 'Buenos días' : h < 19 ? 'Buenas tardes' : 'Buenas noches'
-  const icon = h < 12 ? '☀️' : h < 19 ? '🌤️' : '🌙'
-
-  let message
-  if (adherence === null) {
-    // No medication data yet — new user welcome state
-    message = profileName ? `Cuidando a ${profileName} 🌱` : 'Bienvenido a FamiliaCerca 🌱'
-  } else if (adherence >= 80) {
-    // Great week — rotate emotionally warm messages by day of week
-    const opts = profileName
-      ? [`${profileName} está en excelentes manos 💚`, `Semana perfecta con ${profileName} ✨`, `${profileName} está bien cuidado esta semana 🌟`]
-      : ['¡Excelente semana de cuidado! 💚', 'Todo en orden esta semana ✨', 'Cuidado excepcional esta semana 🌟']
-    message = opts[new Date().getDay() % opts.length]
-  } else if (adherence >= 50) {
-    // Moderate — gentle, non-alarming nudge
-    message = missed7 > 0
-      ? `${missed7} dosis sin confirmar esta semana ⚠️`
-      : (profileName ? `Sigue con el cuidado de ${profileName} 💪` : 'Sigue adelante 💪')
-  } else {
-    // Low adherence — caring, not scolding
-    message = profileName
-      ? `${profileName} necesita más atención esta semana 🙏`
-      : 'Los medicamentos necesitan atención hoy 🙏'
-  }
-
-  return { icon, base, message }
+function fmtTime(t) {
+  if (!t) return ''
+  const [h, m] = t.split(':').map(Number)
+  const ampm = h >= 12 ? 'pm' : 'am'
+  const h12 = h % 12 || 12
+  return `${h12}:${String(m).padStart(2, '0')}${ampm}`
 }
 
-function StatCard({ Icon: IconComp, label, value, to, accentColor }) {
+function dateLabelFor(dateKey, todayKey, yesterdayKey) {
+  if (dateKey === todayKey) return 'Hoy'
+  if (dateKey === yesterdayKey) return 'Ayer'
+  const d = new Date(dateKey + 'T12:00:00')
+  const raw = d.toLocaleDateString('es-US', { weekday: 'long', day: 'numeric', month: 'long' })
+  return raw.charAt(0).toUpperCase() + raw.slice(1)
+}
+
+function sortSection(events) {
+  return [...events].sort((a, b) => {
+    if (a.type === 'MED_PENDING' && b.type !== 'MED_PENDING') return -1
+    if (b.type === 'MED_PENDING' && a.type !== 'MED_PENDING') return 1
+    return b.timestamp - a.timestamp
+  })
+}
+
+// ── Sub-components ────────────────────────────────────────────────────────────
+
+function PendingCard({ evt, confirming, onConfirm }) {
+  const busy = confirming === evt.medicationId
+  return (
+    <div style={{
+      background: '#FFFBEB', borderRadius: 16,
+      border: '1.5px solid #FDE68A',
+      padding: '12px 14px',
+      boxShadow: '0 2px 8px rgba(196,98,58,0.06)',
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <span style={{ fontSize: 20, flexShrink: 0 }}>⚠️</span>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <p style={{ fontSize: 14, fontWeight: 700, color: '#92400E', margin: 0 }}>
+            {evt.medName}
+          </p>
+          <p style={{ fontSize: 11, color: '#B45309', marginTop: 2 }}>
+            {evt.medDosage && `${evt.medDosage} · `}
+            {evt.medTime ? `Pendiente desde las ${fmtTime(evt.medTime)}` : 'Sin horario asignado'}
+          </p>
+        </div>
+      </div>
+      <button
+        onClick={() => onConfirm(evt)}
+        disabled={busy}
+        style={{
+          marginTop: 10, width: '100%', padding: '9px 0',
+          background: busy ? '#D4C4B8' : 'linear-gradient(135deg, #22C55E, #16A34A)',
+          color: 'white', fontWeight: 700, fontSize: 13,
+          borderRadius: 10, border: 'none',
+          cursor: busy ? 'not-allowed' : 'pointer',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+          transition: 'all 0.2s',
+        }}
+      >
+        {busy ? (
+          'Guardando...'
+        ) : (
+          <>
+            <CheckIcon size={14} color="white" strokeWidth={2.5} />
+            Marcar como dado
+          </>
+        )}
+      </button>
+    </div>
+  )
+}
+
+function ConfirmedCard({ evt }) {
+  const time = evt.timestamp
+    ? evt.timestamp.toLocaleTimeString('es-US', { hour: 'numeric', minute: '2-digit' })
+    : null
+  return (
+    <div style={{
+      background: '#F0FDF4', borderRadius: 16,
+      border: '1px solid #BBF7D0',
+      padding: '12px 14px',
+      display: 'flex', alignItems: 'center', gap: 10,
+    }}>
+      <span style={{ fontSize: 16, flexShrink: 0 }}>💊</span>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p style={{ fontSize: 13, fontWeight: 600, color: '#15803D', margin: 0 }}>
+          {evt.medName}
+          {evt.medDosage && (
+            <span style={{ fontWeight: 400, color: '#4B7A5D' }}> · {evt.medDosage}</span>
+          )}
+        </p>
+        {(evt.confirmedBy || time) && (
+          <p style={{ fontSize: 11, color: '#4ADE80', marginTop: 2 }}>
+            ✓ {evt.confirmedBy ? `${evt.confirmedBy.split(' ')[0]} lo dio` : 'Dado'}
+            {time && ` · ${time}`}
+          </p>
+        )}
+      </div>
+      <span style={{
+        fontSize: 10, fontWeight: 700, color: '#16A34A',
+        background: '#DCFCE7', padding: '3px 8px', borderRadius: 6, flexShrink: 0,
+      }}>
+        ✓ Dado
+      </span>
+    </div>
+  )
+}
+
+function MemoryCard({ evt, isExpanded, onToggle }) {
+  const moodColor = evt.mood === '😊' ? '#7C5CBF' : evt.mood === '😔' ? '#9CA3AF' : '#C4623A'
+  return (
+    <div
+      onClick={onToggle}
+      style={{
+        background: 'white', borderRadius: 16,
+        border: '1px solid #EDE5D8',
+        borderLeft: `3px solid ${moodColor}`,
+        padding: '12px 14px',
+        cursor: 'pointer',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <span style={{ fontSize: 16, flexShrink: 0 }}>🎙️</span>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', margin: 0 }}>
+            {evt.recorderName
+              ? `${evt.recorderName.split(' ')[0]} dejó una memoria`
+              : 'Memoria de voz'}
+            {evt.mood && <span style={{ marginLeft: 5 }}>{evt.mood}</span>}
+          </p>
+          {evt.transcription && !isExpanded && (
+            <p style={{
+              fontSize: 11, color: '#9CA3AF', marginTop: 2,
+              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+            }}>
+              {evt.transcription}
+            </p>
+          )}
+        </div>
+        <span style={{ fontSize: 11, color: '#9CA3AF', flexShrink: 0 }}>
+          {isExpanded ? '▲' : '▶ Escuchar'}
+        </span>
+      </div>
+      {isExpanded && evt.audioUrl && (
+        <div style={{ marginTop: 10 }} onClick={e => e.stopPropagation()}>
+          <audio
+            src={evt.audioUrl}
+            controls
+            autoPlay
+            style={{ width: '100%', height: 36, borderRadius: 8 }}
+          />
+          {evt.transcription && (
+            <p style={{ fontSize: 11, color: '#6B7280', marginTop: 8, lineHeight: 1.5 }}>
+              "{evt.transcription}"
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function ExpenseCard({ evt }) {
+  return (
+    <div style={{
+      background: 'white', borderRadius: 16,
+      border: '1px solid #EDE5D8',
+      padding: '12px 14px',
+      display: 'flex', alignItems: 'center', gap: 10,
+      boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+    }}>
+      <span style={{ fontSize: 16, flexShrink: 0 }}>💰</span>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', margin: 0 }}>
+          {evt.description}
+        </p>
+        {evt.paidBy && (
+          <p style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>
+            Pagado por {evt.paidBy.split(' ')[0]}
+          </p>
+        )}
+      </div>
+      {evt.amount != null && (
+        <span style={{ fontSize: 14, fontWeight: 700, color: '#4A7C59', flexShrink: 0 }}>
+          ${Number(evt.amount).toFixed(2)}
+        </span>
+      )}
+    </div>
+  )
+}
+
+function AppointmentCard({ evt }) {
   return (
     <Link
-      to={to}
-      className="bg-white rounded-2xl p-5 flex flex-col gap-4 active:scale-[0.96] transition-transform"
-      style={{ boxShadow: '0 3px 20px rgba(0,0,0,0.07)', borderTop: `3px solid ${accentColor}` }}
+      to="/calendar"
+      style={{
+        background: 'white', borderRadius: 16,
+        border: '1px solid #BFDBFE',
+        padding: '12px 14px',
+        display: 'flex', alignItems: 'center', gap: 10,
+        textDecoration: 'none',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+      }}
     >
-      <div className="w-10 h-10 rounded-xl flex items-center justify-center"
-        style={{ background: `${accentColor}15` }}>
-        <IconComp size={20} color={accentColor} strokeWidth={1.5} />
+      <span style={{ fontSize: 16, flexShrink: 0 }}>📅</span>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', margin: 0 }}>
+          {evt.appointmentTitle}
+        </p>
+        <p style={{ fontSize: 11, color: '#3B82F6', marginTop: 2 }}>
+          {evt.appointmentTime ? fmtTime(evt.appointmentTime) : 'Ver en calendario'}
+        </p>
       </div>
-      <div>
-        <p className="text-2xl font-bold text-gray-900 leading-none">{value}</p>
-        <p className="text-xs text-gray-500 mt-1.5">{label}</p>
-      </div>
+      <span style={{ color: '#BBBBBB', fontSize: 14 }}>›</span>
     </Link>
   )
 }
 
-const QUICK_LINKS = [
-  { to: '/historial',  Icon: ClipboardCheck, label: 'Control\nde dosis', color: '#C4623A' },
-  { to: '/calendar',   Icon: Calendar,       label: 'Calendario',        color: '#4A7C59' },
-  { to: '/album',      Icon: Image,          label: 'Álbum\nfamiliar',   color: '#D4A853' },
-  { to: '/diario-voz', Icon: Mic,            label: 'Diario\nde voz',    color: '#7C5CBF' },
-]
+function CaregiverCard({ evt }) {
+  return (
+    <div style={{
+      background: 'linear-gradient(135deg, #EDE9FE, #DDD6FE)',
+      borderRadius: 16, border: '1px solid #C4B5FD',
+      padding: '14px 16px',
+      boxShadow: '0 2px 8px rgba(124,92,191,0.12)',
+    }}>
+      <p style={{ fontSize: 14, fontWeight: 700, color: '#5B21B6', margin: '0 0 4px' }}>
+        💙 Reconocimiento semanal
+      </p>
+      <p style={{ fontSize: 13, color: '#6D28D9', lineHeight: 1.5, margin: 0 }}>
+        {evt.caregiverName.split(' ')[0]} coordinó{' '}
+        <strong>{evt.weekCount} dosis</strong> esta semana.
+        ¡Gracias por tu dedicación!
+      </p>
+    </div>
+  )
+}
+
+function TimelineEvent({ evt, confirming, expandedAudio, onConfirm, onToggleAudio }) {
+  if (evt.type === 'MED_PENDING') {
+    return <PendingCard evt={evt} confirming={confirming} onConfirm={onConfirm} />
+  }
+  if (evt.type === 'MED_CONFIRMED') {
+    return <ConfirmedCard evt={evt} />
+  }
+  if (evt.type === 'VOICE_MEMORY') {
+    return (
+      <MemoryCard
+        evt={evt}
+        isExpanded={expandedAudio === evt.id}
+        onToggle={() => onToggleAudio(evt.id)}
+      />
+    )
+  }
+  if (evt.type === 'EXPENSE') {
+    return <ExpenseCard evt={evt} />
+  }
+  if (evt.type === 'APPOINTMENT') {
+    return <AppointmentCard evt={evt} />
+  }
+  if (evt.type === 'CAREGIVER_CARD') {
+    return <CaregiverCard evt={evt} />
+  }
+  return null
+}
+
+function EmptyState({ profile }) {
+  return (
+    <div style={{
+      background: 'white', borderRadius: 20, border: '1px solid #EDE5D8',
+      padding: '48px 24px', textAlign: 'center',
+      boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
+    }}>
+      <div style={{ fontSize: 44, marginBottom: 12 }}>
+        {profile ? '💊' : '🌱'}
+      </div>
+      <p style={{ fontSize: 14, fontWeight: 600, color: '#1A1A1A', marginBottom: 6 }}>
+        {profile ? 'Todo tranquilo por aquí' : 'Bienvenido a FamiliaCerca'}
+      </p>
+      <p style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 20, lineHeight: 1.6 }}>
+        {profile
+          ? 'El historial de cuidado aparecerá aquí. Agrega medicamentos para comenzar.'
+          : 'Configura el perfil familiar para comenzar a registrar el cuidado.'}
+      </p>
+      <Link
+        to={profile ? '/medications' : '/onboarding'}
+        style={{
+          display: 'inline-flex', alignItems: 'center', gap: 6,
+          padding: '10px 20px', borderRadius: 12,
+          background: 'linear-gradient(135deg, #C4623A, #A85130)',
+          color: 'white', fontWeight: 700, fontSize: 13,
+          textDecoration: 'none',
+        }}
+      >
+        {profile ? '+ Agregar medicamento' : '+ Configurar familiar'}
+      </Link>
+    </div>
+  )
+}
+
+// ── Main component ─────────────────────────────────────────────────────────────
 
 export default function Dashboard() {
   const { user } = useAuth()
-  const { profile } = useFamily()
-  const [stats, setStats] = useState({ medications: 0, events: 0, notes: 0 })
-  const [recentNotes, setRecentNotes] = useState([])
-  const [logs7, setLogs7] = useState([])
-  const [members, setMembers] = useState([])
-  const [memberProfiles, setMemberProfiles] = useState({})
-  const [membersLoaded, setMembersLoaded] = useState(false)
-  const [memberModal, setMemberModal] = useState(null)   // { member, profile }
-  const [memberContact, setMemberContact] = useState(undefined) // undefined|null|obj
-  const [day10Dismissed, setDay10Dismissed] = useState(
-    () => !!localStorage.getItem('fc_day10_dismissed')
-  )
+  const { profile, ownerId } = useFamily()
 
-  const firstName = user?.user_metadata?.full_name?.split(' ')[0] ?? 'Bienvenido'
+  const [sections, setSections] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [confirming, setConfirming] = useState(null)
+  const [expandedAudio, setExpandedAudio] = useState(null)
 
-  // Trial calculations
-  const trialDaysElapsed = user?.created_at
-    ? Math.floor((Date.now() - new Date(user.created_at).getTime()) / 86400000)
-    : 0
-  const trialDaysLeft = Math.max(0, 14 - trialDaysElapsed)
-  const isInTrial = trialDaysElapsed < 14
-  const showDay10 = trialDaysElapsed >= 10 && trialDaysElapsed < 14 && !day10Dismissed
+  const now = new Date()
+  const todayKey = now.toISOString().split('T')[0]
+  const yesterday = new Date(now); yesterday.setDate(yesterday.getDate() - 1)
+  const yesterdayKey = yesterday.toISOString().split('T')[0]
+  const sevenAgo = new Date(now); sevenAgo.setDate(sevenAgo.getDate() - 6)
+  const sevenAgoKey = sevenAgo.toISOString().split('T')[0]
+
+  const fullName = user?.user_metadata?.full_name ?? user?.email ?? 'Cuidador'
+  const firstName = fullName.split(' ')[0]
+  const nowMinutes = now.getHours() * 60 + now.getMinutes()
+  const isSundayEvening = now.getDay() === 0 && now.getHours() >= 17
+
+  const h = now.getHours()
+  const timeGreeting = h < 12 ? 'Buenos días' : h < 19 ? 'Buenas tardes' : 'Buenas noches'
+  const timeIcon = h < 12 ? '☀️' : h < 19 ? '🌤️' : '🌙'
 
   useEffect(() => {
-    if (!user) return
-    const since = new Date(); since.setDate(since.getDate() - 7)
-    Promise.all([
-      supabase.from('medications').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
-      supabase.from('events').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
-      supabase.from('notes').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
-      supabase.from('notes').select('id, title, content, created_at').eq('user_id', user.id).order('created_at', { ascending: false }).limit(3),
-      supabase.from('medication_logs').select('status').eq('user_id', user.id).gte('log_date', since.toISOString().split('T')[0]),
-    ]).then(([{ count: meds }, { count: events }, { count: notes }, { data: latest }, { data: logs }]) => {
-      setStats({ medications: meds ?? 0, events: events ?? 0, notes: notes ?? 0 })
-      setRecentNotes(latest ?? [])
-      setLogs7(logs ?? [])
-    })
+    if (user && ownerId) fetchTimeline()
+  }, [user, ownerId])
 
-    async function fetchMembers() {
-      const { data: memberRows } = await supabase
-        .from('family_members')
-        .select('member_user_id, member_email, joined_at')
-        .eq('user_id', user.id)
+  async function fetchTimeline() {
+    setLoading(true)
 
-      setMembers(memberRows ?? [])
+    // Step 1: get all family member IDs so we can include their voice memories
+    const { data: familyMembers } = await supabase
+      .from('family_members')
+      .select('member_user_id')
+      .eq('user_id', ownerId)
 
-      const ids = (memberRows ?? []).map(m => m.member_user_id).filter(Boolean)
-      if (ids.length) {
-        const { data: profiles } = await supabase
-          .from('user_profiles')
-          .select('id, full_name, avatar_url, last_seen')
-          .in('id', ids)
+    const allFamilyIds = [
+      ownerId,
+      ...(familyMembers ?? []).map(m => m.member_user_id).filter(Boolean),
+    ]
 
-        if (profiles) {
-          const map = {}
-          profiles.forEach(p => { map[p.id] = p })
-          setMemberProfiles(map)
-        }
+    // Step 2: parallel queries
+    const [
+      { data: meds },
+      { data: todayLogs },
+      { data: confirmedLogs },
+      { data: memories },
+      { data: expenses },
+      { data: events },
+    ] = await Promise.all([
+      supabase.from('medications').select('*').eq('user_id', ownerId),
+
+      supabase.from('medication_logs').select('*')
+        .eq('user_id', ownerId).eq('log_date', todayKey),
+
+      supabase.from('medication_logs')
+        .select('*, medications(name, dosage)')
+        .eq('user_id', ownerId)
+        .gte('log_date', sevenAgoKey)
+        .eq('status', 'confirmed')
+        .order('confirmed_at', { ascending: false })
+        .limit(60),
+
+      supabase.from('voice_diary')
+        .select('*, user_profiles(full_name)')
+        .in('user_id', allFamilyIds)
+        .gte('created_at', sevenAgoKey + 'T00:00:00Z')
+        .order('created_at', { ascending: false })
+        .limit(20),
+
+      supabase.from('expenses')
+        .select('*')
+        .eq('user_id', ownerId)
+        .gte('created_at', sevenAgoKey + 'T00:00:00Z')
+        .order('created_at', { ascending: false })
+        .limit(20),
+
+      supabase.from('events')
+        .select('*')
+        .eq('user_id', ownerId)
+        .gte('start_date', todayKey)
+        .order('start_date', { ascending: true })
+        .limit(5),
+    ])
+
+    // Build today's confirmed map
+    const todayLogMap = {}
+    ;(todayLogs ?? []).forEach(l => { todayLogMap[l.medication_id] = l })
+
+    const allEvents = []
+
+    // ── Pending medications (scheduled time has passed, not confirmed) ──
+    for (const med of (meds ?? [])) {
+      if (todayLogMap[med.id]?.status === 'confirmed') continue
+      const times = med.scheduled_times?.length
+        ? [...med.scheduled_times].sort()
+        : (med.time ? [med.time] : [])
+      const pastTimes = times.filter(t => {
+        const [th, tm] = t.split(':').map(Number)
+        return th * 60 + tm <= nowMinutes
+      })
+      // Show if any scheduled time passed, or if no times at all (show all day)
+      if (pastTimes.length > 0 || times.length === 0) {
+        allEvents.push({
+          id: `pending-${med.id}`,
+          type: 'MED_PENDING',
+          timestamp: times[0]
+            ? new Date(`${todayKey}T${times[0]}:00`)
+            : new Date(`${todayKey}T00:00:00`),
+          dateKey: todayKey,
+          medicationId: med.id,
+          medName: med.name,
+          medDosage: med.dosage,
+          medTime: times[0] ?? null,
+          allTimes: times,
+        })
       }
-
-      setMembersLoaded(true)
     }
 
-    fetchMembers()
-  }, [user])
+    // ── Confirmed medication logs ──
+    for (const log of (confirmedLogs ?? [])) {
+      if (!log.medications) continue
+      allEvents.push({
+        id: `log-${log.id}`,
+        type: 'MED_CONFIRMED',
+        timestamp: new Date(log.confirmed_at ?? `${log.log_date}T12:00:00`),
+        dateKey: log.log_date,
+        medName: log.medications.name,
+        medDosage: log.medications.dosage,
+        confirmedBy: log.confirmed_by_name,
+      })
+    }
 
-  const confirmed7 = logs7.filter(l => l.status === 'confirmed').length
-  const missed7    = logs7.filter(l => l.status === 'missed').length
-  const adherence  = logs7.length ? Math.round((confirmed7 / logs7.length) * 100) : null
-  const greeting   = getDynamicGreeting(adherence, missed7, profile?.name)
-  const concerns   = recentNotes.filter(n =>
-    CONCERN_KEYWORDS.some(kw => (n.title + ' ' + (n.content ?? '')).toLowerCase().includes(kw))
-  )
+    // ── Voice memories ──
+    for (const mem of (memories ?? [])) {
+      const dateKey = mem.created_at.split('T')[0]
+      allEvents.push({
+        id: `mem-${mem.id}`,
+        type: 'VOICE_MEMORY',
+        timestamp: new Date(mem.created_at),
+        dateKey,
+        audioUrl: mem.file_url,
+        transcription: mem.transcription,
+        recorderName: mem.user_profiles?.full_name ?? null,
+        mood: mem.mood ?? null,
+      })
+    }
 
-  // Onboarding progress
-  const onboardingSteps = [
-    { label: 'Familiar agregado',       done: !!profile?.name,       to: '/perfil' },
-    { label: 'Foto del familiar',        done: !!profile?.photo_url,  to: '/perfil' },
-    { label: 'Primer medicamento',       done: stats.medications > 0, to: '/medications' },
-    { label: 'Primera cita registrada',  done: stats.events > 0,      to: '/calendar' },
-  ]
-  const stepsDone = onboardingSteps.filter(s => s.done).length
-  const showOnboarding = stepsDone < onboardingSteps.length
+    // ── Expenses ──
+    for (const exp of (expenses ?? [])) {
+      const ts = exp.created_at ?? exp.date ?? todayKey
+      const dateKey = ts.split('T')[0]
+      allEvents.push({
+        id: `exp-${exp.id}`,
+        type: 'EXPENSE',
+        timestamp: new Date(ts),
+        dateKey,
+        amount: exp.amount,
+        description: exp.description ?? exp.title ?? 'Gasto',
+        paidBy: exp.paid_by_name ?? null,
+      })
+    }
 
-  function dismissDay10() {
-    localStorage.setItem('fc_day10_dismissed', 'true')
-    setDay10Dismissed(true)
+    // ── Upcoming appointments ──
+    for (const ev of (events ?? [])) {
+      allEvents.push({
+        id: `evt-${ev.id}`,
+        type: 'APPOINTMENT',
+        timestamp: new Date(`${ev.start_date}T${ev.start_time ?? '09:00'}:00`),
+        dateKey: ev.start_date,
+        appointmentTitle: ev.title,
+        appointmentTime: ev.start_time ?? null,
+      })
+    }
+
+    // ── Caregiver recognition (Sunday evenings) ──
+    if (isSundayEvening) {
+      allEvents.push({
+        id: 'caregiver-card',
+        type: 'CAREGIVER_CARD',
+        timestamp: new Date(`${todayKey}T17:00:00`),
+        dateKey: todayKey,
+        caregiverName: fullName,
+        weekCount: (confirmedLogs ?? []).length,
+      })
+    }
+
+    // Group by date, sort sections newest first
+    const dateMap = {}
+    for (const evt of allEvents) {
+      if (!dateMap[evt.dateKey]) dateMap[evt.dateKey] = []
+      dateMap[evt.dateKey].push(evt)
+    }
+
+    const sortedKeys = Object.keys(dateMap).sort((a, b) => b.localeCompare(a))
+    const newSections = sortedKeys.map(dk => ({
+      dateKey: dk,
+      label: dateLabelFor(dk, todayKey, yesterdayKey),
+      events: sortSection(dateMap[dk]),
+    }))
+
+    setSections(newSections)
+    setLoading(false)
   }
 
-  function openMemberModal(member, profile) {
-    setMemberModal({ member, profile })
-    setMemberContact(undefined)
-    supabase
-      .from('contacts')
-      .select('*')
-      .eq('user_id', user.id)
-      .ilike('email', member.member_email)
-      .maybeSingle()
-      .then(({ data }) => setMemberContact(data ?? null))
+  async function quickConfirm(evt) {
+    setConfirming(evt.medicationId)
+    const { error } = await supabase.from('medication_logs').upsert({
+      medication_id: evt.medicationId,
+      user_id: ownerId,
+      status: 'confirmed',
+      log_date: todayKey,
+      confirmed_by_name: fullName,
+      confirmed_at: new Date().toISOString(),
+    }, { onConflict: 'medication_id,log_date,user_id' })
+
+    if (!error) {
+      const confirmedEvt = {
+        id: `log-new-${evt.medicationId}`,
+        type: 'MED_CONFIRMED',
+        timestamp: new Date(),
+        dateKey: todayKey,
+        medName: evt.medName,
+        medDosage: evt.medDosage,
+        confirmedBy: fullName,
+      }
+      setSections(prev =>
+        prev
+          .map(section => {
+            if (section.dateKey !== todayKey) return section
+            const filtered = section.events.filter(e => e.id !== evt.id)
+            return { ...section, events: sortSection([...filtered, confirmedEvt]) }
+          })
+          .filter(s => s.events.length > 0)
+      )
+    }
+    setConfirming(null)
   }
+
+  // Summary counts for the header
+  const todaySection = sections.find(s => s.dateKey === todayKey)
+  const pendingCount = todaySection?.events.filter(e => e.type === 'MED_PENDING').length ?? 0
+  const confirmedTodayCount = todaySection?.events.filter(e => e.type === 'MED_CONFIRMED').length ?? 0
 
   return (
     <Layout>
-      <div className="p-5 pb-8 max-w-2xl">
+      <div style={{ padding: '12px 16px 24px', maxWidth: 600 }}>
 
-        {/* ── Premium membership hero card ── */}
-        <div className="rounded-3xl overflow-hidden mb-5 relative"
-          style={{ background: 'linear-gradient(145deg, #BF5E37 0%, #8C3E22 55%, #6B2E18 100%)' }}>
-          {/* Light orb top-right */}
-          <div className="absolute pointer-events-none"
-            style={{ width: 220, height: 220, top: -60, right: -60, borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(255,255,255,0.13) 0%, transparent 65%)' }} />
-          {/* Faint orb bottom-left */}
-          <div className="absolute pointer-events-none"
-            style={{ width: 140, height: 140, bottom: -50, left: -30, borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%)' }} />
-
-          <div className="relative p-6">
-            {/* Card header: brand mark + plan tier */}
-            <div className="flex items-center justify-between mb-5">
-              <div className="flex items-center gap-1.5">
-                <div style={{ width: 18, height: 18, borderRadius: '50%',
-                  background: 'rgba(255,255,255,0.25)', flexShrink: 0 }} />
-                <span style={{ color: 'rgba(255,255,255,0.45)', fontSize: 9,
-                  letterSpacing: '0.18em', fontWeight: 700, textTransform: 'uppercase' }}>
-                  FamiliaCerca
-                </span>
+        {/* ── Greeting header ── */}
+        <div style={{
+          background: 'linear-gradient(135deg, #BF5E37 0%, #7A3418 100%)',
+          borderRadius: 20, padding: '16px 18px', marginBottom: 16,
+          boxShadow: '0 4px 20px rgba(196,98,58,0.3)',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            {profile?.photo_url ? (
+              <img
+                src={profile.photo_url}
+                alt={profile.name}
+                style={{
+                  width: 48, height: 48, borderRadius: '50%', objectFit: 'cover',
+                  border: '2px solid rgba(212,168,83,0.5)', flexShrink: 0,
+                }}
+              />
+            ) : (
+              <div style={{
+                width: 48, height: 48, borderRadius: '50%', flexShrink: 0,
+                background: 'rgba(255,255,255,0.15)',
+                border: '2px solid rgba(255,255,255,0.2)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <User size={22} color="rgba(255,255,255,0.7)" strokeWidth={1.5} />
               </div>
-              <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: 9,
-                letterSpacing: '0.15em', fontWeight: 700, textTransform: 'uppercase' }}>
-                Plan Familiar
-              </span>
-            </div>
-
-            {/* Main content row */}
-            <div className="flex items-center gap-5">
-              {/* Avatar */}
-              <div className="relative flex-shrink-0">
-                <div className="overflow-hidden"
-                  style={{ width: 56, height: 56, borderRadius: '50%',
-                    border: '2.5px solid rgba(212,168,83,0.55)',
-                    background: 'rgba(255,255,255,0.12)',
-                    boxShadow: '0 4px 24px rgba(0,0,0,0.25)' }}>
-                  {profile?.photo_url ? (
-                    <img src={profile.photo_url} alt={profile.name} className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center"
-                      style={{ fontSize: 18, fontWeight: 700, color: 'rgba(255,255,255,0.85)',
-                        letterSpacing: '0.02em', lineHeight: 1, userSelect: 'none' }}>
-                      {profile?.name
-                        ? profile.name.trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase()
-                        : '?'}
-                    </div>
-                  )}
-                </div>
-                {/* Heart badge */}
-                <div className="absolute -bottom-1 -right-1 flex items-center justify-center animate-heartbeat"
-                  style={{ width: 22, height: 22, borderRadius: '50%', background: 'white',
-                    boxShadow: '0 2px 10px rgba(0,0,0,0.2)' }}>
-                  <Heart size={11} color="#C4623A" strokeWidth={1.5} filled />
-                </div>
-              </div>
-
-              {/* Greeting */}
-              <div className="min-w-0 flex-1">
-                <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: 11, fontWeight: 600,
-                  letterSpacing: '0.03em', marginBottom: 3 }}>
-                  {greeting.icon} {greeting.base}
-                </p>
-                <p className="text-white font-bold leading-tight truncate"
-                  style={{ fontFamily: 'Georgia, serif', fontSize: 26, letterSpacing: '-0.5px' }}>
-                  {firstName}
-                </p>
-                {profile ? (
-                  <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 12, marginTop: 6, lineHeight: 1.4 }}>
-                    {greeting.message}
-                  </p>
-                ) : (
-                  <Link to="/onboarding"
-                    style={{ color: 'rgba(255,255,255,0.65)', fontSize: 12, marginTop: 6,
-                      display: 'block', textDecoration: 'underline' }}>
-                    + Agregar familiar
-                  </Link>
-                )}
-              </div>
-            </div>
-
-            {/* Stats row */}
-            <div className="flex mt-6 pt-5"
-              style={{ borderTop: '1px solid rgba(255,255,255,0.15)' }}>
-              {adherence !== null && (
-                <>
-                  <div className="text-center flex-1">
-                    <p className="text-white font-bold leading-none" style={{ fontSize: 20 }}>{adherence}%</p>
-                    <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: 10, marginTop: 4, letterSpacing: '0.04em' }}>
-                      Adherencia
-                    </p>
-                  </div>
-                  <div className="w-px self-stretch" style={{ background: 'rgba(255,255,255,0.18)' }} />
-                </>
-              )}
-              <div className="text-center flex-1">
-                <p className="text-white font-bold leading-none" style={{ fontSize: 20 }}>{stats.medications}</p>
-                <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: 10, marginTop: 4, letterSpacing: '0.04em' }}>
-                  Medicamentos
-                </p>
-              </div>
-              <div className="w-px self-stretch" style={{ background: 'rgba(255,255,255,0.18)' }} />
-              <div className="text-center flex-1">
-                <p className="text-white font-bold leading-none" style={{ fontSize: 20 }}>{stats.events}</p>
-                <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: 10, marginTop: 4, letterSpacing: '0.04em' }}>
-                  Eventos
-                </p>
-              </div>
-              <div className="w-px self-stretch" style={{ background: 'rgba(255,255,255,0.18)' }} />
-              <div className="text-center flex-1">
-                <p className="text-white font-bold leading-none" style={{ fontSize: 20 }}>{stats.notes}</p>
-                <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: 10, marginTop: 4, letterSpacing: '0.04em' }}>
-                  Notas
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* ── Day 10 trial conversion notification ── */}
-        {showDay10 && (
-          <div className="relative rounded-2xl p-5 mb-5 animate-float-in"
-            style={{ background: 'linear-gradient(135deg, #FDF0EB, #FDF8EE)',
-              border: '1px solid #F0C8B0', boxShadow: '0 4px 20px rgba(196,98,58,0.12)' }}>
-            <button onClick={dismissDay10}
-              className="absolute top-4 right-4 w-6 h-6 flex items-center justify-center rounded-full transition-colors"
-              style={{ background: 'rgba(0,0,0,0.06)', color: '#999' }}>
-              ✕
-            </button>
-            <div className="flex items-start gap-3 pr-6">
-              <Heart size={18} color="#C4623A" strokeWidth={1.5} filled />
-              <div>
-                <p className="font-bold text-gray-900 text-sm" style={{ fontFamily: 'Georgia, serif' }}>
-                  No pierdas tu historial
-                </p>
-                <p className="text-xs text-gray-600 leading-relaxed mt-1">
-                  Tu familia lleva <strong>{trialDaysElapsed} días</strong> coordinando el cuidado
-                  {profile?.name ? ` de ${profile.name}` : ''}.
-                  Te quedan <strong>{trialDaysLeft} días</strong> de prueba gratis.
-                </p>
-              </div>
-            </div>
-            <button
-              className="mt-4 w-full py-2.5 text-white text-xs font-bold rounded-xl transition-all active:scale-[0.97]"
-              style={{ background: 'linear-gradient(135deg, #C4623A, #A85130)',
-                boxShadow: '0 4px 16px rgba(196,98,58,0.3)' }}>
-              Activar plan por $19/mes →
-            </button>
-          </div>
-        )}
-
-        {/* ── Trial badge (days 1-9) ── */}
-        {isInTrial && !showDay10 && (
-          <div className="flex items-center gap-3 px-5 py-3.5 rounded-2xl mb-5"
-            style={{ background: '#FDF8EE', border: '1px solid #E8D89A' }}>
-            <Clock size={18} color="#A07830" strokeWidth={1.5} />
-            <div className="flex-1">
-              <p className="text-sm font-semibold text-gray-800">
-                {trialDaysLeft > 1 ? `${trialDaysLeft} días gratis restantes` : 'Último día de prueba'}
+            )}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: 11, margin: 0 }}>
+                {timeIcon} {timeGreeting}, {firstName}
               </p>
-              <p className="text-xs text-gray-400">Sin tarjeta de crédito</p>
-            </div>
-            <span className="text-xs font-bold px-2.5 py-1 rounded-full text-white"
-              style={{ background: '#D4A853' }}>
-              FREE
-            </span>
-          </div>
-        )}
-
-        {/* ── Onboarding progress ── */}
-        {showOnboarding && (
-          <div className="bg-white rounded-2xl p-5 mb-5"
-            style={{ boxShadow: '0 3px 20px rgba(0,0,0,0.06)', border: '1px solid #EDE5D8' }}>
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-sm font-bold text-gray-900" style={{ fontFamily: 'Georgia, serif' }}>
-                Completa tu perfil
-              </p>
-              <span className="text-xs font-bold" style={{ color: '#C4623A' }}>
-                {stepsDone}/{onboardingSteps.length}
-              </span>
-            </div>
-            <div className="h-1.5 rounded-full mb-5" style={{ background: '#F5EEE6' }}>
-              <div className="h-full rounded-full transition-all"
-                style={{ width: `${(stepsDone / onboardingSteps.length) * 100}%`,
-                  background: 'linear-gradient(90deg, #C4623A, #D4A853)' }} />
-            </div>
-            <div className="space-y-3.5">
-              {onboardingSteps.map(step => (
-                <Link key={step.label} to={step.done ? '#' : step.to}
-                  className={`flex items-center gap-3 ${!step.done ? 'active:opacity-70' : ''}`}
-                  onClick={step.done ? e => e.preventDefault() : undefined}>
-                  <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-all"
-                    style={{
-                      background: step.done ? '#C4623A' : 'white',
-                      border: step.done ? 'none' : '1.5px solid #EDE5D8',
-                    }}>
-                    {step.done && <CheckIcon size={11} color="white" strokeWidth={2.5} />}
-                  </div>
-                  <p className={`text-sm flex-1 ${step.done ? 'text-gray-400 line-through' : 'text-gray-700 font-medium'}`}>
-                    {step.label}
-                  </p>
-                  {!step.done && (
-                    <span style={{ color: '#C4623A', fontSize: 18, lineHeight: 1 }}>›</span>
-                  )}
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Profile nudge */}
-        {!profile && (
-          <div className="rounded-2xl p-5 mb-5 flex items-center gap-4"
-            style={{ background: '#FDF8EE', border: '1px solid #E8D89A' }}>
-            <Info size={22} color="#A07830" strokeWidth={1.5} />
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-gray-800">Configura el perfil del familiar</p>
-              <Link to="/onboarding" className="text-xs font-semibold underline mt-0.5 block" style={{ color: '#C4623A' }}>
-                Agregar ahora →
-              </Link>
-            </div>
-          </div>
-        )}
-
-        {/* ── Familia card ── */}
-        {membersLoaded && (
-          <div className="bg-white rounded-2xl p-5 mb-5"
-            style={{ boxShadow: '0 3px 20px rgba(0,0,0,0.06)', border: '1px solid #EDE5D8' }}>
-            <div className="flex items-center justify-between mb-4">
-              <p className="font-bold text-gray-900 text-sm" style={{ fontFamily: 'Georgia, serif' }}>
-                Familia
-              </p>
-              {members.length > 0 && (
-                <Link to="/mas" className="text-xs font-medium" style={{ color: '#C4623A' }}>
-                  Invitar más →
-                </Link>
-              )}
-            </div>
-
-            {members.length === 0 ? (
-              <div className="flex flex-col items-center py-4 gap-3">
-                <div className="w-12 h-12 rounded-full flex items-center justify-center"
-                  style={{ background: '#FDF0EB' }}>
-                  <UserPlus size={22} color="#C4623A" strokeWidth={1.5} />
-                </div>
-                <div className="text-center">
-                  <p className="text-sm font-semibold text-gray-800">Invita a tu familia</p>
-                  <p className="text-xs text-gray-400 mt-1">
-                    Comparte el cuidado con otros miembros
-                  </p>
-                </div>
+              {profile ? (
+                <p style={{
+                  color: 'white', fontSize: 16, fontWeight: 700,
+                  fontFamily: 'Georgia, serif', margin: '2px 0 0',
+                }}>
+                  Cuidando a {profile.name}
+                </p>
+              ) : (
                 <Link
-                  to="/mas"
-                  className="px-5 py-2 rounded-xl text-xs font-bold text-white active:scale-[0.97] transition-transform"
-                  style={{ background: 'linear-gradient(135deg, #C4623A, #A85130)',
-                    boxShadow: '0 4px 14px rgba(196,98,58,0.3)' }}>
-                  Invitar familiar →
-                </Link>
-              </div>
-            ) : (
-              <div className="flex gap-5 flex-wrap">
-                {members.map(member => {
-                  const mp = memberProfiles[member.member_user_id]
-                  const isOnline = mp?.last_seen &&
-                    Date.now() - new Date(mp.last_seen).getTime() < 5 * 60 * 1000
-                  const initials = (mp?.full_name || member.member_email || '?').charAt(0).toUpperCase()
-                  const displayName = mp?.full_name?.split(' ')[0] || member.member_email?.split('@')[0] || '—'
-                  return (
-                    <div key={member.member_user_id || member.member_email}
-                      className="flex flex-col items-center gap-1.5"
-                      onClick={() => openMemberModal(member, mp)}
-                      style={{ cursor: 'pointer' }}>
-                      <div className="relative">
-                        <div className="w-11 h-11 rounded-full overflow-hidden flex items-center justify-center flex-shrink-0"
-                          style={{ background: '#FDF0EB', border: '2px solid #EDE5D8' }}>
-                          {mp?.avatar_url ? (
-                            <img src={mp.avatar_url} alt={mp.full_name} className="w-full h-full object-cover" />
-                          ) : (
-                            <span className="text-sm font-bold" style={{ color: '#C4623A' }}>{initials}</span>
-                          )}
-                        </div>
-                        <div className="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white"
-                          style={{ background: isOnline ? '#22C55E' : '#9CA3AF' }} />
-                      </div>
-                      <p className="text-xs text-gray-600 text-center truncate" style={{ maxWidth: 56 }}>
-                        {displayName}
-                      </p>
-                    </div>
-                  )
-                })}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Emergency button */}
-        <EmergencyAlert />
-
-        {/* ── Stat cards ── */}
-        <div className="grid grid-cols-3 gap-4 mb-5">
-          <StatCard Icon={Pill}     label="Medicamentos" value={stats.medications} to="/medications" accentColor="#C4623A" />
-          <StatCard Icon={Calendar} label="Eventos"      value={stats.events}      to="/calendar"    accentColor="#4A7C59" />
-          <StatCard Icon={FileText} label="Notas"        value={stats.notes}       to="/notes"       accentColor="#D4A853" />
-        </div>
-
-        {/* ── Wellness summary ── */}
-        {(logs7.length > 0 || concerns.length > 0) && (
-          <div className="bg-white rounded-2xl p-5 mb-5"
-            style={{ boxShadow: '0 3px 20px rgba(0,0,0,0.06)', border: '1px solid #EDE5D8' }}>
-            <div className="flex items-center justify-between mb-4">
-              <p className="font-bold text-gray-900 text-sm" style={{ fontFamily: 'Georgia, serif' }}>
-                Bienestar esta semana
-              </p>
-              <Link to="/reportes" className="text-xs font-medium" style={{ color: '#C4623A' }}>
-                Ver análisis →
-              </Link>
-            </div>
-            <div className="space-y-2.5">
-              {logs7.length > 0 && (
-                <div className="flex items-center gap-3 px-3.5 py-3 rounded-xl"
+                  to="/onboarding"
                   style={{
-                    background: adherence >= 80 ? '#F0FAF2' : adherence >= 50 ? '#FFF8EE' : '#FFF0F0',
-                    border: `1px solid ${adherence >= 80 ? '#C0E4C8' : adherence >= 50 ? '#F0D998' : '#FFBABA'}`,
-                  }}>
-                  <AlertTriangle
-                    size={16}
-                    color={adherence >= 80 ? '#4A7C59' : adherence >= 50 ? '#A07830' : '#D63031'}
-                    strokeWidth={1.5}
-                  />
-                  <p className="text-xs text-gray-700">
-                    <strong>{adherence}% adherencia</strong> — {confirmed7} confirmadas, {missed7} perdidas
-                    {missed7 >= 3 && <span className="font-semibold" style={{ color: '#D63031' }}> · Consultar médico</span>}
-                  </p>
-                </div>
-              )}
-              {concerns.length > 0 && (
-                <div className="flex items-center gap-3 px-3.5 py-3 rounded-xl"
-                  style={{ background: '#FFF8EE', border: '1px solid #F0D998' }}>
-                  <AlertTriangle size={16} color="#A07830" strokeWidth={1.5} />
-                  <p className="text-xs text-gray-700">
-                    <strong>{concerns.length} nota{concerns.length > 1 ? 's' : ''}</strong> con términos de atención —{' '}
-                    <Link to="/reportes" className="underline font-medium" style={{ color: '#C4623A' }}>ver análisis</Link>
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* ── Bottom grid ── */}
-        <div className="grid grid-cols-1 gap-5">
-          {/* Recent notes */}
-          <div className="bg-white rounded-2xl p-5"
-            style={{ boxShadow: '0 3px 20px rgba(0,0,0,0.06)', border: '1px solid #EDE5D8' }}>
-            <div className="flex items-center justify-between mb-4">
-              <p className="font-bold text-gray-900 text-sm" style={{ fontFamily: 'Georgia, serif' }}>
-                Notas recientes
-              </p>
-              <Link to="/notes" className="text-xs font-medium" style={{ color: '#C4623A' }}>Ver todas</Link>
-            </div>
-            {recentNotes.length === 0 ? (
-              <p className="text-xs text-gray-400 py-4 text-center">
-                No hay notas.{' '}
-                <Link to="/notes" className="underline" style={{ color: '#C4623A' }}>Crea la primera</Link>
-              </p>
-            ) : (
-              <ul>
-                {recentNotes.map((note, i) => (
-                  <li key={note.id}
-                    className="flex items-center justify-between py-3"
-                    style={{ borderBottom: i < recentNotes.length - 1 ? '1px solid #F5EEE6' : 'none' }}>
-                    <span className="text-sm text-gray-700 truncate mr-4">{note.title}</span>
-                    <span className="text-xs text-gray-400 flex-shrink-0">
-                      {new Date(note.created_at).toLocaleDateString('es-US')}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-
-          {/* Quick access */}
-          <div className="bg-white rounded-2xl p-5"
-            style={{ boxShadow: '0 3px 20px rgba(0,0,0,0.06)', border: '1px solid #EDE5D8' }}>
-            <p className="font-bold text-gray-900 text-sm mb-4" style={{ fontFamily: 'Georgia, serif' }}>
-              Accesos rápidos
-            </p>
-            <div className="grid grid-cols-4 gap-3">
-              {QUICK_LINKS.map(({ to, Icon: IconComp, label, color }) => (
-                <Link key={to} to={to}
-                  className="flex flex-col items-center gap-2 py-4 rounded-2xl active:scale-[0.93] transition-transform"
-                  style={{ background: `${color}0D` }}>
-                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center"
-                    style={{ background: `${color}18` }}>
-                    <IconComp size={22} color={color} strokeWidth={1.5} />
-                  </div>
-                  <span className="text-[9px] font-bold text-center leading-tight whitespace-pre-line"
-                    style={{ color }}>
-                    {label}
-                  </span>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-      {/* ── Member contact modal ── */}
-      {memberModal && (() => {
-        const { member, profile } = memberModal
-        const mc = memberContact
-        const isOnline = profile?.last_seen &&
-          Date.now() - new Date(profile.last_seen).getTime() < 5 * 60 * 1000
-        const name = profile?.full_name || member.member_email?.split('@')[0] || '—'
-        const initials = name.charAt(0).toUpperCase()
-        return (
-          <div
-            style={{
-              position: 'fixed', inset: 0, zIndex: 50,
-              background: 'rgba(0,0,0,0.55)',
-              display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
-            }}
-            onClick={e => { if (e.target === e.currentTarget) setMemberModal(null) }}
-          >
-            <div style={{
-              width: '100%', maxWidth: 480,
-              background: 'white', borderRadius: '24px 24px 0 0',
-              padding: '28px 24px 40px',
-              boxShadow: '0 -8px 48px rgba(0,0,0,0.2)',
-            }}>
-              {/* Close */}
-              <div className="flex justify-end mb-4">
-                <button
-                  onClick={() => setMemberModal(null)}
-                  style={{ padding: 8, borderRadius: 10, background: '#F3F4F6', border: 'none' }}
-                >
-                  <XIcon size={16} color="#6B7280" strokeWidth={2} />
-                </button>
-              </div>
-
-              {/* Avatar + name */}
-              <div className="flex flex-col items-center mb-5">
-                <div className="relative mb-3">
-                  <div className="w-16 h-16 rounded-full overflow-hidden flex items-center justify-center"
-                    style={{ background: '#FDF0EB', border: '3px solid #EDE5D8' }}>
-                    {profile?.avatar_url ? (
-                      <img src={profile.avatar_url} alt={name} className="w-full h-full object-cover" />
-                    ) : (
-                      <span className="text-xl font-bold" style={{ color: '#C4623A' }}>{initials}</span>
-                    )}
-                  </div>
-                  <div className="absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-white"
-                    style={{ background: isOnline ? '#22C55E' : '#9CA3AF' }} />
-                </div>
-                <p className="font-bold text-gray-900 text-lg" style={{ fontFamily: 'Georgia, serif' }}>
-                  {name}
-                </p>
-                {mc?.relationship && (
-                  <p className="text-sm text-gray-500 mt-0.5">{mc.relationship}</p>
-                )}
-                <div className="flex items-center gap-1.5 mt-2">
-                  <div className="w-2 h-2 rounded-full" style={{ background: isOnline ? '#22C55E' : '#9CA3AF' }} />
-                  <span className="text-xs text-gray-400">{isOnline ? 'En línea' : 'Desconectado'}</span>
-                </div>
-              </div>
-
-              {/* Info rows */}
-              <div className="rounded-2xl px-4 py-3 mb-4" style={{ background: '#F9F5F1', border: '1px solid #EDE5D8' }}>
-                {member.member_email && (
-                  <a href={`mailto:${member.member_email}`} className="flex items-center gap-3 py-2 border-b border-[#EDE5D8]">
-                    <Mail size={15} color="#9CA3AF" strokeWidth={1.5} />
-                    <span className="text-sm text-gray-700 break-all">{member.member_email}</span>
-                  </a>
-                )}
-                {mc === undefined ? (
-                  <div className="flex items-center gap-3 py-2">
-                    <Phone size={15} color="#D4C4B8" strokeWidth={1.5} />
-                    <span className="text-sm text-gray-300">Cargando...</span>
-                  </div>
-                ) : mc?.phone ? (
-                  <a href={`tel:${mc.phone}`} className="flex items-center gap-3 py-2 border-b border-[#EDE5D8]">
-                    <Phone size={15} color="#9CA3AF" strokeWidth={1.5} />
-                    <span className="text-sm text-gray-700">{mc.phone}</span>
-                  </a>
-                ) : null}
-                {mc?.address && (
-                  <div className="flex items-start gap-3 py-2">
-                    <MapPin size={15} color="#9CA3AF" strokeWidth={1.5} style={{ flexShrink: 0, marginTop: 2 }} />
-                    <span className="text-sm text-gray-700 leading-relaxed">{mc.address}</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Call button if phone available */}
-              {mc?.phone && (
-                <a
-                  href={`tel:${mc.phone}`}
-                  className="flex items-center justify-center gap-2.5 w-full py-3.5 rounded-2xl font-bold text-sm text-white mb-3 active:scale-[0.97] transition-transform"
-                  style={{
-                    background: 'linear-gradient(135deg, #22C55E, #16A34A)',
-                    boxShadow: '0 4px 16px rgba(34,197,94,0.3)',
-                    textDecoration: 'none',
+                    color: 'rgba(255,255,255,0.75)', fontSize: 13,
+                    display: 'block', marginTop: 2, textDecoration: 'underline',
                   }}
                 >
-                  <Phone size={16} color="white" strokeWidth={2} />
-                  Llamar
-                </a>
+                  + Agregar familiar →
+                </Link>
               )}
-
-              {/* Link to directory */}
-              <Link
-                to="/directorio"
-                onClick={() => setMemberModal(null)}
-                className="flex items-center justify-center w-full py-3 rounded-2xl text-xs font-semibold"
-                style={{ background: '#F9F5F1', border: '1px solid #EDE5D8', color: '#9CA3AF' }}
-              >
-                {mc === null ? 'Agregar al directorio →' : 'Ver en directorio →'}
-              </Link>
+              {pendingCount > 0 ? (
+                <p style={{ color: 'rgba(255,220,100,0.95)', fontSize: 12, margin: '5px 0 0' }}>
+                  ⚠️ {pendingCount} medicamento{pendingCount !== 1 ? 's' : ''} pendiente{pendingCount !== 1 ? 's' : ''}
+                </p>
+              ) : confirmedTodayCount > 0 ? (
+                <p style={{ color: 'rgba(130,255,170,0.9)', fontSize: 12, margin: '5px 0 0' }}>
+                  ✅ Todo al día hoy · {confirmedTodayCount} dado{confirmedTodayCount !== 1 ? 's' : ''}
+                </p>
+              ) : null}
             </div>
           </div>
-        )
-      })()}
+        </div>
+
+        {/* ── Timeline ── */}
+        {loading ? (
+          <div style={{ display: 'flex', justifyContent: 'center', padding: 48 }}>
+            <div style={{
+              width: 28, height: 28, borderRadius: '50%',
+              border: '3px solid #EDE5D8', borderTopColor: '#C4623A',
+              animation: 'spin 0.8s linear infinite',
+            }} />
+          </div>
+        ) : sections.length === 0 ? (
+          <EmptyState profile={profile} />
+        ) : (
+          sections.map(section => (
+            <div key={section.dateKey} style={{ marginBottom: 20 }}>
+              <p style={{
+                fontSize: 11, fontWeight: 700, letterSpacing: '0.08em',
+                textTransform: 'uppercase', color: '#9CA3AF',
+                marginBottom: 8, paddingLeft: 2,
+              }}>
+                {section.label}
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {section.events.map(evt => (
+                  <TimelineEvent
+                    key={evt.id}
+                    evt={evt}
+                    confirming={confirming}
+                    expandedAudio={expandedAudio}
+                    onConfirm={quickConfirm}
+                    onToggleAudio={id =>
+                      setExpandedAudio(prev => (prev === id ? null : id))
+                    }
+                  />
+                ))}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
     </Layout>
   )
 }
