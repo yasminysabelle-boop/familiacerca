@@ -8,6 +8,7 @@ import EmergencyAlert from '../components/EmergencyAlert'
 import {
   Pill, Calendar, FileText, ClipboardCheck, Image, Mic,
   AlertTriangle, Heart, User, Clock, Gift, Info, CheckIcon, UserPlus,
+  Phone, Mail, MapPin, XIcon,
 } from '../components/Icons'
 
 const CONCERN_KEYWORDS = ['dolor', 'caída', 'fiebre', 'triste', 'deprimido', 'sin apetito', 'no comió', 'confundido', 'peor', 'mal']
@@ -77,6 +78,8 @@ export default function Dashboard() {
   const [members, setMembers] = useState([])
   const [memberProfiles, setMemberProfiles] = useState({})
   const [membersLoaded, setMembersLoaded] = useState(false)
+  const [memberModal, setMemberModal] = useState(null)   // { member, profile }
+  const [memberContact, setMemberContact] = useState(undefined) // undefined|null|obj
   const [day10Dismissed, setDay10Dismissed] = useState(
     () => !!localStorage.getItem('fc_day10_dismissed')
   )
@@ -155,6 +158,18 @@ export default function Dashboard() {
   function dismissDay10() {
     localStorage.setItem('fc_day10_dismissed', 'true')
     setDay10Dismissed(true)
+  }
+
+  function openMemberModal(member, profile) {
+    setMemberModal({ member, profile })
+    setMemberContact(undefined)
+    supabase
+      .from('contacts')
+      .select('*')
+      .eq('user_id', user.id)
+      .ilike('email', member.member_email)
+      .maybeSingle()
+      .then(({ data }) => setMemberContact(data ?? null))
   }
 
   return (
@@ -431,7 +446,9 @@ export default function Dashboard() {
                   const displayName = mp?.full_name?.split(' ')[0] || member.member_email?.split('@')[0] || '—'
                   return (
                     <div key={member.member_user_id || member.member_email}
-                      className="flex flex-col items-center gap-1.5">
+                      className="flex flex-col items-center gap-1.5"
+                      onClick={() => openMemberModal(member, mp)}
+                      style={{ cursor: 'pointer' }}>
                       <div className="relative">
                         <div className="w-11 h-11 rounded-full overflow-hidden flex items-center justify-center flex-shrink-0"
                           style={{ background: '#FDF0EB', border: '2px solid #EDE5D8' }}>
@@ -566,6 +583,121 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+      {/* ── Member contact modal ── */}
+      {memberModal && (() => {
+        const { member, profile } = memberModal
+        const mc = memberContact
+        const isOnline = profile?.last_seen &&
+          Date.now() - new Date(profile.last_seen).getTime() < 5 * 60 * 1000
+        const name = profile?.full_name || member.member_email?.split('@')[0] || '—'
+        const initials = name.charAt(0).toUpperCase()
+        return (
+          <div
+            style={{
+              position: 'fixed', inset: 0, zIndex: 50,
+              background: 'rgba(0,0,0,0.55)',
+              display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
+            }}
+            onClick={e => { if (e.target === e.currentTarget) setMemberModal(null) }}
+          >
+            <div style={{
+              width: '100%', maxWidth: 480,
+              background: 'white', borderRadius: '24px 24px 0 0',
+              padding: '28px 24px 40px',
+              boxShadow: '0 -8px 48px rgba(0,0,0,0.2)',
+            }}>
+              {/* Close */}
+              <div className="flex justify-end mb-4">
+                <button
+                  onClick={() => setMemberModal(null)}
+                  style={{ padding: 8, borderRadius: 10, background: '#F3F4F6', border: 'none' }}
+                >
+                  <XIcon size={16} color="#6B7280" strokeWidth={2} />
+                </button>
+              </div>
+
+              {/* Avatar + name */}
+              <div className="flex flex-col items-center mb-5">
+                <div className="relative mb-3">
+                  <div className="w-16 h-16 rounded-full overflow-hidden flex items-center justify-center"
+                    style={{ background: '#FDF0EB', border: '3px solid #EDE5D8' }}>
+                    {profile?.avatar_url ? (
+                      <img src={profile.avatar_url} alt={name} className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-xl font-bold" style={{ color: '#C4623A' }}>{initials}</span>
+                    )}
+                  </div>
+                  <div className="absolute bottom-0 right-0 w-4 h-4 rounded-full border-2 border-white"
+                    style={{ background: isOnline ? '#22C55E' : '#9CA3AF' }} />
+                </div>
+                <p className="font-bold text-gray-900 text-lg" style={{ fontFamily: 'Georgia, serif' }}>
+                  {name}
+                </p>
+                {mc?.relationship && (
+                  <p className="text-sm text-gray-500 mt-0.5">{mc.relationship}</p>
+                )}
+                <div className="flex items-center gap-1.5 mt-2">
+                  <div className="w-2 h-2 rounded-full" style={{ background: isOnline ? '#22C55E' : '#9CA3AF' }} />
+                  <span className="text-xs text-gray-400">{isOnline ? 'En línea' : 'Desconectado'}</span>
+                </div>
+              </div>
+
+              {/* Info rows */}
+              <div className="rounded-2xl px-4 py-3 mb-4" style={{ background: '#F9F5F1', border: '1px solid #EDE5D8' }}>
+                {member.member_email && (
+                  <a href={`mailto:${member.member_email}`} className="flex items-center gap-3 py-2 border-b border-[#EDE5D8]">
+                    <Mail size={15} color="#9CA3AF" strokeWidth={1.5} />
+                    <span className="text-sm text-gray-700 break-all">{member.member_email}</span>
+                  </a>
+                )}
+                {mc === undefined ? (
+                  <div className="flex items-center gap-3 py-2">
+                    <Phone size={15} color="#D4C4B8" strokeWidth={1.5} />
+                    <span className="text-sm text-gray-300">Cargando...</span>
+                  </div>
+                ) : mc?.phone ? (
+                  <a href={`tel:${mc.phone}`} className="flex items-center gap-3 py-2 border-b border-[#EDE5D8]">
+                    <Phone size={15} color="#9CA3AF" strokeWidth={1.5} />
+                    <span className="text-sm text-gray-700">{mc.phone}</span>
+                  </a>
+                ) : null}
+                {mc?.address && (
+                  <div className="flex items-start gap-3 py-2">
+                    <MapPin size={15} color="#9CA3AF" strokeWidth={1.5} style={{ flexShrink: 0, marginTop: 2 }} />
+                    <span className="text-sm text-gray-700 leading-relaxed">{mc.address}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Call button if phone available */}
+              {mc?.phone && (
+                <a
+                  href={`tel:${mc.phone}`}
+                  className="flex items-center justify-center gap-2.5 w-full py-3.5 rounded-2xl font-bold text-sm text-white mb-3 active:scale-[0.97] transition-transform"
+                  style={{
+                    background: 'linear-gradient(135deg, #22C55E, #16A34A)',
+                    boxShadow: '0 4px 16px rgba(34,197,94,0.3)',
+                    textDecoration: 'none',
+                  }}
+                >
+                  <Phone size={16} color="white" strokeWidth={2} />
+                  Llamar
+                </a>
+              )}
+
+              {/* Link to directory */}
+              <Link
+                to="/directorio"
+                onClick={() => setMemberModal(null)}
+                className="flex items-center justify-center w-full py-3 rounded-2xl text-xs font-semibold"
+                style={{ background: '#F9F5F1', border: '1px solid #EDE5D8', color: '#9CA3AF' }}
+              >
+                {mc === null ? 'Agregar al directorio →' : 'Ver en directorio →'}
+              </Link>
+            </div>
+          </div>
+        )
+      })()}
     </Layout>
   )
 }

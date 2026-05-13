@@ -22,6 +22,7 @@ import TermsOfService from './pages/TermsOfService'
 import PrivacyPolicy from './pages/PrivacyPolicy'
 import JoinFamily from './pages/JoinFamily'
 import Permissions from './pages/Permissions'
+import Directory from './pages/Directory'
 
 import imgAbuela  from './assets/images/splash-abuela.png'
 import imgHija    from './assets/images/splash-hija.png'
@@ -177,6 +178,7 @@ export default function App() {
               <Route path="/perfil"      element={<P><FamilyProfile /></P>} />
               <Route path="/mas"         element={<P><More /></P>} />
               <Route path="/gastos"      element={<P><Expenses /></P>} />
+              <Route path="/directorio"   element={<P><Directory /></P>} />
               <Route path="/join"        element={<JoinFamily />} />
               <Route path="/permisos"    element={<P><Permissions /></P>} />
               <Route path="/terminos"    element={<TermsOfService />} />

@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom'
 import { useFamily } from '../contexts/FamilyContext'
 import Logo from './Logo'
-import { Home, Pill, Calendar, Chat, Menu, User } from './Icons'
+import { Home, Pill, Calendar, Chat, Menu, User, BookOpen } from './Icons'
 
 const PAGE_TITLES = {
   '/dashboard':   'Inicio',
@@ -16,12 +16,14 @@ const PAGE_TITLES = {
   '/perfil':      'Perfil familiar',
   '/mas':         'Más opciones',
   '/gastos':      'Cuentas Claras',
+  '/directorio':  'Directorio',
 }
 
 const BOTTOM_TABS = [
   { to: '/dashboard',   Icon: Home,     label: 'Inicio' },
   { to: '/medications', Icon: Pill,     label: 'Medicinas' },
   { to: '/calendar',    Icon: Calendar, label: 'Citas' },
+  { to: '/directorio',  Icon: BookOpen, label: 'Directorio' },
   { to: '/chat',        Icon: Chat,     label: 'Chat' },
   { to: '/mas',         Icon: Menu,     label: 'Más' },
 ]
@@ -131,7 +133,7 @@ export default function Layout({ children }) {
                 />
               </div>
               <span
-                className="text-[9px] font-bold leading-none tracking-wide"
+                className="text-[8px] font-bold leading-none tracking-wide"
                 style={{ color: isActive ? '#C4623A' : '#BBBBBB' }}
               >
                 {label}
