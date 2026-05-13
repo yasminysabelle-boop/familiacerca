@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import Logo from '../components/Logo'
+import { Eye, EyeOff } from '../components/Icons'
 
 const BENEFITS = ['14 días gratis', 'Sin tarjeta de crédito', 'Cancela cuando quieras']
 
@@ -9,6 +10,7 @@ export default function Register() {
   const { signUp } = useAuth()
   const navigate = useNavigate()
   const [form, setForm] = useState({ name: '', email: '', password: '' })
+  const [showPw, setShowPw] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -115,18 +117,35 @@ export default function Register() {
               <label className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">
                 Contraseña
               </label>
-              <input
-                type="password"
-                name="password"
-                required
-                value={form.password}
-                onChange={handleChange}
-                placeholder="Mínimo 6 caracteres"
-                className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none transition-all"
-                style={{ border: '1.5px solid #EDE5D8', background: '#FDFAF7' }}
-                onFocus={e => { e.target.style.borderColor = '#C4623A'; e.target.style.boxShadow = '0 0 0 3px rgba(196,98,58,0.1)' }}
-                onBlur={e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.boxShadow = 'none' }}
-              />
+              <div style={{ position: 'relative' }}>
+                <input
+                  type={showPw ? 'text' : 'password'}
+                  name="password"
+                  required
+                  value={form.password}
+                  onChange={handleChange}
+                  placeholder="Mínimo 6 caracteres"
+                  className="w-full rounded-xl text-sm focus:outline-none transition-all"
+                  style={{ border: '1.5px solid #EDE5D8', background: '#FDFAF7', padding: '12px 44px 12px 16px', boxSizing: 'border-box', width: '100%' }}
+                  onFocus={e => { e.target.style.borderColor = '#C4623A'; e.target.style.boxShadow = '0 0 0 3px rgba(196,98,58,0.1)' }}
+                  onBlur={e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.boxShadow = 'none' }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPw(v => !v)}
+                  style={{
+                    position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)',
+                    background: 'none', border: 'none', cursor: 'pointer',
+                    padding: 4, display: 'flex', alignItems: 'center',
+                  }}
+                  aria-label={showPw ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                >
+                  {showPw
+                    ? <EyeOff size={18} color="#9CA3AF" strokeWidth={1.5} />
+                    : <Eye    size={18} color="#9CA3AF" strokeWidth={1.5} />
+                  }
+                </button>
+              </div>
             </div>
 
             <button

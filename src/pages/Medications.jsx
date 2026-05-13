@@ -2,16 +2,63 @@ import { useEffect, useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
+import { Plus, XIcon, Pencil, Trash, Bell } from '../components/Icons'
+import { usePushNotifications } from '../hooks/usePushNotifications'
 
-const emptyForm = { name: '', dosage: '', frequency: '', time: '', notes: '' }
+const FREQ_OPTIONS = [
+  { value: 'once_daily',  label: 'Una vez al día',    times: 1, interval: null },
+  { value: 'twice_daily', label: 'Dos veces al día',  times: 2, interval: null },
+  { value: 'three_daily', label: 'Tres veces al día', times: 3, interval: null },
+  { value: 'every_4h',    label: 'Cada 4 horas',      times: 1, interval: 4 },
+  { value: 'every_6h',    label: 'Cada 6 horas',      times: 1, interval: 6 },
+  { value: 'every_8h',    label: 'Cada 8 horas',      times: 1, interval: 8 },
+  { value: 'every_12h',   label: 'Cada 12 horas',     times: 1, interval: 12 },
+  { value: 'as_needed',   label: 'Según necesidad',   times: 0, interval: null },
+  { value: 'weekly',      label: 'Semanal',           times: 1, interval: null },
+]
+
+function computeScheduledTimes(frequency, startTimes) {
+  const opt = FREQ_OPTIONS.find(o => o.value === frequency)
+  if (!opt || opt.times === 0) return []
+  if (opt.interval) {
+    const start = startTimes[0]
+    if (!start) return []
+    const [h, m] = start.split(':').map(Number)
+    const dosesPerDay = 24 / opt.interval
+    return Array.from({ length: dosesPerDay }, (_, i) => {
+      const total = (h * 60 + m + i * opt.interval * 60) % (24 * 60)
+      return `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`
+    })
+  }
+  return startTimes.filter(Boolean)
+}
+
+const emptyForm = { name: '', dosage: '', frequency: '', notes: '' }
+
+const fieldStyle = {
+  width: '100%', padding: '11px 14px', borderRadius: 12,
+  border: '1.5px solid #EDE5D8', background: '#FDFAF7',
+  fontSize: 14, outline: 'none', boxSizing: 'border-box',
+  transition: 'all 0.15s', appearance: 'none', WebkitAppearance: 'none',
+}
+const onFocus = e => { e.target.style.borderColor = '#C4623A'; e.target.style.boxShadow = '0 0 0 3px rgba(196,98,58,0.1)' }
+const onBlur  = e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.boxShadow = 'none' }
+const labelStyle = {
+  display: 'block', fontSize: 11, fontWeight: 700, color: '#6B7280',
+  letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6,
+}
 
 export default function Medications() {
   const { user } = useAuth()
+  const { permission, supported, requestAndSubscribe } = usePushNotifications()
   const [medications, setMedications] = useState([])
   const [form, setForm] = useState(emptyForm)
+  const [scheduledTimes, setScheduledTimes] = useState([''])
+  const [editId, setEditId] = useState(null)
   const [showForm, setShowForm] = useState(false)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [deleteConfirm, setDeleteConfirm] = useState(null)
 
   useEffect(() => {
     if (user) fetchMedications()
@@ -32,16 +79,67 @@ export default function Medications() {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
   }
 
+  function handleFrequencyChange(val) {
+    setForm(prev => ({ ...prev, frequency: val }))
+    const opt = FREQ_OPTIONS.find(o => o.value === val)
+    if (!opt || opt.times === 0) {
+      setScheduledTimes([])
+    } else {
+      const count = opt.interval ? 1 : opt.times
+      setScheduledTimes(prev => {
+        const next = [...prev]
+        while (next.length < count) next.push('')
+        return next.slice(0, count)
+      })
+    }
+  }
+
+  function openAdd() {
+    setForm(emptyForm)
+    setScheduledTimes([''])
+    setEditId(null)
+    setShowForm(true)
+  }
+
+  function openEdit(med) {
+    setForm({
+      name: med.name,
+      dosage: med.dosage ?? '',
+      frequency: med.frequency ?? '',
+      notes: med.notes ?? '',
+    })
+    const opt = FREQ_OPTIONS.find(o => o.value === med.frequency)
+    if (med.scheduled_times?.length) {
+      setScheduledTimes(opt?.interval ? [med.scheduled_times[0]] : med.scheduled_times)
+    } else if (med.time) {
+      setScheduledTimes([med.time])
+    } else {
+      setScheduledTimes([''])
+    }
+    setEditId(med.id)
+    setShowForm(true)
+  }
+
   async function handleSubmit(e) {
     e.preventDefault()
     setSaving(true)
+    const scheduled_times = computeScheduledTimes(form.frequency, scheduledTimes)
     const payload = {
-      ...form,
-      time: form.time || null,
+      name: form.name,
+      dosage: form.dosage || null,
+      frequency: form.frequency || null,
+      notes: form.notes || null,
+      scheduled_times,
       user_id: user.id,
     }
-    await supabase.from('medications').insert(payload)
+    if (editId) {
+      await supabase.from('medications').update(payload).eq('id', editId)
+    } else {
+      await supabase.from('medications').insert(payload)
+    }
     setForm(emptyForm)
+    setScheduledTimes([''])
+    setEditId(null)
     setShowForm(false)
     setSaving(false)
     fetchMedications()
@@ -50,107 +148,370 @@ export default function Medications() {
   async function handleDelete(id) {
     await supabase.from('medications').delete().eq('id', id)
     setMedications(prev => prev.filter(m => m.id !== id))
+    setDeleteConfirm(null)
   }
+
+  const freqOpt = FREQ_OPTIONS.find(o => o.value === form.frequency)
+  const showTimePickers = freqOpt && freqOpt.times > 0
+  const isInterval = freqOpt?.interval != null
+  const previewTimes = isInterval && scheduledTimes[0]
+    ? computeScheduledTimes(form.frequency, scheduledTimes)
+    : []
 
   return (
     <Layout>
-      <div className="p-4 md:p-8 max-w-3xl">
-        <div className="flex items-center justify-between mb-8">
+      <div style={{ padding: '16px 16px 0', maxWidth: 600 }}>
+
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Medicamentos</h2>
-            <p className="text-gray-500 mt-1">Registro de medicamentos del familiar</p>
+            <h2 style={{ fontFamily: 'Georgia, serif', fontSize: 20, fontWeight: 700, color: '#1A1A1A', marginBottom: 2 }}>
+              Medicamentos
+            </h2>
+            <p style={{ fontSize: 12, color: '#9CA3AF' }}>Registro de medicamentos del familiar</p>
           </div>
           <button
-            onClick={() => setShowForm(!showForm)}
-            className="px-4 py-2 bg-primary hover:bg-primary-dark text-white text-sm font-medium rounded-lg transition-colors"
+            onClick={openAdd}
+            style={{
+              width: 40, height: 40, borderRadius: 12,
+              background: 'linear-gradient(135deg, #C4623A, #A85130)',
+              border: 'none', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 4px 12px rgba(196,98,58,0.3)',
+            }}
           >
-            + Agregar
+            <Plus size={20} color="white" strokeWidth={2.5} />
           </button>
         </div>
 
-        {showForm && (
-          <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-green-100 p-6 mb-6 space-y-4">
-            <h3 className="font-semibold text-gray-900">Nuevo medicamento</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
-                <input name="name" required value={form.name} onChange={handleChange}
-                  placeholder="ej. Metformina"
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Dosis</label>
-                <input name="dosage" value={form.dosage} onChange={handleChange}
-                  placeholder="ej. 500mg"
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Frecuencia</label>
-                <input name="frequency" value={form.frequency} onChange={handleChange}
-                  placeholder="ej. Dos veces al día"
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Hora</label>
-                <input type="time" name="time" value={form.time} onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
-              </div>
+        {/* Notification opt-in banner */}
+        {supported && permission !== 'granted' && permission !== 'denied' && (
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 12,
+            background: 'white', borderRadius: 14, border: '1px solid #EDE5D8',
+            padding: '12px 14px', marginBottom: 16,
+            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+          }}>
+            <div style={{
+              width: 36, height: 36, borderRadius: 10, flexShrink: 0,
+              background: '#FDF0EB', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <Bell size={18} color="#C4623A" strokeWidth={1.5} />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Notas adicionales</label>
-              <textarea name="notes" value={form.notes} onChange={handleChange} rows={2}
-                placeholder="Instrucciones especiales, efectos secundarios, etc."
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none" />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', marginBottom: 1 }}>
+                Recordatorios de medicamentos
+              </p>
+              <p style={{ fontSize: 11, color: '#9CA3AF' }}>
+                Activa las notificaciones para no olvidar ninguna dosis.
+              </p>
             </div>
-            <div className="flex gap-3">
-              <button type="submit" disabled={saving}
-                className="px-4 py-2 bg-primary hover:bg-primary-dark disabled:opacity-60 text-white text-sm font-medium rounded-lg transition-colors">
-                {saving ? 'Guardando...' : 'Guardar'}
-              </button>
-              <button type="button" onClick={() => setShowForm(false)}
-                className="px-4 py-2 border border-gray-200 text-gray-600 hover:bg-gray-50 text-sm font-medium rounded-lg transition-colors">
-                Cancelar
-              </button>
-            </div>
-          </form>
+            <button
+              onClick={requestAndSubscribe}
+              style={{
+                padding: '7px 14px', borderRadius: 10,
+                background: 'linear-gradient(135deg, #C4623A, #A85130)',
+                color: 'white', fontWeight: 700, fontSize: 12,
+                border: 'none', cursor: 'pointer', flexShrink: 0,
+              }}
+            >
+              Activar
+            </button>
+          </div>
         )}
 
+        {/* List */}
         {loading ? (
-          <div className="flex justify-center py-12">
-            <div className="w-6 h-6 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+          <div style={{ display: 'flex', justifyContent: 'center', padding: '48px 0' }}>
+            <div style={{
+              width: 28, height: 28, borderRadius: '50%',
+              border: '3px solid #EDE5D8', borderTopColor: '#C4623A',
+              animation: 'spin 0.8s linear infinite',
+            }} />
           </div>
         ) : medications.length === 0 ? (
-          <div className="bg-white rounded-xl border border-green-100 p-12 text-center">
-            <p className="text-4xl mb-3">💊</p>
-            <p className="text-gray-500 text-sm">No hay medicamentos registrados aún.</p>
+          <div style={{
+            background: 'white', borderRadius: 20, border: '1px solid #EDE5D8',
+            padding: '48px 24px', textAlign: 'center',
+            boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
+          }}>
+            <div style={{ fontSize: 44, marginBottom: 12 }}>💊</div>
+            <p style={{ fontSize: 14, fontWeight: 600, color: '#1A1A1A', marginBottom: 6 }}>Sin medicamentos</p>
+            <p style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 20 }}>
+              Agrega los medicamentos del familiar para mantener un control preciso.
+            </p>
+            <button
+              onClick={openAdd}
+              style={{
+                padding: '10px 24px', borderRadius: 12,
+                background: 'linear-gradient(135deg, #C4623A, #A85130)',
+                color: 'white', fontWeight: 700, fontSize: 13,
+                border: 'none', cursor: 'pointer',
+              }}
+            >
+              + Agregar medicamento
+            </button>
           </div>
         ) : (
-          <div className="space-y-3">
-            {medications.map(med => (
-              <div key={med.id} className="bg-white rounded-xl border border-green-100 p-5 flex items-start justify-between">
-                <div className="flex gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-primary-light flex items-center justify-center text-xl flex-shrink-0">
-                    💊
-                  </div>
-                  <div>
-                    <p className="font-semibold text-gray-900">{med.name}</p>
-                    <div className="flex flex-wrap gap-x-4 gap-y-0.5 mt-1">
-                      {med.dosage && <span className="text-xs text-gray-500">{med.dosage}</span>}
-                      {med.frequency && <span className="text-xs text-gray-500">{med.frequency}</span>}
-                      {med.time && <span className="text-xs text-gray-500">⏰ {med.time}</span>}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {medications.map(med => {
+              const opt = FREQ_OPTIONS.find(o => o.value === med.frequency)
+              const times = med.scheduled_times?.length
+                ? med.scheduled_times
+                : med.time ? [med.time] : []
+
+              return (
+                <div
+                  key={med.id}
+                  onClick={() => deleteConfirm === med.id && setDeleteConfirm(null)}
+                  style={{
+                    background: 'white', borderRadius: 16,
+                    border: '1px solid #EDE5D8', borderLeft: '4px solid #C4623A',
+                    padding: '14px 16px',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ fontSize: 15, fontWeight: 700, color: '#1A1A1A', marginBottom: 4 }}>
+                        💊 {med.name}
+                      </p>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
+                        {med.dosage && (
+                          <span style={{ fontSize: 12, color: '#6B7280' }}>{med.dosage}</span>
+                        )}
+                        {(opt?.label ?? med.frequency) && (
+                          <span style={{
+                            background: '#FDF0EB', color: '#C4623A',
+                            padding: '2px 8px', borderRadius: 6, fontSize: 11, fontWeight: 600,
+                          }}>
+                            {opt?.label ?? med.frequency}
+                          </span>
+                        )}
+                      </div>
+                      {times.length > 0 && (
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 8 }}>
+                          {times.map((t, i) => (
+                            <span key={i} style={{
+                              background: '#F0F8F4', color: '#2D6A4F',
+                              padding: '3px 8px', borderRadius: 6,
+                              fontSize: 11, fontWeight: 600,
+                            }}>
+                              ⏰ {t}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                      {med.notes && (
+                        <p style={{ fontSize: 11, color: '#9CA3AF', marginTop: 6, lineHeight: 1.4 }}>
+                          {med.notes}
+                        </p>
+                      )}
                     </div>
-                    {med.notes && <p className="text-xs text-gray-400 mt-1">{med.notes}</p>}
+
+                    <div style={{ display: 'flex', gap: 4, marginLeft: 12, flexShrink: 0 }}>
+                      <button
+                        onClick={() => openEdit(med)}
+                        style={{
+                          padding: '6px 8px', borderRadius: 8,
+                          border: '1px solid #EDE5D8', background: 'white',
+                          cursor: 'pointer', display: 'flex', alignItems: 'center',
+                        }}
+                      >
+                        <Pencil size={14} color="#6B7280" strokeWidth={1.5} />
+                      </button>
+                      {deleteConfirm === med.id ? (
+                        <button
+                          onClick={() => handleDelete(med.id)}
+                          style={{
+                            padding: '6px 10px', borderRadius: 8,
+                            border: 'none', background: '#D63031',
+                            color: 'white', fontSize: 11, fontWeight: 700, cursor: 'pointer',
+                          }}
+                        >
+                          Eliminar
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => setDeleteConfirm(med.id)}
+                          style={{
+                            padding: '6px 8px', borderRadius: 8,
+                            border: '1px solid #EDE5D8', background: 'white',
+                            cursor: 'pointer', display: 'flex', alignItems: 'center',
+                          }}
+                        >
+                          <Trash size={14} color="#D63031" strokeWidth={1.5} />
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
-                <button onClick={() => handleDelete(med.id)}
-                  className="text-gray-300 hover:text-red-500 transition-colors p-1 ml-4 flex-shrink-0">
-                  ✕
-                </button>
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
       </div>
+
+      {/* Add / Edit sheet */}
+      {showForm && (
+        <div
+          style={{
+            position: 'fixed', inset: 0, zIndex: 50,
+            background: 'rgba(0,0,0,0.5)',
+            display: 'flex', alignItems: 'flex-end',
+          }}
+          onClick={e => { if (e.target === e.currentTarget) setShowForm(false) }}
+        >
+          <div style={{
+            width: '100%', maxHeight: '92vh',
+            background: 'white', borderRadius: '24px 24px 0 0',
+            padding: '24px 20px 40px',
+            overflowY: 'auto',
+            boxShadow: '0 -8px 48px rgba(0,0,0,0.2)',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+              <h3 style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#1A1A1A' }}>
+                {editId ? 'Editar medicamento' : 'Nuevo medicamento'}
+              </h3>
+              <button
+                onClick={() => setShowForm(false)}
+                style={{ padding: 8, border: 'none', background: 'none', cursor: 'pointer' }}
+              >
+                <XIcon size={20} color="#9CA3AF" strokeWidth={2} />
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div>
+                <label style={labelStyle}>Nombre del medicamento *</label>
+                <input
+                  name="name" required value={form.name} onChange={handleChange}
+                  placeholder="ej. Metformina"
+                  style={fieldStyle} onFocus={onFocus} onBlur={onBlur}
+                />
+              </div>
+
+              <div>
+                <label style={labelStyle}>Dosis</label>
+                <input
+                  name="dosage" value={form.dosage} onChange={handleChange}
+                  placeholder="ej. 500mg"
+                  style={fieldStyle} onFocus={onFocus} onBlur={onBlur}
+                />
+              </div>
+
+              <div>
+                <label style={labelStyle}>Frecuencia</label>
+                <div style={{ position: 'relative' }}>
+                  <select
+                    value={form.frequency}
+                    onChange={e => handleFrequencyChange(e.target.value)}
+                    style={{ ...fieldStyle, paddingRight: 32 }}
+                    onFocus={onFocus} onBlur={onBlur}
+                  >
+                    <option value="">Seleccionar frecuencia...</option>
+                    {FREQ_OPTIONS.map(o => (
+                      <option key={o.value} value={o.value}>{o.label}</option>
+                    ))}
+                  </select>
+                  <span style={{
+                    position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)',
+                    pointerEvents: 'none', color: '#9CA3AF', fontSize: 12,
+                  }}>▼</span>
+                </div>
+              </div>
+
+              {/* Time pickers */}
+              {showTimePickers && (
+                <div>
+                  <label style={labelStyle}>
+                    {isInterval ? 'Hora de inicio' : scheduledTimes.length > 1 ? 'Horarios' : 'Hora'}
+                  </label>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {scheduledTimes.map((t, i) => (
+                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        {scheduledTimes.length > 1 && (
+                          <span style={{ fontSize: 12, color: '#9CA3AF', width: 18, flexShrink: 0 }}>
+                            {i + 1}.
+                          </span>
+                        )}
+                        <input
+                          type="time"
+                          value={t}
+                          onChange={e => {
+                            const next = [...scheduledTimes]
+                            next[i] = e.target.value
+                            setScheduledTimes(next)
+                          }}
+                          style={{ ...fieldStyle, flex: 1 }}
+                          onFocus={onFocus} onBlur={onBlur}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                  {/* Preview computed times for interval-based */}
+                  {previewTimes.length > 0 && (
+                    <div style={{ marginTop: 8, padding: '10px 12px', background: '#F0F8F4', borderRadius: 10 }}>
+                      <p style={{ fontSize: 11, color: '#2D6A4F', fontWeight: 600, marginBottom: 6 }}>
+                        Horarios automáticos ({previewTimes.length} dosis al día):
+                      </p>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                        {previewTimes.map((t, i) => (
+                          <span key={i} style={{
+                            background: 'white', color: '#2D6A4F',
+                            padding: '2px 8px', borderRadius: 6,
+                            fontSize: 11, fontWeight: 600, border: '1px solid #C1E4CC',
+                          }}>
+                            {t}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div>
+                <label style={labelStyle}>Notas adicionales</label>
+                <textarea
+                  name="notes" value={form.notes} onChange={handleChange}
+                  rows={2} placeholder="Instrucciones especiales, efectos secundarios..."
+                  style={{ ...fieldStyle, resize: 'vertical', minHeight: 72, lineHeight: 1.5 }}
+                  onFocus={onFocus} onBlur={onBlur}
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
+                <button
+                  type="button" onClick={() => setShowForm(false)}
+                  style={{
+                    flex: 1, padding: '13px',
+                    border: '1.5px solid #EDE5D8', borderRadius: 14,
+                    background: 'white', color: '#6B7280',
+                    fontSize: 14, fontWeight: 600, cursor: 'pointer',
+                  }}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit" disabled={saving}
+                  style={{
+                    flex: 2, padding: '13px',
+                    background: saving ? '#D4C4B8' : 'linear-gradient(135deg, #C4623A, #A85130)',
+                    color: 'white', fontWeight: 700, fontSize: 14,
+                    borderRadius: 14, border: 'none',
+                    cursor: saving ? 'not-allowed' : 'pointer',
+                    boxShadow: saving ? 'none' : '0 6px 20px rgba(196,98,58,0.3)',
+                    transition: 'all 0.15s',
+                  }}
+                >
+                  {saving ? 'Guardando...' : editId ? 'Guardar cambios' : 'Guardar medicamento'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </Layout>
   )
 }

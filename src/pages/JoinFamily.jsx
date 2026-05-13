@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { supabase } from '../lib/supabase'
 import Logo from '../components/Logo'
-import { Heart, UserPlus } from '../components/Icons'
+import { Heart, UserPlus, Eye, EyeOff } from '../components/Icons'
 import imgFamilia from '../assets/images/splash-familia.png'
 
 export default function JoinFamily() {
@@ -22,6 +22,7 @@ export default function JoinFamily() {
   const [authName, setAuthName]       = useState('')
   const [authEmail, setAuthEmail]     = useState('')
   const [authPassword, setAuthPassword] = useState('')
+  const [showPw, setShowPw]           = useState(false)
   const [authLoading, setAuthLoading] = useState(false)
   const [authError, setAuthError]     = useState('')
 
@@ -429,16 +430,33 @@ export default function JoinFamily() {
                       onFocus={onFocus}
                       onBlur={onBlur}
                     />
-                    <input
-                      type="password"
-                      required
-                      value={authPassword}
-                      onChange={e => setAuthPassword(e.target.value)}
-                      placeholder="Contraseña"
-                      style={fieldBase}
-                      onFocus={onFocus}
-                      onBlur={onBlur}
-                    />
+                    <div style={{ position: 'relative' }}>
+                      <input
+                        type={showPw ? 'text' : 'password'}
+                        required
+                        value={authPassword}
+                        onChange={e => setAuthPassword(e.target.value)}
+                        placeholder="Contraseña"
+                        style={{ ...fieldBase, paddingRight: 44 }}
+                        onFocus={onFocus}
+                        onBlur={onBlur}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPw(v => !v)}
+                        style={{
+                          position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)',
+                          background: 'none', border: 'none', cursor: 'pointer',
+                          padding: 4, display: 'flex', alignItems: 'center',
+                        }}
+                        aria-label={showPw ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                      >
+                        {showPw
+                          ? <EyeOff size={18} color="#9CA3AF" strokeWidth={1.5} />
+                          : <Eye    size={18} color="#9CA3AF" strokeWidth={1.5} />
+                        }
+                      </button>
+                    </div>
                     <button
                       type="submit"
                       disabled={authLoading}
