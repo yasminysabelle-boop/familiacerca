@@ -93,6 +93,22 @@ export default function Hoy() {
     <Layout>
       <div style={{ padding: '16px 16px 96px', maxWidth: 600 }}>
 
+        {/* Add medication button */}
+        <Link
+          to="/medications"
+          style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+            padding: '12px 0', borderRadius: 14, marginBottom: 14,
+            background: 'linear-gradient(135deg, #C4623A, #A85130)',
+            color: 'white', fontWeight: 700, fontSize: 14,
+            textDecoration: 'none',
+            boxShadow: '0 4px 16px rgba(196,98,58,0.3)',
+          }}
+        >
+          <Plus size={16} color="white" strokeWidth={2.5} />
+          Agregar medicamento
+        </Link>
+
         {/* Progress card */}
         {total > 0 && (
           <div style={{

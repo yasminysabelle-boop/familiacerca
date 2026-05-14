@@ -6,6 +6,8 @@ import Logo from './Logo'
 import { Home, Pill, Mic, Users, User, Plus, XIcon } from './Icons'
 import Paywall from './Paywall'
 import InstallBanner from './InstallBanner'
+import OfflineBanner from './OfflineBanner'
+import { useDarkMode } from '../contexts/DarkModeContext'
 
 const PAGE_TITLES = {
   '/dashboard':   'Inicio',
@@ -37,22 +39,29 @@ const BOTTOM_TABS = [
 ]
 
 const FAB_ITEMS = [
-  { to: '/chat',       emoji: '💬', label: 'Chat' },
-  { to: '/calendar',   emoji: '📅', label: 'Calendario' },
-  { to: '/notes',      emoji: '📝', label: 'Notas' },
-  { to: '/album',      emoji: '📸', label: 'Álbum' },
-  { to: '/gastos',     emoji: '💰', label: 'Gastos' },
-  { to: '/historial',  emoji: '📋', label: 'Historial' },
-  { to: '/directorio', emoji: '🏥', label: 'Directorio' },
+  { to: '/medications', emoji: '💊', label: 'Medicamento' },
+  { to: '/chat',        emoji: '💬', label: 'Chat' },
+  { to: '/calendar',    emoji: '📅', label: 'Calendario' },
+  { to: '/notes',       emoji: '📝', label: 'Notas' },
+  { to: '/album',       emoji: '📸', label: 'Álbum' },
+  { to: '/gastos',      emoji: '💰', label: 'Gastos' },
+  { to: '/historial',   emoji: '📋', label: 'Historial' },
+  { to: '/directorio',  emoji: '🏥', label: 'Directorio' },
 ]
 
 export default function Layout({ children }) {
   const { inactivityWarning } = useAuth()
   const { profile } = useFamily()
+  const { dark } = useDarkMode()
   const location = useLocation()
   const navigate = useNavigate()
   const isHome = location.pathname === '/dashboard'
   const [fabOpen, setFabOpen] = useState(false)
+
+  const bg      = dark ? '#1C1208' : '#FFF8F0'
+  const navBg   = dark ? 'rgba(28,18,8,0.97)' : 'rgba(255,255,255,0.97)'
+  const hdrBg   = dark ? 'rgba(28,18,8,0.95)' : 'rgba(255,248,240,0.95)'
+  const border  = dark ? '#3D2A18' : '#EDE5D8'
 
   function handleFabLink(to) {
     setFabOpen(false)
@@ -60,16 +69,16 @@ export default function Layout({ children }) {
   }
 
   return (
-    <div style={{ background: '#FFF8F0' }}>
+    <div style={{ background: bg }}>
       {/* Fixed header */}
       <header
         style={{
           position: 'fixed', top: 0, left: 0, right: 0, zIndex: 40,
           height: 56,
-          background: 'rgba(255,248,240,0.95)',
+          background: hdrBg,
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
-          borderBottom: '1px solid #EDE5D8',
+          borderBottom: `1px solid ${border}`,
           boxShadow: '0 1px 12px rgba(0,0,0,0.05)',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           padding: '0 16px',
@@ -110,6 +119,7 @@ export default function Layout({ children }) {
       {/* Scrollable main */}
       <main style={{ position: 'fixed', inset: 0, overflowY: 'auto', top: 56, bottom: 68 }}>
         <InstallBanner />
+        <OfflineBanner />
         {children}
         <footer style={{ padding: '24px 16px', textAlign: 'center', borderTop: '1px solid #EDE5D8' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, marginBottom: 8 }}>
@@ -225,10 +235,10 @@ export default function Layout({ children }) {
         style={{
           position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 40,
           height: 68,
-          background: 'rgba(255,255,255,0.97)',
+          background: navBg,
           backdropFilter: 'blur(16px)',
           WebkitBackdropFilter: 'blur(16px)',
-          borderTop: '1px solid #EDE5D8',
+          borderTop: `1px solid ${border}`,
           boxShadow: '0 -4px 24px rgba(0,0,0,0.06)',
           display: 'flex',
         }}
