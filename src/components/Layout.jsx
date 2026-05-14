@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import Logo from './Logo'
 import { Home, Pill, Mic, Users, User, Plus, XIcon } from './Icons'
@@ -42,6 +43,7 @@ const FAB_ITEMS = [
 ]
 
 export default function Layout({ children }) {
+  const { inactivityWarning } = useAuth()
   const { profile } = useFamily()
   const location = useLocation()
   const navigate = useNavigate()
@@ -184,6 +186,30 @@ export default function Layout({ children }) {
               ))}
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Inactivity warning banner */}
+      {inactivityWarning && (
+        <div style={{
+          position: 'fixed', bottom: 68, left: 0, right: 0, zIndex: 50,
+          background: '#1F2937',
+          padding: '14px 20px 16px',
+          boxShadow: '0 -4px 24px rgba(0,0,0,0.3)',
+          display: 'flex', flexDirection: 'column', gap: 10,
+        }}>
+          <p style={{ fontSize: 13, color: 'white', lineHeight: 1.5, margin: 0 }}>
+            ¿Sigues ahí? La sesión se cerrará en 1 minuto por seguridad.
+          </p>
+          <button
+            style={{
+              padding: '10px 16px', borderRadius: 10, border: 'none',
+              background: '#C4623A', color: 'white', fontWeight: 700,
+              fontSize: 13, cursor: 'pointer', alignSelf: 'flex-start',
+            }}
+          >
+            Sí, continuar →
+          </button>
         </div>
       )}
 

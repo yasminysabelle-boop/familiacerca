@@ -32,12 +32,13 @@ export default function Login() {
     e.preventDefault()
     setError('')
     setLoading(true)
-    const { error: err } = await signIn(email, password)
+    const { error: err, data } = await signIn(email, password)
     setLoading(false)
     if (err) {
       setError('Correo o contraseña incorrectos.')
     } else {
-      navigate('/permisos')
+      const completed = data?.user?.user_metadata?.onboarding_completed
+      navigate(completed ? '/permisos' : '/onboarding')
     }
   }
 
