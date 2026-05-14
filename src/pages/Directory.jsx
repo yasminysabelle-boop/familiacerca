@@ -14,6 +14,22 @@ const BLANK_INS = { name: '', type: 'Hospital', address: '', phone: '', emergenc
 const BLANK_CON = { name: '', relationship: '', phone: '', email: '', address: '', is_emergency_contact: false, notes: '' }
 
 const INST_TYPES = ['Hospital', 'Clínica', 'Consultorio', 'Laboratorio', 'Farmacia', 'Otro']
+
+const DOCTOR_SPECIALTIES = [
+  'Médico General','Cardiólogo','Neurólogo','Oncólogo','Pediatra','Geriatra','Internista',
+  'Endocrinólogo','Gastroenterólogo','Nefrólogo','Neumólogo','Ortopedista','Traumatólogo',
+  'Dermatólogo','Oftalmólogo','Otorrinolaringólogo','Urólogo','Ginecólogo','Obstetra',
+  'Reumatólogo','Hematólogo','Infectólogo','Inmunólogo','Alergólogo','Anestesiólogo',
+  'Cirujano General','Cirujano Cardiovascular','Neurocirujano','Psiquiatra','Psicólogo',
+  'Nutricionista','Fisioterapeuta','Foniatra','Odontólogo','Odontólogo Especialista',
+  'Enfermero/a','Otro',
+]
+
+const CONTACT_RELATIONSHIPS = [
+  'Hijo/a','Padre','Madre','Hermano/a','Hermana','Esposo/a','Cuñado/a','Suegro/a',
+  'Abuelo/a','Nieto/a','Tío/a','Sobrino/a','Primo/a','Padrino/Madrina',
+  'Cuidador profesional','Vecino cercano','Amigo cercano','Otro',
+]
 const INST_TYPE_COLORS = {
   Hospital: '#D63031', Clínica: '#2D86A0', Consultorio: '#4A7C59',
   Laboratorio: '#7C5CBF', Farmacia: '#C4623A', Otro: '#9CA3AF',
@@ -66,7 +82,7 @@ function FormInput({ label, value, onChange, type = 'text', placeholder, rows })
   )
 }
 
-function FormSelect({ label, value, onChange, options }) {
+function FormSelect({ label, value, onChange, options, placeholder }) {
   return (
     <div>
       <Label>{label}</Label>
@@ -74,6 +90,7 @@ function FormSelect({ label, value, onChange, options }) {
         style={{ ...F, appearance: 'none', backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239CA3AF' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center' }}
         onFocus={onFocus} onBlur={onBlur}
       >
+        {placeholder && <option value="">{placeholder}</option>}
         {options.map(o => <option key={o} value={o}>{o}</option>)}
       </select>
     </div>
@@ -130,9 +147,9 @@ function AddBtn({ onClick, label }) {
 
 function SheetModal({ title, subtitle, onClose, onSave, saveLabel, saving, children }) {
   return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 60, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
+    <div style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
       onClick={e => { if (e.target === e.currentTarget) onClose() }}>
-      <div style={{ width: '100%', maxWidth: 480, background: 'white', borderRadius: '24px 24px 0 0', padding: '28px 24px 40px', boxShadow: '0 -8px 48px rgba(0,0,0,0.2)', maxHeight: '92svh', overflowY: 'auto' }}>
+      <div style={{ width: '100%', maxWidth: 480, background: 'white', borderRadius: '24px 24px 0 0', padding: '28px 24px 96px', boxShadow: '0 -8px 48px rgba(0,0,0,0.2)', maxHeight: '92svh', overflowY: 'auto' }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 20 }}>
           <div>
             <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>{title}</p>
@@ -580,7 +597,7 @@ export default function Directory() {
       {docModal && (
         <SheetModal title={editDoc ? 'Editar médico' : 'Nuevo médico'} subtitle="Los datos son visibles para todo el equipo de cuidado" onClose={() => setDocModal(false)} onSave={saveDoc} saveLabel={editDoc ? 'Guardar cambios' : 'Agregar médico'} saving={savingDoc}>
           <FormInput label="Nombre completo *" value={docForm.name}      onChange={v => setDocForm(f => ({ ...f, name: v }))}      placeholder="Dr. Ana García" />
-          <FormInput label="Especialidad"       value={docForm.specialty} onChange={v => setDocForm(f => ({ ...f, specialty: v }))} placeholder="Cardiología, Neurología…" />
+          <FormSelect label="Especialidad"      value={docForm.specialty} onChange={v => setDocForm(f => ({ ...f, specialty: v }))} options={DOCTOR_SPECIALTIES} placeholder="Seleccionar especialidad" />
           <FormInput label="Teléfono"           value={docForm.phone}     onChange={v => setDocForm(f => ({ ...f, phone: v }))}     placeholder="555-123-4567" type="tel" />
           <FormInput label="Correo"             value={docForm.email}     onChange={v => setDocForm(f => ({ ...f, email: v }))}     placeholder="medico@hospital.com" type="email" />
           <FormInput label="Clínica / Hospital" value={docForm.clinic}    onChange={v => setDocForm(f => ({ ...f, clinic: v }))}    placeholder="Hospital General del Norte" />
@@ -605,7 +622,7 @@ export default function Directory() {
       {conModal && (
         <SheetModal title={editCon ? 'Editar contacto' : 'Nuevo familiar'} subtitle="Agrega personas de confianza del equipo de cuidado" onClose={() => setConModal(false)} onSave={saveCon} saveLabel={editCon ? 'Guardar cambios' : 'Agregar familiar'} saving={savingCon}>
           <FormInput label="Nombre *"   value={conForm.name}         onChange={v => setConForm(f => ({ ...f, name: v }))}         placeholder="María López" />
-          <FormInput label="Parentesco" value={conForm.relationship} onChange={v => setConForm(f => ({ ...f, relationship: v }))} placeholder="Hija, Hermano, Cuidador…" />
+          <FormSelect label="Parentesco" value={conForm.relationship} onChange={v => setConForm(f => ({ ...f, relationship: v }))} options={CONTACT_RELATIONSHIPS} placeholder="Seleccionar parentesco" />
           <FormInput label="Teléfono"   value={conForm.phone}        onChange={v => setConForm(f => ({ ...f, phone: v }))}        placeholder="555-678-9012" type="tel" />
           <FormInput label="Correo"     value={conForm.email}        onChange={v => setConForm(f => ({ ...f, email: v }))}        placeholder="familiar@correo.com" type="email" />
           <FormInput label="Dirección"  value={conForm.address}      onChange={v => setConForm(f => ({ ...f, address: v }))}      placeholder="Calle Robles 45, Col. Centro" />
