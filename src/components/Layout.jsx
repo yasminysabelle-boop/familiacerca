@@ -5,6 +5,7 @@ import { useFamily } from '../contexts/FamilyContext'
 import Logo from './Logo'
 import { Home, Pill, Mic, Users, User, Plus, XIcon } from './Icons'
 import Paywall from './Paywall'
+import InstallBanner from './InstallBanner'
 
 const PAGE_TITLES = {
   '/dashboard':   'Inicio',
@@ -108,6 +109,7 @@ export default function Layout({ children }) {
 
       {/* Scrollable main */}
       <main style={{ position: 'fixed', inset: 0, overflowY: 'auto', top: 56, bottom: 68 }}>
+        <InstallBanner />
         {children}
         <footer style={{ padding: '24px 16px', textAlign: 'center', borderTop: '1px solid #EDE5D8' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, marginBottom: 8 }}>
