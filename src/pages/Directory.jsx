@@ -1,18 +1,25 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import { useFamily } from '../contexts/FamilyContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import {
   Plus, XIcon, Phone, Mail, MapPin, Star, Pencil, Trash,
-  BookOpen, User, AlertTriangle,
+  BookOpen, User, AlertTriangle, Users,
 } from '../components/Icons'
 
-// ── Constants ─────────────────────────────────────────────────────
+// ── Constants ──────────────────────────────────────────────────────
 const BLANK_DOC = { name: '', specialty: '', phone: '', email: '', clinic: '', notes: '' }
+const BLANK_INS = { name: '', type: 'Hospital', address: '', phone: '', emergency_phone: '', website: '', notes: '' }
 const BLANK_CON = { name: '', relationship: '', phone: '', email: '', address: '', is_emergency_contact: false, notes: '' }
 
-const FIELD = {
+const INST_TYPES = ['Hospital', 'Clínica', 'Consultorio', 'Laboratorio', 'Farmacia', 'Otro']
+const INST_TYPE_COLORS = {
+  Hospital: '#D63031', Clínica: '#2D86A0', Consultorio: '#4A7C59',
+  Laboratorio: '#7C5CBF', Farmacia: '#C4623A', Otro: '#9CA3AF',
+}
+
+const F = {
   width: '100%', padding: '11px 14px',
   border: '1.5px solid #EDE5D8', borderRadius: 12,
   fontSize: 14, outline: 'none', background: '#FDFAF7',
@@ -22,24 +29,23 @@ const FIELD = {
 const onFocus = e => { e.target.style.borderColor = '#C4623A'; e.target.style.boxShadow = '0 0 0 3px rgba(196,98,58,0.1)' }
 const onBlur  = e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.boxShadow = 'none' }
 
-// ── Small helpers ─────────────────────────────────────────────────
-function InfoRow({ Icon: Ic, value, href }) {
+// ── Shared small components ────────────────────────────────────────
+function InfoRow({ Icon: Ic, value, href, color }) {
   if (!value) return null
   const inner = (
-    <div className="flex items-start gap-2 mt-2">
-      <Ic size={14} color="#9CA3AF" strokeWidth={1.5} style={{ flexShrink: 0, marginTop: 1 }} />
-      <span className="text-xs text-gray-600 break-all leading-relaxed">{value}</span>
+    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginTop: 6 }}>
+      <Ic size={14} color={color ?? '#9CA3AF'} strokeWidth={1.5} style={{ flexShrink: 0, marginTop: 1 }} />
+      <span style={{ fontSize: 12, color: '#6B7280', wordBreak: 'break-all', lineHeight: 1.5 }}>{value}</span>
     </div>
   )
-  return href ? <a href={href} className="block">{inner}</a> : inner
+  return href
+    ? <a href={href} style={{ display: 'block', textDecoration: 'none' }}>{inner}</a>
+    : inner
 }
 
 function Label({ children }) {
   return (
-    <p style={{
-      fontSize: 11, fontWeight: 700, color: '#6B7280',
-      letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6,
-    }}>
+    <p style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>
       {children}
     </p>
   )
@@ -50,243 +56,102 @@ function FormInput({ label, value, onChange, type = 'text', placeholder, rows })
     <div>
       <Label>{label}</Label>
       {rows ? (
-        <textarea
-          rows={rows}
-          value={value}
-          onChange={e => onChange(e.target.value)}
-          placeholder={placeholder}
-          style={{ ...FIELD, resize: 'none' }}
-          onFocus={onFocus}
-          onBlur={onBlur}
-        />
+        <textarea rows={rows} value={value} onChange={e => onChange(e.target.value)}
+          placeholder={placeholder} style={{ ...F, resize: 'none' }} onFocus={onFocus} onBlur={onBlur} />
       ) : (
-        <input
-          type={type}
-          value={value}
-          onChange={e => onChange(e.target.value)}
-          placeholder={placeholder}
-          style={FIELD}
-          onFocus={onFocus}
-          onBlur={onBlur}
-        />
+        <input type={type} value={value} onChange={e => onChange(e.target.value)}
+          placeholder={placeholder} style={F} onFocus={onFocus} onBlur={onBlur} />
       )}
     </div>
   )
 }
 
-function CardActions({ onEdit, onDelete, isConfirm, onConfirm, onCancel }) {
+function FormSelect({ label, value, onChange, options }) {
+  return (
+    <div>
+      <Label>{label}</Label>
+      <select value={value} onChange={e => onChange(e.target.value)}
+        style={{ ...F, appearance: 'none', backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239CA3AF' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center' }}
+        onFocus={onFocus} onBlur={onBlur}
+      >
+        {options.map(o => <option key={o} value={o}>{o}</option>)}
+      </select>
+    </div>
+  )
+}
+
+function CardActions({ onEdit, onDeleteRequest, isConfirm, onConfirm, onCancel }) {
   if (isConfirm) {
     return (
-      <div className="flex items-center gap-2 flex-shrink-0">
-        <span className="text-xs text-gray-500">¿Eliminar?</span>
-        <button
-          onClick={onCancel}
-          className="px-2 py-1 rounded-lg text-xs font-semibold"
-          style={{ background: '#F3F4F6', color: '#6B7280', border: 'none' }}
-        >
-          No
-        </button>
-        <button
-          onClick={onConfirm}
-          className="px-2 py-1 rounded-lg text-xs font-semibold"
-          style={{ background: '#FFF0F0', color: '#D63031', border: '1px solid #FFBABA' }}
-        >
-          Sí
-        </button>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+        <span style={{ fontSize: 11, color: '#6B7280' }}>¿Eliminar?</span>
+        <button onClick={onCancel} style={{ padding: '3px 8px', borderRadius: 8, fontSize: 11, fontWeight: 600, background: '#F3F4F6', color: '#6B7280', border: 'none', cursor: 'pointer' }}>No</button>
+        <button onClick={onConfirm} style={{ padding: '3px 8px', borderRadius: 8, fontSize: 11, fontWeight: 600, background: '#FFF0F0', color: '#D63031', border: '1px solid #FFBABA', cursor: 'pointer' }}>Sí</button>
       </div>
     )
   }
   return (
-    <div className="flex items-center gap-1 flex-shrink-0">
-      <button
-        onClick={onEdit}
-        className="w-7 h-7 rounded-lg flex items-center justify-center"
-        style={{ background: '#F3F4F6', border: 'none' }}
-      >
+    <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+      <button onClick={onEdit} style={{ width: 28, height: 28, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F3F4F6', border: 'none', cursor: 'pointer' }}>
         <Pencil size={13} color="#6B7280" strokeWidth={1.75} />
       </button>
-      <button
-        onClick={onDelete}
-        className="w-7 h-7 rounded-lg flex items-center justify-center"
-        style={{ background: '#FFF0F0', border: 'none' }}
-      >
+      <button onClick={onDeleteRequest} style={{ width: 28, height: 28, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#FFF0F0', border: 'none', cursor: 'pointer' }}>
         <Trash size={13} color="#D63031" strokeWidth={1.75} />
       </button>
     </div>
   )
 }
 
-// ── Doctor card ────────────────────────────────────────────────────
-function DoctorCard({ doctor, onEdit, isConfirm, onConfirm, onCancel, onDeleteRequest }) {
+function EmptyState({ Icon: Ic, title, subtitle }) {
   return (
-    <div className="bg-white rounded-2xl p-4 mb-3"
-      style={{ boxShadow: '0 2px 12px rgba(0,0,0,0.06)', border: '1px solid #EDE5D8', borderTop: '3px solid #4A7C59' }}>
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0 flex-1">
-          <p className="font-bold text-gray-900 text-sm truncate" style={{ fontFamily: 'Georgia, serif' }}>
-            {doctor.name}
-          </p>
-          {doctor.specialty && (
-            <p className="text-xs font-medium mt-0.5" style={{ color: '#4A7C59' }}>{doctor.specialty}</p>
-          )}
-        </div>
-        <CardActions
-          onEdit={onEdit}
-          onDelete={onDeleteRequest}
-          isConfirm={isConfirm}
-          onConfirm={onConfirm}
-          onCancel={onCancel}
-        />
-      </div>
-      <div className="mt-1">
-        <InfoRow Icon={Phone} value={doctor.phone} href={doctor.phone ? `tel:${doctor.phone}` : undefined} />
-        <InfoRow Icon={Mail}  value={doctor.email} href={doctor.email ? `mailto:${doctor.email}` : undefined} />
-        <InfoRow Icon={BookOpen} value={doctor.clinic} />
-        {doctor.notes && (
-          <p className="text-xs text-gray-400 mt-2 leading-relaxed pl-4 border-l-2 border-gray-100">
-            {doctor.notes}
-          </p>
-        )}
-      </div>
-    </div>
-  )
-}
-
-// ── Contact card ───────────────────────────────────────────────────
-function ContactCard({ contact, onEdit, onToggleEmergency, isConfirm, onConfirm, onCancel, onDeleteRequest }) {
-  return (
-    <div className="bg-white rounded-2xl p-4 mb-3"
-      style={{
-        boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-        border: contact.is_emergency_contact ? '1.5px solid #FFBABA' : '1px solid #EDE5D8',
-        borderTop: `3px solid ${contact.is_emergency_contact ? '#D63031' : '#C4623A'}`,
-      }}>
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0 flex-1">
-          {contact.is_emergency_contact && (
-            <div className="flex items-center gap-1 mb-1">
-              <Star size={11} color="#D63031" strokeWidth={2} filled />
-              <span className="text-[10px] font-bold tracking-wider" style={{ color: '#D63031' }}>
-                EMERGENCIA
-              </span>
-            </div>
-          )}
-          <p className="font-bold text-gray-900 text-sm truncate" style={{ fontFamily: 'Georgia, serif' }}>
-            {contact.name}
-          </p>
-          {contact.relationship && (
-            <p className="text-xs font-medium mt-0.5 text-gray-500">{contact.relationship}</p>
-          )}
-        </div>
-        <CardActions
-          onEdit={onEdit}
-          onDelete={onDeleteRequest}
-          isConfirm={isConfirm}
-          onConfirm={onConfirm}
-          onCancel={onCancel}
-        />
-      </div>
-      <div className="mt-1">
-        <InfoRow Icon={Phone}  value={contact.phone}   href={contact.phone  ? `tel:${contact.phone}`      : undefined} />
-        <InfoRow Icon={Mail}   value={contact.email}   href={contact.email  ? `mailto:${contact.email}`   : undefined} />
-        <InfoRow Icon={MapPin} value={contact.address} />
-        {contact.notes && (
-          <p className="text-xs text-gray-400 mt-2 leading-relaxed pl-4 border-l-2 border-gray-100">
-            {contact.notes}
-          </p>
-        )}
-      </div>
-      <button
-        onClick={() => onToggleEmergency(contact)}
-        className="flex items-center gap-1.5 mt-3 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all active:scale-[0.97]"
-        style={{
-          background: contact.is_emergency_contact ? '#FFF0F0' : '#F9F5F1',
-          border: contact.is_emergency_contact ? '1px solid #FFBABA' : '1px solid #EDE5D8',
-          color: contact.is_emergency_contact ? '#D63031' : '#9CA3AF',
-        }}
-      >
-        <Star size={11} color={contact.is_emergency_contact ? '#D63031' : '#9CA3AF'} strokeWidth={1.75} filled={contact.is_emergency_contact} />
-        {contact.is_emergency_contact ? 'Quitar emergencia' : 'Marcar como emergencia'}
-      </button>
-    </div>
-  )
-}
-
-// ── Empty state ────────────────────────────────────────────────────
-function EmptyState({ icon: Ic, title, subtitle }) {
-  return (
-    <div className="flex flex-col items-center py-10 gap-3">
-      <div className="w-14 h-14 rounded-full flex items-center justify-center" style={{ background: '#F5EEE6' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '40px 0', gap: 12 }}>
+      <div style={{ width: 56, height: 56, borderRadius: '50%', background: '#F5EEE6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <Ic size={26} color="#C4623A" strokeWidth={1.3} />
       </div>
-      <p className="text-sm font-semibold text-gray-700">{title}</p>
-      <p className="text-xs text-gray-400 text-center max-w-[220px] leading-relaxed">{subtitle}</p>
+      <p style={{ fontSize: 14, fontWeight: 600, color: '#374151', textAlign: 'center' }}>{title}</p>
+      <p style={{ fontSize: 12, color: '#9CA3AF', textAlign: 'center', maxWidth: 220, lineHeight: 1.6 }}>{subtitle}</p>
     </div>
   )
 }
 
-// ── Add button ─────────────────────────────────────────────────────
 function AddBtn({ onClick, label }) {
   return (
-    <button
-      onClick={onClick}
-      className="w-full py-3.5 rounded-2xl flex items-center justify-center gap-2 font-semibold text-sm mt-2 active:scale-[0.98] transition-transform"
-      style={{ border: '1.5px dashed #C4623A', background: '#FFF8F4', color: '#C4623A' }}
-    >
+    <button onClick={onClick} style={{
+      width: '100%', padding: '14px', borderRadius: 16, marginTop: 8,
+      border: '1.5px dashed #C4623A', background: '#FFF8F4', color: '#C4623A',
+      fontWeight: 600, fontSize: 13, cursor: 'pointer',
+      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+    }}>
       <Plus size={16} color="#C4623A" strokeWidth={2} />
       {label}
     </button>
   )
 }
 
-// ── Bottom-sheet modal wrapper ─────────────────────────────────────
-function SheetModal({ title, subtitle, onClose, children, onSave, saveLabel, saving }) {
+function SheetModal({ title, subtitle, onClose, onSave, saveLabel, saving, children }) {
   return (
-    <div
-      style={{
-        position: 'fixed', inset: 0, zIndex: 50,
-        background: 'rgba(0,0,0,0.55)',
-        display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
-        padding: '0 0 env(safe-area-inset-bottom)',
-      }}
-      onClick={e => { if (e.target === e.currentTarget) onClose() }}
-    >
-      <div style={{
-        width: '100%', maxWidth: 480,
-        background: 'white', borderRadius: '24px 24px 0 0',
-        padding: '28px 24px 40px',
-        boxShadow: '0 -8px 48px rgba(0,0,0,0.2)',
-        maxHeight: '90svh', overflowY: 'auto',
-      }}>
-        <div className="flex items-start justify-between mb-5">
+    <div style={{ position: 'fixed', inset: 0, zIndex: 60, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
+      onClick={e => { if (e.target === e.currentTarget) onClose() }}>
+      <div style={{ width: '100%', maxWidth: 480, background: 'white', borderRadius: '24px 24px 0 0', padding: '28px 24px 40px', boxShadow: '0 -8px 48px rgba(0,0,0,0.2)', maxHeight: '92svh', overflowY: 'auto' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 20 }}>
           <div>
-            <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#1A1A1A' }}>
-              {title}
-            </p>
-            {subtitle && <p className="text-xs text-gray-400 mt-1">{subtitle}</p>}
+            <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>{title}</p>
+            {subtitle && <p style={{ fontSize: 12, color: '#9CA3AF', marginTop: 4 }}>{subtitle}</p>}
           </div>
-          <button
-            onClick={onClose}
-            style={{ padding: 8, borderRadius: 10, background: '#F3F4F6', border: 'none', cursor: 'pointer' }}
-          >
+          <button onClick={onClose} style={{ padding: 8, borderRadius: 10, background: '#F3F4F6', border: 'none', cursor: 'pointer' }}>
             <XIcon size={16} color="#6B7280" strokeWidth={2} />
           </button>
         </div>
-
-        <div className="flex flex-col gap-4">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {children}
         </div>
-
-        <button
-          onClick={onSave}
-          disabled={saving}
-          className="w-full mt-6 py-3.5 rounded-2xl font-bold text-sm text-white transition-all active:scale-[0.98]"
-          style={{
-            background: saving ? '#D4C4B8' : 'linear-gradient(135deg, #C4623A, #A85130)',
-            border: 'none', cursor: saving ? 'not-allowed' : 'pointer',
-            boxShadow: saving ? 'none' : '0 6px 20px rgba(196,98,58,0.3)',
-          }}
-        >
+        <button onClick={onSave} disabled={saving} style={{
+          width: '100%', marginTop: 24, padding: '14px', borderRadius: 16, border: 'none',
+          background: saving ? '#D4C4B8' : 'linear-gradient(135deg, #C4623A, #A85130)',
+          color: 'white', fontWeight: 700, fontSize: 14,
+          cursor: saving ? 'not-allowed' : 'pointer',
+          boxShadow: saving ? 'none' : '0 6px 20px rgba(196,98,58,0.3)',
+        }}>
           {saving ? 'Guardando...' : saveLabel}
         </button>
       </div>
@@ -294,48 +159,173 @@ function SheetModal({ title, subtitle, onClose, children, onSave, saveLabel, sav
   )
 }
 
+// ── Doctor card ────────────────────────────────────────────────────
+function DoctorCard({ doc, onEdit, isConfirm, onConfirm, onCancel, onDeleteRequest }) {
+  return (
+    <div style={{ background: 'white', borderRadius: 16, border: '1px solid #EDE5D8', borderTop: '3px solid #4A7C59', padding: '14px 16px', marginBottom: 10, boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10 }}>
+        <div style={{ minWidth: 0, flex: 1 }}>
+          <p style={{ fontFamily: 'Georgia, serif', fontSize: 14, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>{doc.name}</p>
+          {doc.specialty && <p style={{ fontSize: 12, fontWeight: 600, color: '#4A7C59', marginTop: 2 }}>{doc.specialty}</p>}
+        </div>
+        <CardActions onEdit={onEdit} onDeleteRequest={onDeleteRequest} isConfirm={isConfirm} onConfirm={onConfirm} onCancel={onCancel} />
+      </div>
+      <InfoRow Icon={Phone}   value={doc.phone}  href={doc.phone  ? `tel:${doc.phone}`      : undefined} />
+      <InfoRow Icon={Mail}    value={doc.email}  href={doc.email  ? `mailto:${doc.email}`   : undefined} />
+      <InfoRow Icon={BookOpen} value={doc.clinic} />
+      {doc.notes && <p style={{ fontSize: 11, color: '#9CA3AF', marginTop: 8, paddingLeft: 12, borderLeft: '2px solid #F3F4F6', lineHeight: 1.5 }}>{doc.notes}</p>}
+    </div>
+  )
+}
+
+// ── Institution card ───────────────────────────────────────────────
+function InstitutionCard({ ins, onEdit, isConfirm, onConfirm, onCancel, onDeleteRequest }) {
+  const typeColor = INST_TYPE_COLORS[ins.type] ?? '#9CA3AF'
+  return (
+    <div style={{ background: 'white', borderRadius: 16, border: '1px solid #EDE5D8', borderTop: `3px solid ${typeColor}`, padding: '14px 16px', marginBottom: 10, boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10 }}>
+        <div style={{ minWidth: 0, flex: 1 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+            <p style={{ fontFamily: 'Georgia, serif', fontSize: 14, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>{ins.name}</p>
+            {ins.type && (
+              <span style={{ fontSize: 10, fontWeight: 700, color: typeColor, background: `${typeColor}14`, padding: '2px 8px', borderRadius: 6 }}>
+                {ins.type}
+              </span>
+            )}
+          </div>
+        </div>
+        <CardActions onEdit={onEdit} onDeleteRequest={onDeleteRequest} isConfirm={isConfirm} onConfirm={onConfirm} onCancel={onCancel} />
+      </div>
+      <InfoRow Icon={MapPin} value={ins.address} />
+      <InfoRow Icon={Phone}  value={ins.phone} href={ins.phone ? `tel:${ins.phone}` : undefined} />
+      {ins.emergency_phone && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 6 }}>
+          <Phone size={14} color="#D63031" strokeWidth={1.75} style={{ flexShrink: 0 }} />
+          <a href={`tel:${ins.emergency_phone}`} style={{ fontSize: 12, color: '#D63031', fontWeight: 600, textDecoration: 'none' }}>
+            {ins.emergency_phone} <span style={{ fontWeight: 400, color: '#9CA3AF' }}>(emergencias)</span>
+          </a>
+        </div>
+      )}
+      {ins.website && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 6 }}>
+          <span style={{ fontSize: 12, flexShrink: 0 }}>🌐</span>
+          <a href={ins.website.startsWith('http') ? ins.website : `https://${ins.website}`} target="_blank" rel="noopener noreferrer"
+            style={{ fontSize: 12, color: '#2D86A0', textDecoration: 'none', wordBreak: 'break-all' }}>
+            {ins.website}
+          </a>
+        </div>
+      )}
+      {ins.notes && <p style={{ fontSize: 11, color: '#9CA3AF', marginTop: 8, paddingLeft: 12, borderLeft: '2px solid #F3F4F6', lineHeight: 1.5 }}>{ins.notes}</p>}
+    </div>
+  )
+}
+
+// ── Family contact card ────────────────────────────────────────────
+function ContactCard({ con, onEdit, onToggleEmergency, isConfirm, onConfirm, onCancel, onDeleteRequest }) {
+  const isEmergency = con.is_emergency_contact
+  return (
+    <div style={{
+      background: 'white', borderRadius: 16, padding: '14px 16px', marginBottom: 10,
+      border: isEmergency ? '1.5px solid #FECACA' : '1px solid #EDE5D8',
+      borderTop: `3px solid ${isEmergency ? '#D63031' : '#C4623A'}`,
+      boxShadow: isEmergency ? '0 2px 12px rgba(214,48,49,0.1)' : '0 2px 8px rgba(0,0,0,0.05)',
+    }}>
+      {isEmergency && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 6 }}>
+          <span style={{ fontSize: 10, fontWeight: 800, color: '#D63031', letterSpacing: '0.1em' }}>⭐ EMERGENCIA</span>
+        </div>
+      )}
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10 }}>
+        <div style={{ minWidth: 0, flex: 1 }}>
+          <p style={{ fontFamily: 'Georgia, serif', fontSize: 14, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>{con.name}</p>
+          {con.relationship && <p style={{ fontSize: 12, color: '#6B7280', marginTop: 2 }}>{con.relationship}</p>}
+        </div>
+        <CardActions onEdit={onEdit} onDeleteRequest={onDeleteRequest} isConfirm={isConfirm} onConfirm={onConfirm} onCancel={onCancel} />
+      </div>
+      <InfoRow Icon={Phone}  value={con.phone}   href={con.phone  ? `tel:${con.phone}`    : undefined} />
+      <InfoRow Icon={Mail}   value={con.email}   href={con.email  ? `mailto:${con.email}` : undefined} />
+      <InfoRow Icon={MapPin} value={con.address} />
+      {con.notes && <p style={{ fontSize: 11, color: '#9CA3AF', marginTop: 8, paddingLeft: 12, borderLeft: '2px solid #F3F4F6', lineHeight: 1.5 }}>{con.notes}</p>}
+
+      {/* Emergency call button */}
+      {isEmergency && con.phone && (
+        <a href={`tel:${con.phone}`} style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+          marginTop: 12, padding: '11px', borderRadius: 12,
+          background: 'linear-gradient(135deg, #22C55E, #16A34A)',
+          color: 'white', fontWeight: 700, fontSize: 13,
+          textDecoration: 'none', boxShadow: '0 4px 16px rgba(34,197,94,0.3)',
+        }}>
+          <Phone size={16} color="white" strokeWidth={2} />
+          Llamar ahora
+        </a>
+      )}
+
+      <button onClick={() => onToggleEmergency(con)} style={{
+        display: 'flex', alignItems: 'center', gap: 6,
+        marginTop: isEmergency && con.phone ? 8 : 10,
+        padding: '6px 12px', borderRadius: 10, cursor: 'pointer',
+        background: isEmergency ? '#FFF0F0' : '#F9F5F1',
+        border: isEmergency ? '1px solid #FECACA' : '1px solid #EDE5D8',
+        color: isEmergency ? '#D63031' : '#9CA3AF',
+        fontSize: 11, fontWeight: 600,
+      }}>
+        <Star size={11} color={isEmergency ? '#D63031' : '#9CA3AF'} strokeWidth={1.75} filled={isEmergency} />
+        {isEmergency ? 'Quitar como emergencia' : 'Marcar como emergencia'}
+      </button>
+    </div>
+  )
+}
+
 // ── Main page ──────────────────────────────────────────────────────
 export default function Directory() {
   const { user } = useAuth()
+  const { ownerId } = useFamily()
 
   const [tab, setTab] = useState('medicos')
-  const [doctors, setDoctors]   = useState([])
-  const [contacts, setContacts] = useState([])
-  const [loading, setLoading]   = useState(true)
-  const [confirmDelete, setConfirmDelete] = useState(null) // { type, id }
+  const [doctors,      setDoctors]      = useState([])
+  const [institutions, setInstitutions] = useState([])
+  const [contacts,     setContacts]     = useState([])
+  const [loading, setLoading] = useState(true)
+  const [confirmDelete, setConfirmDelete] = useState(null)
 
-  // Doctor form
-  const [docModal, setDocModal]   = useState(false)
-  const [editDoc,  setEditDoc]    = useState(null)
-  const [docForm,  setDocForm]    = useState(BLANK_DOC)
+  // Doctor form state
+  const [docModal, setDocModal] = useState(false)
+  const [editDoc,  setEditDoc]  = useState(null)
+  const [docForm,  setDocForm]  = useState(BLANK_DOC)
   const [savingDoc, setSavingDoc] = useState(false)
 
-  // Contact form
-  const [conModal, setConModal]   = useState(false)
-  const [editCon,  setEditCon]    = useState(null)
-  const [conForm,  setConForm]    = useState(BLANK_CON)
+  // Institution form state
+  const [insModal, setInsModal] = useState(false)
+  const [editIns,  setEditIns]  = useState(null)
+  const [insForm,  setInsForm]  = useState(BLANK_INS)
+  const [savingIns, setSavingIns] = useState(false)
+
+  // Contact form state
+  const [conModal, setConModal] = useState(false)
+  const [editCon,  setEditCon]  = useState(null)
+  const [conForm,  setConForm]  = useState(BLANK_CON)
   const [savingCon, setSavingCon] = useState(false)
 
-  useEffect(() => { if (user) fetchAll() }, [user])
+  useEffect(() => { if (ownerId) fetchAll() }, [ownerId])
 
   async function fetchAll() {
     setLoading(true)
-    const [{ data: docs }, { data: cons }] = await Promise.all([
-      supabase.from('doctors').select('*').eq('user_id', user.id).order('name'),
-      supabase.from('contacts').select('*').eq('user_id', user.id).order('name'),
+    const [{ data: docs }, { data: inss }, { data: cons }] = await Promise.all([
+      supabase.from('directory_doctors').select('*').eq('owner_id', ownerId).order('name'),
+      supabase.from('directory_institutions').select('*').eq('owner_id', ownerId).order('name'),
+      supabase.from('directory_contacts').select('*').eq('owner_id', ownerId).order('name'),
     ])
     setDoctors(docs ?? [])
+    setInstitutions(inss ?? [])
     setContacts(cons ?? [])
     setLoading(false)
   }
 
-  // ── Doctor CRUD ────────────────────────────────────────────────
+  // ── Doctor CRUD ───────────────────────────────────────────────────
   function openDoc(d = null) {
     setEditDoc(d)
-    setDocForm(d
-      ? { name: d.name, specialty: d.specialty ?? '', phone: d.phone ?? '', email: d.email ?? '', clinic: d.clinic ?? '', notes: d.notes ?? '' }
-      : BLANK_DOC
-    )
+    setDocForm(d ? { name: d.name, specialty: d.specialty ?? '', phone: d.phone ?? '', email: d.email ?? '', clinic: d.clinic ?? '', notes: d.notes ?? '' } : BLANK_DOC)
     setDocModal(true)
   }
 
@@ -343,305 +333,298 @@ export default function Directory() {
     if (!docForm.name.trim()) return
     setSavingDoc(true)
     if (editDoc) {
-      await supabase.from('doctors')
-        .update({ ...docForm, updated_at: new Date().toISOString() })
-        .eq('id', editDoc.id)
+      await supabase.from('directory_doctors').update({ ...docForm, updated_at: new Date().toISOString() }).eq('id', editDoc.id)
     } else {
-      await supabase.from('doctors').insert({ ...docForm, user_id: user.id })
+      await supabase.from('directory_doctors').insert({ ...docForm, owner_id: ownerId })
     }
     setSavingDoc(false)
     setDocModal(false)
     fetchAll()
   }
 
-  // ── Contact CRUD ───────────────────────────────────────────────
+  // ── Institution CRUD ──────────────────────────────────────────────
+  function openIns(i = null) {
+    setEditIns(i)
+    setInsForm(i ? { name: i.name, type: i.type ?? 'Hospital', address: i.address ?? '', phone: i.phone ?? '', emergency_phone: i.emergency_phone ?? '', website: i.website ?? '', notes: i.notes ?? '' } : BLANK_INS)
+    setInsModal(true)
+  }
+
+  async function saveIns() {
+    if (!insForm.name.trim()) return
+    setSavingIns(true)
+    if (editIns) {
+      await supabase.from('directory_institutions').update({ ...insForm, updated_at: new Date().toISOString() }).eq('id', editIns.id)
+    } else {
+      await supabase.from('directory_institutions').insert({ ...insForm, owner_id: ownerId })
+    }
+    setSavingIns(false)
+    setInsModal(false)
+    fetchAll()
+  }
+
+  // ── Contact CRUD ──────────────────────────────────────────────────
   function openCon(c = null) {
     setEditCon(c)
-    setConForm(c
-      ? { name: c.name, relationship: c.relationship ?? '', phone: c.phone ?? '', email: c.email ?? '', address: c.address ?? '', is_emergency_contact: c.is_emergency_contact, notes: c.notes ?? '' }
-      : BLANK_CON
-    )
+    setConForm(c ? { name: c.name, relationship: c.relationship ?? '', phone: c.phone ?? '', email: c.email ?? '', address: c.address ?? '', is_emergency_contact: c.is_emergency_contact, notes: c.notes ?? '' } : BLANK_CON)
     setConModal(true)
   }
 
   async function saveCon() {
     if (!conForm.name.trim()) return
     setSavingCon(true)
-    // Ensure only one emergency contact exists
     if (conForm.is_emergency_contact) {
-      await supabase.from('contacts')
-        .update({ is_emergency_contact: false })
-        .eq('user_id', user.id)
+      await supabase.from('directory_contacts').update({ is_emergency_contact: false }).eq('owner_id', ownerId)
     }
     if (editCon) {
-      await supabase.from('contacts')
-        .update({ ...conForm, updated_at: new Date().toISOString() })
-        .eq('id', editCon.id)
+      await supabase.from('directory_contacts').update({ ...conForm, updated_at: new Date().toISOString() }).eq('id', editCon.id)
     } else {
-      await supabase.from('contacts').insert({ ...conForm, user_id: user.id })
+      await supabase.from('directory_contacts').insert({ ...conForm, owner_id: ownerId })
     }
     setSavingCon(false)
     setConModal(false)
     fetchAll()
   }
 
-  async function deleteItem(type, id) {
-    await supabase.from(type === 'doctor' ? 'doctors' : 'contacts').delete().eq('id', id)
+  async function deleteItem(table, id) {
+    await supabase.from(table).delete().eq('id', id)
     setConfirmDelete(null)
     fetchAll()
   }
 
   async function toggleEmergency(contact) {
     if (contact.is_emergency_contact) {
-      await supabase.from('contacts').update({ is_emergency_contact: false }).eq('id', contact.id)
+      await supabase.from('directory_contacts').update({ is_emergency_contact: false }).eq('id', contact.id)
     } else {
-      await supabase.from('contacts').update({ is_emergency_contact: false }).eq('user_id', user.id)
-      await supabase.from('contacts').update({ is_emergency_contact: true }).eq('id', contact.id)
+      await supabase.from('directory_contacts').update({ is_emergency_contact: false }).eq('owner_id', ownerId)
+      await supabase.from('directory_contacts').update({ is_emergency_contact: true }).eq('id', contact.id)
     }
     fetchAll()
   }
 
   const emergency = contacts.find(c => c.is_emergency_contact)
+  const topInstitutions = institutions.filter(i => i.emergency_phone).slice(0, 2)
 
-  // ── Tab bar ────────────────────────────────────────────────────
   const TABS = [
-    { id: 'medicos',    label: 'Médicos'    },
-    { id: 'familiares', label: 'Familiares' },
-    { id: 'emergencia', label: 'Emergencia', accent: '#D63031' },
+    { id: 'medicos',       label: 'Médicos'      },
+    { id: 'instituciones', label: 'Instituciones' },
+    { id: 'familiares',    label: 'Familiares'    },
+    { id: 'emergencia',    label: '🆘 Emergencia', accent: '#D63031' },
   ]
 
   return (
     <Layout>
       {/* Sticky tab bar */}
-      <div className="sticky top-0 z-30 px-5 pt-4 pb-3"
-        style={{ background: '#FFF8F0', borderBottom: '1px solid #EDE5D8' }}>
-        <div className="flex gap-1 p-1 rounded-2xl" style={{ background: '#F3F4F6' }}>
+      <div style={{ position: 'sticky', top: 0, zIndex: 30, background: '#FFF8F0', borderBottom: '1px solid #EDE5D8', padding: '12px 16px 10px' }}>
+        <div style={{ display: 'flex', gap: 4, padding: 4, borderRadius: 16, background: '#F3F4F6' }}>
           {TABS.map(t => (
-            <button
-              key={t.id}
-              onClick={() => setTab(t.id)}
-              className="flex-1 py-2 rounded-xl text-xs font-bold transition-all"
-              style={{
-                border: 'none', cursor: 'pointer',
-                background: tab === t.id ? 'white' : 'transparent',
-                color: tab === t.id ? (t.accent ?? '#1A1A1A') : '#9CA3AF',
-                boxShadow: tab === t.id ? '0 1px 4px rgba(0,0,0,0.12)' : 'none',
-              }}
-            >
+            <button key={t.id} onClick={() => setTab(t.id)} style={{
+              flex: 1, padding: '7px 4px', borderRadius: 12,
+              border: 'none', cursor: 'pointer', fontSize: 11, fontWeight: 700,
+              background: tab === t.id ? 'white' : 'transparent',
+              color: tab === t.id ? (t.accent ?? '#1A1A1A') : '#9CA3AF',
+              boxShadow: tab === t.id ? '0 1px 4px rgba(0,0,0,0.1)' : 'none',
+              transition: 'all 0.15s',
+              whiteSpace: 'nowrap',
+            }}>
               {t.label}
             </button>
           ))}
         </div>
       </div>
 
-      <div className="p-5 pb-10">
+      <div style={{ padding: '16px 16px 48px' }}>
 
-        {/* ── Médicos tab ────────────────────────────────────────── */}
+        {/* ── Médicos ───────────────────────────────────────────── */}
         {tab === 'medicos' && (
           <>
-            {loading ? (
-              <p className="text-xs text-gray-400 text-center py-8">Cargando...</p>
-            ) : doctors.length === 0 ? (
-              <EmptyState icon={BookOpen} title="Sin médicos registrados" subtitle="Agrega los médicos tratantes para tenerlos siempre a la mano" />
-            ) : (
-              doctors.map(d => (
-                <DoctorCard
-                  key={d.id}
-                  doctor={d}
+            {loading
+              ? <p style={{ textAlign: 'center', color: '#9CA3AF', fontSize: 13, padding: '32px 0' }}>Cargando...</p>
+              : doctors.length === 0
+              ? <EmptyState Icon={BookOpen} title="Sin médicos registrados" subtitle="Agrega los médicos tratantes para tenerlos siempre a la mano" />
+              : doctors.map(d => (
+                <DoctorCard key={d.id} doc={d}
                   onEdit={() => openDoc(d)}
                   isConfirm={confirmDelete?.id === d.id}
-                  onDeleteRequest={() => setConfirmDelete({ type: 'doctor', id: d.id })}
-                  onConfirm={() => deleteItem('doctor', d.id)}
-                  onCancel={() => setConfirmDelete(null)}
-                />
+                  onDeleteRequest={() => setConfirmDelete({ table: 'directory_doctors', id: d.id })}
+                  onConfirm={() => deleteItem('directory_doctors', d.id)}
+                  onCancel={() => setConfirmDelete(null)} />
               ))
-            )}
+            }
             <AddBtn onClick={() => openDoc()} label="Agregar médico" />
           </>
         )}
 
-        {/* ── Familiares tab ─────────────────────────────────────── */}
-        {tab === 'familiares' && (
+        {/* ── Instituciones ─────────────────────────────────────── */}
+        {tab === 'instituciones' && (
           <>
-            {loading ? (
-              <p className="text-xs text-gray-400 text-center py-8">Cargando...</p>
-            ) : contacts.length === 0 ? (
-              <EmptyState icon={User} title="Sin contactos registrados" subtitle="Agrega familiares y designa un contacto de emergencia" />
-            ) : (
-              contacts.map(c => (
-                <ContactCard
-                  key={c.id}
-                  contact={c}
-                  onEdit={() => openCon(c)}
-                  onToggleEmergency={toggleEmergency}
-                  isConfirm={confirmDelete?.id === c.id}
-                  onDeleteRequest={() => setConfirmDelete({ type: 'contact', id: c.id })}
-                  onConfirm={() => deleteItem('contact', c.id)}
-                  onCancel={() => setConfirmDelete(null)}
-                />
+            {loading
+              ? <p style={{ textAlign: 'center', color: '#9CA3AF', fontSize: 13, padding: '32px 0' }}>Cargando...</p>
+              : institutions.length === 0
+              ? <EmptyState Icon={BookOpen} title="Sin instituciones registradas" subtitle="Agrega hospitales, clínicas y farmacias de referencia" />
+              : institutions.map(i => (
+                <InstitutionCard key={i.id} ins={i}
+                  onEdit={() => openIns(i)}
+                  isConfirm={confirmDelete?.id === i.id}
+                  onDeleteRequest={() => setConfirmDelete({ table: 'directory_institutions', id: i.id })}
+                  onConfirm={() => deleteItem('directory_institutions', i.id)}
+                  onCancel={() => setConfirmDelete(null)} />
               ))
-            )}
-            <AddBtn onClick={() => openCon()} label="Agregar contacto" />
+            }
+            <AddBtn onClick={() => openIns()} label="Agregar institución" />
           </>
         )}
 
-        {/* ── Emergencia tab ─────────────────────────────────────── */}
+        {/* ── Familiares ────────────────────────────────────────── */}
+        {tab === 'familiares' && (
+          <>
+            {loading
+              ? <p style={{ textAlign: 'center', color: '#9CA3AF', fontSize: 13, padding: '32px 0' }}>Cargando...</p>
+              : contacts.length === 0
+              ? <EmptyState Icon={Users} title="Sin contactos registrados" subtitle="Agrega familiares y designa un contacto de emergencia" />
+              : contacts.map(c => (
+                <ContactCard key={c.id} con={c}
+                  onEdit={() => openCon(c)}
+                  onToggleEmergency={toggleEmergency}
+                  isConfirm={confirmDelete?.id === c.id}
+                  onDeleteRequest={() => setConfirmDelete({ table: 'directory_contacts', id: c.id })}
+                  onConfirm={() => deleteItem('directory_contacts', c.id)}
+                  onCancel={() => setConfirmDelete(null)} />
+              ))
+            }
+            <AddBtn onClick={() => openCon()} label="Agregar familiar" />
+          </>
+        )}
+
+        {/* ── Emergencia ────────────────────────────────────────── */}
         {tab === 'emergencia' && (
-          emergency ? (
-            <div>
-              {/* Hero card */}
-              <div className="rounded-3xl p-6 mb-5 text-center"
-                style={{
-                  background: 'linear-gradient(145deg, #D63031 0%, #A52020 100%)',
-                  boxShadow: '0 8px 32px rgba(214,48,49,0.25)',
-                }}>
-                <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
-                  style={{ background: 'rgba(255,255,255,0.2)', border: '2px solid rgba(255,255,255,0.3)' }}>
-                  <User size={32} color="white" strokeWidth={1.3} />
+          <div>
+            {/* Emergency contact hero */}
+            {emergency ? (
+              <div style={{ background: 'linear-gradient(145deg, #D63031, #A52020)', borderRadius: 20, padding: '24px 20px', marginBottom: 14, boxShadow: '0 8px 32px rgba(214,48,49,0.25)', textAlign: 'center' }}>
+                <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(255,255,255,0.2)', border: '2px solid rgba(255,255,255,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', fontSize: 28 }}>
+                  👤
                 </div>
-                <p className="text-white font-bold text-xl" style={{ fontFamily: 'Georgia, serif' }}>
-                  {emergency.name}
+                <p style={{ fontFamily: 'Georgia, serif', fontSize: 20, fontWeight: 700, color: 'white', margin: '0 0 4px' }}>{emergency.name}</p>
+                {emergency.relationship && <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', margin: '0 0 8px' }}>{emergency.relationship}</p>}
+                {emergency.phone && <p style={{ fontSize: 16, fontWeight: 600, color: 'rgba(255,255,255,0.9)', letterSpacing: '0.04em', margin: 0 }}>{emergency.phone}</p>}
+              </div>
+            ) : (
+              <div style={{ background: '#FFF0F0', border: '1.5px solid #FECACA', borderRadius: 16, padding: '20px', marginBottom: 14, textAlign: 'center' }}>
+                <p style={{ fontSize: 14, fontWeight: 600, color: '#D63031', marginBottom: 4 }}>Sin contacto de emergencia</p>
+                <p style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 12 }}>Ve a Familiares y marca uno como contacto de emergencia</p>
+                <button onClick={() => setTab('familiares')} style={{ padding: '8px 20px', borderRadius: 10, background: '#D63031', color: 'white', border: 'none', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>
+                  Ir a Familiares →
+                </button>
+              </div>
+            )}
+
+            {/* Call & email buttons */}
+            {emergency?.phone && (
+              <a href={`tel:${emergency.phone}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, padding: '15px', borderRadius: 16, background: 'linear-gradient(135deg, #22C55E, #16A34A)', color: 'white', fontWeight: 700, fontSize: 15, textDecoration: 'none', boxShadow: '0 6px 24px rgba(34,197,94,0.35)', marginBottom: 10 }}>
+                <Phone size={20} color="white" strokeWidth={2} />
+                Llamar ahora
+              </a>
+            )}
+            {emergency?.email && (
+              <a href={`mailto:${emergency.email}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px', borderRadius: 14, background: 'white', border: '1.5px solid #EDE5D8', color: '#374151', fontWeight: 600, fontSize: 13, textDecoration: 'none', marginBottom: 16 }}>
+                <Mail size={15} color="#6B7280" strokeWidth={1.75} />
+                Enviar correo
+              </a>
+            )}
+
+            {/* Top institutions with emergency phones */}
+            {topInstitutions.length > 0 && (
+              <div style={{ marginBottom: 16 }}>
+                <p style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10 }}>
+                  Instituciones de emergencia
                 </p>
-                {emergency.relationship && (
-                  <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.75)' }}>
-                    {emergency.relationship}
-                  </p>
-                )}
-                {emergency.phone && (
-                  <p className="mt-3 font-mono text-base" style={{ color: 'rgba(255,255,255,0.9)', letterSpacing: '0.05em' }}>
-                    {emergency.phone}
+                {topInstitutions.map(ins => (
+                  <div key={ins.id} style={{ background: 'white', borderRadius: 14, border: '1px solid #EDE5D8', padding: '12px 14px', marginBottom: 8 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+                      <div>
+                        <p style={{ fontSize: 13, fontWeight: 700, color: '#1A1A1A', margin: '0 0 2px' }}>{ins.name}</p>
+                        {ins.type && <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>{ins.type}</p>}
+                      </div>
+                      <a href={`tel:${ins.emergency_phone}`} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 10, background: '#FFF0F0', border: '1px solid #FECACA', color: '#D63031', fontWeight: 700, fontSize: 12, textDecoration: 'none', whiteSpace: 'nowrap' }}>
+                        <Phone size={13} color="#D63031" strokeWidth={2} />
+                        {ins.emergency_phone}
+                      </a>
+                    </div>
+                  </div>
+                ))}
+                {institutions.filter(i => i.emergency_phone).length === 0 && (
+                  <p style={{ fontSize: 12, color: '#9CA3AF', textAlign: 'center', padding: '8px 0' }}>
+                    Agrega instituciones con teléfono de emergencia para verlas aquí.
                   </p>
                 )}
               </div>
+            )}
 
-              {/* Call button */}
-              {emergency.phone && (
-                <a
-                  href={`tel:${emergency.phone}`}
-                  className="flex items-center justify-center gap-3 w-full py-4 rounded-2xl font-bold text-white text-base mb-3 active:scale-[0.97] transition-transform"
-                  style={{
-                    background: 'linear-gradient(135deg, #22C55E, #16A34A)',
-                    boxShadow: '0 6px 24px rgba(34,197,94,0.35)',
-                    textDecoration: 'none',
-                  }}
-                >
-                  <Phone size={20} color="white" strokeWidth={2} />
-                  Llamar ahora
-                </a>
-              )}
-
-              {/* Email button */}
-              {emergency.email && (
-                <a
-                  href={`mailto:${emergency.email}`}
-                  className="flex items-center justify-center gap-2.5 w-full py-3.5 rounded-2xl font-semibold text-sm mb-3 active:scale-[0.97] transition-transform"
-                  style={{
-                    border: '1.5px solid #EDE5D8', background: 'white',
-                    color: '#374151', textDecoration: 'none',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-                  }}
-                >
-                  <Mail size={16} color="#6B7280" strokeWidth={1.75} />
-                  Enviar correo
-                </a>
-              )}
-
-              {/* Address */}
-              {emergency.address && (
-                <div className="flex items-start gap-3 px-4 py-3 rounded-2xl mt-1"
-                  style={{ background: '#F9F5F1', border: '1px solid #EDE5D8' }}>
-                  <MapPin size={16} color="#9CA3AF" strokeWidth={1.5} style={{ flexShrink: 0, marginTop: 1 }} />
-                  <p className="text-sm text-gray-600 leading-relaxed">{emergency.address}</p>
-                </div>
-              )}
-
-              <button
-                onClick={() => setTab('familiares')}
-                className="w-full mt-5 py-3 rounded-2xl text-xs font-semibold"
-                style={{ background: '#F9F5F1', border: '1px solid #EDE5D8', color: '#9CA3AF' }}
-              >
-                Editar contacto de emergencia
-              </button>
+            {/* SOS reminder */}
+            <div style={{ background: 'linear-gradient(135deg, #1F2937, #111827)', borderRadius: 16, padding: '16px 18px', display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'linear-gradient(135deg, #D63031, #B82020)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 3px 12px rgba(214,48,49,0.5)', fontSize: 12, fontWeight: 900, color: 'white', letterSpacing: '0.04em' }}>
+                SOS
+              </div>
+              <div>
+                <p style={{ fontSize: 13, fontWeight: 700, color: 'white', margin: '0 0 3px' }}>Botón SOS en el inicio</p>
+                <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', margin: 0, lineHeight: 1.5 }}>
+                  El botón rojo en el Dashboard alerta a toda la familia al instante.
+                </p>
+              </div>
             </div>
-          ) : (
-            <div>
-              <EmptyState
-                icon={AlertTriangle}
-                title="Sin contacto de emergencia"
-                subtitle="Ve a Familiares y marca uno como contacto de emergencia"
-              />
-              <button
-                onClick={() => setTab('familiares')}
-                className="w-full py-3.5 rounded-2xl font-bold text-sm text-white mt-2 active:scale-[0.97] transition-transform"
-                style={{
-                  background: 'linear-gradient(135deg, #D63031, #A52020)',
-                  border: 'none', boxShadow: '0 4px 16px rgba(214,48,49,0.3)',
-                }}
-              >
-                Ir a Familiares →
-              </button>
-            </div>
-          )
+          </div>
         )}
       </div>
 
-      {/* ── Doctor modal ─────────────────────────────────────────── */}
+      {/* ── Doctor modal ───────────────────────────────────────────── */}
       {docModal && (
-        <SheetModal
-          title={editDoc ? 'Editar médico' : 'Nuevo médico'}
-          subtitle="Los datos se guardan en tu directorio"
-          onClose={() => setDocModal(false)}
-          onSave={saveDoc}
-          saveLabel={editDoc ? 'Guardar cambios' : 'Agregar médico'}
-          saving={savingDoc}
-        >
-          <FormInput label="Nombre *" value={docForm.name}      onChange={v => setDocForm(f => ({ ...f, name: v }))}      placeholder="Dr. Ana García" />
-          <FormInput label="Especialidad" value={docForm.specialty} onChange={v => setDocForm(f => ({ ...f, specialty: v }))} placeholder="Cardiología" />
-          <FormInput label="Teléfono"     value={docForm.phone}     onChange={v => setDocForm(f => ({ ...f, phone: v }))}     placeholder="555-123-4567" type="tel" />
-          <FormInput label="Correo"       value={docForm.email}     onChange={v => setDocForm(f => ({ ...f, email: v }))}     placeholder="medico@hospital.com" type="email" />
-          <FormInput label="Clínica / Hospital" value={docForm.clinic} onChange={v => setDocForm(f => ({ ...f, clinic: v }))} placeholder="Hospital General" />
-          <FormInput label="Notas"        value={docForm.notes}     onChange={v => setDocForm(f => ({ ...f, notes: v }))}     placeholder="Próxima cita: …" rows={3} />
+        <SheetModal title={editDoc ? 'Editar médico' : 'Nuevo médico'} subtitle="Los datos son visibles para todo el equipo de cuidado" onClose={() => setDocModal(false)} onSave={saveDoc} saveLabel={editDoc ? 'Guardar cambios' : 'Agregar médico'} saving={savingDoc}>
+          <FormInput label="Nombre completo *" value={docForm.name}      onChange={v => setDocForm(f => ({ ...f, name: v }))}      placeholder="Dr. Ana García" />
+          <FormInput label="Especialidad"       value={docForm.specialty} onChange={v => setDocForm(f => ({ ...f, specialty: v }))} placeholder="Cardiología, Neurología…" />
+          <FormInput label="Teléfono"           value={docForm.phone}     onChange={v => setDocForm(f => ({ ...f, phone: v }))}     placeholder="555-123-4567" type="tel" />
+          <FormInput label="Correo"             value={docForm.email}     onChange={v => setDocForm(f => ({ ...f, email: v }))}     placeholder="medico@hospital.com" type="email" />
+          <FormInput label="Clínica / Hospital" value={docForm.clinic}    onChange={v => setDocForm(f => ({ ...f, clinic: v }))}    placeholder="Hospital General del Norte" />
+          <FormInput label="Notas"              value={docForm.notes}     onChange={v => setDocForm(f => ({ ...f, notes: v }))}     placeholder="Próxima cita, horario de consulta…" rows={3} />
+        </SheetModal>
+      )}
+
+      {/* ── Institution modal ─────────────────────────────────────── */}
+      {insModal && (
+        <SheetModal title={editIns ? 'Editar institución' : 'Nueva institución'} subtitle="Hospitales, clínicas y farmacias de referencia" onClose={() => setInsModal(false)} onSave={saveIns} saveLabel={editIns ? 'Guardar cambios' : 'Agregar institución'} saving={savingIns}>
+          <FormInput label="Nombre *"  value={insForm.name}    onChange={v => setInsForm(f => ({ ...f, name: v }))}    placeholder="Hospital General del Norte" />
+          <FormSelect label="Tipo"     value={insForm.type}    onChange={v => setInsForm(f => ({ ...f, type: v }))}    options={INST_TYPES} />
+          <FormInput label="Dirección" value={insForm.address} onChange={v => setInsForm(f => ({ ...f, address: v }))} placeholder="Av. Principal 123, Col. Centro" />
+          <FormInput label="Teléfono principal"    value={insForm.phone}           onChange={v => setInsForm(f => ({ ...f, phone: v }))}           placeholder="555-000-1234" type="tel" />
+          <FormInput label="Teléfono de emergencia" value={insForm.emergency_phone} onChange={v => setInsForm(f => ({ ...f, emergency_phone: v }))} placeholder="911 o línea directa" type="tel" />
+          <FormInput label="Sitio web" value={insForm.website} onChange={v => setInsForm(f => ({ ...f, website: v }))} placeholder="www.hospital.com" />
+          <FormInput label="Notas"     value={insForm.notes}   onChange={v => setInsForm(f => ({ ...f, notes: v }))}   placeholder="Urgencias 24h, especialidades…" rows={2} />
         </SheetModal>
       )}
 
       {/* ── Contact modal ─────────────────────────────────────────── */}
       {conModal && (
-        <SheetModal
-          title={editCon ? 'Editar contacto' : 'Nuevo contacto'}
-          subtitle="Agrega familiares y personas de confianza"
-          onClose={() => setConModal(false)}
-          onSave={saveCon}
-          saveLabel={editCon ? 'Guardar cambios' : 'Agregar contacto'}
-          saving={savingCon}
-        >
-          <FormInput label="Nombre *"     value={conForm.name}         onChange={v => setConForm(f => ({ ...f, name: v }))}         placeholder="María López" />
-          <FormInput label="Parentesco"   value={conForm.relationship} onChange={v => setConForm(f => ({ ...f, relationship: v }))} placeholder="Hija, Hermano, Vecino…" />
-          <FormInput label="Teléfono"     value={conForm.phone}        onChange={v => setConForm(f => ({ ...f, phone: v }))}        placeholder="555-678-9012" type="tel" />
-          <FormInput label="Correo"       value={conForm.email}        onChange={v => setConForm(f => ({ ...f, email: v }))}        placeholder="familiar@correo.com" type="email" />
-          <FormInput label="Dirección"    value={conForm.address}      onChange={v => setConForm(f => ({ ...f, address: v }))}      placeholder="Calle Robles 45, Col. Centro" />
-          <FormInput label="Notas"        value={conForm.notes}        onChange={v => setConForm(f => ({ ...f, notes: v }))}        placeholder="Disponible fines de semana…" rows={2} />
+        <SheetModal title={editCon ? 'Editar contacto' : 'Nuevo familiar'} subtitle="Agrega personas de confianza del equipo de cuidado" onClose={() => setConModal(false)} onSave={saveCon} saveLabel={editCon ? 'Guardar cambios' : 'Agregar familiar'} saving={savingCon}>
+          <FormInput label="Nombre *"   value={conForm.name}         onChange={v => setConForm(f => ({ ...f, name: v }))}         placeholder="María López" />
+          <FormInput label="Parentesco" value={conForm.relationship} onChange={v => setConForm(f => ({ ...f, relationship: v }))} placeholder="Hija, Hermano, Cuidador…" />
+          <FormInput label="Teléfono"   value={conForm.phone}        onChange={v => setConForm(f => ({ ...f, phone: v }))}        placeholder="555-678-9012" type="tel" />
+          <FormInput label="Correo"     value={conForm.email}        onChange={v => setConForm(f => ({ ...f, email: v }))}        placeholder="familiar@correo.com" type="email" />
+          <FormInput label="Dirección"  value={conForm.address}      onChange={v => setConForm(f => ({ ...f, address: v }))}      placeholder="Calle Robles 45, Col. Centro" />
+          <FormInput label="Notas"      value={conForm.notes}        onChange={v => setConForm(f => ({ ...f, notes: v }))}        placeholder="Disponible fines de semana…" rows={2} />
 
           {/* Emergency toggle */}
-          <button
-            type="button"
-            onClick={() => setConForm(f => ({ ...f, is_emergency_contact: !f.is_emergency_contact }))}
-            className="flex items-center gap-3 px-4 py-3.5 rounded-2xl text-left transition-all active:scale-[0.98]"
+          <button type="button" onClick={() => setConForm(f => ({ ...f, is_emergency_contact: !f.is_emergency_contact }))}
             style={{
+              display: 'flex', alignItems: 'center', gap: 12,
+              padding: '14px 16px', borderRadius: 14, cursor: 'pointer', textAlign: 'left',
               background: conForm.is_emergency_contact ? '#FFF0F0' : '#F9F5F1',
-              border: conForm.is_emergency_contact ? '1.5px solid #FFBABA' : '1.5px solid #EDE5D8',
-            }}
-          >
-            <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
-              style={{ background: conForm.is_emergency_contact ? '#D63031' : 'white', border: conForm.is_emergency_contact ? 'none' : '1.5px solid #EDE5D8' }}>
-              {conForm.is_emergency_contact && <Star size={10} color="white" strokeWidth={2} filled />}
+              border: conForm.is_emergency_contact ? '1.5px solid #FECACA' : '1.5px solid #EDE5D8',
+            }}>
+            <div style={{ width: 22, height: 22, borderRadius: '50%', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: conForm.is_emergency_contact ? '#D63031' : 'white', border: conForm.is_emergency_contact ? 'none' : '1.5px solid #EDE5D8' }}>
+              {conForm.is_emergency_contact && <span style={{ color: 'white', fontSize: 12 }}>★</span>}
             </div>
             <div>
-              <p className="text-sm font-semibold" style={{ color: conForm.is_emergency_contact ? '#D63031' : '#374151' }}>
-                Contacto de emergencia
-              </p>
-              <p className="text-xs text-gray-400 mt-0.5">
-                Solo puede haber uno — reemplaza al anterior
-              </p>
+              <p style={{ fontSize: 13, fontWeight: 600, color: conForm.is_emergency_contact ? '#D63031' : '#374151', margin: 0 }}>Contacto de emergencia</p>
+              <p style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>Solo puede haber uno — reemplaza al anterior</p>
             </div>
           </button>
         </SheetModal>
