@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
+import { useFamily } from '../contexts/FamilyContext'
 import { supabase } from '../lib/supabase'
+import { geminiGenerate } from '../lib/gemini'
 import Layout from '../components/Layout'
 import MicButton from '../components/MicButton'
 import { useSpeechToText } from '../hooks/useSpeechToText'
@@ -60,11 +62,16 @@ function Avatar({ name, photoUrl, size = 32 }) {
 
 export default function Chat() {
   const { user } = useAuth()
+  const { ownerId } = useFamily()
   const [messages, setMessages] = useState([])
   const [profiles, setProfiles] = useState({}) // userId → { full_name, avatar_url }
   const [input, setInput] = useState('')
   const [sending, setSending] = useState(false)
   const [sendError, setSendError] = useState('')
+  const [showAi, setShowAi] = useState(false)
+  const [aiInput, setAiInput] = useState('')
+  const [aiResponse, setAiResponse] = useState('')
+  const [aiLoading, setAiLoading] = useState(false)
   const bottomRef = useRef(null)
   const inputRef = useRef(null)
 
@@ -157,6 +164,39 @@ export default function Chat() {
 
     setSending(false)
     inputRef.current?.focus()
+  }
+
+  async function handleAiAssistant(question) {
+    if (!question.trim()) return
+    setAiLoading(true)
+    setAiResponse('')
+    const today = new Date().toISOString().split('T')[0]
+    const uid = ownerId ?? user?.id
+    const [
+      { data: todayLogs },
+      { data: recentMemories },
+      { data: upcomingEvents },
+      { data: recentExpenses },
+    ] = await Promise.all([
+      supabase.from('medication_logs').select('*, medications(name)').eq('user_id', uid).eq('log_date', today),
+      supabase.from('voice_diary').select('transcription, mood').order('created_at', { ascending: false }).limit(5),
+      supabase.from('events').select('title, date, time').gte('date', today).order('date', { ascending: true }).limit(3),
+      supabase.from('care_expenses').select('description, amount').order('created_at', { ascending: false }).limit(5),
+    ])
+    const medStatus = (todayLogs ?? []).map(l => `${l.medications?.name}: ${l.status === 'confirmed' ? 'dado' : 'pendiente'}`).join(', ')
+    const memoriesText = (recentMemories ?? []).filter(m => m.transcription).map(m => `"${m.transcription.slice(0, 80)}"`).join('; ')
+    const eventsText = (upcomingEvents ?? []).map(e => `${e.title} el ${e.date}`).join(', ')
+    const expensesText = (recentExpenses ?? []).map(e => `${e.description}: $${e.amount}`).join(', ')
+    const context = [
+      medStatus && `Medicamentos hoy: ${medStatus}`,
+      memoriesText && `Memorias recientes: ${memoriesText}`,
+      eventsText && `Próximas citas: ${eventsText}`,
+      expensesText && `Gastos recientes: ${expensesText}`,
+    ].filter(Boolean).join('. ')
+    const prompt = `Eres FamiliaChat, un asistente familiar cálido y práctico en español para cuidadores. Contexto actual: ${context || 'Sin datos disponibles'}. Pregunta: "${question}". Responde de forma cálida y útil en máximo 3 oraciones, sin asteriscos ni formato especial.`
+    const response = await geminiGenerate(prompt, 200)
+    setAiResponse(response ?? 'No pude obtener una respuesta. Verifica tu conexión e intenta de nuevo.')
+    setAiLoading(false)
   }
 
   function handleKeyDown(e) {
@@ -349,6 +389,55 @@ export default function Chat() {
             </p>
           )}
 
+          {showAi && (
+            <div style={{
+              background: 'linear-gradient(135deg, #F5F3FF, #EDE9FE)',
+              border: '1px solid #C4B5FD',
+              borderRadius: 16, padding: '14px 16px', marginBottom: 12,
+            }}>
+              <p style={{ fontSize: 12, fontWeight: 700, color: '#5B21B6', margin: '0 0 10px' }}>
+                ✨ Asistente familiar
+              </p>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <input
+                  value={aiInput}
+                  onChange={e => setAiInput(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter' && !aiLoading) handleAiAssistant(aiInput) }}
+                  placeholder="Pregunta algo sobre el cuidado..."
+                  style={{
+                    flex: 1, padding: '8px 12px', borderRadius: 12,
+                    border: '1.5px solid #C4B5FD', fontSize: 13,
+                    outline: 'none', background: 'white', fontFamily: 'inherit',
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => handleAiAssistant(aiInput)}
+                  disabled={aiLoading || !aiInput.trim()}
+                  style={{
+                    padding: '8px 14px', borderRadius: 12, border: 'none',
+                    background: aiLoading || !aiInput.trim() ? '#D4C4B8' : 'linear-gradient(135deg, #7C5CBF, #5B21B6)',
+                    color: 'white', fontWeight: 700, fontSize: 12, flexShrink: 0,
+                    cursor: aiLoading || !aiInput.trim() ? 'not-allowed' : 'pointer',
+                  }}
+                >
+                  {aiLoading ? '...' : 'Preguntar'}
+                </button>
+              </div>
+              {aiResponse && (
+                <div style={{
+                  marginTop: 10, padding: '10px 12px',
+                  background: 'white', borderRadius: 12,
+                  border: '1px solid #DDD6FE',
+                }}>
+                  <p style={{ fontSize: 13, color: '#4C1D95', lineHeight: 1.6, margin: 0 }}>
+                    {aiResponse}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
           <form onSubmit={handleSend} style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
             <textarea
               ref={inputRef}
@@ -369,6 +458,20 @@ export default function Chat() {
               onBlur={e => { e.target.style.borderColor = '#EDE5D8' }}
             />
             <MicButton recording={recording} onStart={start} onStop={stop} />
+            <button
+              type="button"
+              onClick={() => { setShowAi(v => !v); setAiResponse('') }}
+              style={{
+                width: 40, height: 40, borderRadius: '50%', border: 'none',
+                background: showAi ? '#EDE9FE' : '#F3F4F6',
+                cursor: 'pointer', flexShrink: 0,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 18, transition: 'background 0.15s',
+              }}
+              aria-label="Asistente familiar IA"
+            >
+              ✨
+            </button>
             <button
               type="submit"
               disabled={sending || !input.trim()}

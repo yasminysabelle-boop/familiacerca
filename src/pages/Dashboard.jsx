@@ -5,6 +5,7 @@ import { useFamily } from '../contexts/FamilyContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import { AlertTriangle, CheckIcon, User, XIcon } from '../components/Icons'
+import { geminiGenerate } from '../lib/gemini'
 
 // Mood lookup — handles both stored text values and emoji values
 const MOOD_MAP = {
@@ -354,6 +355,46 @@ function EmptyState({ profile }) {
   )
 }
 
+// ── AI helpers ────────────────────────────────────────────────────────────────
+
+function weekKey(d = new Date()) {
+  const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()))
+  const day = date.getUTCDay() || 7
+  date.setUTCDate(date.getUTCDate() + 4 - day)
+  const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1))
+  const wk = Math.ceil(((date - yearStart) / 86400000 + 1) / 7)
+  return `${date.getUTCFullYear()}-W${String(wk).padStart(2, '0')}`
+}
+
+const AI_CARD_CONFIGS = {
+  morning: { gradient: 'linear-gradient(135deg, #FEF3C7, #FFFBEB)', border: '#FDE68A',   icon: '🌅', label: 'Tu momento del día',  textColor: '#78350F' },
+  evening: { gradient: 'linear-gradient(135deg, #EDE9FE, #F5F3FF)', border: '#C4B5FD',   icon: '🌙', label: 'Resumen del día',      textColor: '#5B21B6' },
+  burnout: { gradient: 'linear-gradient(135deg, #FEE2E2, #FFF5F5)', border: '#FECACA',   icon: '💙', label: 'Un mensaje para ti',   textColor: '#7F1D1D' },
+  weekly:  { gradient: 'linear-gradient(135deg, #D1FAE5, #ECFDF5)', border: '#6EE7B7',   icon: '🌿', label: 'Resumen semanal',      textColor: '#064E3B' },
+}
+
+function AiCard({ type, text }) {
+  const c = AI_CARD_CONFIGS[type]
+  if (!c) return null
+  return (
+    <div style={{
+      background: c.gradient, borderRadius: 16,
+      border: `1px solid ${c.border}`,
+      padding: '14px 16px', marginBottom: 12,
+      boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+    }}>
+      <p style={{
+        fontSize: 10, fontWeight: 700, letterSpacing: '0.08em',
+        textTransform: 'uppercase', color: c.textColor, opacity: 0.7,
+        margin: '0 0 6px',
+      }}>
+        {c.icon} {c.label} · IA
+      </p>
+      <p style={{ fontSize: 13, color: c.textColor, lineHeight: 1.6, margin: 0 }}>{text}</p>
+    </div>
+  )
+}
+
 // ── Main component ─────────────────────────────────────────────────────────────
 
 export default function Dashboard() {
@@ -368,6 +409,7 @@ export default function Dashboard() {
   const [showSOS, setShowSOS] = useState(false)
   const [sosSent, setSosSent] = useState(false)
   const [sosConfirming, setSosConfirming] = useState(false)
+  const [aiCards, setAiCards] = useState({})
 
   const now = new Date()
   const todayKey = now.toISOString().split('T')[0]
@@ -434,6 +476,94 @@ export default function Dashboard() {
       clearTimeout(eveningTimer)
     }
   }, [profile?.name, firstName, sections, todayKey])
+
+  async function generateAiCards({ confirmedCount, pendingCount, patientName, caregiverName, caregiverNames, weekCount, isSunday }) {
+    const newCards = {}
+    const wk = weekKey()
+
+    if (h >= 7 && h < 19) {
+      const k = `fc_ai_morning_${todayKey}`
+      const cached = localStorage.getItem(k)
+      if (cached) {
+        newCards.morning = cached
+      } else {
+        const text = await geminiGenerate(
+          `Eres un asistente emocional cálido para cuidadores familiares. ${caregiverName} cuida a ${patientName}. Es por la mañana. Escribe un mensaje breve de aliento en español (máximo 2 oraciones, sin asteriscos) para comenzar el día con energía.`,
+          100
+        )
+        if (text) { localStorage.setItem(k, text); newCards.morning = text }
+      }
+    }
+
+    if (h >= 20) {
+      const k = `fc_ai_evening_${todayKey}`
+      const cached = localStorage.getItem(k)
+      if (cached) {
+        newCards.evening = cached
+      } else {
+        const status = pendingCount > 0
+          ? `faltaron ${pendingCount} medicamento(s) por dar`
+          : `se dieron ${confirmedCount} medicamento(s) correctamente`
+        const text = await geminiGenerate(
+          `Eres un asistente emocional cálido para cuidadores familiares. Hoy ${status} para ${patientName}. Escribe un resumen emocional cálido del día en español (máximo 2 oraciones, sin asteriscos) que reconozca el esfuerzo del cuidador.`,
+          110
+        )
+        if (text) { localStorage.setItem(k, text); newCards.evening = text }
+      }
+    }
+
+    if (caregiverNames.length >= 5) {
+      const unique = new Set(caregiverNames.filter(Boolean))
+      if (unique.size === 1) {
+        const k = `fc_ai_burnout_${todayKey}`
+        const cached = localStorage.getItem(k)
+        if (cached) {
+          newCards.burnout = cached
+        } else {
+          const solo = [...unique][0].split(' ')[0]
+          const text = await geminiGenerate(
+            `Eres un asistente emocional para cuidadores familiares. ${solo} ha estado cuidando solo/a varios días consecutivos. Escribe un mensaje breve y compasivo en español (máximo 2 oraciones, sin asteriscos) que reconozca el agotamiento y sugiera pedir apoyo familiar sin culpa.`,
+            120
+          )
+          if (text) { localStorage.setItem(k, text); newCards.burnout = text }
+        }
+      }
+    }
+
+    if (isSunday) {
+      const k = `fc_ai_weekly_${wk}`
+      const cached = localStorage.getItem(k)
+      if (cached) {
+        newCards.weekly = cached
+      } else {
+        const text = await geminiGenerate(
+          `Eres un asistente emocional para cuidadores familiares. Esta semana la familia administró ${weekCount} dosis de medicamentos a ${patientName}. Escribe un resumen semanal cálido en español (máximo 2 oraciones, sin asteriscos) que celebre el esfuerzo familiar.`,
+          120
+        )
+        if (text) { localStorage.setItem(k, text); newCards.weekly = text }
+      }
+    }
+
+    if (Object.keys(newCards).length > 0) setAiCards(newCards)
+  }
+
+  useEffect(() => {
+    if (loading || !ownerId || !profile) return
+    const todaySec = sections.find(s => s.dateKey === todayKey)
+    const confirmedCount = todaySec?.events.filter(e => e.type === 'MED_CONFIRMED').length ?? 0
+    const pendingCount = todaySec?.events.filter(e => e.type === 'MED_PENDING').length ?? 0
+    const allConfirmed = sections.flatMap(s => s.events.filter(e => e.type === 'MED_CONFIRMED'))
+    const caregiverNames = allConfirmed.map(e => e.confirmedBy).filter(Boolean)
+    generateAiCards({
+      confirmedCount,
+      pendingCount,
+      patientName: profile.name ?? 'el familiar',
+      caregiverName: firstName,
+      caregiverNames,
+      weekCount: allConfirmed.length,
+      isSunday: now.getDay() === 0,
+    })
+  }, [loading, ownerId, profile?.name])
 
   async function fetchTimeline() {
     setLoading(true)
@@ -836,6 +966,16 @@ export default function Dashboard() {
                 🚨 Alerta enviada
               </span>
             )}
+          </div>
+        )}
+
+        {/* AI cards */}
+        {Object.keys(aiCards).length > 0 && (
+          <div style={{ marginBottom: 4 }}>
+            {aiCards.morning && <AiCard type="morning" text={aiCards.morning} />}
+            {aiCards.evening && <AiCard type="evening" text={aiCards.evening} />}
+            {aiCards.burnout && <AiCard type="burnout" text={aiCards.burnout} />}
+            {aiCards.weekly  && <AiCard type="weekly"  text={aiCards.weekly} />}
           </div>
         )}
 
