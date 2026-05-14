@@ -83,7 +83,7 @@ export default function Notes() {
 
   return (
     <Layout>
-      <div className="p-4 md:p-8 max-w-3xl">
+      <div className="p-4 md:p-8 max-w-3xl pb-24">
         <div className="flex items-center justify-between mb-8">
           <div>
             <h2 className="text-2xl font-bold text-gray-900">Notas</h2>

@@ -183,8 +183,8 @@ export default function MemoryAlbum() {
 
       {/* Full view lightbox */}
       {viewing && (
-        <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4" onClick={() => setViewing(null)}>
-          <div className="max-w-2xl w-full" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 z-[200] bg-black/95 flex items-center justify-center p-4" onClick={() => setViewing(null)}>
+          <div className="max-w-2xl w-full pb-20 overflow-y-auto max-h-screen" onClick={e => e.stopPropagation()}>
             {viewing.file_type === 'video' ? (
               <video src={viewing.file_url} controls autoPlay className="w-full rounded-2xl max-h-[65vh] object-contain" />
             ) : (
