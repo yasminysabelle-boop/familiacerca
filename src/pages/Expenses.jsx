@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
+import { useSubscription } from '../contexts/SubscriptionContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import { ChevronLeft, ChevronRight, Plus, XIcon, Camera } from '../components/Icons'
@@ -35,6 +37,8 @@ const catFor = id => CATEGORIES.find(c => c.id === id) ?? CATEGORIES[5]
 export default function Expenses() {
   const { user } = useAuth()
   const { ownerId } = useFamily()
+  const { canEdit } = useSubscription()
+  const navigate = useNavigate()
   const fileRef = useRef(null)
   const galleryRef = useRef(null)
   const displayName = user?.user_metadata?.full_name?.split(' ')[0] ?? user?.email ?? ''
@@ -616,15 +620,16 @@ export default function Expenses() {
 
               <button
                 type="submit"
-                disabled={!canSave}
+                disabled={!canSave || !canEdit}
+                onClick={!canEdit ? (e) => { e.preventDefault(); navigate('/pricing') } : undefined}
                 style={{
                   marginTop: 4, width: '100%', padding: '14px',
-                  background: canSave
+                  background: (canSave && canEdit)
                     ? 'linear-gradient(135deg, #C4623A, #A85130)'
                     : '#D4C4B8',
                   color: 'white', fontWeight: 700, fontSize: 14,
                   borderRadius: 14, border: 'none',
-                  cursor: canSave ? 'pointer' : 'not-allowed',
+                  cursor: (canSave && canEdit) ? 'pointer' : 'not-allowed',
                   boxShadow: canSave ? '0 6px 20px rgba(196,98,58,0.3)' : 'none',
                   transition: 'all 0.2s',
                 }}

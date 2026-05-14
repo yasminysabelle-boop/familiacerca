@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
+import { useSubscription } from '../contexts/SubscriptionContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 
@@ -20,6 +22,8 @@ const typeLabel = t => EVENT_TYPES.find(x => x.value === t)?.label ?? t
 export default function Calendar() {
   const { user } = useAuth()
   const { ownerId } = useFamily()
+  const { canEdit } = useSubscription()
+  const navigate = useNavigate()
   const fileRef  = useRef(null)
   const today    = new Date()
 
@@ -165,7 +169,8 @@ export default function Calendar() {
               </div>
             </div>
             <div className="flex gap-3">
-              <button type="submit" disabled={saving}
+              <button type="submit" disabled={saving || !canEdit}
+                onClick={!canEdit ? (e) => { e.preventDefault(); navigate('/pricing') } : undefined}
                 className="px-4 py-2 bg-primary hover:bg-primary-dark disabled:opacity-60 text-white text-sm font-medium rounded-lg transition-colors">
                 {saving ? 'Guardando...' : 'Guardar'}
               </button>

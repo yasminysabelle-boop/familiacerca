@@ -1,14 +1,21 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
+import { useSubscription } from '../contexts/SubscriptionContext'
+import { createPortalSession } from '../lib/stripe'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import { UserPlus, Phone, Mail, MapPin, XIcon, BookOpen, Users } from '../components/Icons'
 
+const PLAN_LABELS = { trial: 'Prueba gratuita', familiar: 'Plan Familiar', care_plus: 'Care+' }
+const PLAN_COLORS = { trial: '#9CA3AF', familiar: '#C4623A', care_plus: '#7C3AED' }
+
 export default function Familia() {
   const { user } = useAuth()
   const { profile, ownerId } = useFamily()
+  const { sub, isPaid, isTrialing, daysLeft } = useSubscription()
+  const navigate = useNavigate()
   const [members, setMembers] = useState([])
   const [memberProfiles, setMemberProfiles] = useState({})
   const [loading, setLoading] = useState(true)
@@ -19,6 +26,7 @@ export default function Familia() {
   const [inviteStatus, setInviteStatus] = useState('idle')
   const [inviteLink, setInviteLink] = useState('')
   const [copied, setCopied] = useState(false)
+  const [portalLoading, setPortalLoading] = useState(false)
 
   const displayName = user?.user_metadata?.full_name ?? user?.email ?? 'Familiar'
 
@@ -87,6 +95,18 @@ export default function Familia() {
     setShowInvite(true)
   }
 
+  async function handlePortal() {
+    if (!isPaid) { navigate('/pricing'); return }
+    setPortalLoading(true)
+    try {
+      const url = await createPortalSession()
+      window.location.href = url
+    } catch {
+      setPortalLoading(false)
+      alert('No se pudo abrir el portal. Intenta de nuevo.')
+    }
+  }
+
   const fieldStyle = {
     width: '100%', padding: '12px 14px', borderRadius: 12,
     border: '1.5px solid #EDE5D8', background: '#FDFAF7',
@@ -131,6 +151,46 @@ export default function Familia() {
                 </p>
               )}
             </div>
+          </div>
+        )}
+
+        {/* Subscription badge */}
+        {sub && (
+          <div style={{
+            background: 'white', borderRadius: 16, border: '1px solid #EDE5D8',
+            padding: '14px 16px', marginBottom: 12,
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{
+                width: 36, height: 36, borderRadius: 10, flexShrink: 0,
+                background: `${PLAN_COLORS[sub.plan] ?? '#9CA3AF'}18`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 18,
+              }}>
+                {sub.plan === 'care_plus' ? '✨' : sub.plan === 'familiar' ? '❤️' : '🌱'}
+              </div>
+              <div>
+                <p style={{ fontSize: 13, fontWeight: 700, color: '#1A1A1A', margin: '0 0 2px' }}>
+                  {PLAN_LABELS[sub.plan] ?? sub.plan}
+                </p>
+                <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>
+                  {isTrialing ? `${daysLeft} días restantes` : isPaid ? 'Activo' : 'Período de prueba terminado'}
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={handlePortal}
+              disabled={portalLoading}
+              style={{
+                padding: '7px 14px', borderRadius: 10, fontSize: 12, fontWeight: 700,
+                border: '1.5px solid #EDE5D8', background: 'white',
+                color: '#6B7280', cursor: 'pointer',
+              }}
+            >
+              {portalLoading ? '...' : isPaid ? 'Gestionar' : 'Ver planes'}
+            </button>
           </div>
         )}
 

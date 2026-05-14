@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import Logo from './Logo'
 import { Home, Pill, Mic, Users, User, Plus, XIcon } from './Icons'
+import Paywall from './Paywall'
 
 const PAGE_TITLES = {
   '/dashboard':   'Inicio',
@@ -188,6 +189,8 @@ export default function Layout({ children }) {
           </div>
         </div>
       )}
+
+      <Paywall />
 
       {/* Inactivity warning banner */}
       {inactivityWarning && (

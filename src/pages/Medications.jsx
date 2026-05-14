@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import { useSubscription } from '../contexts/SubscriptionContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import { Plus, XIcon, Pencil, Trash, Bell } from '../components/Icons'
@@ -50,6 +52,8 @@ const labelStyle = {
 
 export default function Medications() {
   const { user } = useAuth()
+  const { canEdit } = useSubscription()
+  const navigate = useNavigate()
   const { permission, supported, requestAndSubscribe } = usePushNotifications()
   const [medications, setMedications] = useState([])
   const [form, setForm] = useState(emptyForm)
@@ -494,10 +498,11 @@ export default function Medications() {
                   Cancelar
                 </button>
                 <button
-                  type="submit" disabled={saving}
+                  type="submit" disabled={saving || !canEdit}
+                  onClick={!canEdit ? (e) => { e.preventDefault(); navigate('/pricing') } : undefined}
                   style={{
                     flex: 2, padding: '13px',
-                    background: saving ? '#D4C4B8' : 'linear-gradient(135deg, #C4623A, #A85130)',
+                    background: (saving || !canEdit) ? '#D4C4B8' : 'linear-gradient(135deg, #C4623A, #A85130)',
                     color: 'white', fontWeight: 700, fontSize: 14,
                     borderRadius: 14, border: 'none',
                     cursor: saving ? 'not-allowed' : 'pointer',

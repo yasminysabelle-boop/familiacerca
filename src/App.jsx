@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import { FamilyProvider } from './contexts/FamilyContext'
+import { SubscriptionProvider } from './contexts/SubscriptionContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import Login from './pages/Login'
 import Register from './pages/Register'
@@ -26,6 +27,7 @@ import PrivacyPolicy from './pages/PrivacyPolicy'
 import JoinFamily from './pages/JoinFamily'
 import Permissions from './pages/Permissions'
 import Directory from './pages/Directory'
+import Pricing from './pages/Pricing'
 
 import imgAbuela  from './assets/images/splash-abuela.png'
 import imgHija    from './assets/images/splash-hija.png'
@@ -164,6 +166,7 @@ export default function App() {
       {!splashDone && <Splash fading={splashFading} />}
       <AuthProvider>
         <FamilyProvider>
+          <SubscriptionProvider>
           <BrowserRouter>
             <Routes>
               <Route path="/login"       element={<Login />} />
@@ -187,11 +190,13 @@ export default function App() {
               <Route path="/directorio"   element={<P><Directory /></P>} />
               <Route path="/join"        element={<JoinFamily />} />
               <Route path="/permisos"    element={<P><Permissions /></P>} />
+              <Route path="/pricing"     element={<Pricing />} />
               <Route path="/terminos"    element={<TermsOfService />} />
               <Route path="/privacidad"  element={<PrivacyPolicy />} />
               <Route path="*"            element={<Navigate to="/login" replace />} />
             </Routes>
           </BrowserRouter>
+          </SubscriptionProvider>
         </FamilyProvider>
       </AuthProvider>
     </>

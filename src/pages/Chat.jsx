@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
+import { useSubscription } from '../contexts/SubscriptionContext'
 import { supabase } from '../lib/supabase'
 import { geminiGenerate } from '../lib/gemini'
 import Layout from '../components/Layout'
@@ -63,6 +65,8 @@ function Avatar({ name, photoUrl, size = 32 }) {
 export default function Chat() {
   const { user } = useAuth()
   const { ownerId } = useFamily()
+  const { canEdit } = useSubscription()
+  const navigate = useNavigate()
   const [messages, setMessages] = useState([])
   const [profiles, setProfiles] = useState({}) // userId → { full_name, avatar_url }
   const [input, setInput] = useState('')
@@ -474,16 +478,17 @@ export default function Chat() {
             </button>
             <button
               type="submit"
-              disabled={sending || !input.trim()}
+              disabled={sending || !input.trim() || !canEdit}
+              onClick={!canEdit ? (e) => { e.preventDefault(); navigate('/pricing') } : undefined}
               style={{
                 padding: '10px 18px', borderRadius: 20, border: 'none',
-                background: sending || !input.trim()
+                background: (sending || !input.trim() || !canEdit)
                   ? '#D4C4B8'
                   : 'linear-gradient(135deg, #C4623A, #A85130)',
                 color: 'white', fontWeight: 700, fontSize: 13,
-                cursor: sending || !input.trim() ? 'not-allowed' : 'pointer',
+                cursor: (sending || !input.trim() || !canEdit) ? 'not-allowed' : 'pointer',
                 flexShrink: 0, transition: 'all 0.15s',
-                boxShadow: !sending && input.trim() ? '0 3px 12px rgba(196,98,58,0.3)' : 'none',
+                boxShadow: (!sending && input.trim() && canEdit) ? '0 3px 12px rgba(196,98,58,0.3)' : 'none',
               }}
             >
               Enviar

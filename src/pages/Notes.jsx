@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
+import { useSubscription } from '../contexts/SubscriptionContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import MicButton from '../components/MicButton'
@@ -12,6 +14,8 @@ const emptyForm = { title: '', content: '', tags: [] }
 export default function Notes() {
   const { user } = useAuth()
   const { ownerId } = useFamily()
+  const { canEdit } = useSubscription()
+  const navigate = useNavigate()
   const [notes, setNotes] = useState([])
   const [form, setForm] = useState(emptyForm)
   const [showForm, setShowForm] = useState(false)
@@ -180,7 +184,8 @@ export default function Notes() {
             <div className="flex gap-3">
               <button
                 type="submit"
-                disabled={saving}
+                disabled={saving || !canEdit}
+                onClick={!canEdit ? (e) => { e.preventDefault(); navigate('/pricing') } : undefined}
                 className="px-4 py-2 bg-primary hover:bg-primary-dark disabled:opacity-60 text-white text-sm font-medium rounded-lg transition-colors"
               >
                 {saving ? 'Guardando...' : 'Guardar nota'}

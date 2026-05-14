@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
+import { useSubscription } from '../contexts/SubscriptionContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import { AlertTriangle, CheckIcon, User, XIcon } from '../components/Icons'
 import { geminiGenerate } from '../lib/gemini'
+import TrialBanner from '../components/TrialBanner'
 
 // Mood lookup — handles both stored text values and emoji values
 const MOOD_MAP = {
@@ -401,6 +403,8 @@ function AiCard({ type, text }) {
 export default function Dashboard() {
   const { user } = useAuth()
   const { profile, ownerId } = useFamily()
+  const { refresh: refreshSub } = useSubscription()
+  const [searchParams, setSearchParams] = useSearchParams()
 
   const [sections, setSections] = useState([])
   const [loading, setLoading] = useState(true)
@@ -411,6 +415,16 @@ export default function Dashboard() {
   const [sosSent, setSosSent] = useState(false)
   const [sosConfirming, setSosConfirming] = useState(false)
   const [aiCards, setAiCards] = useState({})
+  const [checkoutSuccess, setCheckoutSuccess] = useState(false)
+
+  useEffect(() => {
+    if (searchParams.get('checkout') === 'success') {
+      setCheckoutSuccess(true)
+      refreshSub()
+      setSearchParams({}, { replace: true })
+      setTimeout(() => setCheckoutSuccess(false), 6000)
+    }
+  }, [])
 
   const now = new Date()
   const todayKey = now.toISOString().split('T')[0]
@@ -820,6 +834,18 @@ export default function Dashboard() {
 
   return (
     <Layout>
+      {checkoutSuccess && (
+        <div style={{
+          position: 'fixed', top: 64, left: '50%', transform: 'translateX(-50%)',
+          zIndex: 100, background: '#15803D', color: 'white',
+          borderRadius: 14, padding: '12px 20px',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+          fontSize: 14, fontWeight: 600, whiteSpace: 'nowrap',
+        }}>
+          🎉 ¡Suscripción activada! Gracias por confiar en FamiliaCerca.
+        </div>
+      )}
+      <TrialBanner />
       <div style={{ padding: '12px 16px 24px', maxWidth: 600 }}>
 
         {/* Greeting header */}
