@@ -76,7 +76,7 @@ function PendingCard({ evt, confirming, onConfirm, todayKey }) {
         <span style={{ fontSize: 20, flexShrink: 0, marginTop: 1 }}>⚠️</span>
         <div style={{ flex: 1, minWidth: 0 }}>
           <p style={{ fontSize: 14, fontWeight: 700, color: '#92400E', margin: 0, lineHeight: 1.4 }}>
-            {evt.medName}{evt.medDosage ? ` · ${evt.medDosage}` : ''} pendiente
+            {evt.medDosage ?? evt.medName} pendiente
             {ago && <span style={{ fontWeight: 400, color: '#B45309' }}> — {ago}</span>}
           </p>
           {evt.medTime && (
@@ -124,8 +124,7 @@ function ConfirmedCard({ evt }) {
       <div style={{ flex: 1, minWidth: 0 }}>
         <p style={{ fontSize: 13, fontWeight: 600, color: '#15803D', margin: 0, lineHeight: 1.4 }}>
           {time && <span style={{ fontWeight: 400, color: '#4B7A5D' }}>{time} — </span>}
-          {name ? `${name} dio ${evt.medName}` : evt.medName}
-          {evt.medDosage ? <span style={{ fontWeight: 400, color: '#4B7A5D' }}> {evt.medDosage}</span> : ''}
+          {name ? `${name} dio ${evt.medDosage ?? evt.medName}` : (evt.medDosage ?? evt.medName)}
         </p>
       </div>
       <span style={{ fontSize: 16, flexShrink: 0 }}>✅</span>
