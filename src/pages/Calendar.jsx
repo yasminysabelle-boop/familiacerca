@@ -267,7 +267,7 @@ export default function Calendar() {
 
       {/* Appointment proof modal */}
       {proofEvent && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 p-4">
+        <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center bg-black/50 p-4 pb-24">
           <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl">
             <h3 className="font-bold text-gray-900 mb-0.5">Prueba de asistencia</h3>
             <p className="text-sm text-gray-500 mb-4">{proofEvent.title}</p>
