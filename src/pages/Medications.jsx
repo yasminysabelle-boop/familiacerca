@@ -360,7 +360,7 @@ export default function Medications() {
       {showForm && (
         <div
           style={{
-            position: 'fixed', inset: 0, zIndex: 50,
+            position: 'fixed', inset: 0, zIndex: 200,
             background: 'rgba(0,0,0,0.5)',
             display: 'flex', alignItems: 'flex-end',
           }}
@@ -369,7 +369,7 @@ export default function Medications() {
           <div style={{
             width: '100%', maxHeight: '92vh',
             background: 'white', borderRadius: '24px 24px 0 0',
-            padding: '24px 20px 40px',
+            padding: '24px 20px 96px',
             overflowY: 'auto',
             boxShadow: '0 -8px 48px rgba(0,0,0,0.2)',
           }}>

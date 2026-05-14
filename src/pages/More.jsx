@@ -232,10 +232,9 @@ export default function More() {
       {showModal && (
         <div
           style={{
-            position: 'fixed', inset: 0, zIndex: 50,
+            position: 'fixed', inset: 0, zIndex: 200,
             background: 'rgba(0,0,0,0.55)',
             display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
-            padding: '0 0 env(safe-area-inset-bottom)',
           }}
           onClick={e => { if (e.target === e.currentTarget) closeModal() }}
         >
@@ -243,7 +242,7 @@ export default function More() {
             width: '100%', maxWidth: 480,
             background: 'white',
             borderRadius: '24px 24px 0 0',
-            padding: '28px 24px 40px',
+            padding: '28px 24px 96px',
             boxShadow: '0 -8px 48px rgba(0,0,0,0.2)',
           }}>
             {/* Header */}

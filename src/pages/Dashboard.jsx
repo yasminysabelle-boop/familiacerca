@@ -1010,17 +1010,16 @@ export default function Dashboard() {
         {sosConfirming && (
           <div
             style={{
-              position: 'fixed', inset: 0, zIndex: 60,
+              position: 'fixed', inset: 0, zIndex: 200,
               background: 'rgba(0,0,0,0.6)',
               display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
-              padding: '0 0 16px',
             }}
             onClick={e => { if (e.target === e.currentTarget) setSosConfirming(false) }}
           >
             <div style={{
               width: '100%', maxWidth: 480,
               background: 'white', borderRadius: '24px 24px 0 0',
-              padding: '28px 24px 40px',
+              padding: '28px 24px 96px',
               boxShadow: '0 -8px 48px rgba(0,0,0,0.2)',
             }}>
               <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>

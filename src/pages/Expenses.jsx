@@ -374,7 +374,7 @@ export default function Expenses() {
       {showModal && (
         <div
           style={{
-            position: 'fixed', inset: 0, zIndex: 50,
+            position: 'fixed', inset: 0, zIndex: 200,
             background: 'rgba(0,0,0,0.52)',
             display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
           }}
@@ -385,7 +385,7 @@ export default function Expenses() {
             background: 'white',
             borderRadius: '24px 24px 0 0',
             maxHeight: '92vh', overflowY: 'auto',
-            padding: '24px 20px 48px',
+            padding: '24px 20px 96px',
             boxShadow: '0 -8px 48px rgba(0,0,0,0.2)',
           }}>
 

@@ -332,14 +332,14 @@ export default function Familia() {
         const name = mp?.full_name ?? member.member_email?.split('@')[0] ?? '—'
         return (
           <div
-            style={{ position: 'fixed', inset: 0, zIndex: 50, background: 'rgba(0,0,0,0.55)',
+            style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.55)',
               display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
             onClick={e => { if (e.target === e.currentTarget) setMemberModal(null) }}
           >
             <div style={{
               width: '100%', maxWidth: 480,
               background: 'white', borderRadius: '24px 24px 0 0',
-              padding: '28px 24px 40px',
+              padding: '28px 24px 96px',
               boxShadow: '0 -8px 48px rgba(0,0,0,0.2)',
             }}>
               <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
@@ -420,14 +420,14 @@ export default function Familia() {
       {/* Invite modal */}
       {showInvite && (
         <div
-          style={{ position: 'fixed', inset: 0, zIndex: 50, background: 'rgba(0,0,0,0.55)',
+          style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.55)',
             display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
           onClick={e => { if (e.target === e.currentTarget) setShowInvite(false) }}
         >
           <div style={{
             width: '100%', maxWidth: 480,
             background: 'white', borderRadius: '24px 24px 0 0',
-            padding: '28px 24px 40px',
+            padding: '28px 24px 96px',
             boxShadow: '0 -8px 48px rgba(0,0,0,0.2)',
           }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>

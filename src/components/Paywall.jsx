@@ -27,7 +27,7 @@ export default function Paywall() {
           width: '100%', maxWidth: 480,
           background: 'white',
           borderRadius: '28px 28px 0 0',
-          padding: '32px 24px 48px',
+          padding: '32px 24px 96px',
           boxShadow: '0 -16px 64px rgba(0,0,0,0.3)',
           textAlign: 'center',
         }}
