@@ -8,8 +8,8 @@ import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import { UserPlus, Phone, Mail, MapPin, XIcon, BookOpen, Users } from '../components/Icons'
 
-const PLAN_LABELS = { trial: 'Prueba gratuita', familiar: 'Plan Familiar', care_plus: 'Care+' }
-const PLAN_COLORS = { trial: '#9CA3AF', familiar: '#C4623A', care_plus: '#7C3AED' }
+const PLAN_LABELS = { free: 'Prueba gratuita', familiar: 'Plan Familiar', care_plus: 'Care+' }
+const PLAN_COLORS = { free: '#9CA3AF', familiar: '#C4623A', care_plus: '#7C3AED' }
 
 export default function Familia() {
   const { user } = useAuth()
@@ -170,6 +170,7 @@ export default function Familia() {
                 fontSize: 18,
               }}>
                 {sub.plan === 'care_plus' ? '✨' : sub.plan === 'familiar' ? '❤️' : '🌱'}
+
               </div>
               <div>
                 <p style={{ fontSize: 13, fontWeight: 700, color: '#1A1A1A', margin: '0 0 2px' }}>

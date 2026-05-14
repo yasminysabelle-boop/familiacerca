@@ -24,6 +24,8 @@ const PAGE_TITLES = {
   '/gastos':      'Cuentas Claras',
   '/directorio':  'Directorio',
   '/permisos':    'Permisos',
+  '/ajustes':     'Mi cuenta',
+  '/pricing':     'Planes',
 }
 
 const BOTTOM_TABS = [

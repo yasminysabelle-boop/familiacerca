@@ -2,11 +2,12 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
+import { useSubscription } from '../contexts/SubscriptionContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import {
   ClipboardCheck, FileText, Image, Mic, BarChart, User,
-  Receipt, UserPlus, LogOut, ChevronRight, XIcon,
+  Receipt, UserPlus, LogOut, ChevronRight, XIcon, Settings,
 } from '../components/Icons'
 
 const MORE_ITEMS = [
@@ -17,13 +18,20 @@ const MORE_ITEMS = [
   { to: '/memorias',   Icon: Mic,             label: 'Memorias',            desc: 'Memorias de voz del familiar',          color: '#7C5CBF' },
   { to: '/reportes',   Icon: BarChart,        label: 'Reportes',            desc: 'Análisis semanal y PDF médico',          color: '#2D86A0' },
   { to: '/perfil',     Icon: User,            label: 'Perfil familiar',     desc: 'Datos de la persona a cuidar',          color: '#C4623A' },
+  { to: '/ajustes',    Icon: Settings,        label: 'Mi cuenta',           desc: 'Suscripción y configuración',            color: '#6B7280' },
 ]
+
+const PLAN_COLORS = { free: '#9CA3AF', familiar: '#C4623A', care_plus: '#7C3AED' }
+const PLAN_LABELS = { free: 'Prueba gratuita', familiar: 'Plan Familiar', care_plus: 'Care+' }
 
 export default function More() {
   const { user, signOut } = useAuth()
   const { profile } = useFamily()
+  const { sub, isTrialing, daysLeft, trialExpired } = useSubscription()
   const navigate = useNavigate()
   const caretakerName = user?.user_metadata?.full_name ?? user?.email ?? ''
+  const planColor = PLAN_COLORS[sub?.plan] ?? '#9CA3AF'
+  const planLabel = PLAN_LABELS[sub?.plan] ?? 'Cargando...'
 
   const [showModal, setShowModal]     = useState(false)
   const [inviteEmail, setInviteEmail] = useState('')
@@ -144,9 +152,31 @@ export default function More() {
                   + Agregar perfil familiar
                 </Link>
               )}
-              <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: 11, marginTop: 6, letterSpacing: '0.03em' }}>
+              <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: 11, marginTop: 4, letterSpacing: '0.03em' }}>
                 Cuidado por {caretakerName}
               </p>
+              {sub && (
+                <div
+                  onClick={() => navigate('/ajustes')}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 5,
+                    marginTop: 8, padding: '4px 10px', borderRadius: 8,
+                    background: 'rgba(255,255,255,0.15)', cursor: 'pointer',
+                  }}
+                >
+                  <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.85)', fontWeight: 600 }}>
+                    {planLabel}
+                  </span>
+                  {isTrialing && (
+                    <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)' }}>
+                      · {daysLeft}d restantes
+                    </span>
+                  )}
+                  {trialExpired && (
+                    <span style={{ fontSize: 10, color: '#FCA5A5' }}>· Expirado</span>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>

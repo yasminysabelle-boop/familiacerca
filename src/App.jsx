@@ -28,6 +28,7 @@ import JoinFamily from './pages/JoinFamily'
 import Permissions from './pages/Permissions'
 import Directory from './pages/Directory'
 import Pricing from './pages/Pricing'
+import Settings from './pages/Settings'
 
 import imgAbuela  from './assets/images/splash-abuela.png'
 import imgHija    from './assets/images/splash-hija.png'
@@ -191,6 +192,7 @@ export default function App() {
               <Route path="/join"        element={<JoinFamily />} />
               <Route path="/permisos"    element={<P><Permissions /></P>} />
               <Route path="/pricing"     element={<Pricing />} />
+              <Route path="/ajustes"    element={<P><Settings /></P>} />
               <Route path="/terminos"    element={<TermsOfService />} />
               <Route path="/privacidad"  element={<PrivacyPolicy />} />
               <Route path="*"            element={<Navigate to="/login" replace />} />

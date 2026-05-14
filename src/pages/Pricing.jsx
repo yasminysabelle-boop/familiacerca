@@ -6,45 +6,49 @@ import Logo from '../components/Logo'
 
 const PLANS = [
   {
-    id: 'gratis',
+    id: 'free',
     name: 'Gratis',
     price: '$0',
-    period: 'siempre',
+    period: '14 días de prueba',
     badge: null,
     color: '#6B7280',
     features: [
       'Perfil del familiar',
       'Hasta 3 miembros del equipo',
-      'Registro de medicamentos (solo lectura)',
       'Chat familiar',
+      'Timeline de cuidado',
     ],
     locked: [
       'Recordatorios automáticos',
+      'Miembros ilimitados',
       'Historial ilimitado',
-      'Asistente IA ✨',
+      'Resúmenes con IA ✨',
     ],
-    cta: 'Plan actual',
+    cta: 'Plan base',
     disabled: true,
   },
   {
     id: 'familiar',
-    name: 'Familiar',
+    name: 'Plan Familiar',
     price: '$12.99',
     period: '/mes',
     badge: 'Más popular',
     color: '#C4623A',
     features: [
-      'Todo lo de Gratis',
+      'Todo lo del plan Gratis',
       'Miembros ilimitados',
       'Recordatorios automáticos de medicamentos',
-      'Notas, álbum y gastos',
-      'Historial completo',
-      'Directorio de contactos',
+      'Notas, álbum y gastos compartidos',
+      'Historial completo de dosis',
+      'Directorio de contactos médicos',
+      'Resúmenes básicos con IA',
     ],
     locked: [
-      'Asistente IA ✨',
+      'Detección de agotamiento del cuidador',
+      'PDF médico semanal',
+      'Reportes avanzados con IA',
     ],
-    cta: 'Empezar →',
+    cta: 'Empezar ahora →',
     disabled: false,
   },
   {
@@ -52,49 +56,54 @@ const PLANS = [
     name: 'Care+',
     price: '$24.99',
     period: '/mes',
-    badge: '✨ Con IA',
+    badge: '✨ IA Avanzada',
     color: '#7C3AED',
     features: [
-      'Todo lo de Familiar',
-      'Asistente IA 24/7',
+      'Todo lo del Plan Familiar',
+      'Asistente IA familiar 24/7',
       'Resumen diario inteligente',
       'Detección de agotamiento del cuidador',
-      'Resumen semanal automático',
+      'Reporte semanal familiar automático',
+      'Resumen médico en PDF',
       'Soporte prioritario',
     ],
     locked: [],
-    cta: 'Empezar →',
+    cta: 'Empezar ahora →',
     disabled: false,
   },
 ]
 
 const FAQ = [
   {
+    q: '¿Necesito tarjeta de crédito para la prueba gratuita?',
+    a: 'No. Los primeros 14 días son completamente gratis sin necesidad de tarjeta. Solo se solicita al elegir un plan de pago.',
+  },
+  {
     q: '¿Puedo cancelar en cualquier momento?',
-    a: 'Sí. Puedes cancelar desde tu panel de suscripción y seguirás teniendo acceso hasta el final del período pagado.',
+    a: 'Sí. Puedes cancelar desde tu panel de cuenta y seguirás teniendo acceso hasta el final del período pagado.',
   },
   {
     q: '¿Los datos de mi familiar están seguros?',
     a: 'Absolutamente. Toda la información está cifrada y almacenada de forma segura. Solo tú y tu equipo de cuidado pueden verla.',
   },
   {
-    q: '¿Qué pasa si necesito más de un perfil de cuidado?',
-    a: 'Actualmente cada cuenta tiene un perfil. Contáctanos si tienes necesidades especiales.',
+    q: '¿Qué incluye la detección de agotamiento del cuidador?',
+    a: 'La IA analiza los patrones de registro de los últimos 7 días. Si detecta que la misma persona ha registrado más del 80% de las dosis sola, genera un mensaje de reconocimiento y sugiere distribuir el cuidado.',
   },
   {
     q: '¿Hay descuento anual?',
-    a: 'Estamos trabajando en planes anuales con descuento. Regístrate y serás el primero en saberlo.',
+    a: 'Estamos trabajando en planes anuales con descuento. Únete a la lista de espera desde tu perfil.',
   },
 ]
 
 export default function Pricing() {
   const navigate = useNavigate()
-  const { sub, refresh } = useSubscription()
+  const { sub, isTrialing, daysLeft } = useSubscription()
   const [loading, setLoading] = useState(null)
   const [openFaq, setOpenFaq] = useState(null)
 
   async function handleChoose(planId) {
-    if (planId === 'gratis') return
+    if (planId === 'free') return
     setLoading(planId)
     try {
       const url = await createCheckoutSession(planId)
@@ -110,15 +119,12 @@ export default function Pricing() {
   return (
     <div style={{ minHeight: '100svh', background: '#FFF8F0', paddingBottom: 60 }}>
       {/* Header */}
-      <div style={{
-        padding: '24px 20px 0',
-        display: 'flex', alignItems: 'center', gap: 14,
-      }}>
+      <div style={{ padding: '24px 20px 0', display: 'flex', alignItems: 'center', gap: 14 }}>
         <button
           onClick={() => navigate(-1)}
           style={{
             width: 36, height: 36, borderRadius: 10, border: '1.5px solid #EDE5D8',
-            background: 'white', cursor: 'pointer', fontSize: 18, color: '#6B7280',
+            background: 'white', cursor: 'pointer', fontSize: 20, color: '#6B7280',
             display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
           }}
         >
@@ -144,6 +150,21 @@ export default function Pricing() {
         <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.6, maxWidth: 320, margin: '0 auto' }}>
           Elige el plan que mejor se adapta a tu equipo de cuidado.
         </p>
+
+        {/* Trial countdown */}
+        {isTrialing && (
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: 8,
+            marginTop: 16, padding: '8px 16px', borderRadius: 20,
+            background: daysLeft <= 3 ? '#FEF2F2' : '#FFF8F0',
+            border: `1px solid ${daysLeft <= 3 ? '#FECACA' : '#EDE5D8'}`,
+          }}>
+            <span style={{ fontSize: 14 }}>{daysLeft <= 3 ? '⚠️' : '🌱'}</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: daysLeft <= 3 ? '#DC2626' : '#C4623A' }}>
+              Te quedan {daysLeft} día{daysLeft !== 1 ? 's' : ''} de prueba gratuita
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Plan cards */}
@@ -159,25 +180,31 @@ export default function Pricing() {
               style={{
                 borderRadius: 20,
                 border: `2px solid ${isHighlighted ? plan.color : '#EDE5D8'}`,
-                background: isHighlighted ? 'linear-gradient(135deg, #FFF8F0, #FDF0EB)' : 'white',
+                background: isHighlighted
+                  ? 'linear-gradient(135deg, #FFF8F0, #FDF0EB)'
+                  : plan.id === 'care_plus'
+                  ? 'linear-gradient(135deg, #FAF5FF, #F5F0FF)'
+                  : 'white',
                 padding: '20px 20px 22px',
                 position: 'relative',
-                boxShadow: isHighlighted ? '0 8px 32px rgba(196,98,58,0.15)' : '0 2px 8px rgba(0,0,0,0.04)',
+                boxShadow: isHighlighted
+                  ? '0 8px 32px rgba(196,98,58,0.15)'
+                  : plan.id === 'care_plus'
+                  ? '0 8px 32px rgba(124,58,237,0.1)'
+                  : '0 2px 8px rgba(0,0,0,0.04)',
               }}
             >
-              {/* Badge */}
               {plan.badge && (
                 <div style={{
                   position: 'absolute', top: -1, right: 18,
-                  background: plan.color,
-                  color: 'white', fontSize: 11, fontWeight: 700,
+                  background: plan.color, color: 'white',
+                  fontSize: 11, fontWeight: 700,
                   padding: '4px 12px', borderRadius: '0 0 10px 10px',
                 }}>
                   {plan.badge}
                 </div>
               )}
 
-              {/* Plan header */}
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 16 }}>
                 <div>
                   <p style={{ fontSize: 18, fontWeight: 700, color: '#1A1A1A', margin: '0 0 4px', fontFamily: 'Georgia, serif' }}>
@@ -196,33 +223,33 @@ export default function Pricing() {
                   <span style={{ fontSize: 26, fontWeight: 800, color: plan.color }}>
                     {plan.price}
                   </span>
-                  <span style={{ fontSize: 12, color: '#9CA3AF' }}>{plan.period}</span>
+                  <br />
+                  <span style={{ fontSize: 11, color: '#9CA3AF' }}>{plan.period}</span>
                 </div>
               </div>
 
-              {/* Features */}
               <div style={{ marginBottom: 16 }}>
                 {plan.features.map(f => (
-                  <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 6 }}>
-                    <span style={{ color: '#22C55E', fontSize: 14, flexShrink: 0, marginTop: 1 }}>✓</span>
+                  <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 7 }}>
+                    <span style={{ color: '#22C55E', fontSize: 13, flexShrink: 0, marginTop: 1 }}>✓</span>
                     <span style={{ fontSize: 13, color: '#374151', lineHeight: 1.4 }}>{f}</span>
                   </div>
                 ))}
                 {plan.locked.map(f => (
-                  <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 6 }}>
-                    <span style={{ color: '#D4C4B8', fontSize: 14, flexShrink: 0, marginTop: 1 }}>✕</span>
+                  <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 7 }}>
+                    <span style={{ color: '#D4C4B8', fontSize: 13, flexShrink: 0, marginTop: 1 }}>✕</span>
                     <span style={{ fontSize: 13, color: '#D4C4B8', lineHeight: 1.4 }}>{f}</span>
                   </div>
                 ))}
               </div>
 
-              {/* CTA */}
               <button
                 onClick={() => handleChoose(plan.id)}
                 disabled={plan.disabled || isCurrent || isLoading}
                 style={{
                   width: '100%', padding: '13px', borderRadius: 14, border: 'none',
-                  fontWeight: 700, fontSize: 14, cursor: (plan.disabled || isCurrent) ? 'default' : 'pointer',
+                  fontWeight: 700, fontSize: 14,
+                  cursor: (plan.disabled || isCurrent) ? 'default' : 'pointer',
                   background: isCurrent || plan.disabled
                     ? '#EDE5D8'
                     : `linear-gradient(135deg, ${plan.color}, ${plan.color}CC)`,
@@ -239,15 +266,8 @@ export default function Pricing() {
       </div>
 
       {/* Trust badges */}
-      <div style={{
-        margin: '28px 16px 0',
-        display: 'flex', justifyContent: 'center', gap: 24, flexWrap: 'wrap',
-      }}>
-        {[
-          ['🔒', 'Pago seguro'],
-          ['↩', 'Cancela cuando quieras'],
-          ['💳', 'Stripe'],
-        ].map(([icon, label]) => (
+      <div style={{ margin: '28px 16px 0', display: 'flex', justifyContent: 'center', gap: 24, flexWrap: 'wrap' }}>
+        {[['🔒', 'Pago seguro'], ['↩', 'Cancela cuando quieras'], ['💳', 'Powered by Stripe']].map(([icon, label]) => (
           <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <span style={{ fontSize: 16 }}>{icon}</span>
             <span style={{ fontSize: 12, color: '#9CA3AF', fontWeight: 600 }}>{label}</span>
@@ -257,21 +277,12 @@ export default function Pricing() {
 
       {/* FAQ */}
       <div style={{ padding: '32px 16px 0' }}>
-        <p style={{
-          fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700,
-          color: '#1A1A1A', marginBottom: 16, paddingLeft: 4,
-        }}>
+        <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#1A1A1A', marginBottom: 16, paddingLeft: 4 }}>
           Preguntas frecuentes
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {FAQ.map((item, i) => (
-            <div
-              key={i}
-              style={{
-                background: 'white', borderRadius: 14, border: '1px solid #EDE5D8',
-                overflow: 'hidden',
-              }}
-            >
+            <div key={i} style={{ background: 'white', borderRadius: 14, border: '1px solid #EDE5D8', overflow: 'hidden' }}>
               <button
                 onClick={() => setOpenFaq(openFaq === i ? null : i)}
                 style={{
@@ -286,6 +297,7 @@ export default function Pricing() {
                 </span>
                 <span style={{
                   color: '#C4623A', fontSize: 18, flexShrink: 0,
+                  display: 'inline-block',
                   transform: openFaq === i ? 'rotate(180deg)' : 'rotate(0)',
                   transition: 'transform 0.2s',
                 }}>
@@ -294,9 +306,7 @@ export default function Pricing() {
               </button>
               {openFaq === i && (
                 <div style={{ padding: '0 16px 14px' }}>
-                  <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, margin: 0 }}>
-                    {item.a}
-                  </p>
+                  <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, margin: 0 }}>{item.a}</p>
                 </div>
               )}
             </div>

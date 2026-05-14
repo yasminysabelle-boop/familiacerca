@@ -6,10 +6,10 @@
 create table if not exists public.subscriptions (
   id                      uuid        primary key default gen_random_uuid(),
   user_id                 uuid        not null references auth.users(id) on delete cascade,
-  plan                    text        not null default 'trial'
-                                      check (plan in ('trial', 'familiar', 'care_plus')),
-  status                  text        not null default 'trialing'
-                                      check (status in ('trialing', 'active', 'canceled', 'past_due', 'paused')),
+  plan                    text        not null default 'free'
+                                      check (plan in ('free', 'familiar', 'care_plus')),
+  status                  text        not null default 'trial'
+                                      check (status in ('trial', 'active', 'expired', 'cancelled')),
   trial_end_date          timestamptz,
   current_period_end      timestamptz,
   stripe_customer_id      text,
