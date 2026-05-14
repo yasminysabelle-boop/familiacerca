@@ -63,18 +63,37 @@ alter table public.emergency_alerts
 
 alter table public.emergency_alerts enable row level security;
 
-create policy if not exists "emergency_alerts: insert own"
-  on public.emergency_alerts for insert
-  with check (auth.uid() = user_id);
+do $$ begin
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'public'
+      and tablename  = 'emergency_alerts'
+      and policyname = 'emergency_alerts: insert own'
+  ) then
+    create policy "emergency_alerts: insert own"
+      on public.emergency_alerts for insert
+      with check (auth.uid() = user_id);
+  end if;
+end $$;
 
-create policy if not exists "emergency_alerts: read family group"
-  on public.emergency_alerts for select
-  using (
-    auth.uid() = user_id or
-    auth.uid() in (
-      select member_user_id from public.family_members where user_id = emergency_alerts.user_id
-    )
-  );
+do $$ begin
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'public'
+      and tablename  = 'emergency_alerts'
+      and policyname = 'emergency_alerts: read family group'
+  ) then
+    create policy "emergency_alerts: read family group"
+      on public.emergency_alerts for select
+      using (
+        auth.uid() = user_id or
+        auth.uid() in (
+          select member_user_id from public.family_members
+          where user_id = emergency_alerts.user_id
+        )
+      );
+  end if;
+end $$;
 
 
 -- ── Timeline reactions ────────────────────────────────────────────
