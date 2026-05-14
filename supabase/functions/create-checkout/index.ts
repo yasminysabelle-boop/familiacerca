@@ -11,9 +11,10 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-const PLAN_PRICES: Record<string, { name: string; amount: number }> = {
-  familiar:  { name: 'FamiliaCerca Plan Familiar', amount: 1299 },
-  care_plus: { name: 'FamiliaCerca Plan Care+',    amount: 2499 },
+// Real Stripe Price IDs — set via Supabase secrets or fall back to env
+const PLAN_PRICE_IDS: Record<string, string> = {
+  familiar:  Deno.env.get('STRIPE_FAMILIAR_PRICE_ID')  ?? 'price_1TX1RGRvrgdCtMAGiMYn8Utr',
+  care_plus: Deno.env.get('STRIPE_CARE_PLUS_PRICE_ID') ?? 'price_1TX1WsRvrgdCtMAGYZV9xHHW',
 }
 
 serve(async (req) => {
@@ -23,7 +24,6 @@ serve(async (req) => {
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) throw new Error('Missing auth')
 
-    // Verify caller via Supabase
     const supabaseUser = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
@@ -33,8 +33,8 @@ serve(async (req) => {
     if (authErr || !user) throw new Error('Unauthorized')
 
     const { plan } = await req.json()
-    const priceData = PLAN_PRICES[plan]
-    if (!priceData) throw new Error('Invalid plan: ' + plan)
+    const priceId = PLAN_PRICE_IDS[plan]
+    if (!priceId) throw new Error('Invalid plan: ' + plan)
 
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -67,15 +67,7 @@ serve(async (req) => {
       customer: customerId,
       mode: 'subscription',
       payment_method_types: ['card'],
-      line_items: [{
-        price_data: {
-          currency: 'usd',
-          product_data: { name: priceData.name },
-          unit_amount: priceData.amount,
-          recurring: { interval: 'month' },
-        },
-        quantity: 1,
-      }],
+      line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${origin}/dashboard?checkout=success`,
       cancel_url:  `${origin}/pricing`,
       metadata: { user_id: user.id, plan },
