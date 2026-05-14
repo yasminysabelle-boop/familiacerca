@@ -91,7 +91,7 @@ export default function Hoy() {
 
   return (
     <Layout>
-      <div style={{ padding: '16px 16px 0', maxWidth: 600 }}>
+      <div style={{ padding: '16px 16px 96px', maxWidth: 600 }}>
 
         {/* Progress card */}
         {total > 0 && (

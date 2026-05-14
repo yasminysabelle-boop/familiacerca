@@ -162,7 +162,7 @@ export default function Reports() {
 
   return (
     <Layout>
-      <div className="p-4 md:p-8 max-w-3xl">
+      <div className="p-4 md:p-8 max-w-3xl pb-24">
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-gray-900">Reportes y análisis</h2>
           <p className="text-gray-500 mt-1">Bienestar semanal y documentos para el médico</p>
