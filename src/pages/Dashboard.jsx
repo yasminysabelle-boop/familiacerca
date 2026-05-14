@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
-import { CheckIcon, User } from '../components/Icons'
+import { AlertTriangle, CheckIcon, User, XIcon } from '../components/Icons'
 
 // Mood lookup — handles both stored text values and emoji values
 const MOOD_MAP = {
@@ -364,6 +364,10 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true)
   const [confirming, setConfirming] = useState(null)
   const [expandedAudio, setExpandedAudio] = useState(null)
+  const [medTotal, setMedTotal] = useState(0)
+  const [showSOS, setShowSOS] = useState(false)
+  const [sosSent, setSosSent] = useState(false)
+  const [sosConfirming, setSosConfirming] = useState(false)
 
   const now = new Date()
   const todayKey = now.toISOString().split('T')[0]
@@ -495,6 +499,8 @@ export default function Dashboard() {
         .order('date', { ascending: true })
         .limit(5),
     ])
+
+    setMedTotal((meds ?? []).length)
 
     const todayLogMap = {}
     ;(todayLogs ?? []).forEach(l => { todayLogMap[l.medication_id] = l })
@@ -665,6 +671,18 @@ export default function Dashboard() {
     setConfirming(null)
   }
 
+  async function triggerSOS() {
+    setSosConfirming(false)
+    await supabase.from('emergency_alerts').insert({
+      user_id: user.id,
+      triggered_by_name: fullName,
+      relative_name: profile?.name ?? null,
+    })
+    setSosSent(true)
+    setShowSOS(false)
+    setTimeout(() => setSosSent(false), 15000)
+  }
+
   const todaySection = sections.find(s => s.dateKey === todayKey)
   const pendingCount = todaySection?.events.filter(e => e.type === 'MED_PENDING').length ?? 0
   const confirmedTodayCount = todaySection?.events.filter(e => e.type === 'MED_CONFIRMED').length ?? 0
@@ -676,7 +694,7 @@ export default function Dashboard() {
         {/* Greeting header */}
         <div style={{
           background: 'linear-gradient(135deg, #BF5E37 0%, #7A3418 100%)',
-          borderRadius: 20, padding: '16px 18px', marginBottom: 16,
+          borderRadius: 20, padding: '16px 18px', marginBottom: 12,
           boxShadow: '0 4px 20px rgba(196,98,58,0.3)',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -731,8 +749,170 @@ export default function Dashboard() {
                 </p>
               ) : null}
             </div>
+
+            {/* Permanent SOS button */}
+            <div style={{ flexShrink: 0, position: 'relative' }}>
+              <span style={{
+                position: 'absolute', inset: -4, borderRadius: '50%',
+                background: 'rgba(214,48,49,0.35)',
+                animation: 'ping 1.8s cubic-bezier(0,0,0.2,1) infinite',
+                pointerEvents: 'none',
+              }} />
+              <button
+                onClick={() => setSosConfirming(true)}
+                style={{
+                  width: 46, height: 46, borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #D63031, #B82020)',
+                  border: '2.5px solid rgba(255,255,255,0.35)',
+                  boxShadow: '0 3px 14px rgba(214,48,49,0.55)',
+                  color: 'white', fontWeight: 900, fontSize: 11,
+                  letterSpacing: '0.06em', cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  position: 'relative', zIndex: 1,
+                  transition: 'transform 0.15s, box-shadow 0.15s',
+                }}
+                aria-label="Botón de emergencia SOS"
+              >
+                SOS
+              </button>
+            </div>
           </div>
         </div>
+
+        {/* Care recipient summary card */}
+        {profile && (
+          <div style={{
+            background: 'white', borderRadius: 16,
+            border: '1px solid #EDE5D8',
+            padding: '12px 16px', marginBottom: 16,
+            display: 'flex', alignItems: 'center', gap: 12,
+            boxShadow: '0 2px 10px rgba(0,0,0,0.04)',
+          }}>
+            {profile.photo_url ? (
+              <img
+                src={profile.photo_url}
+                alt={profile.name}
+                style={{
+                  width: 42, height: 42, borderRadius: '50%', objectFit: 'cover',
+                  border: '2px solid #EDE5D8', flexShrink: 0,
+                }}
+              />
+            ) : (
+              <div style={{
+                width: 42, height: 42, borderRadius: '50%', flexShrink: 0,
+                background: '#FDF0EB', border: '2px solid #EDE5D8',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 18, fontWeight: 700, color: '#C4623A',
+              }}>
+                {profile.name?.charAt(0) ?? '?'}
+              </div>
+            )}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{
+                fontSize: 14, fontWeight: 700, color: '#1A1A1A',
+                fontFamily: 'Georgia, serif', margin: 0,
+              }}>
+                {profile.name}
+              </p>
+              {medTotal > 0 ? (
+                <p style={{ fontSize: 12, color: pendingCount > 0 ? '#B45309' : '#4A7C59', marginTop: 2 }}>
+                  {confirmedTodayCount > 0 || pendingCount > 0
+                    ? `${confirmedTodayCount} de ${medTotal} medicamento${medTotal !== 1 ? 's' : ''} dado${confirmedTodayCount !== 1 ? 's' : ''} hoy ${pendingCount === 0 && confirmedTodayCount === medTotal ? '✅' : ''}`
+                    : `${medTotal} medicamento${medTotal !== 1 ? 's' : ''} programado${medTotal !== 1 ? 's' : ''} hoy`
+                  }
+                </p>
+              ) : (
+                <p style={{ fontSize: 12, color: '#9CA3AF', marginTop: 2 }}>
+                  Sin medicamentos configurados
+                </p>
+              )}
+            </div>
+            {sosSent && (
+              <span style={{
+                fontSize: 10, fontWeight: 700, color: '#D63031',
+                background: '#FFF0F0', border: '1px solid #FFBABA',
+                padding: '3px 8px', borderRadius: 6, flexShrink: 0,
+              }}>
+                🚨 Alerta enviada
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* SOS confirm dialog */}
+        {sosConfirming && (
+          <div
+            style={{
+              position: 'fixed', inset: 0, zIndex: 60,
+              background: 'rgba(0,0,0,0.6)',
+              display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
+              padding: '0 0 16px',
+            }}
+            onClick={e => { if (e.target === e.currentTarget) setSosConfirming(false) }}
+          >
+            <div style={{
+              width: '100%', maxWidth: 480,
+              background: 'white', borderRadius: '24px 24px 0 0',
+              padding: '28px 24px 40px',
+              boxShadow: '0 -8px 48px rgba(0,0,0,0.2)',
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
+                <button
+                  onClick={() => setSosConfirming(false)}
+                  style={{
+                    width: 32, height: 32, borderRadius: '50%',
+                    background: '#F3F4F6', border: 'none', cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}
+                >
+                  <XIcon size={14} color="#6B7280" strokeWidth={2} />
+                </button>
+              </div>
+              <div style={{ textAlign: 'center', marginBottom: 24 }}>
+                <div style={{
+                  width: 64, height: 64, borderRadius: '50%', margin: '0 auto 16px',
+                  background: '#FFF0F0', border: '2px solid #FFBABA',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <AlertTriangle size={28} color="#D63031" strokeWidth={1.5} />
+                </div>
+                <h3 style={{
+                  fontSize: 20, fontWeight: 700, color: '#1A1A1A',
+                  fontFamily: 'Georgia, serif', margin: '0 0 8px',
+                }}>
+                  ¿Activar emergencia?
+                </h3>
+                <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, margin: 0 }}>
+                  Todos los miembros de la familia recibirán una alerta inmediata
+                  {profile?.name ? ` sobre ${profile.name}` : ''}.
+                </p>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <button
+                  onClick={triggerSOS}
+                  style={{
+                    width: '100%', padding: '14px', borderRadius: 16, border: 'none',
+                    background: 'linear-gradient(135deg, #D63031, #B82020)',
+                    color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer',
+                    boxShadow: '0 6px 20px rgba(214,48,49,0.35)',
+                  }}
+                >
+                  Sí, es una emergencia real
+                </button>
+                <button
+                  onClick={() => setSosConfirming(false)}
+                  style={{
+                    width: '100%', padding: '13px', borderRadius: 14,
+                    border: '1px solid #EDE5D8', background: 'white',
+                    color: '#6B7280', fontWeight: 600, fontSize: 14, cursor: 'pointer',
+                  }}
+                >
+                  Cancelar — fue un error
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Family timeline */}
         {loading ? (
