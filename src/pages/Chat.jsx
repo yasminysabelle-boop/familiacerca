@@ -14,15 +14,54 @@ function formatDate(ts) {
   const today = new Date()
   const yesterday = new Date(today)
   yesterday.setDate(today.getDate() - 1)
-
   if (d.toDateString() === today.toDateString()) return 'Hoy'
   if (d.toDateString() === yesterday.toDateString()) return 'Ayer'
-  return d.toLocaleDateString('es-US', { day: 'numeric', month: 'long' })
+  return d.toLocaleDateString('es-US', { weekday: 'long', day: 'numeric', month: 'long' })
+}
+
+// Stable warm color per sender based on their first letter
+const AVATAR_COLORS = [
+  '#C4623A', '#7C5CBF', '#2D86A0', '#4A7C59',
+  '#D4A853', '#D63031', '#8B5E3C', '#5E86A0',
+]
+function avatarColor(name = '') {
+  const code = name.charCodeAt(0) || 0
+  return AVATAR_COLORS[code % AVATAR_COLORS.length]
+}
+
+function Avatar({ name, photoUrl, size = 32 }) {
+  const initial = (name ?? '?').charAt(0).toUpperCase()
+  const color = avatarColor(name)
+  if (photoUrl) {
+    return (
+      <img
+        src={photoUrl}
+        alt={name}
+        style={{
+          width: size, height: size, borderRadius: '50%',
+          objectFit: 'cover', flexShrink: 0,
+          border: '1.5px solid #EDE5D8',
+        }}
+      />
+    )
+  }
+  return (
+    <div style={{
+      width: size, height: size, borderRadius: '50%',
+      background: color, flexShrink: 0,
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      color: 'white', fontWeight: 700,
+      fontSize: size * 0.4,
+    }}>
+      {initial}
+    </div>
+  )
 }
 
 export default function Chat() {
   const { user } = useAuth()
   const [messages, setMessages] = useState([])
+  const [profiles, setProfiles] = useState({}) // userId → { full_name, avatar_url }
   const [input, setInput] = useState('')
   const [sending, setSending] = useState(false)
   const [sendError, setSendError] = useState('')
@@ -47,6 +86,20 @@ export default function Chat() {
             if (prev.some(m => m.id === payload.new.id)) return prev
             return [...prev, payload.new]
           })
+          // Fetch profile for new sender if not cached
+          const senderId = payload.new.user_id
+          setProfiles(prev => {
+            if (prev[senderId]) return prev
+            supabase
+              .from('user_profiles')
+              .select('id, full_name, avatar_url')
+              .eq('id', senderId)
+              .maybeSingle()
+              .then(({ data }) => {
+                if (data) setProfiles(p => ({ ...p, [data.id]: data }))
+              })
+            return prev
+          })
         }
       )
       .subscribe()
@@ -54,23 +107,36 @@ export default function Chat() {
     return () => supabase.removeChannel(channel)
   }, [])
 
+  // Scroll to bottom whenever messages update
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
   async function loadMessages() {
-    const { data } = await supabase
+    const { data: msgs } = await supabase
       .from('chat_messages')
       .select('*')
       .order('created_at', { ascending: true })
       .limit(100)
-    setMessages(data ?? [])
+    setMessages(msgs ?? [])
+
+    // Fetch profiles for all unique senders
+    const senderIds = [...new Set((msgs ?? []).map(m => m.user_id).filter(Boolean))]
+    if (senderIds.length) {
+      const { data: profs } = await supabase
+        .from('user_profiles')
+        .select('id, full_name, avatar_url')
+        .in('id', senderIds)
+      const map = {}
+      ;(profs ?? []).forEach(p => { map[p.id] = p })
+      setProfiles(map)
+    }
   }
 
   async function handleSend(e) {
     e.preventDefault()
-    const content = input.trim()
-    if (!content) return
+    const text = input.trim()
+    if (!text) return
 
     setSending(true)
     setSendError('')
@@ -79,12 +145,14 @@ export default function Chat() {
     const { error } = await supabase.from('chat_messages').insert({
       user_id: user.id,
       user_name: displayName,
-      message: content,
+      // Try both column names for compatibility with either schema version
+      content: text,
+      message: text,
     })
 
     if (error) {
-      setSendError('No se pudo enviar el mensaje. Inténtalo de nuevo.')
-      setInput(content)
+      setSendError('No se pudo enviar. Inténtalo de nuevo.')
+      setInput(text)
     }
 
     setSending(false)
@@ -98,6 +166,7 @@ export default function Chat() {
     }
   }
 
+  // Group messages by date
   const grouped = messages.reduce((acc, msg) => {
     const date = formatDate(msg.created_at)
     if (!acc[date]) acc[date] = []
@@ -105,51 +174,136 @@ export default function Chat() {
     return acc
   }, {})
 
-  const mine = id => id === user?.id
+  const isMe = id => id === user?.id
 
   return (
     <Layout>
-      <div className="flex flex-col h-full overflow-hidden">
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-6">
-          {Object.keys(grouped).length === 0 && (
-            <div className="flex flex-col items-center justify-center h-full text-center">
-              <p className="text-4xl mb-3">💬</p>
-              <p className="text-gray-500 text-sm">No hay mensajes aún.</p>
-              <p className="text-gray-400 text-xs mt-1">¡Sé el primero en escribir!</p>
+      <div style={{
+        display: 'flex', flexDirection: 'column',
+        height: '100%', overflow: 'hidden',
+        background: '#FFF8F0',
+      }}>
+
+        {/* Messages area */}
+        <div style={{
+          flex: 1, overflowY: 'auto',
+          padding: '12px 16px',
+          display: 'flex', flexDirection: 'column', gap: 0,
+        }}>
+          {messages.length === 0 && (
+            <div style={{
+              display: 'flex', flexDirection: 'column',
+              alignItems: 'center', justifyContent: 'center',
+              flex: 1, textAlign: 'center', padding: '48px 24px',
+            }}>
+              <div style={{ fontSize: 44, marginBottom: 12 }}>💬</div>
+              <p style={{ fontSize: 14, fontWeight: 600, color: '#1A1A1A', marginBottom: 6 }}>
+                Chat familiar
+              </p>
+              <p style={{ fontSize: 12, color: '#9CA3AF', lineHeight: 1.6 }}>
+                Todos los miembros de la familia pueden ver estos mensajes.
+                ¡Sé el primero en escribir!
+              </p>
             </div>
           )}
 
           {Object.entries(grouped).map(([date, msgs]) => (
             <div key={date}>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="flex-1 h-px bg-green-100" />
-                <span className="text-xs text-gray-400 font-medium px-2">{date}</span>
-                <div className="flex-1 h-px bg-green-100" />
+              {/* Date separator */}
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: 10,
+                margin: '16px 0 12px',
+              }}>
+                <div style={{ flex: 1, height: 1, background: '#EDE5D8' }} />
+                <span style={{
+                  fontSize: 11, fontWeight: 600, color: '#9CA3AF',
+                  background: '#FFF8F0', padding: '0 4px',
+                }}>
+                  {date}
+                </span>
+                <div style={{ flex: 1, height: 1, background: '#EDE5D8' }} />
               </div>
 
-              <div className="space-y-2">
+              {/* Message bubbles */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                 {msgs.map((msg, i) => {
-                  const isMe = mine(msg.user_id)
+                  const mine = isMe(msg.user_id)
                   const prevMsg = msgs[i - 1]
-                  const showName = !prevMsg || prevMsg.user_id !== msg.user_id
+                  const nextMsg = msgs[i + 1]
+                  const showAvatar = !mine && (!nextMsg || nextMsg.user_id !== msg.user_id)
+                  const showName = !mine && (!prevMsg || prevMsg.user_id !== msg.user_id)
+                  const senderProfile = profiles[msg.user_id]
+                  const senderName = senderProfile?.full_name ?? msg.user_name ?? 'Familiar'
+                  const msgText = msg.content ?? msg.message ?? ''
 
                   return (
-                    <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-                      <div className={`max-w-[80%] ${isMe ? 'items-end' : 'items-start'} flex flex-col`}>
-                        {showName && !isMe && (
-                          <span className="text-xs text-gray-400 font-medium mb-1 ml-1">
-                            {msg.user_name}
+                    <div
+                      key={msg.id}
+                      style={{
+                        display: 'flex',
+                        justifyContent: mine ? 'flex-end' : 'flex-start',
+                        alignItems: 'flex-end',
+                        gap: 8,
+                        marginBottom: (!nextMsg || nextMsg.user_id !== msg.user_id) ? 8 : 2,
+                      }}
+                    >
+                      {/* Avatar placeholder for alignment on "mine" side */}
+                      {!mine && (
+                        <div style={{ width: 32, flexShrink: 0 }}>
+                          {showAvatar && (
+                            <Avatar
+                              name={senderName}
+                              photoUrl={senderProfile?.avatar_url}
+                              size={32}
+                            />
+                          )}
+                        </div>
+                      )}
+
+                      <div style={{
+                        display: 'flex', flexDirection: 'column',
+                        alignItems: mine ? 'flex-end' : 'flex-start',
+                        maxWidth: '75%',
+                      }}>
+                        {/* Sender name (only for others, first bubble in group) */}
+                        {showName && (
+                          <span style={{
+                            fontSize: 11, fontWeight: 700,
+                            color: avatarColor(senderName),
+                            marginBottom: 3, marginLeft: 4,
+                          }}>
+                            {senderName.split(' ')[0]}
                           </span>
                         )}
-                        <div className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
-                          isMe
-                            ? 'bg-primary text-white rounded-br-sm'
-                            : 'bg-white border border-green-100 text-gray-800 rounded-bl-sm shadow-sm'
-                        }`}>
-                          {msg.message}
+
+                        {/* Bubble */}
+                        <div style={{
+                          padding: '9px 14px',
+                          borderRadius: mine
+                            ? '18px 18px 4px 18px'
+                            : '18px 18px 18px 4px',
+                          background: mine
+                            ? 'linear-gradient(135deg, #C4623A, #A85130)'
+                            : 'white',
+                          color: mine ? 'white' : '#1A1A1A',
+                          fontSize: 14,
+                          lineHeight: 1.45,
+                          boxShadow: mine
+                            ? '0 2px 8px rgba(196,98,58,0.25)'
+                            : '0 1px 4px rgba(0,0,0,0.08)',
+                          border: mine ? 'none' : '1px solid #EDE5D8',
+                          wordBreak: 'break-word',
+                        }}>
+                          {msgText}
                         </div>
-                        <span className={`text-xs text-gray-400 mt-1 ${isMe ? 'mr-1' : 'ml-1'}`}>
+
+                        {/* Timestamp */}
+                        <span style={{
+                          fontSize: 10, color: '#BBBBBB',
+                          marginTop: 3,
+                          marginLeft: mine ? 0 : 4,
+                          marginRight: mine ? 4 : 0,
+                        }}>
                           {formatTime(msg.created_at)}
                         </span>
                       </div>
@@ -159,33 +313,43 @@ export default function Chat() {
               </div>
             </div>
           ))}
+
           <div ref={bottomRef} />
         </div>
 
         {/* Input area */}
-        <div className="px-4 py-3 bg-white border-t border-green-100 flex-shrink-0">
+        <div style={{
+          padding: '10px 16px 16px',
+          background: 'white',
+          borderTop: '1px solid #EDE5D8',
+          flexShrink: 0,
+        }}>
+          {/* Error / recording status */}
           {sendError && (
-            <p className="text-xs text-red-500 mb-2 px-1">⚠ {sendError}</p>
+            <p style={{ fontSize: 12, color: '#D63031', marginBottom: 8 }}>⚠ {sendError}</p>
           )}
           {speechError && (
-            <p className="text-xs mb-2 px-1" style={{ color: '#D63031' }}>
+            <p style={{ fontSize: 12, color: '#D63031', marginBottom: 8 }}>
               ⚠ {speechError}{' '}
-              <button onClick={clearError} style={{ textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'inherit', color: 'inherit' }}>
+              <button
+                onClick={clearError}
+                style={{ textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'inherit', color: 'inherit' }}
+              >
                 Cerrar
               </button>
             </p>
           )}
-          {recording && interim && (
-            <p className="text-xs mb-2 px-1" style={{ color: '#9CA3AF', fontStyle: 'italic' }}>
-              🎤 {interim}
+          {recording && (
+            <p style={{
+              fontSize: 12, marginBottom: 8, fontStyle: 'italic',
+              color: interim ? '#9CA3AF' : '#D63031',
+              fontWeight: interim ? 400 : 600,
+            }}>
+              {interim ? `🎤 ${interim}` : '🔴 Escuchando... suelta para terminar'}
             </p>
           )}
-          {recording && !interim && (
-            <p className="text-xs mb-2 px-1" style={{ color: '#D63031', fontWeight: 600 }}>
-              🔴 Escuchando... suelta para enviar
-            </p>
-          )}
-          <form onSubmit={handleSend} className="flex gap-2 items-end">
+
+          <form onSubmit={handleSend} style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
             <textarea
               ref={inputRef}
               value={input}
@@ -193,13 +357,31 @@ export default function Chat() {
               onKeyDown={handleKeyDown}
               placeholder="Escribe un mensaje..."
               rows={1}
-              className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+              style={{
+                flex: 1, padding: '10px 14px',
+                border: '1.5px solid #EDE5D8', borderRadius: 20,
+                fontSize: 14, outline: 'none', resize: 'none',
+                background: '#FDFAF7', lineHeight: 1.45,
+                fontFamily: 'inherit',
+                transition: 'border-color 0.15s',
+              }}
+              onFocus={e => { e.target.style.borderColor = '#C4623A' }}
+              onBlur={e => { e.target.style.borderColor = '#EDE5D8' }}
             />
             <MicButton recording={recording} onStart={start} onStop={stop} />
             <button
               type="submit"
               disabled={sending || !input.trim()}
-              className="px-5 py-2.5 bg-primary hover:bg-primary-dark disabled:opacity-40 text-white font-medium rounded-xl text-sm transition-colors flex-shrink-0"
+              style={{
+                padding: '10px 18px', borderRadius: 20, border: 'none',
+                background: sending || !input.trim()
+                  ? '#D4C4B8'
+                  : 'linear-gradient(135deg, #C4623A, #A85130)',
+                color: 'white', fontWeight: 700, fontSize: 13,
+                cursor: sending || !input.trim() ? 'not-allowed' : 'pointer',
+                flexShrink: 0, transition: 'all 0.15s',
+                boxShadow: !sending && input.trim() ? '0 3px 12px rgba(196,98,58,0.3)' : 'none',
+              }}
             >
               Enviar
             </button>

@@ -32,6 +32,7 @@ const BOTTOM_TABS = [
 ]
 
 const FAB_ITEMS = [
+  { to: '/chat',       emoji: '💬', label: 'Chat' },
   { to: '/calendar',   emoji: '📅', label: 'Calendario' },
   { to: '/notes',      emoji: '📝', label: 'Notas' },
   { to: '/album',      emoji: '📸', label: 'Álbum' },
