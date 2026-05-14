@@ -42,7 +42,7 @@ const FAB_ITEMS = [
   { to: '/album',      emoji: '📸', label: 'Álbum' },
   { to: '/gastos',     emoji: '💰', label: 'Gastos' },
   { to: '/historial',  emoji: '📋', label: 'Historial' },
-  { to: '/directorio', emoji: '📚', label: 'Directorio' },
+  { to: '/directorio', emoji: '🏥', label: 'Directorio' },
 ]
 
 export default function Layout({ children }) {
