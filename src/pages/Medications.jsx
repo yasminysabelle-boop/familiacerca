@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useSubscription } from '../contexts/SubscriptionContext'
 import { supabase } from '../lib/supabase'
@@ -54,6 +54,7 @@ export default function Medications() {
   const { user } = useAuth()
   const { canEdit } = useSubscription()
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
   const { permission, supported, requestAndSubscribe } = usePushNotifications()
   const [medications, setMedications] = useState([])
   const [form, setForm] = useState(emptyForm)
@@ -67,6 +68,13 @@ export default function Medications() {
   useEffect(() => {
     if (user) fetchMedications()
   }, [user])
+
+  useEffect(() => {
+    if (searchParams.get('add') === '1') {
+      openAdd()
+      setSearchParams({}, { replace: true })
+    }
+  }, [searchParams])
 
   async function fetchMedications() {
     setLoading(true)

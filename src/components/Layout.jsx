@@ -39,7 +39,7 @@ const BOTTOM_TABS = [
 ]
 
 const FAB_ITEMS = [
-  { to: '/medications', emoji: '💊', label: 'Medicamento' },
+  { to: '/medications?add=1', emoji: '💊', label: 'Medicamento' },
   { to: '/chat',        emoji: '💬', label: 'Chat' },
   { to: '/calendar',    emoji: '📅', label: 'Calendario' },
   { to: '/notes',       emoji: '📝', label: 'Notas' },

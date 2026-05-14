@@ -95,7 +95,7 @@ export default function Hoy() {
 
         {/* Add medication button */}
         <Link
-          to="/medications"
+          to="/medications?add=1"
           style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
             padding: '12px 0', borderRadius: 14, marginBottom: 14,
@@ -171,7 +171,7 @@ export default function Hoy() {
               Agrega los medicamentos del familiar para verlos aquí cada día.
             </p>
             <Link
-              to="/medications"
+              to="/medications?add=1"
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: 6,
                 padding: '10px 20px', borderRadius: 12,
