@@ -7,6 +7,7 @@ import { createPortalSession } from '../lib/stripe'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import { UserPlus, Phone, Mail, MapPin, XIcon, BookOpen, Users } from '../components/Icons'
+import { track } from '../lib/analytics'
 
 const PLAN_LABELS = { free: 'Prueba gratuita', familiar: 'Plan Familiar', care_plus: 'Care+' }
 const PLAN_COLORS = { free: '#9CA3AF', familiar: '#C4623A', care_plus: '#7C3AED' }
@@ -27,12 +28,60 @@ export default function Familia() {
   const [inviteLink, setInviteLink] = useState('')
   const [copied, setCopied] = useState(false)
   const [portalLoading, setPortalLoading] = useState(false)
+  const [shifts, setShifts] = useState({})
+  const [shiftModal, setShiftModal] = useState(null)
+  const [shiftName, setShiftName] = useState('')
+  const [savingShift, setSavingShift] = useState(false)
 
   const displayName = user?.user_metadata?.full_name ?? user?.email ?? 'Familiar'
 
+  const today = new Date()
+  const todayKey = today.toISOString().split('T')[0]
+
+  function getWeekDays() {
+    const d = new Date(today)
+    const dow = d.getDay()
+    d.setDate(d.getDate() - (dow === 0 ? 6 : dow - 1))
+    return Array.from({ length: 7 }, (_, i) => {
+      const day = new Date(d)
+      day.setDate(d.getDate() + i)
+      return day
+    })
+  }
+
   useEffect(() => {
-    if (user && ownerId) fetchMembers()
+    if (user && ownerId) { fetchMembers(); loadShifts() }
   }, [user, ownerId])
+
+  async function loadShifts() {
+    const weekDays = getWeekDays()
+    const from = weekDays[0].toISOString().split('T')[0]
+    const to   = weekDays[6].toISOString().split('T')[0]
+    const { data } = await supabase
+      .from('care_shifts')
+      .select('*')
+      .eq('owner_id', ownerId)
+      .gte('shift_date', from)
+      .lte('shift_date', to)
+    const map = {}
+    ;(data ?? []).forEach(s => { map[s.shift_date] = s })
+    setShifts(map)
+  }
+
+  async function saveShift(dateKey) {
+    if (!shiftName.trim()) return
+    setSavingShift(true)
+    await supabase.from('care_shifts').upsert({
+      owner_id: ownerId,
+      shift_date: dateKey,
+      caregiver_user_id: user.id,
+      caregiver_name: shiftName.trim(),
+    }, { onConflict: 'owner_id,shift_date' })
+    setShifts(prev => ({ ...prev, [dateKey]: { shift_date: dateKey, caregiver_name: shiftName.trim() } }))
+    setShiftModal(null)
+    setShiftName('')
+    setSavingShift(false)
+  }
 
   async function fetchMembers() {
     setLoading(true)
@@ -80,6 +129,7 @@ export default function Familia() {
       p_invited_by: displayName,
     })
     if (error) { setInviteStatus('error'); return }
+    track('family_member_invited', { email: inviteEmail.trim() })
     setInviteLink(`${window.location.origin}/join?token=${token}`)
     setInviteStatus('success')
   }
@@ -153,6 +203,85 @@ export default function Familia() {
             </div>
           </div>
         )}
+
+        {/* ¿Quién cuida hoy? — Care shift rotation */}
+        {(() => {
+          const weekDays = getWeekDays()
+          const todayShift = shifts[todayKey]
+          const DAY_LABELS = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom']
+          return (
+            <div style={{
+              background: 'white', borderRadius: 20, border: '1px solid #EDE5D8',
+              padding: '16px 18px', marginBottom: 12,
+              boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
+            }}>
+              <p style={{ fontFamily: 'Georgia, serif', fontSize: 15, fontWeight: 700, color: '#1A1A1A', margin: '0 0 12px' }}>
+                ¿Quién cuida hoy?
+              </p>
+              {/* Today's caregiver highlight */}
+              <div style={{
+                background: todayShift ? 'linear-gradient(135deg, #FDF0EB, #FFF8F0)' : '#F9F5F1',
+                borderRadius: 14, border: `1.5px solid ${todayShift ? '#C4623A' : '#EDE5D8'}`,
+                padding: '12px 14px', marginBottom: 12,
+                display: 'flex', alignItems: 'center', gap: 10,
+              }}>
+                <span style={{ fontSize: 24 }}>{todayShift ? '👤' : '❓'}</span>
+                <div style={{ flex: 1 }}>
+                  <p style={{ fontSize: 13, fontWeight: 700, color: todayShift ? '#C4623A' : '#9CA3AF', margin: 0 }}>
+                    {todayShift ? todayShift.caregiver_name : 'Sin asignar'}
+                  </p>
+                  <p style={{ fontSize: 11, color: '#9CA3AF', margin: '2px 0 0' }}>Cuidador de hoy</p>
+                </div>
+                <button
+                  onClick={() => { setShiftModal(todayKey); setShiftName(todayShift?.caregiver_name ?? '') }}
+                  style={{
+                    padding: '6px 12px', borderRadius: 10, fontSize: 11, fontWeight: 700,
+                    border: '1.5px solid #C4623A', background: 'white', color: '#C4623A', cursor: 'pointer',
+                  }}
+                >
+                  {todayShift ? 'Cambiar' : 'Asignar'}
+                </button>
+              </div>
+              {/* Weekly mini-calendar */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4 }}>
+                {weekDays.map((day, i) => {
+                  const dk = day.toISOString().split('T')[0]
+                  const isToday = dk === todayKey
+                  const shift = shifts[dk]
+                  const initials = shift?.caregiver_name?.charAt(0)?.toUpperCase() ?? '·'
+                  return (
+                    <button
+                      key={dk}
+                      onClick={() => { setShiftModal(dk); setShiftName(shift?.caregiver_name ?? '') }}
+                      style={{
+                        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
+                        padding: '6px 2px', borderRadius: 10, border: 'none',
+                        background: isToday ? '#FDF0EB' : shift ? '#F0F8F4' : '#F9F5F1',
+                        cursor: 'pointer', transition: 'all 0.15s',
+                      }}
+                    >
+                      <span style={{ fontSize: 9, fontWeight: 700, color: '#9CA3AF', letterSpacing: '0.04em' }}>
+                        {DAY_LABELS[i]}
+                      </span>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: '#6B7280' }}>
+                        {day.getDate()}
+                      </span>
+                      <div style={{
+                        width: 22, height: 22, borderRadius: '50%',
+                        background: isToday ? '#C4623A' : shift ? '#4A7C59' : '#E5E7EB',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: 10, fontWeight: 700,
+                        color: (isToday || shift) ? 'white' : '#9CA3AF',
+                      }}>
+                        {initials}
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          )
+        })()}
 
         {/* Subscription badge */}
         {sub && (
@@ -416,6 +545,80 @@ export default function Familia() {
           </div>
         )
       })()}
+
+      {/* Shift assignment modal */}
+      {shiftModal && (
+        <div
+          style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.55)',
+            display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
+          onClick={e => { if (e.target === e.currentTarget) setShiftModal(null) }}
+        >
+          <div style={{
+            width: '100%', maxWidth: 480,
+            background: 'white', borderRadius: '24px 24px 0 0',
+            padding: '28px 24px 96px',
+            boxShadow: '0 -8px 48px rgba(0,0,0,0.2)',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+              <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>
+                Asignar cuidador
+              </p>
+              <button onClick={() => setShiftModal(null)}
+                style={{ padding: 8, borderRadius: 10, background: '#F3F4F6', border: 'none', cursor: 'pointer' }}>
+                <XIcon size={16} color="#6B7280" strokeWidth={2} />
+              </button>
+            </div>
+            <p style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 16 }}>
+              {(() => {
+                const d = new Date(shiftModal + 'T12:00:00')
+                return d.toLocaleDateString('es-US', { weekday: 'long', day: 'numeric', month: 'long' })
+              })()}
+            </p>
+            {/* Quick-pick from team members */}
+            {members.length > 0 && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 16 }}>
+                {[{ label: displayName }, ...members.map(m => ({ label: memberProfiles[m.member_user_id]?.full_name ?? m.member_email?.split('@')[0] ?? '—' }))].map(({ label }) => (
+                  <button key={label} onClick={() => setShiftName(label)}
+                    style={{
+                      padding: '6px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                      background: shiftName === label ? '#FDF0EB' : '#F3F4F6',
+                      border: shiftName === label ? '1.5px solid #C4623A' : '1.5px solid transparent',
+                      color: shiftName === label ? '#C4623A' : '#6B7280',
+                      transition: 'all 0.15s',
+                    }}>
+                    {label.split(' ')[0]}
+                  </button>
+                ))}
+              </div>
+            )}
+            <input
+              value={shiftName}
+              onChange={e => setShiftName(e.target.value)}
+              placeholder="Nombre del cuidador"
+              style={{
+                width: '100%', padding: '11px 14px', borderRadius: 12,
+                border: '1.5px solid #EDE5D8', background: '#FDFAF7',
+                fontSize: 14, outline: 'none', boxSizing: 'border-box', marginBottom: 14,
+              }}
+              onFocus={e => { e.target.style.borderColor = '#C4623A' }}
+              onBlur={e => { e.target.style.borderColor = '#EDE5D8' }}
+            />
+            <button
+              onClick={() => saveShift(shiftModal)}
+              disabled={savingShift || !shiftName.trim()}
+              style={{
+                width: '100%', padding: '13px', borderRadius: 14, border: 'none',
+                background: shiftName.trim() && !savingShift ? 'linear-gradient(135deg, #C4623A, #A85130)' : '#D4C4B8',
+                color: 'white', fontWeight: 700, fontSize: 14,
+                cursor: shiftName.trim() && !savingShift ? 'pointer' : 'not-allowed',
+                boxShadow: shiftName.trim() ? '0 6px 20px rgba(196,98,58,0.3)' : 'none',
+              }}
+            >
+              {savingShift ? 'Guardando...' : 'Guardar turno'}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Invite modal */}
       {showInvite && (

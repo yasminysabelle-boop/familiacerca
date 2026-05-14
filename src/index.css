@@ -31,6 +31,20 @@ body {
   color: #1A1A1A;
 }
 
+/* ── Dark mode ────────────────────────────────────────────────────── */
+[data-theme="dark"] body {
+  background-color: #1C1208;
+  color: #F0E6D8;
+}
+[data-theme="dark"] .bg-white         { background-color: #2A1E10 !important; }
+[data-theme="dark"] .bg-gray-50       { background-color: #231810 !important; }
+[data-theme="dark"] .border-green-100 { border-color: #3D2A18 !important; }
+[data-theme="dark"] .text-gray-900    { color: #F0E6D8 !important; }
+[data-theme="dark"] .text-gray-700    { color: #D4C4B0 !important; }
+[data-theme="dark"] .text-gray-600    { color: #C0AE98 !important; }
+[data-theme="dark"] .text-gray-500    { color: #9C8870 !important; }
+[data-theme="dark"] .text-gray-400    { color: #7A6A5A !important; }
+
 /* Serif for all headings */
 h1, h2, h3 {
   font-family: Georgia, 'Times New Roman', serif;

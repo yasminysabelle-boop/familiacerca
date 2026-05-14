@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import { Plus, XIcon, Pencil, Trash, Bell } from '../components/Icons'
 import { usePushNotifications } from '../hooks/usePushNotifications'
+import { track } from '../lib/analytics'
 
 const FREQ_OPTIONS = [
   { value: 'once_daily',  label: 'Una vez al día',    times: 1, interval: null },
@@ -148,6 +149,7 @@ export default function Medications() {
       await supabase.from('medications').update(payload).eq('id', editId)
     } else {
       await supabase.from('medications').insert(payload)
+      track('medication_added', { name: payload.name, frequency: payload.frequency })
     }
     setForm(emptyForm)
     setScheduledTimes([''])

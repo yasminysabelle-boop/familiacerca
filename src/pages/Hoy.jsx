@@ -5,6 +5,8 @@ import { useFamily } from '../contexts/FamilyContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import { CheckIcon, Plus } from '../components/Icons'
+import { getLocation } from '../lib/gps'
+import { track } from '../lib/analytics'
 
 const TIME_GROUPS = [
   { id: 0, label: 'Mañana',      icon: '🌅', range: [0, 12] },
@@ -51,6 +53,7 @@ export default function Hoy() {
 
   async function confirmMed(med) {
     setConfirming(med.id)
+    const loc = await getLocation()
     await supabase.from('medication_logs').upsert({
       medication_id: med.id,
       user_id: ownerId,
@@ -58,7 +61,11 @@ export default function Hoy() {
       log_date: today,
       confirmed_by_name: displayName,
       confirmed_at: new Date().toISOString(),
+      latitude: loc?.latitude ?? null,
+      longitude: loc?.longitude ?? null,
+      address: loc?.address ?? null,
     }, { onConflict: 'medication_id,log_date,user_id' })
+    track('medication_marked_given', { medication_name: med.name, has_location: !!loc })
     setLogs(prev => ({ ...prev, [med.id]: { status: 'confirmed', confirmed_by_name: displayName } }))
     setConfirming(null)
   }

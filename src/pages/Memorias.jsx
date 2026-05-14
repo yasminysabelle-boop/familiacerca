@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
+import { track } from '../lib/analytics'
 
 const MOODS = [
   { value: 'good',    emoji: '😊', label: 'Buen día',   color: '#22C55E' },
@@ -154,6 +155,7 @@ export default function Memorias() {
       return
     }
 
+    track('memory_recorded', { mood: selectedMood, duration_seconds: elapsed })
     setSaveError('')
     setSelectedMood(null)
     setElapsed(0)

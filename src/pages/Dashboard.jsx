@@ -8,6 +8,8 @@ import Layout from '../components/Layout'
 import { AlertTriangle, CheckIcon, User, XIcon } from '../components/Icons'
 import { geminiGenerate } from '../lib/gemini'
 import TrialBanner from '../components/TrialBanner'
+import { getLocation, mapsUrl } from '../lib/gps'
+import { track } from '../lib/analytics'
 
 // Mood lookup — handles both stored text values and emoji values
 const MOOD_MAP = {
@@ -118,20 +120,55 @@ function ConfirmedCard({ evt }) {
   const name = evt.confirmedBy ? evt.confirmedBy.split(' ')[0] : null
   const medLabel = [evt.medName, evt.medDosage].filter(Boolean).join(' ')
   return (
-    <div style={{
-      background: '#F0FDF4', borderRadius: 16,
-      border: '1px solid #BBF7D0',
-      padding: '12px 14px',
-      display: 'flex', alignItems: 'center', gap: 10,
-    }}>
-      <span style={{ fontSize: 16, flexShrink: 0 }}>💊</span>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ fontSize: 13, fontWeight: 600, color: '#15803D', margin: 0, lineHeight: 1.4 }}>
-          {time && <span style={{ fontWeight: 400, color: '#4B7A5D' }}>{time} — </span>}
-          {name ? `${name} dio ${medLabel}` : medLabel}
-        </p>
+    <div style={{ background: '#F0FDF4', borderRadius: 16, border: '1px solid #BBF7D0', padding: '12px 14px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <span style={{ fontSize: 16, flexShrink: 0 }}>💊</span>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <p style={{ fontSize: 13, fontWeight: 600, color: '#15803D', margin: 0, lineHeight: 1.4 }}>
+            {time && <span style={{ fontWeight: 400, color: '#4B7A5D' }}>{time} — </span>}
+            {name ? `${name} dio ${medLabel}` : medLabel}
+          </p>
+          {evt.latitude && (
+            <a href={mapsUrl(evt.latitude, evt.longitude)} target="_blank" rel="noopener noreferrer"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 3, marginTop: 3, textDecoration: 'none' }}>
+              <span style={{ fontSize: 11 }}>📍</span>
+              <span style={{ fontSize: 11, color: '#3B82F6' }}>{evt.address ?? 'Ver ubicación'}</span>
+            </a>
+          )}
+        </div>
+        <span style={{ fontSize: 16, flexShrink: 0 }}>✅</span>
       </div>
-      <span style={{ fontSize: 16, flexShrink: 0 }}>✅</span>
+    </div>
+  )
+}
+
+const REACTION_EMOJIS = ['❤️', '👍', '🙏', '😢']
+
+function ReactionBar({ eventKey, reactions, userId, onToggle }) {
+  const myReactions = new Set(reactions?.filter(r => r.user_id === userId).map(r => r.emoji) ?? [])
+  const counts = {}
+  for (const r of (reactions ?? [])) counts[r.emoji] = (counts[r.emoji] ?? 0) + 1
+
+  return (
+    <div style={{ display: 'flex', gap: 4, marginTop: 8, flexWrap: 'wrap' }}>
+      {REACTION_EMOJIS.map(emoji => {
+        const count = counts[emoji] ?? 0
+        const mine = myReactions.has(emoji)
+        return (
+          <button key={emoji} onClick={() => onToggle(eventKey, emoji)}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 3,
+              padding: '3px 8px', borderRadius: 20,
+              background: mine ? '#FDF0EB' : '#F3F4F6',
+              border: mine ? '1px solid #C4623A' : '1px solid #E5E7EB',
+              cursor: 'pointer', fontSize: 13, lineHeight: 1,
+              transition: 'all 0.15s',
+            }}>
+            <span>{emoji}</span>
+            {count > 0 && <span style={{ fontSize: 11, color: mine ? '#C4623A' : '#6B7280', fontWeight: 600 }}>{count}</span>}
+          </button>
+        )
+      })}
     </div>
   )
 }
@@ -301,24 +338,26 @@ function CaregiverCard({ evt }) {
   )
 }
 
-function TimelineEvent({ evt, confirming, expandedAudio, onConfirm, onToggleAudio, todayKey, tomorrowKey }) {
+function TimelineEvent({ evt, confirming, expandedAudio, onConfirm, onToggleAudio, todayKey, tomorrowKey, reactions, userId, onReact }) {
+  const bar = evt.type !== 'MED_PENDING' && evt.type !== 'CAREGIVER_CARD' && (
+    <ReactionBar eventKey={evt.id} reactions={reactions?.[evt.id]} userId={userId} onToggle={onReact} />
+  )
   if (evt.type === 'MED_PENDING') {
     return <PendingCard evt={evt} confirming={confirming} onConfirm={onConfirm} todayKey={todayKey} />
   }
-  if (evt.type === 'MED_CONFIRMED') return <ConfirmedCard evt={evt} />
+  if (evt.type === 'MED_CONFIRMED') return <div><ConfirmedCard evt={evt} />{bar}</div>
   if (evt.type === 'VOICE_MEMORY') {
     return (
-      <MemoryCard
-        evt={evt}
-        isExpanded={expandedAudio === evt.id}
-        onToggle={() => onToggleAudio(evt.id)}
-      />
+      <div>
+        <MemoryCard evt={evt} isExpanded={expandedAudio === evt.id} onToggle={() => onToggleAudio(evt.id)} />
+        {bar}
+      </div>
     )
   }
-  if (evt.type === 'PHOTO') return <PhotoCard evt={evt} />
-  if (evt.type === 'EXPENSE') return <ExpenseCard evt={evt} />
+  if (evt.type === 'PHOTO') return <div><PhotoCard evt={evt} />{bar}</div>
+  if (evt.type === 'EXPENSE') return <div><ExpenseCard evt={evt} />{bar}</div>
   if (evt.type === 'APPOINTMENT') {
-    return <AppointmentCard evt={evt} todayKey={todayKey} tomorrowKey={tomorrowKey} />
+    return <div><AppointmentCard evt={evt} todayKey={todayKey} tomorrowKey={tomorrowKey} />{bar}</div>
   }
   if (evt.type === 'CAREGIVER_CARD') return <CaregiverCard evt={evt} />
   return null
@@ -416,6 +455,8 @@ export default function Dashboard() {
   const [sosConfirming, setSosConfirming] = useState(false)
   const [aiCards, setAiCards] = useState({})
   const [checkoutSuccess, setCheckoutSuccess] = useState(false)
+  const [reactions, setReactions] = useState({})
+  const [sosLocation, setSosLocation] = useState(null)
 
   useEffect(() => {
     if (searchParams.get('checkout') === 'success') {
@@ -447,6 +488,10 @@ export default function Dashboard() {
   useEffect(() => {
     if (user && ownerId) fetchTimeline()
   }, [user, ownerId])
+
+  useEffect(() => {
+    if (user) track('session_start', { user_id: user.id })
+  }, [user?.id])
 
   // Schedule daily browser notifications (fires when app is open/in background)
   useEffect(() => {
@@ -690,6 +735,9 @@ export default function Dashboard() {
         medName: log.medications.name,
         medDosage: log.medications.dosage,
         confirmedBy: log.confirmed_by_name,
+        latitude: log.latitude ?? null,
+        longitude: log.longitude ?? null,
+        address: log.address ?? null,
       })
     }
 
@@ -780,6 +828,45 @@ export default function Dashboard() {
 
     setSections(newSections)
     setLoading(false)
+
+    // Load reactions for all visible event keys
+    const eventKeys = allEvents.map(e => e.id)
+    if (eventKeys.length) {
+      const { data: rxRows } = await supabase
+        .from('timeline_reactions')
+        .select('event_key, emoji, user_id')
+        .eq('owner_id', ownerId)
+        .in('event_key', eventKeys)
+      const map = {}
+      for (const r of (rxRows ?? [])) {
+        if (!map[r.event_key]) map[r.event_key] = []
+        map[r.event_key].push(r)
+      }
+      setReactions(map)
+    }
+  }
+
+  async function toggleReaction(eventKey, emoji) {
+    const existing = reactions[eventKey]?.find(r => r.user_id === user.id && r.emoji === emoji)
+    if (existing) {
+      await supabase.from('timeline_reactions')
+        .delete()
+        .eq('event_key', eventKey)
+        .eq('user_id', user.id)
+        .eq('emoji', emoji)
+      setReactions(prev => ({
+        ...prev,
+        [eventKey]: (prev[eventKey] ?? []).filter(r => !(r.user_id === user.id && r.emoji === emoji)),
+      }))
+    } else {
+      await supabase.from('timeline_reactions').insert({
+        owner_id: ownerId, event_key: eventKey, user_id: user.id, emoji,
+      })
+      setReactions(prev => ({
+        ...prev,
+        [eventKey]: [...(prev[eventKey] ?? []), { event_key: eventKey, user_id: user.id, emoji }],
+      }))
+    }
   }
 
   async function quickConfirm(evt) {
@@ -816,13 +903,23 @@ export default function Dashboard() {
     setConfirming(null)
   }
 
+  async function prepareSOS() {
+    setSosConfirming(true)
+    const loc = await getLocation()
+    setSosLocation(loc)
+  }
+
   async function triggerSOS() {
     setSosConfirming(false)
     await supabase.from('emergency_alerts').insert({
       user_id: user.id,
       triggered_by_name: fullName,
       relative_name: profile?.name ?? null,
+      latitude: sosLocation?.latitude ?? null,
+      longitude: sosLocation?.longitude ?? null,
+      address: sosLocation?.address ?? null,
     })
+    track('sos_pressed', { has_location: !!sosLocation })
     setSosSent(true)
     setShowSOS(false)
     setTimeout(() => setSosSent(false), 15000)
@@ -846,7 +943,7 @@ export default function Dashboard() {
         </div>
       )}
       <TrialBanner />
-      <div style={{ padding: '12px 16px 24px', maxWidth: 600 }}>
+      <div style={{ padding: '12px 16px 96px', maxWidth: 600 }}>
 
         {/* Greeting header */}
         <div style={{
@@ -916,21 +1013,22 @@ export default function Dashboard() {
                 pointerEvents: 'none',
               }} />
               <button
-                onClick={() => setSosConfirming(true)}
+                onClick={prepareSOS}
                 style={{
                   width: 46, height: 46, borderRadius: '50%',
                   background: 'linear-gradient(135deg, #D63031, #B82020)',
                   border: '2.5px solid rgba(255,255,255,0.35)',
                   boxShadow: '0 3px 14px rgba(214,48,49,0.55)',
-                  color: 'white', fontWeight: 900, fontSize: 11,
-                  letterSpacing: '0.06em', cursor: 'pointer',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  position: 'relative', zIndex: 1,
+                  color: 'white', fontWeight: 900, fontSize: 12,
+                  cursor: 'pointer',
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                  position: 'relative', zIndex: 1, lineHeight: 1,
                   transition: 'transform 0.15s, box-shadow 0.15s',
                 }}
                 aria-label="Botón de emergencia SOS"
               >
-                SOS
+                <span style={{ fontSize: 12, fontWeight: 900 }}>SOS</span>
+                <span style={{ fontSize: 14, lineHeight: 1 }}>🆘</span>
               </button>
             </div>
           </div>
@@ -1112,6 +1210,9 @@ export default function Dashboard() {
                     onToggleAudio={id => setExpandedAudio(prev => prev === id ? null : id)}
                     todayKey={todayKey}
                     tomorrowKey={tomorrowKey}
+                    reactions={reactions}
+                    userId={user.id}
+                    onReact={toggleReaction}
                   />
                 ))}
               </div>

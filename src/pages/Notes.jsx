@@ -5,6 +5,7 @@ import { useFamily } from '../contexts/FamilyContext'
 import { useSubscription } from '../contexts/SubscriptionContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
+import { getLocation } from '../lib/gps'
 import MicButton from '../components/MicButton'
 import { useSpeechToText } from '../hooks/useSpeechToText'
 
@@ -58,7 +59,13 @@ export default function Notes() {
   async function handleSubmit(e) {
     e.preventDefault()
     setSaving(true)
-    await supabase.from('notes').insert({ ...form, user_id: ownerId })
+    const loc = await getLocation()
+    await supabase.from('notes').insert({
+      ...form, user_id: ownerId,
+      latitude: loc?.latitude ?? null,
+      longitude: loc?.longitude ?? null,
+      address: loc?.address ?? null,
+    })
     setForm(emptyForm)
     setShowForm(false)
     setSaving(false)

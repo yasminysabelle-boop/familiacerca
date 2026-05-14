@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import { FamilyProvider } from './contexts/FamilyContext'
 import { SubscriptionProvider } from './contexts/SubscriptionContext'
+import { DarkModeProvider } from './contexts/DarkModeContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import Login from './pages/Login'
 import Register from './pages/Register'
@@ -166,6 +167,7 @@ export default function App() {
     <>
       {!splashDone && <Splash fading={splashFading} />}
       <AuthProvider>
+        <DarkModeProvider>
         <FamilyProvider>
           <SubscriptionProvider>
           <BrowserRouter>
@@ -200,6 +202,7 @@ export default function App() {
           </BrowserRouter>
           </SubscriptionProvider>
         </FamilyProvider>
+        </DarkModeProvider>
       </AuthProvider>
     </>
   )

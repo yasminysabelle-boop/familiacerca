@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import Logo from '../components/Logo'
 import { Eye, EyeOff } from '../components/Icons'
+import { track } from '../lib/analytics'
 
 const BENEFITS = ['14 días gratis', 'Sin tarjeta de crédito', 'Cancela cuando quieras']
 
@@ -31,6 +32,7 @@ export default function Register() {
     if (err) {
       setError(err.message)
     } else {
+      track('user_registered', { email: form.email })
       navigate('/permisos?next=/onboarding', { replace: true })
     }
   }

@@ -2,7 +2,10 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useSubscription } from '../contexts/SubscriptionContext'
+import { useDarkMode } from '../contexts/DarkModeContext'
 import { createPortalSession } from '../lib/stripe'
+import { supabase } from '../lib/supabase'
+import { isLocationEnabled, setLocationEnabled } from '../lib/gps'
 import Layout from '../components/Layout'
 import { ChevronRight, LogOut } from '../components/Icons'
 
@@ -44,11 +47,46 @@ const PLAN_FEATURES = {
   ],
 }
 
+function ToggleRow({ icon, label, subtitle, checked, onChange }) {
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: 12,
+      padding: '14px 16px', borderBottom: '1px solid #F5F0EA',
+    }}>
+      <span style={{ fontSize: 18 }}>{icon}</span>
+      <div style={{ flex: 1 }}>
+        <p style={{ fontSize: 14, fontWeight: 600, color: '#1A1A1A', margin: 0 }}>{label}</p>
+        {subtitle && <p style={{ fontSize: 11, color: '#9CA3AF', margin: '1px 0 0' }}>{subtitle}</p>}
+      </div>
+      <button
+        role="switch" aria-checked={checked}
+        onClick={() => onChange(!checked)}
+        style={{
+          width: 44, height: 26, borderRadius: 13, border: 'none',
+          background: checked ? '#C4623A' : '#D1D5DB',
+          position: 'relative', cursor: 'pointer',
+          transition: 'background 0.2s', flexShrink: 0,
+        }}
+      >
+        <span style={{
+          position: 'absolute', top: 3, left: checked ? 21 : 3,
+          width: 20, height: 20, borderRadius: '50%',
+          background: 'white', transition: 'left 0.2s',
+          boxShadow: '0 1px 4px rgba(0,0,0,0.18)',
+        }} />
+      </button>
+    </div>
+  )
+}
+
 export default function Settings() {
   const { user, signOut } = useAuth()
   const { sub, isPaid, isTrialing, trialExpired, daysLeft } = useSubscription()
+  const { dark, toggleDark } = useDarkMode()
   const navigate = useNavigate()
   const [portalLoading, setPortalLoading] = useState(false)
+  const [locationOn, setLocationOn] = useState(() => isLocationEnabled())
+  const [exportingPdf, setExportingPdf] = useState(false)
 
   const plan = sub?.plan ?? 'free'
   const meta = PLAN_META[plan] ?? PLAN_META.free
@@ -77,9 +115,176 @@ export default function Settings() {
     navigate('/login')
   }
 
+  function handleLocationToggle(val) {
+    setLocationEnabled(val)
+    setLocationOn(val)
+  }
+
+  async function exportPDF() {
+    setExportingPdf(true)
+    try {
+      const { jsPDF } = await import('jspdf')
+      const { default: autoTable } = await import('jspdf-autotable')
+
+      const thirtyDaysAgo = new Date()
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+      const fromDate = thirtyDaysAgo.toISOString().split('T')[0]
+      const today = new Date().toISOString().split('T')[0]
+
+      // Fetch data
+      const [
+        { data: meds },
+        { data: notes },
+        { data: events },
+        { data: memories },
+      ] = await Promise.all([
+        supabase.from('medication_logs')
+          .select('*, medications(name, dosage)')
+          .eq('user_id', user.id)
+          .gte('log_date', fromDate)
+          .eq('status', 'confirmed')
+          .order('log_date', { ascending: false }),
+        supabase.from('notes')
+          .select('*')
+          .eq('user_id', user.id)
+          .gte('created_at', fromDate + 'T00:00:00Z')
+          .order('created_at', { ascending: false }),
+        supabase.from('events')
+          .select('*')
+          .eq('user_id', user.id)
+          .gte('date', fromDate)
+          .order('date', { ascending: false }),
+        supabase.from('voice_diary')
+          .select('*')
+          .eq('user_id', user.id)
+          .gte('created_at', fromDate + 'T00:00:00Z')
+          .order('created_at', { ascending: false }),
+      ])
+
+      const doc = new jsPDF()
+      const pageW = doc.internal.pageSize.getWidth()
+
+      // Header
+      doc.setFillColor(196, 98, 58)
+      doc.rect(0, 0, pageW, 32, 'F')
+      doc.setTextColor(255, 255, 255)
+      doc.setFontSize(18)
+      doc.setFont('helvetica', 'bold')
+      doc.text('FamiliaCerca — Historial de Cuidado', 14, 14)
+      doc.setFontSize(10)
+      doc.setFont('helvetica', 'normal')
+      doc.text(`Últimos 30 días · Generado el ${new Date().toLocaleDateString('es-US', { day: 'numeric', month: 'long', year: 'numeric' })}`, 14, 24)
+
+      let y = 42
+      doc.setTextColor(26, 26, 26)
+
+      function sectionTitle(title, emoji) {
+        if (y > 260) { doc.addPage(); y = 20 }
+        doc.setFontSize(13)
+        doc.setFont('helvetica', 'bold')
+        doc.setTextColor(196, 98, 58)
+        doc.text(`${emoji}  ${title}`, 14, y)
+        doc.setTextColor(26, 26, 26)
+        y += 6
+      }
+
+      // Medications
+      if (meds?.length) {
+        sectionTitle('Medicamentos administrados', '💊')
+        autoTable(doc, {
+          startY: y,
+          head: [['Fecha', 'Medicamento', 'Dosis', 'Administrado por']],
+          body: meds.map(m => [
+            m.log_date,
+            m.medications?.name ?? '—',
+            m.medications?.dosage ?? '—',
+            m.confirmed_by_name ?? '—',
+          ]),
+          styles: { fontSize: 9, cellPadding: 3 },
+          headStyles: { fillColor: [196, 98, 58], textColor: 255, fontStyle: 'bold' },
+          alternateRowStyles: { fillColor: [255, 248, 240] },
+          margin: { left: 14, right: 14 },
+        })
+        y = doc.lastAutoTable.finalY + 10
+      }
+
+      // Notes
+      if (notes?.length) {
+        if (y > 260) { doc.addPage(); y = 20 }
+        sectionTitle('Notas', '📝')
+        autoTable(doc, {
+          startY: y,
+          head: [['Fecha', 'Título', 'Contenido']],
+          body: notes.map(n => [
+            n.created_at?.split('T')[0] ?? '—',
+            n.title ?? '—',
+            (n.content ?? '').substring(0, 80) + ((n.content?.length ?? 0) > 80 ? '…' : ''),
+          ]),
+          styles: { fontSize: 9, cellPadding: 3 },
+          headStyles: { fillColor: [74, 124, 89], textColor: 255, fontStyle: 'bold' },
+          alternateRowStyles: { fillColor: [235, 243, 238] },
+          margin: { left: 14, right: 14 },
+          columnStyles: { 2: { cellWidth: 90 } },
+        })
+        y = doc.lastAutoTable.finalY + 10
+      }
+
+      // Calendar events
+      if (events?.length) {
+        if (y > 260) { doc.addPage(); y = 20 }
+        sectionTitle('Eventos del calendario', '📅')
+        autoTable(doc, {
+          startY: y,
+          head: [['Fecha', 'Evento', 'Hora']],
+          body: events.map(ev => [ev.date, ev.title ?? '—', ev.time ?? '—']),
+          styles: { fontSize: 9, cellPadding: 3 },
+          headStyles: { fillColor: [59, 130, 246], textColor: 255, fontStyle: 'bold' },
+          alternateRowStyles: { fillColor: [239, 246, 255] },
+          margin: { left: 14, right: 14 },
+        })
+        y = doc.lastAutoTable.finalY + 10
+      }
+
+      // Voice memories
+      if (memories?.length) {
+        if (y > 260) { doc.addPage(); y = 20 }
+        sectionTitle('Memorias de voz', '🎙️')
+        autoTable(doc, {
+          startY: y,
+          head: [['Fecha', 'Estado de ánimo', 'Transcripción']],
+          body: memories.map(m => [
+            m.created_at?.split('T')[0] ?? '—',
+            m.mood ?? '—',
+            (m.transcription ?? '').substring(0, 80) + ((m.transcription?.length ?? 0) > 80 ? '…' : ''),
+          ]),
+          styles: { fontSize: 9, cellPadding: 3 },
+          headStyles: { fillColor: [124, 92, 191], textColor: 255, fontStyle: 'bold' },
+          alternateRowStyles: { fillColor: [245, 243, 255] },
+          margin: { left: 14, right: 14 },
+          columnStyles: { 2: { cellWidth: 90 } },
+        })
+      }
+
+      // Footer on all pages
+      const totalPages = doc.getNumberOfPages()
+      for (let i = 1; i <= totalPages; i++) {
+        doc.setPage(i)
+        doc.setFontSize(8)
+        doc.setTextColor(156, 163, 175)
+        doc.text(`FamiliaCerca LLC · Página ${i} de ${totalPages}`, 14, doc.internal.pageSize.getHeight() - 8)
+      }
+
+      doc.save(`historial-familiacerca-${today}.pdf`)
+    } catch (err) {
+      alert('Error al generar el PDF: ' + err.message)
+    } finally {
+      setExportingPdf(false)
+    }
+  }
+
   return (
     <Layout>
-      <div style={{ padding: '16px 16px 48px', maxWidth: 600 }}>
+      <div style={{ padding: '16px 16px 96px', maxWidth: 600 }}>
 
         {/* Account card */}
         <div style={{
@@ -117,7 +322,6 @@ export default function Settings() {
             Suscripción
           </p>
 
-          {/* Plan row */}
           <div style={{
             display: 'flex', alignItems: 'center', gap: 12,
             padding: '14px', borderRadius: 14,
@@ -147,7 +351,7 @@ export default function Settings() {
               </div>
               {isTrialing && (
                 <p style={{ fontSize: 12, color: daysLeft <= 3 ? '#DC2626' : '#9CA3AF', margin: '3px 0 0' }}>
-                  {daysLeft <= 3 ? `⚠ ` : ''}{daysLeft} día{daysLeft !== 1 ? 's' : ''} restante{daysLeft !== 1 ? 's' : ''} de prueba
+                  {daysLeft <= 3 ? '⚠ ' : ''}{daysLeft} día{daysLeft !== 1 ? 's' : ''} restante{daysLeft !== 1 ? 's' : ''} de prueba
                   {trialEnd ? ` · Vence ${trialEnd}` : ''}
                 </p>
               )}
@@ -164,7 +368,6 @@ export default function Settings() {
             </div>
           </div>
 
-          {/* What's included */}
           {features.length > 0 && (
             <div style={{ marginBottom: 16 }}>
               <p style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8 }}>
@@ -181,7 +384,6 @@ export default function Settings() {
             </div>
           )}
 
-          {/* Action buttons */}
           {isPaid ? (
             <button
               onClick={handlePortal}
@@ -210,6 +412,53 @@ export default function Settings() {
               {trialExpired ? 'Reactivar acceso →' : 'Ver planes →'}
             </button>
           )}
+        </div>
+
+        {/* Preferences */}
+        <div style={{ background: 'white', borderRadius: 20, border: '1px solid #EDE5D8', overflow: 'hidden', marginBottom: 12 }}>
+          <p style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', letterSpacing: '0.08em', textTransform: 'uppercase', padding: '14px 16px 8px', margin: 0 }}>
+            Preferencias
+          </p>
+          <ToggleRow
+            icon="🌙"
+            label="Modo oscuro"
+            subtitle="Colores cálidos oscuros, sin azules"
+            checked={dark}
+            onChange={toggleDark}
+          />
+          <ToggleRow
+            icon="📍"
+            label="Compartir ubicación"
+            subtitle="Captura GPS al marcar medicamentos y notas"
+            checked={locationOn}
+            onChange={handleLocationToggle}
+          />
+        </div>
+
+        {/* PDF Export */}
+        <div style={{ background: 'white', borderRadius: 20, border: '1px solid #EDE5D8', padding: '16px', marginBottom: 12 }}>
+          <p style={{ fontFamily: 'Georgia, serif', fontSize: 15, fontWeight: 700, color: '#1A1A1A', margin: '0 0 6px' }}>
+            Exportar historial
+          </p>
+          <p style={{ fontSize: 12, color: '#9CA3AF', margin: '0 0 14px', lineHeight: 1.5 }}>
+            Genera un PDF con los últimos 30 días: medicamentos, notas, citas y memorias de voz.
+          </p>
+          <button
+            onClick={exportPDF}
+            disabled={exportingPdf}
+            style={{
+              width: '100%', padding: '12px', borderRadius: 14, border: 'none',
+              background: exportingPdf ? '#D4C4B8' : 'linear-gradient(135deg, #4A7C59, #3A6147)',
+              color: 'white', fontWeight: 700, fontSize: 14,
+              cursor: exportingPdf ? 'not-allowed' : 'pointer',
+              boxShadow: exportingPdf ? 'none' : '0 4px 16px rgba(74,124,89,0.3)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+              transition: 'all 0.2s',
+            }}
+          >
+            <span>{exportingPdf ? '⏳' : '📄'}</span>
+            {exportingPdf ? 'Generando PDF...' : 'Exportar historial PDF'}
+          </button>
         </div>
 
         {/* More options */}

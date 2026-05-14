@@ -6,6 +6,7 @@ import { useSubscription } from '../contexts/SubscriptionContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import { ChevronLeft, ChevronRight, Plus, XIcon, Camera } from '../components/Icons'
+import { track } from '../lib/analytics'
 
 const CATEGORIES = [
   { id: 'Medicamentos',    emoji: '💊', color: '#C4623A' },
@@ -154,6 +155,7 @@ export default function Expenses() {
       return
     }
 
+    track('expense_added', { category: form.category, amount: parseFloat(form.amount) })
     setShowModal(false)
     loadExpenses()
   }
