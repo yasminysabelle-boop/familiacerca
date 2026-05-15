@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import Logo from './Logo'
-import { Home, Pill, Mic, Users, User, Plus, XIcon } from './Icons'
+import { Home, Pill, Mic, Users, User, Plus, XIcon, LogOut } from './Icons'
 import Paywall from './Paywall'
 import InstallBanner from './InstallBanner'
 import OfflineBanner from './OfflineBanner'
@@ -53,7 +53,7 @@ const FAB_ITEMS = [
 const HIDE_FAB_PATHS = new Set(['/gastos'])
 
 export default function Layout({ children }) {
-  const { inactivityWarning } = useAuth()
+  const { inactivityWarning, signOut } = useAuth()
   const { profile } = useFamily()
   const { dark } = useDarkMode()
   const location = useLocation()
@@ -70,6 +70,15 @@ export default function Layout({ children }) {
   function handleFabLink(to) {
     setFabOpen(false)
     navigate(to)
+  }
+
+  async function handleSignOut() {
+    setFabOpen(false)
+    try { await signOut() } catch { }
+    finally {
+      localStorage.removeItem('fc_active_family')
+      window.location.href = '/login'
+    }
   }
 
   return (
@@ -103,21 +112,23 @@ export default function Layout({ children }) {
           </div>
         )}
 
-        {profile?.photo_url ? (
-          <img
-            src={profile.photo_url} alt={profile.name}
-            style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover',
-              border: '2px solid #C4623A', boxShadow: '0 0 0 2px #FDF0EB', flexShrink: 0 }}
-          />
-        ) : (
-          <div style={{
-            width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
-            background: '#FDF0EB', border: '2px solid #EDE5D8',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            <User size={16} color="#C4623A" strokeWidth={1.5} />
-          </div>
-        )}
+        <Link to="/ajustes" style={{ flexShrink: 0, lineHeight: 0 }}>
+          {profile?.photo_url ? (
+            <img
+              src={profile.photo_url} alt={profile.name}
+              style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover',
+                border: '2px solid #C4623A', boxShadow: '0 0 0 2px #FDF0EB' }}
+            />
+          ) : (
+            <div style={{
+              width: 32, height: 32, borderRadius: '50%',
+              background: '#FDF0EB', border: '2px solid #EDE5D8',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <User size={16} color="#C4623A" strokeWidth={1.5} />
+            </div>
+          )}
+        </Link>
       </header>
 
       {/* Scrollable main */}
@@ -206,6 +217,21 @@ export default function Layout({ children }) {
                 </button>
               ))}
             </div>
+
+            {/* Sign out — always visible at bottom of FAB sheet */}
+            <button
+              onClick={handleSignOut}
+              style={{
+                width: '100%', marginTop: 16, padding: '13px',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                border: '1.5px solid #FFBABA', borderRadius: 14,
+                background: '#FFF8F8', color: '#D63031',
+                fontWeight: 700, fontSize: 14, cursor: 'pointer',
+              }}
+            >
+              <LogOut size={16} color="#D63031" strokeWidth={1.75} />
+              Cerrar sesión
+            </button>
           </div>
         </div>
       )}

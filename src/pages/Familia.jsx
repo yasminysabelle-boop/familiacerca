@@ -6,14 +6,14 @@ import { useSubscription } from '../contexts/SubscriptionContext'
 import { createPortalSession } from '../lib/stripe'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
-import { UserPlus, Phone, Mail, MapPin, XIcon, BookOpen, Users } from '../components/Icons'
+import { UserPlus, Phone, Mail, MapPin, XIcon, BookOpen, Users, LogOut } from '../components/Icons'
 import { track } from '../lib/analytics'
 
 const PLAN_LABELS = { free: 'Prueba gratuita', familiar: 'Plan Familiar', care_plus: 'Care+' }
 const PLAN_COLORS = { free: '#9CA3AF', familiar: '#C4623A', care_plus: '#7C3AED' }
 
 export default function Familia() {
-  const { user } = useAuth()
+  const { user, signOut } = useAuth()
   const { profile, ownerId } = useFamily()
   const { sub, isPaid, isTrialing, daysLeft } = useSubscription()
   const navigate = useNavigate()
@@ -154,6 +154,14 @@ export default function Familia() {
     } catch {
       setPortalLoading(false)
       alert('No se pudo abrir el portal. Intenta de nuevo.')
+    }
+  }
+
+  async function handleSignOut() {
+    try { await signOut() } catch { }
+    finally {
+      localStorage.removeItem('fc_active_family')
+      window.location.href = '/login'
     }
   }
 
@@ -451,6 +459,21 @@ export default function Familia() {
           </div>
           <span style={{ color: '#D1D5DB', fontSize: 18 }}>›</span>
         </Link>
+
+        {/* Sign out */}
+        <button
+          onClick={handleSignOut}
+          style={{
+            width: '100%', padding: '14px', marginBottom: 24,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+            border: '1.5px solid #FFBABA', borderRadius: 16,
+            background: '#FFF8F8', color: '#D63031',
+            fontWeight: 700, fontSize: 14, cursor: 'pointer',
+          }}
+        >
+          <LogOut size={17} color="#D63031" strokeWidth={1.75} />
+          Cerrar sesión
+        </button>
       </div>
 
       {/* Member contact modal */}
