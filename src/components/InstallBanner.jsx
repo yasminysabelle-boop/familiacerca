@@ -46,7 +46,6 @@ export default function InstallBanner() {
 
     // Capture event if it fires after component mounts (rare, but possible)
     function handler(e) {
-      e.preventDefault()
       timer = setTimeout(() => { setPrompt(e); setVisible(true) }, SHOW_DELAY)
     }
     window.addEventListener('beforeinstallprompt', handler)

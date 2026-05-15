@@ -6,7 +6,7 @@
     <link rel="manifest" href="/manifest.json" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <!-- Capture beforeinstallprompt before React mounts so InstallBanner can use it -->
-    <script>window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__pwaPrompt=e;});</script>
+    <script>window.addEventListener('beforeinstallprompt',function(e){window.__pwaPrompt=e;});</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#C4623A" />
     <meta name="mobile-web-app-capable" content="yes" />
