@@ -11,11 +11,11 @@ export default function JoinFamily() {
   const [searchParams] = useSearchParams()
   const token = searchParams.get('token')
   const navigate = useNavigate()
-  const { user, signIn, signUp } = useAuth()
+  const { user, loading: sessionLoading, signIn, signUp } = useAuth()
   const { refresh: refreshFamily } = useFamily()
 
   const [invitation, setInvitation] = useState(null)
-  const [invLoading, setInvLoading] = useState(true)
+  const [invLoading, setInvLoading] = useState(!!token)
   const [invError, setInvError]     = useState('')
 
   const [authMode, setAuthMode] = useState('login') // 'login' | 'register'
@@ -30,13 +30,16 @@ export default function JoinFamily() {
   const [acceptError, setAcceptError] = useState('')
   const [accepted, setAccepted]     = useState(false)
 
-  // Load invitation on mount
+  // No token → not an invitation page; redirect once auth state is settled
   useEffect(() => {
-    if (!token) {
-      setInvError('Enlace de invitación inválido.')
-      setInvLoading(false)
-      return
+    if (!token && !sessionLoading) {
+      navigate(user ? '/dashboard' : '/login', { replace: true })
     }
+  }, [token, user, sessionLoading])
+
+  // Load invitation on mount (only when a token is present)
+  useEffect(() => {
+    if (!token) return
     fetchInvitation()
   }, [token])
 
@@ -128,6 +131,9 @@ export default function JoinFamily() {
   }
   const onFocus = e => { e.target.style.borderColor = '#C4623A'; e.target.style.boxShadow = '0 0 0 3px rgba(196,98,58,0.1)' }
   const onBlur  = e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.boxShadow = 'none' }
+
+  // Render nothing while the no-token redirect is in flight
+  if (!token) return null
 
   return (
     <div style={{
