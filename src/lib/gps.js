@@ -8,8 +8,8 @@ export function setLocationEnabled(val) {
   localStorage.setItem(GPS_KEY, val ? '1' : '0')
 }
 
-export async function getLocation() {
-  if (!isLocationEnabled()) return null
+export async function getLocation({ force = false } = {}) {
+  if (!force && !isLocationEnabled()) return null
   if (!navigator.geolocation) return null
   return new Promise(resolve => {
     navigator.geolocation.getCurrentPosition(

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useSubscription } from '../contexts/SubscriptionContext'
 import { useDarkMode } from '../contexts/DarkModeContext'
+import { usePushNotifications } from '../hooks/usePushNotifications'
 import { createPortalSession } from '../lib/stripe'
 import { supabase } from '../lib/supabase'
 import { isLocationEnabled, setLocationEnabled } from '../lib/gps'
@@ -83,10 +84,13 @@ export default function Settings() {
   const { user, signOut } = useAuth()
   const { sub, isPaid, isTrialing, trialExpired, daysLeft } = useSubscription()
   const { dark, toggleDark } = useDarkMode()
+  const { permission, subscribed, supported, requestAndSubscribe } = usePushNotifications()
   const navigate = useNavigate()
   const [portalLoading, setPortalLoading] = useState(false)
   const [locationOn, setLocationOn] = useState(() => isLocationEnabled())
   const [exportingPdf, setExportingPdf] = useState(false)
+  const [testingPush, setTestingPush] = useState(false)
+  const [testResult, setTestResult] = useState(null)
 
   const plan = sub?.plan ?? 'free'
   const meta = PLAN_META[plan] ?? PLAN_META.free
@@ -124,6 +128,26 @@ export default function Settings() {
   function handleLocationToggle(val) {
     setLocationEnabled(val)
     setLocationOn(val)
+  }
+
+  async function sendTestNotification() {
+    setTestingPush(true)
+    setTestResult(null)
+    try {
+      const { data, error } = await supabase.functions.invoke('send-test-notification')
+      if (error) throw error
+      if (data.sent > 0) {
+        setTestResult({ ok: true, msg: `✅ Enviado a ${data.sent} dispositivo${data.sent !== 1 ? 's' : ''}` })
+      } else if (data.error) {
+        setTestResult({ ok: false, msg: `Sin suscripciones guardadas. Activa las notificaciones primero.` })
+      } else {
+        setTestResult({ ok: false, msg: `No se encontraron suscripciones (sent=0). ¿El servicio worker está registrado?` })
+      }
+    } catch (err) {
+      setTestResult({ ok: false, msg: `Error: ${err.message ?? 'Desconocido'}` })
+    } finally {
+      setTestingPush(false)
+    }
   }
 
   async function exportPDF() {
@@ -440,6 +464,92 @@ export default function Settings() {
             onChange={handleLocationToggle}
           />
         </div>
+
+        {/* Push Notifications */}
+        {supported && (
+          <div style={{ background: 'white', borderRadius: 20, border: '1px solid #EDE5D8', padding: '16px', marginBottom: 12 }}>
+            <p style={{ fontFamily: 'Georgia, serif', fontSize: 15, fontWeight: 700, color: '#1A1A1A', margin: '0 0 6px' }}>
+              Notificaciones push
+            </p>
+            <p style={{ fontSize: 12, color: '#9CA3AF', margin: '0 0 12px', lineHeight: 1.5 }}>
+              {permission === 'granted'
+                ? subscribed
+                  ? 'Activas — recibirás recordatorios de medicamentos y alertas familiares.'
+                  : 'Permiso otorgado pero sin suscripción activa.'
+                : permission === 'denied'
+                  ? 'Bloqueadas en el navegador. Habilítalas en Configuración del sistema.'
+                  : 'Activa las notificaciones para recibir recordatorios de medicamentos.'}
+            </p>
+
+            {/* Status indicator */}
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 8,
+              padding: '8px 12px', borderRadius: 10, marginBottom: 12,
+              background: permission === 'granted' && subscribed ? '#F0FDF4' : '#FFF7ED',
+              border: `1px solid ${permission === 'granted' && subscribed ? '#BBF7D0' : '#FED7AA'}`,
+            }}>
+              <span style={{ fontSize: 16 }}>
+                {permission === 'granted' && subscribed ? '🔔' : permission === 'denied' ? '🔕' : '🔔'}
+              </span>
+              <span style={{
+                fontSize: 12, fontWeight: 600,
+                color: permission === 'granted' && subscribed ? '#15803D' : '#92400E',
+              }}>
+                {permission === 'granted' && subscribed
+                  ? 'Notificaciones activas'
+                  : permission === 'denied'
+                    ? 'Bloqueadas por el navegador'
+                    : 'Notificaciones inactivas'}
+              </span>
+            </div>
+
+            {/* Activate button — shown when not yet granted */}
+            {permission !== 'denied' && !(permission === 'granted' && subscribed) && (
+              <button
+                onClick={requestAndSubscribe}
+                style={{
+                  width: '100%', padding: '12px', borderRadius: 14, border: 'none',
+                  background: 'linear-gradient(135deg, #C4623A, #A85130)',
+                  color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer',
+                  boxShadow: '0 4px 16px rgba(196,98,58,0.25)',
+                  marginBottom: 8,
+                }}
+              >
+                🔔 Activar notificaciones
+              </button>
+            )}
+
+            {/* Test button — shown when subscribed */}
+            {permission === 'granted' && subscribed && (
+              <button
+                onClick={sendTestNotification}
+                disabled={testingPush}
+                style={{
+                  width: '100%', padding: '12px', borderRadius: 14,
+                  border: '1.5px solid #C4623A', background: 'white',
+                  color: '#C4623A', fontWeight: 700, fontSize: 14,
+                  cursor: testingPush ? 'not-allowed' : 'pointer',
+                  opacity: testingPush ? 0.6 : 1,
+                  transition: 'all 0.2s',
+                }}
+              >
+                {testingPush ? '⏳ Enviando...' : '🧪 Test notificación'}
+              </button>
+            )}
+
+            {/* Result message */}
+            {testResult && (
+              <p style={{
+                fontSize: 12, fontWeight: 600, margin: '10px 0 0',
+                color: testResult.ok ? '#15803D' : '#DC2626',
+                padding: '8px 12px', borderRadius: 10,
+                background: testResult.ok ? '#F0FDF4' : '#FEF2F2',
+              }}>
+                {testResult.msg}
+              </p>
+            )}
+          </div>
+        )}
 
         {/* PDF Export */}
         <div style={{ background: 'white', borderRadius: 20, border: '1px solid #EDE5D8', padding: '16px', marginBottom: 12 }}>

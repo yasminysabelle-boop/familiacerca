@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
-import { CheckIcon, Plus } from '../components/Icons'
+import { CheckIcon, Plus, XIcon } from '../components/Icons'
 import { getLocation, mapsUrl } from '../lib/gps'
 import { track } from '../lib/analytics'
 
@@ -58,8 +58,13 @@ export default function Hoy() {
   const [logs, setLogs] = useState({})
   const [loading, setLoading] = useState(true)
   const [confirming, setConfirming] = useState(null)
-  const [proofMedId, setProofMedId] = useState(null)
+
+  // Bottom sheet for proof photo — shown immediately after marking
+  const [proofSheet, setProofSheet] = useState(null) // { med } or null
   const [proofUploading, setProofUploading] = useState(false)
+  const [proofStamping, setProofStamping] = useState(false)
+  const [proofPreview, setProofPreview] = useState(null)
+  const [proofBlob, setProofBlob] = useState(null)
   const fileRef = useRef(null)
 
   const today = new Date().toISOString().split('T')[0]
@@ -84,7 +89,8 @@ export default function Hoy() {
 
   async function confirmMed(med) {
     setConfirming(med.id)
-    const loc = await getLocation()
+    // force: true — request GPS unconditionally regardless of the toggle setting
+    const loc = await getLocation({ force: true })
     const confirmedAt = new Date().toISOString()
     await supabase.from('medication_logs').upsert({
       medication_id: med.id,
@@ -111,6 +117,8 @@ export default function Hoy() {
       },
     }))
     setConfirming(null)
+    // Open the proof photo bottom sheet immediately
+    openProofSheet(med)
   }
 
   async function unconfirmMed(med) {
@@ -121,25 +129,48 @@ export default function Hoy() {
     setLogs(prev => { const n = { ...prev }; delete n[med.id]; return n })
   }
 
+  function openProofSheet(med) {
+    setProofSheet({ med })
+    setProofPreview(null)
+    setProofBlob(null)
+    setProofStamping(false)
+  }
+
+  function closeProofSheet() {
+    setProofSheet(null)
+    setProofPreview(null)
+    setProofBlob(null)
+    if (fileRef.current) fileRef.current.value = ''
+  }
+
   async function handleProofFile(e) {
     const f = e.target.files?.[0]
     e.target.value = ''
-    if (!f || !proofMedId) return
+    if (!f) return
+    setProofStamping(true)
+    const stamped = await stampProof(f, displayName)
+    setProofBlob(stamped)
+    setProofPreview(URL.createObjectURL(stamped))
+    setProofStamping(false)
+  }
+
+  async function submitProofPhoto() {
+    if (!proofBlob || !proofSheet) return
     setProofUploading(true)
     try {
-      const stamped = await stampProof(f, displayName)
-      const path = `${ownerId}/${today}/${proofMedId}.jpg`
-      await supabase.storage.from('confirmations').upload(path, stamped, { upsert: true, contentType: 'image/jpeg' })
+      const medId = proofSheet.med.id
+      const path = `${ownerId}/${today}/${medId}.jpg`
+      await supabase.storage.from('confirmations').upload(path, proofBlob, { upsert: true, contentType: 'image/jpeg' })
       const { data: { publicUrl } } = supabase.storage.from('confirmations').getPublicUrl(path)
       await supabase.from('medication_logs')
         .update({ photo_url: publicUrl })
-        .eq('medication_id', proofMedId)
+        .eq('medication_id', medId)
         .eq('user_id', ownerId)
         .eq('log_date', today)
-      setLogs(prev => ({ ...prev, [proofMedId]: { ...prev[proofMedId], photo_url: publicUrl } }))
-    } catch { /* upload error — banner remains visible */ }
+      setLogs(prev => ({ ...prev, [medId]: { ...prev[medId], photo_url: publicUrl } }))
+      closeProofSheet()
+    } catch { /* upload failed — sheet stays open */ }
     setProofUploading(false)
-    setProofMedId(null)
   }
 
   function firstTime(med) {
@@ -159,6 +190,7 @@ export default function Hoy() {
   const total = medications.length
   const allDone = total > 0 && confirmedCount === total
 
+  // Meds confirmed without photo within the last 30 min (from DB or current session)
   const pendingProof = medications.filter(med => {
     const log = logs[med.id]
     if (log?.status !== 'confirmed') return false
@@ -200,9 +232,7 @@ export default function Hoy() {
         {/* Progress card */}
         {total > 0 && (
           <div style={{
-            background: allDone
-              ? 'linear-gradient(135deg, #F0FDF4, #DCFCE7)'
-              : 'white',
+            background: allDone ? 'linear-gradient(135deg, #F0FDF4, #DCFCE7)' : 'white',
             borderRadius: 20, padding: '16px 18px',
             border: `1px solid ${allDone ? '#BBF7D0' : '#EDE5D8'}`,
             marginBottom: 16,
@@ -234,39 +264,29 @@ export default function Hoy() {
           </div>
         )}
 
-        {/* Proof photo banners — one per med confirmed in last 30 min without photo */}
-        {pendingProof.map(med => {
+        {/* Persistent proof reminders (meds confirmed > 0 min ago without photo, sheet dismissed) */}
+        {pendingProof.filter(med => med.id !== proofSheet?.med?.id).map(med => {
           const log = logs[med.id]
           const minLeft = Math.max(0, 30 - Math.floor((Date.now() - new Date(log.confirmed_at).getTime()) / 60000))
-          const isThis = proofMedId === med.id
           return (
             <div
               key={med.id}
+              onClick={() => openProofSheet(med)}
               style={{
                 display: 'flex', alignItems: 'center', gap: 10,
                 background: '#FFFBEB', border: '1.5px solid #F59E0B',
                 borderRadius: 14, padding: '10px 14px', marginBottom: 10,
+                cursor: 'pointer',
               }}
             >
-              <span style={{ fontSize: 20, flexShrink: 0 }}>📷</span>
+              <span style={{ fontSize: 18, flexShrink: 0 }}>📷</span>
               <div style={{ flex: 1 }}>
                 <p style={{ fontSize: 13, fontWeight: 700, color: '#92400E', margin: 0 }}>
-                  Agrega foto de prueba — tienes {minLeft} min
+                  Agrega foto de prueba — {minLeft} min restantes
                 </p>
                 <p style={{ fontSize: 11, color: '#B45309', margin: '2px 0 0' }}>{med.name}</p>
               </div>
-              <button
-                onClick={() => { setProofMedId(med.id); fileRef.current?.click() }}
-                disabled={proofUploading}
-                style={{
-                  flexShrink: 0, padding: '7px 12px', borderRadius: 10,
-                  background: proofUploading && isThis ? '#D4A853' : '#F59E0B',
-                  border: 'none', cursor: proofUploading ? 'not-allowed' : 'pointer',
-                  fontWeight: 700, fontSize: 12, color: 'white',
-                }}
-              >
-                {proofUploading && isThis ? '...' : '📷 Tomar'}
-              </button>
+              <span style={{ fontSize: 11, color: '#F59E0B', fontWeight: 700 }}>📷 Agregar</span>
             </div>
           )
         })}
@@ -330,7 +350,7 @@ export default function Hoy() {
                       : med.time ? [med.time] : []
 
                     const hasPhoto = !!log?.photo_url
-                    const hasGPS = !!(log?.latitude && log?.longitude)
+                    const hasGPS   = !!(log?.latitude && log?.longitude)
                     const proofExpired = isConfirmed && !hasPhoto && log?.confirmed_at &&
                       (Date.now() - new Date(log.confirmed_at).getTime()) >= 30 * 60 * 1000
 
@@ -397,7 +417,7 @@ export default function Hoy() {
 
                         {/* Status badges */}
                         {isConfirmed && (
-                          <div style={{ flexShrink: 0, textAlign: 'right', minWidth: 0 }}>
+                          <div style={{ flexShrink: 0, textAlign: 'right' }}>
                             {hasPhoto ? (
                               <span style={{
                                 fontSize: 10, fontWeight: 700, color: '#16A34A',
@@ -424,7 +444,6 @@ export default function Hoy() {
                               </span>
                             )}
 
-                            {/* GPS link */}
                             {hasGPS ? (
                               <a
                                 href={mapsUrl(log.latitude, log.longitude)}
@@ -451,6 +470,127 @@ export default function Hoy() {
           })
         )}
       </div>
+
+      {/* Proof photo bottom sheet — opens immediately after marking */}
+      {proofSheet && (
+        <div
+          style={{
+            position: 'fixed', inset: 0, zIndex: 200,
+            background: 'rgba(0,0,0,0.6)',
+            display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
+          }}
+          onClick={e => { if (e.target === e.currentTarget) closeProofSheet() }}
+        >
+          <div style={{
+            width: '100%', maxWidth: 480,
+            background: 'white',
+            borderRadius: '24px 24px 0 0',
+            padding: '28px 24px 96px',
+            boxShadow: '0 -8px 48px rgba(0,0,0,0.25)',
+          }}>
+            {/* Header */}
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 20 }}>
+              <div>
+                <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>
+                  📷 Foto de prueba
+                </p>
+                <p style={{ fontSize: 13, color: '#6B7280', marginTop: 4 }}>
+                  {proofSheet.med.name} — tienes 30 minutos para agregar una foto
+                </p>
+              </div>
+              <button
+                onClick={closeProofSheet}
+                style={{ padding: 8, borderRadius: 10, background: '#F3F4F6', border: 'none', cursor: 'pointer', flexShrink: 0 }}
+              >
+                <XIcon size={16} color="#6B7280" strokeWidth={2} />
+              </button>
+            </div>
+
+            {/* Camera area */}
+            <button
+              type="button"
+              onClick={() => !proofStamping && !proofUploading && fileRef.current?.click()}
+              disabled={proofStamping || proofUploading}
+              style={{
+                width: '100%', border: '2px dashed #EDE5D8',
+                borderRadius: 16, background: proofPreview ? 'transparent' : '#FDFAF7',
+                cursor: proofStamping || proofUploading ? 'default' : 'pointer',
+                overflow: 'hidden', marginBottom: 16,
+                display: 'flex', flexDirection: 'column',
+                alignItems: 'center', justifyContent: 'center',
+              }}
+            >
+              {proofStamping ? (
+                <div style={{ padding: '40px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+                  <div style={{
+                    width: 28, height: 28, borderRadius: '50%',
+                    border: '3px solid #EDE5D8', borderTopColor: '#C4623A',
+                    animation: 'spin 0.8s linear infinite',
+                  }} />
+                  <p style={{ fontSize: 13, color: '#9CA3AF', margin: 0 }}>Aplicando sello...</p>
+                </div>
+              ) : proofPreview ? (
+                <>
+                  <img src={proofPreview} alt="Prueba sellada" style={{ width: '100%', maxHeight: 220, objectFit: 'cover' }} />
+                  <div style={{
+                    width: '100%', padding: '10px 14px',
+                    background: '#F0FDF4', display: 'flex', alignItems: 'center', gap: 6,
+                  }}>
+                    <span style={{ fontSize: 14 }}>🔒</span>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: '#15803D' }}>Sello aplicado · Toca para cambiar</span>
+                  </div>
+                </>
+              ) : (
+                <div style={{ padding: '40px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+                  <div style={{
+                    width: 64, height: 64, borderRadius: '50%',
+                    background: '#FDF0EB', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    marginBottom: 4,
+                  }}>
+                    <span style={{ fontSize: 30 }}>📷</span>
+                  </div>
+                  <p style={{ fontSize: 14, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>
+                    Tomar foto de prueba
+                  </p>
+                  <p style={{ fontSize: 12, color: '#9CA3AF', margin: 0 }}>
+                    Se sellará automáticamente con fecha y hora
+                  </p>
+                </div>
+              )}
+            </button>
+
+            {/* Action buttons */}
+            <button
+              onClick={submitProofPhoto}
+              disabled={!proofBlob || proofUploading || proofStamping}
+              style={{
+                width: '100%', padding: '14px', marginBottom: 10,
+                borderRadius: 14, border: 'none',
+                background: proofBlob && !proofUploading
+                  ? 'linear-gradient(135deg, #C4623A, #A85130)'
+                  : '#D4C4B8',
+                color: 'white', fontWeight: 700, fontSize: 14,
+                cursor: proofBlob && !proofUploading ? 'pointer' : 'not-allowed',
+                boxShadow: proofBlob ? '0 6px 20px rgba(196,98,58,0.3)' : 'none',
+                transition: 'all 0.2s',
+              }}
+            >
+              {proofUploading ? 'Guardando...' : '✓ Guardar foto de prueba'}
+            </button>
+
+            <button
+              onClick={closeProofSheet}
+              style={{
+                width: '100%', padding: '12px',
+                background: 'none', border: 'none', cursor: 'pointer',
+                fontSize: 13, color: '#9CA3AF',
+              }}
+            >
+              Omitir por ahora (tienes 30 min)
+            </button>
+          </div>
+        </div>
+      )}
     </Layout>
   )
 }
