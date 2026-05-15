@@ -91,6 +91,9 @@ export default function JoinFamily() {
       return
     }
 
+    // Mark onboarding complete — members join an existing family, no profile creation needed
+    await supabase.auth.updateUser({ data: { onboarding_completed: true } })
+
     setAccepting(false)
     setAccepted(true)
     localStorage.setItem('fc_active_family', 'member')

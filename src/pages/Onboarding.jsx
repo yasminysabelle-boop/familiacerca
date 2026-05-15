@@ -59,7 +59,7 @@ const inputStyle = (active) => ({
 
 export default function Onboarding() {
   const { user } = useAuth()
-  const { refresh } = useFamily()
+  const { profile, ownerId, loading: familyLoading, refresh } = useFamily()
   const navigate = useNavigate()
 
   const [step, setStep] = useState(1)
@@ -85,6 +85,22 @@ export default function Onboarding() {
       navigate('/dashboard', { replace: true })
     }
   }, [user, navigate])
+
+  // Member users (accepted invitation) never need to create a profile
+  useEffect(() => {
+    if (familyLoading || !user) return
+    if (ownerId && ownerId !== user.id) {
+      supabase.auth.updateUser({ data: { onboarding_completed: true } })
+      navigate('/dashboard', { replace: true })
+    }
+  }, [user, ownerId, familyLoading, navigate])
+
+  // User already has their own care profile — skip step 1
+  useEffect(() => {
+    if (!familyLoading && profile && ownerId === user?.id && step === 1) {
+      setStep(2)
+    }
+  }, [familyLoading, profile, ownerId])
 
   async function handleStep1(e) {
     e.preventDefault()
