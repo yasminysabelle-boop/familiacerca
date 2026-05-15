@@ -22,31 +22,36 @@ export function FamilyProvider({ children }) {
 
   async function fetchProfile() {
     setLoading(true)
+    try {
+      const { data: ownData } = await supabase
+        .from('care_profiles').select('*').eq('user_id', user.id).maybeSingle()
 
-    // Fetch own profile and any family membership in parallel
-    const [{ data: ownData }, { data: membership }] = await Promise.all([
-      supabase.from('care_profiles').select('*').eq('user_id', user.id).maybeSingle(),
-      supabase.from('family_members').select('user_id').eq('member_user_id', user.id).maybeSingle(),
-    ])
+      const preferMember = localStorage.getItem('fc_active_family') === 'member'
 
-    // Use the invited family when: user just accepted an invite (fc_active_family=member)
-    // or when user has no profile of their own yet
-    const preferMember = localStorage.getItem('fc_active_family') === 'member'
+      // Only query family_members when the user has accepted an invitation
+      // or has no profile of their own — avoids unnecessary queries for regular users
+      if (!ownData || preferMember) {
+        const { data: membership } = await supabase
+          .from('family_members').select('user_id').eq('member_user_id', user.id).maybeSingle()
 
-    if (membership && (!ownData || preferMember)) {
-      const { data: ownerProfile } = await supabase
-        .from('care_profiles').select('*').eq('user_id', membership.user_id).maybeSingle()
-      setOwnerId(membership.user_id)
-      setProfile(ownerProfile ?? null)
-    } else if (ownData) {
+        if (membership) {
+          const { data: ownerProfile } = await supabase
+            .from('care_profiles').select('*').eq('user_id', membership.user_id).maybeSingle()
+          setOwnerId(membership.user_id)
+          setProfile(ownerProfile ?? null)
+          return
+        }
+      }
+
       setOwnerId(user.id)
-      setProfile(ownData)
-    } else {
+      setProfile(ownData ?? null)
+    } catch {
+      // On any unexpected error fall back to the user's own context
       setOwnerId(user.id)
       setProfile(null)
+    } finally {
+      setLoading(false)
     }
-
-    setLoading(false)
   }
 
   return (
