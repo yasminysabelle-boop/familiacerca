@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { useSubscription } from '../contexts/SubscriptionContext'
@@ -40,6 +40,7 @@ export default function Expenses() {
   const { ownerId } = useFamily()
   const { canEdit } = useSubscription()
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
   const fileRef = useRef(null)
   const galleryRef = useRef(null)
   const displayName = user?.user_metadata?.full_name?.split(' ')[0] ?? user?.email ?? ''
@@ -62,6 +63,13 @@ export default function Expenses() {
   const [saveError, setSaveError] = useState('')
 
   useEffect(() => { loadExpenses() }, [year, month])
+
+  useEffect(() => {
+    if (searchParams.get('add') === '1') {
+      openModal()
+      setSearchParams({}, { replace: true })
+    }
+  }, [searchParams])
 
   async function loadExpenses() {
     setLoading(true)

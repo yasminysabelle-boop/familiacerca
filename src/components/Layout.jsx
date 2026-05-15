@@ -40,14 +40,17 @@ const BOTTOM_TABS = [
 
 const FAB_ITEMS = [
   { to: '/medications?add=1', emoji: '💊', label: 'Medicamento' },
-  { to: '/chat',        emoji: '💬', label: 'Chat' },
-  { to: '/calendar',    emoji: '📅', label: 'Calendario' },
-  { to: '/notes',       emoji: '📝', label: 'Notas' },
-  { to: '/album',       emoji: '📸', label: 'Álbum' },
-  { to: '/gastos',      emoji: '💰', label: 'Gastos' },
-  { to: '/historial',   emoji: '📋', label: 'Historial' },
-  { to: '/directorio',  emoji: '🏥', label: 'Directorio' },
+  { to: '/chat',         emoji: '💬', label: 'Chat' },
+  { to: '/calendar',     emoji: '📅', label: 'Calendario' },
+  { to: '/notes',        emoji: '📝', label: 'Notas' },
+  { to: '/album',        emoji: '📸', label: 'Álbum' },
+  { to: '/gastos?add=1', emoji: '💰', label: 'Gastos' },
+  { to: '/historial',    emoji: '📋', label: 'Historial' },
+  { to: '/directorio',   emoji: '🏥', label: 'Directorio' },
 ]
+
+// Pages that have their own add-button — hide the global FAB there
+const HIDE_FAB_PATHS = new Set(['/gastos'])
 
 export default function Layout({ children }) {
   const { inactivityWarning } = useAuth()
@@ -56,6 +59,7 @@ export default function Layout({ children }) {
   const location = useLocation()
   const navigate = useNavigate()
   const isHome = location.pathname === '/dashboard'
+  const fabHidden = HIDE_FAB_PATHS.has(location.pathname)
   const [fabOpen, setFabOpen] = useState(false)
 
   const bg      = dark ? '#1C1208' : '#FFF8F0'
@@ -135,26 +139,28 @@ export default function Layout({ children }) {
         </footer>
       </main>
 
-      {/* Floating "+" button */}
-      <button
-        onClick={() => setFabOpen(v => !v)}
-        style={{
-          position: 'fixed', bottom: 82, right: 20, zIndex: 41,
-          width: 50, height: 50, borderRadius: '50%',
-          background: 'linear-gradient(135deg, #C4623A, #A85130)',
-          boxShadow: '0 4px 20px rgba(196,98,58,0.45)',
-          border: 'none', cursor: 'pointer',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          transition: 'transform 0.2s',
-          transform: fabOpen ? 'rotate(45deg)' : 'rotate(0deg)',
-        }}
-        aria-label="Más opciones"
-      >
-        <Plus size={22} color="white" strokeWidth={2.5} />
-      </button>
+      {/* Floating "+" button — hidden on pages with their own add button */}
+      {!fabHidden && (
+        <button
+          onClick={() => setFabOpen(v => !v)}
+          style={{
+            position: 'fixed', bottom: 82, right: 20, zIndex: 41,
+            width: 50, height: 50, borderRadius: '50%',
+            background: 'linear-gradient(135deg, #C4623A, #A85130)',
+            boxShadow: '0 4px 20px rgba(196,98,58,0.45)',
+            border: 'none', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            transition: 'transform 0.2s',
+            transform: fabOpen ? 'rotate(45deg)' : 'rotate(0deg)',
+          }}
+          aria-label="Más opciones"
+        >
+          <Plus size={22} color="white" strokeWidth={2.5} />
+        </button>
+      )}
 
       {/* FAB backdrop + sheet */}
-      {fabOpen && (
+      {!fabHidden && fabOpen && (
         <div
           style={{
             position: 'fixed', inset: 0, zIndex: 45,

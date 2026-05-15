@@ -90,6 +90,7 @@ export default function JoinFamily() {
 
     setAccepting(false)
     setAccepted(true)
+    localStorage.setItem('fc_active_family', 'member')
     refreshFamily() // connect member to family group immediately
   }
 

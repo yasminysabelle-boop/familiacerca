@@ -23,36 +23,29 @@ export function FamilyProvider({ children }) {
   async function fetchProfile() {
     setLoading(true)
 
-    let { data } = await supabase
-      .from('care_profiles')
-      .select('*')
-      .eq('user_id', user.id)
-      .maybeSingle()
+    // Fetch own profile and any family membership in parallel
+    const [{ data: ownData }, { data: membership }] = await Promise.all([
+      supabase.from('care_profiles').select('*').eq('user_id', user.id).maybeSingle(),
+      supabase.from('family_members').select('user_id').eq('member_user_id', user.id).maybeSingle(),
+    ])
 
-    if (!data) {
-      // User is an invited member — look up the family owner's profile
-      const { data: membership } = await supabase
-        .from('family_members')
-        .select('user_id')
-        .eq('member_user_id', user.id)
-        .maybeSingle()
+    // Use the invited family when: user just accepted an invite (fc_active_family=member)
+    // or when user has no profile of their own yet
+    const preferMember = localStorage.getItem('fc_active_family') === 'member'
 
-      if (membership) {
-        const { data: ownerProfile } = await supabase
-          .from('care_profiles')
-          .select('*')
-          .eq('user_id', membership.user_id)
-          .maybeSingle()
-        data = ownerProfile
-        setOwnerId(membership.user_id)
-      } else {
-        setOwnerId(user.id)
-      }
+    if (membership && (!ownData || preferMember)) {
+      const { data: ownerProfile } = await supabase
+        .from('care_profiles').select('*').eq('user_id', membership.user_id).maybeSingle()
+      setOwnerId(membership.user_id)
+      setProfile(ownerProfile ?? null)
+    } else if (ownData) {
+      setOwnerId(user.id)
+      setProfile(ownData)
     } else {
       setOwnerId(user.id)
+      setProfile(null)
     }
 
-    setProfile(data ?? null)
     setLoading(false)
   }
 

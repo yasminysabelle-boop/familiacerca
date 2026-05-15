@@ -31,118 +31,60 @@ import Directory from './pages/Directory'
 import Pricing from './pages/Pricing'
 import Settings from './pages/Settings'
 
-import imgAbuela  from './assets/images/splash-abuela.png'
-import imgHija    from './assets/images/splash-hija.png'
-import imgFamilia from './assets/images/splash-familia.png'
-
-const SLIDES = [
-  { src: imgAbuela,  alt: 'Abuela con familia' },
-  { src: imgHija,    alt: 'Hija cuidando' },
-  { src: imgFamilia, alt: 'Familia unida' },
-]
-
 const P = ({ children }) => <ProtectedRoute>{children}</ProtectedRoute>
 
 function Splash({ fading }) {
-  const [slide, setSlide] = useState(0)
-
-  useEffect(() => {
-    const t1 = setTimeout(() => setSlide(1), 2000)
-    const t2 = setTimeout(() => setSlide(2), 4000)
-    return () => { clearTimeout(t1); clearTimeout(t2) }
-  }, [])
-
   return (
     <div
       style={{
         position: 'fixed', inset: 0, zIndex: 9999,
-        background: '#0A0A0A',
+        background: 'linear-gradient(160deg, #C4623A 0%, #8C3E22 60%, #5C2610 100%)',
         opacity: fading ? 0 : 1,
-        transition: 'opacity 0.45s ease-out',
+        transition: 'opacity 0.5s ease-out',
         pointerEvents: fading ? 'none' : 'all',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}
     >
-      {/* Photo slides — each absolutely positioned, crossfade via opacity */}
-      {SLIDES.map(({ src, alt }, i) => (
-        <img
-          key={i}
-          src={src}
-          alt={alt}
-          style={{
-            position: 'absolute', inset: 0,
-            width: '100%', height: '100%',
-            objectFit: 'cover', objectPosition: 'center 20%',
-            opacity: slide === i ? 1 : 0,
-            transition: 'opacity 0.5s ease-in-out',
-          }}
-        />
-      ))}
-
-      {/* Gradient — lighter at top for logo readability, darker at bottom */}
+      {/* Soft glow ring behind logo */}
       <div style={{
-        position: 'absolute', inset: 0,
-        background: 'linear-gradient(to bottom, rgba(0,0,0,0.22) 0%, rgba(0,0,0,0.45) 55%, rgba(0,0,0,0.78) 100%)',
+        position: 'absolute',
+        width: 220, height: 220, borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 70%)',
       }} />
 
-      {/* Center content */}
-      <div style={{
-        position: 'absolute', inset: 0,
-        display: 'flex', flexDirection: 'column',
-        alignItems: 'center', justifyContent: 'center',
-        padding: '0 32px',
+      <div className="animate-splash-in" style={{
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
       }}>
-        <div className="animate-splash-in flex flex-col items-center">
-          {/* White FC mark on dark background */}
-          <svg width={76} height={76} viewBox="0 0 40 40" fill="none" aria-hidden="true"
-            style={{ filter: 'drop-shadow(0 6px 20px rgba(0,0,0,0.5))' }}>
-            <circle cx="20" cy="20" r="20" fill="rgba(255,255,255,0.18)" />
-            <circle cx="20" cy="20" r="17.5" fill="white" />
-            <text x="20" y="19.5" textAnchor="middle" dominantBaseline="middle"
-              fill="#C4623A" fontSize="14" fontWeight="800"
-              fontFamily="Georgia, serif" letterSpacing="-0.5">FC</text>
-            <text x="20" y="31" textAnchor="middle" dominantBaseline="middle"
-              fill="#C4623A" fillOpacity="0.72" fontSize="10">♥</text>
-          </svg>
+        {/* FC circle logo */}
+        <svg width={88} height={88} viewBox="0 0 40 40" fill="none" aria-hidden="true"
+          style={{ filter: 'drop-shadow(0 8px 24px rgba(0,0,0,0.25))' }}>
+          <circle cx="20" cy="20" r="20" fill="rgba(255,255,255,0.15)" />
+          <circle cx="20" cy="20" r="17.5" fill="white" />
+          <text x="20" y="19.5" textAnchor="middle" dominantBaseline="middle"
+            fill="#C4623A" fontSize="14" fontWeight="800"
+            fontFamily="Georgia, serif" letterSpacing="-0.5">FC</text>
+          <text x="20" y="31" textAnchor="middle" dominantBaseline="middle"
+            fill="#C4623A" fillOpacity="0.72" fontSize="10">♥</text>
+        </svg>
 
-          <div className="animate-splash-tag flex flex-col items-center mt-5">
-            <p style={{
-              color: 'white', fontFamily: 'Georgia, serif',
-              fontSize: 28, fontWeight: 700, letterSpacing: '-0.5px',
-              lineHeight: 1, textShadow: '0 2px 12px rgba(0,0,0,0.4)',
-            }}>
-              FamiliaCerca
-            </p>
-
-            <div style={{ marginTop: 16, textAlign: 'center' }}>
-              <p style={{
-                color: 'rgba(255,255,255,0.88)', fontSize: 15, fontWeight: 400, lineHeight: 1.55,
-                textShadow: '0 1px 8px rgba(0,0,0,0.4)',
-              }}>
-                Conectamos generaciones.
-              </p>
-              <p style={{
-                color: 'rgba(255,255,255,0.88)', fontSize: 15, fontWeight: 400, lineHeight: 1.55,
-                textShadow: '0 1px 8px rgba(0,0,0,0.4)',
-              }}>
-                Compartimos amor.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Slide progress indicators */}
-        <div style={{
-          position: 'absolute', bottom: 52,
-          display: 'flex', alignItems: 'center', gap: 8,
-        }}>
-          {SLIDES.map((_, i) => (
-            <div key={i} style={{
-              height: 4, borderRadius: 2, background: 'white',
-              opacity: i === slide ? 1 : 0.32,
-              width: i === slide ? 28 : 8,
-              transition: 'all 0.35s ease-out',
-            }} />
-          ))}
+        <div className="animate-splash-tag" style={{ textAlign: 'center', marginTop: 22 }}>
+          <p style={{
+            color: 'white',
+            fontFamily: 'Georgia, serif',
+            fontSize: 32, fontWeight: 700,
+            letterSpacing: '-0.5px', lineHeight: 1,
+            margin: 0,
+          }}>
+            FamiliaCerca
+          </p>
+          <p style={{
+            color: 'rgba(255,255,255,0.78)',
+            fontSize: 16, fontWeight: 400,
+            letterSpacing: '0.06em',
+            margin: '12px 0 0',
+          }}>
+            Cuidado con amor
+          </p>
         </div>
       </div>
     </div>
@@ -157,9 +99,8 @@ export default function App() {
   useEffect(() => {
     if (splashDone) return
     localStorage.setItem('fc_splash_shown', '1')
-    // 3 slides × 2 s = 6 s hold, then 0.45 s fade-out
-    const t1 = setTimeout(() => setSplashFading(true), 6000)
-    const t2 = setTimeout(() => setSplashDone(true), 6450)
+    const t1 = setTimeout(() => setSplashFading(true), 2000)
+    const t2 = setTimeout(() => setSplashDone(true), 2500)
     return () => { clearTimeout(t1); clearTimeout(t2) }
   }, [])
 

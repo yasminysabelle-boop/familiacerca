@@ -111,8 +111,14 @@ export default function Settings() {
   }
 
   async function handleSignOut() {
-    await signOut()
-    navigate('/login')
+    try {
+      await signOut()
+    } catch {
+      // ignore — still clear local state and redirect
+    } finally {
+      localStorage.removeItem('fc_active_family')
+      window.location.href = '/login'
+    }
   }
 
   function handleLocationToggle(val) {
