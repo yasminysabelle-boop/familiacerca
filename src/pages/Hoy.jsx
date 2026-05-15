@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import { CheckIcon, Plus } from '../components/Icons'
-import { getLocation } from '../lib/gps'
+import { getLocation, mapsUrl } from '../lib/gps'
 import { track } from '../lib/analytics'
 
 const TIME_GROUPS = [
@@ -23,6 +23,34 @@ function groupIndex(timeStr) {
   return 2
 }
 
+async function stampProof(file, confirmerName) {
+  return new Promise(resolve => {
+    const img = new Image()
+    const objUrl = URL.createObjectURL(file)
+    img.onload = () => {
+      const canvas = document.createElement('canvas')
+      canvas.width = img.naturalWidth
+      canvas.height = img.naturalHeight
+      const ctx = canvas.getContext('2d')
+      ctx.drawImage(img, 0, 0)
+      const barH = Math.max(44, Math.round(img.naturalHeight * 0.07))
+      ctx.fillStyle = 'rgba(0,0,0,0.72)'
+      ctx.fillRect(0, img.naturalHeight - barH, img.naturalWidth, barH)
+      const now = new Date()
+      const stamp = `${now.toLocaleDateString('es-US', { day: 'numeric', month: 'long', year: 'numeric' })} · ${now.toLocaleTimeString('es-US', { hour: '2-digit', minute: '2-digit' })} · ${confirmerName} · FamiliaCerca ✓`
+      const fs = Math.max(11, Math.round(img.naturalWidth * 0.022))
+      ctx.fillStyle = 'white'
+      ctx.font = `bold ${fs}px Arial, sans-serif`
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      ctx.fillText(stamp, img.naturalWidth / 2, img.naturalHeight - barH / 2, img.naturalWidth - 16)
+      URL.revokeObjectURL(objUrl)
+      canvas.toBlob(blob => resolve(blob), 'image/jpeg', 0.92)
+    }
+    img.src = objUrl
+  })
+}
+
 export default function Hoy() {
   const { user } = useAuth()
   const { ownerId, profile } = useFamily()
@@ -30,6 +58,9 @@ export default function Hoy() {
   const [logs, setLogs] = useState({})
   const [loading, setLoading] = useState(true)
   const [confirming, setConfirming] = useState(null)
+  const [proofMedId, setProofMedId] = useState(null)
+  const [proofUploading, setProofUploading] = useState(false)
+  const fileRef = useRef(null)
 
   const today = new Date().toISOString().split('T')[0]
   const displayName = user?.user_metadata?.full_name ?? user?.email ?? 'Familiar'
@@ -54,19 +85,31 @@ export default function Hoy() {
   async function confirmMed(med) {
     setConfirming(med.id)
     const loc = await getLocation()
+    const confirmedAt = new Date().toISOString()
     await supabase.from('medication_logs').upsert({
       medication_id: med.id,
       user_id: ownerId,
       status: 'confirmed',
       log_date: today,
       confirmed_by_name: displayName,
-      confirmed_at: new Date().toISOString(),
+      confirmed_at: confirmedAt,
       latitude: loc?.latitude ?? null,
       longitude: loc?.longitude ?? null,
       address: loc?.address ?? null,
     }, { onConflict: 'medication_id,log_date,user_id' })
     track('medication_marked_given', { medication_name: med.name, has_location: !!loc })
-    setLogs(prev => ({ ...prev, [med.id]: { status: 'confirmed', confirmed_by_name: displayName } }))
+    setLogs(prev => ({
+      ...prev,
+      [med.id]: {
+        status: 'confirmed',
+        confirmed_by_name: displayName,
+        confirmed_at: confirmedAt,
+        latitude: loc?.latitude ?? null,
+        longitude: loc?.longitude ?? null,
+        address: loc?.address ?? null,
+        photo_url: null,
+      },
+    }))
     setConfirming(null)
   }
 
@@ -78,12 +121,32 @@ export default function Hoy() {
     setLogs(prev => { const n = { ...prev }; delete n[med.id]; return n })
   }
 
+  async function handleProofFile(e) {
+    const f = e.target.files?.[0]
+    e.target.value = ''
+    if (!f || !proofMedId) return
+    setProofUploading(true)
+    try {
+      const stamped = await stampProof(f, displayName)
+      const path = `${ownerId}/${today}/${proofMedId}.jpg`
+      await supabase.storage.from('confirmations').upload(path, stamped, { upsert: true, contentType: 'image/jpeg' })
+      const { data: { publicUrl } } = supabase.storage.from('confirmations').getPublicUrl(path)
+      await supabase.from('medication_logs')
+        .update({ photo_url: publicUrl })
+        .eq('medication_id', proofMedId)
+        .eq('user_id', ownerId)
+        .eq('log_date', today)
+      setLogs(prev => ({ ...prev, [proofMedId]: { ...prev[proofMedId], photo_url: publicUrl } }))
+    } catch { /* upload error — banner remains visible */ }
+    setProofUploading(false)
+    setProofMedId(null)
+  }
+
   function firstTime(med) {
     if (med.scheduled_times?.length) return [...med.scheduled_times].sort()[0]
     return med.time ?? null
   }
 
-  // Build grouped structure
   const grouped = {}
   for (const med of medications) {
     const t = firstTime(med)
@@ -96,8 +159,26 @@ export default function Hoy() {
   const total = medications.length
   const allDone = total > 0 && confirmedCount === total
 
+  const pendingProof = medications.filter(med => {
+    const log = logs[med.id]
+    if (log?.status !== 'confirmed') return false
+    if (log?.photo_url) return false
+    if (!log?.confirmed_at) return false
+    return (Date.now() - new Date(log.confirmed_at).getTime()) < 30 * 60 * 1000
+  })
+
   return (
     <Layout>
+      {/* Hidden file input for proof photos */}
+      <input
+        ref={fileRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        style={{ display: 'none' }}
+        onChange={handleProofFile}
+      />
+
       <div style={{ padding: '16px 16px 96px', maxWidth: 600 }}>
 
         {/* Add medication button */}
@@ -131,10 +212,7 @@ export default function Hoy() {
               <p style={{ fontSize: 13, fontWeight: 700, color: '#1A1A1A', fontFamily: 'Georgia, serif', margin: 0 }}>
                 {allDone ? '¡Todo dado hoy! ✅' : `${confirmedCount} de ${total} medicamentos`}
               </p>
-              <span style={{
-                fontSize: 11, fontWeight: 700,
-                color: allDone ? '#16A34A' : '#C4623A',
-              }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: allDone ? '#16A34A' : '#C4623A' }}>
                 {total > 0 ? Math.round((confirmedCount / total) * 100) : 0}%
               </span>
             </div>
@@ -155,6 +233,43 @@ export default function Hoy() {
             )}
           </div>
         )}
+
+        {/* Proof photo banners — one per med confirmed in last 30 min without photo */}
+        {pendingProof.map(med => {
+          const log = logs[med.id]
+          const minLeft = Math.max(0, 30 - Math.floor((Date.now() - new Date(log.confirmed_at).getTime()) / 60000))
+          const isThis = proofMedId === med.id
+          return (
+            <div
+              key={med.id}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 10,
+                background: '#FFFBEB', border: '1.5px solid #F59E0B',
+                borderRadius: 14, padding: '10px 14px', marginBottom: 10,
+              }}
+            >
+              <span style={{ fontSize: 20, flexShrink: 0 }}>📷</span>
+              <div style={{ flex: 1 }}>
+                <p style={{ fontSize: 13, fontWeight: 700, color: '#92400E', margin: 0 }}>
+                  Agrega foto de prueba — tienes {minLeft} min
+                </p>
+                <p style={{ fontSize: 11, color: '#B45309', margin: '2px 0 0' }}>{med.name}</p>
+              </div>
+              <button
+                onClick={() => { setProofMedId(med.id); fileRef.current?.click() }}
+                disabled={proofUploading}
+                style={{
+                  flexShrink: 0, padding: '7px 12px', borderRadius: 10,
+                  background: proofUploading && isThis ? '#D4A853' : '#F59E0B',
+                  border: 'none', cursor: proofUploading ? 'not-allowed' : 'pointer',
+                  fontWeight: 700, fontSize: 12, color: 'white',
+                }}
+              >
+                {proofUploading && isThis ? '...' : '📷 Tomar'}
+              </button>
+            </div>
+          )
+        })}
 
         {loading ? (
           <div style={{ display: 'flex', justifyContent: 'center', padding: 48 }}>
@@ -213,6 +328,11 @@ export default function Hoy() {
                     const allTimes = med.scheduled_times?.length
                       ? [...med.scheduled_times].sort()
                       : med.time ? [med.time] : []
+
+                    const hasPhoto = !!log?.photo_url
+                    const hasGPS = !!(log?.latitude && log?.longitude)
+                    const proofExpired = isConfirmed && !hasPhoto && log?.confirmed_at &&
+                      (Date.now() - new Date(log.confirmed_at).getTime()) >= 30 * 60 * 1000
 
                     return (
                       <div
@@ -275,17 +395,47 @@ export default function Hoy() {
                           </div>
                         </div>
 
-                        {/* Status badge */}
+                        {/* Status badges */}
                         {isConfirmed && (
-                          <div style={{ flexShrink: 0, textAlign: 'right' }}>
-                            <span style={{
-                              fontSize: 10, fontWeight: 700, color: '#16A34A',
-                              background: '#DCFCE7', padding: '3px 8px', borderRadius: 6,
-                              display: 'block',
-                            }}>
-                              ✓ Dado
-                            </span>
-                            {log?.confirmed_by_name && (
+                          <div style={{ flexShrink: 0, textAlign: 'right', minWidth: 0 }}>
+                            {hasPhoto ? (
+                              <span style={{
+                                fontSize: 10, fontWeight: 700, color: '#16A34A',
+                                background: '#DCFCE7', padding: '3px 8px', borderRadius: 6,
+                                display: 'block',
+                              }}>
+                                ✅ Con prueba
+                              </span>
+                            ) : proofExpired ? (
+                              <span style={{
+                                fontSize: 10, fontWeight: 700, color: '#92400E',
+                                background: '#FFFBEB', padding: '3px 8px', borderRadius: 6,
+                                display: 'block',
+                              }}>
+                                Sin foto de prueba
+                              </span>
+                            ) : (
+                              <span style={{
+                                fontSize: 10, fontWeight: 700, color: '#16A34A',
+                                background: '#DCFCE7', padding: '3px 8px', borderRadius: 6,
+                                display: 'block',
+                              }}>
+                                ✓ Dado
+                              </span>
+                            )}
+
+                            {/* GPS link */}
+                            {hasGPS ? (
+                              <a
+                                href={mapsUrl(log.latitude, log.longitude)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={e => e.stopPropagation()}
+                                style={{ fontSize: 10, color: '#2D86A0', textDecoration: 'none', display: 'block', marginTop: 3 }}
+                              >
+                                📍 Ver mapa
+                              </a>
+                            ) : log?.confirmed_by_name && (
                               <span style={{ fontSize: 9, color: '#9CA3AF', display: 'block', marginTop: 2 }}>
                                 {log.confirmed_by_name.split(' ')[0]}
                               </span>

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
+import { getLocation, mapsUrl } from '../lib/gps'
 
 function isOverdue(time, status) {
   if (!time || status === 'confirmed' || status === 'missed') return false
@@ -108,6 +109,7 @@ export default function MedicationTimeline() {
   async function submitConfirm() {
     if (!photoFile) { alert('Se requiere una foto como prueba de confirmación'); return }
     setSaving(true)
+    const loc = await getLocation()
     const path = `${user.id}/${today}/${confirming.id}.jpg`
     await supabase.storage.from('confirmations').upload(path, photoFile, { upsert: true, contentType: 'image/jpeg' })
     const { data: { publicUrl } } = supabase.storage.from('confirmations').getPublicUrl(path)
@@ -122,6 +124,9 @@ export default function MedicationTimeline() {
       confirmed_at: new Date().toISOString(),
       notes: confirmNote || null,
       log_date: today,
+      latitude: loc?.latitude ?? null,
+      longitude: loc?.longitude ?? null,
+      address: loc?.address ?? null,
     }, { onConflict: 'medication_id,log_date,user_id' })
 
     setConfirming(null); setSaving(false)
@@ -278,6 +283,26 @@ export default function MedicationTimeline() {
                           }`}>
                             {log.status === 'confirmed' ? '✓' : '✗'}
                           </div>
+                          {/* Proof + GPS micro-badges */}
+                          {log.status === 'confirmed' && (
+                            <div style={{ display: 'flex', gap: 2, justifyContent: 'center', marginTop: 2 }}>
+                              {log.photo_url
+                                ? <span title="Con foto de prueba" style={{ fontSize: 9 }}>📷</span>
+                                : <span title="Sin foto de prueba" style={{ fontSize: 9, opacity: 0.4 }}>📷</span>
+                              }
+                              {log.latitude && log.longitude && (
+                                <a
+                                  href={mapsUrl(log.latitude, log.longitude)}
+                                  target="_blank" rel="noopener noreferrer"
+                                  onClick={e => e.stopPropagation()}
+                                  title={log.address ?? 'Ver ubicación'}
+                                  style={{ fontSize: 9, textDecoration: 'none' }}
+                                >
+                                  📍
+                                </a>
+                              )}
+                            </div>
+                          )}
                           <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 bg-gray-900 text-white text-xs rounded-lg px-2 py-1 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-10 pointer-events-none">
                             {log.medications?.name}
                             {log.scheduled_time && ` · ${log.scheduled_time}`}

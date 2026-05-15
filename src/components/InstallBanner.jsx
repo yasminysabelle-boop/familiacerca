@@ -22,6 +22,16 @@ export default function InstallBanner() {
 
   useEffect(() => {
     if (!shouldShow()) return
+
+    // Use prompt captured before React mounted (index.html inline script)
+    if (window.__pwaPrompt) {
+      setPrompt(window.__pwaPrompt)
+      setVisible(true)
+      window.__pwaPrompt = null
+      return
+    }
+
+    // Also handle the event if it fires after component mounts
     function handler(e) {
       e.preventDefault()
       setPrompt(e)
