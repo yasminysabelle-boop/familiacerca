@@ -29,6 +29,7 @@ export default function JoinFamily() {
   const [accepting, setAccepting]   = useState(false)
   const [acceptError, setAcceptError] = useState('')
   const [accepted, setAccepted]     = useState(false)
+  const [patientName, setPatientName] = useState('')
 
   // No token → not an invitation page; redirect once auth state is settled
   useEffect(() => {
@@ -67,6 +68,14 @@ export default function JoinFamily() {
     }
 
     setInvitation(data)
+
+    // Fetch the care recipient's name to show "Te invitaron a cuidar a [nombre]"
+    const { data: careProfile } = await supabase
+      .from('care_profiles')
+      .select('name')
+      .eq('user_id', data.user_id)
+      .maybeSingle()
+    if (careProfile?.name) setPatientName(careProfile.name)
   }
 
   function isExpired(inv) {
@@ -342,7 +351,7 @@ export default function JoinFamily() {
                   <UserPlus size={24} color="#C4623A" strokeWidth={1.5} />
                 </div>
                 <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#1A1A1A', lineHeight: 1.3, marginBottom: 6 }}>
-                  Invitación a FamiliaCerca
+                  {patientName ? `Te invitaron a cuidar a ${patientName}` : 'Invitación a FamiliaCerca'}
                 </p>
                 <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.5 }}>
                   <strong style={{ color: '#1A1A1A' }}>{invitation.invited_by}</strong> te invita a unirte a su grupo familiar de cuidado.
