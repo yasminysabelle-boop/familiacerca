@@ -54,7 +54,7 @@ const labelStyle = {
 
 export default function Medications() {
   const { user } = useAuth()
-  const { ownerId } = useFamily()
+  const { ownerId, memberRole } = useFamily()
   const { canEdit } = useSubscription()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -69,6 +69,12 @@ export default function Medications() {
   const [confirmDialog, setConfirmDialog] = useState(null) // { onConfirm }
 
   const isAdmin = user?.id === ownerId
+  const isCuidador = !isAdmin && memberRole === 'cuidador'
+  function canActOn(med) {
+    if (isAdmin) return true
+    if (isCuidador && med.created_by_user_id === user?.id) return true
+    return false
+  }
 
   useEffect(() => {
     if (user && ownerId) fetchMedications()
@@ -152,7 +158,7 @@ export default function Medications() {
     if (editId) {
       await supabase.from('medications').update(payload).eq('id', editId)
     } else {
-      await supabase.from('medications').insert(payload)
+      await supabase.from('medications').insert({ ...payload, created_by_user_id: user.id })
       track('medication_added', { name: payload.name, frequency: payload.frequency })
     }
     setForm(emptyForm)
@@ -325,19 +331,19 @@ export default function Medications() {
                       )}
                     </div>
 
-                    <div style={{ display: 'flex', gap: 4, marginLeft: 12, flexShrink: 0 }}>
-                      <button
-                        onClick={() => openEdit(med)}
-                        style={{
-                          padding: '6px 8px', borderRadius: 8,
-                          border: '1px solid #EDE5D8', background: 'white',
-                          cursor: 'pointer', display: 'flex', alignItems: 'center',
-                        }}
-                        title="Editar"
-                      >
-                        <Pencil size={14} color="#6B7280" strokeWidth={1.5} />
-                      </button>
-                      {isAdmin && (
+                    {canActOn(med) && (
+                      <div style={{ display: 'flex', gap: 4, marginLeft: 12, flexShrink: 0 }}>
+                        <button
+                          onClick={() => openEdit(med)}
+                          style={{
+                            padding: '6px 8px', borderRadius: 8,
+                            border: '1px solid #EDE5D8', background: 'white',
+                            cursor: 'pointer', display: 'flex', alignItems: 'center',
+                          }}
+                          title="Editar"
+                        >
+                          <Pencil size={14} color="#6B7280" strokeWidth={1.5} />
+                        </button>
                         <button
                           onClick={() => setConfirmDialog({ onConfirm: () => handleDelete(med.id) })}
                           style={{
@@ -349,8 +355,8 @@ export default function Medications() {
                         >
                           <Trash size={14} color="#D63031" strokeWidth={1.5} />
                         </button>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               )

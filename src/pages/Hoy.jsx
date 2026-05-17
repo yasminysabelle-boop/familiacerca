@@ -53,7 +53,7 @@ async function stampProof(file, confirmerName) {
 
 export default function Hoy() {
   const { user } = useAuth()
-  const { ownerId, profile } = useFamily()
+  const { ownerId, profile, memberRole } = useFamily()
   const [medications, setMedications] = useState([])
   const [logs, setLogs] = useState({})
   const [loading, setLoading] = useState(true)
@@ -63,6 +63,12 @@ export default function Hoy() {
   const [confirmDialog, setConfirmDialog] = useState(null) // { onConfirm }
 
   const isAdmin = user?.id === ownerId
+  const isCuidador = !isAdmin && memberRole === 'cuidador'
+  function canActOn(med) {
+    if (isAdmin) return true
+    if (isCuidador && med.created_by_user_id === user?.id) return true
+    return false
+  }
 
   // Bottom sheet for proof photo — shown immediately after marking
   const [proofSheet, setProofSheet] = useState(null) // { med } or null
@@ -511,8 +517,8 @@ export default function Hoy() {
                           </div>
                         )}
 
-                        {/* ⋮ menu — admin only */}
-                        {isAdmin && (
+                        {/* ⋮ menu — admin or cuidador who added this med */}
+                        {canActOn(med) && (
                           <div style={{ position: 'relative', flexShrink: 0 }}>
                             <button
                               onClick={e => { e.stopPropagation(); setMenuOpen(menuOpen === med.id ? null : med.id) }}
