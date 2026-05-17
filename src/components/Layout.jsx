@@ -39,18 +39,14 @@ const BOTTOM_TABS = [
 ]
 
 const FAB_ITEMS = [
-  { to: '/medications?add=1', emoji: '💊', label: 'Medicamento' },
-  { to: '/chat',         emoji: '💬', label: 'Chat' },
-  { to: '/calendar',     emoji: '📅', label: 'Calendario' },
-  { to: '/notes',        emoji: '📝', label: 'Notas' },
-  { to: '/album',        emoji: '📸', label: 'Álbum' },
-  { to: '/gastos?add=1', emoji: '💰', label: 'Gastos' },
-  { to: '/historial',    emoji: '📋', label: 'Historial' },
-  { to: '/directorio',   emoji: '🏥', label: 'Directorio' },
+  { to: '/notes?add=1',      emoji: '📝', label: 'Nota rápida' },
+  { to: '/gastos?add=1',     emoji: '💰', label: 'Gasto' },
+  { to: '/medications?add=1',emoji: '💊', label: 'Medicamento' },
+  { to: '/calendar',         emoji: '📅', label: 'Cita' },
 ]
 
 // Pages that have their own add-button — hide the global FAB there
-const HIDE_FAB_PATHS = new Set(['/gastos'])
+const HIDE_FAB_PATHS = new Set(['/gastos', '/medications', '/notes'])
 
 export default function Layout({ children }) {
   const { inactivityWarning, signOut } = useAuth()
@@ -200,7 +196,7 @@ export default function Layout({ children }) {
                 <XIcon size={18} color="#9CA3AF" strokeWidth={2} />
               </button>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
               {FAB_ITEMS.map(({ to, emoji, label }) => (
                 <button
                   key={to}

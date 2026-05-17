@@ -57,6 +57,7 @@ export default function Hoy() {
   const [medications, setMedications] = useState([])
   const [logs, setLogs] = useState({})
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState('')
   const [confirming, setConfirming] = useState(null)
 
   // Bottom sheet for proof photo — shown immediately after marking
@@ -84,15 +85,22 @@ export default function Hoy() {
 
   async function fetchData() {
     setLoading(true)
-    const [{ data: meds }, { data: todayLogs }] = await Promise.all([
-      supabase.from('medications').select('*').eq('user_id', ownerId),
-      supabase.from('medication_logs').select('*').eq('user_id', ownerId).eq('log_date', today),
-    ])
-    setMedications(meds ?? [])
-    const map = {}
-    ;(todayLogs ?? []).forEach(l => { map[l.medication_id] = l })
-    setLogs(map)
-    setLoading(false)
+    setLoadError('')
+    try {
+      const [{ data: meds, error: e1 }, { data: todayLogs, error: e2 }] = await Promise.all([
+        supabase.from('medications').select('*').eq('user_id', ownerId),
+        supabase.from('medication_logs').select('*').eq('user_id', ownerId).eq('log_date', today),
+      ])
+      if (e1 || e2) throw e1 ?? e2
+      setMedications(meds ?? [])
+      const map = {}
+      ;(todayLogs ?? []).forEach(l => { map[l.medication_id] = l })
+      setLogs(map)
+    } catch {
+      setLoadError('No se pudieron cargar los medicamentos. Verifica tu conexión.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   async function confirmMed(med) {
@@ -322,6 +330,13 @@ export default function Hoy() {
               border: '3px solid #EDE5D8', borderTopColor: '#C4623A',
               animation: 'spin 0.8s linear infinite',
             }} />
+          </div>
+        ) : loadError ? (
+          <div style={{ background: 'white', borderRadius: 20, border: '1px solid #EDE5D8', padding: '40px 24px', textAlign: 'center' }}>
+            <p style={{ fontSize: 14, color: '#D63031', marginBottom: 12 }}>{loadError}</p>
+            <button onClick={fetchData} style={{ padding: '10px 24px', borderRadius: 12, background: '#C4623A', color: 'white', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>
+              Reintentar
+            </button>
           </div>
         ) : medications.length === 0 ? (
           <div style={{

@@ -51,6 +51,7 @@ export default function Expenses() {
 
   const [expenses, setExpenses] = useState([])
   const [loading,  setLoading]  = useState(true)
+  const [loadError, setLoadError] = useState('')
 
   const isAdmin = user?.id === ownerId
 
@@ -78,22 +79,29 @@ export default function Expenses() {
 
   async function loadExpenses() {
     setLoading(true)
-    const mm   = String(month + 1).padStart(2, '0')
-    const from = `${year}-${mm}-01`
-    const last = new Date(year, month + 1, 0).getDate()
-    const to   = `${year}-${mm}-${String(last).padStart(2, '0')}`
+    setLoadError('')
+    try {
+      const mm   = String(month + 1).padStart(2, '0')
+      const from = `${year}-${mm}-01`
+      const last = new Date(year, month + 1, 0).getDate()
+      const to   = `${year}-${mm}-${String(last).padStart(2, '0')}`
 
-    const { data } = await supabase
-      .from('care_expenses')
-      .select('*')
-      .eq('user_id', ownerId)
-      .gte('date', from)
-      .lte('date', to)
-      .order('date', { ascending: false })
-      .order('created_at', { ascending: false })
+      const { data, error } = await supabase
+        .from('care_expenses')
+        .select('*')
+        .eq('user_id', ownerId)
+        .gte('date', from)
+        .lte('date', to)
+        .order('date', { ascending: false })
+        .order('created_at', { ascending: false })
 
-    setExpenses(data ?? [])
-    setLoading(false)
+      if (error) throw error
+      setExpenses(data ?? [])
+    } catch {
+      setLoadError('No se pudieron cargar los gastos. Verifica tu conexión.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   function prevMonth() {
@@ -319,6 +327,14 @@ export default function Expenses() {
             <p style={{ textAlign: 'center', padding: '40px 0', color: '#9CA3AF', fontSize: 13 }}>
               Cargando...
             </p>
+          ) : loadError ? (
+            <div style={{ textAlign: 'center', padding: '40px 24px' }}>
+              <p style={{ fontSize: 14, color: '#D63031', marginBottom: 12 }}>{loadError}</p>
+              <button onClick={loadExpenses} style={{
+                padding: '10px 20px', borderRadius: 12, border: 'none',
+                background: '#C4623A', color: 'white', fontWeight: 700, fontSize: 13, cursor: 'pointer',
+              }}>Reintentar</button>
+            </div>
           ) : expenses.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '48px 24px' }}>
               <div style={{ fontSize: 48, marginBottom: 12 }}>💰</div>

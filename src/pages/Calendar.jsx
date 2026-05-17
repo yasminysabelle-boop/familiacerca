@@ -38,6 +38,7 @@ export default function Calendar() {
   const [editEvent, setEditEvent] = useState(null)
   const [confirmDialog, setConfirmDialog] = useState(null)
   const [saving, setSaving]   = useState(false)
+  const [loadError, setLoadError] = useState('')
 
   // Appointment proof modal state
   const [proofEvent, setProofEvent]   = useState(null)
@@ -50,20 +51,27 @@ export default function Calendar() {
   useEffect(() => { if (user && ownerId) fetchEvents() }, [user, ownerId, year, month])
 
   async function fetchEvents() {
-    const start = `${year}-${String(month + 1).padStart(2, '0')}-01`
-    const end   = `${year}-${String(month + 1).padStart(2, '0')}-31`
-    const { data } = await supabase
-      .from('events').select('*').eq('user_id', ownerId)
-      .gte('date', start).lte('date', end).order('date')
-    setEvents(data ?? [])
+    setLoadError('')
+    try {
+      const start = `${year}-${String(month + 1).padStart(2, '0')}-01`
+      const lastDay = new Date(year, month + 1, 0).getDate()
+      const end   = `${year}-${String(month + 1).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`
+      const { data, error } = await supabase
+        .from('events').select('*').eq('user_id', ownerId)
+        .gte('date', start).lte('date', end).order('date')
+      if (error) throw error
+      setEvents(data ?? [])
 
-    // Fetch proofs for visible events
-    if (data?.length) {
-      const ids = data.map(e => e.id)
-      const { data: ps } = await supabase
-        .from('appointment_proofs').select('*').in('event_id', ids)
-      const map = {}; ps?.forEach(p => { map[p.event_id] = p })
-      setProofs(map)
+      // Fetch proofs for visible events
+      if (data?.length) {
+        const ids = data.map(e => e.id)
+        const { data: ps } = await supabase
+          .from('appointment_proofs').select('*').in('event_id', ids)
+        const map = {}; ps?.forEach(p => { map[p.event_id] = p })
+        setProofs(map)
+      }
+    } catch {
+      setLoadError('No se pudieron cargar los eventos. Verifica tu conexión.')
     }
   }
 
@@ -234,7 +242,12 @@ export default function Calendar() {
             <h3 className="font-semibold text-gray-900 mb-4">
               {selected ? `${selected} de ${MONTHS[month]}` : 'Próximos eventos'}
             </h3>
-            {(selected ? selectedEvents : events.slice(0, 5)).length === 0 ? (
+            {loadError ? (
+              <div className="text-center py-6">
+                <p className="text-sm text-red-600 mb-3">{loadError}</p>
+                <button onClick={fetchEvents} className="text-sm font-semibold text-primary underline">Reintentar</button>
+              </div>
+            ) : (selected ? selectedEvents : events.slice(0, 5)).length === 0 ? (
               <p className="text-sm text-gray-400 text-center py-6">Sin eventos</p>
             ) : (
               <ul className="space-y-4">

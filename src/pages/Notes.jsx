@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { useSubscription } from '../contexts/SubscriptionContext'
@@ -28,12 +28,14 @@ export default function Notes() {
   const { ownerId } = useFamily()
   const { canEdit } = useSubscription()
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [notes, setNotes] = useState([])
   const [form, setForm] = useState(emptyForm)
   const [editId, setEditId] = useState(null)
   const [showForm, setShowForm] = useState(false)
   const [expanded, setExpanded] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState('')
   const [saving, setSaving] = useState(false)
   const [search, setSearch] = useState('')
   const [menuOpen, setMenuOpen] = useState(null)
@@ -48,6 +50,14 @@ export default function Notes() {
 
   useEffect(() => { if (user && ownerId) fetchNotes() }, [user, ownerId])
 
+  // Auto-open compose form when navigated via FAB (?add=1)
+  useEffect(() => {
+    if (searchParams.get('add') === '1') {
+      openAdd()
+      setSearchParams({}, { replace: true })
+    }
+  }, [searchParams])
+
   // Real-time sync for all family members
   useEffect(() => {
     if (!ownerId) return
@@ -60,13 +70,20 @@ export default function Notes() {
 
   async function fetchNotes() {
     setLoading(true)
-    const { data } = await supabase
-      .from('notes')
-      .select('*')
-      .eq('user_id', ownerId)
-      .order('created_at', { ascending: false })
-    setNotes(data ?? [])
-    setLoading(false)
+    setLoadError('')
+    try {
+      const { data, error } = await supabase
+        .from('notes')
+        .select('*')
+        .eq('user_id', ownerId)
+        .order('created_at', { ascending: false })
+      if (error) throw error
+      setNotes(data ?? [])
+    } catch {
+      setLoadError('No se pudieron cargar las notas. Verifica tu conexión.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   function handleChange(e) {
@@ -186,6 +203,13 @@ export default function Notes() {
           <div style={{ display: 'flex', justifyContent: 'center', padding: '48px 0' }}>
             <div style={{ width: 28, height: 28, borderRadius: '50%', border: '3px solid #EDE5D8', borderTopColor: '#C4623A', animation: 'spin 0.8s linear infinite' }} />
           </div>
+        ) : loadError ? (
+          <div style={{ background: 'white', borderRadius: 20, border: '1px solid #EDE5D8', padding: '40px 24px', textAlign: 'center' }}>
+            <p style={{ fontSize: 14, color: '#D63031', marginBottom: 12 }}>{loadError}</p>
+            <button onClick={fetchNotes} style={{ padding: '10px 24px', borderRadius: 12, background: '#C4623A', color: 'white', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>
+              Reintentar
+            </button>
+          </div>
         ) : filtered.length === 0 ? (
           <div style={{ background: 'white', borderRadius: 20, border: '1px solid #EDE5D8', padding: '48px 24px', textAlign: 'center', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
             <div style={{ fontSize: 44, marginBottom: 12 }}>📝</div>
@@ -218,7 +242,7 @@ export default function Notes() {
                       style={{ flex: 1, textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
                     >
                       <p style={{ fontSize: 14, fontWeight: 600, color: '#1A1A1A', margin: '0 0 4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {note.title}
+                        {note.title || note.content?.slice(0, 60) || '—'}
                       </p>
                       <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
                         <span style={{ fontSize: 11, color: '#9CA3AF' }}>
@@ -306,20 +330,6 @@ export default function Notes() {
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
 
               <div>
-                <p style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>Título *</p>
-                <input
-                  name="title"
-                  required
-                  value={form.title}
-                  onChange={handleChange}
-                  placeholder="ej. Visita al médico hoy"
-                  style={fieldStyle}
-                  onFocus={onFocus}
-                  onBlur={onBlur}
-                />
-              </div>
-
-              <div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
                   <p style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', letterSpacing: '0.08em', textTransform: 'uppercase', margin: 0 }}>Contenido *</p>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -353,6 +363,19 @@ export default function Notes() {
                     </button>
                   </div>
                 )}
+              </div>
+
+              <div>
+                <p style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>Título <span style={{ fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>(opcional)</span></p>
+                <input
+                  name="title"
+                  value={form.title}
+                  onChange={handleChange}
+                  placeholder="ej. Visita al médico hoy"
+                  style={fieldStyle}
+                  onFocus={onFocus}
+                  onBlur={onBlur}
+                />
               </div>
 
               <div>

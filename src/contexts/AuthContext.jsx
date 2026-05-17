@@ -3,8 +3,8 @@ import { supabase } from '../lib/supabase'
 
 const AuthContext = createContext(null)
 
-const WARN_MS   = 9  * 60 * 1000  // 9 min → show warning
-const LOGOUT_MS = 10 * 60 * 1000  // 10 min → sign out
+const WARN_MS   = 25 * 60 * 1000  // 25 min → show warning
+const LOGOUT_MS = 30 * 60 * 1000  // 30 min → sign out (caregivers step away frequently)
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)

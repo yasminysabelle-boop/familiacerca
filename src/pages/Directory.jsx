@@ -298,6 +298,7 @@ export default function Directory() {
   const [institutions, setInstitutions] = useState([])
   const [contacts,     setContacts]     = useState([])
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState('')
   const [confirmDialog, setConfirmDialog] = useState(null)
 
   // Doctor form state
@@ -322,15 +323,22 @@ export default function Directory() {
 
   async function fetchAll() {
     setLoading(true)
-    const [{ data: docs }, { data: inss }, { data: cons }] = await Promise.all([
-      supabase.from('directory_doctors').select('*').eq('owner_id', ownerId).order('name'),
-      supabase.from('directory_institutions').select('*').eq('owner_id', ownerId).order('name'),
-      supabase.from('directory_contacts').select('*').eq('owner_id', ownerId).order('name'),
-    ])
-    setDoctors(docs ?? [])
-    setInstitutions(inss ?? [])
-    setContacts(cons ?? [])
-    setLoading(false)
+    setLoadError('')
+    try {
+      const [{ data: docs, error: e1 }, { data: inss, error: e2 }, { data: cons, error: e3 }] = await Promise.all([
+        supabase.from('directory_doctors').select('*').eq('owner_id', ownerId).order('name'),
+        supabase.from('directory_institutions').select('*').eq('owner_id', ownerId).order('name'),
+        supabase.from('directory_contacts').select('*').eq('owner_id', ownerId).order('name'),
+      ])
+      if (e1 || e2 || e3) throw e1 ?? e2 ?? e3
+      setDoctors(docs ?? [])
+      setInstitutions(inss ?? [])
+      setContacts(cons ?? [])
+    } catch {
+      setLoadError('No se pudo cargar el directorio. Verifica tu conexión.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   // ── Doctor CRUD ───────────────────────────────────────────────────
@@ -450,6 +458,8 @@ export default function Directory() {
           <>
             {loading
               ? <p style={{ textAlign: 'center', color: '#9CA3AF', fontSize: 13, padding: '32px 0' }}>Cargando...</p>
+              : loadError
+              ? <div style={{ textAlign: 'center', padding: '32px 0' }}><p style={{ fontSize: 13, color: '#D63031', marginBottom: 10 }}>{loadError}</p><button onClick={fetchAll} style={{ padding: '9px 20px', borderRadius: 12, background: '#C4623A', color: 'white', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>Reintentar</button></div>
               : doctors.length === 0
               ? <EmptyState Icon={BookOpen} title="Sin médicos registrados" subtitle="Agrega los médicos tratantes para tenerlos siempre a la mano" />
               : doctors.map(d => (
@@ -468,6 +478,8 @@ export default function Directory() {
           <>
             {loading
               ? <p style={{ textAlign: 'center', color: '#9CA3AF', fontSize: 13, padding: '32px 0' }}>Cargando...</p>
+              : loadError
+              ? <div style={{ textAlign: 'center', padding: '32px 0' }}><p style={{ fontSize: 13, color: '#D63031', marginBottom: 10 }}>{loadError}</p><button onClick={fetchAll} style={{ padding: '9px 20px', borderRadius: 12, background: '#C4623A', color: 'white', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>Reintentar</button></div>
               : institutions.length === 0
               ? <EmptyState Icon={BookOpen} title="Sin instituciones registradas" subtitle="Agrega hospitales, clínicas y farmacias de referencia" />
               : institutions.map(i => (
@@ -486,6 +498,8 @@ export default function Directory() {
           <>
             {loading
               ? <p style={{ textAlign: 'center', color: '#9CA3AF', fontSize: 13, padding: '32px 0' }}>Cargando...</p>
+              : loadError
+              ? <div style={{ textAlign: 'center', padding: '32px 0' }}><p style={{ fontSize: 13, color: '#D63031', marginBottom: 10 }}>{loadError}</p><button onClick={fetchAll} style={{ padding: '9px 20px', borderRadius: 12, background: '#C4623A', color: 'white', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>Reintentar</button></div>
               : contacts.length === 0
               ? <EmptyState Icon={Users} title="Sin contactos registrados" subtitle="Agrega familiares y designa un contacto de emergencia" />
               : contacts.map(c => (

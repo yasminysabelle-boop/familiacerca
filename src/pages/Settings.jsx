@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import { useFamily } from '../contexts/FamilyContext'
 import { useSubscription } from '../contexts/SubscriptionContext'
 import { useDarkMode } from '../contexts/DarkModeContext'
 import { usePushNotifications } from '../hooks/usePushNotifications'
@@ -82,6 +83,7 @@ function ToggleRow({ icon, label, subtitle, checked, onChange }) {
 
 export default function Settings() {
   const { user, signOut } = useAuth()
+  const { ownerId } = useFamily()
   const { sub, isPaid, isTrialing, trialExpired, daysLeft } = useSubscription()
   const { dark, toggleDark } = useDarkMode()
   const { permission, subscribed, supported, requestAndSubscribe } = usePushNotifications()
@@ -162,6 +164,7 @@ export default function Settings() {
       const today = new Date().toISOString().split('T')[0]
 
       // Fetch data
+      const exportId = ownerId ?? user.id
       const [
         { data: meds },
         { data: notes },
@@ -170,23 +173,23 @@ export default function Settings() {
       ] = await Promise.all([
         supabase.from('medication_logs')
           .select('*, medications(name, dosage)')
-          .eq('user_id', user.id)
+          .eq('user_id', exportId)
           .gte('log_date', fromDate)
           .eq('status', 'confirmed')
           .order('log_date', { ascending: false }),
         supabase.from('notes')
           .select('*')
-          .eq('user_id', user.id)
+          .eq('user_id', exportId)
           .gte('created_at', fromDate + 'T00:00:00Z')
           .order('created_at', { ascending: false }),
         supabase.from('events')
           .select('*')
-          .eq('user_id', user.id)
+          .eq('user_id', exportId)
           .gte('date', fromDate)
           .order('date', { ascending: false }),
         supabase.from('voice_diary')
           .select('*')
-          .eq('user_id', user.id)
+          .eq('user_id', exportId)
           .gte('created_at', fromDate + 'T00:00:00Z')
           .order('created_at', { ascending: false }),
       ])

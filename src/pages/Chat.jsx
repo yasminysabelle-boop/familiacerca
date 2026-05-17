@@ -88,10 +88,10 @@ export default function Chat() {
     loadMessages()
 
     const channel = supabase
-      .channel('familia-chat')
+      .channel(`familia-chat:${ownerId}`)
       .on(
         'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'chat_messages' },
+        { event: 'INSERT', schema: 'public', table: 'chat_messages', filter: `owner_id=eq.${ownerId}` },
         payload => {
           setMessages(prev => {
             if (prev.some(m => m.id === payload.new.id)) return prev
@@ -127,6 +127,7 @@ export default function Chat() {
     const { data: msgs } = await supabase
       .from('chat_messages')
       .select('*')
+      .eq('owner_id', ownerId)
       .order('created_at', { ascending: true })
       .limit(100)
     setMessages(msgs ?? [])
@@ -154,9 +155,9 @@ export default function Chat() {
     setInput('')
 
     const { error } = await supabase.from('chat_messages').insert({
+      owner_id: ownerId,
       user_id: user.id,
       user_name: displayName,
-      // Try both column names for compatibility with either schema version
       content: text,
       message: text,
     })
@@ -183,7 +184,7 @@ export default function Chat() {
       { data: recentExpenses },
     ] = await Promise.all([
       supabase.from('medication_logs').select('*, medications(name)').eq('user_id', uid).eq('log_date', today),
-      supabase.from('voice_diary').select('transcription, mood').order('created_at', { ascending: false }).limit(5),
+      supabase.from('voice_diary').select('transcription, mood').eq('user_id', uid).order('created_at', { ascending: false }).limit(5),
       supabase.from('events').select('title, date, time').gte('date', today).order('date', { ascending: true }).limit(3),
       supabase.from('care_expenses').select('description, amount').order('created_at', { ascending: false }).limit(5),
     ])

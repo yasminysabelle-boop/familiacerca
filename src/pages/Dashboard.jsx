@@ -447,6 +447,8 @@ export default function Dashboard() {
 
   const [sections, setSections] = useState([])
   const [loading, setLoading] = useState(true)
+  const [timelineError, setTimelineError] = useState('')
+  const [confirmError, setConfirmError] = useState('')
   const [confirming, setConfirming] = useState(null)
   const [expandedAudio, setExpandedAudio] = useState(null)
   const [medTotal, setMedTotal] = useState(0)
@@ -627,7 +629,8 @@ export default function Dashboard() {
 
   async function fetchTimeline() {
     setLoading(true)
-
+    setTimelineError('')
+    try {
     // Get all family member IDs for shared data queries
     const { data: familyMembers } = await supabase
       .from('family_members')
@@ -844,6 +847,10 @@ export default function Dashboard() {
       }
       setReactions(map)
     }
+    } catch (err) {
+      setTimelineError('No se pudo cargar el historial. Verifica tu conexión.')
+      setLoading(false)
+    }
   }
 
   async function toggleReaction(eventKey, emoji) {
@@ -871,6 +878,7 @@ export default function Dashboard() {
 
   async function quickConfirm(evt) {
     setConfirming(evt.medicationId)
+    setConfirmError('')
     const { error } = await supabase.from('medication_logs').upsert({
       medication_id: evt.medicationId,
       user_id: ownerId,
@@ -880,7 +888,10 @@ export default function Dashboard() {
       confirmed_at: new Date().toISOString(),
     }, { onConflict: 'medication_id,log_date,user_id' })
 
-    if (!error) {
+    if (error) {
+      setConfirmError(`No se pudo registrar ${evt.medName}. Toca de nuevo.`)
+      setTimeout(() => setConfirmError(''), 6000)
+    } else {
       const confirmedEvt = {
         id: `log-new-${evt.medicationId}`,
         type: 'MED_CONFIRMED',
@@ -943,6 +954,18 @@ export default function Dashboard() {
         </div>
       )}
       <TrialBanner />
+      {confirmError && (
+        <div style={{
+          position: 'fixed', top: 64, left: '50%', transform: 'translateX(-50%)',
+          zIndex: 100, background: '#D63031', color: 'white',
+          borderRadius: 14, padding: '12px 20px',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+          fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap',
+          maxWidth: '90vw', textAlign: 'center',
+        }}>
+          ⚠️ {confirmError}
+        </div>
+      )}
       <div style={{ padding: '12px 16px 96px', maxWidth: 600 }}>
 
         {/* Greeting header */}
@@ -1179,6 +1202,25 @@ export default function Dashboard() {
         )}
 
         {/* Family timeline */}
+        {timelineError && (
+          <div style={{
+            background: '#FFF0F0', border: '1px solid #FFBABA',
+            borderRadius: 14, padding: '14px 16px', marginBottom: 16,
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+          }}>
+            <p style={{ fontSize: 13, color: '#D63031', margin: 0 }}>⚠️ {timelineError}</p>
+            <button
+              onClick={fetchTimeline}
+              style={{
+                padding: '6px 14px', borderRadius: 8, border: 'none',
+                background: '#D63031', color: 'white', fontSize: 12,
+                fontWeight: 700, cursor: 'pointer', flexShrink: 0,
+              }}
+            >
+              Reintentar
+            </button>
+          </div>
+        )}
         {loading ? (
           <div style={{ display: 'flex', justifyContent: 'center', padding: 48 }}>
             <div style={{
@@ -1187,7 +1229,7 @@ export default function Dashboard() {
               animation: 'spin 0.8s linear infinite',
             }} />
           </div>
-        ) : sections.length === 0 ? (
+        ) : sections.length === 0 && !timelineError ? (
           <EmptyState profile={profile} />
         ) : (
           sections.map(section => (
