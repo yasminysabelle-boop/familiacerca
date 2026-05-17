@@ -2,19 +2,22 @@ import { useEffect, useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { supabase } from '../lib/supabase'
-import { AlertTriangle, CheckIcon, XIcon } from './Icons'
+import { getLocation, mapsUrl } from '../lib/gps'
+import { AlertTriangle, CheckIcon, Phone, XIcon } from './Icons'
 
 export default function EmergencyAlert() {
   const { user } = useAuth()
-  const { profile } = useFamily()
+  const { profile, ownerId } = useFamily()
   const [confirming, setConfirming] = useState(false)
-  const [sent, setSent] = useState(false)
+  const [sending, setSending]       = useState(false)
+  const [sent, setSent]             = useState(false)
+  const [pushFailed, setPushFailed] = useState(false)
+  const [fallbackContacts, setFallbackContacts] = useState([])
   const [activeAlert, setActiveAlert] = useState(null)
   const displayName = user?.user_metadata?.full_name ?? user?.email ?? 'Familiar'
 
   useEffect(() => {
     checkActiveAlerts()
-
     const channel = supabase
       .channel('emergency-alerts')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'emergency_alerts' }, payload => {
@@ -24,7 +27,6 @@ export default function EmergencyAlert() {
         if (payload.new.resolved) setActiveAlert(prev => prev?.id === payload.new.id ? null : prev)
       })
       .subscribe()
-
     return () => supabase.removeChannel(channel)
   }, [])
 
@@ -37,13 +39,58 @@ export default function EmergencyAlert() {
 
   async function handleEmergency() {
     setConfirming(false)
+    setSending(true)
+
+    // Always capture GPS for emergencies — location is critical
+    const loc = await getLocation({ force: true })
+
+    // Log SOS in DB — triggers realtime banner for all family members
     await supabase.from('emergency_alerts').insert({
       user_id: user.id,
       triggered_by_name: displayName,
       relative_name: profile?.name ?? null,
+      latitude: loc?.latitude ?? null,
+      longitude: loc?.longitude ?? null,
+      address: loc?.address ?? null,
     })
+
+    // Send push notification to all family members
+    let pushOk = false
+    try {
+      const { data, error } = await supabase.functions.invoke('send-sos-notification', {
+        body: {
+          ownerId,
+          triggeredByName: displayName,
+          latitude: loc?.latitude ?? null,
+          longitude: loc?.longitude ?? null,
+          address: loc?.address ?? null,
+        },
+      })
+      if (!error && data?.sent > 0) pushOk = true
+    } catch {
+      // fall through to fallback
+    }
+
+    if (!pushOk) {
+      // Push failed or no subscriptions — show directory phone numbers so they can call
+      const { data: contacts } = await supabase
+        .from('directory_contacts')
+        .select('name, phone, relationship')
+        .eq('owner_id', ownerId)
+        .not('phone', 'is', null)
+        .order('is_emergency_contact', { ascending: false })
+        .limit(5)
+      setFallbackContacts(contacts ?? [])
+      setPushFailed(true)
+    }
+
+    setSending(false)
     setSent(true)
-    setTimeout(() => setSent(false), 15000)
+    setTimeout(() => {
+      setSent(false)
+      setPushFailed(false)
+      setFallbackContacts([])
+    }, 30000)
   }
 
   async function resolveAlert() {
@@ -54,7 +101,7 @@ export default function EmergencyAlert() {
 
   return (
     <>
-      {/* Active alert banner — covers header intentionally */}
+      {/* Active alert banner — shown to all family members via realtime */}
       {activeAlert && (
         <div
           className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-3 animate-pulse"
@@ -63,10 +110,11 @@ export default function EmergencyAlert() {
           <div className="flex items-center gap-3">
             <AlertTriangle size={20} color="white" strokeWidth={2} />
             <div>
-              <p className="font-bold text-white text-sm leading-tight">ALERTA DE EMERGENCIA ACTIVA</p>
+              <p className="font-bold text-white text-sm leading-tight">🚨 ALERTA DE EMERGENCIA ACTIVA</p>
               <p className="text-white/80 text-xs mt-0.5">
-                Activada por {activeAlert.triggered_by_name}
+                {activeAlert.triggered_by_name}
                 {activeAlert.relative_name && ` · ${activeAlert.relative_name}`}
+                {activeAlert.address && ` · 📍 ${activeAlert.address}`}
               </p>
             </div>
           </div>
@@ -85,17 +133,14 @@ export default function EmergencyAlert() {
       <div
         className="rounded-2xl p-5 mb-5 transition-all"
         style={{
-          background: sent ? '#FDECEA' : 'white',
-          border: sent ? '1px solid #FFBABA' : '1px solid #EDE5D8',
+          background: sent ? (pushFailed ? '#FFFBEB' : '#F0FDF4') : 'white',
+          border: sent ? (pushFailed ? '1px solid #FCD34D' : '1px solid #86EFAC') : '1px solid #EDE5D8',
           boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
         }}
       >
         <div className="flex items-center gap-4">
           <div className="flex-1 min-w-0">
-            <p
-              className="font-bold text-gray-900 text-sm leading-tight"
-              style={{ fontFamily: 'Georgia, serif' }}
-            >
+            <p className="font-bold text-gray-900 text-sm leading-tight" style={{ fontFamily: 'Georgia, serif' }}>
               Botón de emergencia
             </p>
             <p className="text-xs text-gray-500 mt-1 leading-snug">
@@ -103,32 +148,71 @@ export default function EmergencyAlert() {
                 ? `Alerta inmediata a la familia sobre ${profile.name}`
                 : 'Notifica a toda la familia al instante'}
             </p>
-            {sent && (
-              <p className="text-xs font-semibold mt-2 flex items-center gap-1.5" style={{ color: '#D63031' }}>
-                <AlertTriangle size={12} color="#D63031" strokeWidth={2} />
-                Toda la familia ha sido notificada
+
+            {sent && !pushFailed && (
+              <p className="text-xs font-semibold mt-2 flex items-center gap-1.5" style={{ color: '#15803D' }}>
+                <CheckIcon size={12} color="#15803D" strokeWidth={2.5} />
+                ✅ Tu familia fue notificada
               </p>
+            )}
+
+            {sent && pushFailed && (
+              <div style={{ marginTop: 8 }}>
+                <p className="text-xs font-semibold flex items-center gap-1.5" style={{ color: '#D97706' }}>
+                  <AlertTriangle size={12} color="#D97706" strokeWidth={2} />
+                  Sin señal push — llama directamente:
+                </p>
+                {fallbackContacts.length > 0 ? (
+                  <div style={{ marginTop: 6, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    {fallbackContacts.map((c, i) => (
+                      <a
+                        key={i}
+                        href={`tel:${c.phone}`}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: 8,
+                          padding: '8px 10px', borderRadius: 10,
+                          background: '#FEF3C7', textDecoration: 'none',
+                        }}
+                      >
+                        <Phone size={13} color="#D97706" strokeWidth={2} />
+                        <span style={{ fontSize: 12, fontWeight: 600, color: '#92400E' }}>
+                          {c.name} {c.relationship ? `(${c.relationship})` : ''} — {c.phone}
+                        </span>
+                      </a>
+                    ))}
+                  </div>
+                ) : (
+                  <p style={{ fontSize: 11, color: '#9CA3AF', marginTop: 4 }}>
+                    Agrega contactos en el Directorio para verlos aquí.
+                  </p>
+                )}
+              </div>
             )}
           </div>
 
           {/* SOS button */}
           <div className="relative flex-shrink-0" style={{ width: 60, height: 60 }}>
-            {!sent && (
+            {!sent && !sending && (
               <span
                 className="absolute inset-0 rounded-full animate-sos-pulse"
                 style={{ background: 'rgba(214,48,49,0.22)' }}
               />
             )}
             <button
-              onClick={() => setConfirming(true)}
-              className="absolute inset-0 rounded-full text-white font-black flex items-center justify-center animate-sos-heartbeat active:scale-90"
+              onClick={() => !sending && !sent && setConfirming(true)}
+              disabled={sending || sent}
+              className="absolute inset-0 rounded-full text-white font-black flex items-center justify-center active:scale-90"
               style={{
-                background: 'linear-gradient(135deg, #D63031, #B82020)',
-                fontSize: 13,
+                background: sent
+                  ? (pushFailed ? '#D97706' : '#15803D')
+                  : 'linear-gradient(135deg, #D63031, #B82020)',
+                fontSize: sending ? 10 : 13,
                 letterSpacing: '0.05em',
+                transition: 'background 0.3s',
+                animation: sending ? 'none' : undefined,
               }}
             >
-              SOS
+              {sending ? 'Enviando...' : sent ? (pushFailed ? '⚠️' : '✓') : 'SOS'}
             </button>
           </div>
         </div>
@@ -141,7 +225,6 @@ export default function EmergencyAlert() {
             className="bg-white rounded-3xl p-6 w-full max-w-sm animate-float-in"
             style={{ boxShadow: '0 24px 60px rgba(0,0,0,0.25)' }}
           >
-            {/* Close */}
             <div className="flex justify-end mb-2">
               <button
                 onClick={() => setConfirming(false)}
@@ -161,10 +244,11 @@ export default function EmergencyAlert() {
                 ¿Activar emergencia?
               </h3>
               <p className="text-sm text-gray-500 mt-2 leading-relaxed">
-                Todos los miembros de la familia recibirán una alerta inmediata
+                Todos los miembros de la familia recibirán una alerta inmediata con tu ubicación
                 {profile?.name ? ` sobre ${profile.name}` : ''}.
               </p>
             </div>
+
             <div className="space-y-3">
               <button
                 onClick={handleEmergency}
@@ -174,7 +258,7 @@ export default function EmergencyAlert() {
                   boxShadow: '0 6px 20px rgba(214,48,49,0.35)',
                 }}
               >
-                Sí, es una emergencia real
+                🚨 Sí, es una emergencia real
               </button>
               <button
                 onClick={() => setConfirming(false)}

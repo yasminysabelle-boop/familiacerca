@@ -262,6 +262,44 @@ function PhotoCard({ evt }) {
   )
 }
 
+function SosCard({ evt }) {
+  const name = evt.triggeredBy ? evt.triggeredBy.split(' ')[0] : 'Familiar'
+  return (
+    <div style={{
+      background: evt.resolved ? '#F9FAFB' : '#FFF0F0',
+      borderRadius: 16,
+      border: `1px solid ${evt.resolved ? '#EDE5D8' : '#FFBABA'}`,
+      padding: '12px 14px',
+      display: 'flex', alignItems: 'center', gap: 10,
+      boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+    }}>
+      <span style={{ fontSize: 18, flexShrink: 0 }}>{evt.resolved ? '✅' : '🚨'}</span>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p style={{ fontSize: 13, fontWeight: 700, color: evt.resolved ? '#374151' : '#D63031', margin: 0 }}>
+          {evt.resolved ? 'Emergencia resuelta' : `EMERGENCIA — ${name}`}
+        </p>
+        {evt.address && (
+          <p style={{ fontSize: 11, color: '#6B7280', marginTop: 2 }}>📍 {evt.address}</p>
+        )}
+      </div>
+      {evt.latitude && evt.longitude && !evt.resolved && (
+        <a
+          href={mapsUrl(evt.latitude, evt.longitude)}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            padding: '5px 10px', borderRadius: 8,
+            background: '#D63031', color: 'white',
+            fontSize: 11, fontWeight: 700, textDecoration: 'none', flexShrink: 0,
+          }}
+        >
+          Ver mapa
+        </a>
+      )}
+    </div>
+  )
+}
+
 function ExpenseCard({ evt }) {
   const name = evt.paidBy ? evt.paidBy.split(' ')[0] : null
   return (
@@ -359,6 +397,7 @@ function TimelineEvent({ evt, confirming, expandedAudio, onConfirm, onToggleAudi
   if (evt.type === 'APPOINTMENT') {
     return <div><AppointmentCard evt={evt} todayKey={todayKey} tomorrowKey={tomorrowKey} />{bar}</div>
   }
+  if (evt.type === 'SOS_ALERT') return <div><SosCard evt={evt} />{bar}</div>
   if (evt.type === 'CAREGIVER_CARD') return <CaregiverCard evt={evt} />
   return null
 }
@@ -650,6 +689,7 @@ export default function Dashboard() {
       { data: photoMemories },
       { data: expenses },
       { data: events },
+      { data: sosAlerts },
     ] = await Promise.all([
       supabase.from('medications').select('*').eq('user_id', ownerId),
 
@@ -691,6 +731,13 @@ export default function Dashboard() {
         .gte('date', todayKey)
         .order('date', { ascending: true })
         .limit(5),
+
+      supabase.from('emergency_alerts')
+        .select('*')
+        .in('user_id', allFamilyIds)
+        .gte('created_at', sevenAgoKey + 'T00:00:00Z')
+        .order('created_at', { ascending: false })
+        .limit(10),
     ])
 
     setMedTotal((meds ?? []).length)
@@ -800,6 +847,22 @@ export default function Dashboard() {
         dateKey: evDate,
         appointmentTitle: ev.title,
         appointmentTime: evTime ?? null,
+      })
+    }
+
+    // ── SOS alerts ──
+    for (const alert of (sosAlerts ?? [])) {
+      const dateKey = alert.created_at.split('T')[0]
+      allEvents.push({
+        id: `sos-${alert.id}`,
+        type: 'SOS_ALERT',
+        timestamp: new Date(alert.created_at),
+        dateKey,
+        triggeredBy: alert.triggered_by_name,
+        latitude: alert.latitude ?? null,
+        longitude: alert.longitude ?? null,
+        address: alert.address ?? null,
+        resolved: alert.resolved ?? false,
       })
     }
 
