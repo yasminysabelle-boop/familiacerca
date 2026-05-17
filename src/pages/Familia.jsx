@@ -33,6 +33,7 @@ export default function Familia() {
   const [shiftName, setShiftName] = useState('')
   const [savingShift, setSavingShift] = useState(false)
   const [savingRole, setSavingRole] = useState(false)
+  const [confirmRemoveDialog, setConfirmRemoveDialog] = useState(null) // { member, name }
 
   const displayName = user?.user_metadata?.full_name ?? user?.email ?? 'Familiar'
   const isAdmin = user?.id === ownerId
@@ -171,6 +172,17 @@ export default function Familia() {
       track('member_role_assigned', { role: newRole })
     }
     setSavingRole(false)
+  }
+
+  async function handleRemoveMember(memberUserId) {
+    await supabase.from('family_members')
+      .delete()
+      .eq('user_id', ownerId)
+      .eq('member_user_id', memberUserId)
+    setMembers(prev => prev.filter(m => m.member_user_id !== memberUserId))
+    setConfirmRemoveDialog(null)
+    setMemberModal(null)
+    track('family_member_removed', {})
   }
 
   async function handleSignOut() {
@@ -664,6 +676,18 @@ export default function Familia() {
               }}>
                 {mc === null ? 'Agregar al directorio →' : 'Ver en directorio →'}
               </Link>
+              {isAdmin && (
+                <button
+                  onClick={() => setConfirmRemoveDialog({ member, name })}
+                  style={{
+                    width: '100%', padding: '12px', marginTop: 10, borderRadius: 14,
+                    background: '#FFF8F8', border: '1.5px solid #FFBABA',
+                    color: '#D63031', fontWeight: 700, fontSize: 13, cursor: 'pointer',
+                  }}
+                >
+                  Eliminar de la familia
+                </button>
+              )}
             </div>
           </div>
         )
@@ -825,6 +849,39 @@ export default function Familia() {
                 </button>
               </form>
             )}
+          </div>
+        </div>
+      )}
+      {/* Remove member confirmation — z-index 300 sits above the member modal (200) */}
+      {confirmRemoveDialog && (
+        <div
+          style={{ position: 'fixed', inset: 0, zIndex: 300, background: 'rgba(0,0,0,0.6)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 24px' }}
+          onClick={e => { if (e.target === e.currentTarget) setConfirmRemoveDialog(null) }}
+        >
+          <div style={{ background: 'white', borderRadius: 20, padding: '28px 24px',
+            maxWidth: 340, width: '100%', boxShadow: '0 24px 64px rgba(0,0,0,0.25)', textAlign: 'center' }}>
+            <div style={{ fontSize: 40, marginBottom: 14 }}>👤</div>
+            <p style={{ fontFamily: 'Georgia, serif', fontSize: 17, fontWeight: 700, color: '#1A1A1A', marginBottom: 8 }}>
+              ¿Eliminar a {confirmRemoveDialog.name.split(' ')[0]} de la familia?
+            </p>
+            <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, marginBottom: 24 }}>
+              Ya no podrá ver el historial ni recibir notificaciones.
+            </p>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button
+                onClick={() => setConfirmRemoveDialog(null)}
+                style={{ flex: 1, padding: '12px', borderRadius: 12, border: '1.5px solid #EDE5D8', background: 'white', color: '#6B7280', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => handleRemoveMember(confirmRemoveDialog.member.member_user_id)}
+                style={{ flex: 1, padding: '12px', borderRadius: 12, border: 'none', background: '#D63031', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer', boxShadow: '0 4px 16px rgba(214,48,49,0.3)' }}
+              >
+                Eliminar
+              </button>
+            </div>
           </div>
         </div>
       )}
