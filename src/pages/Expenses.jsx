@@ -349,6 +349,7 @@ export default function Expenses() {
               </p>
             </div>
           ) : (
+            <>
             {menuOpen !== null && (
               <div
                 style={{ position: 'fixed', inset: 0, zIndex: 99 }}
@@ -449,6 +450,7 @@ export default function Expenses() {
                 )
               })}
             </div>
+            </>
           )}
         </div>
       </div>
