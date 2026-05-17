@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
-import { CheckIcon, Plus, XIcon } from '../components/Icons'
+import { CheckIcon, MoreVertical, Plus, Trash, XIcon } from '../components/Icons'
 import { getLocation, mapsUrl } from '../lib/gps'
 import { track } from '../lib/analytics'
 
@@ -59,6 +59,10 @@ export default function Hoy() {
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
   const [confirming, setConfirming] = useState(null)
+  const [menuOpen, setMenuOpen] = useState(null)       // med.id with open ⋮ menu
+  const [confirmDialog, setConfirmDialog] = useState(null) // { onConfirm }
+
+  const isAdmin = user?.id === ownerId
 
   // Bottom sheet for proof photo — shown immediately after marking
   const [proofSheet, setProofSheet] = useState(null) // { med } or null
@@ -143,6 +147,12 @@ export default function Hoy() {
       .eq('user_id', ownerId)
       .eq('log_date', today)
     setLogs(prev => { const n = { ...prev }; delete n[med.id]; return n })
+  }
+
+  async function handleDeleteMed(id) {
+    await supabase.from('medications').delete().eq('id', id).eq('user_id', ownerId)
+    setMedications(prev => prev.filter(m => m.id !== id))
+    setLogs(prev => { const n = { ...prev }; delete n[id]; return n })
   }
 
   function openProofSheet(med) {
@@ -500,6 +510,59 @@ export default function Hoy() {
                             )}
                           </div>
                         )}
+
+                        {/* ⋮ menu — admin only */}
+                        {isAdmin && (
+                          <div style={{ position: 'relative', flexShrink: 0 }}>
+                            <button
+                              onClick={e => { e.stopPropagation(); setMenuOpen(menuOpen === med.id ? null : med.id) }}
+                              style={{
+                                width: 28, height: 28, borderRadius: 8,
+                                border: '1px solid #EDE5D8', background: 'white',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                cursor: 'pointer',
+                              }}
+                              aria-label="Opciones"
+                            >
+                              <MoreVertical size={14} color="#9CA3AF" strokeWidth={2} />
+                            </button>
+
+                            {menuOpen === med.id && (
+                              <>
+                                {/* Backdrop to close menu */}
+                                <div
+                                  style={{ position: 'fixed', inset: 0, zIndex: 90 }}
+                                  onClick={() => setMenuOpen(null)}
+                                />
+                                <div style={{
+                                  position: 'absolute', right: 0, top: 32, zIndex: 100,
+                                  background: 'white', borderRadius: 12,
+                                  border: '1px solid #EDE5D8',
+                                  boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                                  minWidth: 180, overflow: 'hidden',
+                                }}>
+                                  <button
+                                    onClick={e => {
+                                      e.stopPropagation()
+                                      setMenuOpen(null)
+                                      setConfirmDialog({ onConfirm: () => handleDeleteMed(med.id) })
+                                    }}
+                                    style={{
+                                      width: '100%', padding: '12px 16px',
+                                      display: 'flex', alignItems: 'center', gap: 10,
+                                      background: 'none', border: 'none', cursor: 'pointer',
+                                      color: '#D63031', fontSize: 13, fontWeight: 600,
+                                      textAlign: 'left',
+                                    }}
+                                  >
+                                    <Trash size={14} color="#D63031" strokeWidth={1.75} />
+                                    Eliminar medicamento
+                                  </button>
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        )}
                       </div>
                     )
                   })}
@@ -509,6 +572,38 @@ export default function Hoy() {
           })
         )}
       </div>
+
+      {/* Delete confirmation dialog */}
+      {confirmDialog && (
+        <div
+          style={{ position: 'fixed', inset: 0, zIndex: 300, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 24px' }}
+          onClick={e => { if (e.target === e.currentTarget) setConfirmDialog(null) }}
+        >
+          <div style={{ background: 'white', borderRadius: 20, padding: '28px 24px', maxWidth: 340, width: '100%', boxShadow: '0 24px 64px rgba(0,0,0,0.25)', textAlign: 'center' }}>
+            <div style={{ fontSize: 40, marginBottom: 14 }}>🗑️</div>
+            <p style={{ fontFamily: 'Georgia, serif', fontSize: 17, fontWeight: 700, color: '#1A1A1A', marginBottom: 8 }}>
+              ¿Eliminar este medicamento?
+            </p>
+            <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, marginBottom: 24 }}>
+              Esta acción no se puede deshacer.
+            </p>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button
+                onClick={() => setConfirmDialog(null)}
+                style={{ flex: 1, padding: '12px', borderRadius: 12, border: '1.5px solid #EDE5D8', background: 'white', color: '#6B7280', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => { confirmDialog.onConfirm(); setConfirmDialog(null) }}
+                style={{ flex: 1, padding: '12px', borderRadius: 12, border: 'none', background: '#D63031', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer', boxShadow: '0 4px 16px rgba(214,48,49,0.3)' }}
+              >
+                Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Proof photo bottom sheet — opens immediately after marking */}
       {proofSheet && (

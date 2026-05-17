@@ -355,3 +355,13 @@ export function Settings({ size, color, strokeWidth }) {
     </Svg>
   )
 }
+
+export function MoreVertical({ size, color, strokeWidth }) {
+  return (
+    <Svg size={size} color={color} strokeWidth={strokeWidth}>
+      <circle cx="12" cy="5"  r="1" fill={color} stroke="none" />
+      <circle cx="12" cy="12" r="1" fill={color} stroke="none" />
+      <circle cx="12" cy="19" r="1" fill={color} stroke="none" />
+    </Svg>
+  )
+}
