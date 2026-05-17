@@ -1,7 +1,5 @@
-// FamiliaCerca — SOS Emergency Push Notification
-// Called by the client immediately after an SOS is triggered.
-// Sends a high-priority push notification to every family member
-// (excluding the person who pressed SOS, who already knows).
+// FamiliaCerca — SOS Emergency Push Notification + Email
+// Sends high-priority push notifications AND email to every family member.
 // Deploy: supabase functions deploy send-sos-notification
 
 import webpush from 'npm:web-push@3.6.7'
@@ -10,6 +8,40 @@ import { createClient } from 'npm:@supabase/supabase-js@2'
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
+function sosEmailHtml(name: string, address: string | null, lat: number | null, lng: number | null): string {
+  const mapsUrl = lat && lng ? `https://www.google.com/maps?q=${lat},${lng}` : null
+  const locationBlock = address
+    ? `<p style="margin:0 0 8px;font-size:14px;color:#374151;">📍 ${address}</p>`
+    : mapsUrl
+    ? `<p style="margin:0 0 8px;font-size:14px;color:#374151;">📍 Coordenadas: ${lat?.toFixed(5)}, ${lng?.toFixed(5)}</p>`
+    : ''
+  const mapsButton = mapsUrl
+    ? `<a href="${mapsUrl}" style="display:inline-block;margin-top:16px;padding:12px 24px;background:#C4623A;color:white;font-weight:700;font-size:14px;border-radius:10px;text-decoration:none;">Ver ubicación en mapa</a>`
+    : ''
+
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"></head>
+<body style="margin:0;padding:20px;background:#F9F5F1;font-family:Arial,sans-serif;">
+<div style="max-width:480px;margin:0 auto;background:white;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+  <div style="background:#D63031;padding:28px 24px;text-align:center;">
+    <p style="margin:0;font-size:36px;">🚨</p>
+    <h1 style="color:white;font-family:Georgia,serif;margin:8px 0 0;font-size:22px;">EMERGENCIA</h1>
+    <p style="color:rgba(255,255,255,0.85);margin:6px 0 0;font-size:15px;">${name} necesita ayuda ahora mismo</p>
+  </div>
+  <div style="padding:28px 24px;">
+    <p style="margin:0 0 16px;font-size:15px;color:#1A1A1A;font-weight:600;">Se ha activado una alerta de emergencia.</p>
+    ${locationBlock}
+    ${mapsButton}
+    <div style="margin-top:24px;padding:14px;background:#FFF0F0;border-radius:10px;border:1px solid #FFBABA;">
+      <p style="margin:0;font-size:13px;color:#D63031;font-weight:600;">Abre la app para más detalles y para marcar la emergencia como resuelta.</p>
+    </div>
+  </div>
+  <div style="padding:16px 24px;border-top:1px solid #F3EEE8;text-align:center;">
+    <p style="font-size:11px;color:#9CA3AF;margin:0;">FamiliaCerca · Cuidado familiar con amor</p>
+  </div>
+</div>
+</body></html>`
 }
 
 Deno.serve(async (req: Request) => {
@@ -69,27 +101,16 @@ Deno.serve(async (req: Request) => {
     ownerId,
     ...(members?.map((m: { member_user_id: string }) => m.member_user_id).filter(Boolean) ?? []),
   ]
-
-  // Notify ALL family members including the person who pressed SOS.
-  // Always ensure ownerId (admin) is in the list even if family_members query missed them.
   const recipientIds = Array.from(new Set([ownerId, ...allFamilyIds]))
 
-  console.log(`[send-sos-notification] ${allFamilyIds.length} family members total, notifying all ${recipientIds.length}`)
+  console.log(`[send-sos-notification] ${recipientIds.length} recipients`)
 
-  if (recipientIds.length === 0) {
-    return new Response(JSON.stringify({ sent: 0, failed: 0, total: 0, noRecipients: true }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    })
-  }
-
+  // ── Push notifications ────────────────────────────────────────────────────
   const { data: subs } = await supabase
     .from('push_subscriptions')
     .select('id, endpoint, p256dh, auth, user_id')
     .in('user_id', recipientIds)
 
-  console.log(`[send-sos-notification] Found ${subs?.length ?? 0} push subscriptions`)
-
-  // Build notification body — include address if GPS was captured
   const locationStr = address
     ? ` · 📍 ${address}`
     : latitude && longitude
@@ -117,18 +138,49 @@ Deno.serve(async (req: Request) => {
         })
       )
       sentCount++
-      console.log(`[send-sos-notification] ✓ Notified user ${sub.user_id}`)
+      console.log(`[send-sos-notification] ✓ Push sent to user ${sub.user_id}`)
     } catch (err: unknown) {
       failCount++
       const statusCode = (err as { statusCode?: number }).statusCode
-      console.error(`[send-sos-notification] ✗ Failed for user ${sub.user_id}, status=${statusCode}:`, err)
+      console.error(`[send-sos-notification] ✗ Push failed for user ${sub.user_id}, status=${statusCode}`)
       if (statusCode === 410) {
         await supabase.from('push_subscriptions').delete().eq('id', sub.id)
       }
     }
   }
 
-  console.log(`[send-sos-notification] Done. sent=${sentCount}, failed=${failCount}`)
+  // ── Email notifications via Resend ────────────────────────────────────────
+  const resendApiKey = Deno.env.get('RESEND_API_KEY')
+  if (resendApiKey) {
+    try {
+      const userFetches = await Promise.all(
+        recipientIds.map(id => supabase.auth.admin.getUserById(id))
+      )
+      const emails = userFetches
+        .map(r => r.data?.user?.email)
+        .filter((e): e is string => !!e)
+
+      if (emails.length > 0) {
+        const emailRes = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${resendApiKey}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            from: 'FamiliaCerca <noreply@familiacerca.com>',
+            to: emails,
+            subject: `🚨 EMERGENCIA - ${triggeredByName} necesita ayuda`,
+            html: sosEmailHtml(triggeredByName, address ?? null, latitude ?? null, longitude ?? null),
+          }),
+        })
+        console.log(`[send-sos-notification] Email sent to ${emails.length} recipients, status=${emailRes.status}`)
+      }
+    } catch (err) {
+      console.error('[send-sos-notification] Email send failed:', err)
+    }
+  } else {
+    console.warn('[send-sos-notification] RESEND_API_KEY not set, skipping email')
+  }
+
+  console.log(`[send-sos-notification] Done. push sent=${sentCount}, failed=${failCount}`)
 
   return new Response(
     JSON.stringify({ sent: sentCount, failed: failCount, total: subs?.length ?? 0 }),
