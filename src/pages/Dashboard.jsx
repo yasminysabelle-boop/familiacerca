@@ -115,12 +115,12 @@ function PendingCard({ evt, confirming, onConfirm, todayKey }) {
   )
 }
 
-function ConfirmedCard({ evt }) {
+function ConfirmedCard({ evt, onTap }) {
   const time = evt.timestamp ? fmtTimestamp(evt.timestamp) : null
   const name = evt.confirmedBy ? evt.confirmedBy.split(' ')[0] : null
   const medLabel = [evt.medName, evt.medDosage].filter(Boolean).join(' ')
   return (
-    <div style={{ background: '#F0FDF4', borderRadius: 16, border: '1px solid #BBF7D0', padding: '12px 14px' }}>
+    <div onClick={onTap} style={{ background: '#F0FDF4', borderRadius: 16, border: '1px solid #BBF7D0', padding: '12px 14px', cursor: 'pointer' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         <span style={{ fontSize: 16, flexShrink: 0 }}>💊</span>
         <div style={{ flex: 1, minWidth: 0 }}>
@@ -173,13 +173,13 @@ function ReactionBar({ eventKey, reactions, userId, onToggle }) {
   )
 }
 
-function MemoryCard({ evt, isExpanded, onToggle }) {
+function MemoryCard({ evt, onTap }) {
   const color = getMoodColor(evt.mood)
   const emoji = getMoodEmoji(evt.mood)
   const name = evt.recorderName ? evt.recorderName.split(' ')[0] : null
   return (
     <div
-      onClick={onToggle}
+      onClick={onTap}
       style={{
         background: 'white', borderRadius: 16,
         border: '1px solid #EDE5D8',
@@ -196,7 +196,7 @@ function MemoryCard({ evt, isExpanded, onToggle }) {
             {name ? `${name} dejó una memoria` : 'Memoria de voz'}
             {evt.mood && <span style={{ marginLeft: 5 }}>{emoji}</span>}
           </p>
-          {evt.transcription && !isExpanded && (
+          {evt.transcription && (
             <p style={{
               fontSize: 11, color: '#9CA3AF', marginTop: 2,
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
@@ -205,37 +205,21 @@ function MemoryCard({ evt, isExpanded, onToggle }) {
             </p>
           )}
         </div>
-        <span style={{ fontSize: 11, color: '#9CA3AF', flexShrink: 0 }}>
-          {isExpanded ? '▲' : '▶ Escuchar'}
-        </span>
+        <span style={{ fontSize: 11, color: '#9CA3AF', flexShrink: 0 }}>▶ Escuchar</span>
       </div>
-      {isExpanded && evt.audioUrl && (
-        <div style={{ marginTop: 10 }} onClick={e => e.stopPropagation()}>
-          <audio
-            src={evt.audioUrl}
-            controls
-            autoPlay
-            style={{ width: '100%', height: 36, borderRadius: 8 }}
-          />
-          {evt.transcription && (
-            <p style={{ fontSize: 11, color: '#6B7280', marginTop: 8, lineHeight: 1.5 }}>
-              "{evt.transcription}"
-            </p>
-          )}
-        </div>
-      )}
     </div>
   )
 }
 
-function PhotoCard({ evt }) {
+function PhotoCard({ evt, onTap }) {
   const name = evt.uploaderName ? evt.uploaderName.split(' ')[0] : null
   return (
-    <div style={{
+    <div onClick={onTap} style={{
       background: 'white', borderRadius: 16,
       border: '1px solid #EDE5D8',
       overflow: 'hidden',
       boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+      cursor: 'pointer',
     }}>
       <img
         src={evt.fileUrl}
@@ -262,16 +246,17 @@ function PhotoCard({ evt }) {
   )
 }
 
-function SosCard({ evt }) {
+function SosCard({ evt, onTap }) {
   const name = evt.triggeredBy ? evt.triggeredBy.split(' ')[0] : 'Familiar'
   return (
-    <div style={{
+    <div onClick={onTap} style={{
       background: evt.resolved ? '#F9FAFB' : '#FFF0F0',
       borderRadius: 16,
       border: `1px solid ${evt.resolved ? '#EDE5D8' : '#FFBABA'}`,
       padding: '12px 14px',
       display: 'flex', alignItems: 'center', gap: 10,
       boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+      cursor: 'pointer',
     }}>
       <span style={{ fontSize: 18, flexShrink: 0 }}>{evt.resolved ? '✅' : '🚨'}</span>
       <div style={{ flex: 1, minWidth: 0 }}>
@@ -287,6 +272,7 @@ function SosCard({ evt }) {
           href={mapsUrl(evt.latitude, evt.longitude)}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={e => e.stopPropagation()}
           style={{
             padding: '5px 10px', borderRadius: 8,
             background: '#D63031', color: 'white',
@@ -300,15 +286,16 @@ function SosCard({ evt }) {
   )
 }
 
-function ExpenseCard({ evt }) {
+function ExpenseCard({ evt, onTap }) {
   const name = evt.paidBy ? evt.paidBy.split(' ')[0] : null
   return (
-    <div style={{
+    <div onClick={onTap} style={{
       background: 'white', borderRadius: 16,
       border: '1px solid #EDE5D8',
       padding: '12px 14px',
       display: 'flex', alignItems: 'center', gap: 10,
       boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+      cursor: 'pointer',
     }}>
       <span style={{ fontSize: 16, flexShrink: 0 }}>💰</span>
       <div style={{ flex: 1, minWidth: 0 }}>
@@ -376,28 +363,304 @@ function CaregiverCard({ evt }) {
   )
 }
 
-function TimelineEvent({ evt, confirming, expandedAudio, onConfirm, onToggleAudio, todayKey, tomorrowKey, reactions, userId, onReact }) {
+// ── Detail row helper ─────────────────────────────────────────────────────────
+
+function DetailRow({ icon, label, value }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+      <span style={{ fontSize: 16, flexShrink: 0, marginTop: 1 }}>{icon}</span>
+      <div>
+        <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>{label}</p>
+        <p style={{ fontSize: 13, color: '#1A1A1A', fontWeight: 500, margin: '1px 0 0' }}>{value}</p>
+      </div>
+    </div>
+  )
+}
+
+// ── Event detail sheet sub-components ────────────────────────────────────────
+
+function MedConfirmedDetail({ evt }) {
+  const time = evt.timestamp ? fmtTimestamp(evt.timestamp) : null
+  return (
+    <div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+        <span style={{ fontSize: 28 }}>💊</span>
+        <div>
+          <p style={{ fontSize: 18, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>
+            {[evt.medName, evt.medDosage].filter(Boolean).join(' · ')}
+          </p>
+          <p style={{ fontSize: 12, color: '#22C55E', fontWeight: 600, margin: '3px 0 0' }}>Medicamento dado ✅</p>
+        </div>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+        {evt.confirmedBy && <DetailRow icon="👤" label="Dado por" value={evt.confirmedBy} />}
+        {time && <DetailRow icon="🕐" label="Hora" value={time} />}
+        {evt.latitude && (
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+            <span style={{ fontSize: 16, flexShrink: 0, marginTop: 1 }}>📍</span>
+            <div>
+              <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>Ubicación</p>
+              <a href={mapsUrl(evt.latitude, evt.longitude)} target="_blank" rel="noopener noreferrer"
+                style={{ fontSize: 13, color: '#3B82F6', textDecoration: 'none', fontWeight: 500 }}>
+                {evt.address ?? 'Ver en mapa'} →
+              </a>
+            </div>
+          </div>
+        )}
+        {evt.photoUrl && (
+          <div>
+            <p style={{ fontSize: 11, color: '#9CA3AF', margin: '0 0 8px' }}>Foto de prueba</p>
+            <img src={evt.photoUrl} alt="Prueba" style={{ width: '100%', borderRadius: 12, maxHeight: 220, objectFit: 'cover' }} />
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function VoiceMemoryDetail({ evt }) {
+  const color = getMoodColor(evt.mood)
+  const emoji = getMoodEmoji(evt.mood)
+  const time = evt.timestamp ? fmtTimestamp(evt.timestamp) : null
+  return (
+    <div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+        <span style={{ fontSize: 28 }}>🎙️</span>
+        <div>
+          <p style={{ fontSize: 18, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>Memoria de voz</p>
+          {evt.mood && (
+            <span style={{
+              display: 'inline-block', marginTop: 4,
+              padding: '2px 10px', borderRadius: 20,
+              background: color + '20', fontSize: 13, color, fontWeight: 600,
+            }}>
+              {emoji}
+            </span>
+          )}
+        </div>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+        {evt.recorderName && <DetailRow icon="👤" label="Grabado por" value={evt.recorderName} />}
+        {time && <DetailRow icon="🕐" label="Hora" value={time} />}
+        {evt.audioUrl && (
+          <div>
+            <p style={{ fontSize: 11, color: '#9CA3AF', margin: '0 0 8px' }}>Reproducir</p>
+            <audio src={evt.audioUrl} controls style={{ width: '100%', height: 40, borderRadius: 8 }} />
+          </div>
+        )}
+        {evt.transcription && (
+          <div style={{ padding: '12px 14px', background: '#F9FAFB', borderRadius: 12, border: '1px solid #E5E7EB' }}>
+            <p style={{ fontSize: 13, color: '#374151', lineHeight: 1.6, margin: 0, fontStyle: 'italic' }}>
+              "{evt.transcription}"
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function NoteDetail({ evt }) {
+  const time = evt.timestamp ? fmtTimestamp(evt.timestamp) : null
+  return (
+    <div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+        <span style={{ fontSize: 28 }}>📝</span>
+        <p style={{ fontSize: 18, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>Nota</p>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+        {evt.noteText && (
+          <div style={{ padding: '12px 14px', background: '#F9FAFB', borderRadius: 12, border: '1px solid #E5E7EB' }}>
+            <p style={{ fontSize: 13, color: '#374151', lineHeight: 1.6, margin: 0 }}>{evt.noteText}</p>
+          </div>
+        )}
+        {evt.authorName && <DetailRow icon="👤" label="Escrito por" value={evt.authorName} />}
+        {time && <DetailRow icon="🕐" label="Hora" value={time} />}
+        {evt.photoUrl && (
+          <div>
+            <p style={{ fontSize: 11, color: '#9CA3AF', margin: '0 0 8px' }}>Foto adjunta</p>
+            <img src={evt.photoUrl} alt="Adjunto" style={{ width: '100%', borderRadius: 12, maxHeight: 220, objectFit: 'cover' }} />
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function PhotoDetailContent({ evt }) {
+  const time = evt.timestamp ? fmtTimestamp(evt.timestamp) : null
+  return (
+    <div>
+      {evt.fileUrl && (
+        <img src={evt.fileUrl} alt={evt.caption ?? 'Foto'} style={{ width: '100%', borderRadius: 12, maxHeight: 320, objectFit: 'cover', marginBottom: 16 }} />
+      )}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+        {evt.caption && (
+          <p style={{ fontSize: 14, color: '#1A1A1A', fontWeight: 500, margin: 0, lineHeight: 1.5 }}>{evt.caption}</p>
+        )}
+        {evt.uploaderName && <DetailRow icon="👤" label="Subida por" value={evt.uploaderName} />}
+        {time && <DetailRow icon="🕐" label="Hora" value={time} />}
+      </div>
+    </div>
+  )
+}
+
+function ExpenseDetail({ evt }) {
+  const time = evt.timestamp ? fmtTimestamp(evt.timestamp) : null
+  return (
+    <div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+        <span style={{ fontSize: 28 }}>💰</span>
+        <div>
+          <p style={{ fontSize: 22, fontWeight: 700, color: '#4A7C59', margin: 0 }}>
+            ${evt.amount != null ? Number(evt.amount).toFixed(2) : '—'}
+          </p>
+          <p style={{ fontSize: 13, color: '#6B7280', margin: '2px 0 0' }}>{evt.description}</p>
+        </div>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+        {evt.paidBy && <DetailRow icon="👤" label="Registrado por" value={evt.paidBy} />}
+        {time && <DetailRow icon="🕐" label="Hora" value={time} />}
+        {evt.receiptUrl && (
+          <div>
+            <p style={{ fontSize: 11, color: '#9CA3AF', margin: '0 0 8px' }}>Recibo</p>
+            <img src={evt.receiptUrl} alt="Recibo" style={{ width: '100%', borderRadius: 12, maxHeight: 220, objectFit: 'cover' }} />
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function SosDetail({ evt }) {
+  const time = evt.timestamp ? fmtTimestamp(evt.timestamp) : null
+  return (
+    <div>
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20,
+        padding: '14px 16px',
+        background: evt.resolved ? '#F9FAFB' : '#FFF0F0',
+        borderRadius: 16,
+        border: `1px solid ${evt.resolved ? '#EDE5D8' : '#FFBABA'}`,
+      }}>
+        <span style={{ fontSize: 28 }}>{evt.resolved ? '✅' : '🚨'}</span>
+        <div>
+          <p style={{ fontSize: 16, fontWeight: 700, color: evt.resolved ? '#374151' : '#D63031', margin: 0 }}>
+            {evt.resolved ? 'Emergencia resuelta' : 'EMERGENCIA'}
+          </p>
+          <p style={{ fontSize: 12, color: '#6B7280', margin: '2px 0 0' }}>
+            {evt.resolved ? 'Esta alerta fue atendida' : 'Alerta activa'}
+          </p>
+        </div>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+        {evt.triggeredBy && <DetailRow icon="👤" label="Activado por" value={evt.triggeredBy} />}
+        {time && <DetailRow icon="🕐" label="Hora" value={time} />}
+        {evt.address && <DetailRow icon="📍" label="Dirección" value={evt.address} />}
+        {evt.latitude && evt.longitude && (
+          <a
+            href={mapsUrl(evt.latitude, evt.longitude)}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+              padding: '14px', borderRadius: 16, marginTop: 4,
+              background: evt.resolved ? '#F3F4F6' : 'linear-gradient(135deg, #D63031, #B82020)',
+              color: evt.resolved ? '#374151' : 'white',
+              fontWeight: 700, fontSize: 14, textDecoration: 'none',
+              boxShadow: evt.resolved ? 'none' : '0 6px 20px rgba(214,48,49,0.35)',
+            }}
+          >
+            📍 Ver en mapa
+          </a>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function EventDetailSheet({ evt, onClose }) {
+  if (!evt) return null
+  const TITLES = {
+    MED_CONFIRMED: 'Medicamento',
+    VOICE_MEMORY: 'Memoria de voz',
+    NOTE: 'Nota',
+    PHOTO: 'Foto',
+    EXPENSE: 'Gasto',
+    SOS_ALERT: 'Alerta SOS',
+  }
+  return (
+    <div
+      style={{
+        position: 'fixed', inset: 0, zIndex: 200,
+        background: 'rgba(0,0,0,0.6)',
+        display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
+      }}
+      onClick={e => { if (e.target === e.currentTarget) onClose() }}
+    >
+      <div style={{
+        width: '100%', maxWidth: 480,
+        background: 'white', borderRadius: '24px 24px 0 0',
+        boxShadow: '0 -8px 48px rgba(0,0,0,0.2)',
+        maxHeight: '85vh',
+        overflowY: 'auto',
+        paddingBottom: 96,
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 12 }}>
+          <div style={{ width: 40, height: 4, borderRadius: 2, background: '#E5E7EB' }} />
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 20px 0' }}>
+          <p style={{ fontSize: 11, color: '#9CA3AF', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>
+            {TITLES[evt.type] ?? 'Detalle'}
+          </p>
+          <button
+            onClick={onClose}
+            style={{
+              width: 32, height: 32, borderRadius: '50%',
+              background: '#F3F4F6', border: 'none', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}
+          >
+            <XIcon size={14} color="#6B7280" strokeWidth={2} />
+          </button>
+        </div>
+        <div style={{ padding: '16px 20px 0' }}>
+          {evt.type === 'MED_CONFIRMED' && <MedConfirmedDetail evt={evt} />}
+          {evt.type === 'VOICE_MEMORY' && <VoiceMemoryDetail evt={evt} />}
+          {evt.type === 'NOTE' && <NoteDetail evt={evt} />}
+          {evt.type === 'PHOTO' && <PhotoDetailContent evt={evt} />}
+          {evt.type === 'EXPENSE' && <ExpenseDetail evt={evt} />}
+          {evt.type === 'SOS_ALERT' && <SosDetail evt={evt} />}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ── Timeline event dispatcher ─────────────────────────────────────────────────
+
+function TimelineEvent({ evt, confirming, expandedAudio, onConfirm, onToggleAudio, todayKey, tomorrowKey, reactions, userId, onReact, onTap }) {
   const bar = evt.type !== 'MED_PENDING' && evt.type !== 'CAREGIVER_CARD' && (
     <ReactionBar eventKey={evt.id} reactions={reactions?.[evt.id]} userId={userId} onToggle={onReact} />
   )
   if (evt.type === 'MED_PENDING') {
     return <PendingCard evt={evt} confirming={confirming} onConfirm={onConfirm} todayKey={todayKey} />
   }
-  if (evt.type === 'MED_CONFIRMED') return <div><ConfirmedCard evt={evt} />{bar}</div>
+  if (evt.type === 'MED_CONFIRMED') return <div><ConfirmedCard evt={evt} onTap={() => onTap(evt)} />{bar}</div>
   if (evt.type === 'VOICE_MEMORY') {
     return (
       <div>
-        <MemoryCard evt={evt} isExpanded={expandedAudio === evt.id} onToggle={() => onToggleAudio(evt.id)} />
+        <MemoryCard evt={evt} onTap={() => onTap(evt)} />
         {bar}
       </div>
     )
   }
-  if (evt.type === 'PHOTO') return <div><PhotoCard evt={evt} />{bar}</div>
-  if (evt.type === 'EXPENSE') return <div><ExpenseCard evt={evt} />{bar}</div>
+  if (evt.type === 'PHOTO') return <div><PhotoCard evt={evt} onTap={() => onTap(evt)} />{bar}</div>
+  if (evt.type === 'EXPENSE') return <div><ExpenseCard evt={evt} onTap={() => onTap(evt)} />{bar}</div>
   if (evt.type === 'APPOINTMENT') {
     return <div><AppointmentCard evt={evt} todayKey={todayKey} tomorrowKey={tomorrowKey} />{bar}</div>
   }
-  if (evt.type === 'SOS_ALERT') return <div><SosCard evt={evt} />{bar}</div>
+  if (evt.type === 'SOS_ALERT') return <div><SosCard evt={evt} onTap={() => onTap(evt)} />{bar}</div>
   if (evt.type === 'CAREGIVER_CARD') return <CaregiverCard evt={evt} />
   return null
 }
@@ -441,7 +704,7 @@ function EmptyState({ profile }) {
 function DaySection({
   section, isExpanded, onToggle, medTotal,
   confirming, expandedAudio, onConfirm, onToggleAudio,
-  todayKey, tomorrowKey, reactions, userId, onReact,
+  todayKey, tomorrowKey, reactions, userId, onReact, onTap,
 }) {
   const confirmedCount = section.events.filter(e => e.type === 'MED_CONFIRMED').length
   const pendingCount   = section.events.filter(e => e.type === 'MED_PENDING').length
@@ -550,6 +813,7 @@ function DaySection({
                 reactions={reactions}
                 userId={userId}
                 onReact={onReact}
+                onTap={onTap}
               />
             ))}
           </div>
@@ -621,6 +885,7 @@ export default function Dashboard() {
   const [checkoutSuccess, setCheckoutSuccess] = useState(false)
   const [reactions, setReactions] = useState({})
   const [sosLocation, setSosLocation] = useState(null)
+  const [selectedEvent, setSelectedEvent] = useState(null)
   // Initialized to today's key so today is expanded; past days start collapsed
   const [expandedDays, setExpandedDays] = useState(() => new Set([new Date().toISOString().split('T')[0]]))
 
@@ -913,6 +1178,7 @@ export default function Dashboard() {
         latitude: log.latitude ?? null,
         longitude: log.longitude ?? null,
         address: log.address ?? null,
+        photoUrl: log.photo_url ?? null,
       })
     }
 
@@ -958,6 +1224,7 @@ export default function Dashboard() {
         amount: exp.amount,
         description: exp.description ?? exp.category ?? 'Gasto',
         paidBy: exp.paid_by ?? null,
+        receiptUrl: exp.receipt_url ?? null,
       })
     }
 
@@ -1475,10 +1742,14 @@ export default function Dashboard() {
               reactions={reactions}
               userId={user.id}
               onReact={toggleReaction}
+              onTap={setSelectedEvent}
             />
           ))
         )}
       </div>
+      {selectedEvent && (
+        <EventDetailSheet evt={selectedEvent} onClose={() => setSelectedEvent(null)} />
+      )}
     </Layout>
   )
 }
