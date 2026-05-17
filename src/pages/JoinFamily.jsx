@@ -11,7 +11,7 @@ export default function JoinFamily() {
   const [searchParams] = useSearchParams()
   const token = searchParams.get('token')
   const navigate = useNavigate()
-  const { user, loading: sessionLoading, signIn, signUp } = useAuth()
+  const { user, loading: sessionLoading, signIn, signUp, signOut } = useAuth()
   const { refresh: refreshFamily } = useFamily()
 
   const [invitation, setInvitation] = useState(null)
@@ -43,9 +43,11 @@ export default function JoinFamily() {
     fetchInvitation()
   }, [token])
 
-  // If user just logged in and we have a valid invitation, accept automatically
+  // If user just logged in and we have a valid invitation, accept automatically.
+  // Guard: skip if the logged-in user is the admin who created this invitation.
   useEffect(() => {
     if (user && invitation && invitation.status === 'pending' && !isExpired(invitation) && !accepted) {
+      if (user.id === invitation.user_id) return
       acceptInvitation()
     }
   }, [user, invitation])
@@ -357,30 +359,60 @@ export default function JoinFamily() {
                 </div>
               )}
 
-              {/* If already logged in: just show accept button */}
+              {/* If already logged in: check if this is the admin or a different account */}
               {user ? (
-                <div>
-                  <p style={{ fontSize: 12, color: '#9CA3AF', textAlign: 'center', marginBottom: 16 }}>
-                    Ingresando como <strong>{user.email}</strong>
-                  </p>
-                  <button
-                    onClick={acceptInvitation}
-                    disabled={accepting}
-                    style={{
-                      width: '100%', padding: '14px',
-                      background: accepting
-                        ? '#D4C4B8'
-                        : 'linear-gradient(135deg, #C4623A, #A85130)',
-                      color: 'white', fontWeight: 700, fontSize: 14,
-                      borderRadius: 14, border: 'none',
-                      cursor: accepting ? 'not-allowed' : 'pointer',
-                      boxShadow: accepting ? 'none' : '0 8px 24px rgba(196,98,58,0.35)',
-                      transition: 'all 0.2s',
-                    }}
-                  >
-                    {accepting ? 'Uniéndome...' : 'Aceptar invitación →'}
-                  </button>
-                </div>
+                user.id === invitation.user_id ? (
+                  /* Admin opening their own invitation link */
+                  <div>
+                    <div style={{
+                      marginBottom: 16, padding: '12px 14px',
+                      background: '#FFF0F0', border: '1px solid #FFBABA',
+                      borderRadius: 10,
+                    }}>
+                      <p style={{ fontSize: 13, fontWeight: 700, color: '#D63031', margin: '0 0 4px' }}>
+                        Debes abrir este link desde otra cuenta
+                      </p>
+                      <p style={{ fontSize: 12, color: '#D63031', margin: 0, lineHeight: 1.5 }}>
+                        Creaste este enlace con tu cuenta ({user.email}). Compártelo con el familiar que quieres agregar.
+                      </p>
+                    </div>
+                    <button
+                      onClick={signOut}
+                      style={{
+                        width: '100%', padding: '13px', borderRadius: 14,
+                        border: '1.5px solid #EDE5D8', background: 'white',
+                        color: '#374151', fontWeight: 600, fontSize: 14,
+                        cursor: 'pointer', transition: 'all 0.2s',
+                      }}
+                    >
+                      Cambiar de cuenta
+                    </button>
+                  </div>
+                ) : (
+                  /* Different user — show accept button */
+                  <div>
+                    <p style={{ fontSize: 12, color: '#9CA3AF', textAlign: 'center', marginBottom: 16 }}>
+                      Ingresando como <strong>{user.email}</strong>
+                    </p>
+                    <button
+                      onClick={acceptInvitation}
+                      disabled={accepting}
+                      style={{
+                        width: '100%', padding: '14px',
+                        background: accepting
+                          ? '#D4C4B8'
+                          : 'linear-gradient(135deg, #C4623A, #A85130)',
+                        color: 'white', fontWeight: 700, fontSize: 14,
+                        borderRadius: 14, border: 'none',
+                        cursor: accepting ? 'not-allowed' : 'pointer',
+                        boxShadow: accepting ? 'none' : '0 8px 24px rgba(196,98,58,0.35)',
+                        transition: 'all 0.2s',
+                      }}
+                    >
+                      {accepting ? 'Uniéndome...' : 'Aceptar invitación →'}
+                    </button>
+                  </div>
+                )
               ) : (
                 /* Not logged in: show auth form */
                 <div>
