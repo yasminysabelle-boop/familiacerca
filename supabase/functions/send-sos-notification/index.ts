@@ -70,10 +70,11 @@ Deno.serve(async (req: Request) => {
     ...(members?.map((m: { member_user_id: string }) => m.member_user_id).filter(Boolean) ?? []),
   ]
 
-  // Notify everyone except the person who pressed SOS
-  const recipientIds = allFamilyIds.filter(id => id !== user.id)
+  // Notify ALL family members including the person who pressed SOS.
+  // Always ensure ownerId (admin) is in the list even if family_members query missed them.
+  const recipientIds = Array.from(new Set([ownerId, ...allFamilyIds]))
 
-  console.log(`[send-sos-notification] ${allFamilyIds.length} family members total, notifying ${recipientIds.length} recipients`)
+  console.log(`[send-sos-notification] ${allFamilyIds.length} family members total, notifying all ${recipientIds.length}`)
 
   if (recipientIds.length === 0) {
     return new Response(JSON.stringify({ sent: 0, failed: 0, total: 0, noRecipients: true }), {
