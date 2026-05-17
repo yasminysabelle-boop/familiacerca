@@ -985,7 +985,11 @@ export default function Dashboard() {
 
   async function triggerSOS() {
     setSosConfirming(false)
-    await supabase.from('emergency_alerts').insert({
+
+    console.log('[SOS] triggerSOS — ownerId:', ownerId, 'fullName:', fullName)
+
+    // Log in DB (triggers realtime banner for all family members)
+    const { error: insertError } = await supabase.from('emergency_alerts').insert({
       user_id: user.id,
       triggered_by_name: fullName,
       relative_name: profile?.name ?? null,
@@ -993,6 +997,32 @@ export default function Dashboard() {
       longitude: sosLocation?.longitude ?? null,
       address: sosLocation?.address ?? null,
     })
+    if (insertError) console.error('[SOS] DB insert error:', insertError)
+
+    // Send push notification to ALL family members via edge function
+    if (ownerId) {
+      const payload = {
+        ownerId,
+        triggeredByName: fullName,
+        latitude: sosLocation?.latitude ?? null,
+        longitude: sosLocation?.longitude ?? null,
+        address: sosLocation?.address ?? null,
+      }
+      console.log('[SOS] Invoking send-sos-notification:', JSON.stringify(payload))
+      try {
+        const { data, error } = await supabase.functions.invoke('send-sos-notification', {
+          body: payload,
+        })
+        console.log('[SOS] Edge function response — data:', JSON.stringify(data), '| error:', error ? JSON.stringify({ message: error.message, context: error.context }) : null)
+        if (error) console.error('[SOS] Push error:', error.message, error.context)
+        else console.log(`[SOS] ✅ Push sent:${data?.sent} failed:${data?.failed} total:${data?.total}`)
+      } catch (err) {
+        console.error('[SOS] Exception invoking edge function:', err)
+      }
+    } else {
+      console.error('[SOS] ownerId is null — skipping push notification')
+    }
+
     track('sos_pressed', { has_location: !!sosLocation })
     setSosSent(true)
     setShowSOS(false)
