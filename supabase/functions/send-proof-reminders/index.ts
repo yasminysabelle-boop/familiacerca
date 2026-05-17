@@ -90,9 +90,9 @@ Deno.serve(async (req: Request) => {
         await webpush.sendNotification(
           { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
           JSON.stringify({
-            title: '⚠️ Falta foto de prueba',
-            body: `${medName} fue dado pero falta la foto de prueba`,
-            url: '/historial',
+            title: '📷 Falta foto de prueba',
+            body: `${medName} fue dado hace 30 min — agrega la foto de prueba`,
+            url: '/hoy',
             tag: `proof-missing-${log.id}`,
           })
         )

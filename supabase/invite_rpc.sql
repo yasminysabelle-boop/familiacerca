@@ -57,8 +57,8 @@ begin
     return 'invalid';
   end if;
 
-  insert into public.family_members (user_id, member_user_id, member_email)
-  values (v_inv.user_id, auth.uid(), auth.email())
+  insert into public.family_members (user_id, member_user_id, member_email, role)
+  values (v_inv.user_id, auth.uid(), auth.email(), 'familiar')
   on conflict (user_id, member_user_id) do nothing;
 
   update public.family_invitations

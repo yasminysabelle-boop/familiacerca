@@ -65,7 +65,15 @@ export default function Hoy() {
   const [proofStamping, setProofStamping] = useState(false)
   const [proofPreview, setProofPreview] = useState(null)
   const [proofBlob, setProofBlob] = useState(null)
+  const [proofGps, setProofGps] = useState(null)
   const fileRef = useRef(null)
+
+  // Tick every 30 s so countdown displays stay current
+  const [, setTick] = useState(0)
+  useEffect(() => {
+    const id = setInterval(() => setTick(t => t + 1), 30_000)
+    return () => clearInterval(id)
+  }, [])
 
   const today = new Date().toISOString().split('T')[0]
   const displayName = user?.user_metadata?.full_name ?? user?.email ?? 'Familiar'
@@ -133,6 +141,7 @@ export default function Hoy() {
     setProofSheet({ med })
     setProofPreview(null)
     setProofBlob(null)
+    setProofGps(null)
     setProofStamping(false)
   }
 
@@ -140,6 +149,7 @@ export default function Hoy() {
     setProofSheet(null)
     setProofPreview(null)
     setProofBlob(null)
+    setProofGps(null)
     if (fileRef.current) fileRef.current.value = ''
   }
 
@@ -148,9 +158,14 @@ export default function Hoy() {
     e.target.value = ''
     if (!f) return
     setProofStamping(true)
-    const stamped = await stampProof(f, displayName)
+    // Capture GPS and stamp the image in parallel
+    const [stamped, loc] = await Promise.all([
+      stampProof(f, displayName),
+      getLocation({ force: true }),
+    ])
     setProofBlob(stamped)
     setProofPreview(URL.createObjectURL(stamped))
+    setProofGps(loc)
     setProofStamping(false)
   }
 
@@ -162,12 +177,21 @@ export default function Hoy() {
       const path = `${ownerId}/${today}/${medId}.jpg`
       await supabase.storage.from('confirmations').upload(path, proofBlob, { upsert: true, contentType: 'image/jpeg' })
       const { data: { publicUrl } } = supabase.storage.from('confirmations').getPublicUrl(path)
+      // Save photo + GPS captured at photo time
+      const updateFields = {
+        photo_url: publicUrl,
+        ...(proofGps && {
+          latitude:  proofGps.latitude,
+          longitude: proofGps.longitude,
+          address:   proofGps.address,
+        }),
+      }
       await supabase.from('medication_logs')
-        .update({ photo_url: publicUrl })
+        .update(updateFields)
         .eq('medication_id', medId)
         .eq('user_id', ownerId)
         .eq('log_date', today)
-      setLogs(prev => ({ ...prev, [medId]: { ...prev[medId], photo_url: publicUrl } }))
+      setLogs(prev => ({ ...prev, [medId]: { ...prev[medId], ...updateFields } }))
       closeProofSheet()
     } catch { /* upload failed — sheet stays open */ }
     setProofUploading(false)
@@ -494,9 +518,17 @@ export default function Hoy() {
                 <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>
                   📷 Foto de prueba
                 </p>
-                <p style={{ fontSize: 13, color: '#6B7280', marginTop: 4 }}>
-                  {proofSheet.med.name} — tienes 30 minutos para agregar una foto
-                </p>
+                {(() => {
+                  const confirmedAt = logs[proofSheet.med.id]?.confirmed_at
+                  const minLeft = confirmedAt
+                    ? Math.max(0, 30 - Math.floor((Date.now() - new Date(confirmedAt).getTime()) / 60_000))
+                    : 30
+                  return (
+                    <p style={{ fontSize: 13, color: minLeft <= 5 ? '#D97706' : '#6B7280', marginTop: 4 }}>
+                      {proofSheet.med.name} — {minLeft > 0 ? `${minLeft} min restantes` : 'Tiempo agotado'}
+                    </p>
+                  )
+                })()}
               </div>
               <button
                 onClick={closeProofSheet}
@@ -537,7 +569,14 @@ export default function Hoy() {
                     background: '#F0FDF4', display: 'flex', alignItems: 'center', gap: 6,
                   }}>
                     <span style={{ fontSize: 14 }}>🔒</span>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: '#15803D' }}>Sello aplicado · Toca para cambiar</span>
+                    <div style={{ flex: 1 }}>
+                      <p style={{ fontSize: 12, fontWeight: 700, color: '#15803D', margin: 0 }}>Sello aplicado · Toca para cambiar</p>
+                      {proofGps && (
+                        <p style={{ fontSize: 11, color: '#4A7C59', margin: '2px 0 0' }}>
+                          📍 {proofGps.address ?? `${proofGps.latitude.toFixed(5)}, ${proofGps.longitude.toFixed(5)}`}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </>
               ) : (

@@ -32,8 +32,10 @@ export default function Familia() {
   const [shiftModal, setShiftModal] = useState(null)
   const [shiftName, setShiftName] = useState('')
   const [savingShift, setSavingShift] = useState(false)
+  const [savingRole, setSavingRole] = useState(false)
 
   const displayName = user?.user_metadata?.full_name ?? user?.email ?? 'Familiar'
+  const isAdmin = user?.id === ownerId
 
   const today = new Date()
   const todayKey = today.toISOString().split('T')[0]
@@ -87,7 +89,7 @@ export default function Familia() {
     setLoading(true)
     const { data: memberRows } = await supabase
       .from('family_members')
-      .select('member_user_id, member_email, joined_at')
+      .select('member_user_id, member_email, joined_at, role')
       .eq('user_id', ownerId)
 
     setMembers(memberRows ?? [])
@@ -155,6 +157,20 @@ export default function Familia() {
       setPortalLoading(false)
       alert('No se pudo abrir el portal. Intenta de nuevo.')
     }
+  }
+
+  async function handleAssignRole(memberUserId, newRole) {
+    setSavingRole(true)
+    const { error } = await supabase.rpc('assign_member_role', {
+      p_member_user_id: memberUserId,
+      p_role: newRole,
+    })
+    if (!error) {
+      setMembers(prev => prev.map(m => m.member_user_id === memberUserId ? { ...m, role: newRole } : m))
+      setMemberModal(prev => prev ? { ...prev, member: { ...prev.member, role: newRole } } : null)
+      track('member_role_assigned', { role: newRole })
+    }
+    setSavingRole(false)
   }
 
   async function handleSignOut() {
@@ -364,24 +380,62 @@ export default function Familia() {
                 animation: 'spin 0.8s linear infinite',
               }} />
             </div>
-          ) : members.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '24px 0' }}>
-              <div style={{
-                width: 56, height: 56, borderRadius: '50%', margin: '0 auto 14px',
-                background: '#FDF0EB',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <Users size={24} color="#C4623A" strokeWidth={1.5} />
-              </div>
-              <p style={{ fontSize: 14, fontWeight: 600, color: '#1A1A1A', marginBottom: 6 }}>
-                Eres el único cuidador
-              </p>
-              <p style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 0 }}>
-                Invita a familiares para compartir el cuidado.
-              </p>
-            </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+
+              {/* Admin self-card — always first */}
+              {isAdmin && (
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: 12,
+                  padding: '12px 14px', borderRadius: 14,
+                  background: '#FDF8F5', border: '1.5px solid #C4623A',
+                }}>
+                  <div style={{
+                    width: 44, height: 44, borderRadius: '50%', flexShrink: 0,
+                    background: '#FDF0EB', border: '2px solid #C4623A',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 16, fontWeight: 700, color: '#C4623A',
+                  }}>
+                    {displayName.charAt(0).toUpperCase()}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ fontSize: 14, fontWeight: 700, color: '#1A1A1A', margin: '0 0 2px' }}>
+                      {displayName.split(' ')[0]} <span style={{ fontWeight: 400, color: '#9CA3AF' }}>(tú)</span>
+                    </p>
+                    <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>🟢 Administrador</p>
+                  </div>
+                  <span style={{
+                    fontSize: 10, fontWeight: 700, color: '#C4623A',
+                    background: '#FDF0EB', padding: '4px 10px', borderRadius: 6,
+                  }}>
+                    Admin
+                  </span>
+                </div>
+              )}
+
+              {/* Invited members */}
+              {members.length === 0 && (
+                <div style={{ textAlign: 'center', padding: isAdmin ? '12px 0 4px' : '24px 0' }}>
+                  {!isAdmin && (
+                    <div style={{
+                      width: 56, height: 56, borderRadius: '50%', margin: '0 auto 14px',
+                      background: '#FDF0EB',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      <Users size={24} color="#C4623A" strokeWidth={1.5} />
+                    </div>
+                  )}
+                  <p style={{ fontSize: isAdmin ? 12 : 14, fontWeight: isAdmin ? 400 : 600, color: isAdmin ? '#9CA3AF' : '#1A1A1A', marginBottom: isAdmin ? 0 : 6 }}>
+                    {isAdmin ? 'Aún no hay otros miembros' : 'Eres el único cuidador'}
+                  </p>
+                  {!isAdmin && (
+                    <p style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 0 }}>
+                      Invita a familiares para compartir el cuidado.
+                    </p>
+                  )}
+                </div>
+              )}
+
               {members.map(member => {
                 const mp = memberProfiles[member.member_user_id]
                 const online = isOnline(mp)
@@ -390,6 +444,7 @@ export default function Familia() {
                 const joined = member.joined_at
                   ? new Date(member.joined_at).toLocaleDateString('es-US', { day: 'numeric', month: 'short', year: 'numeric' })
                   : null
+                const isCuidador = member.role === 'cuidador'
                 return (
                   <div
                     key={member.member_user_id ?? member.member_email}
@@ -421,7 +476,7 @@ export default function Familia() {
                       }} />
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ fontSize: 14, fontWeight: 600, color: '#1A1A1A', margin: '0 0 2px', truncate: true }}>
+                      <p style={{ fontSize: 14, fontWeight: 600, color: '#1A1A1A', margin: '0 0 2px' }}>
                         {name.split(' ')[0]}
                       </p>
                       <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>
@@ -429,7 +484,17 @@ export default function Familia() {
                         {joined ? ` · Desde ${joined}` : ''}
                       </p>
                     </div>
-                    <span style={{ color: '#D1D5DB', fontSize: 18 }}>›</span>
+                    <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+                      <span style={{
+                        fontSize: 10, fontWeight: 700,
+                        color: isCuidador ? '#C4623A' : '#6B7280',
+                        background: isCuidador ? '#FDF0EB' : '#F3F4F6',
+                        padding: '3px 10px', borderRadius: 6,
+                      }}>
+                        {isCuidador ? 'Cuidador' : 'Familiar'}
+                      </span>
+                      <span style={{ color: '#D1D5DB', fontSize: 18, lineHeight: 1 }}>›</span>
+                    </div>
                   </div>
                 )
               })}
@@ -519,6 +584,41 @@ export default function Familia() {
                   {online ? '🟢 En línea' : '⚫ Desconectado'}
                 </p>
               </div>
+              {/* Role assignment — admin only */}
+              {isAdmin && (
+                <div style={{ marginBottom: 16 }}>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10 }}>
+                    Rol en el equipo
+                  </p>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    {[
+                      { value: 'familiar', label: 'Familiar', desc: 'Puede ver registros' },
+                      { value: 'cuidador', label: 'Cuidador', desc: 'Puede registrar medicamentos' },
+                    ].map(r => (
+                      <button
+                        key={r.value}
+                        onClick={() => member.role !== r.value && handleAssignRole(member.member_user_id, r.value)}
+                        disabled={savingRole || member.role === r.value}
+                        style={{
+                          flex: 1, padding: '11px 8px', borderRadius: 12,
+                          border: `1.5px solid ${member.role === r.value ? '#C4623A' : '#EDE5D8'}`,
+                          background: member.role === r.value ? '#FDF0EB' : 'white',
+                          color: member.role === r.value ? '#C4623A' : '#6B7280',
+                          cursor: member.role === r.value || savingRole ? 'default' : 'pointer',
+                          fontWeight: 700, fontSize: 13,
+                          transition: 'all 0.15s',
+                        }}
+                      >
+                        <p style={{ margin: 0 }}>{r.label}</p>
+                        <p style={{ margin: '3px 0 0', fontSize: 10, fontWeight: 400, color: member.role === r.value ? '#A85130' : '#9CA3AF' }}>
+                          {r.desc}
+                        </p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div style={{ borderRadius: 16, background: '#F9F5F1', border: '1px solid #EDE5D8', padding: '4px 16px', marginBottom: 16 }}>
                 {member.member_email && (
                   <a href={`mailto:${member.member_email}`} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 0', borderBottom: '1px solid #EDE5D8', textDecoration: 'none' }}>
