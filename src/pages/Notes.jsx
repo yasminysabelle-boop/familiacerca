@@ -8,9 +8,20 @@ import Layout from '../components/Layout'
 import { getLocation } from '../lib/gps'
 import MicButton from '../components/MicButton'
 import { useSpeechToText } from '../hooks/useSpeechToText'
+import { Plus, XIcon } from '../components/Icons'
 
 const TAG_OPTIONS = ['Salud', 'Médico', 'Familia', 'Dieta', 'Ejercicio', 'Otro']
+
 const emptyForm = { title: '', content: '', tags: [] }
+
+const fieldStyle = {
+  width: '100%', padding: '11px 14px', borderRadius: 12,
+  border: '1.5px solid #EDE5D8', background: '#FDFAF7',
+  fontSize: 14, outline: 'none', boxSizing: 'border-box',
+  transition: 'all 0.15s', fontFamily: 'inherit',
+}
+const onFocus = e => { e.target.style.borderColor = '#C4623A'; e.target.style.boxShadow = '0 0 0 3px rgba(196,98,58,0.1)' }
+const onBlur  = e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.boxShadow = 'none' }
 
 export default function Notes() {
   const { user } = useAuth()
@@ -19,11 +30,16 @@ export default function Notes() {
   const navigate = useNavigate()
   const [notes, setNotes] = useState([])
   const [form, setForm] = useState(emptyForm)
+  const [editId, setEditId] = useState(null)
   const [showForm, setShowForm] = useState(false)
   const [expanded, setExpanded] = useState(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [search, setSearch] = useState('')
+  const [menuOpen, setMenuOpen] = useState(null)
+  const [confirmDialog, setConfirmDialog] = useState(null)
+
+  const isAdmin = user?.id === ownerId
 
   const { recording, interim, error: speechError, start, stop, clearError } =
     useSpeechToText(text =>
@@ -31,6 +47,16 @@ export default function Notes() {
     )
 
   useEffect(() => { if (user && ownerId) fetchNotes() }, [user, ownerId])
+
+  // Real-time sync for all family members
+  useEffect(() => {
+    if (!ownerId) return
+    const ch = supabase
+      .channel(`notes:${ownerId}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'notes', filter: `user_id=eq.${ownerId}` }, fetchNotes)
+      .subscribe()
+    return () => supabase.removeChannel(ch)
+  }, [ownerId])
 
   async function fetchNotes() {
     setLoading(true)
@@ -52,21 +78,42 @@ export default function Notes() {
       ...prev,
       tags: prev.tags.includes(tag)
         ? prev.tags.filter(t => t !== tag)
-        : [...prev.tags, tag]
+        : [...prev.tags, tag],
     }))
+  }
+
+  function openAdd() {
+    setEditId(null)
+    setForm(emptyForm)
+    setShowForm(true)
+  }
+
+  function openEdit(note) {
+    setEditId(note.id)
+    setForm({ title: note.title ?? '', content: note.content ?? '', tags: note.tags ?? [] })
+    setExpanded(null)
+    setShowForm(true)
   }
 
   async function handleSubmit(e) {
     e.preventDefault()
     setSaving(true)
-    const loc = await getLocation()
-    await supabase.from('notes').insert({
-      ...form, user_id: ownerId,
-      latitude: loc?.latitude ?? null,
-      longitude: loc?.longitude ?? null,
-      address: loc?.address ?? null,
-    })
+    if (editId) {
+      await supabase.from('notes').update({ title: form.title, content: form.content, tags: form.tags }).eq('id', editId)
+    } else {
+      const loc = await getLocation()
+      await supabase.from('notes').insert({
+        ...form,
+        user_id: ownerId,
+        created_by_user_id: user.id,
+        latitude:  loc?.latitude  ?? null,
+        longitude: loc?.longitude ?? null,
+        address:   loc?.address   ?? null,
+      })
+    }
+    stop()
     setForm(emptyForm)
+    setEditId(null)
     setShowForm(false)
     setSaving(false)
     fetchNotes()
@@ -74,6 +121,7 @@ export default function Notes() {
 
   function handleCancel() {
     stop()
+    setEditId(null)
     setShowForm(false)
   }
 
@@ -83,6 +131,10 @@ export default function Notes() {
     if (expanded === id) setExpanded(null)
   }
 
+  function canActOn(note) {
+    return isAdmin || note.created_by_user_id === user?.id
+  }
+
   const filtered = notes.filter(n =>
     n.title?.toLowerCase().includes(search.toLowerCase()) ||
     n.content?.toLowerCase().includes(search.toLowerCase())
@@ -90,184 +142,291 @@ export default function Notes() {
 
   return (
     <Layout>
-      <div className="p-4 md:p-8 max-w-3xl pb-24">
-        <div className="flex items-center justify-between mb-8">
+      {/* Transparent overlay to close menu */}
+      {menuOpen && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 99 }} onClick={() => setMenuOpen(null)} />
+      )}
+
+      <div style={{ padding: '16px 16px 96px', maxWidth: 600 }}>
+
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Notas</h2>
-            <p className="text-gray-500 mt-1">Observaciones del cuidado diario</p>
+            <h2 style={{ fontFamily: 'Georgia, serif', fontSize: 20, fontWeight: 700, color: '#1A1A1A', marginBottom: 2 }}>
+              Notas
+            </h2>
+            <p style={{ fontSize: 12, color: '#9CA3AF' }}>Observaciones del cuidado diario</p>
           </div>
           <button
-            onClick={() => setShowForm(!showForm)}
-            className="px-4 py-2 bg-primary hover:bg-primary-dark text-white text-sm font-medium rounded-lg transition-colors"
+            onClick={openAdd}
+            style={{
+              width: 40, height: 40, borderRadius: 12,
+              background: 'linear-gradient(135deg, #C4623A, #A85130)',
+              border: 'none', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 4px 12px rgba(196,98,58,0.3)',
+            }}
           >
-            + Nueva nota
+            <Plus size={20} color="white" strokeWidth={2.5} />
           </button>
         </div>
 
-        {showForm && (
-          <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-green-100 p-6 mb-6 space-y-4">
-            <h3 className="font-semibold text-gray-900">Nueva nota</h3>
+        {/* Search */}
+        <input
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Buscar notas..."
+          style={{ ...fieldStyle, marginBottom: 16 }}
+          onFocus={onFocus}
+          onBlur={onBlur}
+        />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Título *</label>
-              <input
-                name="title"
-                required
-                value={form.title}
-                onChange={handleChange}
-                placeholder="ej. Visita al médico hoy"
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-            </div>
-
-            <div>
-              {/* Label row with mic button */}
-              <div className="flex items-center justify-between mb-1">
-                <label className="block text-sm font-medium text-gray-700">
-                  Contenido *
-                </label>
-                <div className="flex items-center gap-2">
-                  {recording && (
-                    <span className="text-xs font-semibold" style={{ color: '#D63031' }}>
-                      🔴 Escuchando...
-                    </span>
-                  )}
-                  <MicButton recording={recording} onStart={start} onStop={stop} size="sm" />
-                </div>
-              </div>
-
-              <textarea
-                name="content"
-                required
-                value={form.content}
-                onChange={handleChange}
-                rows={4}
-                placeholder="Escribe o dicta las observaciones..."
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none"
-              />
-
-              {/* Live interim preview */}
-              {recording && interim && (
-                <p className="text-xs mt-1.5 px-1" style={{ color: '#9CA3AF', fontStyle: 'italic' }}>
-                  🎤 {interim}
-                </p>
-              )}
-
-              {/* Speech error */}
-              {speechError && (
-                <div className="mt-2 px-3 py-2 rounded-lg text-xs" style={{ background: '#FFF0F0', border: '1px solid #FFBABA', color: '#D63031' }}>
-                  ⚠ {speechError}{' '}
-                  <button
-                    type="button"
-                    onClick={clearError}
-                    style={{ textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'inherit', color: 'inherit' }}
-                  >
-                    Cerrar
-                  </button>
-                </div>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Etiquetas</label>
-              <div className="flex flex-wrap gap-2">
-                {TAG_OPTIONS.map(tag => (
-                  <button
-                    key={tag}
-                    type="button"
-                    onClick={() => toggleTag(tag)}
-                    className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                      form.tags.includes(tag)
-                        ? 'bg-primary text-white'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                    }`}
-                  >
-                    {tag}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex gap-3">
-              <button
-                type="submit"
-                disabled={saving || !canEdit}
-                onClick={!canEdit ? (e) => { e.preventDefault(); navigate('/pricing') } : undefined}
-                className="px-4 py-2 bg-primary hover:bg-primary-dark disabled:opacity-60 text-white text-sm font-medium rounded-lg transition-colors"
-              >
-                {saving ? 'Guardando...' : 'Guardar nota'}
-              </button>
-              <button
-                type="button"
-                onClick={handleCancel}
-                className="px-4 py-2 border border-gray-200 text-gray-600 hover:bg-gray-50 text-sm font-medium rounded-lg transition-colors"
-              >
-                Cancelar
-              </button>
-            </div>
-          </form>
-        )}
-
-        <div className="mb-4">
-          <input
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Buscar notas..."
-            className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary bg-white"
-          />
-        </div>
-
+        {/* Notes list */}
         {loading ? (
-          <div className="flex justify-center py-12">
-            <div className="w-6 h-6 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+          <div style={{ display: 'flex', justifyContent: 'center', padding: '48px 0' }}>
+            <div style={{ width: 28, height: 28, borderRadius: '50%', border: '3px solid #EDE5D8', borderTopColor: '#C4623A', animation: 'spin 0.8s linear infinite' }} />
           </div>
         ) : filtered.length === 0 ? (
-          <div className="bg-white rounded-xl border border-green-100 p-12 text-center">
-            <p className="text-4xl mb-3">📝</p>
-            <p className="text-gray-500 text-sm">
-              {search ? 'Sin resultados para esa búsqueda.' : 'No hay notas aún.'}
+          <div style={{ background: 'white', borderRadius: 20, border: '1px solid #EDE5D8', padding: '48px 24px', textAlign: 'center', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
+            <div style={{ fontSize: 44, marginBottom: 12 }}>📝</div>
+            <p style={{ fontSize: 14, fontWeight: 600, color: '#1A1A1A', marginBottom: 6 }}>
+              {search ? 'Sin resultados' : 'Sin notas aún'}
             </p>
+            <p style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 20 }}>
+              {search ? 'Intenta con otras palabras.' : 'Registra las observaciones del cuidado diario.'}
+            </p>
+            {!search && (
+              <button onClick={openAdd} style={{ padding: '10px 24px', borderRadius: 12, background: 'linear-gradient(135deg, #C4623A, #A85130)', color: 'white', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>
+                + Nueva nota
+              </button>
+            )}
           </div>
         ) : (
-          <div className="space-y-3">
-            {filtered.map(note => (
-              <div key={note.id} className="bg-white rounded-xl border border-green-100 overflow-hidden">
-                <button
-                  onClick={() => setExpanded(expanded === note.id ? null : note.id)}
-                  className="w-full text-left px-5 py-4 flex items-start justify-between gap-4"
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {filtered.map(note => {
+              const isExpanded = expanded === note.id
+              const canAct = canActOn(note)
+              return (
+                <div
+                  key={note.id}
+                  style={{ background: 'white', borderRadius: 16, border: '1px solid #EDE5D8', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
                 >
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-gray-900 truncate">{note.title}</p>
-                    <div className="flex items-center gap-2 mt-1 flex-wrap">
-                      <span className="text-xs text-gray-400">
-                        {new Date(note.created_at).toLocaleDateString('es-US', { day: 'numeric', month: 'short', year: 'numeric' })}
-                      </span>
-                      {note.tags?.map(tag => (
-                        <span key={tag} className="text-xs bg-primary-light text-primary px-2 py-0.5 rounded-full">
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                  <span className="text-gray-400 text-sm flex-shrink-0">{expanded === note.id ? '▲' : '▼'}</span>
-                </button>
-
-                {expanded === note.id && (
-                  <div className="px-5 pb-4 border-t border-gray-50">
-                    <p className="text-sm text-gray-700 mt-3 whitespace-pre-wrap">{note.content}</p>
+                  {/* Card header */}
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 4, padding: '14px 14px 14px 16px' }}>
                     <button
-                      onClick={() => handleDelete(note.id)}
-                      className="mt-4 text-xs text-red-400 hover:text-red-600 transition-colors"
+                      onClick={() => setExpanded(isExpanded ? null : note.id)}
+                      style={{ flex: 1, textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
                     >
-                      Eliminar nota
+                      <p style={{ fontSize: 14, fontWeight: 600, color: '#1A1A1A', margin: '0 0 4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {note.title}
+                      </p>
+                      <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
+                        <span style={{ fontSize: 11, color: '#9CA3AF' }}>
+                          {new Date(note.created_at).toLocaleDateString('es-US', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        </span>
+                        {note.tags?.map(tag => (
+                          <span key={tag} style={{ fontSize: 10, fontWeight: 700, color: '#C4623A', background: '#FDF0EB', padding: '2px 8px', borderRadius: 20 }}>
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    </button>
+
+                    {/* ⋮ Menu */}
+                    {canAct && (
+                      <div style={{ position: 'relative', flexShrink: 0 }}>
+                        <button
+                          onClick={e => { e.stopPropagation(); setMenuOpen(menuOpen === note.id ? null : note.id) }}
+                          style={{ width: 32, height: 32, borderRadius: 8, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, color: '#9CA3AF', lineHeight: 1 }}
+                        >
+                          ⋮
+                        </button>
+                        {menuOpen === note.id && (
+                          <div style={{ position: 'absolute', right: 0, top: '100%', zIndex: 100, background: 'white', borderRadius: 12, boxShadow: '0 4px 24px rgba(0,0,0,0.15)', border: '1px solid #EDE5D8', overflow: 'hidden', minWidth: 150 }}>
+                            <button
+                              onClick={() => { openEdit(note); setMenuOpen(null) }}
+                              style={{ display: 'block', width: '100%', padding: '12px 16px', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: '#374151', fontWeight: 600 }}
+                            >
+                              ✏️ Editar
+                            </button>
+                            <button
+                              onClick={() => { setMenuOpen(null); setConfirmDialog({ onConfirm: () => handleDelete(note.id) }) }}
+                              style={{ display: 'block', width: '100%', padding: '12px 16px', textAlign: 'left', background: '#FFF8F8', border: 'none', borderTop: '1px solid #F3F4F6', cursor: 'pointer', fontSize: 13, color: '#D63031', fontWeight: 600 }}
+                            >
+                              🗑️ Eliminar
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    <button
+                      onClick={() => setExpanded(isExpanded ? null : note.id)}
+                      style={{ width: 28, height: 28, flexShrink: 0, background: 'none', border: 'none', cursor: 'pointer', color: '#9CA3AF', fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    >
+                      {isExpanded ? '▲' : '▼'}
+                    </button>
+                  </div>
+
+                  {/* Expanded content */}
+                  {isExpanded && (
+                    <div style={{ padding: '0 16px 16px', borderTop: '1px solid #F3F4F6' }}>
+                      <p style={{ fontSize: 13, color: '#374151', marginTop: 12, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
+                        {note.content}
+                      </p>
+                      {note.address && (
+                        <p style={{ fontSize: 11, color: '#9CA3AF', marginTop: 8 }}>📍 {note.address}</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Add / Edit sheet */}
+      {showForm && (
+        <div
+          style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'flex-end' }}
+          onClick={e => { if (e.target === e.currentTarget) handleCancel() }}
+        >
+          <div style={{ width: '100%', maxHeight: '92vh', background: 'white', borderRadius: '24px 24px 0 0', padding: '24px 20px 96px', overflowY: 'auto', boxShadow: '0 -8px 48px rgba(0,0,0,0.2)' }}>
+
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+              <h3 style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>
+                {editId ? 'Editar nota' : 'Nueva nota'}
+              </h3>
+              <button onClick={handleCancel} style={{ padding: 8, border: 'none', background: 'none', cursor: 'pointer' }}>
+                <XIcon size={20} color="#9CA3AF" strokeWidth={2} />
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+
+              <div>
+                <p style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>Título *</p>
+                <input
+                  name="title"
+                  required
+                  value={form.title}
+                  onChange={handleChange}
+                  placeholder="ej. Visita al médico hoy"
+                  style={fieldStyle}
+                  onFocus={onFocus}
+                  onBlur={onBlur}
+                />
+              </div>
+
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', letterSpacing: '0.08em', textTransform: 'uppercase', margin: 0 }}>Contenido *</p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    {recording && (
+                      <span style={{ fontSize: 11, fontWeight: 700, color: '#D63031' }}>🔴 Escuchando...</span>
+                    )}
+                    <MicButton recording={recording} onStart={start} onStop={stop} size="sm" />
+                  </div>
+                </div>
+                <textarea
+                  name="content"
+                  required
+                  value={form.content}
+                  onChange={handleChange}
+                  rows={4}
+                  placeholder="Escribe o dicta las observaciones..."
+                  style={{ ...fieldStyle, resize: 'vertical', minHeight: 88, lineHeight: 1.5 }}
+                  onFocus={onFocus}
+                  onBlur={onBlur}
+                />
+                {recording && interim && (
+                  <p style={{ fontSize: 11, marginTop: 6, paddingLeft: 4, color: '#9CA3AF', fontStyle: 'italic' }}>
+                    🎤 {interim}
+                  </p>
+                )}
+                {speechError && (
+                  <div style={{ marginTop: 8, padding: '10px 14px', background: '#FFF0F0', border: '1px solid #FFBABA', borderRadius: 10, fontSize: 12, color: '#D63031' }}>
+                    ⚠ {speechError}{' '}
+                    <button type="button" onClick={clearError} style={{ textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'inherit', color: 'inherit' }}>
+                      Cerrar
                     </button>
                   </div>
                 )}
               </div>
-            ))}
+
+              <div>
+                <p style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8 }}>Etiquetas</p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                  {TAG_OPTIONS.map(tag => (
+                    <button
+                      key={tag}
+                      type="button"
+                      onClick={() => toggleTag(tag)}
+                      style={{
+                        padding: '6px 14px', borderRadius: 20,
+                        border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600,
+                        background: form.tags.includes(tag) ? '#C4623A' : '#F3F4F6',
+                        color: form.tags.includes(tag) ? 'white' : '#6B7280',
+                        transition: 'all 0.15s',
+                      }}
+                    >
+                      {tag}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
+                <button
+                  type="button"
+                  onClick={handleCancel}
+                  style={{ flex: 1, padding: '13px', border: '1.5px solid #EDE5D8', borderRadius: 14, background: 'white', color: '#6B7280', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={saving || !canEdit}
+                  onClick={!canEdit ? e => { e.preventDefault(); navigate('/pricing') } : undefined}
+                  style={{
+                    flex: 2, padding: '13px', borderRadius: 14, border: 'none',
+                    background: (saving || !canEdit) ? '#D4C4B8' : 'linear-gradient(135deg, #C4623A, #A85130)',
+                    color: 'white', fontWeight: 700, fontSize: 14,
+                    cursor: saving ? 'not-allowed' : 'pointer',
+                    boxShadow: saving ? 'none' : '0 6px 20px rgba(196,98,58,0.3)',
+                    transition: 'all 0.15s',
+                  }}
+                >
+                  {saving ? 'Guardando...' : editId ? 'Guardar cambios' : 'Guardar nota'}
+                </button>
+              </div>
+            </form>
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* Confirmation dialog */}
+      {confirmDialog && (
+        <div
+          style={{ position: 'fixed', inset: 0, zIndex: 300, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 24px' }}
+          onClick={e => { if (e.target === e.currentTarget) setConfirmDialog(null) }}
+        >
+          <div style={{ background: 'white', borderRadius: 20, padding: '28px 24px', maxWidth: 340, width: '100%', boxShadow: '0 24px 64px rgba(0,0,0,0.25)', textAlign: 'center' }}>
+            <div style={{ fontSize: 40, marginBottom: 14 }}>🗑️</div>
+            <p style={{ fontFamily: 'Georgia, serif', fontSize: 17, fontWeight: 700, color: '#1A1A1A', marginBottom: 8 }}>¿Eliminar este registro?</p>
+            <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, marginBottom: 24 }}>Esta acción no se puede deshacer.</p>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button onClick={() => setConfirmDialog(null)} style={{ flex: 1, padding: '12px', borderRadius: 12, border: '1.5px solid #EDE5D8', background: 'white', color: '#6B7280', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>
+                Cancelar
+              </button>
+              <button onClick={() => { confirmDialog.onConfirm(); setConfirmDialog(null) }} style={{ flex: 1, padding: '12px', borderRadius: 12, border: 'none', background: '#D63031', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer', boxShadow: '0 4px 16px rgba(214,48,49,0.3)' }}>
+                Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </Layout>
   )
 }

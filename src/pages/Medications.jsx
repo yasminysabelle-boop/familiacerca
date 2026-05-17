@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import { useFamily } from '../contexts/FamilyContext'
 import { useSubscription } from '../contexts/SubscriptionContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
@@ -53,6 +54,7 @@ const labelStyle = {
 
 export default function Medications() {
   const { user } = useAuth()
+  const { ownerId } = useFamily()
   const { canEdit } = useSubscription()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -64,11 +66,13 @@ export default function Medications() {
   const [showForm, setShowForm] = useState(false)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [deleteConfirm, setDeleteConfirm] = useState(null)
+  const [confirmDialog, setConfirmDialog] = useState(null) // { onConfirm }
+
+  const isAdmin = user?.id === ownerId
 
   useEffect(() => {
-    if (user) fetchMedications()
-  }, [user])
+    if (user && ownerId) fetchMedications()
+  }, [user, ownerId])
 
   useEffect(() => {
     if (searchParams.get('add') === '1') {
@@ -82,7 +86,7 @@ export default function Medications() {
     const { data } = await supabase
       .from('medications')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('user_id', ownerId)
       .order('created_at', { ascending: false })
     setMedications(data ?? [])
     setLoading(false)
@@ -143,7 +147,7 @@ export default function Medications() {
       frequency: form.frequency || null,
       notes: form.notes || null,
       scheduled_times,
-      user_id: user.id,
+      user_id: ownerId,
     }
     if (editId) {
       await supabase.from('medications').update(payload).eq('id', editId)
@@ -160,9 +164,8 @@ export default function Medications() {
   }
 
   async function handleDelete(id) {
-    await supabase.from('medications').delete().eq('id', id)
+    await supabase.from('medications').delete().eq('id', id).eq('user_id', ownerId)
     setMedications(prev => prev.filter(m => m.id !== id))
-    setDeleteConfirm(null)
   }
 
   const freqOpt = FREQ_OPTIONS.find(o => o.value === form.frequency)
@@ -331,28 +334,19 @@ export default function Medications() {
                           border: '1px solid #EDE5D8', background: 'white',
                           cursor: 'pointer', display: 'flex', alignItems: 'center',
                         }}
+                        title="Editar"
                       >
                         <Pencil size={14} color="#6B7280" strokeWidth={1.5} />
                       </button>
-                      {deleteConfirm === med.id ? (
+                      {isAdmin && (
                         <button
-                          onClick={() => handleDelete(med.id)}
-                          style={{
-                            padding: '6px 10px', borderRadius: 8,
-                            border: 'none', background: '#D63031',
-                            color: 'white', fontSize: 11, fontWeight: 700, cursor: 'pointer',
-                          }}
-                        >
-                          Eliminar
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => setDeleteConfirm(med.id)}
+                          onClick={() => setConfirmDialog({ onConfirm: () => handleDelete(med.id) })}
                           style={{
                             padding: '6px 8px', borderRadius: 8,
                             border: '1px solid #EDE5D8', background: 'white',
                             cursor: 'pointer', display: 'flex', alignItems: 'center',
                           }}
+                          title="Eliminar"
                         >
                           <Trash size={14} color="#D63031" strokeWidth={1.5} />
                         </button>
@@ -365,6 +359,28 @@ export default function Medications() {
           </div>
         )}
       </div>
+
+      {/* Confirmation dialog */}
+      {confirmDialog && (
+        <div
+          style={{ position: 'fixed', inset: 0, zIndex: 300, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 24px' }}
+          onClick={e => { if (e.target === e.currentTarget) setConfirmDialog(null) }}
+        >
+          <div style={{ background: 'white', borderRadius: 20, padding: '28px 24px', maxWidth: 340, width: '100%', boxShadow: '0 24px 64px rgba(0,0,0,0.25)', textAlign: 'center' }}>
+            <div style={{ fontSize: 40, marginBottom: 14 }}>🗑️</div>
+            <p style={{ fontFamily: 'Georgia, serif', fontSize: 17, fontWeight: 700, color: '#1A1A1A', marginBottom: 8 }}>¿Eliminar este registro?</p>
+            <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, marginBottom: 24 }}>Esta acción no se puede deshacer.</p>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button onClick={() => setConfirmDialog(null)} style={{ flex: 1, padding: '12px', borderRadius: 12, border: '1.5px solid #EDE5D8', background: 'white', color: '#6B7280', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>
+                Cancelar
+              </button>
+              <button onClick={() => { confirmDialog.onConfirm(); setConfirmDialog(null) }} style={{ flex: 1, padding: '12px', borderRadius: 12, border: 'none', background: '#D63031', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer', boxShadow: '0 4px 16px rgba(214,48,49,0.3)' }}>
+                Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Add / Edit sheet */}
       {showForm && (

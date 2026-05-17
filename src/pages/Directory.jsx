@@ -97,24 +97,17 @@ function FormSelect({ label, value, onChange, options, placeholder }) {
   )
 }
 
-function CardActions({ onEdit, onDeleteRequest, isConfirm, onConfirm, onCancel }) {
-  if (isConfirm) {
-    return (
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-        <span style={{ fontSize: 11, color: '#6B7280' }}>¿Eliminar?</span>
-        <button onClick={onCancel} style={{ padding: '3px 8px', borderRadius: 8, fontSize: 11, fontWeight: 600, background: '#F3F4F6', color: '#6B7280', border: 'none', cursor: 'pointer' }}>No</button>
-        <button onClick={onConfirm} style={{ padding: '3px 8px', borderRadius: 8, fontSize: 11, fontWeight: 600, background: '#FFF0F0', color: '#D63031', border: '1px solid #FFBABA', cursor: 'pointer' }}>Sí</button>
-      </div>
-    )
-  }
+function CardActions({ onEdit, onDeleteRequest, canDelete }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
       <button onClick={onEdit} style={{ width: 28, height: 28, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F3F4F6', border: 'none', cursor: 'pointer' }}>
         <Pencil size={13} color="#6B7280" strokeWidth={1.75} />
       </button>
-      <button onClick={onDeleteRequest} style={{ width: 28, height: 28, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#FFF0F0', border: 'none', cursor: 'pointer' }}>
-        <Trash size={13} color="#D63031" strokeWidth={1.75} />
-      </button>
+      {canDelete && (
+        <button onClick={onDeleteRequest} style={{ width: 28, height: 28, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#FFF0F0', border: 'none', cursor: 'pointer' }}>
+          <Trash size={13} color="#D63031" strokeWidth={1.75} />
+        </button>
+      )}
     </div>
   )
 }
@@ -177,7 +170,7 @@ function SheetModal({ title, subtitle, onClose, onSave, saveLabel, saving, child
 }
 
 // ── Doctor card ────────────────────────────────────────────────────
-function DoctorCard({ doc, onEdit, isConfirm, onConfirm, onCancel, onDeleteRequest }) {
+function DoctorCard({ doc, onEdit, onDeleteRequest, canDelete }) {
   return (
     <div style={{ background: 'white', borderRadius: 16, border: '1px solid #EDE5D8', borderTop: '3px solid #4A7C59', padding: '14px 16px', marginBottom: 10, boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10 }}>
@@ -185,7 +178,7 @@ function DoctorCard({ doc, onEdit, isConfirm, onConfirm, onCancel, onDeleteReque
           <p style={{ fontFamily: 'Georgia, serif', fontSize: 14, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>{doc.name}</p>
           {doc.specialty && <p style={{ fontSize: 12, fontWeight: 600, color: '#4A7C59', marginTop: 2 }}>{doc.specialty}</p>}
         </div>
-        <CardActions onEdit={onEdit} onDeleteRequest={onDeleteRequest} isConfirm={isConfirm} onConfirm={onConfirm} onCancel={onCancel} />
+        <CardActions onEdit={onEdit} onDeleteRequest={onDeleteRequest} canDelete={canDelete} />
       </div>
       <InfoRow Icon={Phone}   value={doc.phone}  href={doc.phone  ? `tel:${doc.phone}`      : undefined} />
       <InfoRow Icon={Mail}    value={doc.email}  href={doc.email  ? `mailto:${doc.email}`   : undefined} />
@@ -196,7 +189,7 @@ function DoctorCard({ doc, onEdit, isConfirm, onConfirm, onCancel, onDeleteReque
 }
 
 // ── Institution card ───────────────────────────────────────────────
-function InstitutionCard({ ins, onEdit, isConfirm, onConfirm, onCancel, onDeleteRequest }) {
+function InstitutionCard({ ins, onEdit, onDeleteRequest, canDelete }) {
   const typeColor = INST_TYPE_COLORS[ins.type] ?? '#9CA3AF'
   return (
     <div style={{ background: 'white', borderRadius: 16, border: '1px solid #EDE5D8', borderTop: `3px solid ${typeColor}`, padding: '14px 16px', marginBottom: 10, boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
@@ -211,7 +204,7 @@ function InstitutionCard({ ins, onEdit, isConfirm, onConfirm, onCancel, onDelete
             )}
           </div>
         </div>
-        <CardActions onEdit={onEdit} onDeleteRequest={onDeleteRequest} isConfirm={isConfirm} onConfirm={onConfirm} onCancel={onCancel} />
+        <CardActions onEdit={onEdit} onDeleteRequest={onDeleteRequest} canDelete={canDelete} />
       </div>
       <InfoRow Icon={MapPin} value={ins.address} />
       <InfoRow Icon={Phone}  value={ins.phone} href={ins.phone ? `tel:${ins.phone}` : undefined} />
@@ -238,7 +231,7 @@ function InstitutionCard({ ins, onEdit, isConfirm, onConfirm, onCancel, onDelete
 }
 
 // ── Family contact card ────────────────────────────────────────────
-function ContactCard({ con, onEdit, onToggleEmergency, isConfirm, onConfirm, onCancel, onDeleteRequest }) {
+function ContactCard({ con, onEdit, onToggleEmergency, onDeleteRequest, canDelete }) {
   const isEmergency = con.is_emergency_contact
   return (
     <div style={{
@@ -257,7 +250,7 @@ function ContactCard({ con, onEdit, onToggleEmergency, isConfirm, onConfirm, onC
           <p style={{ fontFamily: 'Georgia, serif', fontSize: 14, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>{con.name}</p>
           {con.relationship && <p style={{ fontSize: 12, color: '#6B7280', marginTop: 2 }}>{con.relationship}</p>}
         </div>
-        <CardActions onEdit={onEdit} onDeleteRequest={onDeleteRequest} isConfirm={isConfirm} onConfirm={onConfirm} onCancel={onCancel} />
+        <CardActions onEdit={onEdit} onDeleteRequest={onDeleteRequest} canDelete={canDelete} />
       </div>
       <InfoRow Icon={Phone}  value={con.phone}   href={con.phone  ? `tel:${con.phone}`    : undefined} />
       <InfoRow Icon={Mail}   value={con.email}   href={con.email  ? `mailto:${con.email}` : undefined} />
@@ -298,13 +291,14 @@ function ContactCard({ con, onEdit, onToggleEmergency, isConfirm, onConfirm, onC
 export default function Directory() {
   const { user } = useAuth()
   const { ownerId } = useFamily()
+  const isAdmin = user?.id === ownerId
 
   const [tab, setTab] = useState('medicos')
   const [doctors,      setDoctors]      = useState([])
   const [institutions, setInstitutions] = useState([])
   const [contacts,     setContacts]     = useState([])
   const [loading, setLoading] = useState(true)
-  const [confirmDelete, setConfirmDelete] = useState(null)
+  const [confirmDialog, setConfirmDialog] = useState(null)
 
   // Doctor form state
   const [docModal, setDocModal] = useState(false)
@@ -404,7 +398,7 @@ export default function Directory() {
 
   async function deleteItem(table, id) {
     await supabase.from(table).delete().eq('id', id)
-    setConfirmDelete(null)
+    setConfirmDialog(null)
     fetchAll()
   }
 
@@ -461,10 +455,8 @@ export default function Directory() {
               : doctors.map(d => (
                 <DoctorCard key={d.id} doc={d}
                   onEdit={() => openDoc(d)}
-                  isConfirm={confirmDelete?.id === d.id}
-                  onDeleteRequest={() => setConfirmDelete({ table: 'directory_doctors', id: d.id })}
-                  onConfirm={() => deleteItem('directory_doctors', d.id)}
-                  onCancel={() => setConfirmDelete(null)} />
+                  canDelete={isAdmin}
+                  onDeleteRequest={() => setConfirmDialog({ onConfirm: () => deleteItem('directory_doctors', d.id) })} />
               ))
             }
             <AddBtn onClick={() => openDoc()} label="Agregar médico" />
@@ -481,10 +473,8 @@ export default function Directory() {
               : institutions.map(i => (
                 <InstitutionCard key={i.id} ins={i}
                   onEdit={() => openIns(i)}
-                  isConfirm={confirmDelete?.id === i.id}
-                  onDeleteRequest={() => setConfirmDelete({ table: 'directory_institutions', id: i.id })}
-                  onConfirm={() => deleteItem('directory_institutions', i.id)}
-                  onCancel={() => setConfirmDelete(null)} />
+                  canDelete={isAdmin}
+                  onDeleteRequest={() => setConfirmDialog({ onConfirm: () => deleteItem('directory_institutions', i.id) })} />
               ))
             }
             <AddBtn onClick={() => openIns()} label="Agregar institución" />
@@ -502,10 +492,8 @@ export default function Directory() {
                 <ContactCard key={c.id} con={c}
                   onEdit={() => openCon(c)}
                   onToggleEmergency={toggleEmergency}
-                  isConfirm={confirmDelete?.id === c.id}
-                  onDeleteRequest={() => setConfirmDelete({ table: 'directory_contacts', id: c.id })}
-                  onConfirm={() => deleteItem('directory_contacts', c.id)}
-                  onCancel={() => setConfirmDelete(null)} />
+                  canDelete={isAdmin}
+                  onDeleteRequest={() => setConfirmDialog({ onConfirm: () => deleteItem('directory_contacts', c.id) })} />
               ))
             }
             <AddBtn onClick={() => openCon()} label="Agregar familiar" />
@@ -592,6 +580,51 @@ export default function Directory() {
           </div>
         )}
       </div>
+
+      {/* ── Confirmation dialog ───────────────────────────────────── */}
+      {confirmDialog && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 300,
+          background: 'rgba(0,0,0,0.52)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          padding: '0 24px',
+        }}>
+          <div style={{
+            background: 'white', borderRadius: 20, padding: '28px 24px',
+            maxWidth: 340, width: '100%',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.25)',
+          }}>
+            <p style={{ fontFamily: 'Georgia, serif', fontSize: 17, fontWeight: 700, color: '#1A1A1A', marginBottom: 10 }}>
+              ¿Eliminar este registro?
+            </p>
+            <p style={{ fontSize: 13, color: '#6B7280', marginBottom: 24, lineHeight: 1.6 }}>
+              Esta acción no se puede deshacer.
+            </p>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button
+                onClick={() => setConfirmDialog(null)}
+                style={{
+                  flex: 1, padding: '12px', borderRadius: 12,
+                  border: '1.5px solid #EDE5D8', background: 'white',
+                  fontSize: 14, fontWeight: 600, color: '#374151', cursor: 'pointer',
+                }}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => { confirmDialog.onConfirm(); setConfirmDialog(null) }}
+                style={{
+                  flex: 1, padding: '12px', borderRadius: 12,
+                  border: 'none', background: '#D63031',
+                  fontSize: 14, fontWeight: 700, color: 'white', cursor: 'pointer',
+                }}
+              >
+                Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Doctor modal ───────────────────────────────────────────── */}
       {docModal && (

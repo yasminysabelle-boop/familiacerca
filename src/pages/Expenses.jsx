@@ -52,7 +52,12 @@ export default function Expenses() {
   const [expenses, setExpenses] = useState([])
   const [loading,  setLoading]  = useState(true)
 
+  const isAdmin = user?.id === ownerId
+
   const [showModal, setShowModal] = useState(false)
+  const [editExpense, setEditExpense] = useState(null)
+  const [menuOpen, setMenuOpen] = useState(null)
+  const [confirmDialog, setConfirmDialog] = useState(null)
   const [form, setForm] = useState({
     amount: '', category: 'Medicamentos', description: '',
     paid_by: displayName, date: now.toISOString().slice(0, 10),
@@ -101,13 +106,31 @@ export default function Expenses() {
     else setMonth(m => m + 1)
   }
 
-  function openModal() {
-    setForm({
-      amount: '', category: 'Medicamentos', description: '',
-      paid_by: displayName, date: new Date().toISOString().slice(0, 10),
-    })
-    setPhotoFile(null)
-    setPhotoPreview(null)
+  function canActOn(expense) {
+    return isAdmin || expense.created_by_user_id === user?.id
+  }
+
+  function openModal(expense = null) {
+    if (expense) {
+      setEditExpense(expense)
+      setForm({
+        amount:      String(expense.amount),
+        category:    expense.category,
+        description: expense.description ?? '',
+        paid_by:     expense.paid_by,
+        date:        expense.date,
+      })
+      setPhotoFile(null)
+      setPhotoPreview(expense.receipt_photo_url ?? null)
+    } else {
+      setEditExpense(null)
+      setForm({
+        amount: '', category: 'Medicamentos', description: '',
+        paid_by: displayName, date: new Date().toISOString().slice(0, 10),
+      })
+      setPhotoFile(null)
+      setPhotoPreview(null)
+    }
     setSaveError('')
     setShowModal(true)
   }
@@ -128,7 +151,7 @@ export default function Expenses() {
     setSaving(true)
     setSaveError('')
 
-    let receipt_photo_url = null
+    let receipt_photo_url = editExpense?.receipt_photo_url ?? null
 
     if (photoFile) {
       const ext  = photoFile.name.split('.').pop()
@@ -146,15 +169,25 @@ export default function Expenses() {
       }
     }
 
-    const { error } = await supabase.from('care_expenses').insert({
-      user_id:           ownerId,
+    const payload = {
       amount:            parseFloat(form.amount),
       category:          form.category,
       description:       form.description.trim() || null,
       paid_by:           form.paid_by.trim() || displayName,
       date:              form.date,
       receipt_photo_url,
-    })
+    }
+
+    let error
+    if (editExpense) {
+      ;({ error } = await supabase.from('care_expenses')
+        .update(payload)
+        .eq('id', editExpense.id)
+        .eq('user_id', ownerId))
+    } else {
+      ;({ error } = await supabase.from('care_expenses')
+        .insert({ ...payload, user_id: ownerId, created_by_user_id: user.id }))
+    }
 
     setSaving(false)
 
@@ -163,7 +196,7 @@ export default function Expenses() {
       return
     }
 
-    track('expense_added', { category: form.category, amount: parseFloat(form.amount) })
+    track(editExpense ? 'expense_edited' : 'expense_added', { category: form.category, amount: parseFloat(form.amount) })
     setShowModal(false)
     loadExpenses()
   }
@@ -300,6 +333,12 @@ export default function Expenses() {
               </p>
             </div>
           ) : (
+            {menuOpen !== null && (
+              <div
+                style={{ position: 'fixed', inset: 0, zIndex: 99 }}
+                onClick={() => setMenuOpen(null)}
+              />
+            )}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {expenses.map(expense => {
                 const c = catFor(expense.category)
@@ -310,6 +349,7 @@ export default function Expenses() {
                     border: '1px solid #EDE5D8',
                     boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
                     display: 'flex', alignItems: 'center', gap: 12,
+                    position: 'relative',
                   }}>
                     {/* Category emoji */}
                     <div style={{
@@ -335,22 +375,59 @@ export default function Expenses() {
                       </p>
                     </div>
 
-                    {/* Amount + delete */}
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 5, flexShrink: 0 }}>
-                      <p style={{ fontSize: 15, fontWeight: 800, color: '#1A1A1A' }}>
-                        {formatCurrency(expense.amount)}
-                      </p>
+                    {/* Amount */}
+                    <p style={{ fontSize: 15, fontWeight: 800, color: '#1A1A1A', flexShrink: 0 }}>
+                      {formatCurrency(expense.amount)}
+                    </p>
+
+                    {/* ⋮ menu */}
+                    <div style={{ position: 'relative', flexShrink: 0 }}>
                       <button
-                        onClick={() => handleDelete(expense.id)}
+                        onClick={() => setMenuOpen(menuOpen === expense.id ? null : expense.id)}
                         style={{
-                          padding: '2px 8px', borderRadius: 6,
-                          background: '#FFF0F0', border: 'none',
-                          cursor: 'pointer', fontSize: 10, color: '#D63031',
-                          fontWeight: 600,
+                          padding: '4px 8px', borderRadius: 8,
+                          background: 'transparent', border: 'none',
+                          cursor: 'pointer', fontSize: 18, color: '#9CA3AF', lineHeight: 1,
                         }}
                       >
-                        eliminar
+                        ⋮
                       </button>
+                      {menuOpen === expense.id && (
+                        <div style={{
+                          position: 'absolute', right: 0, top: '110%', zIndex: 100,
+                          background: 'white', borderRadius: 14,
+                          boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
+                          border: '1px solid #EDE5D8',
+                          minWidth: 150, overflow: 'hidden',
+                        }}>
+                          <button
+                            onClick={() => { setMenuOpen(null); openModal(expense) }}
+                            style={{
+                              display: 'block', width: '100%', textAlign: 'left',
+                              padding: '12px 16px', background: 'none', border: 'none',
+                              fontSize: 14, color: '#374151', cursor: 'pointer',
+                              borderBottom: canActOn(expense) ? '1px solid #F3F4F6' : 'none',
+                            }}
+                          >
+                            ✏️ Editar
+                          </button>
+                          {canActOn(expense) && (
+                            <button
+                              onClick={() => {
+                                setMenuOpen(null)
+                                setConfirmDialog({ onConfirm: () => handleDelete(expense.id) })
+                              }}
+                              style={{
+                                display: 'block', width: '100%', textAlign: 'left',
+                                padding: '12px 16px', background: 'none', border: 'none',
+                                fontSize: 14, color: '#D63031', cursor: 'pointer',
+                              }}
+                            >
+                              🗑️ Eliminar
+                            </button>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
                 )
@@ -380,7 +457,52 @@ export default function Expenses() {
         <Plus size={26} color="white" strokeWidth={2.5} />
       </button>
 
-      {/* Add expense modal */}
+      {/* Confirmation dialog */}
+      {confirmDialog && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 300,
+          background: 'rgba(0,0,0,0.52)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          padding: '0 24px',
+        }}>
+          <div style={{
+            background: 'white', borderRadius: 20, padding: '28px 24px',
+            maxWidth: 340, width: '100%',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.25)',
+          }}>
+            <p style={{ fontFamily: 'Georgia, serif', fontSize: 17, fontWeight: 700, color: '#1A1A1A', marginBottom: 10 }}>
+              ¿Eliminar este registro?
+            </p>
+            <p style={{ fontSize: 13, color: '#6B7280', marginBottom: 24, lineHeight: 1.6 }}>
+              Esta acción no se puede deshacer.
+            </p>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button
+                onClick={() => setConfirmDialog(null)}
+                style={{
+                  flex: 1, padding: '12px', borderRadius: 12,
+                  border: '1.5px solid #EDE5D8', background: 'white',
+                  fontSize: 14, fontWeight: 600, color: '#374151', cursor: 'pointer',
+                }}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => { confirmDialog.onConfirm(); setConfirmDialog(null) }}
+                style={{
+                  flex: 1, padding: '12px', borderRadius: 12,
+                  border: 'none', background: '#D63031',
+                  fontSize: 14, fontWeight: 700, color: 'white', cursor: 'pointer',
+                }}
+              >
+                Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add/Edit expense modal */}
       {showModal && (
         <div
           style={{
@@ -406,7 +528,7 @@ export default function Expenses() {
             }}>
               <div>
                 <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#1A1A1A' }}>
-                  Nuevo gasto
+                  {editExpense ? 'Editar gasto' : 'Nuevo gasto'}
                 </p>
                 <p style={{ fontSize: 12, color: '#9CA3AF', marginTop: 2 }}>
                   Cuentas Claras
@@ -644,7 +766,7 @@ export default function Expenses() {
                   transition: 'all 0.2s',
                 }}
               >
-                {saving ? 'Guardando...' : 'Guardar gasto'}
+                {saving ? 'Guardando...' : editExpense ? 'Guardar cambios' : 'Guardar gasto'}
               </button>
             </form>
           </div>

@@ -27,12 +27,16 @@ export default function Calendar() {
   const fileRef  = useRef(null)
   const today    = new Date()
 
+  const isAdmin = user?.id === ownerId
+
   const [year, setYear]       = useState(today.getFullYear())
   const [month, setMonth]     = useState(today.getMonth())
   const [events, setEvents]   = useState([])
   const [selected, setSelected] = useState(null)
   const [showForm, setShowForm] = useState(false)
   const [form, setForm]       = useState(emptyForm)
+  const [editEvent, setEditEvent] = useState(null)
+  const [confirmDialog, setConfirmDialog] = useState(null)
   const [saving, setSaving]   = useState(false)
 
   // Appointment proof modal state
@@ -63,12 +67,24 @@ export default function Calendar() {
     }
   }
 
+  function canActOn(ev) { return isAdmin || ev.created_by_user_id === user?.id }
+
+  function openEdit(ev) {
+    setEditEvent(ev)
+    setForm({ title: ev.title, date: ev.date, time: ev.time ?? '', description: ev.description ?? '', type: ev.type })
+    setShowForm(true)
+  }
+
   function handleChange(e) { setForm(prev => ({ ...prev, [e.target.name]: e.target.value })) }
 
   async function handleSubmit(e) {
     e.preventDefault(); setSaving(true)
-    await supabase.from('events').insert({ ...form, time: form.time || null, user_id: ownerId })
-    setForm(emptyForm); setShowForm(false); setSaving(false); fetchEvents()
+    if (editEvent) {
+      await supabase.from('events').update({ ...form, time: form.time || null }).eq('id', editEvent.id)
+    } else {
+      await supabase.from('events').insert({ ...form, time: form.time || null, user_id: ownerId, created_by_user_id: user.id })
+    }
+    setForm(emptyForm); setShowForm(false); setEditEvent(null); setSaving(false); fetchEvents()
   }
 
   async function handleDelete(id) {
@@ -128,7 +144,7 @@ export default function Calendar() {
             <h2 className="text-2xl font-bold text-gray-900">Calendario</h2>
             <p className="text-gray-500 mt-1">Citas médicas y eventos importantes</p>
           </div>
-          <button onClick={() => setShowForm(!showForm)}
+          <button onClick={() => { setEditEvent(null); setForm(emptyForm); setShowForm(!showForm) }}
             className="px-4 py-2 bg-primary hover:bg-primary-dark text-white text-sm font-medium rounded-lg transition-colors">
             + Agregar evento
           </button>
@@ -136,7 +152,7 @@ export default function Calendar() {
 
         {showForm && (
           <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-green-100 p-6 mb-6 space-y-4">
-            <h3 className="font-semibold text-gray-900">Nuevo evento</h3>
+            <h3 className="font-semibold text-gray-900">{editEvent ? 'Editar evento' : 'Nuevo evento'}</h3>
             <div className="grid grid-cols-2 gap-4">
               <div className="col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">Título *</label>
@@ -172,9 +188,9 @@ export default function Calendar() {
               <button type="submit" disabled={saving || !canEdit}
                 onClick={!canEdit ? (e) => { e.preventDefault(); navigate('/pricing') } : undefined}
                 className="px-4 py-2 bg-primary hover:bg-primary-dark disabled:opacity-60 text-white text-sm font-medium rounded-lg transition-colors">
-                {saving ? 'Guardando...' : 'Guardar'}
+                {saving ? 'Guardando...' : editEvent ? 'Guardar cambios' : 'Guardar'}
               </button>
-              <button type="button" onClick={() => setShowForm(false)}
+              <button type="button" onClick={() => { setShowForm(false); setEditEvent(null) }}
                 className="px-4 py-2 border border-gray-200 text-gray-600 hover:bg-gray-50 text-sm font-medium rounded-lg transition-colors">
                 Cancelar
               </button>
@@ -235,8 +251,14 @@ export default function Calendar() {
                           {ev.time && <p className="text-xs text-gray-400 mt-0.5">⏰ {ev.time}</p>}
                           {ev.description && <p className="text-xs text-gray-400">{ev.description}</p>}
                         </div>
-                        <button onClick={() => handleDelete(ev.id)}
-                          className="text-gray-200 hover:text-red-500 transition-colors flex-shrink-0 text-xs p-0.5">✕</button>
+                        <div className="flex items-center gap-1 flex-shrink-0">
+                          <button onClick={() => openEdit(ev)}
+                            className="text-gray-300 hover:text-gray-600 transition-colors text-xs p-0.5" title="Editar">✏️</button>
+                          {canActOn(ev) && (
+                            <button onClick={() => setConfirmDialog({ onConfirm: () => handleDelete(ev.id) })}
+                              className="text-gray-200 hover:text-red-500 transition-colors text-xs p-0.5" title="Eliminar">✕</button>
+                          )}
+                        </div>
                       </div>
 
                       {/* Proof section */}
@@ -264,6 +286,51 @@ export default function Calendar() {
           </div>
         </div>
       </div>
+
+      {/* Confirmation dialog */}
+      {confirmDialog && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 300,
+          background: 'rgba(0,0,0,0.52)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          padding: '0 24px',
+        }}>
+          <div style={{
+            background: 'white', borderRadius: 20, padding: '28px 24px',
+            maxWidth: 340, width: '100%',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.25)',
+          }}>
+            <p style={{ fontFamily: 'Georgia, serif', fontSize: 17, fontWeight: 700, color: '#1A1A1A', marginBottom: 10 }}>
+              ¿Eliminar este registro?
+            </p>
+            <p style={{ fontSize: 13, color: '#6B7280', marginBottom: 24, lineHeight: 1.6 }}>
+              Esta acción no se puede deshacer.
+            </p>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button
+                onClick={() => setConfirmDialog(null)}
+                style={{
+                  flex: 1, padding: '12px', borderRadius: 12,
+                  border: '1.5px solid #EDE5D8', background: 'white',
+                  fontSize: 14, fontWeight: 600, color: '#374151', cursor: 'pointer',
+                }}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => { confirmDialog.onConfirm(); setConfirmDialog(null) }}
+                style={{
+                  flex: 1, padding: '12px', borderRadius: 12,
+                  border: 'none', background: '#D63031',
+                  fontSize: 14, fontWeight: 700, color: 'white', cursor: 'pointer',
+                }}
+              >
+                Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Appointment proof modal */}
       {proofEvent && (
@@ -303,8 +370,6 @@ export default function Calendar() {
         </div>
       )}
 
-      {/* Hidden file input for proof */}
-      <input ref={fileRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handleProofPhoto} />
     </Layout>
   )
 }
