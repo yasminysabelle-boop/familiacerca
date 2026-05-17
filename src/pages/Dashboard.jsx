@@ -436,6 +436,129 @@ function EmptyState({ profile }) {
   )
 }
 
+// ── Collapsible day section ───────────────────────────────────────────────────
+
+function DaySection({
+  section, isExpanded, onToggle, medTotal,
+  confirming, expandedAudio, onConfirm, onToggleAudio,
+  todayKey, tomorrowKey, reactions, userId, onReact,
+}) {
+  const confirmedCount = section.events.filter(e => e.type === 'MED_CONFIRMED').length
+  const pendingCount   = section.events.filter(e => e.type === 'MED_PENDING').length
+  const noteCount      = section.events.filter(e => e.type === 'VOICE_MEMORY' || e.type === 'PHOTO').length
+  const expenseCount   = section.events.filter(e => e.type === 'EXPENSE').length
+  const sosCount       = section.events.filter(e => e.type === 'SOS_ALERT').length
+  const reactCount     = section.events.reduce((s, e) => s + (reactions?.[e.id]?.length ?? 0), 0)
+
+  // Status based on medication coverage for this day
+  let status = 'none'
+  if (medTotal > 0) {
+    if (pendingCount === 0 && confirmedCount >= medTotal) status = 'green'
+    else if (confirmedCount > 0) status = 'yellow'
+    else status = 'red'
+  }
+
+  const STATUS_STYLE = {
+    green:  { dot: '🟢', border: '#22C55E', bg: '#F0FDF4' },
+    yellow: { dot: '🟡', border: '#F59E0B', bg: '#FFFBEB' },
+    red:    { dot: '🔴', border: '#D63031', bg: '#FFF0F0' },
+    none:   { dot: '',   border: '#EDE5D8', bg: 'white'   },
+  }
+  const ss = STATUS_STYLE[status]
+
+  const parts = []
+  if (confirmedCount > 0) parts.push(`${confirmedCount} medicamento${confirmedCount !== 1 ? 's' : ''} ✅`)
+  if (pendingCount   > 0) parts.push(`${pendingCount} pendiente${pendingCount !== 1 ? 's' : ''} ⚠️`)
+  if (noteCount      > 0) parts.push(`${noteCount} nota${noteCount !== 1 ? 's' : ''}`)
+  if (expenseCount   > 0) parts.push(`${expenseCount} gasto${expenseCount !== 1 ? 's' : ''}`)
+  if (sosCount       > 0) parts.push('🚨 SOS')
+  if (reactCount     > 0) parts.push(`${reactCount} reacción${reactCount !== 1 ? 'es' : ''}`)
+  const summary = parts.join(' · ')
+
+  return (
+    <div style={{ marginBottom: 14 }}>
+      {/* Tappable header — card style when collapsed, plain label when expanded */}
+      <button
+        onClick={onToggle}
+        style={{
+          width: '100%', display: 'flex', alignItems: 'center', gap: 8,
+          textAlign: 'left', cursor: 'pointer', border: 'none',
+          borderRadius: isExpanded ? 0 : 12,
+          padding: isExpanded ? '0 2px 8px' : '11px 14px',
+          background: isExpanded ? 'none' : ss.bg,
+          borderLeft: isExpanded ? 'none' : `3px solid ${ss.border}`,
+          boxShadow: isExpanded ? 'none' : '0 2px 8px rgba(0,0,0,0.04)',
+          transition: 'background 0.2s ease, box-shadow 0.2s ease, padding 0.2s ease',
+        }}
+      >
+        {ss.dot && (
+          <span style={{ fontSize: 10, flexShrink: 0, lineHeight: 1 }}>{ss.dot}</span>
+        )}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <span style={{
+            fontSize: 11, fontWeight: 700, letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            color: isExpanded ? '#9CA3AF' : '#374151',
+            display: 'block',
+            transition: 'color 0.2s ease',
+          }}>
+            {section.label}
+          </span>
+          {!isExpanded && summary && (
+            <span style={{
+              fontSize: 11, color: '#6B7280',
+              display: 'block', marginTop: 2,
+              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+            }}>
+              {summary}
+            </span>
+          )}
+        </div>
+        <span style={{
+          fontSize: 14, color: '#C4B0A0', flexShrink: 0,
+          display: 'inline-block',
+          transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
+          transition: 'transform 0.25s ease',
+        }}>›</span>
+      </button>
+
+      {/* Collapsible content — CSS grid trick for smooth height animation */}
+      <div style={{
+        display: 'grid',
+        gridTemplateRows: isExpanded ? '1fr' : '0fr',
+        transition: 'grid-template-rows 0.3s cubic-bezier(0.4,0,0.2,1)',
+      }}>
+        <div style={{ overflow: 'hidden' }}>
+          <div style={{
+            display: 'flex', flexDirection: 'column', gap: 8, paddingTop: 2,
+            opacity: isExpanded ? 1 : 0,
+            transform: isExpanded ? 'translateY(0)' : 'translateY(-6px)',
+            transition: isExpanded
+              ? 'opacity 0.22s ease 0.08s, transform 0.22s ease 0.08s'
+              : 'opacity 0.12s ease, transform 0.12s ease',
+          }}>
+            {section.events.map(evt => (
+              <TimelineEvent
+                key={evt.id}
+                evt={evt}
+                confirming={confirming}
+                expandedAudio={expandedAudio}
+                onConfirm={onConfirm}
+                onToggleAudio={onToggleAudio}
+                todayKey={todayKey}
+                tomorrowKey={tomorrowKey}
+                reactions={reactions}
+                userId={userId}
+                onReact={onReact}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ── AI helpers ────────────────────────────────────────────────────────────────
 
 function weekKey(d = new Date()) {
@@ -498,6 +621,8 @@ export default function Dashboard() {
   const [checkoutSuccess, setCheckoutSuccess] = useState(false)
   const [reactions, setReactions] = useState({})
   const [sosLocation, setSosLocation] = useState(null)
+  // Initialized to today's key so today is expanded; past days start collapsed
+  const [expandedDays, setExpandedDays] = useState(() => new Set([new Date().toISOString().split('T')[0]]))
 
   useEffect(() => {
     if (searchParams.get('checkout') === 'success') {
@@ -1029,6 +1154,15 @@ export default function Dashboard() {
     setTimeout(() => setSosSent(false), 15000)
   }
 
+  function toggleDay(dateKey) {
+    setExpandedDays(prev => {
+      const next = new Set(prev)
+      if (next.has(dateKey)) next.delete(dateKey)
+      else next.add(dateKey)
+      return next
+    })
+  }
+
   const todaySection = sections.find(s => s.dateKey === todayKey)
   const pendingCount = todaySection?.events.filter(e => e.type === 'MED_PENDING').length ?? 0
   const confirmedTodayCount = todaySection?.events.filter(e => e.type === 'MED_CONFIRMED').length ?? 0
@@ -1326,32 +1460,22 @@ export default function Dashboard() {
           <EmptyState profile={profile} />
         ) : (
           sections.map(section => (
-            <div key={section.dateKey} style={{ marginBottom: 20 }}>
-              <p style={{
-                fontSize: 11, fontWeight: 700, letterSpacing: '0.08em',
-                textTransform: 'uppercase', color: '#9CA3AF',
-                marginBottom: 8, paddingLeft: 2,
-              }}>
-                {section.label}
-              </p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {section.events.map(evt => (
-                  <TimelineEvent
-                    key={evt.id}
-                    evt={evt}
-                    confirming={confirming}
-                    expandedAudio={expandedAudio}
-                    onConfirm={quickConfirm}
-                    onToggleAudio={id => setExpandedAudio(prev => prev === id ? null : id)}
-                    todayKey={todayKey}
-                    tomorrowKey={tomorrowKey}
-                    reactions={reactions}
-                    userId={user.id}
-                    onReact={toggleReaction}
-                  />
-                ))}
-              </div>
-            </div>
+            <DaySection
+              key={section.dateKey}
+              section={section}
+              isExpanded={expandedDays.has(section.dateKey)}
+              onToggle={() => toggleDay(section.dateKey)}
+              medTotal={medTotal}
+              confirming={confirming}
+              expandedAudio={expandedAudio}
+              onConfirm={quickConfirm}
+              onToggleAudio={id => setExpandedAudio(prev => prev === id ? null : id)}
+              todayKey={todayKey}
+              tomorrowKey={tomorrowKey}
+              reactions={reactions}
+              userId={user.id}
+              onReact={toggleReaction}
+            />
           ))
         )}
       </div>
