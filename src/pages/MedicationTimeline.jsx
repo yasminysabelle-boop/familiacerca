@@ -46,7 +46,16 @@ async function stampImage(file, confirmerName) {
       ctx.fillText(stamp, img.naturalWidth / 2, img.naturalHeight - barH / 2, img.naturalWidth - 16)
 
       URL.revokeObjectURL(objUrl)
-      canvas.toBlob(blob => resolve(blob), 'image/jpeg', 0.92)
+      function dataUrlToBlob(dataUrl) {
+        const [, b64] = dataUrl.split(',')
+        const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0))
+        return new Blob([bytes], { type: 'image/jpeg' })
+      }
+      if (typeof canvas.toBlob === 'function') {
+        canvas.toBlob(blob => resolve(blob ?? dataUrlToBlob(canvas.toDataURL('image/jpeg', 0.92))), 'image/jpeg', 0.92)
+      } else {
+        resolve(dataUrlToBlob(canvas.toDataURL('image/jpeg', 0.92)))
+      }
     }
     img.src = objUrl
   })
