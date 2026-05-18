@@ -34,6 +34,14 @@ export function FamilyProvider({ children }) {
 
   async function fetchProfile() {
     setLoading(true)
+    // Safety net: if Supabase never responds on slow mobile, unblock after 8 s
+    const timer = setTimeout(() => {
+      setOwnerId(user.id)
+      setMemberRole(null)
+      setProfile(null)
+      setActiveFamily('owner')
+      setLoading(false)
+    }, 8000)
     try {
       // Always fetch own profile and membership in parallel so we can detect both
       const [{ data: ownData }, { data: membership }] = await Promise.all([
@@ -77,6 +85,7 @@ export function FamilyProvider({ children }) {
       setProfile(null)
       setActiveFamily('owner')
     } finally {
+      clearTimeout(timer)
       setLoading(false)
     }
   }

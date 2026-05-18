@@ -1117,7 +1117,7 @@ export default function Dashboard() {
   const [searchParams, setSearchParams] = useSearchParams()
 
   const [sections, setSections] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [timelineError, setTimelineError] = useState('')
   const [confirmError, setConfirmError] = useState('')
   const [confirming, setConfirming] = useState(null)
@@ -1305,6 +1305,11 @@ export default function Dashboard() {
   async function fetchTimeline() {
     setLoading(true)
     setTimelineError('')
+    // Safety net: if any Supabase query hangs on slow mobile, unblock after 12 s
+    const timeoutTimer = setTimeout(() => {
+      setTimelineError('No se pudo cargar el historial. Verifica tu conexión.')
+      setLoading(false)
+    }, 12000)
     try {
     // Get all family member IDs for shared data queries
     const { data: familyMembers } = await supabase
@@ -1549,6 +1554,7 @@ export default function Dashboard() {
       events: sortSection(dateMap[dk]),
     }))
 
+    clearTimeout(timeoutTimer)
     setSections(newSections)
     setLoading(false)
 
@@ -1568,6 +1574,7 @@ export default function Dashboard() {
       setReactions(map)
     }
     } catch (err) {
+      clearTimeout(timeoutTimer)
       setTimelineError('No se pudo cargar el historial. Verifica tu conexión.')
       setLoading(false)
     }
@@ -1968,7 +1975,7 @@ export default function Dashboard() {
             </button>
           </div>
         )}
-        {loading ? (
+        {ownerId && (loading ? (
           <div style={{ display: 'flex', justifyContent: 'center', padding: 48 }}>
             <div style={{
               width: 28, height: 28, borderRadius: '50%',
@@ -1998,7 +2005,7 @@ export default function Dashboard() {
               onTap={setSelectedEvent}
             />
           ))
-        )}
+        ))}
       </div>
       {selectedEvent && (
         <EventDetailSheet evt={selectedEvent} onClose={() => setSelectedEvent(null)} />
