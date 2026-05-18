@@ -66,7 +66,7 @@ function sortSection(events) {
 
 // ── Card components ───────────────────────────────────────────────────────────
 
-function PendingCard({ evt, confirming, onConfirm, todayKey }) {
+function PendingCard({ evt, confirming, onConfirm, todayKey, isFamiliar }) {
   const busy = confirming === evt.medicationId
   const ago = minutesAgo(evt.medTime, todayKey)
   const medLabel = [evt.medName, evt.medDosage].filter(Boolean).join(' ')
@@ -91,26 +91,28 @@ function PendingCard({ evt, confirming, onConfirm, todayKey }) {
           )}
         </div>
       </div>
-      <button
-        onClick={() => onConfirm(evt)}
-        disabled={busy}
-        style={{
-          marginTop: 10, width: '100%', padding: '9px 0',
-          background: busy ? '#D4C4B8' : 'linear-gradient(135deg, #22C55E, #16A34A)',
-          color: 'white', fontWeight: 700, fontSize: 13,
-          borderRadius: 10, border: 'none',
-          cursor: busy ? 'not-allowed' : 'pointer',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-          transition: 'all 0.2s',
-        }}
-      >
-        {busy ? 'Guardando...' : (
-          <>
-            <CheckIcon size={14} color="white" strokeWidth={2.5} />
-            Marcar como dado
-          </>
-        )}
-      </button>
+      {!isFamiliar && (
+        <button
+          onClick={() => onConfirm(evt)}
+          disabled={busy}
+          style={{
+            marginTop: 10, width: '100%', padding: '9px 0',
+            background: busy ? '#D4C4B8' : 'linear-gradient(135deg, #22C55E, #16A34A)',
+            color: 'white', fontWeight: 700, fontSize: 13,
+            borderRadius: 10, border: 'none',
+            cursor: busy ? 'not-allowed' : 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+            transition: 'all 0.2s',
+          }}
+        >
+          {busy ? 'Guardando...' : (
+            <>
+              <CheckIcon size={14} color="white" strokeWidth={2.5} />
+              Marcar como dado
+            </>
+          )}
+        </button>
+      )}
     </div>
   )
 }
@@ -856,12 +858,12 @@ function EventDetailSheet({ evt, onClose }) {
 
 // ── Timeline event dispatcher ─────────────────────────────────────────────────
 
-function TimelineEvent({ evt, confirming, expandedAudio, onConfirm, onToggleAudio, todayKey, tomorrowKey, reactions, userId, onReact, onTap }) {
+function TimelineEvent({ evt, confirming, expandedAudio, onConfirm, onToggleAudio, todayKey, tomorrowKey, reactions, userId, onReact, onTap, isFamiliar }) {
   const bar = evt.type !== 'MED_PENDING' && evt.type !== 'CAREGIVER_CARD' && (
     <ReactionBar eventKey={evt.id} reactions={reactions?.[evt.id]} userId={userId} onToggle={onReact} />
   )
   if (evt.type === 'MED_PENDING') {
-    return <PendingCard evt={evt} confirming={confirming} onConfirm={onConfirm} todayKey={todayKey} />
+    return <PendingCard evt={evt} confirming={confirming} onConfirm={onConfirm} todayKey={todayKey} isFamiliar={isFamiliar} />
   }
   if (evt.type === 'MED_CONFIRMED') return <div><ConfirmedCard evt={evt} onTap={() => onTap(evt)} />{bar}</div>
   if (evt.type === 'VOICE_MEMORY') {
@@ -935,7 +937,7 @@ const CATEGORY_GROUPS = [
 function DaySection({
   section, isExpanded, onToggle, medTotal,
   confirming, expandedAudio, onConfirm, onToggleAudio,
-  todayKey, tomorrowKey, reactions, userId, onReact, onTap,
+  todayKey, tomorrowKey, reactions, userId, onReact, onTap, isFamiliar,
 }) {
   const confirmedCount = section.events.filter(e => e.type === 'MED_CONFIRMED').length
   const pendingCount   = section.events.filter(e => e.type === 'MED_PENDING').length
@@ -1055,6 +1057,7 @@ function DaySection({
                         userId={userId}
                         onReact={onReact}
                         onTap={onTap}
+                        isFamiliar={isFamiliar}
                       />
                     ))}
                   </div>
@@ -1112,7 +1115,9 @@ function AiCard({ type, text }) {
 
 export default function Dashboard() {
   const { user } = useAuth()
-  const { profile, ownerId } = useFamily()
+  const { profile, ownerId, memberRole } = useFamily()
+  const isFamiliar = memberRole === 'familiar'
+  const isAdmin = memberRole === null
   const { refresh: refreshSub } = useSubscription()
   const [searchParams, setSearchParams] = useSearchParams()
 
@@ -1130,6 +1135,7 @@ export default function Dashboard() {
   const [checkoutSuccess, setCheckoutSuccess] = useState(false)
   const [reactions, setReactions] = useState({})
   const [sosLocation, setSosLocation] = useState(null)
+  const [adminConfirmEvt, setAdminConfirmEvt] = useState(null)
   const [selectedEvent, setSelectedEvent] = useState(null)
   // Initialized to today's key so today is expanded; past days start collapsed
   const [expandedDays, setExpandedDays] = useState(() => new Set([new Date().toISOString().split('T')[0]]))
@@ -1603,6 +1609,12 @@ export default function Dashboard() {
     }
   }
 
+  function handleConfirmMed(evt) {
+    if (isFamiliar) return
+    if (isAdmin) { setAdminConfirmEvt(evt); return }
+    quickConfirm(evt)
+  }
+
   async function quickConfirm(evt) {
     setConfirming(evt.medicationId)
     setConfirmError('')
@@ -2003,7 +2015,7 @@ export default function Dashboard() {
               medTotal={medTotal}
               confirming={confirming}
               expandedAudio={expandedAudio}
-              onConfirm={quickConfirm}
+              onConfirm={handleConfirmMed}
               onToggleAudio={id => setExpandedAudio(prev => prev === id ? null : id)}
               todayKey={todayKey}
               tomorrowKey={tomorrowKey}
@@ -2011,10 +2023,46 @@ export default function Dashboard() {
               userId={user.id}
               onReact={toggleReaction}
               onTap={setSelectedEvent}
+              isFamiliar={isFamiliar}
             />
           ))
         ))}
       </div>
+      {/* Admin emergency confirmation dialog */}
+      {adminConfirmEvt && (
+        <div
+          style={{ position: 'fixed', inset: 0, zIndex: 300, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 24px' }}
+          onClick={e => { if (e.target === e.currentTarget) setAdminConfirmEvt(null) }}
+        >
+          <div style={{ background: 'white', borderRadius: 20, padding: '28px 24px', maxWidth: 340, width: '100%', boxShadow: '0 24px 64px rgba(0,0,0,0.25)', textAlign: 'center' }}>
+            <div style={{ fontSize: 40, marginBottom: 14 }}>⚠️</div>
+            <p style={{ fontFamily: 'Georgia, serif', fontSize: 17, fontWeight: 700, color: '#1A1A1A', marginBottom: 8 }}>
+              Confirmar como administrador
+            </p>
+            <p style={{ fontSize: 13, color: '#92400E', lineHeight: 1.6, marginBottom: 8, background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 12, padding: '10px 14px' }}>
+              Confirmando como administrador — solo en caso de emergencia
+            </p>
+            <p style={{ fontSize: 12, color: '#6B7280', lineHeight: 1.6, marginBottom: 24 }}>
+              {adminConfirmEvt.medName} · Esta acción se registrará con tu nombre.
+            </p>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button
+                onClick={() => setAdminConfirmEvt(null)}
+                style={{ flex: 1, padding: '12px', borderRadius: 12, border: '1.5px solid #EDE5D8', background: 'white', color: '#6B7280', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => { const evt = adminConfirmEvt; setAdminConfirmEvt(null); quickConfirm(evt) }}
+                style={{ flex: 1, padding: '12px', borderRadius: 12, border: 'none', background: '#D97706', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer', boxShadow: '0 4px 16px rgba(217,119,6,0.3)' }}
+              >
+                Confirmar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {selectedEvent && (
         <EventDetailSheet evt={selectedEvent} onClose={() => setSelectedEvent(null)} />
       )}

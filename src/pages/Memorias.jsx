@@ -46,7 +46,8 @@ function groupByDate(recs) {
 
 export default function Memorias() {
   const { user } = useAuth()
-  const { profile, ownerId } = useFamily()
+  const { profile, ownerId, memberRole } = useFamily()
+  const isFamiliar = memberRole === 'familiar'
   const [recordings, setRecordings] = useState([])
   const [loading, setLoading] = useState(true)
   const [step, setStep] = useState('idle') // 'idle' | 'recording' | 'saving'
@@ -273,7 +274,19 @@ export default function Memorias() {
           </div>
         )}
 
-        {/* Recorder card */}
+        {/* Recorder card — hidden for familiar (view only) */}
+        {isFamiliar ? (
+          <div style={{
+            background: '#F9FAFB', borderRadius: 16, border: '1px solid #E5E7EB',
+            padding: '16px 20px', marginBottom: 16,
+            display: 'flex', alignItems: 'center', gap: 12,
+          }}>
+            <span style={{ fontSize: 22 }}>👁️</span>
+            <p style={{ fontSize: 13, color: '#6B7280', margin: 0 }}>
+              Solo puedes escuchar las memorias grabadas por el cuidador.
+            </p>
+          </div>
+        ) : (
         <div style={{
           background: 'white', borderRadius: 20, border: '1px solid #EDE5D8',
           padding: '20px', marginBottom: 16,
@@ -423,6 +436,7 @@ export default function Memorias() {
             </div>
           )}
         </div>
+        )}
 
         {/* Grouped timeline */}
         {loading ? (

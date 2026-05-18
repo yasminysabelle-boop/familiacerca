@@ -37,7 +37,8 @@ const catFor = id => CATEGORIES.find(c => c.id === id) ?? CATEGORIES[5]
 
 export default function Expenses() {
   const { user } = useAuth()
-  const { ownerId } = useFamily()
+  const { ownerId, memberRole } = useFamily()
+  const isFamiliar = memberRole === 'familiar'
   const { canEdit } = useSubscription()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -115,6 +116,7 @@ export default function Expenses() {
   }
 
   function canActOn(expense) {
+    if (isFamiliar) return false
     return isAdmin || expense.created_by_user_id === user?.id
   }
 
@@ -397,8 +399,8 @@ export default function Expenses() {
                       {formatCurrency(expense.amount)}
                     </p>
 
-                    {/* ⋮ menu */}
-                    <div style={{ position: 'relative', flexShrink: 0 }}>
+                    {/* ⋮ menu — hidden for familiar */}
+                    {!isFamiliar && <div style={{ position: 'relative', flexShrink: 0 }}>
                       <button
                         onClick={() => setMenuOpen(menuOpen === expense.id ? null : expense.id)}
                         style={{
@@ -445,7 +447,7 @@ export default function Expenses() {
                           )}
                         </div>
                       )}
-                    </div>
+                    </div>}
                   </div>
                 )
               })}
@@ -455,25 +457,27 @@ export default function Expenses() {
         </div>
       </div>
 
-      {/* FAB */}
-      <button
-        onClick={openModal}
-        style={{
-          position: 'fixed', bottom: 84, right: 20, zIndex: 30,
-          width: 54, height: 54, borderRadius: '50%',
-          background: 'linear-gradient(135deg, #C4623A, #A85130)',
-          border: 'none', cursor: 'pointer',
-          boxShadow: '0 6px 20px rgba(196,98,58,0.4)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          transition: 'transform 0.15s',
-        }}
-        onMouseDown={e => e.currentTarget.style.transform = 'scale(0.92)'}
-        onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
-        onTouchStart={e => e.currentTarget.style.transform = 'scale(0.92)'}
-        onTouchEnd={e => e.currentTarget.style.transform = 'scale(1)'}
-      >
-        <Plus size={26} color="white" strokeWidth={2.5} />
-      </button>
+      {/* FAB — hidden for familiar (view only) */}
+      {!isFamiliar && (
+        <button
+          onClick={openModal}
+          style={{
+            position: 'fixed', bottom: 84, right: 20, zIndex: 30,
+            width: 54, height: 54, borderRadius: '50%',
+            background: 'linear-gradient(135deg, #C4623A, #A85130)',
+            border: 'none', cursor: 'pointer',
+            boxShadow: '0 6px 20px rgba(196,98,58,0.4)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            transition: 'transform 0.15s',
+          }}
+          onMouseDown={e => e.currentTarget.style.transform = 'scale(0.92)'}
+          onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
+          onTouchStart={e => e.currentTarget.style.transform = 'scale(0.92)'}
+          onTouchEnd={e => e.currentTarget.style.transform = 'scale(1)'}
+        >
+          <Plus size={26} color="white" strokeWidth={2.5} />
+        </button>
+      )}
 
       {/* Confirmation dialog */}
       {confirmDialog && (

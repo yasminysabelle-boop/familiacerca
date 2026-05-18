@@ -82,13 +82,16 @@ export default function Hoy() {
   const [menuOpen, setMenuOpen] = useState(null)       // med.id with open ⋮ menu
   const [confirmDialog, setConfirmDialog] = useState(null) // { onConfirm }
 
-  const isAdmin = user?.id === ownerId
-  const isCuidador = !isAdmin && memberRole === 'cuidador'
+  const isFamiliar = memberRole === 'familiar'
+  const isAdmin = memberRole === null
+  const isCuidador = memberRole === 'cuidador'
   function canActOn(med) {
+    if (isFamiliar) return false
     if (isAdmin) return true
     if (isCuidador && med.created_by_user_id === user?.id) return true
     return false
   }
+  const [adminWarningMed, setAdminWarningMed] = useState(null)
 
   // Bottom sheet for proof photo — shown immediately after marking
   const [proofSheet, setProofSheet] = useState(null) // { med } or null
@@ -292,21 +295,23 @@ export default function Hoy() {
 
       <div style={{ padding: '16px 16px 96px', maxWidth: 600 }}>
 
-        {/* Add medication button */}
-        <Link
-          to="/medications?add=1"
-          style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-            padding: '12px 0', borderRadius: 14, marginBottom: 14,
-            background: 'linear-gradient(135deg, #C4623A, #A85130)',
-            color: 'white', fontWeight: 700, fontSize: 14,
-            textDecoration: 'none',
-            boxShadow: '0 4px 16px rgba(196,98,58,0.3)',
-          }}
-        >
-          <Plus size={16} color="white" strokeWidth={2.5} />
-          Agregar medicamento
-        </Link>
+        {/* Add medication button — hidden for familiar (view-only) */}
+        {!isFamiliar && (
+          <Link
+            to="/medications?add=1"
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+              padding: '12px 0', borderRadius: 14, marginBottom: 14,
+              background: 'linear-gradient(135deg, #C4623A, #A85130)',
+              color: 'white', fontWeight: 700, fontSize: 14,
+              textDecoration: 'none',
+              boxShadow: '0 4px 16px rgba(196,98,58,0.3)',
+            }}
+          >
+            <Plus size={16} color="white" strokeWidth={2.5} />
+            Agregar medicamento
+          </Link>
+        )}
 
         {/* Progress card */}
         {total > 0 && (
@@ -350,12 +355,12 @@ export default function Hoy() {
           return (
             <div
               key={med.id}
-              onClick={() => openProofSheet(med)}
+              onClick={() => !isFamiliar && openProofSheet(med)}
               style={{
                 display: 'flex', alignItems: 'center', gap: 10,
                 background: '#FFFBEB', border: '1.5px solid #F59E0B',
                 borderRadius: 14, padding: '10px 14px', marginBottom: 10,
-                cursor: 'pointer',
+                cursor: isFamiliar ? 'default' : 'pointer',
               }}
             >
               <span style={{ fontSize: 18, flexShrink: 0 }}>📷</span>
@@ -464,14 +469,18 @@ export default function Hoy() {
                       >
                         {/* Checkbox */}
                         <button
-                          onClick={() => isConfirmed ? unconfirmMed(med) : confirmMed(med)}
-                          disabled={isWorking || isEarly}
+                          onClick={() => {
+                            if (isFamiliar) return
+                            if (!isConfirmed && isAdmin) { setAdminWarningMed(med); return }
+                            isConfirmed ? unconfirmMed(med) : confirmMed(med)
+                          }}
+                          disabled={isWorking || isEarly || isFamiliar}
                           style={{
                             width: 28, height: 28, borderRadius: 8, flexShrink: 0,
-                            border: `2px solid ${isConfirmed ? '#22C55E' : '#D1D5DB'}`,
-                            background: isConfirmed ? '#22C55E' : 'white',
+                            border: `2px solid ${isConfirmed ? '#22C55E' : isFamiliar ? '#E5E7EB' : '#D1D5DB'}`,
+                            background: isConfirmed ? '#22C55E' : isFamiliar ? '#F9FAFB' : 'white',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            cursor: isWorking ? 'not-allowed' : 'pointer',
+                            cursor: isWorking || isFamiliar ? 'not-allowed' : 'pointer',
                             transition: 'all 0.2s',
                           }}
                           aria-label={isConfirmed ? 'Desmarcar' : 'Marcar como dado'}
@@ -665,6 +674,41 @@ export default function Hoy() {
                 style={{ flex: 1, padding: '12px', borderRadius: 12, border: 'none', background: '#D63031', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer', boxShadow: '0 4px 16px rgba(214,48,49,0.3)' }}
               >
                 Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Admin emergency confirmation dialog */}
+      {adminWarningMed && (
+        <div
+          style={{ position: 'fixed', inset: 0, zIndex: 300, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 24px' }}
+          onClick={e => { if (e.target === e.currentTarget) setAdminWarningMed(null) }}
+        >
+          <div style={{ background: 'white', borderRadius: 20, padding: '28px 24px', maxWidth: 340, width: '100%', boxShadow: '0 24px 64px rgba(0,0,0,0.25)', textAlign: 'center' }}>
+            <div style={{ fontSize: 40, marginBottom: 14 }}>⚠️</div>
+            <p style={{ fontFamily: 'Georgia, serif', fontSize: 17, fontWeight: 700, color: '#1A1A1A', marginBottom: 8 }}>
+              Confirmar como administrador
+            </p>
+            <p style={{ fontSize: 13, color: '#92400E', lineHeight: 1.6, marginBottom: 8, background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 12, padding: '10px 14px' }}>
+              Confirmando como administrador — solo en caso de emergencia
+            </p>
+            <p style={{ fontSize: 12, color: '#6B7280', lineHeight: 1.6, marginBottom: 24 }}>
+              Esta acción se registrará con tu nombre.
+            </p>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button
+                onClick={() => { setAdminWarningMed(null) }}
+                style={{ flex: 1, padding: '12px', borderRadius: 12, border: '1.5px solid #EDE5D8', background: 'white', color: '#6B7280', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => { const m = adminWarningMed; setAdminWarningMed(null); confirmMed(m) }}
+                style={{ flex: 1, padding: '12px', borderRadius: 12, border: 'none', background: '#D97706', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer', boxShadow: '0 4px 16px rgba(217,119,6,0.3)' }}
+              >
+                Confirmar
               </button>
             </div>
           </div>

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
+import { useFamily } from '../contexts/FamilyContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import { getLocation, mapsUrl } from '../lib/gps'
@@ -74,6 +75,9 @@ async function stampImage(file, confirmerName) {
 
 export default function MedicationTimeline() {
   const { user } = useAuth()
+  const { memberRole } = useFamily()
+  const isFamiliar = memberRole === 'familiar'
+  const isAdmin = memberRole === null
   const fileRef       = useRef(null)
   const attachFileRef = useRef(null)
   const [medications, setMedications] = useState([])
@@ -289,7 +293,7 @@ export default function MedicationTimeline() {
                           </div>
                         </div>
                       </div>
-                      {!log && (
+                      {!log && !isFamiliar && (
                         <div className="flex gap-1.5 flex-shrink-0 ml-3">
                           <button onClick={() => openConfirm(med)}
                             className="px-3 py-2 bg-primary hover:bg-primary-dark text-white text-xs font-semibold rounded-lg transition-colors">
@@ -519,6 +523,11 @@ export default function MedicationTimeline() {
             </button>
 
             <div className="px-6 pt-4 pb-6">
+              {isAdmin && (
+                <div className="mb-3 px-3 py-2.5 bg-amber-50 border border-amber-300 rounded-xl text-sm text-amber-800 flex items-center gap-2">
+                  <span>⚠️</span> Confirmando como administrador — solo en caso de emergencia
+                </div>
+              )}
               {photoError && (
                 <div className="mb-3 px-3 py-2.5 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700 flex items-center gap-2">
                   <span>⚠</span>{photoError}
