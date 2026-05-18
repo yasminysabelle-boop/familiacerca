@@ -60,6 +60,17 @@ async function stampProof(file, confirmerName) {
   })
 }
 
+function getMedTimingStatus(scheduledTime) {
+  if (!scheduledTime) return 'ok'
+  const [h, m] = scheduledTime.split(':').map(Number)
+  const scheduled = new Date()
+  scheduled.setHours(h, m, 0, 0)
+  const diffMin = (Date.now() - scheduled.getTime()) / 60000
+  if (diffMin < 0) return 'early'
+  if (diffMin <= 30) return 'on-time'
+  return 'late'
+}
+
 export default function Hoy() {
   const { user } = useAuth()
   const { ownerId, profile, memberRole } = useFamily()
@@ -429,6 +440,15 @@ export default function Hoy() {
                     const proofExpired = isConfirmed && !hasPhoto && log?.confirmed_at &&
                       (Date.now() - new Date(log.confirmed_at).getTime()) >= 30 * 60 * 1000
 
+                    const timingStatus = !isConfirmed ? getMedTimingStatus(med._firstTime) : 'ok'
+                    const isEarly = timingStatus === 'early'
+                    const earlyLabel = (() => {
+                      if (!isEarly || !med._firstTime) return null
+                      const [hh, mm] = med._firstTime.split(':').map(Number)
+                      const d = new Date(); d.setHours(hh, mm, 0, 0)
+                      return d.toLocaleTimeString('es-US', { hour: '2-digit', minute: '2-digit' })
+                    })()
+
                     return (
                       <div
                         key={med.id}
@@ -445,7 +465,7 @@ export default function Hoy() {
                         {/* Checkbox */}
                         <button
                           onClick={() => isConfirmed ? unconfirmMed(med) : confirmMed(med)}
-                          disabled={isWorking}
+                          disabled={isWorking || isEarly}
                           style={{
                             width: 28, height: 28, borderRadius: 8, flexShrink: 0,
                             border: `2px solid ${isConfirmed ? '#22C55E' : '#D1D5DB'}`,
@@ -535,6 +555,26 @@ export default function Hoy() {
                               </span>
                             )}
                           </div>
+                        )}
+
+                        {/* Timing badge — only for pending meds with a schedule */}
+                        {!isConfirmed && isEarly && earlyLabel && (
+                          <span style={{
+                            fontSize: 10, fontWeight: 700, color: '#6B7280',
+                            background: '#F3F4F6', padding: '3px 8px', borderRadius: 6,
+                            flexShrink: 0, whiteSpace: 'nowrap',
+                          }}>
+                            🕐 {earlyLabel}
+                          </span>
+                        )}
+                        {!isConfirmed && timingStatus === 'late' && (
+                          <span style={{
+                            fontSize: 10, fontWeight: 700, color: '#B45309',
+                            background: '#FFFBEB', padding: '3px 8px', borderRadius: 6,
+                            flexShrink: 0, whiteSpace: 'nowrap',
+                          }}>
+                            ⚠ Tarde
+                          </span>
                         )}
 
                         {/* ⋮ menu — admin or cuidador who added this med */}
@@ -674,6 +714,20 @@ export default function Hoy() {
                 <XIcon size={16} color="#6B7280" strokeWidth={2} />
               </button>
             </div>
+
+            {/* Late warning */}
+            {getMedTimingStatus(firstTime(proofSheet.med)) === 'late' && (
+              <div style={{
+                padding: '10px 14px', background: '#FFFBEB', border: '1px solid #F59E0B',
+                borderRadius: 12, marginBottom: 16,
+                display: 'flex', alignItems: 'center', gap: 8,
+              }}>
+                <span style={{ fontSize: 14 }}>⚠️</span>
+                <p style={{ fontSize: 12, color: '#92400E', margin: 0, lineHeight: 1.5 }}>
+                  Dado fuera del horario programado · Foto subida fuera del horario
+                </p>
+              </div>
+            )}
 
             {/* Camera area */}
             <button

@@ -12,6 +12,17 @@ function isOverdue(time, status) {
   return Date.now() > scheduled.getTime() + 30 * 60 * 1000
 }
 
+function getMedTimingStatus(scheduledTime) {
+  if (!scheduledTime) return 'ok'
+  const [h, m] = scheduledTime.split(':').map(Number)
+  const scheduled = new Date()
+  scheduled.setHours(h, m, 0, 0)
+  const diffMin = (Date.now() - scheduled.getTime()) / 60000
+  if (diffMin < 0) return 'early'
+  if (diffMin <= 30) return 'on-time'
+  return 'late'
+}
+
 function StatusBadge({ status, overdue }) {
   if (status === 'confirmed') return <span className="text-xs bg-primary-light text-primary px-2 py-0.5 rounded-full font-medium">✓ Confirmado</span>
   if (status === 'missed')    return <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-medium">✗ Perdido</span>
@@ -75,6 +86,7 @@ export default function MedicationTimeline() {
   const [confirmNote, setConfirmNote] = useState('')
   const [saving, setSaving] = useState(false)
   const [photoError, setPhotoError] = useState('')
+  const [tick, setTick] = useState(0)
   const [editingPhoto, setEditingPhoto] = useState(null)   // { log, medName }
   const [attachFile, setAttachFile] = useState(null)
   const [attachPreview, setAttachPreview] = useState(null)
@@ -87,6 +99,12 @@ export default function MedicationTimeline() {
   useEffect(() => {
     if (user) { fetchToday(); fetchHistory() }
   }, [user])
+
+  useEffect(() => {
+    if (!confirming) return
+    const id = setInterval(() => setTick(t => t + 1), 15_000)
+    return () => clearInterval(id)
+  }, [!!confirming])
 
   async function fetchToday() {
     const [{ data: meds }, { data: logs }] = await Promise.all([
@@ -196,6 +214,14 @@ export default function MedicationTimeline() {
   }
 
   const overdueCount = medications.filter(m => isOverdue(m.time, todayLogs[m.id]?.status)).length
+  const confirmTimingStatus = getMedTimingStatus(confirming?.time)
+  const confirmScheduledLabel = (() => {
+    if (!confirming?.time) return null
+    const [h, m] = confirming.time.split(':').map(Number)
+    const d = new Date(); d.setHours(h, m, 0, 0)
+    return d.toLocaleTimeString('es-US', { hour: '2-digit', minute: '2-digit' })
+  })()
+  const attachTimingStatus = getMedTimingStatus(editingPhoto?.log?.scheduled_time)
 
   const historyByDate = history.reduce((acc, l) => {
     if (!acc[l.log_date]) acc[l.log_date] = []
@@ -433,6 +459,11 @@ export default function MedicationTimeline() {
             </button>
 
             <div className="px-6 pt-4 pb-6">
+              {attachTimingStatus === 'late' && (
+                <div className="mb-3 px-3 py-2.5 bg-orange-50 border border-orange-200 rounded-xl text-sm text-orange-700 flex items-center gap-2">
+                  <span>⚠</span>Foto subida fuera del horario
+                </div>
+              )}
               {attachError && (
                 <div className="mb-3 px-3 py-2.5 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700 flex items-center gap-2">
                   <span>⚠</span>{attachError}
@@ -493,12 +524,17 @@ export default function MedicationTimeline() {
                   <span>⚠</span>{photoError}
                 </div>
               )}
+              {confirmTimingStatus === 'late' && (
+                <div className="mb-3 px-3 py-2.5 bg-orange-50 border border-orange-200 rounded-xl text-sm text-orange-700 flex items-center gap-2">
+                  <span>⚠</span>Dado fuera del horario programado
+                </div>
+              )}
               <textarea value={confirmNote} onChange={e => setConfirmNote(e.target.value)} rows={2}
                 placeholder="Nota opcional (ej. tomó bien, sin problemas...)"
                 className="w-full mb-4 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none" />
 
               <div className="flex gap-3">
-                <button onClick={submitConfirm} disabled={saving || stamping}
+                <button onClick={submitConfirm} disabled={saving || stamping || confirmTimingStatus === 'early'}
                   className="flex-1 py-3 bg-primary hover:bg-primary-dark disabled:opacity-50 text-white font-semibold rounded-xl transition-colors text-sm">
                   {saving ? 'Guardando...' : '✓ Confirmar dosis'}
                 </button>
@@ -507,6 +543,11 @@ export default function MedicationTimeline() {
                   Cancelar
                 </button>
               </div>
+              {confirmTimingStatus === 'early' && confirmScheduledLabel && (
+                <p className="text-center text-xs text-gray-500 mt-2">
+                  Disponible a las {confirmScheduledLabel}
+                </p>
+              )}
             </div>
           </div>
         </div>
