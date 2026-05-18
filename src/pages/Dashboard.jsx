@@ -1976,12 +1976,20 @@ export default function Dashboard() {
           </div>
         )}
         {ownerId && (loading ? (
-          <div style={{ display: 'flex', justifyContent: 'center', padding: 48 }}>
-            <div style={{
-              width: 28, height: 28, borderRadius: '50%',
-              border: '3px solid #EDE5D8', borderTopColor: '#C4623A',
-              animation: 'spin 0.8s linear infinite',
-            }} />
+          <div>
+            {[1, 2, 3].map(i => (
+              <div key={i} style={{
+                background: 'white', borderRadius: 16, padding: '14px 14px',
+                marginBottom: 10, border: '1px solid #EDE5D8',
+                display: 'flex', alignItems: 'center', gap: 12,
+              }}>
+                <div className="animate-pulse" style={{ width: 44, height: 44, borderRadius: 12, background: '#EDE5D8', flexShrink: 0 }} />
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <div className="animate-pulse" style={{ height: 14, width: '55%', background: '#EDE5D8', borderRadius: 6 }} />
+                  <div className="animate-pulse" style={{ height: 11, width: '35%', background: '#EDE5D8', borderRadius: 6 }} />
+                </div>
+              </div>
+            ))}
           </div>
         ) : sections.length === 0 && !timelineError ? (
           <EmptyState profile={profile} />

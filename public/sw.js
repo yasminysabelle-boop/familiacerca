@@ -1,6 +1,6 @@
 // FamiliaCerca Service Worker — offline caching + push notifications
 
-const CACHE_VER = 'familiacerca-v4'
+const CACHE_VER = 'familiacerca-v5'
 
 // Static assets whose URLs are stable (not content-hashed by Vite)
 const PRECACHE = [
@@ -37,7 +37,12 @@ self.addEventListener('activate', event => {
       caches.keys().then(keys =>
         Promise.all(keys.filter(k => k !== CACHE_VER).map(k => caches.delete(k)))
       ),
-    ])
+    ]).then(() =>
+      // Tell all open windows to reload so they pick up the new JS bundle
+      clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
+        for (const c of list) c.postMessage({ type: 'SW_UPDATED' })
+      })
+    )
   )
 })
 
