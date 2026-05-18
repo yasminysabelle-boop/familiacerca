@@ -24,8 +24,8 @@ const PLANS = [
       'Historial ilimitado',
       'Resúmenes con IA ✨',
     ],
-    cta: 'Plan base',
-    disabled: true,
+    cta: 'Comenzar gratis →',
+    disabled: false,
   },
   {
     id: 'familiar',
@@ -103,7 +103,7 @@ export default function Pricing() {
   const [openFaq, setOpenFaq] = useState(null)
 
   async function handleChoose(planId) {
-    if (planId === 'free') return
+    if (planId === 'free') { navigate('/register'); return }
     setLoading(planId)
     try {
       const url = await createCheckoutSession(planId)
@@ -170,7 +170,7 @@ export default function Pricing() {
       {/* Plan cards */}
       <div style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 14 }}>
         {PLANS.map(plan => {
-          const isCurrent = currentPlan === plan.id
+          const isCurrent = currentPlan === plan.id || (plan.id === 'free' && isTrialing)
           const isHighlighted = plan.id === 'familiar'
           const isLoading = loading === plan.id
 
