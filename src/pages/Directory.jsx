@@ -361,12 +361,12 @@ export default function Directory() {
 
   useEffect(() => { if (ownerId) fetchAll() }, [ownerId])
 
-  // Realtime: refresh familiares whenever a new member joins
+  // Realtime: refresh familiares on any membership change (join, role update, removal)
   useEffect(() => {
     if (!ownerId) return
     const channel = supabase
       .channel(`dir_family_members_${ownerId}`)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'family_members', filter: `user_id=eq.${ownerId}` }, () => fetchAll())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'family_members', filter: `user_id=eq.${ownerId}` }, () => fetchAll())
       .subscribe()
     return () => { supabase.removeChannel(channel) }
   }, [ownerId])
