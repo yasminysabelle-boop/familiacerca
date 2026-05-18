@@ -287,41 +287,49 @@ function ContactCard({ con, onEdit, onToggleEmergency, onDeleteRequest, canDelet
   )
 }
 
-function JoinedMemberCard({ member }) {
-  const roleLabel = member.role === 'cuidador' ? 'Cuidador' : 'Familiar'
-  const roleColor = member.role === 'cuidador' ? '#4A7C59' : '#7C5CBF'
-  const roleBg    = member.role === 'cuidador' ? '#F0FDF4' : '#EDE9FE'
+function JoinedMemberCard({ member, inDirectory, onClick }) {
+  const roleLabel  = member.role === 'cuidador' ? 'Cuidador' : 'Familiar'
+  const roleColor  = member.role === 'cuidador' ? '#4A7C59' : '#7C5CBF'
+  const roleBg     = member.role === 'cuidador' ? '#F0FDF4' : '#EDE9FE'
   const roleBorder = member.role === 'cuidador' ? '#BBF7D0' : '#C4B5FD'
   return (
-    <div style={{
-      background: 'white', borderRadius: 14,
-      border: '1.5px solid #BFDBFE',
-      padding: '12px 14px', marginBottom: 10,
-      display: 'flex', alignItems: 'center', gap: 12,
-    }}>
-      <div style={{
-        width: 38, height: 38, borderRadius: '50%', flexShrink: 0,
-        background: 'linear-gradient(135deg, #DBEAFE, #BFDBFE)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: 16, fontWeight: 700, color: '#2563EB',
-      }}>
-        {member.name?.charAt(0)?.toUpperCase() ?? '?'}
+    <div
+      onClick={onClick}
+      style={{
+        background: 'white', borderRadius: 14,
+        border: '1.5px solid #BFDBFE',
+        padding: '12px 14px', marginBottom: 10,
+        cursor: 'pointer',
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{
+          width: 38, height: 38, borderRadius: '50%', flexShrink: 0,
+          background: 'linear-gradient(135deg, #DBEAFE, #BFDBFE)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: 16, fontWeight: 700, color: '#2563EB',
+        }}>
+          {member.name?.charAt(0)?.toUpperCase() ?? '?'}
+        </div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <p style={{ fontSize: 13, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>{member.name}</p>
+          {member.email && (
+            <p style={{ fontSize: 11, color: '#9CA3AF', margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {member.email}
+            </p>
+          )}
+        </div>
+        <span style={{
+          fontSize: 11, fontWeight: 700, color: roleColor,
+          background: roleBg, border: `1px solid ${roleBorder}`,
+          padding: '3px 9px', borderRadius: 20, flexShrink: 0,
+        }}>
+          {roleLabel}
+        </span>
       </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ fontSize: 13, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>{member.name}</p>
-        {member.email && (
-          <p style={{ fontSize: 11, color: '#9CA3AF', margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {member.email}
-          </p>
-        )}
-      </div>
-      <span style={{
-        fontSize: 11, fontWeight: 700, color: roleColor,
-        background: roleBg, border: `1px solid ${roleBorder}`,
-        padding: '3px 9px', borderRadius: 20, flexShrink: 0,
-      }}>
-        {roleLabel}
-      </span>
+      <p style={{ fontSize: 11, color: inDirectory ? '#4A7C59' : '#C4623A', margin: '8px 0 0', fontWeight: 600 }}>
+        {inDirectory ? '✓ En directorio — toca para editar' : '+ Toca para añadir al directorio'}
+      </p>
     </div>
   )
 }
@@ -450,10 +458,21 @@ export default function Directory() {
   }
 
   // ── Contact CRUD ──────────────────────────────────────────────────
-  function openCon(c = null) {
+  function openCon(c = null, prefill = {}) {
     setEditCon(c)
-    setConForm(c ? { name: c.name, relationship: c.relationship ?? '', phone: c.phone ?? '', email: c.email ?? '', address: c.address ?? '', is_emergency_contact: c.is_emergency_contact, notes: c.notes ?? '' } : BLANK_CON)
+    setConForm(c
+      ? { name: c.name, relationship: c.relationship ?? '', phone: c.phone ?? '', email: c.email ?? '', address: c.address ?? '', is_emergency_contact: c.is_emergency_contact, notes: c.notes ?? '' }
+      : { ...BLANK_CON, ...prefill }
+    )
     setConModal(true)
+  }
+
+  function handleMemberTap(member) {
+    const existing = contacts.find(c =>
+      c.email && member.email &&
+      c.email.toLowerCase() === member.email.toLowerCase()
+    )
+    openCon(existing ?? null, { name: member.name, email: member.email })
   }
 
   async function saveCon() {
@@ -576,7 +595,19 @@ export default function Directory() {
                       <p style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10 }}>
                         Con acceso al app
                       </p>
-                      {familyMembers.map(m => <JoinedMemberCard key={m.id} member={m} />)}
+                      {familyMembers.map(m => {
+                        const inDirectory = contacts.some(c =>
+                          c.email && m.email && c.email.toLowerCase() === m.email.toLowerCase()
+                        )
+                        return (
+                          <JoinedMemberCard
+                            key={m.id}
+                            member={m}
+                            inDirectory={inDirectory}
+                            onClick={() => handleMemberTap(m)}
+                          />
+                        )
+                      })}
                     </div>
                   )}
 
