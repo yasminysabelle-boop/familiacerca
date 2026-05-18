@@ -77,6 +77,7 @@ export default function Hoy() {
   const [proofPreview, setProofPreview] = useState(null)
   const [proofBlob, setProofBlob] = useState(null)
   const [proofGps, setProofGps] = useState(null)
+  const [uploadError, setUploadError] = useState('')
   const fileRef = useRef(null)
 
   // Tick every 30 s so countdown displays stay current
@@ -167,6 +168,7 @@ export default function Hoy() {
     setProofBlob(null)
     setProofGps(null)
     setProofStamping(false)
+    setUploadError('')
   }
 
   function closeProofSheet() {
@@ -174,6 +176,7 @@ export default function Hoy() {
     setProofPreview(null)
     setProofBlob(null)
     setProofGps(null)
+    setUploadError('')
     if (fileRef.current) fileRef.current.value = ''
   }
 
@@ -181,6 +184,7 @@ export default function Hoy() {
     const f = e.target.files?.[0]
     e.target.value = ''
     if (!f) return
+    setUploadError('')
     setProofStamping(true)
     // Capture GPS and stamp the image in parallel
     const [stamped, loc] = await Promise.all([
@@ -196,12 +200,15 @@ export default function Hoy() {
   async function submitProofPhoto() {
     if (!proofBlob || !proofSheet) return
     setProofUploading(true)
+    setUploadError('')
     try {
       const medId = proofSheet.med.id
       const path = `${ownerId}/${today}/${medId}.jpg`
-      await supabase.storage.from('confirmations').upload(path, proofBlob, { upsert: true, contentType: 'image/jpeg' })
+      const { error: storageError } = await supabase.storage
+        .from('confirmations')
+        .upload(path, proofBlob, { upsert: true, contentType: 'image/jpeg' })
+      if (storageError) throw storageError
       const { data: { publicUrl } } = supabase.storage.from('confirmations').getPublicUrl(path)
-      // Save photo + GPS captured at photo time
       const updateFields = {
         photo_url: publicUrl,
         ...(proofGps && {
@@ -210,15 +217,19 @@ export default function Hoy() {
           address:   proofGps.address,
         }),
       }
-      await supabase.from('medication_logs')
+      const { error: dbError } = await supabase.from('medication_logs')
         .update(updateFields)
         .eq('medication_id', medId)
         .eq('user_id', ownerId)
         .eq('log_date', today)
+      if (dbError) throw dbError
       setLogs(prev => ({ ...prev, [medId]: { ...prev[medId], ...updateFields } }))
       closeProofSheet()
-    } catch { /* upload failed — sheet stays open */ }
-    setProofUploading(false)
+    } catch {
+      setUploadError('No se pudo guardar la foto. Verifica tu conexión e intenta de nuevo.')
+    } finally {
+      setProofUploading(false)
+    }
   }
 
   function firstTime(med) {
@@ -619,7 +630,7 @@ export default function Hoy() {
             background: 'rgba(0,0,0,0.6)',
             display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
           }}
-          onClick={e => { if (e.target === e.currentTarget) closeProofSheet() }}
+          onClick={e => { if (e.target === e.currentTarget && !proofUploading) closeProofSheet() }}
         >
           <div style={{
             width: '100%', maxWidth: 480,
@@ -648,7 +659,8 @@ export default function Hoy() {
               </div>
               <button
                 onClick={closeProofSheet}
-                style={{ padding: 8, borderRadius: 10, background: '#F3F4F6', border: 'none', cursor: 'pointer', flexShrink: 0 }}
+                disabled={proofUploading}
+                style={{ padding: 8, borderRadius: 10, background: '#F3F4F6', border: 'none', cursor: proofUploading ? 'not-allowed' : 'pointer', flexShrink: 0, opacity: proofUploading ? 0.4 : 1 }}
               >
                 <XIcon size={16} color="#6B7280" strokeWidth={2} />
               </button>
@@ -714,6 +726,20 @@ export default function Hoy() {
               )}
             </button>
 
+            {/* Error feedback */}
+            {uploadError && (
+              <div style={{
+                display: 'flex', alignItems: 'flex-start', gap: 8,
+                background: '#FFF0F0', border: '1px solid #FFBABA',
+                borderRadius: 10, padding: '10px 12px', marginBottom: 12,
+              }}>
+                <span style={{ fontSize: 14, flexShrink: 0 }}>⚠️</span>
+                <p style={{ fontSize: 12, color: '#D63031', margin: 0, lineHeight: 1.5 }}>
+                  {uploadError}
+                </p>
+              </div>
+            )}
+
             {/* Action buttons */}
             <button
               onClick={submitProofPhoto}
@@ -726,11 +752,25 @@ export default function Hoy() {
                   : '#D4C4B8',
                 color: 'white', fontWeight: 700, fontSize: 14,
                 cursor: proofBlob && !proofUploading ? 'pointer' : 'not-allowed',
-                boxShadow: proofBlob ? '0 6px 20px rgba(196,98,58,0.3)' : 'none',
+                boxShadow: proofBlob && !proofUploading ? '0 6px 20px rgba(196,98,58,0.3)' : 'none',
                 transition: 'all 0.2s',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
               }}
             >
-              {proofUploading ? 'Guardando...' : '✓ Guardar foto de prueba'}
+              {proofUploading ? (
+                <>
+                  <div style={{
+                    width: 16, height: 16, borderRadius: '50%',
+                    border: '2.5px solid rgba(255,255,255,0.4)',
+                    borderTopColor: 'white',
+                    animation: 'spin 0.7s linear infinite',
+                    flexShrink: 0,
+                  }} />
+                  Guardando...
+                </>
+              ) : (
+                '✓ Guardar foto de prueba'
+              )}
             </button>
 
             <button
