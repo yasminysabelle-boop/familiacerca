@@ -343,6 +343,44 @@ function AppointmentCard({ evt, todayKey, tomorrowKey }) {
   )
 }
 
+function AppointmentProofCard({ evt, onTap }) {
+  return (
+    <div
+      onClick={() => onTap(evt)}
+      style={{
+        background: 'white', borderRadius: 16,
+        border: '1px solid #BBF7D0',
+        padding: '12px 14px',
+        display: 'flex', alignItems: 'center', gap: 10,
+        cursor: 'pointer',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+      }}
+    >
+      {evt.proofPhotoUrl ? (
+        <img
+          src={evt.proofPhotoUrl}
+          alt="Prueba"
+          style={{ width: 44, height: 44, borderRadius: 10, objectFit: 'cover', flexShrink: 0, border: '1px solid #D1FAE5' }}
+        />
+      ) : (
+        <span style={{ fontSize: 22, flexShrink: 0 }}>📅</span>
+      )}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', margin: 0 }}>
+          {evt.appointmentTitle}
+        </p>
+        <p style={{ fontSize: 11, color: '#16A34A', marginTop: 2, fontWeight: 600 }}>
+          ✓ Asistencia confirmada
+          {evt.appointmentTime ? ` · ${fmtTime(evt.appointmentTime)}` : ''}
+        </p>
+        {evt.proofNotes && (
+          <p style={{ fontSize: 11, color: '#6B7280', marginTop: 2 }}>{evt.proofNotes}</p>
+        )}
+      </div>
+    </div>
+  )
+}
+
 function CaregiverCard({ evt }) {
   return (
     <div style={{
@@ -588,6 +626,7 @@ function EventDetailSheet({ evt, onClose }) {
     PHOTO: 'Foto',
     EXPENSE: 'Gasto',
     SOS_ALERT: 'Alerta SOS',
+    APPOINTMENT_PROOF: 'Cita médica',
   }
   return (
     <div
@@ -631,6 +670,32 @@ function EventDetailSheet({ evt, onClose }) {
           {evt.type === 'PHOTO' && <PhotoDetailContent evt={evt} />}
           {evt.type === 'EXPENSE' && <ExpenseDetail evt={evt} />}
           {evt.type === 'SOS_ALERT' && <SosDetail evt={evt} />}
+          {evt.type === 'APPOINTMENT_PROOF' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <p style={{ fontSize: 17, fontWeight: 700, color: '#1A1A1A', fontFamily: 'Georgia, serif', margin: 0 }}>
+                {evt.appointmentTitle}
+              </p>
+              {evt.appointmentTime && (
+                <DetailRow icon="🕐" label="Hora" value={fmtTime(evt.appointmentTime)} />
+              )}
+              <DetailRow icon="✅" label="Estado" value="Asistencia confirmada" />
+              {evt.proofNotes && (
+                <DetailRow icon="📝" label="Notas" value={evt.proofNotes} />
+              )}
+              {evt.proofPhotoUrl && (
+                <div>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
+                    Foto de prueba
+                  </p>
+                  <img
+                    src={evt.proofPhotoUrl}
+                    alt="Prueba de cita"
+                    style={{ width: '100%', borderRadius: 12, objectFit: 'cover', maxHeight: 260, border: '1px solid #D1FAE5' }}
+                  />
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -659,6 +724,9 @@ function TimelineEvent({ evt, confirming, expandedAudio, onConfirm, onToggleAudi
   if (evt.type === 'EXPENSE') return <div><ExpenseCard evt={evt} onTap={() => onTap(evt)} />{bar}</div>
   if (evt.type === 'APPOINTMENT') {
     return <div><AppointmentCard evt={evt} todayKey={todayKey} tomorrowKey={tomorrowKey} />{bar}</div>
+  }
+  if (evt.type === 'APPOINTMENT_PROOF') {
+    return <div><AppointmentProofCard evt={evt} onTap={() => onTap(evt)} />{bar}</div>
   }
   if (evt.type === 'SOS_ALERT') return <div><SosCard evt={evt} onTap={() => onTap(evt)} />{bar}</div>
   if (evt.type === 'CAREGIVER_CARD') return <CaregiverCard evt={evt} />
@@ -703,7 +771,7 @@ function EmptyState({ profile }) {
 
 const CATEGORY_GROUPS = [
   { id: 'meds',    emoji: '💊', label: 'Medicamentos', types: ['MED_PENDING', 'MED_CONFIRMED'] },
-  { id: 'citas',   emoji: '📅', label: 'Citas',        types: ['APPOINTMENT'] },
+  { id: 'citas',   emoji: '📅', label: 'Citas',        types: ['APPOINTMENT', 'APPOINTMENT_PROOF'] },
   { id: 'familia', emoji: '👥', label: 'Familia',      types: ['PHOTO', 'CAREGIVER_CARD'] },
   { id: 'notas',   emoji: '💬', label: 'Notas',        types: ['VOICE_MEMORY', 'NOTE'] },
   { id: 'gastos',  emoji: '💰', label: 'Gastos',       types: ['EXPENSE'] },
@@ -1142,11 +1210,11 @@ export default function Dashboard() {
         .limit(20),
 
       supabase.from('events')
-        .select('*')
+        .select('*, appointment_proofs(*)')
         .eq('user_id', ownerId)
-        .gte('date', todayKey)
+        .gte('date', sevenAgoKey)
         .order('date', { ascending: true })
-        .limit(5),
+        .limit(20),
 
       supabase.from('emergency_alerts')
         .select('*')
@@ -1254,18 +1322,35 @@ export default function Dashboard() {
       })
     }
 
-    // ── Upcoming appointments ──
+    // ── Appointments: upcoming + past attended (with proof photos) ──
     for (const ev of (events ?? [])) {
       const evDate = ev.date
       const evTime = ev.time
-      allEvents.push({
-        id: `evt-${ev.id}`,
-        type: 'APPOINTMENT',
-        timestamp: new Date(`${evDate}T${evTime ?? '09:00'}:00`),
-        dateKey: evDate,
-        appointmentTitle: ev.title,
-        appointmentTime: evTime ?? null,
-      })
+      const proof  = ev.appointment_proofs?.[0] ?? null
+
+      if (evDate >= todayKey) {
+        // Upcoming — show as a forward-looking appointment card
+        allEvents.push({
+          id: `evt-${ev.id}`,
+          type: 'APPOINTMENT',
+          timestamp: new Date(`${evDate}T${evTime ?? '09:00'}:00`),
+          dateKey: evDate,
+          appointmentTitle: ev.title,
+          appointmentTime: evTime ?? null,
+        })
+      } else if (proof) {
+        // Past appointment with a proof — surface it in the timeline
+        allEvents.push({
+          id: `proof-${proof.id}`,
+          type: 'APPOINTMENT_PROOF',
+          timestamp: new Date(`${evDate}T${evTime ?? '09:00'}:00`),
+          dateKey: evDate,
+          appointmentTitle: ev.title,
+          appointmentTime: evTime ?? null,
+          proofPhotoUrl: proof.photo_url ?? null,
+          proofNotes: proof.notes ?? null,
+        })
+      }
     }
 
     // ── SOS alerts ──
