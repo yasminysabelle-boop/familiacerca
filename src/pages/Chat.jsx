@@ -85,6 +85,8 @@ export default function Chat() {
     useSpeechToText(text => setInput(prev => prev ? prev + ' ' + text : text))
 
   useEffect(() => {
+    if (!ownerId) return
+
     loadMessages()
 
     const channel = supabase
@@ -97,7 +99,6 @@ export default function Chat() {
             if (prev.some(m => m.id === payload.new.id)) return prev
             return [...prev, payload.new]
           })
-          // Fetch profile for new sender if not cached
           const senderId = payload.new.user_id
           setProfiles(prev => {
             if (prev[senderId]) return prev
@@ -116,7 +117,7 @@ export default function Chat() {
       .subscribe()
 
     return () => supabase.removeChannel(channel)
-  }, [])
+  }, [ownerId])
 
   // Scroll to bottom whenever messages update
   useEffect(() => {
@@ -150,6 +151,8 @@ export default function Chat() {
     const text = input.trim()
     if (!text) return
 
+    if (!ownerId) { setSendError('No se pudo enviar. Inténtalo de nuevo.'); return }
+
     setSending(true)
     setSendError('')
     setInput('')
@@ -159,7 +162,6 @@ export default function Chat() {
       user_id: user.id,
       user_name: displayName,
       content: text,
-      message: text,
     })
 
     if (error) {
