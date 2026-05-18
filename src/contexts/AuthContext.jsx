@@ -12,16 +12,27 @@ export function AuthProvider({ children }) {
   const [inactivityWarning, setInactivityWarning] = useState(false)
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    // On slow/offline mobile, getSession() can hang if it needs to refresh an
+    // expired access token. Cap the wait so the app never stays in loading=true forever.
+    let settled = false
+    function resolve(session) {
+      if (settled) return
+      settled = true
       setUser(session?.user ?? null)
       setLoading(false)
+    }
+    const timer = setTimeout(() => resolve(null), 8000)
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      clearTimeout(timer)
+      resolve(session)
     })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
     })
 
-    return () => subscription.unsubscribe()
+    return () => { subscription.unsubscribe(); clearTimeout(timer) }
   }, [])
 
   // Update last_seen every 2 minutes while active

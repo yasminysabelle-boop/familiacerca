@@ -1,6 +1,6 @@
 // FamiliaCerca Service Worker — offline caching + push notifications
 
-const CACHE_VER = 'familiacerca-v3'
+const CACHE_VER = 'familiacerca-v4'
 
 // Static assets whose URLs are stable (not content-hashed by Vite)
 const PRECACHE = [
@@ -50,18 +50,26 @@ self.addEventListener('fetch', event => {
   // Never intercept cross-origin requests (Supabase, Stripe, Google, etc.)
   if (url.origin !== self.location.origin) return
 
-  // Navigation → network-first, cache index.html, fall back to cached shell
+  // Navigation → network-first with 5 s timeout, cache index.html, fall back to cached shell.
+  // The timeout prevents an unbounded hang on slow mobile connections.
   if (event.request.mode === 'navigate') {
     event.respondWith(
-      fetch(event.request)
-        .then(res => {
+      (async () => {
+        const controller = new AbortController()
+        const timer = setTimeout(() => controller.abort(), 5000)
+        try {
+          const res = await fetch(event.request, { signal: controller.signal })
+          clearTimeout(timer)
           if (res.ok) {
             const clone = res.clone()
             caches.open(CACHE_VER).then(c => c.put('/index.html', clone))
           }
           return res
-        })
-        .catch(() => caches.match('/index.html'))
+        } catch {
+          clearTimeout(timer)
+          return caches.match('/index.html')
+        }
+      })()
     )
     return
   }
