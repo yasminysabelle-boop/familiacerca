@@ -63,7 +63,8 @@ async function stampImage(file, confirmerName) {
 
 export default function MedicationTimeline() {
   const { user } = useAuth()
-  const fileRef = useRef(null)
+  const fileRef       = useRef(null)
+  const attachFileRef = useRef(null)
   const [medications, setMedications] = useState([])
   const [todayLogs, setTodayLogs] = useState({})
   const [history, setHistory] = useState([])
@@ -74,6 +75,12 @@ export default function MedicationTimeline() {
   const [confirmNote, setConfirmNote] = useState('')
   const [saving, setSaving] = useState(false)
   const [photoError, setPhotoError] = useState('')
+  const [editingPhoto, setEditingPhoto] = useState(null)   // { log, medName }
+  const [attachFile, setAttachFile] = useState(null)
+  const [attachPreview, setAttachPreview] = useState(null)
+  const [attachStamping, setAttachStamping] = useState(false)
+  const [attachSaving, setAttachSaving] = useState(false)
+  const [attachError, setAttachError] = useState('')
   const displayName = user?.user_metadata?.full_name ?? user?.email ?? 'Familiar'
   const today = new Date().toISOString().split('T')[0]
 
@@ -141,6 +148,37 @@ export default function MedicationTimeline() {
     }, { onConflict: 'medication_id,log_date,user_id' })
 
     setConfirming(null); setSaving(false)
+    fetchToday(); fetchHistory()
+  }
+
+  function openAttachPhoto(log, medName) {
+    setEditingPhoto({ log, medName })
+    setAttachFile(null); setAttachPreview(null); setAttachError('')
+  }
+
+  async function handleAttachPhotoChange(e) {
+    const f = e.target.files?.[0]; if (!f) return
+    setAttachStamping(true)
+    const stamped = await stampImage(f, displayName)
+    setAttachFile(stamped)
+    setAttachPreview(URL.createObjectURL(stamped))
+    setAttachStamping(false)
+  }
+
+  async function submitAttachPhoto() {
+    if (!attachFile) { setAttachError('Selecciona una foto primero'); return }
+    setAttachSaving(true); setAttachError('')
+    const { log } = editingPhoto
+    const path = `${user.id}/${log.log_date}/${log.medication_id}.jpg`
+    const { error: upErr } = await supabase.storage.from('confirmations').upload(path, attachFile, { upsert: true, contentType: 'image/jpeg' })
+    if (upErr) { setAttachError('No se pudo subir la foto. Verifica tu conexión.'); setAttachSaving(false); return }
+    const { data: { publicUrl } } = supabase.storage.from('confirmations').getPublicUrl(path)
+    await supabase.from('medication_logs').update({
+      photo_url: publicUrl,
+      confirmed_by_name: displayName,
+      confirmed_at: new Date().toISOString(),
+    }).eq('id', log.id)
+    setEditingPhoto(null); setAttachSaving(false)
     fetchToday(); fetchHistory()
   }
 
@@ -238,18 +276,38 @@ export default function MedicationTimeline() {
                       )}
                     </div>
 
+                    {/* No-photo warning */}
+                    {log?.status === 'confirmed' && !log?.photo_url && (
+                      <div className="border-t border-orange-200 px-4 py-3 bg-orange-50 flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-2">
+                          <span className="text-base">⚠️</span>
+                          <span className="text-xs font-medium text-orange-800">Falta la foto de prueba</span>
+                        </div>
+                        <button
+                          onClick={() => openAttachPhoto(log, med.name)}
+                          className="px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold rounded-lg transition-colors flex-shrink-0">
+                          📷 Agregar foto
+                        </button>
+                      </div>
+                    )}
+
                     {/* Sealed proof card */}
                     {log?.status === 'confirmed' && log?.photo_url && (
                       <div className="border-t border-green-200">
                         <img src={log.photo_url} className="w-full" alt="Prueba sellada" />
                         <div className="flex items-center gap-2 px-3 py-2 bg-green-50">
                           <span className="text-sm">🔒</span>
-                          <span className="text-xs font-semibold text-primary">Prueba sellada · No editable</span>
+                          <span className="text-xs font-semibold text-primary">Prueba sellada</span>
                           {log.confirmed_by_name && (
-                            <span className="text-xs text-gray-400 ml-auto">
+                            <span className="text-xs text-gray-400">
                               {log.confirmed_by_name} · {new Date(log.confirmed_at).toLocaleTimeString('es-US', { hour: '2-digit', minute: '2-digit' })}
                             </span>
                           )}
+                          <button
+                            onClick={() => openAttachPhoto(log, med.name)}
+                            className="ml-auto px-2.5 py-1 border border-green-300 text-green-700 hover:bg-green-100 text-xs font-medium rounded-lg transition-colors">
+                            Cambiar
+                          </button>
                         </div>
                       </div>
                     )}
@@ -328,6 +386,71 @@ export default function MedicationTimeline() {
           )}
         </div>
       </div>
+
+      {/* Attach / replace photo modal */}
+      {editingPhoto && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden">
+            <div className="px-6 pt-6 pb-4">
+              <h3 className="font-bold text-gray-900 mb-0.5">
+                {editingPhoto.log.photo_url ? 'Reemplazar foto de prueba' : 'Agregar foto de prueba'}
+              </h3>
+              <p className="text-sm text-gray-500">{editingPhoto.medName}</p>
+            </div>
+
+            <input ref={attachFileRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handleAttachPhotoChange} />
+            <button type="button" onClick={() => !attachStamping && attachFileRef.current?.click()} disabled={attachStamping}
+              className="w-full border-y border-dashed border-green-200 hover:bg-gray-50 disabled:cursor-default transition-colors">
+              {attachStamping ? (
+                <div className="h-36 flex flex-col items-center justify-center gap-2 text-gray-400">
+                  <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                  <p className="text-sm font-medium">Aplicando sello de tiempo...</p>
+                </div>
+              ) : attachPreview ? (
+                <div>
+                  <img src={attachPreview} className="w-full max-h-52 object-cover" alt="Nueva prueba" />
+                  <div className="flex items-center gap-1.5 px-3 py-2 bg-green-50">
+                    <span className="text-xs">🔒</span>
+                    <span className="text-xs font-semibold text-primary">Sello aplicado</span>
+                    <span className="text-xs text-gray-400 ml-auto">Toca para cambiar</span>
+                  </div>
+                </div>
+              ) : editingPhoto.log.photo_url ? (
+                <div className="relative">
+                  <img src={editingPhoto.log.photo_url} className="w-full max-h-52 object-cover opacity-40" alt="Foto actual" />
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 text-gray-600">
+                    <span className="text-2xl">📷</span>
+                    <p className="text-sm font-semibold">Toca para reemplazar</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="h-36 flex flex-col items-center justify-center gap-2 text-gray-400">
+                  <span className="text-3xl">📷</span>
+                  <p className="text-sm font-medium">Toca para tomar foto</p>
+                </div>
+              )}
+            </button>
+
+            <div className="px-6 pt-4 pb-6">
+              {attachError && (
+                <div className="mb-3 px-3 py-2.5 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700 flex items-center gap-2">
+                  <span>⚠</span>{attachError}
+                </div>
+              )}
+              <div className="flex gap-3">
+                <button onClick={submitAttachPhoto} disabled={attachSaving || attachStamping}
+                  className="flex-1 py-3 bg-primary hover:bg-primary-dark disabled:opacity-50 text-white font-semibold rounded-xl transition-colors text-sm">
+                  {attachSaving ? 'Guardando...' : '✓ Guardar foto'}
+                </button>
+                <button onClick={() => setEditingPhoto(null)}
+                  className="flex-1 py-3 border border-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors text-sm">
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Confirm modal */}
       {confirming && (
