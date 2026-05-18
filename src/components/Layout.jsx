@@ -50,7 +50,7 @@ const HIDE_FAB_PATHS = new Set(['/gastos', '/medications', '/notes'])
 
 export default function Layout({ children }) {
   const { inactivityWarning, signOut } = useAuth()
-  const { profile } = useFamily()
+  const { profile, hasBoth, activeFamily, ownPatientName, memberPatientName, switchFamily } = useFamily()
   const { dark } = useDarkMode()
   const location = useLocation()
   const navigate = useNavigate()
@@ -131,6 +131,40 @@ export default function Layout({ children }) {
       <main style={{ position: 'fixed', inset: 0, overflowY: 'auto', top: 56, bottom: 68 }}>
         <InstallBanner />
         <OfflineBanner />
+
+        {/* Family switcher — only visible when user belongs to 2+ families */}
+        {hasBoth && (
+          <div style={{
+            position: 'sticky', top: 0, zIndex: 10,
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '8px 16px',
+            background: activeFamily === 'member' ? '#EFF6FF' : '#FDF8F0',
+            borderBottom: `1px solid ${activeFamily === 'member' ? '#BFDBFE' : '#EDE5D8'}`,
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ fontSize: 13 }}>{activeFamily === 'member' ? '👁' : '🏠'}</span>
+              <span style={{ fontSize: 12, fontWeight: 600, color: '#374151' }}>
+                {activeFamily === 'member'
+                  ? `Viendo familia de ${memberPatientName ?? 'otro familiar'}`
+                  : `Tu familia${ownPatientName ? ` · ${ownPatientName}` : ''}`}
+              </span>
+            </div>
+            <button
+              onClick={() => switchFamily(activeFamily === 'owner' ? 'member' : 'owner')}
+              style={{
+                fontSize: 12, fontWeight: 700,
+                color: activeFamily === 'member' ? '#2D86A0' : '#C4623A',
+                background: activeFamily === 'member' ? '#DBEAFE' : '#FDF0EB',
+                border: 'none', borderRadius: 8,
+                padding: '5px 10px', cursor: 'pointer',
+                flexShrink: 0,
+              }}
+            >
+              Cambiar ↔
+            </button>
+          </div>
+        )}
+
         {children}
         <footer style={{ padding: '24px 16px', textAlign: 'center', borderTop: '1px solid #EDE5D8' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, marginBottom: 8 }}>

@@ -11,6 +11,12 @@ export function FamilyProvider({ children }) {
   const [memberRole, setMemberRole] = useState(null) // null = owner/admin, 'cuidador' | 'familiar' = invited member
   const [loading, setLoading] = useState(true)
 
+  // Switcher state — only populated when the user belongs to 2+ families
+  const [hasBoth, setHasBoth] = useState(false)
+  const [activeFamily, setActiveFamily] = useState('owner') // 'owner' | 'member'
+  const [ownPatientName, setOwnPatientName] = useState(null)
+  const [memberPatientName, setMemberPatientName] = useState(null)
+
   useEffect(() => {
     if (user) {
       fetchProfile()
@@ -18,6 +24,10 @@ export function FamilyProvider({ children }) {
       setProfile(null)
       setOwnerId(null)
       setMemberRole(null)
+      setHasBoth(false)
+      setActiveFamily('owner')
+      setOwnPatientName(null)
+      setMemberPatientName(null)
       setLoading(false)
     }
   }, [user])
@@ -25,43 +35,62 @@ export function FamilyProvider({ children }) {
   async function fetchProfile() {
     setLoading(true)
     try {
-      const { data: ownData } = await supabase
-        .from('care_profiles').select('*').eq('user_id', user.id).maybeSingle()
+      // Always fetch own profile and membership in parallel so we can detect both
+      const [{ data: ownData }, { data: membership }] = await Promise.all([
+        supabase.from('care_profiles').select('*').eq('user_id', user.id).maybeSingle(),
+        supabase.from('family_members').select('user_id, role').eq('member_user_id', user.id).maybeSingle(),
+      ])
+
+      const both = !!(ownData && membership)
+      setHasBoth(both)
+      setOwnPatientName(ownData?.name ?? null)
 
       const preferMember = localStorage.getItem('fc_active_family') === 'member'
+      const useMember = !!membership && (!ownData || preferMember)
 
-      // Only query family_members when the user has accepted an invitation
-      // or has no profile of their own — avoids unnecessary queries for regular users
-      if (!ownData || preferMember) {
-        const { data: membership } = await supabase
-          .from('family_members').select('user_id, role').eq('member_user_id', user.id).maybeSingle()
+      if (membership) {
+        // Fetch the invited family's care profile — needed for the switcher label
+        // and as the active profile when viewing as member
+        const { data: ownerProfile } = await supabase
+          .from('care_profiles').select('*').eq('user_id', membership.user_id).maybeSingle()
+        setMemberPatientName(ownerProfile?.name ?? null)
 
-        if (membership) {
-          const { data: ownerProfile } = await supabase
-            .from('care_profiles').select('*').eq('user_id', membership.user_id).maybeSingle()
+        if (useMember) {
           setOwnerId(membership.user_id)
           setMemberRole(membership.role ?? 'familiar')
           setProfile(ownerProfile ?? null)
+          setActiveFamily('member')
           return
         }
+      } else {
+        setMemberPatientName(null)
       }
 
-      // User is the family owner — no role restriction
+      // Viewing as owner
       setOwnerId(user.id)
       setMemberRole(null)
       setProfile(ownData ?? null)
+      setActiveFamily('owner')
     } catch {
-      // On any unexpected error fall back to the user's own context
       setOwnerId(user.id)
       setMemberRole(null)
       setProfile(null)
+      setActiveFamily('owner')
     } finally {
       setLoading(false)
     }
   }
 
+  function switchFamily(target) {
+    localStorage.setItem('fc_active_family', target)
+    fetchProfile()
+  }
+
   return (
-    <FamilyContext.Provider value={{ profile, ownerId, memberRole, loading, refresh: fetchProfile }}>
+    <FamilyContext.Provider value={{
+      profile, ownerId, memberRole, loading, refresh: fetchProfile,
+      hasBoth, activeFamily, ownPatientName, memberPatientName, switchFamily,
+    }}>
       {children}
     </FamilyContext.Provider>
   )
