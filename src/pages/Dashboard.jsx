@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
@@ -417,8 +417,79 @@ function DetailRow({ icon, label, value }) {
 
 // ── Event detail sheet sub-components ────────────────────────────────────────
 
+function stampImage(file, confirmerName) {
+  return new Promise(resolve => {
+    const img = new Image()
+    const objUrl = URL.createObjectURL(file)
+    img.onload = () => {
+      const canvas = document.createElement('canvas')
+      canvas.width = img.naturalWidth; canvas.height = img.naturalHeight
+      const ctx = canvas.getContext('2d')
+      ctx.drawImage(img, 0, 0)
+      const barH = Math.max(44, Math.round(img.naturalHeight * 0.07))
+      ctx.fillStyle = 'rgba(0,0,0,0.72)'
+      ctx.fillRect(0, img.naturalHeight - barH, img.naturalWidth, barH)
+      const now = new Date()
+      const stamp = `${now.toLocaleDateString('es-US', { day: 'numeric', month: 'long', year: 'numeric' })} · ${now.toLocaleTimeString('es-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })} · Confirmado por: ${confirmerName} · FamiliaCerca ✓`
+      const fs = Math.max(11, Math.round(img.naturalWidth * 0.022))
+      ctx.fillStyle = '#ffffff'; ctx.font = `bold ${fs}px Arial, sans-serif`
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+      ctx.fillText(stamp, img.naturalWidth / 2, img.naturalHeight - barH / 2, img.naturalWidth - 16)
+      URL.revokeObjectURL(objUrl)
+      function dataUrlToBlob(dataUrl) {
+        const [, b64] = dataUrl.split(',')
+        const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0))
+        return new Blob([bytes], { type: 'image/jpeg' })
+      }
+      if (typeof canvas.toBlob === 'function') {
+        canvas.toBlob(blob => resolve(blob ?? dataUrlToBlob(canvas.toDataURL('image/jpeg', 0.92))), 'image/jpeg', 0.92)
+      } else {
+        resolve(dataUrlToBlob(canvas.toDataURL('image/jpeg', 0.92)))
+      }
+    }
+    img.src = objUrl
+  })
+}
+
 function MedConfirmedDetail({ evt }) {
+  const { user } = useAuth()
+  const displayName = user?.user_metadata?.full_name ?? user?.email ?? 'Familiar'
+  const attachFileRef = useRef(null)
+  const [editing, setEditing] = useState(false)
+  const [attachFile, setAttachFile] = useState(null)
+  const [attachPreview, setAttachPreview] = useState(null)
+  const [attachStamping, setAttachStamping] = useState(false)
+  const [attachSaving, setAttachSaving] = useState(false)
+  const [attachError, setAttachError] = useState('')
+  const [photoUrl, setPhotoUrl] = useState(evt.photoUrl)
+
   const time = evt.timestamp ? fmtTimestamp(evt.timestamp) : null
+
+  async function handleAttachPhotoChange(e) {
+    const f = e.target.files?.[0]; if (!f) return
+    setAttachStamping(true)
+    const stamped = await stampImage(f, displayName)
+    setAttachFile(stamped)
+    setAttachPreview(URL.createObjectURL(stamped))
+    setAttachStamping(false)
+  }
+
+  async function submitAttachPhoto() {
+    if (!attachFile) { setAttachError('Selecciona una foto primero'); return }
+    setAttachSaving(true); setAttachError('')
+    const path = `${user.id}/${evt.dateKey}/${evt.medicationId}.jpg`
+    const { error: upErr } = await supabase.storage.from('confirmations').upload(path, attachFile, { upsert: true, contentType: 'image/jpeg' })
+    if (upErr) { setAttachError('No se pudo subir la foto. Verifica tu conexión.'); setAttachSaving(false); return }
+    const { data: { publicUrl } } = supabase.storage.from('confirmations').getPublicUrl(path)
+    await supabase.from('medication_logs').update({
+      photo_url: publicUrl,
+      confirmed_by_name: displayName,
+      confirmed_at: new Date().toISOString(),
+    }).eq('id', evt.logId)
+    setPhotoUrl(publicUrl)
+    setEditing(false); setAttachFile(null); setAttachPreview(null); setAttachSaving(false)
+  }
+
   return (
     <div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
@@ -445,10 +516,91 @@ function MedConfirmedDetail({ evt }) {
             </div>
           </div>
         )}
-        {evt.photoUrl && (
+
+        {/* Photo — no-photo warning */}
+        {!editing && !photoUrl && (
+          <div style={{ background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: 12, padding: '12px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span>⚠️</span>
+              <span style={{ fontSize: 13, fontWeight: 600, color: '#9A3412' }}>Falta la foto de prueba</span>
+            </div>
+            <button onClick={() => setEditing(true)} style={{ padding: '6px 12px', background: '#F97316', color: 'white', border: 'none', borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
+              📷 Agregar
+            </button>
+          </div>
+        )}
+
+        {/* Photo — existing proof */}
+        {!editing && photoUrl && (
           <div>
-            <p style={{ fontSize: 11, color: '#9CA3AF', margin: '0 0 8px' }}>Foto de prueba</p>
-            <img src={evt.photoUrl} alt="Prueba" style={{ width: '100%', borderRadius: 12, maxHeight: 220, objectFit: 'cover' }} />
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+              <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>Foto de prueba</p>
+              <button onClick={() => setEditing(true)} style={{ padding: '4px 10px', background: 'none', border: '1px solid #D1D5DB', borderRadius: 7, fontSize: 12, fontWeight: 600, color: '#374151', cursor: 'pointer' }}>
+                Cambiar
+              </button>
+            </div>
+            <img src={photoUrl} alt="Prueba" style={{ width: '100%', borderRadius: 12, maxHeight: 220, objectFit: 'cover' }} />
+          </div>
+        )}
+
+        {/* Photo — upload form */}
+        {editing && (
+          <div>
+            <p style={{ fontSize: 11, color: '#9CA3AF', margin: '0 0 8px' }}>
+              {photoUrl ? 'Reemplazar foto de prueba' : 'Agregar foto de prueba'}
+            </p>
+            <input ref={attachFileRef} type="file" accept="image/*" capture="environment" style={{ display: 'none' }} onChange={handleAttachPhotoChange} />
+            <button
+              type="button"
+              onClick={() => !attachStamping && attachFileRef.current?.click()}
+              disabled={attachStamping}
+              style={{ width: '100%', border: '1.5px dashed #D1D5DB', borderRadius: 12, background: 'none', cursor: attachStamping ? 'default' : 'pointer', overflow: 'hidden', marginBottom: 10 }}
+            >
+              {attachStamping ? (
+                <div style={{ height: 110, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, color: '#9CA3AF' }}>
+                  <div style={{ width: 20, height: 20, border: '2px solid #C4623A', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
+                  <span style={{ fontSize: 12 }}>Aplicando sello...</span>
+                </div>
+              ) : attachPreview ? (
+                <div>
+                  <img src={attachPreview} style={{ width: '100%', maxHeight: 180, objectFit: 'cover' }} alt="Nueva prueba" />
+                  <p style={{ fontSize: 11, color: '#9CA3AF', textAlign: 'center', padding: '6px 0 8px', margin: 0 }}>Toca para cambiar</p>
+                </div>
+              ) : photoUrl ? (
+                <div style={{ position: 'relative' }}>
+                  <img src={photoUrl} style={{ width: '100%', maxHeight: 180, objectFit: 'cover', opacity: 0.35 }} alt="Foto actual" />
+                  <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+                    <span style={{ fontSize: 24 }}>📷</span>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: '#374151' }}>Toca para reemplazar</span>
+                  </div>
+                </div>
+              ) : (
+                <div style={{ height: 110, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, color: '#9CA3AF' }}>
+                  <span style={{ fontSize: 28 }}>📷</span>
+                  <span style={{ fontSize: 12 }}>Toca para tomar foto</span>
+                </div>
+              )}
+            </button>
+            {attachError && (
+              <div style={{ marginBottom: 10, padding: '10px 12px', background: '#FFF0F0', border: '1px solid #FFBABA', borderRadius: 10, fontSize: 13, color: '#D63031', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span>⚠</span>{attachError}
+              </div>
+            )}
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button
+                onClick={submitAttachPhoto}
+                disabled={attachSaving || attachStamping}
+                style={{ flex: 1, padding: '11px', borderRadius: 12, border: 'none', background: '#C4623A', color: 'white', fontWeight: 700, fontSize: 13, cursor: (attachSaving || attachStamping) ? 'default' : 'pointer', opacity: (attachSaving || attachStamping) ? 0.6 : 1 }}
+              >
+                {attachSaving ? 'Guardando...' : '✓ Guardar foto'}
+              </button>
+              <button
+                onClick={() => { setEditing(false); setAttachFile(null); setAttachPreview(null); setAttachError('') }}
+                style={{ flex: 1, padding: '11px', borderRadius: 12, border: '1px solid #E5E7EB', background: 'none', color: '#374151', fontWeight: 600, fontSize: 13, cursor: 'pointer' }}
+              >
+                Cancelar
+              </button>
+            </div>
           </div>
         )}
       </div>
@@ -1266,6 +1418,8 @@ export default function Dashboard() {
         type: 'MED_CONFIRMED',
         timestamp: new Date(log.confirmed_at ?? `${log.log_date}T12:00:00`),
         dateKey: log.log_date,
+        logId: log.id,
+        medicationId: log.medication_id,
         medName: log.medications.name,
         medDosage: log.medications.dosage,
         confirmedBy: log.confirmed_by_name,
