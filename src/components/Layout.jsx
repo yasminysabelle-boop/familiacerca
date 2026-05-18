@@ -247,6 +247,7 @@ export default function Layout({ children }) {
             ¿Sigues ahí? La sesión se cerrará en 1 minuto por seguridad.
           </p>
           <button
+            onClick={() => window.dispatchEvent(new MouseEvent('mousemove'))}
             style={{
               padding: '10px 16px', borderRadius: 10, border: 'none',
               background: '#C4623A', color: 'white', fontWeight: 700,
