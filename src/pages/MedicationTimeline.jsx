@@ -64,6 +64,7 @@ export default function MedicationTimeline() {
   const [stamping, setStamping] = useState(false)
   const [confirmNote, setConfirmNote] = useState('')
   const [saving, setSaving] = useState(false)
+  const [photoError, setPhotoError] = useState('')
   const displayName = user?.user_metadata?.full_name ?? user?.email ?? 'Familiar'
   const today = new Date().toISOString().split('T')[0]
 
@@ -94,7 +95,7 @@ export default function MedicationTimeline() {
   }
 
   function openConfirm(med) {
-    setConfirming(med); setPhotoFile(null); setPhotoPreview(null); setConfirmNote(''); setStamping(false)
+    setConfirming(med); setPhotoFile(null); setPhotoPreview(null); setConfirmNote(''); setStamping(false); setPhotoError('')
   }
 
   async function handlePhotoChange(e) {
@@ -107,7 +108,8 @@ export default function MedicationTimeline() {
   }
 
   async function submitConfirm() {
-    if (!photoFile) { alert('Se requiere una foto como prueba de confirmación'); return }
+    if (!photoFile) { setPhotoError('Se requiere una foto como prueba de confirmación'); return }
+    setPhotoError('')
     setSaving(true)
     const loc = await getLocation()
     const path = `${user.id}/${today}/${confirming.id}.jpg`
@@ -353,12 +355,17 @@ export default function MedicationTimeline() {
             </button>
 
             <div className="px-6 pt-4 pb-6">
+              {photoError && (
+                <div className="mb-3 px-3 py-2.5 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700 flex items-center gap-2">
+                  <span>⚠</span>{photoError}
+                </div>
+              )}
               <textarea value={confirmNote} onChange={e => setConfirmNote(e.target.value)} rows={2}
                 placeholder="Nota opcional (ej. tomó bien, sin problemas...)"
                 className="w-full mb-4 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none" />
 
               <div className="flex gap-3">
-                <button onClick={submitConfirm} disabled={saving || !photoFile || stamping}
+                <button onClick={submitConfirm} disabled={saving || stamping}
                   className="flex-1 py-3 bg-primary hover:bg-primary-dark disabled:opacity-50 text-white font-semibold rounded-xl transition-colors text-sm">
                   {saving ? 'Guardando...' : '✓ Confirmar dosis'}
                 </button>

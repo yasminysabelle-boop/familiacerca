@@ -15,6 +15,7 @@ export default function VoiceDiary() {
   const [recording, setRecording] = useState(false)
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState('')
+  const [micError, setMicError] = useState('')
   const [elapsed, setElapsed] = useState(0)
   const [title, setTitle] = useState('')
   const recorderRef = useRef(null)
@@ -37,6 +38,7 @@ export default function VoiceDiary() {
   }
 
   async function startRecording() {
+    setMicError('')
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
       chunksRef.current = []
@@ -48,7 +50,7 @@ export default function VoiceDiary() {
       setRecording(true); setElapsed(0)
       timerRef.current = setInterval(() => setElapsed(n => n + 1), 1000)
     } catch {
-      alert('No se pudo acceder al micrófono. Verifica los permisos del navegador.')
+      setMicError('No se pudo acceder al micrófono. Verifica los permisos del navegador.')
     }
   }
 
@@ -130,9 +132,16 @@ export default function VoiceDiary() {
                 <span className="text-3xl">🎙️</span>
                 <span>Grabar nota de voz</span>
               </button>
-              <p className="text-xs text-gray-400 text-center mt-3">
-                Perfecta para que el familiar cuente cómo se siente hoy
-              </p>
+              {micError && (
+                <div className="mt-3 px-4 py-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700 flex items-start gap-2">
+                  <span>⚠</span><span>{micError}</span>
+                </div>
+              )}
+              {!micError && (
+                <p className="text-xs text-gray-400 text-center mt-3">
+                  Perfecta para que el familiar cuente cómo se siente hoy
+                </p>
+              )}
             </div>
           )}
 

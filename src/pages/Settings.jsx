@@ -91,6 +91,9 @@ export default function Settings() {
   const [portalLoading, setPortalLoading] = useState(false)
   const [locationOn, setLocationOn] = useState(() => isLocationEnabled())
   const [exportingPdf, setExportingPdf] = useState(false)
+  const [pdfError, setPdfError] = useState('')
+  const [pdfDone, setPdfDone] = useState(false)
+  const [portalError, setPortalError] = useState('')
   const [testingPush, setTestingPush] = useState(false)
   const [testResult, setTestResult] = useState(null)
 
@@ -107,12 +110,13 @@ export default function Settings() {
 
   async function handlePortal() {
     setPortalLoading(true)
+    setPortalError('')
     try {
       const url = await createPortalSession()
       window.location.href = url
     } catch {
       setPortalLoading(false)
-      alert('No se pudo abrir el portal. Intenta de nuevo.')
+      setPortalError('No se pudo abrir el portal. Intenta de nuevo.')
     }
   }
 
@@ -154,6 +158,8 @@ export default function Settings() {
 
   async function exportPDF() {
     setExportingPdf(true)
+    setPdfError('')
+    setPdfDone(false)
     try {
       const { jsPDF } = await import('jspdf')
       const { default: autoTable } = await import('jspdf-autotable')
@@ -308,8 +314,9 @@ export default function Settings() {
       }
 
       doc.save(`historial-familiacerca-${today}.pdf`)
+      setPdfDone(true)
     } catch (err) {
-      alert('Error al generar el PDF: ' + err.message)
+      setPdfError('Error al generar el PDF: ' + (err.message ?? 'Intenta de nuevo.'))
     } finally {
       setExportingPdf(false)
     }
@@ -418,20 +425,27 @@ export default function Settings() {
           )}
 
           {isPaid ? (
-            <button
-              onClick={handlePortal}
-              disabled={portalLoading}
-              style={{
-                width: '100%', padding: '13px', borderRadius: 14, border: 'none',
-                background: portalLoading ? '#D4C4B8' : 'linear-gradient(135deg, #C4623A, #A85130)',
-                color: 'white', fontWeight: 700, fontSize: 14,
-                cursor: portalLoading ? 'not-allowed' : 'pointer',
-                boxShadow: portalLoading ? 'none' : '0 6px 20px rgba(196,98,58,0.3)',
-                transition: 'all 0.2s',
-              }}
-            >
-              {portalLoading ? 'Abriendo portal...' : 'Gestionar suscripción →'}
-            </button>
+            <>
+              <button
+                onClick={handlePortal}
+                disabled={portalLoading}
+                style={{
+                  width: '100%', padding: '13px', borderRadius: 14, border: 'none',
+                  background: portalLoading ? '#D4C4B8' : 'linear-gradient(135deg, #C4623A, #A85130)',
+                  color: 'white', fontWeight: 700, fontSize: 14,
+                  cursor: portalLoading ? 'not-allowed' : 'pointer',
+                  boxShadow: portalLoading ? 'none' : '0 6px 20px rgba(196,98,58,0.3)',
+                  transition: 'all 0.2s',
+                }}
+              >
+                {portalLoading ? 'Abriendo portal...' : 'Gestionar suscripción →'}
+              </button>
+              {portalError && (
+                <p style={{ fontSize: 12, color: '#D63031', margin: '8px 0 0', padding: '8px 12px', background: '#FFF0F0', border: '1px solid #FFBABA', borderRadius: 10 }}>
+                  ⚠ {portalError}
+                </p>
+              )}
+            </>
           ) : (
             <button
               onClick={() => navigate('/pricing')}
@@ -578,6 +592,16 @@ export default function Settings() {
             <span>{exportingPdf ? '⏳' : '📄'}</span>
             {exportingPdf ? 'Generando PDF...' : 'Exportar historial PDF'}
           </button>
+          {pdfDone && (
+            <p style={{ fontSize: 12, color: '#15803D', margin: '8px 0 0', padding: '8px 12px', background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 10 }}>
+              ✓ PDF descargado correctamente
+            </p>
+          )}
+          {pdfError && (
+            <p style={{ fontSize: 12, color: '#D63031', margin: '8px 0 0', padding: '8px 12px', background: '#FFF0F0', border: '1px solid #FFBABA', borderRadius: 10 }}>
+              ⚠ {pdfError}
+            </p>
+          )}
         </div>
 
         {/* More options */}

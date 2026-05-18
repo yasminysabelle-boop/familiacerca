@@ -28,6 +28,7 @@ export default function Familia() {
   const [inviteLink, setInviteLink] = useState('')
   const [copied, setCopied] = useState(false)
   const [portalLoading, setPortalLoading] = useState(false)
+  const [portalError, setPortalError] = useState('')
   const [shifts, setShifts] = useState({})
   const [shiftModal, setShiftModal] = useState(null)
   const [shiftName, setShiftName] = useState('')
@@ -151,12 +152,13 @@ export default function Familia() {
   async function handlePortal() {
     if (!isPaid) { navigate('/pricing'); return }
     setPortalLoading(true)
+    setPortalError('')
     try {
       const url = await createPortalSession()
       window.location.href = url
     } catch {
       setPortalLoading(false)
-      alert('No se pudo abrir el portal. Intenta de nuevo.')
+      setPortalError('No se pudo abrir el portal. Intenta de nuevo.')
     }
   }
 
@@ -358,6 +360,11 @@ export default function Familia() {
               {portalLoading ? '...' : isPaid ? 'Gestionar' : 'Ver planes'}
             </button>
           </div>
+        )}
+        {portalError && (
+          <p style={{ fontSize: 12, color: '#D63031', margin: '-4px 0 12px', padding: '8px 12px', background: '#FFF0F0', border: '1px solid #FFBABA', borderRadius: 10 }}>
+            ⚠ {portalError}
+          </p>
         )}
 
         {/* Members section */}
