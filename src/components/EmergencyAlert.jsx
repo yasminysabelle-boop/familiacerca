@@ -41,13 +41,7 @@ export default function EmergencyAlert() {
     setConfirming(false)
     setSending(true)
 
-    console.log('[SOS] ── handleEmergency START ──')
-    console.log('[SOS] user.id   :', user?.id)
-    console.log('[SOS] ownerId   :', ownerId)
-    console.log('[SOS] displayName:', displayName)
-
     if (!ownerId) {
-      console.error('[SOS] ABORT: ownerId is null — FamilyContext not loaded yet')
       setPushFailed(true)
       setSending(false)
       setSent(true)
@@ -56,12 +50,9 @@ export default function EmergencyAlert() {
     }
 
     // Capture GPS — always force on emergencies
-    console.log('[SOS] Requesting GPS...')
     const loc = await getLocation({ force: true })
-    console.log('[SOS] GPS result:', loc)
 
     // Insert into DB — triggers realtime banner for all family members
-    console.log('[SOS] Inserting emergency_alerts row...')
     const { error: insertError } = await supabase.from('emergency_alerts').insert({
       user_id: user.id,
       triggered_by_name: displayName,
@@ -70,9 +61,6 @@ export default function EmergencyAlert() {
       longitude: loc?.longitude ?? null,
       address: loc?.address ?? null,
     })
-    if (insertError) console.error('[SOS] DB insert error:', insertError)
-    else console.log('[SOS] DB insert OK')
-
     // Invoke edge function
     const payload = {
       ownerId,
@@ -81,45 +69,32 @@ export default function EmergencyAlert() {
       longitude: loc?.longitude ?? null,
       address: loc?.address ?? null,
     }
-    console.log('[SOS] Invoking send-sos-notification with payload:', JSON.stringify(payload))
-
     let pushOk = false
     try {
       const { data, error } = await supabase.functions.invoke('send-sos-notification', {
         body: payload,
       })
-      console.log('[SOS] Edge function data  :', JSON.stringify(data))
-      console.log('[SOS] Edge function error :', error ? JSON.stringify({ message: error.message, context: error.context }) : null)
-      if (error) {
-        console.error('[SOS] Push failed — HTTP error from edge function:', error.message, error.context)
-      } else if (!data || data.sent === 0) {
-        console.warn('[SOS] Push sent=0 — no subscriptions found. data:', JSON.stringify(data))
-      } else {
-        console.log(`[SOS] ✅ Push OK — sent:${data.sent} failed:${data.failed} total:${data.total}`)
+      if (!error && data?.sent > 0) {
         pushOk = true
       }
-    } catch (err) {
-      console.error('[SOS] Exception invoking edge function:', err)
+    } catch {
+      // push failed — fall through to directory contact fallback
     }
 
     if (!pushOk) {
-      console.warn('[SOS] Falling back to directory contacts')
-      const { data: contacts, error: contactsErr } = await supabase
+      const { data: contacts } = await supabase
         .from('directory_contacts')
         .select('name, phone, relationship')
         .eq('owner_id', ownerId)
         .not('phone', 'is', null)
         .order('is_emergency_contact', { ascending: false })
         .limit(5)
-      if (contactsErr) console.error('[SOS] directory_contacts error:', contactsErr)
-      console.log('[SOS] Fallback contacts:', contacts?.length ?? 0)
       setFallbackContacts(contacts ?? [])
       setPushFailed(true)
     }
 
     setSending(false)
     setSent(true)
-    console.log('[SOS] ── handleEmergency END ──')
     setTimeout(() => {
       setSent(false)
       setPushFailed(false)
