@@ -202,7 +202,6 @@ export default function Chat() {
     const response = await geminiGenerate(prompt, 200)
     setAiResponse(response ?? 'No pude obtener una respuesta. Verifica tu conexión e intenta de nuevo.')
     setAiLoading(false)
-    // DEBUG: remove after confirming error — raw API error starts with __ERROR__
   }
 
   function handleKeyDown(e) {
