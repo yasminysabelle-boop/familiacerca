@@ -699,6 +699,17 @@ function EmptyState({ profile }) {
   )
 }
 
+// ── Category groups for expanded timeline ────────────────────────────────────
+
+const CATEGORY_GROUPS = [
+  { id: 'meds',    emoji: '💊', label: 'Medicamentos', types: ['MED_PENDING', 'MED_CONFIRMED'] },
+  { id: 'citas',   emoji: '📅', label: 'Citas',        types: ['APPOINTMENT'] },
+  { id: 'familia', emoji: '👥', label: 'Familia',      types: ['PHOTO', 'CAREGIVER_CARD'] },
+  { id: 'notas',   emoji: '💬', label: 'Notas',        types: ['VOICE_MEMORY', 'NOTE'] },
+  { id: 'gastos',  emoji: '💰', label: 'Gastos',       types: ['EXPENSE'] },
+  { id: 'alertas', emoji: '🚨', label: 'Alertas',      types: ['SOS_ALERT'] },
+]
+
 // ── Collapsible day section ───────────────────────────────────────────────────
 
 function DaySection({
@@ -708,10 +719,6 @@ function DaySection({
 }) {
   const confirmedCount = section.events.filter(e => e.type === 'MED_CONFIRMED').length
   const pendingCount   = section.events.filter(e => e.type === 'MED_PENDING').length
-  const noteCount      = section.events.filter(e => e.type === 'VOICE_MEMORY' || e.type === 'PHOTO').length
-  const expenseCount   = section.events.filter(e => e.type === 'EXPENSE').length
-  const sosCount       = section.events.filter(e => e.type === 'SOS_ALERT').length
-  const reactCount     = section.events.reduce((s, e) => s + (reactions?.[e.id]?.length ?? 0), 0)
 
   // Status based on medication coverage for this day
   let status = 'none'
@@ -729,14 +736,13 @@ function DaySection({
   }
   const ss = STATUS_STYLE[status]
 
-  const parts = []
-  if (confirmedCount > 0) parts.push(`${confirmedCount} medicamento${confirmedCount !== 1 ? 's' : ''} ✅`)
-  if (pendingCount   > 0) parts.push(`${pendingCount} pendiente${pendingCount !== 1 ? 's' : ''} ⚠️`)
-  if (noteCount      > 0) parts.push(`${noteCount} nota${noteCount !== 1 ? 's' : ''}`)
-  if (expenseCount   > 0) parts.push(`${expenseCount} gasto${expenseCount !== 1 ? 's' : ''}`)
-  if (sosCount       > 0) parts.push('🚨 SOS')
-  if (reactCount     > 0) parts.push(`${reactCount} reacción${reactCount !== 1 ? 'es' : ''}`)
-  const summary = parts.join(' · ')
+  // Last update time for collapsed subtitle
+  const lastTs = section.events.length > 0
+    ? section.events.reduce((a, b) => (a.timestamp > b.timestamp ? a : b)).timestamp
+    : null
+  const lastUpdateText = lastTs
+    ? lastTs.toLocaleTimeString('es-US', { hour: 'numeric', minute: '2-digit', hour12: true })
+    : null
 
   return (
     <div style={{ marginBottom: 14 }}>
@@ -759,21 +765,19 @@ function DaySection({
         )}
         <div style={{ flex: 1, minWidth: 0 }}>
           <span style={{
-            fontSize: 11, fontWeight: 700, letterSpacing: '0.08em',
-            textTransform: 'uppercase',
+            fontSize: 12, fontWeight: 700,
             color: isExpanded ? '#9CA3AF' : '#374151',
             display: 'block',
             transition: 'color 0.2s ease',
           }}>
             {section.label}
           </span>
-          {!isExpanded && summary && (
+          {!isExpanded && lastUpdateText && (
             <span style={{
-              fontSize: 11, color: '#6B7280',
+              fontSize: 11, color: '#9CA3AF',
               display: 'block', marginTop: 2,
-              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
             }}>
-              {summary}
+              última actualización {lastUpdateText}
             </span>
           )}
         </div>
@@ -793,29 +797,50 @@ function DaySection({
       }}>
         <div style={{ overflow: 'hidden' }}>
           <div style={{
-            display: 'flex', flexDirection: 'column', gap: 8, paddingTop: 2,
+            paddingTop: 2,
             opacity: isExpanded ? 1 : 0,
             transform: isExpanded ? 'translateY(0)' : 'translateY(-6px)',
             transition: isExpanded
               ? 'opacity 0.22s ease 0.08s, transform 0.22s ease 0.08s'
               : 'opacity 0.12s ease, transform 0.12s ease',
           }}>
-            {section.events.map(evt => (
-              <TimelineEvent
-                key={evt.id}
-                evt={evt}
-                confirming={confirming}
-                expandedAudio={expandedAudio}
-                onConfirm={onConfirm}
-                onToggleAudio={onToggleAudio}
-                todayKey={todayKey}
-                tomorrowKey={tomorrowKey}
-                reactions={reactions}
-                userId={userId}
-                onReact={onReact}
-                onTap={onTap}
-              />
-            ))}
+            {CATEGORY_GROUPS.map(group => {
+              const groupEvts = section.events.filter(e => group.types.includes(e.type))
+              if (groupEvts.length === 0) return null
+              return (
+                <div key={group.id} style={{ marginBottom: 16 }}>
+                  <div style={{
+                    display: 'flex', alignItems: 'center', gap: 6,
+                    paddingBottom: 6, marginBottom: 8,
+                    borderBottom: '1px solid #F3F4F6',
+                  }}>
+                    <span style={{ fontSize: 13 }}>{group.emoji}</span>
+                    <span style={{ fontSize: 10, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                      {group.label}
+                    </span>
+                    <span style={{ fontSize: 10, color: '#C4B0A0' }}>{groupEvts.length}</span>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {groupEvts.map(evt => (
+                      <TimelineEvent
+                        key={evt.id}
+                        evt={evt}
+                        confirming={confirming}
+                        expandedAudio={expandedAudio}
+                        onConfirm={onConfirm}
+                        onToggleAudio={onToggleAudio}
+                        todayKey={todayKey}
+                        tomorrowKey={tomorrowKey}
+                        reactions={reactions}
+                        userId={userId}
+                        onReact={onReact}
+                        onTap={onTap}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )
+            })}
           </div>
         </div>
       </div>

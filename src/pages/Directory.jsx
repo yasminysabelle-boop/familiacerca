@@ -287,6 +287,45 @@ function ContactCard({ con, onEdit, onToggleEmergency, onDeleteRequest, canDelet
   )
 }
 
+function JoinedMemberCard({ member }) {
+  const roleLabel = member.role === 'cuidador' ? 'Cuidador' : 'Familiar'
+  const roleColor = member.role === 'cuidador' ? '#4A7C59' : '#7C5CBF'
+  const roleBg    = member.role === 'cuidador' ? '#F0FDF4' : '#EDE9FE'
+  const roleBorder = member.role === 'cuidador' ? '#BBF7D0' : '#C4B5FD'
+  return (
+    <div style={{
+      background: 'white', borderRadius: 14,
+      border: '1.5px solid #BFDBFE',
+      padding: '12px 14px', marginBottom: 10,
+      display: 'flex', alignItems: 'center', gap: 12,
+    }}>
+      <div style={{
+        width: 38, height: 38, borderRadius: '50%', flexShrink: 0,
+        background: 'linear-gradient(135deg, #DBEAFE, #BFDBFE)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontSize: 16, fontWeight: 700, color: '#2563EB',
+      }}>
+        {member.name?.charAt(0)?.toUpperCase() ?? '?'}
+      </div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p style={{ fontSize: 13, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>{member.name}</p>
+        {member.email && (
+          <p style={{ fontSize: 11, color: '#9CA3AF', margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {member.email}
+          </p>
+        )}
+      </div>
+      <span style={{
+        fontSize: 11, fontWeight: 700, color: roleColor,
+        background: roleBg, border: `1px solid ${roleBorder}`,
+        padding: '3px 9px', borderRadius: 20, flexShrink: 0,
+      }}>
+        {roleLabel}
+      </span>
+    </div>
+  )
+}
+
 // ── Main page ──────────────────────────────────────────────────────
 export default function Directory() {
   const { user } = useAuth()
@@ -296,7 +335,8 @@ export default function Directory() {
   const [tab, setTab] = useState('medicos')
   const [doctors,      setDoctors]      = useState([])
   const [institutions, setInstitutions] = useState([])
-  const [contacts,     setContacts]     = useState([])
+  const [contacts,      setContacts]      = useState([])
+  const [familyMembers, setFamilyMembers] = useState([])
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
   const [confirmDialog, setConfirmDialog] = useState(null)
@@ -321,19 +361,47 @@ export default function Directory() {
 
   useEffect(() => { if (ownerId) fetchAll() }, [ownerId])
 
+  // Realtime: refresh familiares whenever a new member joins
+  useEffect(() => {
+    if (!ownerId) return
+    const channel = supabase
+      .channel(`dir_family_members_${ownerId}`)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'family_members', filter: `user_id=eq.${ownerId}` }, () => fetchAll())
+      .subscribe()
+    return () => { supabase.removeChannel(channel) }
+  }, [ownerId])
+
   async function fetchAll() {
     setLoading(true)
     setLoadError('')
     try {
-      const [{ data: docs, error: e1 }, { data: inss, error: e2 }, { data: cons, error: e3 }] = await Promise.all([
+      const [{ data: docs, error: e1 }, { data: inss, error: e2 }, { data: cons, error: e3 }, { data: members }] = await Promise.all([
         supabase.from('directory_doctors').select('*').eq('owner_id', ownerId).order('name'),
         supabase.from('directory_institutions').select('*').eq('owner_id', ownerId).order('name'),
         supabase.from('directory_contacts').select('*').eq('owner_id', ownerId).order('name'),
+        supabase.from('family_members').select('member_user_id, member_email, role, joined_at').eq('user_id', ownerId).not('member_user_id', 'is', null),
       ])
       if (e1 || e2 || e3) throw e1 ?? e2 ?? e3
       setDoctors(docs ?? [])
       setInstitutions(inss ?? [])
       setContacts(cons ?? [])
+
+      // Enrich family members with names from user_profiles
+      if (members?.length) {
+        const uids = members.map(m => m.member_user_id)
+        const { data: profiles } = await supabase.from('user_profiles').select('id, full_name').in('id', uids)
+        const profileMap = {}
+        profiles?.forEach(p => { profileMap[p.id] = p.full_name })
+        setFamilyMembers(members.map(m => ({
+          id: m.member_user_id,
+          name: profileMap[m.member_user_id] || m.member_email?.split('@')[0] || '—',
+          email: m.member_email ?? '',
+          role: m.role ?? 'familiar',
+          joinedAt: m.joined_at,
+        })))
+      } else {
+        setFamilyMembers([])
+      }
     } catch {
       setLoadError('No se pudo cargar el directorio. Verifica tu conexión.')
     } finally {
@@ -500,15 +568,39 @@ export default function Directory() {
               ? <p style={{ textAlign: 'center', color: '#9CA3AF', fontSize: 13, padding: '32px 0' }}>Cargando...</p>
               : loadError
               ? <div style={{ textAlign: 'center', padding: '32px 0' }}><p style={{ fontSize: 13, color: '#D63031', marginBottom: 10 }}>{loadError}</p><button onClick={fetchAll} style={{ padding: '9px 20px', borderRadius: 12, background: '#C4623A', color: 'white', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>Reintentar</button></div>
-              : contacts.length === 0
-              ? <EmptyState Icon={Users} title="Sin contactos registrados" subtitle="Agrega familiares y designa un contacto de emergencia" />
-              : contacts.map(c => (
-                <ContactCard key={c.id} con={c}
-                  onEdit={() => openCon(c)}
-                  onToggleEmergency={toggleEmergency}
-                  canDelete={isAdmin}
-                  onDeleteRequest={() => setConfirmDialog({ onConfirm: () => deleteItem('directory_contacts', c.id) })} />
-              ))
+              : (
+                <>
+                  {/* Joined app members */}
+                  {familyMembers.length > 0 && (
+                    <div style={{ marginBottom: 20 }}>
+                      <p style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10 }}>
+                        Con acceso al app
+                      </p>
+                      {familyMembers.map(m => <JoinedMemberCard key={m.id} member={m} />)}
+                    </div>
+                  )}
+
+                  {/* Manual directory contacts */}
+                  {contacts.length > 0 ? (
+                    <div>
+                      {familyMembers.length > 0 && (
+                        <p style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10 }}>
+                          Directorio
+                        </p>
+                      )}
+                      {contacts.map(c => (
+                        <ContactCard key={c.id} con={c}
+                          onEdit={() => openCon(c)}
+                          onToggleEmergency={toggleEmergency}
+                          canDelete={isAdmin}
+                          onDeleteRequest={() => setConfirmDialog({ onConfirm: () => deleteItem('directory_contacts', c.id) })} />
+                      ))}
+                    </div>
+                  ) : familyMembers.length === 0 ? (
+                    <EmptyState Icon={Users} title="Sin contactos registrados" subtitle="Agrega familiares y designa un contacto de emergencia" />
+                  ) : null}
+                </>
+              )
             }
             <AddBtn onClick={() => openCon()} label="Agregar familiar" />
           </>
