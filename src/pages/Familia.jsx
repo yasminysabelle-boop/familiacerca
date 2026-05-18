@@ -26,6 +26,7 @@ export default function Familia() {
   const [inviteEmail, setInviteEmail] = useState('')
   const [inviteStatus, setInviteStatus] = useState('idle')
   const [inviteLink, setInviteLink] = useState('')
+  const [emailSent, setEmailSent] = useState(false)
   const [copied, setCopied] = useState(false)
   const [portalLoading, setPortalLoading] = useState(false)
   const [portalError, setPortalError] = useState('')
@@ -134,7 +135,18 @@ export default function Familia() {
     })
     if (error) { setInviteStatus('error'); return }
     track('family_member_invited', { email: inviteEmail.trim() })
-    setInviteLink(`${window.location.origin}/join?token=${token}`)
+    const link = `${window.location.origin}/join?token=${token}`
+    setInviteLink(link)
+    const { error: sendErr } = await supabase.functions.invoke('send-invitation', {
+      body: {
+        inviteeEmail: inviteEmail.trim().toLowerCase(),
+        inviterName: displayName,
+        relativeName: profile?.name ?? 'su familiar',
+        invitationLink: link,
+        role: 'familiar',
+      },
+    })
+    setEmailSent(!sendErr)
     setInviteStatus('success')
   }
 
@@ -802,20 +814,32 @@ export default function Familia() {
 
             {inviteStatus === 'success' ? (
               <div>
-                <div style={{ padding: 14, background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 12, marginBottom: 14 }}>
-                  <p style={{ fontSize: 13, fontWeight: 600, color: '#15803D', margin: '0 0 4px' }}>✓ Invitación creada</p>
-                  <p style={{ fontSize: 12, color: '#4B7A5D', margin: 0 }}>Comparte este enlace con {inviteEmail}</p>
-                </div>
-                <div style={{ padding: '12px 14px', background: '#F9F5F1', border: '1.5px solid #EDE5D8', borderRadius: 12, marginBottom: 12 }}>
-                  <p style={{ fontSize: 11, color: '#6B7280', wordBreak: 'break-all', margin: 0 }}>{inviteLink}</p>
-                </div>
-                <button onClick={copyLink} style={{
-                  width: '100%', padding: 13, borderRadius: 14, border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 14, color: 'white',
-                  background: copied ? 'linear-gradient(135deg, #4A7C59, #3A6147)' : 'linear-gradient(135deg, #C4623A, #A85130)',
-                  transition: 'all 0.2s', marginBottom: 10,
-                }}>
-                  {copied ? '¡Copiado!' : 'Copiar enlace'}
-                </button>
+                {emailSent ? (
+                  <div style={{ padding: 16, background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 12, marginBottom: 14, textAlign: 'center' }}>
+                    <p style={{ fontSize: 22, margin: '0 0 6px' }}>📧</p>
+                    <p style={{ fontSize: 14, fontWeight: 700, color: '#15803D', margin: '0 0 4px' }}>¡Invitación enviada!</p>
+                    <p style={{ fontSize: 12, color: '#4B7A5D', margin: 0 }}>
+                      Le llegará un email a <strong>{inviteEmail}</strong> con el enlace para unirse.
+                    </p>
+                  </div>
+                ) : (
+                  <div>
+                    <div style={{ padding: 12, background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 12, marginBottom: 12 }}>
+                      <p style={{ fontSize: 13, fontWeight: 600, color: '#92400E', margin: '0 0 2px' }}>⚠ No pudimos enviar el email</p>
+                      <p style={{ fontSize: 12, color: '#78350F', margin: 0 }}>Comparte este enlace directamente con {inviteEmail}:</p>
+                    </div>
+                    <div style={{ padding: '12px 14px', background: '#F9F5F1', border: '1.5px solid #EDE5D8', borderRadius: 12, marginBottom: 12 }}>
+                      <p style={{ fontSize: 11, color: '#6B7280', wordBreak: 'break-all', margin: 0 }}>{inviteLink}</p>
+                    </div>
+                    <button onClick={copyLink} style={{
+                      width: '100%', padding: 13, borderRadius: 14, border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 14, color: 'white',
+                      background: copied ? 'linear-gradient(135deg, #4A7C59, #3A6147)' : 'linear-gradient(135deg, #C4623A, #A85130)',
+                      transition: 'all 0.2s', marginBottom: 10,
+                    }}>
+                      {copied ? '¡Copiado!' : 'Copiar enlace'}
+                    </button>
+                  </div>
+                )}
                 <button onClick={() => setShowInvite(false)} style={{ width: '100%', padding: 12, background: 'none', border: 'none', color: '#9CA3AF', fontSize: 13, cursor: 'pointer' }}>
                   Cerrar
                 </button>
