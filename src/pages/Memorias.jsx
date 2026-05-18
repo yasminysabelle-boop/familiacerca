@@ -57,6 +57,8 @@ export default function Memorias() {
   const [playing, setPlaying] = useState(null)
   const [yearAgoMemory, setYearAgoMemory] = useState(null)
   const recorderRef = useRef(null)
+  const streamRef   = useRef(null)
+  const mimeTypeRef = useRef('')
   const chunksRef = useRef([])
   const timerRef = useRef(null)
   const transcriptRef = useRef('')
@@ -104,17 +106,36 @@ export default function Memorias() {
     setLoading(false)
   }
 
+  function pickMimeType() {
+    const candidates = [
+      'audio/webm;codecs=opus',
+      'audio/webm',
+      'audio/ogg;codecs=opus',
+      'audio/mp4',
+    ]
+    return (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported)
+      ? (candidates.find(t => MediaRecorder.isTypeSupported(t)) ?? '')
+      : ''
+  }
+
   async function startRecording() {
     if (!selectedMood) return
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
       setMicError('')
+      setSaveError('')
       chunksRef.current = []
       transcriptRef.current = ''
+
+      const mimeType = pickMimeType()
+      mimeTypeRef.current = mimeType
+      streamRef.current = stream
+
       startSpeech()
-      const recorder = new MediaRecorder(stream)
+
+      const recOpts = mimeType ? { mimeType } : {}
+      const recorder = new MediaRecorder(stream, recOpts)
       recorder.ondataavailable = e => { if (e.data.size > 0) chunksRef.current.push(e.data) }
-      recorder.onstop = () => stream.getTracks().forEach(t => t.stop())
       recorder.start(250)
       recorderRef.current = recorder
       setStep('recording'); setElapsed(0)
@@ -127,22 +148,46 @@ export default function Memorias() {
   async function stopAndSave() {
     clearInterval(timerRef.current)
     stopSpeech()
+
     const recorder = recorderRef.current
-    if (!recorder || recorder.state === 'inactive') return
+    const stream   = streamRef.current
+
+    const stopStream = () => stream?.getTracks().forEach(t => t.stop())
+
+    if (!recorder || recorder.state === 'inactive') {
+      stopStream()
+      setSaveError('La grabación se interrumpió. Intenta de nuevo.')
+      setStep('idle')
+      return
+    }
+
     setStep('saving')
+    setSaveError('')
+    const duration = elapsed
 
     await new Promise(resolve => {
-      recorder.onstop = resolve
+      recorder.onstop = () => { stopStream(); resolve() }
       recorder.stop()
     })
 
-    const duration = elapsed
-    const blob = new Blob(chunksRef.current, { type: 'audio/webm' })
-    const path = `${user.id}/${Date.now()}.webm`
+    recorderRef.current = null
+    streamRef.current = null
+
+    const mimeType = mimeTypeRef.current || 'audio/webm'
+    const blob = new Blob(chunksRef.current, { type: mimeType })
+
+    if (blob.size === 0) {
+      setSaveError('No se capturó audio. Intenta grabar de nuevo.')
+      setStep('idle')
+      return
+    }
+
+    const ext  = mimeType.includes('mp4') ? 'mp4' : mimeType.includes('ogg') ? 'ogg' : 'webm'
+    const path = `${user.id}/${Date.now()}.${ext}`
 
     const { error: uploadError } = await supabase.storage
       .from('voice-diary')
-      .upload(path, blob, { contentType: 'audio/webm' })
+      .upload(path, blob, { contentType: mimeType })
 
     if (uploadError) {
       setSaveError('Error al subir el audio. Verifica tu conexión.')
@@ -182,7 +227,15 @@ export default function Memorias() {
     stopSpeech()
     transcriptRef.current = ''
     const recorder = recorderRef.current
-    if (recorder && recorder.state !== 'inactive') recorder.stop()
+    const stream   = streamRef.current
+    if (recorder && recorder.state !== 'inactive') {
+      recorder.onstop = () => stream?.getTracks().forEach(t => t.stop())
+      recorder.stop()
+    } else {
+      stream?.getTracks().forEach(t => t.stop())
+    }
+    recorderRef.current = null
+    streamRef.current = null
     setStep('idle'); setElapsed(0)
   }
 
