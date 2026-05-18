@@ -1,16 +1,85 @@
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 
+function Bone({ style }) {
+  return (
+    <div
+      className="animate-pulse"
+      style={{ background: '#EDE5D8', borderRadius: 10, ...style }}
+    />
+  )
+}
+
+function PageSkeleton() {
+  return (
+    <div style={{ background: '#FFF8F0', minHeight: '100dvh' }}>
+      {/* Header */}
+      <div style={{
+        position: 'fixed', top: 0, left: 0, right: 0, height: 56, zIndex: 40,
+        background: 'rgba(255,248,240,0.97)',
+        borderBottom: '1px solid #EDE5D8',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '0 16px',
+      }}>
+        <Bone style={{ width: 110, height: 22 }} />
+        <Bone style={{ width: 32, height: 32, borderRadius: '50%' }} />
+      </div>
+
+      {/* Content */}
+      <div style={{ paddingTop: 72, paddingBottom: 84, padding: '72px 16px 84px' }}>
+        {/* Hero card */}
+        <Bone style={{ height: 120, borderRadius: 20, marginBottom: 16 }} />
+
+        {/* Row of small chips */}
+        <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+          {[72, 90, 64].map(w => (
+            <Bone key={w} style={{ width: w, height: 32, borderRadius: 12 }} />
+          ))}
+        </div>
+
+        {/* List cards */}
+        {[1, 2, 3, 4].map(i => (
+          <div
+            key={i}
+            style={{
+              background: 'white', borderRadius: 16, padding: '14px 14px',
+              marginBottom: 10, border: '1px solid #EDE5D8',
+              display: 'flex', alignItems: 'center', gap: 12,
+            }}
+          >
+            <Bone style={{ width: 44, height: 44, borderRadius: 12, flexShrink: 0 }} />
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <Bone style={{ height: 14, width: '55%' }} />
+              <Bone style={{ height: 11, width: '35%' }} />
+            </div>
+            <Bone style={{ width: 20, height: 20, borderRadius: 6, flexShrink: 0 }} />
+          </div>
+        ))}
+      </div>
+
+      {/* Bottom nav */}
+      <div style={{
+        position: 'fixed', bottom: 0, left: 0, right: 0, height: 68,
+        background: 'rgba(255,255,255,0.97)',
+        borderTop: '1px solid #EDE5D8',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-around',
+        padding: '0 8px',
+      }}>
+        {[1, 2, 3, 4, 5].map(i => (
+          <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+            <Bone style={{ width: 46, height: 28, borderRadius: 10 }} />
+            <Bone style={{ width: 28, height: 8, borderRadius: 4 }} />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export default function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#FFF8F0]">
-        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-      </div>
-    )
-  }
+  if (loading) return <PageSkeleton />
 
   return user ? children : <Navigate to="/login" replace />
 }
