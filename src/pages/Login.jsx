@@ -21,9 +21,10 @@ export default function Login() {
   const [resetSent, setResetSent] = useState(false)
   const [resetDone, setResetDone] = useState(false)
 
-  // Detect Supabase recovery link (type=recovery in URL hash)
+  // Detect Supabase recovery link — parse hash as query string for exact key match
   useEffect(() => {
-    if (window.location.hash.includes('type=recovery')) {
+    const params = new URLSearchParams(window.location.hash.slice(1))
+    if (params.get('type') === 'recovery') {
       setMode('reset')
     }
   }, [])
