@@ -4,6 +4,7 @@ import { useFamily } from '../contexts/FamilyContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import { track } from '../lib/analytics'
+import { useSpeechToText } from '../hooks/useSpeechToText'
 
 const MOODS = [
   { value: 'good',    emoji: '😊', label: 'Buen día',   color: '#22C55E' },
@@ -58,6 +59,13 @@ export default function Memorias() {
   const recorderRef = useRef(null)
   const chunksRef = useRef([])
   const timerRef = useRef(null)
+  const transcriptRef = useRef('')
+
+  const { start: startSpeech, stop: stopSpeech } = useSpeechToText(text => {
+    transcriptRef.current = transcriptRef.current
+      ? transcriptRef.current + ' ' + text
+      : text
+  })
 
   const patientName = profile?.name ?? 'el familiar'
   const myDisplayName = user?.user_metadata?.full_name ?? user?.email ?? 'Familiar'
@@ -102,6 +110,8 @@ export default function Memorias() {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
       setMicError('')
       chunksRef.current = []
+      transcriptRef.current = ''
+      startSpeech()
       const recorder = new MediaRecorder(stream)
       recorder.ondataavailable = e => { if (e.data.size > 0) chunksRef.current.push(e.data) }
       recorder.onstop = () => stream.getTracks().forEach(t => t.stop())
@@ -116,6 +126,7 @@ export default function Memorias() {
 
   async function stopAndSave() {
     clearInterval(timerRef.current)
+    stopSpeech()
     const recorder = recorderRef.current
     if (!recorder || recorder.state === 'inactive') return
     setStep('saving')
@@ -149,6 +160,7 @@ export default function Memorias() {
       title: defaultTitle,
       duration_seconds: duration,
       mood: selectedMood,
+      transcription: transcriptRef.current || null,
     })
 
     if (insertError) {
@@ -167,6 +179,8 @@ export default function Memorias() {
 
   function cancelRecording() {
     clearInterval(timerRef.current)
+    stopSpeech()
+    transcriptRef.current = ''
     const recorder = recorderRef.current
     if (recorder && recorder.state !== 'inactive') recorder.stop()
     setStep('idle'); setElapsed(0)
@@ -442,6 +456,14 @@ export default function Memorias() {
                           )}
                         </div>
                       </div>
+                      {rec.transcription && (
+                        <p style={{
+                          fontSize: 12, color: '#6B7280', lineHeight: 1.5,
+                          marginTop: 8, fontStyle: 'italic',
+                        }}>
+                          "{rec.transcription}"
+                        </p>
+                      )}
                       {isOpen ? (
                         <audio
                           src={rec.audio_url}
