@@ -52,6 +52,7 @@ export default function Memorias() {
   const [selectedMood, setSelectedMood] = useState(null)
   const [elapsed, setElapsed] = useState(0)
   const [saveError, setSaveError] = useState('')
+  const [micError, setMicError] = useState('')
   const [playing, setPlaying] = useState(null)
   const [yearAgoMemory, setYearAgoMemory] = useState(null)
   const recorderRef = useRef(null)
@@ -99,6 +100,7 @@ export default function Memorias() {
     if (!selectedMood) return
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      setMicError('')
       chunksRef.current = []
       const recorder = new MediaRecorder(stream)
       recorder.ondataavailable = e => { if (e.data.size > 0) chunksRef.current.push(e.data) }
@@ -108,7 +110,7 @@ export default function Memorias() {
       setStep('recording'); setElapsed(0)
       timerRef.current = setInterval(() => setElapsed(n => n + 1), 1000)
     } catch {
-      alert('No se pudo acceder al micrófono. Verifica los permisos del navegador.')
+      setMicError('No se pudo acceder al micrófono. Verifica los permisos del navegador.')
     }
   }
 
@@ -245,6 +247,14 @@ export default function Memorias() {
                   </button>
                 ))}
               </div>
+              {micError && (
+                <div style={{
+                  marginBottom: 12, padding: '10px 14px', borderRadius: 12,
+                  background: '#FFF0F0', border: '1px solid #FFBABA', color: '#D63031', fontSize: 13,
+                }}>
+                  🎤 {micError}
+                </div>
+              )}
               {saveError && (
                 <div style={{
                   marginBottom: 12, padding: '10px 14px', borderRadius: 12,
