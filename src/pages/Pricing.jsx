@@ -90,27 +90,25 @@ const FAQ = [
     q: '¿Qué incluye la detección de agotamiento del cuidador?',
     a: 'La IA analiza los patrones de registro de los últimos 7 días. Si detecta que la misma persona ha registrado más del 80% de las dosis sola, genera un mensaje de reconocimiento y sugiere distribuir el cuidado.',
   },
-  {
-    q: '¿Hay descuento anual?',
-    a: 'Estamos trabajando en planes anuales con descuento. Únete a la lista de espera desde tu perfil.',
-  },
 ]
 
 export default function Pricing() {
   const navigate = useNavigate()
   const { sub, isTrialing, daysLeft } = useSubscription()
   const [loading, setLoading] = useState(null)
+  const [checkoutError, setCheckoutError] = useState('')
   const [openFaq, setOpenFaq] = useState(null)
 
   async function handleChoose(planId) {
     if (planId === 'free') { navigate('/register'); return }
     setLoading(planId)
+    setCheckoutError('')
     try {
       const url = await createCheckoutSession(planId)
       window.location.href = url
     } catch {
       setLoading(null)
-      alert('No se pudo iniciar el pago. Intenta de nuevo.')
+      setCheckoutError('No se pudo iniciar el pago. Verifica tu conexión e intenta de nuevo.')
     }
   }
 
@@ -264,6 +262,13 @@ export default function Pricing() {
           )
         })}
       </div>
+
+      {/* Checkout error */}
+      {checkoutError && (
+        <div style={{ margin: '12px 16px 0', padding: '12px 14px', background: '#FFF0F0', border: '1px solid #FFBABA', borderRadius: 14 }}>
+          <p style={{ fontSize: 13, color: '#D63031', margin: 0 }}>⚠ {checkoutError}</p>
+        </div>
+      )}
 
       {/* Trust badges */}
       <div style={{ margin: '28px 16px 0', display: 'flex', justifyContent: 'center', gap: 24, flexWrap: 'wrap' }}>
