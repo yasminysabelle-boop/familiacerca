@@ -97,7 +97,7 @@ export default function Familia() {
 
     setMembers(memberRows ?? [])
 
-    const ids = (memberRows ?? []).map(m => m.member_user_id).filter(Boolean)
+    const ids = [...new Set([(memberRows ?? []).map(m => m.member_user_id).filter(Boolean), user.id].flat())]
     if (ids.length) {
       const { data: profiles } = await supabase
         .from('user_profiles')
@@ -467,6 +467,50 @@ export default function Familia() {
                 </div>
               )}
 
+              {/* Admin's own card — always first */}
+              {(() => {
+                const adminMp = memberProfiles[user.id]
+                const adminInitials = displayName.charAt(0).toUpperCase()
+                return (
+                  <div
+                    onClick={() => navigate(`/directorio?member=${encodeURIComponent(user.email ?? '')}`)}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 12,
+                      padding: '12px 14px', borderRadius: 14,
+                      background: '#FDF8F5', border: '1.5px solid #C4623A22',
+                      cursor: 'pointer', transition: 'all 0.15s',
+                    }}
+                  >
+                    <div style={{ position: 'relative', flexShrink: 0 }}>
+                      <div style={{
+                        width: 44, height: 44, borderRadius: '50%', overflow: 'hidden',
+                        background: '#FDF0EB', border: '2px solid #C4623A44',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      }}>
+                        {adminMp?.avatar_url
+                          ? <img src={adminMp.avatar_url} alt={displayName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          : <span style={{ fontSize: 16, fontWeight: 700, color: '#C4623A' }}>{adminInitials}</span>
+                        }
+                      </div>
+                      <div style={{ position: 'absolute', bottom: 0, right: 0, width: 12, height: 12, borderRadius: '50%', border: '2px solid white', background: '#22C55E' }} />
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ fontSize: 14, fontWeight: 600, color: '#1A1A1A', margin: '0 0 2px' }}>
+                        {displayName.split(' ')[0]}
+                        <span style={{ marginLeft: 6, fontSize: 10, fontWeight: 700, color: '#C4623A', background: '#FDF0EB', padding: '2px 7px', borderRadius: 6 }}>Tú</span>
+                      </p>
+                      <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>🟢 En línea</p>
+                    </div>
+                    <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+                      <span style={{ fontSize: 10, fontWeight: 700, color: '#C4623A', background: '#FDF0EB', padding: '3px 10px', borderRadius: 6 }}>
+                        Admin
+                      </span>
+                      <span style={{ color: '#D1D5DB', fontSize: 18, lineHeight: 1 }}>›</span>
+                    </div>
+                  </div>
+                )
+              })()}
+
               {members.map(member => {
                 const mp = memberProfiles[member.member_user_id]
                 const online = isOnline(mp)
@@ -479,7 +523,7 @@ export default function Familia() {
                 return (
                   <div
                     key={member.member_user_id ?? member.member_email}
-                    onClick={() => openModal(member, mp)}
+                    onClick={() => navigate(`/directorio?member=${encodeURIComponent(member.member_email ?? '')}`)}
                     style={{
                       display: 'flex', alignItems: 'center', gap: 12,
                       padding: '12px 14px', borderRadius: 14,
@@ -515,16 +559,31 @@ export default function Familia() {
                         {joined ? ` · Desde ${joined}` : ''}
                       </p>
                     </div>
-                    <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
-                      <span style={{
-                        fontSize: 10, fontWeight: 700,
-                        color: isCuidador ? '#C4623A' : '#6B7280',
-                        background: isCuidador ? '#FDF0EB' : '#F3F4F6',
-                        padding: '3px 10px', borderRadius: 6,
-                      }}>
-                        {isCuidador ? 'Cuidador' : 'Familiar'}
-                      </span>
-                      <span style={{ color: '#D1D5DB', fontSize: 18, lineHeight: 1 }}>›</span>
+                    <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+                        <span style={{
+                          fontSize: 10, fontWeight: 700,
+                          color: isCuidador ? '#C4623A' : '#6B7280',
+                          background: isCuidador ? '#FDF0EB' : '#F3F4F6',
+                          padding: '3px 10px', borderRadius: 6,
+                        }}>
+                          {isCuidador ? 'Cuidador' : 'Familiar'}
+                        </span>
+                        <span style={{ color: '#D1D5DB', fontSize: 18, lineHeight: 1 }}>›</span>
+                      </div>
+                      {isAdmin && (
+                        <button
+                          onClick={e => { e.stopPropagation(); openModal(member, mp) }}
+                          style={{
+                            padding: '6px 7px', borderRadius: 9,
+                            background: '#F3F4F6', border: 'none', cursor: 'pointer',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          }}
+                          title="Gestionar miembro"
+                        >
+                          <span style={{ fontSize: 14, lineHeight: 1 }}>⚙</span>
+                        </button>
+                      )}
                     </div>
                   </div>
                 )

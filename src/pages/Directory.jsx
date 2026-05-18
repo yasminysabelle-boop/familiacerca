@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { supabase } from '../lib/supabase'
@@ -339,6 +340,9 @@ export default function Directory() {
   const { user } = useAuth()
   const { ownerId } = useFamily()
   const isAdmin = user?.id === ownerId
+  const [searchParams] = useSearchParams()
+  const autoOpenEmail = searchParams.get('member')
+  const autoOpenedRef = useRef(false)
 
   const [tab, setTab] = useState('medicos')
   const [doctors,      setDoctors]      = useState([])
@@ -368,6 +372,16 @@ export default function Directory() {
   const [savingCon, setSavingCon] = useState(false)
 
   useEffect(() => { if (ownerId) fetchAll() }, [ownerId])
+
+  // Auto-open a contact when arriving from Familia with ?member=email
+  useEffect(() => {
+    if (loading || !autoOpenEmail || autoOpenedRef.current) return
+    autoOpenedRef.current = true
+    const email = decodeURIComponent(autoOpenEmail)
+    const match = familyMembers.find(m => m.email?.toLowerCase() === email.toLowerCase())
+    handleMemberTap(match ?? { name: email.split('@')[0], email })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, autoOpenEmail])
 
   // Realtime: refresh familiares on any membership change (join, role update, removal)
   useEffect(() => {
