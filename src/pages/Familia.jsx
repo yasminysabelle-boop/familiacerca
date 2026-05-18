@@ -37,7 +37,7 @@ export default function Familia() {
   const [savingRole, setSavingRole] = useState(false)
   const [confirmRemoveDialog, setConfirmRemoveDialog] = useState(null) // { member, name }
 
-  const displayName = user?.user_metadata?.full_name ?? user?.email ?? 'Familiar'
+  const displayName = user?.user_metadata?.full_name?.trim() || user?.email?.trim() || 'Familiar'
   const isAdmin = user?.id === ownerId
 
   const today = new Date()
@@ -445,25 +445,11 @@ export default function Familia() {
               )}
 
               {/* Invited members */}
-              {members.length === 0 && (
-                <div style={{ textAlign: 'center', padding: isAdmin ? '12px 0 4px' : '24px 0' }}>
-                  {!isAdmin && (
-                    <div style={{
-                      width: 56, height: 56, borderRadius: '50%', margin: '0 auto 14px',
-                      background: '#FDF0EB',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    }}>
-                      <Users size={24} color="#C4623A" strokeWidth={1.5} />
-                    </div>
-                  )}
-                  <p style={{ fontSize: isAdmin ? 12 : 14, fontWeight: isAdmin ? 400 : 600, color: isAdmin ? '#9CA3AF' : '#1A1A1A', marginBottom: isAdmin ? 0 : 6 }}>
-                    {isAdmin ? 'Aún no hay otros miembros' : 'Eres el único cuidador'}
+              {isAdmin && members.length === 0 && (
+                <div style={{ textAlign: 'center', padding: '12px 0 4px' }}>
+                  <p style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 0 }}>
+                    Aún no hay otros miembros en el equipo
                   </p>
-                  {!isAdmin && (
-                    <p style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 0 }}>
-                      Invita a familiares para compartir el cuidado.
-                    </p>
-                  )}
                 </div>
               )}
 

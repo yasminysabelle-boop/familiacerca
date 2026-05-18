@@ -129,7 +129,8 @@ export default function MedicationTimeline() {
     setSaving(true)
     const loc = await getLocation()
     const path = `${user.id}/${today}/${confirming.id}.jpg`
-    await supabase.storage.from('confirmations').upload(path, photoFile, { upsert: true, contentType: 'image/jpeg' })
+    const { error: uploadErr } = await supabase.storage.from('confirmations').upload(path, photoFile, { upsert: true, contentType: 'image/jpeg' })
+    if (uploadErr) { setPhotoError('No se pudo subir la foto. Verifica tu conexión.'); setSaving(false); return }
     const { data: { publicUrl } } = supabase.storage.from('confirmations').getPublicUrl(path)
 
     await supabase.from('medication_logs').upsert({

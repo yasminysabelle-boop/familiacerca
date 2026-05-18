@@ -46,6 +46,7 @@ export default function Calendar() {
   const [proofPreview, setProofPreview] = useState(null)
   const [proofNote, setProofNote]     = useState('')
   const [proofSaving, setProofSaving] = useState(false)
+  const [proofUploadError, setProofUploadError] = useState('')
   const [proofs, setProofs]           = useState({}) // eventId -> proof
 
   useEffect(() => { if (user && ownerId) fetchEvents() }, [user, ownerId, year, month])
@@ -120,14 +121,19 @@ export default function Calendar() {
   async function submitProof() {
     if (!proofPhoto && !proofNote) return
     setProofSaving(true)
+    setProofUploadError('')
 
     let photo_url = null
     if (proofPhoto) {
       const ext  = proofPhoto.name.split('.').pop()
       const path = `${user.id}/${proofEvent.id}.${ext}`
-      await supabase.storage.from('appointment-proofs').upload(path, proofPhoto, { upsert: true, contentType: proofPhoto.type })
-      const { data: { publicUrl } } = supabase.storage.from('appointment-proofs').getPublicUrl(path)
-      photo_url = publicUrl
+      const { error: uploadErr } = await supabase.storage.from('appointment-proofs').upload(path, proofPhoto, { upsert: true, contentType: proofPhoto.type })
+      if (uploadErr) {
+        setProofUploadError('No se pudo subir la foto. La cita se guardará sin imagen.')
+      } else {
+        const { data: { publicUrl } } = supabase.storage.from('appointment-proofs').getPublicUrl(path)
+        photo_url = publicUrl
+      }
     }
 
     await supabase.from('appointment_proofs').upsert({
@@ -369,6 +375,9 @@ export default function Calendar() {
               placeholder="Notas de la cita (diagnóstico, instrucciones...)..."
               className="w-full mb-4 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none" />
 
+            {proofUploadError && (
+              <p className="text-xs text-orange-600 mb-3 px-1">⚠ {proofUploadError}</p>
+            )}
             <div className="flex gap-3">
               <button onClick={submitProof} disabled={proofSaving || (!proofPhoto && !proofNote)}
                 className="flex-1 py-3 bg-primary hover:bg-primary-dark disabled:opacity-50 text-white font-semibold rounded-xl transition-colors text-sm">

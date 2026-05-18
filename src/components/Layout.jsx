@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import Logo from './Logo'
-import { Home, Pill, Mic, Users, User, Plus, XIcon, LogOut } from './Icons'
+import { Home, Pill, Mic, Users, User, Plus, XIcon, LogOut, Chat } from './Icons'
 import Paywall from './Paywall'
 import InstallBanner from './InstallBanner'
 import OfflineBanner from './OfflineBanner'
@@ -29,11 +29,13 @@ const PAGE_TITLES = {
   '/permisos':    'Permisos',
   '/ajustes':     'Mi cuenta',
   '/pricing':     'Planes',
+  '/mas':         'Más opciones',
 }
 
 const BOTTOM_TABS = [
   { to: '/dashboard', Icon: Home,  label: 'Inicio' },
   { to: '/hoy',       Icon: Pill,  label: 'Hoy' },
+  { to: '/chat',      Icon: Chat,  label: 'Chat' },
   { to: '/memorias',  Icon: Mic,   label: 'Memorias' },
   { to: '/familia',   Icon: Users, label: 'Familia' },
 ]
@@ -108,7 +110,7 @@ export default function Layout({ children }) {
           </div>
         )}
 
-        <Link to="/ajustes" style={{ flexShrink: 0, lineHeight: 0 }}>
+        <Link to="/ajustes" aria-label="Ir a configuración" style={{ flexShrink: 0, lineHeight: 0 }}>
           {profile?.photo_url ? (
             <img
               src={profile.photo_url} alt={profile.name}
@@ -176,7 +178,7 @@ export default function Layout({ children }) {
               Política de privacidad
             </Link>
           </div>
-          <p style={{ fontSize: 10, color: '#D1D5DB', margin: 0 }}>© 2025 FamiliaCerca LLC</p>
+          <p style={{ fontSize: 10, color: '#D1D5DB', margin: 0 }}>© 2026 FamiliaCerca LLC</p>
         </footer>
       </main>
 
@@ -225,6 +227,7 @@ export default function Layout({ children }) {
               </p>
               <button
                 onClick={() => setFabOpen(false)}
+                aria-label="Cerrar menú rápido"
                 style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4 }}
               >
                 <XIcon size={18} color="#9CA3AF" strokeWidth={2} />
@@ -247,6 +250,21 @@ export default function Layout({ children }) {
                 </button>
               ))}
             </div>
+
+            {/* Ver todo — link to /mas hub */}
+            <Link
+              to="/mas"
+              onClick={() => setFabOpen(false)}
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                width: '100%', marginTop: 12, padding: '11px',
+                border: '1px solid #EDE5D8', borderRadius: 12,
+                background: '#FDFAF7', color: '#6B7280',
+                fontWeight: 600, fontSize: 13, textDecoration: 'none',
+              }}
+            >
+              ☰ Ver todas las funciones
+            </Link>
 
             {/* Sign out — always visible at bottom of FAB sheet */}
             <button
@@ -313,6 +331,7 @@ export default function Layout({ children }) {
             <Link
               key={to}
               to={to}
+              aria-current={isActive ? 'page' : undefined}
               style={{
                 flex: 1, display: 'flex', flexDirection: 'column',
                 alignItems: 'center', justifyContent: 'center',

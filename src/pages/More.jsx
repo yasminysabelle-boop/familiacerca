@@ -84,8 +84,19 @@ export default function More() {
       return
     }
 
-    setInviteLink(`${window.location.origin}/join?token=${token}`)
+    const link = `${window.location.origin}/join?token=${token}`
+    setInviteLink(link)
     setStatus('success')
+    // Fire-and-forget — link shown as fallback if email fails
+    supabase.functions.invoke('send-invitation', {
+      body: {
+        inviteeEmail: inviteEmail.trim().toLowerCase(),
+        inviterName: displayName,
+        relativeName: profile?.name ?? 'su familiar',
+        invitationLink: link,
+        role: 'familiar',
+      },
+    })
   }
 
   async function copyLink() {
