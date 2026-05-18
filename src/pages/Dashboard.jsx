@@ -996,9 +996,10 @@ export default function Dashboard() {
   async function generateAiCards({ confirmedCount, pendingCount, patientName, caregiverName, caregiverNames, weekCount, isSunday }) {
     const newCards = {}
     const wk = weekKey()
+    const uid = user?.id ?? 'anon'
 
     if (h >= 7 && h < 19) {
-      const k = `fc_ai_morning_${todayKey}`
+      const k = `fc_ai_morning_${uid}_${todayKey}`
       const cached = localStorage.getItem(k)
       if (cached) {
         newCards.morning = cached
@@ -1012,7 +1013,7 @@ export default function Dashboard() {
     }
 
     if (h >= 20) {
-      const k = `fc_ai_evening_${todayKey}`
+      const k = `fc_ai_evening_${uid}_${todayKey}`
       const cached = localStorage.getItem(k)
       if (cached) {
         newCards.evening = cached
@@ -1031,7 +1032,7 @@ export default function Dashboard() {
     if (caregiverNames.length >= 5) {
       const unique = new Set(caregiverNames.filter(Boolean))
       if (unique.size === 1) {
-        const k = `fc_ai_burnout_${todayKey}`
+        const k = `fc_ai_burnout_${uid}_${todayKey}`
         const cached = localStorage.getItem(k)
         if (cached) {
           newCards.burnout = cached
@@ -1047,7 +1048,7 @@ export default function Dashboard() {
     }
 
     if (isSunday) {
-      const k = `fc_ai_weekly_${wk}`
+      const k = `fc_ai_weekly_${uid}_${wk}`
       const cached = localStorage.getItem(k)
       if (cached) {
         newCards.weekly = cached
