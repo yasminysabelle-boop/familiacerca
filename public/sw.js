@@ -1,13 +1,31 @@
-// FamiliaCerca Service Worker — push notifications + offline shell
+// FamiliaCerca Service Worker — offline caching + push notifications
 
-const CACHE   = 'familiacerca-v2'
-const SHELL   = ['/index.html', '/manifest.json']
+const CACHE_VER = 'familiacerca-v3'
 
-// ── Install: cache app shell ──────────────────────────────────────
+// Static assets whose URLs are stable (not content-hashed by Vite)
+const PRECACHE = [
+  '/index.html',
+  '/manifest.json',
+  '/icon-192.png',
+  '/icon-512.png',
+  '/icon-72.png',
+  '/apple-touch-icon.png',
+  '/favicon.svg',
+  '/icons.svg',
+]
+
+// ── Install: precache known static assets ─────────────────────────
 self.addEventListener('install', event => {
   self.skipWaiting()
   event.waitUntil(
-    caches.open(CACHE).then(c => c.addAll(SHELL))
+    caches.open(CACHE_VER).then(cache =>
+      // Individual fetches so one 404 can't abort the whole install
+      Promise.allSettled(
+        PRECACHE.map(url =>
+          fetch(url).then(res => { if (res.ok) cache.put(url, res) }).catch(() => {})
+        )
+      )
+    )
   )
 })
 
@@ -17,35 +35,66 @@ self.addEventListener('activate', event => {
     Promise.all([
       clients.claim(),
       caches.keys().then(keys =>
-        Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+        Promise.all(keys.filter(k => k !== CACHE_VER).map(k => caches.delete(k)))
       ),
     ])
   )
 })
 
-// ── Fetch: offline fallback for navigation requests ───────────────
+// ── Fetch ─────────────────────────────────────────────────────────
 self.addEventListener('fetch', event => {
-  // Only intercept same-origin GET requests
   if (event.request.method !== 'GET') return
-  if (!event.request.url.startsWith(self.location.origin)) return
 
+  const url = new URL(event.request.url)
+
+  // Never intercept cross-origin requests (Supabase, Stripe, Google, etc.)
+  if (url.origin !== self.location.origin) return
+
+  // Navigation → network-first, cache index.html, fall back to cached shell
   if (event.request.mode === 'navigate') {
     event.respondWith(
-      fetch(event.request).catch(() => caches.match('/index.html'))
+      fetch(event.request)
+        .then(res => {
+          if (res.ok) {
+            const clone = res.clone()
+            caches.open(CACHE_VER).then(c => c.put('/index.html', clone))
+          }
+          return res
+        })
+        .catch(() => caches.match('/index.html'))
     )
     return
   }
 
-  // Cache-first for shell assets, network-first otherwise
+  // Vite hashed bundles (/assets/*.js, /assets/*.css) — immutable, cache-first
+  // Content hash in filename means a new deploy = new URL = cache miss = fresh fetch
+  if (url.pathname.startsWith('/assets/')) {
+    event.respondWith(
+      caches.match(event.request).then(cached => {
+        if (cached) return cached
+        return fetch(event.request).then(res => {
+          if (res.ok) {
+            const clone = res.clone()
+            caches.open(CACHE_VER).then(c => c.put(event.request, clone))
+          }
+          return res
+        })
+      })
+    )
+    return
+  }
+
+  // Everything else (icons, manifest, fonts) — stale-while-revalidate
   event.respondWith(
-    caches.match(event.request).then(cached =>
-      cached ?? fetch(event.request).then(res => {
-        // Cache successful static asset responses
-        if (res.ok && SHELL.includes(new URL(event.request.url).pathname)) {
-          const clone = res.clone()
-          caches.open(CACHE).then(c => c.put(event.request, clone))
-        }
-        return res
+    caches.open(CACHE_VER).then(cache =>
+      cache.match(event.request).then(cached => {
+        const revalidate = fetch(event.request)
+          .then(res => {
+            if (res.ok) cache.put(event.request, res.clone())
+            return res
+          })
+          .catch(() => cached)
+        return cached ?? revalidate
       })
     )
   )
@@ -63,7 +112,7 @@ self.addEventListener('push', event => {
       icon: '/icon-192.png',
       badge: '/icon-72.png',
       tag: data.tag ?? 'med-reminder',
-      data: { url: data.url ?? '/medications' },
+      data: { url: data.url ?? '/hoy' },
       actions: [
         { action: 'taken',  title: '✓ Tomado' },
         { action: 'snooze', title: '⏰ 15 min' },
@@ -75,15 +124,14 @@ self.addEventListener('push', event => {
 
 self.addEventListener('notificationclick', event => {
   event.notification.close()
-  const url = (event.notification.data?.url ?? '/medications') +
+  const target = (event.notification.data?.url ?? '/hoy') +
     (event.action ? `?action=${event.action}` : '')
 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
-      for (const client of list) {
-        if ('focus' in client) return client.focus()
-      }
-      return clients.openWindow(url)
+      const existing = list.find(c => c.url.startsWith(self.location.origin))
+      if (existing) return existing.focus().then(w => w.navigate(target))
+      return clients.openWindow(target)
     })
   )
 })
