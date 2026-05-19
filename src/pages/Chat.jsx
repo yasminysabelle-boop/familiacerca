@@ -165,6 +165,7 @@ export default function Chat() {
     })
 
     if (error) {
+      console.error('[Chat] insert error:', error.code, error.message, error.details, error.hint)
       setSendError('No se pudo enviar. Inténtalo de nuevo.')
       setInput(text)
     }
