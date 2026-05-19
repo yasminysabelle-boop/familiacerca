@@ -168,7 +168,8 @@ create table if not exists public.chat_messages (
   id          uuid        primary key default gen_random_uuid(),
   user_id     uuid        not null references auth.users(id) on delete cascade,
   user_name   text,
-  content     text        not null,
+  message     text        not null,
+  owner_id    uuid        references auth.users(id),
   created_at  timestamptz not null default now()
 );
 
