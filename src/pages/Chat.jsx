@@ -157,17 +157,20 @@ export default function Chat() {
     setSendError('')
     setInput('')
 
-    const { error } = await supabase.from('chat_messages').insert({
-      owner_id: ownerId,
-      user_id: user.id,
-      user_name: displayName,
-      content: text,
-    })
+    const payload = { owner_id: ownerId, user_id: user.id, user_name: displayName, content: text }
+    console.log('[Chat] sending payload:', payload)
+
+    const { data: sessionData } = await supabase.auth.getSession()
+    console.log('[Chat] auth.uid in session:', sessionData?.session?.user?.id)
+
+    const { error } = await supabase.from('chat_messages').insert(payload)
 
     if (error) {
       console.error('[Chat] insert error:', error.code, error.message, error.details, error.hint)
       setSendError('No se pudo enviar. Inténtalo de nuevo.')
       setInput(text)
+    } else {
+      console.log('[Chat] insert succeeded')
     }
 
     setSending(false)
