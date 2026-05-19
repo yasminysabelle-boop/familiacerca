@@ -16,17 +16,17 @@ DROP POLICY IF EXISTS "Chat: authenticated can read" ON public.chat_messages;
 DROP POLICY IF EXISTS "Chat: authenticated can insert" ON public.chat_messages;
 DROP POLICY IF EXISTS "Chat: own messages can delete" ON public.chat_messages;
 
--- Family-scoped SELECT: members can only read their family's messages
+-- Family-scoped SELECT: owner or member can read their family's messages
 CREATE POLICY "Chat: family members can read"
   ON public.chat_messages FOR SELECT
-  USING (fc_is_member_of(owner_id));
+  USING (auth.uid() = owner_id OR fc_is_member_of(owner_id));
 
--- Family-scoped INSERT: sender must belong to the target family
+-- Family-scoped INSERT: owner or member can insert into their family chat
 CREATE POLICY "Chat: family members can insert"
   ON public.chat_messages FOR INSERT
   WITH CHECK (
     auth.uid() = user_id
-    AND fc_is_member_of(owner_id)
+    AND (auth.uid() = owner_id OR fc_is_member_of(owner_id))
   );
 
 -- DELETE: only the message author
