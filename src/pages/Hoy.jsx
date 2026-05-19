@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
@@ -101,8 +101,6 @@ export default function Hoy() {
   const [proofBlob, setProofBlob] = useState(null)
   const [proofGps, setProofGps] = useState(null)
   const [uploadError, setUploadError] = useState('')
-  const fileRef = useRef(null)
-  const galleryRef = useRef(null)
 
   // Tick every 30 s so countdown displays stay current
   const [, setTick] = useState(0)
@@ -195,14 +193,28 @@ export default function Hoy() {
     setUploadError('')
   }
 
+  function openCamera() {
+    if (proofStamping || proofUploading) return
+    const el = document.createElement('input')
+    el.type = 'file'; el.accept = 'image/*'; el.capture = 'environment'
+    el.addEventListener('change', handleProofFile, { once: true })
+    el.click()
+  }
+
+  function openGallery() {
+    if (proofStamping || proofUploading) return
+    const el = document.createElement('input')
+    el.type = 'file'; el.accept = 'image/*'
+    el.addEventListener('change', handleProofFile, { once: true })
+    el.click()
+  }
+
   function closeProofSheet() {
     setProofSheet(null)
     setProofPreview(null)
     setProofBlob(null)
     setProofGps(null)
     setUploadError('')
-    if (fileRef.current) fileRef.current.value = ''
-    if (galleryRef.current) galleryRef.current.value = ''
   }
 
   async function handleProofFile(e) {
@@ -285,9 +297,6 @@ export default function Hoy() {
 
   return (
     <Layout>
-      {/* Hidden file inputs for proof photos */}
-      <input ref={fileRef} type="file" accept="image/*" capture="environment" style={{ display: 'none' }} onChange={handleProofFile} />
-      <input ref={galleryRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleProofFile} />
 
       <div style={{ padding: '16px 16px 96px', maxWidth: 600 }}>
 
@@ -802,11 +811,11 @@ export default function Hoy() {
                     </div>
                   </div>
                   <div style={{ display: 'flex', gap: 8, padding: '8px 12px 12px' }}>
-                    <button type="button" onClick={() => !proofUploading && fileRef.current?.click()} disabled={proofUploading}
+                    <button type="button" onClick={openCamera} disabled={proofUploading}
                       style={{ flex: 1, padding: '8px 0', borderRadius: 10, border: '1.5px solid #C4623A', background: '#FDF0EB', color: '#C4623A', fontSize: 12, fontWeight: 700, cursor: proofUploading ? 'not-allowed' : 'pointer' }}>
                       📷 Tomar foto
                     </button>
-                    <button type="button" onClick={() => !proofUploading && galleryRef.current?.click()} disabled={proofUploading}
+                    <button type="button" onClick={openGallery} disabled={proofUploading}
                       style={{ flex: 1, padding: '8px 0', borderRadius: 10, border: '1.5px solid #D4C4B8', background: '#FDFAF7', color: '#6B7280', fontSize: 12, fontWeight: 700, cursor: proofUploading ? 'not-allowed' : 'pointer' }}>
                       🖼 De galería
                     </button>
@@ -822,11 +831,11 @@ export default function Hoy() {
                   </div>
                   <p style={{ fontSize: 12, color: '#9CA3AF', margin: 0 }}>Se sellará automáticamente con fecha y hora</p>
                   <div style={{ display: 'flex', gap: 8, width: '100%' }}>
-                    <button type="button" onClick={() => fileRef.current?.click()}
+                    <button type="button" onClick={openCamera}
                       style={{ flex: 1, padding: '11px 0', borderRadius: 12, border: '1.5px solid #C4623A', background: '#FDF0EB', color: '#C4623A', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
                       📷 Tomar foto
                     </button>
-                    <button type="button" onClick={() => galleryRef.current?.click()}
+                    <button type="button" onClick={openGallery}
                       style={{ flex: 1, padding: '11px 0', borderRadius: 12, border: '1.5px solid #D4C4B8', background: '#FDFAF7', color: '#6B7280', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
                       🖼 Elegir de galería
                     </button>

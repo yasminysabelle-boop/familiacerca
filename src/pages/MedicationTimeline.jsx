@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { supabase } from '../lib/supabase'
@@ -78,10 +78,6 @@ export default function MedicationTimeline() {
   const { memberRole } = useFamily()
   const isFamiliar = memberRole === 'familiar'
   const isAdmin = memberRole === null
-  const fileRef          = useRef(null)
-  const galleryRef       = useRef(null)
-  const attachFileRef    = useRef(null)
-  const attachGalleryRef = useRef(null)
   const [medications, setMedications] = useState([])
   const [todayLogs, setTodayLogs] = useState({})
   const [history, setHistory] = useState([])
@@ -132,6 +128,20 @@ export default function MedicationTimeline() {
       .gte('log_date', since.toISOString().split('T')[0])
       .order('log_date', { ascending: false })
     setHistory(data ?? [])
+  }
+
+  function pickCamera(onChange) {
+    const el = document.createElement('input')
+    el.type = 'file'; el.accept = 'image/*'; el.capture = 'environment'
+    el.addEventListener('change', onChange, { once: true })
+    el.click()
+  }
+
+  function pickGallery(onChange) {
+    const el = document.createElement('input')
+    el.type = 'file'; el.accept = 'image/*'
+    el.addEventListener('change', onChange, { once: true })
+    el.click()
   }
 
   function openConfirm(med) {
@@ -431,8 +441,6 @@ export default function MedicationTimeline() {
               <p className="text-sm text-gray-500">{editingPhoto.medName}</p>
             </div>
 
-            <input ref={attachFileRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handleAttachPhotoChange} />
-            <input ref={attachGalleryRef} type="file" accept="image/*" className="hidden" onChange={handleAttachPhotoChange} />
             <div className="w-full border-y border-dashed border-green-200">
               {attachStamping ? (
                 <div className="h-36 flex flex-col items-center justify-center gap-2 text-gray-400">
@@ -447,11 +455,11 @@ export default function MedicationTimeline() {
                     <span className="text-xs font-semibold text-primary">Sello aplicado</span>
                   </div>
                   <div className="flex gap-2 px-3 py-2.5">
-                    <button type="button" onClick={() => attachFileRef.current?.click()}
+                    <button type="button" onClick={() => pickCamera(handleAttachPhotoChange)}
                       className="flex-1 py-2 text-xs font-semibold rounded-lg border border-primary text-primary bg-green-50 hover:bg-green-100 transition-colors">
                       📷 Tomar foto
                     </button>
-                    <button type="button" onClick={() => attachGalleryRef.current?.click()}
+                    <button type="button" onClick={() => pickGallery(handleAttachPhotoChange)}
                       className="flex-1 py-2 text-xs font-semibold rounded-lg border border-gray-200 text-gray-600 bg-gray-50 hover:bg-gray-100 transition-colors">
                       🖼 Elegir de galería
                     </button>
@@ -466,11 +474,11 @@ export default function MedicationTimeline() {
                     </div>
                   </div>
                   <div className="flex gap-2 px-3 py-2.5">
-                    <button type="button" onClick={() => attachFileRef.current?.click()}
+                    <button type="button" onClick={() => pickCamera(handleAttachPhotoChange)}
                       className="flex-1 py-2 text-xs font-semibold rounded-lg border border-primary text-primary bg-green-50 hover:bg-green-100 transition-colors">
                       📷 Tomar foto
                     </button>
-                    <button type="button" onClick={() => attachGalleryRef.current?.click()}
+                    <button type="button" onClick={() => pickGallery(handleAttachPhotoChange)}
                       className="flex-1 py-2 text-xs font-semibold rounded-lg border border-gray-200 text-gray-600 bg-gray-50 hover:bg-gray-100 transition-colors">
                       🖼 Elegir de galería
                     </button>
@@ -480,11 +488,11 @@ export default function MedicationTimeline() {
                 <div className="flex flex-col items-center gap-3 py-5 px-4">
                   <span className="text-3xl">📷</span>
                   <div className="flex gap-2 w-full">
-                    <button type="button" onClick={() => attachFileRef.current?.click()}
+                    <button type="button" onClick={() => pickCamera(handleAttachPhotoChange)}
                       className="flex-1 py-2.5 text-sm font-semibold rounded-xl border border-primary text-primary bg-green-50 hover:bg-green-100 transition-colors">
                       📷 Tomar foto
                     </button>
-                    <button type="button" onClick={() => attachGalleryRef.current?.click()}
+                    <button type="button" onClick={() => pickGallery(handleAttachPhotoChange)}
                       className="flex-1 py-2.5 text-sm font-semibold rounded-xl border border-gray-200 text-gray-600 bg-gray-50 hover:bg-gray-100 transition-colors">
                       🖼 Elegir de galería
                     </button>
@@ -528,8 +536,6 @@ export default function MedicationTimeline() {
               <p className="text-sm text-gray-500">{confirming.name}{confirming.dosage ? ` · ${confirming.dosage}` : ''}</p>
             </div>
 
-            <input ref={fileRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handlePhotoChange} />
-            <input ref={galleryRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
             <div className="w-full border-y border-dashed border-green-200">
               {stamping ? (
                 <div className="h-36 flex flex-col items-center justify-center gap-2 text-gray-400">
@@ -544,11 +550,11 @@ export default function MedicationTimeline() {
                     <span className="text-xs font-semibold text-primary">Sello aplicado</span>
                   </div>
                   <div className="flex gap-2 px-3 py-2.5">
-                    <button type="button" onClick={() => fileRef.current?.click()}
+                    <button type="button" onClick={() => pickCamera(handlePhotoChange)}
                       className="flex-1 py-2 text-xs font-semibold rounded-lg border border-primary text-primary bg-green-50 hover:bg-green-100 transition-colors">
                       📷 Tomar foto
                     </button>
-                    <button type="button" onClick={() => galleryRef.current?.click()}
+                    <button type="button" onClick={() => pickGallery(handlePhotoChange)}
                       className="flex-1 py-2 text-xs font-semibold rounded-lg border border-gray-200 text-gray-600 bg-gray-50 hover:bg-gray-100 transition-colors">
                       🖼 Elegir de galería
                     </button>
@@ -559,11 +565,11 @@ export default function MedicationTimeline() {
                   <span className="text-3xl">📷</span>
                   <p className="text-xs text-gray-400">Requerida para confirmar · Se sellará automáticamente</p>
                   <div className="flex gap-2 w-full">
-                    <button type="button" onClick={() => fileRef.current?.click()}
+                    <button type="button" onClick={() => pickCamera(handlePhotoChange)}
                       className="flex-1 py-2.5 text-sm font-semibold rounded-xl border border-primary text-primary bg-green-50 hover:bg-green-100 transition-colors">
                       📷 Tomar foto
                     </button>
-                    <button type="button" onClick={() => galleryRef.current?.click()}
+                    <button type="button" onClick={() => pickGallery(handlePhotoChange)}
                       className="flex-1 py-2.5 text-sm font-semibold rounded-xl border border-gray-200 text-gray-600 bg-gray-50 hover:bg-gray-100 transition-colors">
                       🖼 Elegir de galería
                     </button>

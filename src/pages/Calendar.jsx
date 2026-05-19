@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
@@ -24,8 +24,6 @@ export default function Calendar() {
   const { ownerId } = useFamily()
   const { canEdit } = useSubscription()
   const navigate = useNavigate()
-  const fileRef      = useRef(null)
-  const galleryRef   = useRef(null)
   const today    = new Date()
 
   const isAdmin = user?.id === ownerId
@@ -112,6 +110,20 @@ export default function Calendar() {
   function eventsOnDay(day) {
     const ds = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
     return events.filter(e => e.date === ds)
+  }
+
+  function pickCamera() {
+    const el = document.createElement('input')
+    el.type = 'file'; el.accept = 'image/*'; el.capture = 'environment'
+    el.addEventListener('change', handleProofPhoto, { once: true })
+    el.click()
+  }
+
+  function pickGallery() {
+    const el = document.createElement('input')
+    el.type = 'file'; el.accept = 'image/*'
+    el.addEventListener('change', handleProofPhoto, { once: true })
+    el.click()
   }
 
   function handleProofPhoto(e) {
@@ -359,18 +371,16 @@ export default function Calendar() {
             <h3 className="font-bold text-gray-900 mb-0.5">Prueba de asistencia</h3>
             <p className="text-sm text-gray-500 mb-4">{proofEvent.title}</p>
 
-            <input ref={fileRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handleProofPhoto} />
-            <input ref={galleryRef} type="file" accept="image/*" className="hidden" onChange={handleProofPhoto} />
             <div className="w-full mb-3 border-2 border-dashed border-green-200 rounded-xl overflow-hidden">
               {proofPreview ? (
                 <div>
                   <img src={proofPreview} className="w-full h-40 object-cover" alt="Prueba" />
                   <div className="flex gap-2 px-3 py-2.5">
-                    <button type="button" onClick={() => fileRef.current?.click()}
+                    <button type="button" onClick={pickCamera}
                       className="flex-1 py-2 text-xs font-semibold rounded-lg border border-primary text-primary bg-green-50 hover:bg-green-100 transition-colors">
                       📷 Tomar foto
                     </button>
-                    <button type="button" onClick={() => galleryRef.current?.click()}
+                    <button type="button" onClick={pickGallery}
                       className="flex-1 py-2 text-xs font-semibold rounded-lg border border-gray-200 text-gray-600 bg-gray-50 hover:bg-gray-100 transition-colors">
                       🖼 Elegir de galería
                     </button>
@@ -381,11 +391,11 @@ export default function Calendar() {
                   <span className="text-3xl">📷</span>
                   <p className="text-xs text-gray-400 text-center">Foto de la cita (sala de espera, receta...)</p>
                   <div className="flex gap-2 w-full">
-                    <button type="button" onClick={() => fileRef.current?.click()}
+                    <button type="button" onClick={pickCamera}
                       className="flex-1 py-2.5 text-sm font-semibold rounded-xl border border-primary text-primary bg-green-50 hover:bg-green-100 transition-colors">
                       📷 Tomar foto
                     </button>
-                    <button type="button" onClick={() => galleryRef.current?.click()}
+                    <button type="button" onClick={pickGallery}
                       className="flex-1 py-2.5 text-sm font-semibold rounded-xl border border-gray-200 text-gray-600 bg-gray-50 hover:bg-gray-100 transition-colors">
                       🖼 Elegir de galería
                     </button>
