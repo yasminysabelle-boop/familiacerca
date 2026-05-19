@@ -102,6 +102,7 @@ export default function Hoy() {
   const [proofGps, setProofGps] = useState(null)
   const [uploadError, setUploadError] = useState('')
   const fileRef = useRef(null)
+  const galleryRef = useRef(null)
 
   // Tick every 30 s so countdown displays stay current
   const [, setTick] = useState(0)
@@ -201,6 +202,7 @@ export default function Hoy() {
     setProofGps(null)
     setUploadError('')
     if (fileRef.current) fileRef.current.value = ''
+    if (galleryRef.current) galleryRef.current.value = ''
   }
 
   async function handleProofFile(e) {
@@ -283,15 +285,9 @@ export default function Hoy() {
 
   return (
     <Layout>
-      {/* Hidden file input for proof photos */}
-      <input
-        ref={fileRef}
-        type="file"
-        accept="image/*"
-        capture="environment"
-        style={{ display: 'none' }}
-        onChange={handleProofFile}
-      />
+      {/* Hidden file inputs for proof photos */}
+      <input ref={fileRef} type="file" accept="image/*" capture="environment" style={{ display: 'none' }} onChange={handleProofFile} />
+      <input ref={galleryRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleProofFile} />
 
       <div style={{ padding: '16px 16px 96px', maxWidth: 600 }}>
 
@@ -773,20 +769,12 @@ export default function Hoy() {
               </div>
             )}
 
-            {/* Camera area */}
-            <button
-              type="button"
-              onClick={() => !proofStamping && !proofUploading && fileRef.current?.click()}
-              disabled={proofStamping || proofUploading}
-              style={{
-                width: '100%', border: '2px dashed #EDE5D8',
-                borderRadius: 16, background: proofPreview ? 'transparent' : '#FDFAF7',
-                cursor: proofStamping || proofUploading ? 'default' : 'pointer',
-                overflow: 'hidden', marginBottom: 16,
-                display: 'flex', flexDirection: 'column',
-                alignItems: 'center', justifyContent: 'center',
-              }}
-            >
+            {/* Photo area */}
+            <div style={{
+              width: '100%', border: '2px dashed #EDE5D8',
+              borderRadius: 16, overflow: 'hidden', marginBottom: 16,
+              background: proofPreview ? 'transparent' : '#FDFAF7',
+            }}>
               {proofStamping ? (
                 <div style={{ padding: '40px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
                   <div style={{
@@ -805,7 +793,7 @@ export default function Hoy() {
                   }}>
                     <span style={{ fontSize: 14 }}>🔒</span>
                     <div style={{ flex: 1 }}>
-                      <p style={{ fontSize: 12, fontWeight: 700, color: '#15803D', margin: 0 }}>Sello aplicado · Toca para cambiar</p>
+                      <p style={{ fontSize: 12, fontWeight: 700, color: '#15803D', margin: 0 }}>Sello aplicado</p>
                       {proofGps && (
                         <p style={{ fontSize: 11, color: '#4A7C59', margin: '2px 0 0' }}>
                           📍 {proofGps.address ?? `${proofGps.latitude.toFixed(5)}, ${proofGps.longitude.toFixed(5)}`}
@@ -813,25 +801,39 @@ export default function Hoy() {
                       )}
                     </div>
                   </div>
+                  <div style={{ display: 'flex', gap: 8, padding: '8px 12px 12px' }}>
+                    <button type="button" onClick={() => !proofUploading && fileRef.current?.click()} disabled={proofUploading}
+                      style={{ flex: 1, padding: '8px 0', borderRadius: 10, border: '1.5px solid #C4623A', background: '#FDF0EB', color: '#C4623A', fontSize: 12, fontWeight: 700, cursor: proofUploading ? 'not-allowed' : 'pointer' }}>
+                      📷 Tomar foto
+                    </button>
+                    <button type="button" onClick={() => !proofUploading && galleryRef.current?.click()} disabled={proofUploading}
+                      style={{ flex: 1, padding: '8px 0', borderRadius: 10, border: '1.5px solid #D4C4B8', background: '#FDFAF7', color: '#6B7280', fontSize: 12, fontWeight: 700, cursor: proofUploading ? 'not-allowed' : 'pointer' }}>
+                      🖼 De galería
+                    </button>
+                  </div>
                 </>
               ) : (
-                <div style={{ padding: '40px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+                <div style={{ padding: '28px 16px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
                   <div style={{
-                    width: 64, height: 64, borderRadius: '50%',
+                    width: 56, height: 56, borderRadius: '50%',
                     background: '#FDF0EB', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    marginBottom: 4,
                   }}>
-                    <span style={{ fontSize: 30 }}>📷</span>
+                    <span style={{ fontSize: 26 }}>📷</span>
                   </div>
-                  <p style={{ fontSize: 14, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>
-                    Tomar foto de prueba
-                  </p>
-                  <p style={{ fontSize: 12, color: '#9CA3AF', margin: 0 }}>
-                    Se sellará automáticamente con fecha y hora
-                  </p>
+                  <p style={{ fontSize: 12, color: '#9CA3AF', margin: 0 }}>Se sellará automáticamente con fecha y hora</p>
+                  <div style={{ display: 'flex', gap: 8, width: '100%' }}>
+                    <button type="button" onClick={() => fileRef.current?.click()}
+                      style={{ flex: 1, padding: '11px 0', borderRadius: 12, border: '1.5px solid #C4623A', background: '#FDF0EB', color: '#C4623A', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                      📷 Tomar foto
+                    </button>
+                    <button type="button" onClick={() => galleryRef.current?.click()}
+                      style={{ flex: 1, padding: '11px 0', borderRadius: 12, border: '1.5px solid #D4C4B8', background: '#FDFAF7', color: '#6B7280', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                      🖼 Elegir de galería
+                    </button>
+                  </div>
                 </div>
               )}
-            </button>
+            </div>
 
             {/* Error feedback */}
             {uploadError && (

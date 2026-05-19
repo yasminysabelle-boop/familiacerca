@@ -78,8 +78,10 @@ export default function MedicationTimeline() {
   const { memberRole } = useFamily()
   const isFamiliar = memberRole === 'familiar'
   const isAdmin = memberRole === null
-  const fileRef       = useRef(null)
-  const attachFileRef = useRef(null)
+  const fileRef          = useRef(null)
+  const galleryRef       = useRef(null)
+  const attachFileRef    = useRef(null)
+  const attachGalleryRef = useRef(null)
   const [medications, setMedications] = useState([])
   const [todayLogs, setTodayLogs] = useState({})
   const [history, setHistory] = useState([])
@@ -430,8 +432,8 @@ export default function MedicationTimeline() {
             </div>
 
             <input ref={attachFileRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handleAttachPhotoChange} />
-            <button type="button" onClick={() => !attachStamping && attachFileRef.current?.click()} disabled={attachStamping}
-              className="w-full border-y border-dashed border-green-200 hover:bg-gray-50 disabled:cursor-default transition-colors">
+            <input ref={attachGalleryRef} type="file" accept="image/*" className="hidden" onChange={handleAttachPhotoChange} />
+            <div className="w-full border-y border-dashed border-green-200">
               {attachStamping ? (
                 <div className="h-36 flex flex-col items-center justify-center gap-2 text-gray-400">
                   <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
@@ -443,24 +445,53 @@ export default function MedicationTimeline() {
                   <div className="flex items-center gap-1.5 px-3 py-2 bg-green-50">
                     <span className="text-xs">🔒</span>
                     <span className="text-xs font-semibold text-primary">Sello aplicado</span>
-                    <span className="text-xs text-gray-400 ml-auto">Toca para cambiar</span>
+                  </div>
+                  <div className="flex gap-2 px-3 py-2.5">
+                    <button type="button" onClick={() => attachFileRef.current?.click()}
+                      className="flex-1 py-2 text-xs font-semibold rounded-lg border border-primary text-primary bg-green-50 hover:bg-green-100 transition-colors">
+                      📷 Tomar foto
+                    </button>
+                    <button type="button" onClick={() => attachGalleryRef.current?.click()}
+                      className="flex-1 py-2 text-xs font-semibold rounded-lg border border-gray-200 text-gray-600 bg-gray-50 hover:bg-gray-100 transition-colors">
+                      🖼 Elegir de galería
+                    </button>
                   </div>
                 </div>
               ) : editingPhoto.log.photo_url ? (
-                <div className="relative">
-                  <img src={editingPhoto.log.photo_url} className="w-full max-h-52 object-cover opacity-40" alt="Foto actual" />
-                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 text-gray-600">
-                    <span className="text-2xl">📷</span>
-                    <p className="text-sm font-semibold">Toca para reemplazar</p>
+                <div>
+                  <div className="relative">
+                    <img src={editingPhoto.log.photo_url} className="w-full max-h-52 object-cover opacity-40" alt="Foto actual" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-2xl">📷</span>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 px-3 py-2.5">
+                    <button type="button" onClick={() => attachFileRef.current?.click()}
+                      className="flex-1 py-2 text-xs font-semibold rounded-lg border border-primary text-primary bg-green-50 hover:bg-green-100 transition-colors">
+                      📷 Tomar foto
+                    </button>
+                    <button type="button" onClick={() => attachGalleryRef.current?.click()}
+                      className="flex-1 py-2 text-xs font-semibold rounded-lg border border-gray-200 text-gray-600 bg-gray-50 hover:bg-gray-100 transition-colors">
+                      🖼 Elegir de galería
+                    </button>
                   </div>
                 </div>
               ) : (
-                <div className="h-36 flex flex-col items-center justify-center gap-2 text-gray-400">
+                <div className="flex flex-col items-center gap-3 py-5 px-4">
                   <span className="text-3xl">📷</span>
-                  <p className="text-sm font-medium">Toca para tomar foto</p>
+                  <div className="flex gap-2 w-full">
+                    <button type="button" onClick={() => attachFileRef.current?.click()}
+                      className="flex-1 py-2.5 text-sm font-semibold rounded-xl border border-primary text-primary bg-green-50 hover:bg-green-100 transition-colors">
+                      📷 Tomar foto
+                    </button>
+                    <button type="button" onClick={() => attachGalleryRef.current?.click()}
+                      className="flex-1 py-2.5 text-sm font-semibold rounded-xl border border-gray-200 text-gray-600 bg-gray-50 hover:bg-gray-100 transition-colors">
+                      🖼 Elegir de galería
+                    </button>
+                  </div>
                 </div>
               )}
-            </button>
+            </div>
 
             <div className="px-6 pt-4 pb-6">
               {attachTimingStatus === 'late' && (
@@ -498,8 +529,8 @@ export default function MedicationTimeline() {
             </div>
 
             <input ref={fileRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handlePhotoChange} />
-            <button type="button" onClick={() => !stamping && fileRef.current?.click()} disabled={stamping}
-              className="w-full border-y border-dashed border-green-200 hover:bg-gray-50 disabled:cursor-default transition-colors">
+            <input ref={galleryRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
+            <div className="w-full border-y border-dashed border-green-200">
               {stamping ? (
                 <div className="h-36 flex flex-col items-center justify-center gap-2 text-gray-400">
                   <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
@@ -510,17 +541,36 @@ export default function MedicationTimeline() {
                   <img src={photoPreview} className="w-full max-h-52 object-cover" alt="Prueba sellada" />
                   <div className="flex items-center gap-1.5 px-3 py-2 bg-green-50">
                     <span className="text-xs">🔒</span>
-                    <span className="text-xs font-semibold text-primary">Sello aplicado · No editable</span>
+                    <span className="text-xs font-semibold text-primary">Sello aplicado</span>
+                  </div>
+                  <div className="flex gap-2 px-3 py-2.5">
+                    <button type="button" onClick={() => fileRef.current?.click()}
+                      className="flex-1 py-2 text-xs font-semibold rounded-lg border border-primary text-primary bg-green-50 hover:bg-green-100 transition-colors">
+                      📷 Tomar foto
+                    </button>
+                    <button type="button" onClick={() => galleryRef.current?.click()}
+                      className="flex-1 py-2 text-xs font-semibold rounded-lg border border-gray-200 text-gray-600 bg-gray-50 hover:bg-gray-100 transition-colors">
+                      🖼 Elegir de galería
+                    </button>
                   </div>
                 </div>
               ) : (
-                <div className="h-36 flex flex-col items-center justify-center gap-2 text-gray-400">
+                <div className="flex flex-col items-center gap-3 py-5 px-4">
                   <span className="text-3xl">📷</span>
-                  <p className="text-sm font-medium">Toca para tomar foto</p>
-                  <p className="text-xs">Solo cámara · Requerida para confirmar</p>
+                  <p className="text-xs text-gray-400">Requerida para confirmar · Se sellará automáticamente</p>
+                  <div className="flex gap-2 w-full">
+                    <button type="button" onClick={() => fileRef.current?.click()}
+                      className="flex-1 py-2.5 text-sm font-semibold rounded-xl border border-primary text-primary bg-green-50 hover:bg-green-100 transition-colors">
+                      📷 Tomar foto
+                    </button>
+                    <button type="button" onClick={() => galleryRef.current?.click()}
+                      className="flex-1 py-2.5 text-sm font-semibold rounded-xl border border-gray-200 text-gray-600 bg-gray-50 hover:bg-gray-100 transition-colors">
+                      🖼 Elegir de galería
+                    </button>
+                  </div>
                 </div>
               )}
-            </button>
+            </div>
 
             <div className="px-6 pt-4 pb-6">
               {isAdmin && (
