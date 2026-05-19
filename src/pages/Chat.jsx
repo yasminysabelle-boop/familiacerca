@@ -157,7 +157,7 @@ export default function Chat() {
     setSendError('')
     setInput('')
 
-    const payload = { owner_id: ownerId, user_id: user.id, user_name: displayName, content: text }
+    const payload = { owner_id: ownerId, user_id: user.id, user_name: displayName, message: text }
     console.log('[Chat] sending payload:', payload)
 
     const { data: sessionData } = await supabase.auth.getSession()
