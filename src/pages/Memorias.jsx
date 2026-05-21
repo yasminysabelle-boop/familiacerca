@@ -80,16 +80,9 @@ export default function Memorias() {
 
   async function fetchRecordings() {
     setLoading(true)
-    const { data: memberRows } = await supabase
-      .from('family_members')
-      .select('member_user_id')
-      .eq('user_id', ownerId)
-    const allIds = [ownerId, ...(memberRows ?? []).map(m => m.member_user_id).filter(Boolean)]
-
     const { data } = await supabase
       .from('voice_diary')
       .select('*, user_profiles(full_name)')
-      .in('user_id', allIds)
       .order('created_at', { ascending: false })
     const list = data ?? []
     setRecordings(list)
