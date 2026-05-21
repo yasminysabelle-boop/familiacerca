@@ -15,6 +15,30 @@ const TIME_GROUPS = [
   { id: 3, label: 'Sin horario', icon: '💊', range: null },
 ]
 
+const CARE_MOMENTS = [
+  { id: 'morning',   label: 'Mañana',            icon: '🌅', overdueHour: 14,   color: '#D97706', bg: '#FFFBEB' },
+  { id: 'afternoon', label: 'Tarde',              icon: '☀️',  overdueHour: 20,   color: '#C4623A', bg: '#FDF0EB' },
+  { id: 'night',     label: 'Noche',              icon: '🌙', overdueHour: null, color: '#6366F1', bg: '#EEF2FF' },
+  { id: 'asneeded',  label: 'Cuando se necesita', icon: '🔔', overdueHour: null, color: '#6B7280', bg: '#F9FAFB' },
+]
+
+const CARE_ITEMS = [
+  { key: 'morning_bath',    label: 'Baño / ducha',           icon: '🛁', moment: 'morning' },
+  { key: 'morning_clothes', label: 'Cambio de ropa',         icon: '👕', moment: 'morning' },
+  { key: 'morning_dental',  label: 'Higiene bucal',          icon: '🦷', moment: 'morning' },
+  { key: 'breakfast',       label: 'Desayuno',               icon: '🍳', moment: 'morning' },
+  { key: 'lunch',           label: 'Almuerzo',               icon: '🍽️', moment: 'afternoon' },
+  { key: 'rest',            label: 'Siesta / descanso',      icon: '😴', moment: 'afternoon' },
+  { key: 'exercise',        label: 'Ejercicio / caminata',   icon: '🚶', moment: 'afternoon' },
+  { key: 'dinner',          label: 'Cena',                   icon: '🍲', moment: 'night' },
+  { key: 'night_dental',    label: 'Higiene bucal',          icon: '🦷', moment: 'night' },
+  { key: 'bed_sheets',      label: 'Cambio de ropa de cama', icon: '🛏️', moment: 'night', weekly: true },
+  { key: 'diaper',          label: 'Cambio de pañal',        icon: '🧷', moment: 'asneeded' },
+  { key: 'bathroom',        label: 'Visita al baño',         icon: '🚿', moment: 'asneeded' },
+  { key: 'pain',            label: 'Dolor / malestar',       icon: '😣', moment: 'asneeded' },
+  { key: 'incident',        label: 'Caída o incidente',      icon: '⚠️', moment: 'asneeded' },
+]
+
 function groupIndex(timeStr) {
   if (!timeStr) return 3
   const h = parseInt(timeStr.split(':')[0], 10)
@@ -79,8 +103,8 @@ export default function Hoy() {
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
   const [confirming, setConfirming] = useState(null)
-  const [menuOpen, setMenuOpen] = useState(null)       // med.id with open ⋮ menu
-  const [confirmDialog, setConfirmDialog] = useState(null) // { onConfirm }
+  const [menuOpen, setMenuOpen] = useState(null)
+  const [confirmDialog, setConfirmDialog] = useState(null)
 
   const isFamiliar = memberRole === 'familiar'
   const isAdmin = memberRole === null
@@ -93,8 +117,12 @@ export default function Hoy() {
   }
   const [adminWarningMed, setAdminWarningMed] = useState(null)
 
-  // Bottom sheet for proof photo — shown immediately after marking
-  const [proofSheet, setProofSheet] = useState(null) // { med } or null
+  // Care checklist state
+  const [careLogs, setCareLogs] = useState({})
+  const [careToggling, setCareToggling] = useState(null)
+
+  // Bottom sheet for proof photo
+  const [proofSheet, setProofSheet] = useState(null)
   const [proofUploading, setProofUploading] = useState(false)
   const [proofStamping, setProofStamping] = useState(false)
   const [proofPreview, setProofPreview] = useState(null)
@@ -112,6 +140,14 @@ export default function Hoy() {
   const today = new Date().toISOString().split('T')[0]
   const displayName = user?.user_metadata?.full_name ?? user?.email ?? 'Familiar'
 
+  // Monday of the current week — used to fetch weekly care items
+  const weekStart = (() => {
+    const d = new Date()
+    const day = d.getDay()
+    d.setDate(d.getDate() - (day === 0 ? 6 : day - 1))
+    return d.toISOString().split('T')[0]
+  })()
+
   useEffect(() => {
     if (user && ownerId) fetchData()
   }, [user, ownerId])
@@ -120,17 +156,36 @@ export default function Hoy() {
     setLoading(true)
     setLoadError('')
     try {
-      const [{ data: meds, error: e1 }, { data: todayLogs, error: e2 }] = await Promise.all([
+      const [
+        { data: meds,      error: e1 },
+        { data: todayLogs, error: e2 },
+        { data: careRows },
+      ] = await Promise.all([
         supabase.from('medications').select('*').eq('user_id', ownerId),
         supabase.from('medication_logs').select('*').eq('user_id', ownerId).eq('log_date', today),
+        supabase.from('daily_care_logs').select('*').eq('user_id', ownerId).gte('log_date', weekStart),
       ])
       if (e1 || e2) throw e1 ?? e2
       setMedications(meds ?? [])
       const map = {}
       ;(todayLogs ?? []).forEach(l => { map[l.medication_id] = l })
       setLogs(map)
+
+      // Build care map — weekly items use the most recent entry this week;
+      // daily items only count for today.
+      const cmap = {}
+      for (const row of (careRows ?? [])) {
+        const item = CARE_ITEMS.find(i => i.key === row.item_key)
+        if (!item) continue
+        if (item.weekly) {
+          if (!cmap[row.item_key] || row.log_date > cmap[row.item_key].log_date) cmap[row.item_key] = row
+        } else if (row.log_date === today) {
+          cmap[row.item_key] = row
+        }
+      }
+      setCareLogs(cmap)
     } catch {
-      setLoadError('No se pudieron cargar los medicamentos. Verifica tu conexión.')
+      setLoadError('No se pudieron cargar los datos. Verifica tu conexión.')
     } finally {
       setLoading(false)
     }
@@ -138,7 +193,6 @@ export default function Hoy() {
 
   async function confirmMed(med) {
     setConfirming(med.id)
-    // force: true — request GPS unconditionally regardless of the toggle setting
     const loc = await getLocation({ force: true })
     const confirmedAt = new Date().toISOString()
     await supabase.from('medication_logs').upsert({
@@ -166,7 +220,6 @@ export default function Hoy() {
       },
     }))
     setConfirming(null)
-    // Open the proof photo bottom sheet immediately
     openProofSheet(med)
   }
 
@@ -182,6 +235,40 @@ export default function Hoy() {
     await supabase.from('medications').delete().eq('id', id).eq('user_id', ownerId)
     setMedications(prev => prev.filter(m => m.id !== id))
     setLogs(prev => { const n = { ...prev }; delete n[id]; return n })
+  }
+
+  async function toggleCareItem(item) {
+    if (isFamiliar || careToggling) return
+    const existing = careLogs[item.key]
+    setCareToggling(item.key)
+    try {
+      if (existing) {
+        await supabase.from('daily_care_logs').delete().eq('id', existing.id)
+        setCareLogs(prev => { const n = { ...prev }; delete n[item.key]; return n })
+      } else {
+        const { data, error } = await supabase
+          .from('daily_care_logs')
+          .upsert({
+            user_id: ownerId,
+            item_key: item.key,
+            log_date: today,
+            checked_at: new Date().toISOString(),
+            checked_by: displayName,
+          }, { onConflict: 'user_id,item_key,log_date' })
+          .select()
+          .single()
+        if (!error && data) setCareLogs(prev => ({ ...prev, [item.key]: data }))
+      }
+    } finally {
+      setCareToggling(null)
+    }
+  }
+
+  function isCareItemOverdue(item) {
+    if (careLogs[item.key] || item.moment === 'asneeded' || item.weekly) return false
+    const overdueHour = CARE_MOMENTS.find(m => m.id === item.moment)?.overdueHour
+    if (!overdueHour) return false
+    return new Date().getHours() >= overdueHour
   }
 
   function openProofSheet(med) {
@@ -223,7 +310,6 @@ export default function Hoy() {
     if (!f) return
     setUploadError('')
     setProofStamping(true)
-    // Capture GPS and stamp the image in parallel
     const [stamped, loc] = await Promise.all([
       stampProof(f, displayName),
       getLocation({ force: true }),
@@ -286,7 +372,6 @@ export default function Hoy() {
   const total = medications.length
   const allDone = total > 0 && confirmedCount === total
 
-  // Meds confirmed without photo within the last 30 min (from DB or current session)
   const pendingProof = medications.filter(med => {
     const log = logs[med.id]
     if (log?.status !== 'confirmed') return false
@@ -295,12 +380,19 @@ export default function Hoy() {
     return (Date.now() - new Date(log.confirmed_at).getTime()) < 30 * 60 * 1000
   })
 
+  // Care checklist derived values
+  const requiredItems = CARE_ITEMS.filter(i => i.moment !== 'asneeded')
+  const completedRequired = requiredItems.filter(i => !!careLogs[i.key]).length
+  const todayTimeline = Object.values(careLogs)
+    .filter(l => l.log_date === today)
+    .sort((a, b) => a.checked_at.localeCompare(b.checked_at))
+
   return (
     <Layout>
 
       <div style={{ padding: '16px 16px 96px', maxWidth: 600 }}>
 
-        {/* Add medication button — hidden for familiar (view-only) */}
+        {/* Add medication button */}
         {!isFamiliar && (
           <Link
             to="/medications?add=1"
@@ -353,7 +445,7 @@ export default function Hoy() {
           </div>
         )}
 
-        {/* Persistent proof reminders (meds confirmed > 0 min ago without photo, sheet dismissed) */}
+        {/* Persistent proof reminders */}
         {pendingProof.filter(med => med.id !== proofSheet?.med?.id).map(med => {
           const log = logs[med.id]
           const minLeft = Math.max(0, 30 - Math.floor((Date.now() - new Date(log.confirmed_at).getTime()) / 60000))
@@ -395,261 +487,456 @@ export default function Hoy() {
               Reintentar
             </button>
           </div>
-        ) : medications.length === 0 ? (
-          <div style={{
-            background: 'white', borderRadius: 20, border: '1px solid #EDE5D8',
-            padding: '48px 24px', textAlign: 'center',
-            boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
-          }}>
-            <div style={{ fontSize: 44, marginBottom: 12 }}>💊</div>
-            <p style={{ fontSize: 14, fontWeight: 600, color: '#1A1A1A', marginBottom: 6 }}>
-              Sin medicamentos configurados
-            </p>
-            <p style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 20 }}>
-              Agrega los medicamentos del familiar para verlos aquí cada día.
-            </p>
-            <Link
-              to="/medications?add=1"
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: 6,
-                padding: '10px 20px', borderRadius: 12,
-                background: 'linear-gradient(135deg, #C4623A, #A85130)',
-                color: 'white', fontWeight: 700, fontSize: 13,
-                textDecoration: 'none',
-              }}
-            >
-              <Plus size={14} color="white" strokeWidth={2.5} />
-              Agregar medicamento
-            </Link>
-          </div>
         ) : (
-          TIME_GROUPS.map(group => {
-            const meds = (grouped[group.id] ?? [])
-              .sort((a, b) => (a._firstTime ?? '99:99').localeCompare(b._firstTime ?? '99:99'))
-            if (!meds.length) return null
-            return (
-              <div key={group.id} style={{ marginBottom: 16 }}>
-                <p style={{
-                  fontSize: 11, fontWeight: 700, letterSpacing: '0.08em',
-                  textTransform: 'uppercase', color: '#9CA3AF',
-                  marginBottom: 8, paddingLeft: 2,
-                }}>
-                  {group.icon} {group.label}
+          <>
+            {/* Medications list */}
+            {medications.length === 0 ? (
+              <div style={{
+                background: 'white', borderRadius: 20, border: '1px solid #EDE5D8',
+                padding: '48px 24px', textAlign: 'center',
+                boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
+              }}>
+                <div style={{ fontSize: 44, marginBottom: 12 }}>💊</div>
+                <p style={{ fontSize: 14, fontWeight: 600, color: '#1A1A1A', marginBottom: 6 }}>
+                  Sin medicamentos configurados
                 </p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  {meds.map(med => {
-                    const log = logs[med.id]
-                    const isConfirmed = log?.status === 'confirmed'
-                    const isWorking = confirming === med.id
-                    const allTimes = med.scheduled_times?.length
-                      ? [...med.scheduled_times].sort()
-                      : med.time ? [med.time] : []
+                <p style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 20 }}>
+                  Agrega los medicamentos del familiar para verlos aquí cada día.
+                </p>
+                <Link
+                  to="/medications?add=1"
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 6,
+                    padding: '10px 20px', borderRadius: 12,
+                    background: 'linear-gradient(135deg, #C4623A, #A85130)',
+                    color: 'white', fontWeight: 700, fontSize: 13,
+                    textDecoration: 'none',
+                  }}
+                >
+                  <Plus size={14} color="white" strokeWidth={2.5} />
+                  Agregar medicamento
+                </Link>
+              </div>
+            ) : (
+              TIME_GROUPS.map(group => {
+                const meds = (grouped[group.id] ?? [])
+                  .sort((a, b) => (a._firstTime ?? '99:99').localeCompare(b._firstTime ?? '99:99'))
+                if (!meds.length) return null
+                return (
+                  <div key={group.id} style={{ marginBottom: 16 }}>
+                    <p style={{
+                      fontSize: 11, fontWeight: 700, letterSpacing: '0.08em',
+                      textTransform: 'uppercase', color: '#9CA3AF',
+                      marginBottom: 8, paddingLeft: 2,
+                    }}>
+                      {group.icon} {group.label}
+                    </p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      {meds.map(med => {
+                        const log = logs[med.id]
+                        const isConfirmed = log?.status === 'confirmed'
+                        const isWorking = confirming === med.id
+                        const allTimes = med.scheduled_times?.length
+                          ? [...med.scheduled_times].sort()
+                          : med.time ? [med.time] : []
 
-                    const hasPhoto = !!log?.photo_url
-                    const hasGPS   = !!(log?.latitude && log?.longitude)
-                    const proofExpired = isConfirmed && !hasPhoto && log?.confirmed_at &&
-                      (Date.now() - new Date(log.confirmed_at).getTime()) >= 30 * 60 * 1000
+                        const hasPhoto = !!log?.photo_url
+                        const hasGPS   = !!(log?.latitude && log?.longitude)
+                        const proofExpired = isConfirmed && !hasPhoto && log?.confirmed_at &&
+                          (Date.now() - new Date(log.confirmed_at).getTime()) >= 30 * 60 * 1000
 
-                    const timingStatus = !isConfirmed ? getMedTimingStatus(med._firstTime) : 'ok'
-                    const isEarly = timingStatus === 'early'
-                    const earlyLabel = (() => {
-                      if (!isEarly || !med._firstTime) return null
-                      const [hh, mm] = med._firstTime.split(':').map(Number)
-                      const d = new Date(); d.setHours(hh, mm, 0, 0)
-                      return d.toLocaleTimeString('es-US', { hour: '2-digit', minute: '2-digit' })
-                    })()
+                        const timingStatus = !isConfirmed ? getMedTimingStatus(med._firstTime) : 'ok'
+                        const isEarly = timingStatus === 'early'
+                        const earlyLabel = (() => {
+                          if (!isEarly || !med._firstTime) return null
+                          const [hh, mm] = med._firstTime.split(':').map(Number)
+                          const d = new Date(); d.setHours(hh, mm, 0, 0)
+                          return d.toLocaleTimeString('es-US', { hour: '2-digit', minute: '2-digit' })
+                        })()
 
-                    return (
-                      <div
-                        key={med.id}
-                        style={{
-                          display: 'flex', alignItems: 'center', gap: 12,
-                          background: isConfirmed ? '#F0FDF4' : 'white',
-                          borderRadius: 16,
-                          border: `1px solid ${isConfirmed ? '#BBF7D0' : '#EDE5D8'}`,
-                          padding: '12px 14px',
-                          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-                          transition: 'all 0.25s',
-                        }}
-                      >
-                        {/* Checkbox */}
-                        <button
-                          onClick={() => {
-                            if (isFamiliar) return
-                            if (!isConfirmed && isAdmin) { setAdminWarningMed(med); return }
-                            isConfirmed ? unconfirmMed(med) : confirmMed(med)
-                          }}
-                          disabled={isWorking || isEarly || isFamiliar}
-                          style={{
-                            width: 28, height: 28, borderRadius: 8, flexShrink: 0,
-                            border: `2px solid ${isConfirmed ? '#22C55E' : isFamiliar ? '#E5E7EB' : '#D1D5DB'}`,
-                            background: isConfirmed ? '#22C55E' : isFamiliar ? '#F9FAFB' : 'white',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            cursor: isWorking || isFamiliar ? 'not-allowed' : 'pointer',
-                            transition: 'all 0.2s',
-                          }}
-                          aria-label={isConfirmed ? 'Desmarcar' : 'Marcar como dado'}
-                        >
-                          {isConfirmed && <CheckIcon size={14} color="white" strokeWidth={2.5} />}
-                          {isWorking && !isConfirmed && (
-                            <div style={{
-                              width: 10, height: 10, borderRadius: '50%',
-                              border: '2px solid #D1D5DB', borderTopColor: '#C4623A',
-                              animation: 'spin 0.6s linear infinite',
-                            }} />
-                          )}
-                        </button>
-
-                        {/* Info */}
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <p style={{
-                            fontSize: 14, fontWeight: 600, margin: 0,
-                            color: isConfirmed ? '#9CA3AF' : '#1A1A1A',
-                            textDecoration: isConfirmed ? 'line-through' : 'none',
-                          }}>
-                            {med.name}
-                          </p>
-                          <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 6, marginTop: 3 }}>
-                            {med.dosage && (
-                              <span style={{ fontSize: 11, color: '#9CA3AF' }}>{med.dosage}</span>
-                            )}
-                            {allTimes.map(t => (
-                              <span key={t} style={{
-                                fontSize: 11, color: '#9CA3AF',
-                                background: '#F5EEE6', padding: '1px 6px', borderRadius: 4,
-                              }}>
-                                ⏰ {t}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-
-                        {/* Status badges */}
-                        {isConfirmed && (
-                          <div style={{ flexShrink: 0, textAlign: 'right' }}>
-                            {hasPhoto ? (
-                              <span style={{
-                                fontSize: 10, fontWeight: 700, color: '#16A34A',
-                                background: '#DCFCE7', padding: '3px 8px', borderRadius: 6,
-                                display: 'block',
-                              }}>
-                                ✅ Con prueba
-                              </span>
-                            ) : proofExpired ? (
-                              <span style={{
-                                fontSize: 10, fontWeight: 700, color: '#92400E',
-                                background: '#FFFBEB', padding: '3px 8px', borderRadius: 6,
-                                display: 'block',
-                              }}>
-                                Sin foto de prueba
-                              </span>
-                            ) : (
-                              <span style={{
-                                fontSize: 10, fontWeight: 700, color: '#16A34A',
-                                background: '#DCFCE7', padding: '3px 8px', borderRadius: 6,
-                                display: 'block',
-                              }}>
-                                ✓ Dado
-                              </span>
-                            )}
-
-                            {hasGPS ? (
-                              <a
-                                href={mapsUrl(log.latitude, log.longitude)}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                onClick={e => e.stopPropagation()}
-                                style={{ fontSize: 10, color: '#2D86A0', textDecoration: 'none', display: 'block', marginTop: 3 }}
-                              >
-                                📍 Ver mapa
-                              </a>
-                            ) : log?.confirmed_by_name && (
-                              <span style={{ fontSize: 9, color: '#9CA3AF', display: 'block', marginTop: 2 }}>
-                                {log.confirmed_by_name.split(' ')[0]}
-                              </span>
-                            )}
-                          </div>
-                        )}
-
-                        {/* Timing badge — only for pending meds with a schedule */}
-                        {!isConfirmed && isEarly && earlyLabel && (
-                          <span style={{
-                            fontSize: 10, fontWeight: 700, color: '#6B7280',
-                            background: '#F3F4F6', padding: '3px 8px', borderRadius: 6,
-                            flexShrink: 0, whiteSpace: 'nowrap',
-                          }}>
-                            🕐 {earlyLabel}
-                          </span>
-                        )}
-                        {!isConfirmed && timingStatus === 'late' && (
-                          <span style={{
-                            fontSize: 10, fontWeight: 700, color: '#B45309',
-                            background: '#FFFBEB', padding: '3px 8px', borderRadius: 6,
-                            flexShrink: 0, whiteSpace: 'nowrap',
-                          }}>
-                            ⚠ Tarde
-                          </span>
-                        )}
-
-                        {/* ⋮ menu — admin or cuidador who added this med */}
-                        {canActOn(med) && (
-                          <div style={{ position: 'relative', flexShrink: 0 }}>
+                        return (
+                          <div
+                            key={med.id}
+                            style={{
+                              display: 'flex', alignItems: 'center', gap: 12,
+                              background: isConfirmed ? '#F0FDF4' : 'white',
+                              borderRadius: 16,
+                              border: `1px solid ${isConfirmed ? '#BBF7D0' : '#EDE5D8'}`,
+                              padding: '12px 14px',
+                              boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                              transition: 'all 0.25s',
+                            }}
+                          >
                             <button
-                              onClick={e => { e.stopPropagation(); setMenuOpen(menuOpen === med.id ? null : med.id) }}
-                              style={{
-                                width: 28, height: 28, borderRadius: 8,
-                                border: '1px solid #EDE5D8', background: 'white',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                cursor: 'pointer',
+                              onClick={() => {
+                                if (isFamiliar) return
+                                if (!isConfirmed && isAdmin) { setAdminWarningMed(med); return }
+                                isConfirmed ? unconfirmMed(med) : confirmMed(med)
                               }}
-                              aria-label="Opciones"
+                              disabled={isWorking || isEarly || isFamiliar}
+                              style={{
+                                width: 28, height: 28, borderRadius: 8, flexShrink: 0,
+                                border: `2px solid ${isConfirmed ? '#22C55E' : isFamiliar ? '#E5E7EB' : '#D1D5DB'}`,
+                                background: isConfirmed ? '#22C55E' : isFamiliar ? '#F9FAFB' : 'white',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                cursor: isWorking || isFamiliar ? 'not-allowed' : 'pointer',
+                                transition: 'all 0.2s',
+                              }}
+                              aria-label={isConfirmed ? 'Desmarcar' : 'Marcar como dado'}
                             >
-                              <MoreVertical size={14} color="#9CA3AF" strokeWidth={2} />
+                              {isConfirmed && <CheckIcon size={14} color="white" strokeWidth={2.5} />}
+                              {isWorking && !isConfirmed && (
+                                <div style={{
+                                  width: 10, height: 10, borderRadius: '50%',
+                                  border: '2px solid #D1D5DB', borderTopColor: '#C4623A',
+                                  animation: 'spin 0.6s linear infinite',
+                                }} />
+                              )}
                             </button>
 
-                            {menuOpen === med.id && (
-                              <>
-                                {/* Backdrop to close menu */}
-                                <div
-                                  style={{ position: 'fixed', inset: 0, zIndex: 90 }}
-                                  onClick={() => setMenuOpen(null)}
-                                />
-                                <div style={{
-                                  position: 'absolute', right: 0, top: 32, zIndex: 100,
-                                  background: 'white', borderRadius: 12,
-                                  border: '1px solid #EDE5D8',
-                                  boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
-                                  minWidth: 180, overflow: 'hidden',
-                                }}>
-                                  <button
-                                    onClick={e => {
-                                      e.stopPropagation()
-                                      setMenuOpen(null)
-                                      setConfirmDialog({ onConfirm: () => handleDeleteMed(med.id) })
-                                    }}
-                                    style={{
-                                      width: '100%', padding: '12px 16px',
-                                      display: 'flex', alignItems: 'center', gap: 10,
-                                      background: 'none', border: 'none', cursor: 'pointer',
-                                      color: '#D63031', fontSize: 13, fontWeight: 600,
-                                      textAlign: 'left',
-                                    }}
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <p style={{
+                                fontSize: 14, fontWeight: 600, margin: 0,
+                                color: isConfirmed ? '#9CA3AF' : '#1A1A1A',
+                                textDecoration: isConfirmed ? 'line-through' : 'none',
+                              }}>
+                                {med.name}
+                              </p>
+                              <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 6, marginTop: 3 }}>
+                                {med.dosage && (
+                                  <span style={{ fontSize: 11, color: '#9CA3AF' }}>{med.dosage}</span>
+                                )}
+                                {allTimes.map(t => (
+                                  <span key={t} style={{
+                                    fontSize: 11, color: '#9CA3AF',
+                                    background: '#F5EEE6', padding: '1px 6px', borderRadius: 4,
+                                  }}>
+                                    ⏰ {t}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+
+                            {isConfirmed && (
+                              <div style={{ flexShrink: 0, textAlign: 'right' }}>
+                                {hasPhoto ? (
+                                  <span style={{
+                                    fontSize: 10, fontWeight: 700, color: '#16A34A',
+                                    background: '#DCFCE7', padding: '3px 8px', borderRadius: 6,
+                                    display: 'block',
+                                  }}>
+                                    ✅ Con prueba
+                                  </span>
+                                ) : proofExpired ? (
+                                  <span style={{
+                                    fontSize: 10, fontWeight: 700, color: '#92400E',
+                                    background: '#FFFBEB', padding: '3px 8px', borderRadius: 6,
+                                    display: 'block',
+                                  }}>
+                                    Sin foto de prueba
+                                  </span>
+                                ) : (
+                                  <span style={{
+                                    fontSize: 10, fontWeight: 700, color: '#16A34A',
+                                    background: '#DCFCE7', padding: '3px 8px', borderRadius: 6,
+                                    display: 'block',
+                                  }}>
+                                    ✓ Dado
+                                  </span>
+                                )}
+                                {hasGPS ? (
+                                  <a
+                                    href={mapsUrl(log.latitude, log.longitude)}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    onClick={e => e.stopPropagation()}
+                                    style={{ fontSize: 10, color: '#2D86A0', textDecoration: 'none', display: 'block', marginTop: 3 }}
                                   >
-                                    <Trash size={14} color="#D63031" strokeWidth={1.75} />
-                                    Eliminar medicamento
-                                  </button>
-                                </div>
-                              </>
+                                    📍 Ver mapa
+                                  </a>
+                                ) : log?.confirmed_by_name && (
+                                  <span style={{ fontSize: 9, color: '#9CA3AF', display: 'block', marginTop: 2 }}>
+                                    {log.confirmed_by_name.split(' ')[0]}
+                                  </span>
+                                )}
+                              </div>
+                            )}
+
+                            {!isConfirmed && isEarly && earlyLabel && (
+                              <span style={{
+                                fontSize: 10, fontWeight: 700, color: '#6B7280',
+                                background: '#F3F4F6', padding: '3px 8px', borderRadius: 6,
+                                flexShrink: 0, whiteSpace: 'nowrap',
+                              }}>
+                                🕐 {earlyLabel}
+                              </span>
+                            )}
+                            {!isConfirmed && timingStatus === 'late' && (
+                              <span style={{
+                                fontSize: 10, fontWeight: 700, color: '#B45309',
+                                background: '#FFFBEB', padding: '3px 8px', borderRadius: 6,
+                                flexShrink: 0, whiteSpace: 'nowrap',
+                              }}>
+                                ⚠ Tarde
+                              </span>
+                            )}
+
+                            {canActOn(med) && (
+                              <div style={{ position: 'relative', flexShrink: 0 }}>
+                                <button
+                                  onClick={e => { e.stopPropagation(); setMenuOpen(menuOpen === med.id ? null : med.id) }}
+                                  style={{
+                                    width: 28, height: 28, borderRadius: 8,
+                                    border: '1px solid #EDE5D8', background: 'white',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    cursor: 'pointer',
+                                  }}
+                                  aria-label="Opciones"
+                                >
+                                  <MoreVertical size={14} color="#9CA3AF" strokeWidth={2} />
+                                </button>
+                                {menuOpen === med.id && (
+                                  <>
+                                    <div
+                                      style={{ position: 'fixed', inset: 0, zIndex: 90 }}
+                                      onClick={() => setMenuOpen(null)}
+                                    />
+                                    <div style={{
+                                      position: 'absolute', right: 0, top: 32, zIndex: 100,
+                                      background: 'white', borderRadius: 12,
+                                      border: '1px solid #EDE5D8',
+                                      boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                                      minWidth: 180, overflow: 'hidden',
+                                    }}>
+                                      <button
+                                        onClick={e => {
+                                          e.stopPropagation()
+                                          setMenuOpen(null)
+                                          setConfirmDialog({ onConfirm: () => handleDeleteMed(med.id) })
+                                        }}
+                                        style={{
+                                          width: '100%', padding: '12px 16px',
+                                          display: 'flex', alignItems: 'center', gap: 10,
+                                          background: 'none', border: 'none', cursor: 'pointer',
+                                          color: '#D63031', fontSize: 13, fontWeight: 600,
+                                          textAlign: 'left',
+                                        }}
+                                      >
+                                        <Trash size={14} color="#D63031" strokeWidth={1.75} />
+                                        Eliminar medicamento
+                                      </button>
+                                    </div>
+                                  </>
+                                )}
+                              </div>
                             )}
                           </div>
-                        )}
-                      </div>
-                    )
-                  })}
-                </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )
+              })
+            )}
+
+            {/* ── Cuidado de hoy ──────────────────────────────────── */}
+            <div style={{ marginTop: 28 }}>
+
+              {/* Section header */}
+              <div style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                marginBottom: 14,
+              }}>
+                <p style={{
+                  fontSize: 16, fontWeight: 700, color: '#1A1A1A',
+                  fontFamily: 'Georgia, serif', margin: 0,
+                }}>
+                  Cuidado de hoy
+                </p>
+                <span style={{
+                  fontSize: 11, fontWeight: 700,
+                  color: completedRequired === requiredItems.length ? '#16A34A' : '#C4623A',
+                  background: completedRequired === requiredItems.length ? '#DCFCE7' : '#FDF0EB',
+                  padding: '3px 10px', borderRadius: 20,
+                }}>
+                  {completedRequired}/{requiredItems.length}
+                </span>
               </div>
-            )
-          })
+
+              {isFamiliar && (
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: 10,
+                  background: '#F9FAFB', border: '1px solid #E5E7EB',
+                  borderRadius: 12, padding: '10px 14px', marginBottom: 14,
+                }}>
+                  <span style={{ fontSize: 16 }}>👁️</span>
+                  <p style={{ fontSize: 12, color: '#6B7280', margin: 0 }}>
+                    Solo puedes ver el cuidado registrado por el cuidador.
+                  </p>
+                </div>
+              )}
+
+              {/* Checklist grouped by moment */}
+              {CARE_MOMENTS.map(moment => {
+                const items = CARE_ITEMS.filter(i => i.moment === moment.id)
+                return (
+                  <div key={moment.id} style={{ marginBottom: 14 }}>
+                    <p style={{
+                      fontSize: 11, fontWeight: 700, letterSpacing: '0.08em',
+                      textTransform: 'uppercase', color: '#9CA3AF',
+                      marginBottom: 6, paddingLeft: 2,
+                    }}>
+                      {moment.icon} {moment.label}
+                    </p>
+                    <div style={{
+                      background: 'white', borderRadius: 16,
+                      border: '1px solid #EDE5D8', overflow: 'hidden',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
+                    }}>
+                      {items.map((item, idx) => {
+                        const isChecked  = !!careLogs[item.key]
+                        const isOverdue  = isCareItemOverdue(item)
+                        const isToggling = careToggling === item.key
+                        const log        = careLogs[item.key]
+                        const checkedTime = log?.checked_at
+                          ? new Date(log.checked_at).toLocaleTimeString('es-US', { hour: '2-digit', minute: '2-digit' })
+                          : null
+
+                        return (
+                          <div
+                            key={item.key}
+                            style={{
+                              display: 'flex', alignItems: 'center', gap: 12,
+                              padding: '13px 14px',
+                              background: isChecked ? moment.bg : 'white',
+                              borderBottom: idx < items.length - 1
+                                ? `1px solid ${isChecked ? moment.color + '25' : '#F5EEE6'}`
+                                : 'none',
+                              transition: 'background 0.2s',
+                              opacity: isToggling ? 0.55 : 1,
+                            }}
+                          >
+                            {/* Checkbox */}
+                            <button
+                              onClick={() => toggleCareItem(item)}
+                              disabled={isFamiliar || !!careToggling}
+                              style={{
+                                width: 26, height: 26, borderRadius: 8, flexShrink: 0,
+                                border: `2px solid ${isChecked ? moment.color : isOverdue ? '#FCA5A5' : '#D1D5DB'}`,
+                                background: isChecked ? moment.color : 'white',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                cursor: isFamiliar ? 'default' : 'pointer',
+                                padding: 0, transition: 'all 0.2s',
+                              }}
+                              aria-label={isChecked ? 'Desmarcar' : 'Marcar'}
+                            >
+                              {isChecked && !isToggling && (
+                                <CheckIcon size={13} color="white" strokeWidth={2.5} />
+                              )}
+                              {isToggling && (
+                                <div style={{
+                                  width: 10, height: 10, borderRadius: '50%',
+                                  border: `2px solid ${isChecked ? 'rgba(255,255,255,0.4)' : '#D1D5DB'}`,
+                                  borderTopColor: isChecked ? 'white' : moment.color,
+                                  animation: 'spin 0.6s linear infinite',
+                                }} />
+                              )}
+                            </button>
+
+                            {/* Icon + text */}
+                            <span style={{ fontSize: 20, flexShrink: 0, lineHeight: 1 }}>{item.icon}</span>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <p style={{
+                                fontSize: 13, fontWeight: 600, margin: 0, lineHeight: 1.3,
+                                color: isChecked ? '#9CA3AF' : isOverdue ? '#DC2626' : '#1A1A1A',
+                                textDecoration: isChecked ? 'line-through' : 'none',
+                              }}>
+                                {item.label}
+                                {item.weekly && (
+                                  <span style={{ fontSize: 10, fontWeight: 400, color: '#9CA3AF', marginLeft: 6 }}>
+                                    · semanal
+                                  </span>
+                                )}
+                              </p>
+                              {isChecked && checkedTime && (
+                                <p style={{ fontSize: 10, color: moment.color, margin: '2px 0 0', fontWeight: 600 }}>
+                                  ✓ {checkedTime}
+                                  {log?.checked_by ? ` · ${log.checked_by.split(' ')[0]}` : ''}
+                                  {item.weekly && log?.log_date !== today ? ' · esta semana' : ''}
+                                </p>
+                              )}
+                            </div>
+
+                            {/* Overdue badge */}
+                            {isOverdue && !isChecked && (
+                              <span style={{
+                                fontSize: 10, fontWeight: 700,
+                                color: '#DC2626', background: '#FEE2E2',
+                                padding: '2px 8px', borderRadius: 6, flexShrink: 0,
+                              }}>
+                                Pendiente
+                              </span>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )
+              })}
+
+              {/* Timeline of today's completed care items */}
+              {todayTimeline.length > 0 && (
+                <div style={{ marginTop: 8, marginBottom: 8 }}>
+                  <p style={{
+                    fontSize: 11, fontWeight: 700, letterSpacing: '0.08em',
+                    textTransform: 'uppercase', color: '#9CA3AF',
+                    marginBottom: 6, paddingLeft: 2,
+                  }}>
+                    Línea de tiempo del día
+                  </p>
+                  <div style={{
+                    background: 'white', borderRadius: 16,
+                    border: '1px solid #EDE5D8', overflow: 'hidden',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
+                  }}>
+                    {todayTimeline.map((log, i) => {
+                      const ci  = CARE_ITEMS.find(x => x.key === log.item_key)
+                      const mom = CARE_MOMENTS.find(m => m.id === ci?.moment)
+                      return (
+                        <div
+                          key={log.id}
+                          style={{
+                            display: 'flex', alignItems: 'center', gap: 10,
+                            padding: '11px 14px',
+                            borderBottom: i < todayTimeline.length - 1 ? '1px solid #F5EEE6' : 'none',
+                          }}
+                        >
+                          <span style={{ fontSize: 18, flexShrink: 0 }}>{ci?.icon ?? '✓'}</span>
+                          <p style={{ flex: 1, fontSize: 13, color: '#1A1A1A', margin: 0, fontWeight: 500 }}>
+                            {ci?.label ?? log.item_key}
+                          </p>
+                          <span style={{ fontSize: 11, color: '#9CA3AF', flexShrink: 0 }}>
+                            {new Date(log.checked_at).toLocaleTimeString('es-US', { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                          {log.checked_by && (
+                            <span style={{
+                              fontSize: 10, fontWeight: 700, flexShrink: 0,
+                              color: mom?.color ?? '#C4623A',
+                              background: mom ? `${mom.color}18` : '#FDF0EB',
+                              padding: '2px 7px', borderRadius: 6,
+                            }}>
+                              {log.checked_by.split(' ')[0]}
+                            </span>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          </>
         )}
       </div>
 
@@ -720,7 +1007,7 @@ export default function Hoy() {
         </div>
       )}
 
-      {/* Proof photo bottom sheet — opens immediately after marking */}
+      {/* Proof photo bottom sheet */}
       {proofSheet && (
         <div
           style={{
@@ -737,7 +1024,6 @@ export default function Hoy() {
             padding: '28px 24px 96px',
             boxShadow: '0 -8px 48px rgba(0,0,0,0.25)',
           }}>
-            {/* Header */}
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 20 }}>
               <div>
                 <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>
@@ -764,7 +1050,6 @@ export default function Hoy() {
               </button>
             </div>
 
-            {/* Late warning */}
             {getMedTimingStatus(firstTime(proofSheet.med)) === 'late' && (
               <div style={{
                 padding: '10px 14px', background: '#FFFBEB', border: '1px solid #F59E0B',
@@ -778,7 +1063,6 @@ export default function Hoy() {
               </div>
             )}
 
-            {/* Photo area */}
             <div style={{
               width: '100%', border: '2px dashed #EDE5D8',
               borderRadius: 16, overflow: 'hidden', marginBottom: 16,
@@ -844,7 +1128,6 @@ export default function Hoy() {
               )}
             </div>
 
-            {/* Error feedback */}
             {uploadError && (
               <div style={{
                 display: 'flex', alignItems: 'flex-start', gap: 8,
@@ -858,7 +1141,6 @@ export default function Hoy() {
               </div>
             )}
 
-            {/* Action buttons */}
             <button
               onClick={submitProofPhoto}
               disabled={!proofBlob || proofUploading || proofStamping}
