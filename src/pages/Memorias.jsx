@@ -188,7 +188,7 @@ export default function Memorias() {
 
     const { error: uploadError } = await supabase.storage
       .from('voice-diary')
-      .upload(path, blob, { contentType: mimeType })
+      .upload(path, blob, { contentType: mimeType.split(';')[0] })
 
     if (uploadError) {
       setSaveError('Error al subir el audio. Verifica tu conexión.')
