@@ -197,7 +197,17 @@ export default function Memorias() {
 
     if (uploadError) {
       console.error('[stopAndSave] error upload:', uploadError)
-      setSaveError('Error al subir el audio. Verifica tu conexión.')
+      // Detect common causes for a clearer user message
+      const errMsg = uploadError.message ?? ''
+      let friendlyMsg = 'Error al subir el audio.'
+      if (errMsg.toLowerCase().includes('bucket') || uploadError.statusCode === '404') {
+        friendlyMsg = 'El bucket de almacenamiento no existe. Pide al administrador que ejecute create_storage_buckets.sql en Supabase.'
+      } else if (uploadError.statusCode === '403' || errMsg.toLowerCase().includes('policy') || errMsg.toLowerCase().includes('permission')) {
+        friendlyMsg = 'Sin permiso para subir archivos. Verifica las políticas RLS del bucket voice-diary en Supabase.'
+      } else if (errMsg) {
+        friendlyMsg = `Error al subir el audio: ${errMsg}`
+      }
+      setSaveError(friendlyMsg)
       setStep('idle')
       return
     }
@@ -220,7 +230,7 @@ export default function Memorias() {
 
     if (insertError) {
       console.error('[stopAndSave] error insert:', insertError)
-      setSaveError('El audio se subió pero no se pudo guardar: ' + insertError.message)
+      setSaveError('El audio se subió pero no se pudo guardar en la base de datos: ' + insertError.message)
       setStep('idle')
       return
     }
@@ -348,10 +358,14 @@ export default function Memorias() {
               )}
               {saveError && (
                 <div style={{
-                  marginBottom: 12, padding: '10px 14px', borderRadius: 12,
-                  background: '#FFF0F0', border: '1px solid #FFBABA', color: '#D63031', fontSize: 13,
+                  marginBottom: 16, padding: '12px 16px', borderRadius: 14,
+                  background: '#FFF0F0', border: '1.5px solid #FFBABA',
+                  color: '#B91C1C', fontSize: 13, fontWeight: 500,
+                  lineHeight: 1.5, textAlign: 'left',
+                  boxShadow: '0 2px 8px rgba(214,48,49,0.12)',
                 }}>
-                  ⚠ {saveError}
+                  <p style={{ margin: '0 0 2px', fontWeight: 700 }}>⚠️ No se pudo guardar</p>
+                  <p style={{ margin: 0 }}>{saveError}</p>
                 </div>
               )}
               <button

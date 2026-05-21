@@ -1111,6 +1111,129 @@ function AiCard({ type, text }) {
   )
 }
 
+// ── Dashboard Status Cards ────────────────────────────────────────────────────
+
+function StatusCard({ icon, title, subtitle, status, statusType, to, onClick }) {
+  const styles = {
+    ok:      { bg: '#F0FDF4', border: '#86EFAC', statusColor: '#15803D', statusIcon: '✅' },
+    warning: { bg: '#FFFBEB', border: '#FDE68A', statusColor: '#92400E', statusIcon: '⚠️' },
+    urgent:  { bg: '#FFF0F0', border: '#FECACA', statusColor: '#D63031', statusIcon: '🔴' },
+    info:    { bg: '#FFFFFF', border: '#C8BEB4', statusColor: '#6B7280', statusIcon: '💙' },
+  }
+  const s = styles[statusType ?? 'info']
+  const inner = (
+    <div style={{
+      background: s.bg, borderRadius: 20,
+      border: `1.5px solid ${s.border}`,
+      padding: '18px 14px 14px',
+      display: 'flex', flexDirection: 'column', gap: 6,
+      minHeight: 140, boxSizing: 'border-box',
+      boxShadow: '0 2px 16px rgba(0,0,0,0.12)',
+      WebkitTapHighlightColor: 'transparent',
+    }}>
+      <span style={{ fontSize: 38, lineHeight: 1, display: 'block' }}>{icon}</span>
+      <p style={{ fontSize: 15, fontWeight: 700, color: '#1A1A1A', margin: 0, lineHeight: 1.2 }}>{title}</p>
+      {subtitle && (
+        <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0, lineHeight: 1.3 }}>{subtitle}</p>
+      )}
+      <p style={{ fontSize: 12, fontWeight: 600, color: s.statusColor, margin: 'auto 0 0', paddingTop: 6 }}>
+        {s.statusIcon} {status}
+      </p>
+    </div>
+  )
+  if (to) return <Link to={to} style={{ textDecoration: 'none', display: 'block' }}>{inner}</Link>
+  return <div onClick={onClick} style={{ display: 'block', cursor: 'pointer' }}>{inner}</div>
+}
+
+function EmergencyCard({ onPress, sosSent }) {
+  return (
+    <button
+      onClick={onPress}
+      style={{
+        width: '100%', borderRadius: 20, border: 'none',
+        background: sosSent
+          ? 'linear-gradient(135deg, #B91C1C 0%, #7F1D1D 100%)'
+          : 'linear-gradient(135deg, #D63031 0%, #991B1B 100%)',
+        padding: '20px 22px',
+        display: 'flex', alignItems: 'center', gap: 16,
+        cursor: 'pointer', marginBottom: 20,
+        boxShadow: '0 6px 24px rgba(214,48,49,0.35)',
+        WebkitTapHighlightColor: 'transparent',
+        textAlign: 'left',
+      }}
+      aria-label="Botón de emergencia SOS"
+    >
+      <div style={{ position: 'relative', flexShrink: 0 }}>
+        {!sosSent && (
+          <span style={{
+            position: 'absolute', inset: -5, borderRadius: '50%',
+            background: 'rgba(255,255,255,0.25)',
+            animation: 'ping 1.8s cubic-bezier(0,0,0.2,1) infinite',
+            pointerEvents: 'none',
+          }} />
+        )}
+        <span style={{ fontSize: 40, lineHeight: 1, position: 'relative', zIndex: 1 }}>🆘</span>
+      </div>
+      <div style={{ flex: 1 }}>
+        <p style={{ fontSize: 18, fontWeight: 800, color: 'white', margin: 0 }}>
+          {sosSent ? '🚨 Alerta enviada' : 'Emergencia'}
+        </p>
+        <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.82)', margin: '3px 0 0', fontWeight: 500 }}>
+          {sosSent ? 'La familia ha sido notificada' : 'Toca para alertar a toda la familia'}
+        </p>
+      </div>
+      <span style={{ fontSize: 22, color: 'rgba(255,255,255,0.5)', fontWeight: 700 }}>›</span>
+    </button>
+  )
+}
+
+const RECENT_EVENT_CONFIG = {
+  MED_CONFIRMED:     { icon: '💊', color: '#15803D', label: e => `${e.medName ?? 'Medicamento'} dado${e.confirmedBy ? ` por ${e.confirmedBy.split(' ')[0]}` : ''}` },
+  VOICE_MEMORY:      { icon: '🎙️', color: '#7C5CBF', label: e => `Memoria de voz${e.recorderName ? ` de ${e.recorderName.split(' ')[0]}` : ''}` },
+  PHOTO:             { icon: '📸', color: '#C4623A', label: e => `Foto${e.uploaderName ? ` de ${e.uploaderName.split(' ')[0]}` : ' familiar'}` },
+  EXPENSE:           { icon: '💰', color: '#4A7C59', label: e => e.description ?? 'Gasto registrado' },
+  SOS_ALERT:         { icon: '🚨', color: '#D63031', label: () => 'Alerta de emergencia' },
+  APPOINTMENT:       { icon: '📅', color: '#3B82F6', label: e => e.appointmentTitle ?? 'Cita médica' },
+  APPOINTMENT_PROOF: { icon: '✅', color: '#15803D', label: e => `Cita: ${e.appointmentTitle ?? 'médica'}` },
+  NOTE:              { icon: '📝', color: '#6B7280', label: () => 'Nota registrada' },
+}
+
+function RecentEventRow({ evt, onTap }) {
+  const c = RECENT_EVENT_CONFIG[evt.type] ?? { icon: '📌', color: '#9CA3AF', label: () => 'Evento' }
+  const time = evt.timestamp ? fmtTimestamp(evt.timestamp) : ''
+  return (
+    <div
+      onClick={() => onTap(evt)}
+      style={{
+        background: 'white', borderRadius: 14,
+        border: '1px solid #EDE5D8',
+        padding: '12px 14px',
+        display: 'flex', alignItems: 'center', gap: 12,
+        cursor: 'pointer',
+        boxShadow: '0 1px 6px rgba(0,0,0,0.04)',
+      }}
+    >
+      <div style={{
+        width: 42, height: 42, borderRadius: 12, flexShrink: 0,
+        background: c.color + '18',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontSize: 20,
+      }}>
+        {c.icon}
+      </div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p style={{ fontSize: 14, fontWeight: 600, color: '#1A1A1A', margin: 0, lineHeight: 1.3 }}>
+          {c.label(evt)}
+        </p>
+        {time && (
+          <p style={{ fontSize: 11, color: '#9CA3AF', margin: '2px 0 0' }}>{time}</p>
+        )}
+      </div>
+      <span style={{ fontSize: 16, color: '#D4C0B0', flexShrink: 0 }}>›</span>
+    </div>
+  )
+}
+
 // ── Main component ─────────────────────────────────────────────────────────────
 
 export default function Dashboard() {
@@ -1137,6 +1260,7 @@ export default function Dashboard() {
   const [sosLocation, setSosLocation] = useState(null)
   const [adminConfirmEvt, setAdminConfirmEvt] = useState(null)
   const [selectedEvent, setSelectedEvent] = useState(null)
+  const [chatCount, setChatCount] = useState(0)
   // Initialized to today's key so today is expanded; past days start collapsed
   const [expandedDays, setExpandedDays] = useState(() => new Set([new Date().toISOString().split('T')[0]]))
 
@@ -1174,6 +1298,16 @@ export default function Dashboard() {
   useEffect(() => {
     if (user) track('session_start', { user_id: user.id })
   }, [user?.id])
+
+  useEffect(() => {
+    if (!ownerId) return
+    supabase
+      .from('chat_messages')
+      .select('id', { count: 'exact', head: true })
+      .eq('owner_id', ownerId)
+      .gte('created_at', todayKey + 'T00:00:00Z')
+      .then(({ count }) => setChatCount(count ?? 0))
+  }, [ownerId, todayKey])
 
   // Schedule daily browser notifications (fires when app is open/in background)
   useEffect(() => {
@@ -1706,6 +1840,67 @@ export default function Dashboard() {
   const pendingCount = todaySection?.events.filter(e => e.type === 'MED_PENDING').length ?? 0
   const confirmedTodayCount = todaySection?.events.filter(e => e.type === 'MED_CONFIRMED').length ?? 0
 
+  // Next pending medication for the meds card
+  const nextPendingMed = todaySection?.events.find(e => e.type === 'MED_PENDING') ?? null
+
+  // Last voice/photo memory across any day
+  const lastMemory = sections.flatMap(s => s.events).find(e => e.type === 'VOICE_MEMORY' || e.type === 'PHOTO') ?? null
+
+  // Recent events from today (non-pending, non-AI) for "Últimas novedades"
+  const recentEvents = (todaySection?.events ?? [])
+    .filter(e => !['MED_PENDING', 'CAREGIVER_CARD'].includes(e.type))
+    .slice(0, 3)
+
+  // Cuidado de hoy card status
+  let careStatus, careStatusType
+  if (loading) {
+    careStatus = 'Cargando...'; careStatusType = 'info'
+  } else if (medTotal === 0) {
+    careStatus = 'Sin medicamentos'; careStatusType = 'info'
+  } else if (pendingCount === 0 && confirmedTodayCount >= medTotal) {
+    careStatus = `${confirmedTodayCount} de ${medTotal} dados`; careStatusType = 'ok'
+  } else if (pendingCount > 0 && confirmedTodayCount > 0) {
+    careStatus = `${pendingCount} pendiente${pendingCount !== 1 ? 's' : ''}`; careStatusType = 'warning'
+  } else if (pendingCount > 0) {
+    careStatus = `${pendingCount} sin dar hoy`; careStatusType = 'urgent'
+  } else {
+    careStatus = 'Sin actividad hoy'; careStatusType = 'info'
+  }
+
+  // Medicamentos card status
+  let medCardStatus, medCardStatusType, medCardSubtitle
+  if (nextPendingMed) {
+    medCardStatus = nextPendingMed.medName ?? 'Pendiente'
+    medCardStatusType = 'warning'
+    medCardSubtitle = nextPendingMed.medTime ? `A las ${fmtTime(nextPendingMed.medTime)}` : 'Pendiente hoy'
+  } else if (confirmedTodayCount > 0) {
+    medCardStatus = 'Todo dado hoy'
+    medCardStatusType = 'ok'
+    medCardSubtitle = `${confirmedTodayCount} dosis confirmada${confirmedTodayCount !== 1 ? 's' : ''}`
+  } else {
+    medCardStatus = 'Sin pendientes'
+    medCardStatusType = 'info'
+    medCardSubtitle = medTotal > 0 ? 'Aún no hay dosis' : 'Sin meds configurados'
+  }
+
+  // Memorias card status
+  let memStatus, memStatusType, memSubtitle
+  if (lastMemory) {
+    const memDay = lastMemory.dateKey === todayKey ? 'hoy' : lastMemory.dateKey === yesterdayKey ? 'ayer' : 'esta semana'
+    memStatus = `Última ${memDay}`
+    memStatusType = 'ok'
+    memSubtitle = lastMemory.type === 'VOICE_MEMORY' ? 'Memoria de voz' : 'Foto familiar'
+  } else {
+    memStatus = 'Sin memorias aún'
+    memStatusType = 'info'
+    memSubtitle = 'Toca para grabar'
+  }
+
+  // Chat card status
+  const chatStatus = chatCount > 0
+    ? `${chatCount} mensaje${chatCount !== 1 ? 's' : ''} hoy`
+    : 'Sin mensajes nuevos'
+
   return (
     <Layout>
       {checkoutSuccess && (
@@ -1734,158 +1929,62 @@ export default function Dashboard() {
       )}
       <div style={{ padding: '12px 16px 96px', maxWidth: 600 }}>
 
-        {/* Greeting header */}
+        {/* ── Greeting header ───────────────────────────────────────────── */}
         <div style={{
           background: 'linear-gradient(135deg, #BF5E37 0%, #7A3418 100%)',
-          borderRadius: 20, padding: '16px 18px', marginBottom: 12,
+          borderRadius: 20, padding: '18px 20px', marginBottom: 16,
           boxShadow: '0 4px 20px rgba(196,98,58,0.3)',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             {profile?.photo_url ? (
               <img
                 src={profile.photo_url}
                 alt={profile.name}
                 style={{
-                  width: 48, height: 48, borderRadius: '50%', objectFit: 'cover',
+                  width: 52, height: 52, borderRadius: '50%', objectFit: 'cover',
                   border: '2px solid rgba(212,168,83,0.5)', flexShrink: 0,
                 }}
               />
             ) : (
               <div style={{
-                width: 48, height: 48, borderRadius: '50%', flexShrink: 0,
+                width: 52, height: 52, borderRadius: '50%', flexShrink: 0,
                 background: 'rgba(255,255,255,0.15)',
                 border: '2px solid rgba(255,255,255,0.2)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 22, fontWeight: 700, color: 'rgba(255,255,255,0.85)',
               }}>
-                <User size={22} color="rgba(255,255,255,0.7)" strokeWidth={1.5} />
+                {profile?.name?.charAt(0) ?? '👴'}
               </div>
             )}
             <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: 11, margin: 0 }}>
+              <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 12, margin: 0 }}>
                 {timeIcon} {timeGreeting}, {firstName}
               </p>
               {profile ? (
                 <p style={{
-                  color: 'white', fontSize: 16, fontWeight: 700,
-                  fontFamily: 'Georgia, serif', margin: '2px 0 0',
+                  color: 'white', fontSize: 18, fontWeight: 800,
+                  fontFamily: 'Georgia, serif', margin: '3px 0 0', lineHeight: 1.25,
                 }}>
-                  Cuidando a {profile.name}
+                  Así estuvo {(profile.name ?? 'el familiar').toUpperCase()} hoy 👴
                 </p>
               ) : (
                 <Link
                   to="/onboarding"
                   style={{
-                    color: 'rgba(255,255,255,0.75)', fontSize: 13,
-                    display: 'block', marginTop: 2, textDecoration: 'underline',
+                    color: 'rgba(255,255,255,0.8)', fontSize: 14,
+                    display: 'block', marginTop: 4, textDecoration: 'underline', fontWeight: 600,
                   }}
                 >
                   + Agregar familiar →
                 </Link>
               )}
-              {pendingCount > 0 ? (
-                <p style={{ color: 'rgba(255,220,100,0.95)', fontSize: 12, margin: '5px 0 0' }}>
-                  ⚠️ {pendingCount} medicamento{pendingCount !== 1 ? 's' : ''} pendiente{pendingCount !== 1 ? 's' : ''}
-                </p>
-              ) : confirmedTodayCount > 0 ? (
-                <p style={{ color: 'rgba(130,255,170,0.9)', fontSize: 12, margin: '5px 0 0' }}>
-                  ✅ Todo al día hoy · {confirmedTodayCount} dado{confirmedTodayCount !== 1 ? 's' : ''}
-                </p>
-              ) : null}
-            </div>
-
-            {/* Permanent SOS button */}
-            <div style={{ flexShrink: 0, position: 'relative' }}>
-              <span style={{
-                position: 'absolute', inset: -4, borderRadius: '50%',
-                background: 'rgba(214,48,49,0.35)',
-                animation: 'ping 1.8s cubic-bezier(0,0,0.2,1) infinite',
-                pointerEvents: 'none',
-              }} />
-              <button
-                onClick={prepareSOS}
-                style={{
-                  width: 46, height: 46, borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #D63031, #B82020)',
-                  border: '2.5px solid rgba(255,255,255,0.35)',
-                  boxShadow: '0 3px 14px rgba(214,48,49,0.55)',
-                  color: 'white', fontWeight: 900, fontSize: 12,
-                  cursor: 'pointer',
-                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                  position: 'relative', zIndex: 1, lineHeight: 1,
-                  transition: 'transform 0.15s, box-shadow 0.15s',
-                }}
-                aria-label="Botón de emergencia SOS"
-              >
-                <span style={{ fontSize: 12, fontWeight: 900 }}>SOS</span>
-                <span style={{ fontSize: 14, lineHeight: 1 }}>🆘</span>
-              </button>
             </div>
           </div>
         </div>
 
-        {/* Care recipient summary card */}
-        {profile && (
-          <div style={{
-            background: 'white', borderRadius: 16,
-            border: '1px solid #EDE5D8',
-            padding: '12px 16px', marginBottom: 16,
-            display: 'flex', alignItems: 'center', gap: 12,
-            boxShadow: '0 2px 10px rgba(0,0,0,0.04)',
-          }}>
-            {profile.photo_url ? (
-              <img
-                src={profile.photo_url}
-                alt={profile.name}
-                style={{
-                  width: 42, height: 42, borderRadius: '50%', objectFit: 'cover',
-                  border: '2px solid #EDE5D8', flexShrink: 0,
-                }}
-              />
-            ) : (
-              <div style={{
-                width: 42, height: 42, borderRadius: '50%', flexShrink: 0,
-                background: '#FDF0EB', border: '2px solid #EDE5D8',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 18, fontWeight: 700, color: '#C4623A',
-              }}>
-                {profile.name?.charAt(0) ?? '?'}
-              </div>
-            )}
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{
-                fontSize: 14, fontWeight: 700, color: '#1A1A1A',
-                fontFamily: 'Georgia, serif', margin: 0,
-              }}>
-                {profile.name}
-              </p>
-              {medTotal > 0 ? (
-                <p style={{ fontSize: 12, color: pendingCount > 0 ? '#B45309' : '#4A7C59', marginTop: 2 }}>
-                  {confirmedTodayCount > 0 || pendingCount > 0
-                    ? `${confirmedTodayCount} de ${medTotal} medicamento${medTotal !== 1 ? 's' : ''} dado${confirmedTodayCount !== 1 ? 's' : ''} hoy ${pendingCount === 0 && confirmedTodayCount === medTotal ? '✅' : ''}`
-                    : `${medTotal} medicamento${medTotal !== 1 ? 's' : ''} programado${medTotal !== 1 ? 's' : ''} hoy`
-                  }
-                </p>
-              ) : (
-                <p style={{ fontSize: 12, color: '#9CA3AF', marginTop: 2 }}>
-                  Sin medicamentos configurados
-                </p>
-              )}
-            </div>
-            {sosSent && (
-              <span style={{
-                fontSize: 10, fontWeight: 700, color: '#D63031',
-                background: '#FFF0F0', border: '1px solid #FFBABA',
-                padding: '3px 8px', borderRadius: 6, flexShrink: 0,
-              }}>
-                🚨 Alerta enviada
-              </span>
-            )}
-          </div>
-        )}
-
-        {/* AI cards */}
+        {/* ── AI cards ─────────────────────────────────────────────────── */}
         {Object.keys(aiCards).length > 0 && (
-          <div style={{ marginBottom: 4 }}>
+          <div style={{ marginBottom: 16 }}>
             {aiCards.morning && <AiCard type="morning" text={aiCards.morning} />}
             {aiCards.evening && <AiCard type="evening" text={aiCards.evening} />}
             {aiCards.burnout && <AiCard type="burnout" text={aiCards.burnout} />}
@@ -1893,142 +1992,208 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* SOS confirm dialog */}
-        {sosConfirming && (
-          <div
-            style={{
-              position: 'fixed', inset: 0, zIndex: 200,
-              background: 'rgba(0,0,0,0.6)',
-              display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
-            }}
-            onClick={e => { if (e.target === e.currentTarget) setSosConfirming(false) }}
-          >
-            <div style={{
-              width: '100%', maxWidth: 480,
-              background: 'white', borderRadius: '24px 24px 0 0',
-              padding: '28px 24px 96px',
-              boxShadow: '0 -8px 48px rgba(0,0,0,0.2)',
+        {/* ── Status cards grid ─────────────────────────────────────────── */}
+        {console.log('[Dashboard] rendering status cards grid', { careStatus, careStatusType, medCardStatus, medCardStatusType, memStatus, memStatusType, chatStatus })}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 14 }}>
+          <StatusCard
+            icon="🏥"
+            title="Cuidado de hoy"
+            subtitle={medTotal > 0 ? `${medTotal} med${medTotal !== 1 ? 's' : ''} programado${medTotal !== 1 ? 's' : ''}` : 'Rutina de cuidado'}
+            status={careStatus}
+            statusType={careStatusType}
+            to="/hoy"
+          />
+          <StatusCard
+            icon="💊"
+            title="Medicamentos"
+            subtitle={medCardSubtitle}
+            status={medCardStatus}
+            statusType={medCardStatusType}
+            to="/hoy"
+          />
+          <StatusCard
+            icon="🎙️"
+            title="Memorias"
+            subtitle={memSubtitle}
+            status={memStatus}
+            statusType={memStatusType}
+            to="/memorias"
+          />
+          <StatusCard
+            icon="💬"
+            title="Chat familiar"
+            subtitle="Mensajes del día"
+            status={chatStatus}
+            statusType="info"
+            to="/chat"
+          />
+        </div>
+
+        {/* ── Emergency card ────────────────────────────────────────────── */}
+        <EmergencyCard onPress={prepareSOS} sosSent={sosSent} />
+
+        {/* ── Últimas novedades ─────────────────────────────────────────── */}
+        {!loading && recentEvents.length > 0 && (
+          <div style={{ marginBottom: 24 }}>
+            <p style={{
+              fontSize: 11, fontWeight: 700, color: '#9CA3AF',
+              textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 10px',
             }}>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
-                <button
-                  onClick={() => setSosConfirming(false)}
-                  style={{
-                    width: 32, height: 32, borderRadius: '50%',
-                    background: '#F3F4F6', border: 'none', cursor: 'pointer',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}
-                >
-                  <XIcon size={14} color="#6B7280" strokeWidth={2} />
-                </button>
-              </div>
-              <div style={{ textAlign: 'center', marginBottom: 24 }}>
-                <div style={{
-                  width: 64, height: 64, borderRadius: '50%', margin: '0 auto 16px',
-                  background: '#FFF0F0', border: '2px solid #FFBABA',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>
-                  <AlertTriangle size={28} color="#D63031" strokeWidth={1.5} />
-                </div>
-                <h3 style={{
-                  fontSize: 20, fontWeight: 700, color: '#1A1A1A',
-                  fontFamily: 'Georgia, serif', margin: '0 0 8px',
-                }}>
-                  ¿Activar emergencia?
-                </h3>
-                <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, margin: 0 }}>
-                  Todos los miembros de la familia recibirán una alerta inmediata
-                  {profile?.name ? ` sobre ${profile.name}` : ''}.
-                </p>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                <button
-                  onClick={triggerSOS}
-                  style={{
-                    width: '100%', padding: '14px', borderRadius: 16, border: 'none',
-                    background: 'linear-gradient(135deg, #D63031, #B82020)',
-                    color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer',
-                    boxShadow: '0 6px 20px rgba(214,48,49,0.35)',
-                  }}
-                >
-                  Sí, es una emergencia real
-                </button>
-                <button
-                  onClick={() => setSosConfirming(false)}
-                  style={{
-                    width: '100%', padding: '13px', borderRadius: 14,
-                    border: '1px solid #EDE5D8', background: 'white',
-                    color: '#6B7280', fontWeight: 600, fontSize: 14, cursor: 'pointer',
-                  }}
-                >
-                  Cancelar — fue un error
-                </button>
-              </div>
+              Últimas novedades
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {recentEvents.map(evt => (
+                <RecentEventRow key={evt.id} evt={evt} onTap={setSelectedEvent} />
+              ))}
             </div>
           </div>
         )}
 
-        {/* Family timeline */}
-        {timelineError && (
-          <div style={{
-            background: '#FFF0F0', border: '1px solid #FFBABA',
-            borderRadius: 14, padding: '14px 16px', marginBottom: 16,
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+        {/* ── Historial ────────────────────────────────────────────────── */}
+        <div>
+          <p style={{
+            fontSize: 11, fontWeight: 700, color: '#9CA3AF',
+            textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 10px',
           }}>
-            <p style={{ fontSize: 13, color: '#D63031', margin: 0 }}>⚠️ {timelineError}</p>
-            <button
-              onClick={fetchTimeline}
-              style={{
-                padding: '6px 14px', borderRadius: 8, border: 'none',
-                background: '#D63031', color: 'white', fontSize: 12,
-                fontWeight: 700, cursor: 'pointer', flexShrink: 0,
-              }}
-            >
-              Reintentar
-            </button>
-          </div>
-        )}
-        {ownerId && (loading ? (
-          <div>
-            {[1, 2, 3].map(i => (
-              <div key={i} style={{
-                background: 'white', borderRadius: 16, padding: '14px 14px',
-                marginBottom: 10, border: '1px solid #EDE5D8',
-                display: 'flex', alignItems: 'center', gap: 12,
-              }}>
-                <div className="animate-pulse" style={{ width: 44, height: 44, borderRadius: 12, background: '#EDE5D8', flexShrink: 0 }} />
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  <div className="animate-pulse" style={{ height: 14, width: '55%', background: '#EDE5D8', borderRadius: 6 }} />
-                  <div className="animate-pulse" style={{ height: 11, width: '35%', background: '#EDE5D8', borderRadius: 6 }} />
+            Historial
+          </p>
+          {timelineError && (
+            <div style={{
+              background: '#FFF0F0', border: '1px solid #FFBABA',
+              borderRadius: 14, padding: '14px 16px', marginBottom: 16,
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+            }}>
+              <p style={{ fontSize: 13, color: '#D63031', margin: 0 }}>⚠️ {timelineError}</p>
+              <button
+                onClick={fetchTimeline}
+                style={{
+                  padding: '6px 14px', borderRadius: 8, border: 'none',
+                  background: '#D63031', color: 'white', fontSize: 12,
+                  fontWeight: 700, cursor: 'pointer', flexShrink: 0,
+                }}
+              >
+                Reintentar
+              </button>
+            </div>
+          )}
+          {ownerId && (loading ? (
+            <div>
+              {[1, 2, 3].map(i => (
+                <div key={i} style={{
+                  background: 'white', borderRadius: 16, padding: '14px 14px',
+                  marginBottom: 10, border: '1px solid #EDE5D8',
+                  display: 'flex', alignItems: 'center', gap: 12,
+                }}>
+                  <div className="animate-pulse" style={{ width: 44, height: 44, borderRadius: 12, background: '#EDE5D8', flexShrink: 0 }} />
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    <div className="animate-pulse" style={{ height: 14, width: '55%', background: '#EDE5D8', borderRadius: 6 }} />
+                    <div className="animate-pulse" style={{ height: 11, width: '35%', background: '#EDE5D8', borderRadius: 6 }} />
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        ) : sections.length === 0 && !timelineError ? (
-          <EmptyState profile={profile} />
-        ) : (
-          sections.map(section => (
-            <DaySection
-              key={section.dateKey}
-              section={section}
-              isExpanded={expandedDays.has(section.dateKey)}
-              onToggle={() => toggleDay(section.dateKey)}
-              medTotal={medTotal}
-              confirming={confirming}
-              expandedAudio={expandedAudio}
-              onConfirm={handleConfirmMed}
-              onToggleAudio={id => setExpandedAudio(prev => prev === id ? null : id)}
-              todayKey={todayKey}
-              tomorrowKey={tomorrowKey}
-              reactions={reactions}
-              userId={user.id}
-              onReact={toggleReaction}
-              onTap={setSelectedEvent}
-              isFamiliar={isFamiliar}
-            />
-          ))
-        ))}
+              ))}
+            </div>
+          ) : sections.length === 0 && !timelineError ? (
+            <EmptyState profile={profile} />
+          ) : (
+            sections.map(section => (
+              <DaySection
+                key={section.dateKey}
+                section={section}
+                isExpanded={expandedDays.has(section.dateKey)}
+                onToggle={() => toggleDay(section.dateKey)}
+                medTotal={medTotal}
+                confirming={confirming}
+                expandedAudio={expandedAudio}
+                onConfirm={handleConfirmMed}
+                onToggleAudio={id => setExpandedAudio(prev => prev === id ? null : id)}
+                todayKey={todayKey}
+                tomorrowKey={tomorrowKey}
+                reactions={reactions}
+                userId={user.id}
+                onReact={toggleReaction}
+                onTap={setSelectedEvent}
+                isFamiliar={isFamiliar}
+              />
+            ))
+          ))}
+        </div>
       </div>
-      {/* Admin emergency confirmation dialog */}
+
+      {/* ── SOS confirm dialog ────────────────────────────────────────────── */}
+      {sosConfirming && (
+        <div
+          style={{
+            position: 'fixed', inset: 0, zIndex: 200,
+            background: 'rgba(0,0,0,0.6)',
+            display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
+          }}
+          onClick={e => { if (e.target === e.currentTarget) setSosConfirming(false) }}
+        >
+          <div style={{
+            width: '100%', maxWidth: 480,
+            background: 'white', borderRadius: '24px 24px 0 0',
+            padding: '28px 24px 96px',
+            boxShadow: '0 -8px 48px rgba(0,0,0,0.2)',
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
+              <button
+                onClick={() => setSosConfirming(false)}
+                style={{
+                  width: 32, height: 32, borderRadius: '50%',
+                  background: '#F3F4F6', border: 'none', cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}
+              >
+                <XIcon size={14} color="#6B7280" strokeWidth={2} />
+              </button>
+            </div>
+            <div style={{ textAlign: 'center', marginBottom: 24 }}>
+              <div style={{
+                width: 64, height: 64, borderRadius: '50%', margin: '0 auto 16px',
+                background: '#FFF0F0', border: '2px solid #FFBABA',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <AlertTriangle size={28} color="#D63031" strokeWidth={1.5} />
+              </div>
+              <h3 style={{
+                fontSize: 20, fontWeight: 700, color: '#1A1A1A',
+                fontFamily: 'Georgia, serif', margin: '0 0 8px',
+              }}>
+                ¿Activar emergencia?
+              </h3>
+              <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, margin: 0 }}>
+                Todos los miembros de la familia recibirán una alerta inmediata
+                {profile?.name ? ` sobre ${profile.name}` : ''}.
+              </p>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <button
+                onClick={triggerSOS}
+                style={{
+                  width: '100%', padding: '14px', borderRadius: 16, border: 'none',
+                  background: 'linear-gradient(135deg, #D63031, #B82020)',
+                  color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer',
+                  boxShadow: '0 6px 20px rgba(214,48,49,0.35)',
+                }}
+              >
+                Sí, es una emergencia real
+              </button>
+              <button
+                onClick={() => setSosConfirming(false)}
+                style={{
+                  width: '100%', padding: '13px', borderRadius: 14,
+                  border: '1px solid #EDE5D8', background: 'white',
+                  color: '#6B7280', fontWeight: 600, fontSize: 14, cursor: 'pointer',
+                }}
+              >
+                Cancelar — fue un error
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Admin emergency confirmation dialog ────────────────────────────── */}
       {adminConfirmEvt && (
         <div
           style={{ position: 'fixed', inset: 0, zIndex: 300, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 24px' }}
