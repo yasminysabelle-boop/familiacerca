@@ -122,19 +122,24 @@ export default function Memorias() {
       transcriptRef.current = ''
 
       const mimeType = pickMimeType()
+      console.log('[startRecording] mimeType:', mimeType || '(navegador default)', '— MediaRecorder disponible:', typeof MediaRecorder !== 'undefined')
       mimeTypeRef.current = mimeType
       streamRef.current = stream
 
-      startSpeech()
+      try { startSpeech() } catch (e) { console.warn('[startRecording] SpeechRecognition no disponible:', e) }
 
       const recOpts = mimeType ? { mimeType } : {}
       const recorder = new MediaRecorder(stream, recOpts)
-      recorder.ondataavailable = e => { if (e.data.size > 0) chunksRef.current.push(e.data) }
+      recorder.ondataavailable = e => {
+        console.log('[ondataavailable] chunk size:', e.data.size)
+        if (e.data.size > 0) chunksRef.current.push(e.data)
+      }
       recorder.start(250)
       recorderRef.current = recorder
       setStep('recording'); setElapsed(0)
       timerRef.current = setInterval(() => setElapsed(n => n + 1), 1000)
-    } catch {
+    } catch (err) {
+      console.error('[startRecording] error:', err)
       setMicError('No se pudo acceder al micrófono. Verifica los permisos del navegador.')
     }
   }
@@ -161,7 +166,7 @@ export default function Memorias() {
 
     await new Promise(resolve => {
       recorder.onstop = () => {
-        stopSpeech()
+        try { stopSpeech() } catch (e) { console.warn('[stopAndSave] stopSpeech error:', e) }
         stream?.getTracks().forEach(t => t.stop())
         resolve()
       }
