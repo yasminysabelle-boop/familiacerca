@@ -82,7 +82,7 @@ export default function Memorias() {
     setLoading(true)
     const { data } = await supabase
       .from('voice_diary')
-      .select('*, user_profiles(full_name)')
+      .select('*')
       .order('created_at', { ascending: false })
     const list = data ?? []
     setRecordings(list)
@@ -141,15 +141,13 @@ export default function Memorias() {
 
   async function stopAndSave() {
     clearInterval(timerRef.current)
-    stopSpeech()
 
     const recorder = recorderRef.current
     const stream   = streamRef.current
 
-    const stopStream = () => stream?.getTracks().forEach(t => t.stop())
-
     if (!recorder || recorder.state === 'inactive') {
-      stopStream()
+      stopSpeech()
+      stream?.getTracks().forEach(t => t.stop())
       setSaveError('La grabación se interrumpió. Intenta de nuevo.')
       setStep('idle')
       return
@@ -160,7 +158,11 @@ export default function Memorias() {
     const duration = elapsed
 
     await new Promise(resolve => {
-      recorder.onstop = () => { stopStream(); resolve() }
+      recorder.onstop = () => {
+        stopSpeech()
+        stream?.getTracks().forEach(t => t.stop())
+        resolve()
+      }
       recorder.stop()
     })
 
@@ -242,7 +244,7 @@ export default function Memorias() {
 
   function recorderName(rec) {
     if (rec.user_id === user.id) return myDisplayName.split(' ')[0]
-    return rec.user_profiles?.full_name?.split(' ')[0] ?? 'Familiar'
+    return 'Familiar'
   }
 
   return (
