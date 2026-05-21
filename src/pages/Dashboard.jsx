@@ -1997,39 +1997,23 @@ export default function Dashboard() {
         <div style={{ background: 'red', color: 'white', fontWeight: 700, fontSize: 13, padding: '6px 10px', borderRadius: 8, marginBottom: 8 }}>
           DEBUG ZONA TARJETAS — careStatus: {careStatus} | medStatus: {medCardStatus}
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 14, border: '3px solid blue' }}>
-          <StatusCard
-            icon="🏥"
-            title="Cuidado de hoy"
-            subtitle={medTotal > 0 ? `${medTotal} med${medTotal !== 1 ? 's' : ''} programado${medTotal !== 1 ? 's' : ''}` : 'Rutina de cuidado'}
-            status={careStatus}
-            statusType={careStatusType}
-            to="/hoy"
-          />
-          <StatusCard
-            icon="💊"
-            title="Medicamentos"
-            subtitle={medCardSubtitle}
-            status={medCardStatus}
-            statusType={medCardStatusType}
-            to="/hoy"
-          />
-          <StatusCard
-            icon="🎙️"
-            title="Memorias"
-            subtitle={memSubtitle}
-            status={memStatus}
-            statusType={memStatusType}
-            to="/memorias"
-          />
-          <StatusCard
-            icon="💬"
-            title="Chat familiar"
-            subtitle="Mensajes del día"
-            status={chatStatus}
-            statusType="info"
-            to="/chat"
-          />
+        <div style={{ marginBottom: 14 }}>
+          <div style={{ background: '#F0FDF4', border: '2px solid #86EFAC', borderRadius: 16, padding: 16, marginBottom: 8, minHeight: 80 }}>
+            <p style={{ margin: 0, fontWeight: 700 }}>🏥 Cuidado de hoy</p>
+            <p style={{ margin: 0, fontSize: 12, color: '#15803D' }}>{careStatus}</p>
+          </div>
+          <div style={{ background: '#FFFBEB', border: '2px solid #FDE68A', borderRadius: 16, padding: 16, marginBottom: 8, minHeight: 80 }}>
+            <p style={{ margin: 0, fontWeight: 700 }}>💊 Medicamentos</p>
+            <p style={{ margin: 0, fontSize: 12, color: '#92400E' }}>{medCardStatus}</p>
+          </div>
+          <div style={{ background: '#EFF6FF', border: '2px solid #BFDBFE', borderRadius: 16, padding: 16, marginBottom: 8, minHeight: 80 }}>
+            <p style={{ margin: 0, fontWeight: 700 }}>🎙️ Memorias</p>
+            <p style={{ margin: 0, fontSize: 12, color: '#1D4ED8' }}>{memStatus}</p>
+          </div>
+          <div style={{ background: '#F5F3FF', border: '2px solid #C4B5FD', borderRadius: 16, padding: 16, marginBottom: 8, minHeight: 80 }}>
+            <p style={{ margin: 0, fontWeight: 700 }}>💬 Chat familiar</p>
+            <p style={{ margin: 0, fontSize: 12, color: '#6B7280' }}>{chatStatus}</p>
+          </div>
         </div>
 
         {/* ── Emergency card ────────────────────────────────────────────── */}
