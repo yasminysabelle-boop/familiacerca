@@ -1994,7 +1994,10 @@ export default function Dashboard() {
 
         {/* ── Status cards grid ─────────────────────────────────────────── */}
         {console.log('[Dashboard] rendering status cards grid', { careStatus, careStatusType, medCardStatus, medCardStatusType, memStatus, memStatusType, chatStatus })}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 14 }}>
+        <div style={{ background: 'red', color: 'white', fontWeight: 700, fontSize: 13, padding: '6px 10px', borderRadius: 8, marginBottom: 8 }}>
+          DEBUG ZONA TARJETAS — careStatus: {careStatus} | medStatus: {medCardStatus}
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 14, border: '3px solid blue' }}>
           <StatusCard
             icon="🏥"
             title="Cuidado de hoy"
