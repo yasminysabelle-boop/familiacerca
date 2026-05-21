@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams, useNavigate as useNav } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { useSubscription } from '../contexts/SubscriptionContext'
@@ -1141,8 +1141,15 @@ function StatusCard({ icon, title, subtitle, status, statusType, to, onClick }) 
       </p>
     </div>
   )
-  if (to) return <Link to={to} style={{ textDecoration: 'none', display: 'block' }}>{inner}</Link>
-  return <div onClick={onClick} style={{ display: 'block', cursor: 'pointer' }}>{inner}</div>
+  const navigate = useNav()
+  return (
+    <div
+      onClick={to ? () => navigate(to) : onClick}
+      style={{ cursor: 'pointer' }}
+    >
+      {inner}
+    </div>
+  )
 }
 
 function EmergencyCard({ onPress, sosSent }) {
@@ -1870,9 +1877,9 @@ export default function Dashboard() {
   // Medicamentos card status
   let medCardStatus, medCardStatusType, medCardSubtitle
   if (nextPendingMed) {
-    medCardStatus = nextPendingMed.medName ?? 'Pendiente'
+    medCardStatus = nextPendingMed.medTime ? `A las ${fmtTime(nextPendingMed.medTime)}` : 'Pendiente hoy'
     medCardStatusType = 'warning'
-    medCardSubtitle = nextPendingMed.medTime ? `A las ${fmtTime(nextPendingMed.medTime)}` : 'Pendiente hoy'
+    medCardSubtitle = `${pendingCount} medicamento${pendingCount !== 1 ? 's' : ''} por dar`
   } else if (confirmedTodayCount > 0) {
     medCardStatus = 'Todo dado hoy'
     medCardStatusType = 'ok'
@@ -1993,27 +2000,39 @@ export default function Dashboard() {
         )}
 
         {/* ── Status cards grid ─────────────────────────────────────────── */}
-        {console.log('[Dashboard] rendering status cards grid', { careStatus, careStatusType, medCardStatus, medCardStatusType, memStatus, memStatusType, chatStatus })}
-        <div style={{ background: 'red', color: 'white', fontWeight: 700, fontSize: 13, padding: '6px 10px', borderRadius: 8, marginBottom: 8 }}>
-          DEBUG ZONA TARJETAS — careStatus: {careStatus} | medStatus: {medCardStatus}
-        </div>
-        <div style={{ marginBottom: 14 }}>
-          <div style={{ background: '#F0FDF4', border: '2px solid #86EFAC', borderRadius: 16, padding: 16, marginBottom: 8, minHeight: 80 }}>
-            <p style={{ margin: 0, fontWeight: 700 }}>🏥 Cuidado de hoy</p>
-            <p style={{ margin: 0, fontSize: 12, color: '#15803D' }}>{careStatus}</p>
-          </div>
-          <div style={{ background: '#FFFBEB', border: '2px solid #FDE68A', borderRadius: 16, padding: 16, marginBottom: 8, minHeight: 80 }}>
-            <p style={{ margin: 0, fontWeight: 700 }}>💊 Medicamentos</p>
-            <p style={{ margin: 0, fontSize: 12, color: '#92400E' }}>{medCardStatus}</p>
-          </div>
-          <div style={{ background: '#EFF6FF', border: '2px solid #BFDBFE', borderRadius: 16, padding: 16, marginBottom: 8, minHeight: 80 }}>
-            <p style={{ margin: 0, fontWeight: 700 }}>🎙️ Memorias</p>
-            <p style={{ margin: 0, fontSize: 12, color: '#1D4ED8' }}>{memStatus}</p>
-          </div>
-          <div style={{ background: '#F5F3FF', border: '2px solid #C4B5FD', borderRadius: 16, padding: 16, marginBottom: 8, minHeight: 80 }}>
-            <p style={{ margin: 0, fontWeight: 700 }}>💬 Chat familiar</p>
-            <p style={{ margin: 0, fontSize: 12, color: '#6B7280' }}>{chatStatus}</p>
-          </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 14 }}>
+          <StatusCard
+            icon="🏥"
+            title="Cuidado de hoy"
+            subtitle={medTotal > 0 ? `${medTotal} med${medTotal !== 1 ? 's' : ''} programado${medTotal !== 1 ? 's' : ''}` : 'Rutina de cuidado'}
+            status={careStatus}
+            statusType={careStatusType}
+            to="/hoy"
+          />
+          <StatusCard
+            icon="💊"
+            title="Medicamentos"
+            subtitle={medCardSubtitle}
+            status={medCardStatus}
+            statusType={medCardStatusType}
+            to="/hoy"
+          />
+          <StatusCard
+            icon="🎙️"
+            title="Memorias"
+            subtitle={memSubtitle}
+            status={memStatus}
+            statusType={memStatusType}
+            to="/memorias"
+          />
+          <StatusCard
+            icon="💬"
+            title="Chat familiar"
+            subtitle="Mensajes del día"
+            status={chatStatus}
+            statusType="info"
+            to="/chat"
+          />
         </div>
 
         {/* ── Emergency card ────────────────────────────────────────────── */}
