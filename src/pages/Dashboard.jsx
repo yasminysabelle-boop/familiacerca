@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, useSearchParams, useNavigate as useNav } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { useSubscription } from '../contexts/SubscriptionContext'
@@ -1114,7 +1114,6 @@ function AiCard({ type, text }) {
 // ── Dashboard Status Cards ────────────────────────────────────────────────────
 
 function StatusCard({ icon, title, subtitle, status, statusType, to, onClick }) {
-  const navigate = useNav()
   const styles = {
     ok:      { bg: '#F0FDF4', border: '#86EFAC', statusColor: '#15803D', statusIcon: '✅' },
     warning: { bg: '#FFFBEB', border: '#FDE68A', statusColor: '#92400E', statusIcon: '⚠️' },
@@ -1122,20 +1121,16 @@ function StatusCard({ icon, title, subtitle, status, statusType, to, onClick }) 
     info:    { bg: '#FFFFFF', border: '#C8BEB4', statusColor: '#6B7280', statusIcon: '💙' },
   }
   const s = styles[statusType ?? 'info']
-  return (
-    <div
-      onClick={to ? () => navigate(to) : onClick}
-      style={{
-        background: s.bg, borderRadius: 20,
-        border: `1.5px solid ${s.border}`,
-        padding: '18px 14px 14px',
-        display: 'flex', flexDirection: 'column', gap: 6,
-        minHeight: 140, boxSizing: 'border-box',
-        boxShadow: '0 2px 16px rgba(0,0,0,0.12)',
-        WebkitTapHighlightColor: 'transparent',
-        cursor: 'pointer',
-      }}
-    >
+  const inner = (
+    <div style={{
+      background: s.bg, borderRadius: 20,
+      border: `1.5px solid ${s.border}`,
+      padding: '18px 14px 14px',
+      display: 'flex', flexDirection: 'column', gap: 6,
+      minHeight: 140, boxSizing: 'border-box',
+      boxShadow: '0 2px 16px rgba(0,0,0,0.12)',
+      WebkitTapHighlightColor: 'transparent',
+    }}>
       <span style={{ fontSize: 38, lineHeight: 1, display: 'block' }}>{icon}</span>
       <p style={{ fontSize: 15, fontWeight: 700, color: '#1A1A1A', margin: 0, lineHeight: 1.2 }}>{title}</p>
       {subtitle && (
@@ -1146,6 +1141,8 @@ function StatusCard({ icon, title, subtitle, status, statusType, to, onClick }) 
       </p>
     </div>
   )
+  if (to) return <Link to={to} style={{ textDecoration: 'none', display: 'block' }}>{inner}</Link>
+  return <div onClick={onClick} style={{ display: 'block', cursor: 'pointer' }}>{inner}</div>
 }
 
 function EmergencyCard({ onPress, sosSent }) {
@@ -1264,7 +1261,6 @@ export default function Dashboard() {
   const [adminConfirmEvt, setAdminConfirmEvt] = useState(null)
   const [selectedEvent, setSelectedEvent] = useState(null)
   const [chatCount, setChatCount] = useState(0)
-  const [showHistorial, setShowHistorial] = useState(false)
   // Initialized to today's key so today is expanded; past days start collapsed
   const [expandedDays, setExpandedDays] = useState(() => new Set([new Date().toISOString().split('T')[0]]))
 
@@ -1874,9 +1870,9 @@ export default function Dashboard() {
   // Medicamentos card status
   let medCardStatus, medCardStatusType, medCardSubtitle
   if (nextPendingMed) {
-    medCardStatus = nextPendingMed.medTime ? `A las ${fmtTime(nextPendingMed.medTime)}` : 'Pendiente hoy'
+    medCardStatus = nextPendingMed.medName ?? 'Pendiente'
     medCardStatusType = 'warning'
-    medCardSubtitle = `${pendingCount} medicamento${pendingCount !== 1 ? 's' : ''} por dar`
+    medCardSubtitle = nextPendingMed.medTime ? `A las ${fmtTime(nextPendingMed.medTime)}` : 'Pendiente hoy'
   } else if (confirmedTodayCount > 0) {
     medCardStatus = 'Todo dado hoy'
     medCardStatusType = 'ok'
@@ -1997,39 +1993,27 @@ export default function Dashboard() {
         )}
 
         {/* ── Status cards grid ─────────────────────────────────────────── */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 14 }}>
-          <StatusCard
-            icon="🏥"
-            title="Cuidado de hoy"
-            subtitle={medTotal > 0 ? `${medTotal} med${medTotal !== 1 ? 's' : ''} programado${medTotal !== 1 ? 's' : ''}` : 'Rutina de cuidado'}
-            status={careStatus}
-            statusType={careStatusType}
-            to="/hoy"
-          />
-          <StatusCard
-            icon="💊"
-            title="Medicamentos"
-            subtitle={medCardSubtitle}
-            status={medCardStatus}
-            statusType={medCardStatusType}
-            to="/hoy"
-          />
-          <StatusCard
-            icon="🎙️"
-            title="Memorias"
-            subtitle={memSubtitle}
-            status={memStatus}
-            statusType={memStatusType}
-            to="/memorias"
-          />
-          <StatusCard
-            icon="💬"
-            title="Chat familiar"
-            subtitle="Mensajes del día"
-            status={chatStatus}
-            statusType="info"
-            to="/chat"
-          />
+        {console.log('[Dashboard] rendering status cards grid', { careStatus, careStatusType, medCardStatus, medCardStatusType, memStatus, memStatusType, chatStatus })}
+        <div style={{ background: 'red', color: 'white', fontWeight: 700, fontSize: 13, padding: '6px 10px', borderRadius: 8, marginBottom: 8 }}>
+          DEBUG ZONA TARJETAS — careStatus: {careStatus} | medStatus: {medCardStatus}
+        </div>
+        <div style={{ marginBottom: 14 }}>
+          <div style={{ background: '#F0FDF4', border: '2px solid #86EFAC', borderRadius: 16, padding: 16, marginBottom: 8, minHeight: 80 }}>
+            <p style={{ margin: 0, fontWeight: 700 }}>🏥 Cuidado de hoy</p>
+            <p style={{ margin: 0, fontSize: 12, color: '#15803D' }}>{careStatus}</p>
+          </div>
+          <div style={{ background: '#FFFBEB', border: '2px solid #FDE68A', borderRadius: 16, padding: 16, marginBottom: 8, minHeight: 80 }}>
+            <p style={{ margin: 0, fontWeight: 700 }}>💊 Medicamentos</p>
+            <p style={{ margin: 0, fontSize: 12, color: '#92400E' }}>{medCardStatus}</p>
+          </div>
+          <div style={{ background: '#EFF6FF', border: '2px solid #BFDBFE', borderRadius: 16, padding: 16, marginBottom: 8, minHeight: 80 }}>
+            <p style={{ margin: 0, fontWeight: 700 }}>🎙️ Memorias</p>
+            <p style={{ margin: 0, fontSize: 12, color: '#1D4ED8' }}>{memStatus}</p>
+          </div>
+          <div style={{ background: '#F5F3FF', border: '2px solid #C4B5FD', borderRadius: 16, padding: 16, marginBottom: 8, minHeight: 80 }}>
+            <p style={{ margin: 0, fontWeight: 700 }}>💬 Chat familiar</p>
+            <p style={{ margin: 0, fontSize: 12, color: '#6B7280' }}>{chatStatus}</p>
+          </div>
         </div>
 
         {/* ── Emergency card ────────────────────────────────────────────── */}
@@ -2054,24 +2038,13 @@ export default function Dashboard() {
 
         {/* ── Historial ────────────────────────────────────────────────── */}
         <div>
-          <button
-            onClick={() => setShowHistorial(v => !v)}
-            style={{
-              width: '100%', padding: '14px 18px', marginBottom: showHistorial ? 14 : 0,
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              background: '#FFFFFF', border: '1.5px solid #EDE5D8', borderRadius: 16,
-              cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-            }}
-          >
-            <span style={{ fontSize: 14, fontWeight: 700, color: '#374151' }}>
-              📋 Ver historial completo
-            </span>
-            <span style={{ fontSize: 18, color: '#9CA3AF', lineHeight: 1 }}>
-              {showHistorial ? '▲' : '▼'}
-            </span>
-          </button>
-
-          {showHistorial && timelineError && (
+          <p style={{
+            fontSize: 11, fontWeight: 700, color: '#9CA3AF',
+            textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 10px',
+          }}>
+            Historial
+          </p>
+          {timelineError && (
             <div style={{
               background: '#FFF0F0', border: '1px solid #FFBABA',
               borderRadius: 14, padding: '14px 16px', marginBottom: 16,
@@ -2090,7 +2063,7 @@ export default function Dashboard() {
               </button>
             </div>
           )}
-          {showHistorial && ownerId && (loading ? (
+          {ownerId && (loading ? (
             <div>
               {[1, 2, 3].map(i => (
                 <div key={i} style={{
