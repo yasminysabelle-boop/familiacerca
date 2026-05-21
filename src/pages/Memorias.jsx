@@ -140,12 +140,14 @@ export default function Memorias() {
   }
 
   async function stopAndSave() {
+    console.log('[stopAndSave] inicio — elapsed:', elapsed, 'chunks:', chunksRef.current.length)
     clearInterval(timerRef.current)
 
     const recorder = recorderRef.current
     const stream   = streamRef.current
 
     if (!recorder || recorder.state === 'inactive') {
+      console.warn('[stopAndSave] recorder inactivo o nulo — state:', recorder?.state)
       stopSpeech()
       stream?.getTracks().forEach(t => t.stop())
       setSaveError('La grabación se interrumpió. Intenta de nuevo.')
@@ -171,8 +173,10 @@ export default function Memorias() {
 
     const mimeType = mimeTypeRef.current || 'audio/webm'
     const blob = new Blob(chunksRef.current, { type: mimeType })
+    console.log('[stopAndSave] chunks:', chunksRef.current.length, '— blob size:', blob.size, 'bytes — mimeType:', mimeType)
 
     if (blob.size === 0) {
+      console.error('[stopAndSave] blob vacío, abortando')
       setSaveError('No se capturó audio. Intenta grabar de nuevo.')
       setStep('idle')
       return
@@ -180,21 +184,26 @@ export default function Memorias() {
 
     const ext  = mimeType.includes('mp4') ? 'mp4' : mimeType.includes('ogg') ? 'ogg' : 'webm'
     const path = `${user.id}/${Date.now()}.${ext}`
+    console.log('[stopAndSave] subiendo a storage — path:', path, 'contentType:', mimeType.split(';')[0])
 
     const { error: uploadError } = await supabase.storage
       .from('voice-diary')
       .upload(path, blob, { contentType: mimeType.split(';')[0] })
 
     if (uploadError) {
+      console.error('[stopAndSave] error upload:', uploadError)
       setSaveError('Error al subir el audio. Verifica tu conexión.')
       setStep('idle')
       return
     }
 
     const { data: { publicUrl } } = supabase.storage.from('voice-diary').getPublicUrl(path)
+    console.log('[stopAndSave] upload OK — publicUrl:', publicUrl)
+
     const moodLabel = MOODS.find(m => m.value === selectedMood)?.label ?? ''
     const defaultTitle = `${moodLabel} — ${new Date().toLocaleDateString('es-US', { weekday: 'long', day: 'numeric', month: 'long' })}`
 
+    console.log('[stopAndSave] insertando en voice_diary — mood:', selectedMood, 'duration:', duration)
     const { error: insertError } = await supabase.from('voice_diary').insert({
       user_id: user.id,
       audio_url: publicUrl,
@@ -205,11 +214,13 @@ export default function Memorias() {
     })
 
     if (insertError) {
+      console.error('[stopAndSave] error insert:', insertError)
       setSaveError('El audio se subió pero no se pudo guardar: ' + insertError.message)
       setStep('idle')
       return
     }
 
+    console.log('[stopAndSave] guardado correctamente')
     track('memory_recorded', { mood: selectedMood, duration_seconds: elapsed })
     setSaveError('')
     setSelectedMood(null)
