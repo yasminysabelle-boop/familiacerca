@@ -1,6 +1,6 @@
 // FamiliaCerca Service Worker — offline caching + push notifications
 
-const CACHE_VER = 'familiacerca-v5'
+const CACHE_VER = 'familiacerca-v6'
 
 // Static assets whose URLs are stable (not content-hashed by Vite)
 const PRECACHE = [
