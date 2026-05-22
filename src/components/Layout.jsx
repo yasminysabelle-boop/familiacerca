@@ -75,6 +75,7 @@ export default function Layout({ children }) {
     try { await signOut() } catch { }
     finally {
       localStorage.removeItem('fc_active_family')
+      localStorage.removeItem('fc_member_owner_id')
       window.location.href = '/login'
     }
   }

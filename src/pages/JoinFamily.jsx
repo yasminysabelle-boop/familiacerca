@@ -108,6 +108,7 @@ export default function JoinFamily() {
     setAccepting(false)
     setAccepted(true)
     localStorage.setItem('fc_active_family', 'member')
+    localStorage.setItem('fc_member_owner_id', invitation.user_id)
     refreshFamily() // connect member to family group immediately
   }
 
