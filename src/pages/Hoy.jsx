@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
-import { CheckIcon, MoreVertical, Plus, Trash, XIcon } from '../components/Icons'
+import { CheckIcon, MoreVertical, Pencil, Plus, Trash, XIcon } from '../components/Icons'
 import { getLocation, mapsUrl } from '../lib/gps'
 import { track } from '../lib/analytics'
 
@@ -100,6 +100,7 @@ function calcularEstadoMedicamento(scheduledTime, isConfirmed = false) {
 export default function Hoy() {
   const { user } = useAuth()
   const { ownerId, profile, memberRole } = useFamily()
+  const navigate = useNavigate()
   const [medications, setMedications] = useState([])
   const [logs, setLogs] = useState({})
   const [loading, setLoading] = useState(true)
@@ -716,6 +717,24 @@ export default function Hoy() {
                                       boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
                                       minWidth: 180, overflow: 'hidden',
                                     }}>
+                                      <button
+                                        onClick={e => {
+                                          e.stopPropagation()
+                                          setMenuOpen(null)
+                                          navigate(`/medications?edit=${med.id}`)
+                                        }}
+                                        style={{
+                                          width: '100%', padding: '12px 16px',
+                                          display: 'flex', alignItems: 'center', gap: 10,
+                                          background: 'none', border: 'none', cursor: 'pointer',
+                                          color: '#374151', fontSize: 13, fontWeight: 600,
+                                          textAlign: 'left',
+                                          borderBottom: '1px solid #F3F4F6',
+                                        }}
+                                      >
+                                        <Pencil size={14} color="#6B7280" strokeWidth={1.75} />
+                                        Editar medicamento
+                                      </button>
                                       <button
                                         onClick={e => {
                                           e.stopPropagation()

@@ -87,6 +87,16 @@ export default function Medications() {
     }
   }, [searchParams])
 
+  useEffect(() => {
+    const editId = searchParams.get('edit')
+    if (!editId || loading) return
+    const med = medications.find(m => m.id === editId)
+    if (med) {
+      openEdit(med)
+      setSearchParams({}, { replace: true })
+    }
+  }, [searchParams, medications, loading])
+
   async function fetchMedications() {
     setLoading(true)
     const { data } = await supabase
