@@ -909,7 +909,7 @@ export default function Hoy() {
                             {isOverdue && !isChecked && (
                               <span style={{
                                 fontSize: 10, fontWeight: 700,
-                                color: '#DC2626', background: '#FEE2E2',
+                                color: '#92400E', background: '#FEF3C7',
                                 padding: '2px 8px', borderRadius: 6, flexShrink: 0,
                               }}>
                                 Pendiente
