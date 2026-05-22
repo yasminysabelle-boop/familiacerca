@@ -414,36 +414,6 @@ export default function Familia() {
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
 
-              {/* Admin self-card — always first */}
-              {isAdmin && (
-                <div style={{
-                  display: 'flex', alignItems: 'center', gap: 12,
-                  padding: '12px 14px', borderRadius: 14,
-                  background: '#FDF8F5', border: '1.5px solid #C4623A',
-                }}>
-                  <div style={{
-                    width: 44, height: 44, borderRadius: '50%', flexShrink: 0,
-                    background: '#FDF0EB', border: '2px solid #C4623A',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 16, fontWeight: 700, color: '#C4623A',
-                  }}>
-                    {displayName.charAt(0).toUpperCase()}
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ fontSize: 14, fontWeight: 700, color: '#1A1A1A', margin: '0 0 2px' }}>
-                      {displayName.split(' ')[0]} <span style={{ fontWeight: 400, color: '#9CA3AF' }}>(tú)</span>
-                    </p>
-                    <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>🟢 Administrador</p>
-                  </div>
-                  <span style={{
-                    fontSize: 10, fontWeight: 700, color: '#C4623A',
-                    background: '#FDF0EB', padding: '4px 10px', borderRadius: 6,
-                  }}>
-                    Admin
-                  </span>
-                </div>
-              )}
-
               {/* Invited members */}
               {isAdmin && members.length === 0 && (
                 <div style={{ textAlign: 'center', padding: '12px 0 4px' }}>
@@ -453,8 +423,8 @@ export default function Familia() {
                 </div>
               )}
 
-              {/* Admin's own card — always first */}
-              {(() => {
+              {/* Admin's own card */}
+              {isAdmin && (() => {
                 const adminMp = memberProfiles[user.id]
                 const adminInitials = displayName.charAt(0).toUpperCase()
                 return (
@@ -497,6 +467,7 @@ export default function Familia() {
                 )
               })()}
 
+              {/* Invited members list */}
               {members.map(member => {
                 const mp = memberProfiles[member.member_user_id]
                 const online = isOnline(mp)
