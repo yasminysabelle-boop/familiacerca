@@ -5,6 +5,7 @@ import { FamilyProvider } from './contexts/FamilyContext'
 import { SubscriptionProvider } from './contexts/SubscriptionContext'
 import { DarkModeProvider } from './contexts/DarkModeContext'
 import ProtectedRoute from './components/ProtectedRoute'
+import WelcomeSlides from './components/WelcomeSlides'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Onboarding from './pages/Onboarding'
@@ -91,21 +92,31 @@ function Splash({ fading }) {
 }
 
 export default function App() {
-  // First-visit check — splash only shows once
-  const [splashDone, setSplashDone] = useState(() => !!localStorage.getItem('fc_splash_shown'))
+  // New users see the 3-slide onboarding carousel (once ever).
+  // Returning users (fc_onboarding_done or legacy fc_splash_shown) see the logo splash once per session.
+  const onboardingDone = !!localStorage.getItem('fc_onboarding_done') || !!localStorage.getItem('fc_splash_shown')
+  const [showSlides, setShowSlides] = useState(!onboardingDone)
+
+  const [splashDone, setSplashDone] = useState(() => !!sessionStorage.getItem('fc_logo_splash_done'))
   const [splashFading, setSplashFading] = useState(false)
 
+  function handleOnboardingDone() {
+    localStorage.setItem('fc_onboarding_done', '1')
+    setShowSlides(false)
+  }
+
   useEffect(() => {
-    if (splashDone) return
-    localStorage.setItem('fc_splash_shown', '1')
-    const t1 = setTimeout(() => setSplashFading(true), 2000)
-    const t2 = setTimeout(() => setSplashDone(true), 2500)
+    if (showSlides || splashDone) return
+    sessionStorage.setItem('fc_logo_splash_done', '1')
+    const t1 = setTimeout(() => setSplashFading(true), 2200)
+    const t2 = setTimeout(() => setSplashDone(true), 2700)
     return () => { clearTimeout(t1); clearTimeout(t2) }
-  }, [])
+  }, [showSlides])
 
   return (
     <>
-      {!splashDone && <Splash fading={splashFading} />}
+      {showSlides && <WelcomeSlides onDone={handleOnboardingDone} />}
+      {!showSlides && !splashDone && <Splash fading={splashFading} />}
       <AuthProvider>
         <DarkModeProvider>
         <FamilyProvider>
