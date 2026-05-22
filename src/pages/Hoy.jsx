@@ -84,15 +84,17 @@ async function stampProof(file, confirmerName) {
   })
 }
 
-function getMedTimingStatus(scheduledTime) {
-  if (!scheduledTime) return 'ok'
-  const [h, m] = scheduledTime.split(':').map(Number)
-  const scheduled = new Date()
-  scheduled.setHours(h, m, 0, 0)
-  const diffMin = (Date.now() - scheduled.getTime()) / 60000
-  if (diffMin < 0) return 'early'
-  if (diffMin <= 30) return 'on-time'
-  return 'late'
+function calcularEstadoMedicamento(scheduledTime, isConfirmed = false) {
+  if (isConfirmed) return 'completado'
+  if (!scheduledTime) return 'pendiente'
+  const parts = scheduledTime.split(':')
+  const h = Math.min(Math.max(parseInt(parts[0], 10) || 0, 0), 23)
+  const m = Math.min(Math.max(parseInt(parts[1], 10) || 0, 0), 59)
+  const now = new Date()
+  const diff = (now.getHours() * 60 + now.getMinutes()) - (h * 60 + m)
+  if (diff < 0)   return 'programado'
+  if (diff <= 30) return 'pendiente'
+  return 'tarde'
 }
 
 export default function Hoy() {
@@ -545,8 +547,8 @@ export default function Hoy() {
                         const proofExpired = isConfirmed && !hasPhoto && log?.confirmed_at &&
                           (Date.now() - new Date(log.confirmed_at).getTime()) >= 30 * 60 * 1000
 
-                        const timingStatus = !isConfirmed ? getMedTimingStatus(med._firstTime) : 'ok'
-                        const isEarly = timingStatus === 'early'
+                        const timingStatus = calcularEstadoMedicamento(med._firstTime, isConfirmed)
+                        const isEarly = timingStatus === 'programado'
                         const earlyLabel = (() => {
                           if (!isEarly || !med._firstTime) return null
                           const [hh, mm] = med._firstTime.split(':').map(Number)
@@ -671,7 +673,7 @@ export default function Hoy() {
                                 🕐 {earlyLabel}
                               </span>
                             )}
-                            {!isConfirmed && timingStatus === 'late' && (
+                            {!isConfirmed && timingStatus === 'tarde' && (
                               <span style={{
                                 fontSize: 10, fontWeight: 700, color: '#B45309',
                                 background: '#FFFBEB', padding: '3px 8px', borderRadius: 6,
@@ -1050,7 +1052,7 @@ export default function Hoy() {
               </button>
             </div>
 
-            {getMedTimingStatus(firstTime(proofSheet.med)) === 'late' && (
+            {calcularEstadoMedicamento(firstTime(proofSheet.med)) === 'tarde' && (
               <div style={{
                 padding: '10px 14px', background: '#FFFBEB', border: '1px solid #F59E0B',
                 borderRadius: 12, marginBottom: 16,

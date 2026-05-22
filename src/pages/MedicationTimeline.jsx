@@ -5,29 +5,23 @@ import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import { getLocation, mapsUrl } from '../lib/gps'
 
-function isOverdue(time, status) {
-  if (!time || status === 'confirmed' || status === 'missed') return false
-  const [h, m] = time.split(':').map(Number)
-  const scheduled = new Date()
-  scheduled.setHours(h, m, 0, 0)
-  return Date.now() > scheduled.getTime() + 30 * 60 * 1000
+function calcularEstadoMedicamento(scheduledTime, isConfirmed = false) {
+  if (isConfirmed) return 'completado'
+  if (!scheduledTime) return 'pendiente'
+  const parts = scheduledTime.split(':')
+  const h = Math.min(Math.max(parseInt(parts[0], 10) || 0, 0), 23)
+  const m = Math.min(Math.max(parseInt(parts[1], 10) || 0, 0), 59)
+  const now = new Date()
+  const diff = (now.getHours() * 60 + now.getMinutes()) - (h * 60 + m)
+  if (diff < 0)   return 'programado'
+  if (diff <= 30) return 'pendiente'
+  return 'tarde'
 }
 
-function getMedTimingStatus(scheduledTime) {
-  if (!scheduledTime) return 'ok'
-  const [h, m] = scheduledTime.split(':').map(Number)
-  const scheduled = new Date()
-  scheduled.setHours(h, m, 0, 0)
-  const diffMin = (Date.now() - scheduled.getTime()) / 60000
-  if (diffMin < 0) return 'early'
-  if (diffMin <= 30) return 'on-time'
-  return 'late'
-}
-
-function StatusBadge({ status, overdue }) {
+function StatusBadge({ status, medState }) {
   if (status === 'confirmed') return <span className="text-xs bg-primary-light text-primary px-2 py-0.5 rounded-full font-medium">✓ Confirmado</span>
   if (status === 'missed')    return <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-medium">✗ Perdido</span>
-  if (overdue)                return <span className="text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full font-medium">⚠ Retrasado +30 min</span>
+  if (medState === 'tarde')   return <span className="text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full font-medium">⚠ Retrasado +30 min</span>
   return <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full font-medium">Pendiente</span>
 }
 
@@ -229,15 +223,18 @@ export default function MedicationTimeline() {
     fetchToday(); fetchHistory()
   }
 
-  const overdueCount = medications.filter(m => isOverdue(m.time, todayLogs[m.id]?.status)).length
-  const confirmTimingStatus = getMedTimingStatus(confirming?.time)
+  const overdueCount = medications.filter(m => {
+    const s = todayLogs[m.id]?.status
+    return s !== 'confirmed' && s !== 'missed' && calcularEstadoMedicamento(m.time) === 'tarde'
+  }).length
+  const confirmTimingStatus = calcularEstadoMedicamento(confirming?.time)
   const confirmScheduledLabel = (() => {
     if (!confirming?.time) return null
     const [h, m] = confirming.time.split(':').map(Number)
     const d = new Date(); d.setHours(h, m, 0, 0)
     return d.toLocaleTimeString('es-US', { hour: '2-digit', minute: '2-digit' })
   })()
-  const attachTimingStatus = getMedTimingStatus(editingPhoto?.log?.scheduled_time)
+  const attachTimingStatus = calcularEstadoMedicamento(editingPhoto?.log?.scheduled_time)
 
   const historyByDate = history.reduce((acc, l) => {
     if (!acc[l.log_date]) acc[l.log_date] = []
@@ -278,20 +275,20 @@ export default function MedicationTimeline() {
             <div className="space-y-3">
               {medications.map(med => {
                 const log = todayLogs[med.id]
-                const overdue = isOverdue(med.time, log?.status)
+                const medState = calcularEstadoMedicamento(med.time, log?.status === 'confirmed')
                 return (
                   <div key={med.id} className={`rounded-xl border overflow-hidden transition-colors ${
-                    log?.status === 'confirmed' ? 'bg-green-50 border-green-200' :
-                    log?.status === 'missed'    ? 'bg-red-50 border-red-200' :
-                    overdue                     ? 'bg-orange-50 border-orange-200' :
-                                                  'bg-gray-50 border-gray-200'
+                    log?.status === 'confirmed'  ? 'bg-green-50 border-green-200' :
+                    log?.status === 'missed'     ? 'bg-red-50 border-red-200' :
+                    medState === 'tarde'         ? 'bg-orange-50 border-orange-200' :
+                                                   'bg-gray-50 border-gray-200'
                   }`}>
                     <div className="flex items-center justify-between p-4">
                       <div className="flex items-center gap-3 min-w-0">
                         <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 ${
                           log?.status === 'confirmed' ? 'bg-primary text-white' :
                           log?.status === 'missed'    ? 'bg-red-500 text-white' :
-                          overdue                     ? 'bg-orange-400 text-white' :
+                          medState === 'tarde'        ? 'bg-orange-400 text-white' :
                                                         'bg-gray-300 text-white'
                         }`}>
                           {log?.status === 'confirmed' ? '✓' : log?.status === 'missed' ? '✗' : '💊'}
@@ -301,7 +298,7 @@ export default function MedicationTimeline() {
                           <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-0.5">
                             {med.time && <span className="text-xs text-gray-500">⏰ {med.time}</span>}
                             {med.dosage && <span className="text-xs text-gray-500">{med.dosage}</span>}
-                            <StatusBadge status={log?.status} overdue={overdue} />
+                            <StatusBadge status={log?.status} medState={medState} />
                           </div>
                         </div>
                       </div>
@@ -502,7 +499,7 @@ export default function MedicationTimeline() {
             </div>
 
             <div className="px-6 pt-4 pb-6">
-              {attachTimingStatus === 'late' && (
+              {attachTimingStatus === 'tarde' && (
                 <div className="mb-3 px-3 py-2.5 bg-orange-50 border border-orange-200 rounded-xl text-sm text-orange-700 flex items-center gap-2">
                   <span>⚠</span>Foto subida fuera del horario
                 </div>
@@ -589,7 +586,7 @@ export default function MedicationTimeline() {
                   <span>⚠</span>{photoError}
                 </div>
               )}
-              {confirmTimingStatus === 'late' && (
+              {confirmTimingStatus === 'tarde' && (
                 <div className="mb-3 px-3 py-2.5 bg-orange-50 border border-orange-200 rounded-xl text-sm text-orange-700 flex items-center gap-2">
                   <span>⚠</span>Dado fuera del horario programado
                 </div>
@@ -599,7 +596,7 @@ export default function MedicationTimeline() {
                 className="w-full mb-4 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none" />
 
               <div className="flex gap-3">
-                <button onClick={submitConfirm} disabled={saving || stamping || confirmTimingStatus === 'early'}
+                <button onClick={submitConfirm} disabled={saving || stamping || confirmTimingStatus === 'programado'}
                   className="flex-1 py-3 bg-primary hover:bg-primary-dark disabled:opacity-50 text-white font-semibold rounded-xl transition-colors text-sm">
                   {saving ? 'Guardando...' : '✓ Confirmar dosis'}
                 </button>
@@ -608,7 +605,7 @@ export default function MedicationTimeline() {
                   Cancelar
                 </button>
               </div>
-              {confirmTimingStatus === 'early' && confirmScheduledLabel && (
+              {confirmTimingStatus === 'programado' && confirmScheduledLabel && (
                 <p className="text-center text-xs text-gray-500 mt-2">
                   Disponible a las {confirmScheduledLabel}
                 </p>

@@ -37,6 +37,19 @@ function fmtTimestamp(date) {
   return date.toLocaleTimeString('es-US', { hour: 'numeric', minute: '2-digit', hour12: true })
 }
 
+function calcularEstadoMedicamento(scheduledTime, isConfirmed = false) {
+  if (isConfirmed) return 'completado'
+  if (!scheduledTime) return 'pendiente'
+  const parts = scheduledTime.split(':')
+  const h = Math.min(Math.max(parseInt(parts[0], 10) || 0, 0), 23)
+  const m = Math.min(Math.max(parseInt(parts[1], 10) || 0, 0), 59)
+  const now = new Date()
+  const diff = (now.getHours() * 60 + now.getMinutes()) - (h * 60 + m)
+  if (diff < 0)   return 'programado'
+  if (diff <= 30) return 'pendiente'
+  return 'tarde'
+}
+
 function minutesAgo(timeStr, todayKey) {
   if (!timeStr) return null
   const [h, m] = timeStr.split(':').map(Number)
@@ -1558,6 +1571,7 @@ export default function Dashboard() {
           medDosage: med.dosage,
           medTime: times[0] ?? null,
           allTimes: times,
+          medStatus: calcularEstadoMedicamento(times[0] ?? null),
         })
       }
     }
