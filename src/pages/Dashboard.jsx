@@ -1138,18 +1138,19 @@ function StatusCard({ icon, title, subtitle, status, statusType, to, onClick }) 
     <div style={{
       background: s.bg, borderRadius: 20,
       border: `1.5px solid ${s.border}`,
-      padding: '18px 14px 14px',
-      display: 'flex', flexDirection: 'column', gap: 6,
+      padding: '16px 12px 12px',
+      display: 'flex', flexDirection: 'column', gap: 5,
       minHeight: 140, boxSizing: 'border-box',
       boxShadow: '0 2px 16px rgba(0,0,0,0.12)',
       WebkitTapHighlightColor: 'transparent',
+      overflow: 'hidden', minWidth: 0,
     }}>
-      <span style={{ fontSize: 38, lineHeight: 1, display: 'block' }}>{icon}</span>
-      <p style={{ fontSize: 15, fontWeight: 700, color: '#1A1A1A', margin: 0, lineHeight: 1.2 }}>{title}</p>
+      <span style={{ fontSize: 34, lineHeight: 1, display: 'block' }}>{icon}</span>
+      <p style={{ fontSize: 14, fontWeight: 700, color: '#1A1A1A', margin: 0, lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</p>
       {subtitle && (
-        <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0, lineHeight: 1.3 }}>{subtitle}</p>
+        <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0, lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{subtitle}</p>
       )}
-      <p style={{ fontSize: 12, fontWeight: 600, color: s.statusColor, margin: 'auto 0 0', paddingTop: 6 }}>
+      <p style={{ fontSize: 11, fontWeight: 700, color: s.statusColor, margin: 'auto 0 0', paddingTop: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {s.statusIcon} {status}
       </p>
     </div>

@@ -477,6 +477,7 @@ export default function Familia() {
                   ? new Date(member.joined_at).toLocaleDateString('es-US', { day: 'numeric', month: 'short', year: 'numeric' })
                   : null
                 const isCuidador = member.role === 'cuidador'
+                const isPending = !member.member_user_id
                 return (
                   <div
                     key={member.member_user_id ?? member.member_email}
@@ -520,11 +521,11 @@ export default function Familia() {
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
                         <span style={{
                           fontSize: 10, fontWeight: 700,
-                          color: isCuidador ? '#C4623A' : '#6B7280',
-                          background: isCuidador ? '#FDF0EB' : '#F3F4F6',
+                          color: isPending ? '#92400E' : isCuidador ? '#C4623A' : '#6B7280',
+                          background: isPending ? '#FEF3C7' : isCuidador ? '#FDF0EB' : '#F3F4F6',
                           padding: '3px 10px', borderRadius: 6,
                         }}>
-                          {isCuidador ? 'Cuidador' : 'Familiar'}
+                          {isPending ? 'Invitación pendiente' : isCuidador ? 'Cuidador' : 'Familiar'}
                         </span>
                         <span style={{ color: '#D1D5DB', fontSize: 18, lineHeight: 1 }}>›</span>
                       </div>

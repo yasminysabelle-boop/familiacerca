@@ -85,7 +85,8 @@ export default function Layout({ children }) {
       <header
         style={{
           position: 'fixed', top: 0, left: 0, right: 0, zIndex: 40,
-          height: 56,
+          height: 'calc(56px + env(safe-area-inset-top))',
+          paddingTop: 'env(safe-area-inset-top)',
           background: hdrBg,
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
@@ -130,7 +131,7 @@ export default function Layout({ children }) {
       </header>
 
       {/* Scrollable main */}
-      <main style={{ position: 'fixed', inset: 0, overflowY: 'auto', top: 56, bottom: 68 }}>
+      <main style={{ position: 'fixed', inset: 0, overflowY: 'auto', top: 'calc(56px + env(safe-area-inset-top))', bottom: 68 }}>
         <InstallBanner />
         <OfflineBanner />
 

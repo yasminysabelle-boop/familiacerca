@@ -192,7 +192,12 @@ export default function FamilyProfile() {
             disabled={saving}
             className="w-full py-2.5 bg-primary hover:bg-primary-dark disabled:opacity-60 text-white font-medium rounded-lg text-sm transition-colors"
           >
-            {saving ? 'Guardando...' : 'Guardar perfil'}
+            {saving ? (
+              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                <span className="btn-spinner" />
+                Guardando...
+              </span>
+            ) : 'Guardar perfil'}
           </button>
         </form>
       </div>

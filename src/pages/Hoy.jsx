@@ -619,8 +619,9 @@ export default function Hoy() {
                               </div>
                             </div>
 
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
                             {isConfirmed && (
-                              <div style={{ flexShrink: 0, textAlign: 'right' }}>
+                              <div style={{ textAlign: 'right' }}>
                                 {hasPhoto ? (
                                   <span style={{
                                     fontSize: 10, fontWeight: 700, color: '#16A34A',
@@ -668,7 +669,7 @@ export default function Hoy() {
                               <span style={{
                                 fontSize: 10, fontWeight: 700, color: '#6B7280',
                                 background: '#F3F4F6', padding: '3px 8px', borderRadius: 6,
-                                flexShrink: 0, whiteSpace: 'nowrap',
+                                whiteSpace: 'nowrap',
                               }}>
                                 🕐 {earlyLabel}
                               </span>
@@ -677,14 +678,14 @@ export default function Hoy() {
                               <span style={{
                                 fontSize: 10, fontWeight: 700, color: '#B45309',
                                 background: '#FFFBEB', padding: '3px 8px', borderRadius: 6,
-                                flexShrink: 0, whiteSpace: 'nowrap',
+                                whiteSpace: 'nowrap',
                               }}>
                                 ⚠ Tarde
                               </span>
                             )}
 
                             {canActOn(med) && (
-                              <div style={{ position: 'relative', flexShrink: 0 }}>
+                              <div style={{ position: 'relative' }}>
                                 <button
                                   onClick={e => { e.stopPropagation(); setMenuOpen(menuOpen === med.id ? null : med.id) }}
                                   style={{
@@ -869,7 +870,16 @@ export default function Hoy() {
                               )}
                             </div>
 
-                            {/* Overdue badge */}
+                            {/* Overdue / done badges */}
+                            {isChecked && (
+                              <span style={{
+                                fontSize: 10, fontWeight: 700,
+                                color: '#16A34A', background: '#DCFCE7',
+                                padding: '2px 8px', borderRadius: 6, flexShrink: 0,
+                              }}>
+                                ✓ Listo
+                              </span>
+                            )}
                             {isOverdue && !isChecked && (
                               <span style={{
                                 fontSize: 10, fontWeight: 700,

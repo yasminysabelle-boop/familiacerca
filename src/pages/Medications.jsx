@@ -541,7 +541,12 @@ export default function Medications() {
                     transition: 'all 0.15s',
                   }}
                 >
-                  {saving ? 'Guardando...' : editId ? 'Guardar cambios' : 'Guardar medicamento'}
+                  {saving ? (
+                    <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                      <span className="btn-spinner" />
+                      Guardando...
+                    </span>
+                  ) : editId ? 'Guardar cambios' : 'Guardar medicamento'}
                 </button>
               </div>
             </form>
