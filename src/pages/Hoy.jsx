@@ -139,7 +139,12 @@ export default function Hoy() {
     return () => clearInterval(id)
   }, [])
 
-  const today = new Date().toISOString().split('T')[0]
+  // Use LOCAL date to avoid UTC midnight rollover showing yesterday's
+  // confirmed-in-the-evening logs as today's pre-confirmed medications.
+  function toLocalDate(d = new Date()) {
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+  }
+  const today = toLocalDate()
   const displayName = user?.user_metadata?.full_name ?? user?.email ?? 'Familiar'
 
   // Monday of the current week — used to fetch weekly care items
@@ -147,7 +152,7 @@ export default function Hoy() {
     const d = new Date()
     const day = d.getDay()
     d.setDate(d.getDate() - (day === 0 ? 6 : day - 1))
-    return d.toISOString().split('T')[0]
+    return toLocalDate(d)
   })()
 
   useEffect(() => {

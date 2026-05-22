@@ -420,8 +420,9 @@ export default function Medications() {
               <div>
                 <label style={labelStyle}>Nombre del medicamento *</label>
                 <input
-                  name="name" required value={form.name} onChange={handleChange}
+                  name="med_name" required value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
                   placeholder="ej. Metformina"
+                  autoComplete="off"
                   style={fieldStyle} onFocus={onFocus} onBlur={onBlur}
                 />
               </div>
