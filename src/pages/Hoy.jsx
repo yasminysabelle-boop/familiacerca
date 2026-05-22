@@ -690,7 +690,7 @@ export default function Hoy() {
                               </span>
                             )}
 
-                            {canActOn(med) && (
+                            {(isAdmin || canActOn(med)) && (
                               <div style={{ position: 'relative' }}>
                                 <button
                                   onClick={e => { e.stopPropagation(); setMenuOpen(menuOpen === med.id ? null : med.id) }}
@@ -729,29 +729,31 @@ export default function Hoy() {
                                           background: 'none', border: 'none', cursor: 'pointer',
                                           color: '#374151', fontSize: 13, fontWeight: 600,
                                           textAlign: 'left',
-                                          borderBottom: '1px solid #F3F4F6',
+                                          borderBottom: canActOn(med) ? '1px solid #F3F4F6' : 'none',
                                         }}
                                       >
                                         <Pencil size={14} color="#6B7280" strokeWidth={1.75} />
                                         Editar medicamento
                                       </button>
-                                      <button
-                                        onClick={e => {
-                                          e.stopPropagation()
-                                          setMenuOpen(null)
-                                          setConfirmDialog({ onConfirm: () => handleDeleteMed(med.id) })
-                                        }}
-                                        style={{
-                                          width: '100%', padding: '12px 16px',
-                                          display: 'flex', alignItems: 'center', gap: 10,
-                                          background: 'none', border: 'none', cursor: 'pointer',
-                                          color: '#D63031', fontSize: 13, fontWeight: 600,
-                                          textAlign: 'left',
-                                        }}
-                                      >
-                                        <Trash size={14} color="#D63031" strokeWidth={1.75} />
-                                        Eliminar medicamento
-                                      </button>
+                                      {canActOn(med) && (
+                                        <button
+                                          onClick={e => {
+                                            e.stopPropagation()
+                                            setMenuOpen(null)
+                                            setConfirmDialog({ onConfirm: () => handleDeleteMed(med.id) })
+                                          }}
+                                          style={{
+                                            width: '100%', padding: '12px 16px',
+                                            display: 'flex', alignItems: 'center', gap: 10,
+                                            background: 'none', border: 'none', cursor: 'pointer',
+                                            color: '#D63031', fontSize: 13, fontWeight: 600,
+                                            textAlign: 'left',
+                                          }}
+                                        >
+                                          <Trash size={14} color="#D63031" strokeWidth={1.75} />
+                                          Eliminar medicamento
+                                        </button>
+                                      )}
                                     </div>
                                   </>
                                 )}
