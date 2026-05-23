@@ -7,8 +7,8 @@ const PROBLEMA = 'https://i.postimg.cc/3JdVcYsn/Chat-GPT-Image-May-22-2026-10-21
 const COMO     = 'https://i.postimg.cc/hGTq3cd4/Chat-GPT-Image-May-22-2026-10-22-32-PM.png'
 const CTA_IMG  = 'https://i.postimg.cc/hj8chcDs/Chat-GPT-Image-May-22-2026-10-23-48-PM.png'
 
-const PRIMARY      = '#C4623A'
-const PRIMARY_DARK = '#A85130'
+const PRIMARY      = '#C17A5C'
+const PRIMARY_DARK = '#9E6045'
 const CREAM        = '#F9F4EE'
 const SAGE         = '#4A7C59'
 
@@ -53,7 +53,7 @@ function PriceCard({ name, price, period, highlight, badge, features, cta }) {
       background: highlight ? '#FFF8F0' : 'white',
       padding: '32px 28px',
       boxShadow: highlight
-        ? `0 8px 40px rgba(196,98,58,0.14)`
+        ? `0 8px 40px rgba(193,122,92,0.14)`
         : '0 2px 12px rgba(0,0,0,0.05)',
       position: 'relative',
       display: 'flex', flexDirection: 'column',
@@ -101,7 +101,7 @@ function PriceCard({ name, price, period, highlight, badge, features, cta }) {
             : 'white',
           color: highlight ? 'white' : PRIMARY,
           border: highlight ? 'none' : `1.5px solid ${PRIMARY}`,
-          boxShadow: highlight ? `0 6px 20px rgba(196,98,58,0.28)` : 'none',
+          boxShadow: highlight ? `0 6px 20px rgba(193,122,92,0.28)` : 'none',
         }}
       >
         {cta}
@@ -254,7 +254,7 @@ export default function Landing() {
               padding: '10px 22px', borderRadius: 12,
               background: `linear-gradient(135deg, ${PRIMARY}, ${PRIMARY_DARK})`,
               color: 'white', fontWeight: 700, fontSize: 14, textDecoration: 'none',
-              boxShadow: '0 4px 14px rgba(196,98,58,0.28)',
+              boxShadow: '0 4px 14px rgba(193,122,92,0.28)',
             }}>
               Iniciar sesión
             </Link>
@@ -342,7 +342,7 @@ export default function Landing() {
                 padding: '16px 32px', borderRadius: 16,
                 background: `linear-gradient(135deg, ${PRIMARY}, ${PRIMARY_DARK})`,
                 color: 'white', fontWeight: 700, fontSize: 16, textDecoration: 'none',
-                boxShadow: '0 8px 28px rgba(196,98,58,0.32)',
+                boxShadow: '0 8px 28px rgba(193,122,92,0.32)',
                 display: 'inline-flex', alignItems: 'center', gap: 8,
               }}>
                 Empezar gratis
@@ -373,10 +373,10 @@ export default function Landing() {
 
           {/* Phone mockup with hero image */}
           <div style={{ flex: '1 1 300px', display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }}>
-            <div style={{ position: 'relative', width: 260 }}>
+            <div style={{ position: 'relative', width: 310 }}>
               {/* Phone frame */}
               <div style={{
-                width: 260, height: 520,
+                width: 310, height: 620,
                 background: '#1A1A1A',
                 borderRadius: 44,
                 padding: 10,
@@ -467,7 +467,7 @@ export default function Landing() {
               src={PROBLEMA}
               alt="El problema del cuidado familiar"
               style={{
-                width: '100%', maxWidth: 480, borderRadius: 28,
+                width: '100%', maxWidth: 600, borderRadius: 28,
                 boxShadow: '0 16px 56px rgba(0,0,0,0.12)',
                 display: 'block',
               }}
@@ -651,7 +651,7 @@ export default function Landing() {
               marginTop: 40, padding: '14px 28px', borderRadius: 14,
               background: `linear-gradient(135deg, ${PRIMARY}, ${PRIMARY_DARK})`,
               color: 'white', fontWeight: 700, fontSize: 15, textDecoration: 'none',
-              boxShadow: '0 6px 20px rgba(196,98,58,0.28)',
+              boxShadow: '0 6px 20px rgba(193,122,92,0.28)',
             }}>
               Empezar ahora — es gratis
             </Link>
@@ -661,7 +661,7 @@ export default function Landing() {
               src={COMO}
               alt="Cómo funciona FamiliaCerca"
               style={{
-                width: '100%', maxWidth: 460, borderRadius: 28,
+                width: '100%', maxWidth: 580, borderRadius: 28,
                 boxShadow: '0 16px 56px rgba(0,0,0,0.12)',
               }}
             />
@@ -802,6 +802,27 @@ export default function Landing() {
               </ol>
             </div>
           </div>
+          <div style={{ textAlign: 'center', marginTop: 40 }}>
+            <a
+              href="https://familiacerca.netlify.app"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 10,
+                padding: '16px 32px', borderRadius: 16,
+                background: `linear-gradient(135deg, ${PRIMARY}, ${PRIMARY_DARK})`,
+                color: 'white', fontWeight: 700, fontSize: 16,
+                textDecoration: 'none',
+                boxShadow: `0 8px 28px rgba(193,122,92,0.30)`,
+              }}
+            >
+              <span style={{ fontSize: 20 }}>📲</span>
+              Abrir e instalar FamiliaCerca
+            </a>
+            <p style={{ fontSize: 12, color: '#9CA3AF', marginTop: 12 }}>
+              Se abre en el navegador — luego sigue los pasos arriba para instalar
+            </p>
+          </div>
         </div>
       </section>
 
@@ -862,12 +883,12 @@ export default function Landing() {
                 </Link>
               </div>
             </div>
-            <div style={{ flex: '1 1 300px', alignSelf: 'flex-end', overflow: 'hidden', maxHeight: 380 }}>
+            <div style={{ flex: '1 1 300px', alignSelf: 'flex-end', overflow: 'hidden', maxHeight: 480 }}>
               <img
                 src={CTA_IMG}
                 alt="Familia feliz usando FamiliaCerca"
                 style={{
-                  width: '100%', height: 380, objectFit: 'cover',
+                  width: '100%', height: 480, objectFit: 'cover',
                   objectPosition: 'center top', display: 'block',
                 }}
               />
