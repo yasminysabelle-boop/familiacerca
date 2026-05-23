@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { FamilyProvider } from './contexts/FamilyContext'
 import { SubscriptionProvider } from './contexts/SubscriptionContext'
@@ -38,6 +38,65 @@ function HomeRoute() {
   const { user, loading } = useAuth()
   if (loading) return null
   return user ? <Navigate to="/hoy" replace /> : <Landing />
+}
+
+function AppShell() {
+  const location = useLocation()
+  const isLanding = location.pathname === '/'
+
+  const onboardingDone = !!localStorage.getItem('fc_onboarding_done') || !!localStorage.getItem('fc_splash_shown')
+  const [showSlides, setShowSlides] = useState(!onboardingDone)
+  const [splashDone, setSplashDone] = useState(() => !!sessionStorage.getItem('fc_logo_splash_done'))
+  const [splashFading, setSplashFading] = useState(false)
+
+  function handleOnboardingDone() {
+    localStorage.setItem('fc_onboarding_done', '1')
+    setShowSlides(false)
+  }
+
+  useEffect(() => {
+    if (showSlides || splashDone) return
+    sessionStorage.setItem('fc_logo_splash_done', '1')
+    const t1 = setTimeout(() => setSplashFading(true), 2200)
+    const t2 = setTimeout(() => setSplashDone(true), 2700)
+    return () => { clearTimeout(t1); clearTimeout(t2) }
+  }, [showSlides])
+
+  return (
+    <>
+      {showSlides && !isLanding && <WelcomeSlides onDone={handleOnboardingDone} />}
+      {!showSlides && !splashDone && !isLanding && <Splash fading={splashFading} />}
+      <Routes>
+        <Route path="/"            element={<HomeRoute />} />
+        <Route path="/login"       element={<Login />} />
+        <Route path="/register"    element={<Register />} />
+        <Route path="/onboarding"  element={<P><Onboarding /></P>} />
+        <Route path="/dashboard"   element={<P><Dashboard /></P>} />
+        <Route path="/medications" element={<P><Medications /></P>} />
+        <Route path="/historial"   element={<P><MedicationTimeline /></P>} />
+        <Route path="/calendar"    element={<P><Calendar /></P>} />
+        <Route path="/notes"       element={<P><Notes /></P>} />
+        <Route path="/chat"        element={<P><Chat /></P>} />
+        <Route path="/album"       element={<P><MemoryAlbum /></P>} />
+        <Route path="/diario-voz"  element={<P><Memorias /></P>} />
+        <Route path="/memorias"    element={<P><Memorias /></P>} />
+        <Route path="/hoy"         element={<P><Hoy /></P>} />
+        <Route path="/familia"     element={<P><Familia /></P>} />
+        <Route path="/reportes"    element={<P><Reports /></P>} />
+        <Route path="/perfil"      element={<P><FamilyProfile /></P>} />
+        <Route path="/mas"         element={<P><More /></P>} />
+        <Route path="/gastos"      element={<P><Expenses /></P>} />
+        <Route path="/directorio"  element={<P><Directory /></P>} />
+        <Route path="/join"        element={<JoinFamily />} />
+        <Route path="/permisos"    element={<P><Permissions /></P>} />
+        <Route path="/pricing"     element={<Pricing />} />
+        <Route path="/ajustes"     element={<P><Settings /></P>} />
+        <Route path="/terminos"    element={<TermsOfService />} />
+        <Route path="/privacidad"  element={<PrivacyPolicy />} />
+        <Route path="*"            element={<Navigate to="/login" replace />} />
+      </Routes>
+    </>
+  )
 }
 
 function Splash({ fading }) {
@@ -99,70 +158,17 @@ function Splash({ fading }) {
 }
 
 export default function App() {
-  // New users see the 3-slide onboarding carousel (once ever).
-  // Returning users (fc_onboarding_done or legacy fc_splash_shown) see the logo splash once per session.
-  const onboardingDone = !!localStorage.getItem('fc_onboarding_done') || !!localStorage.getItem('fc_splash_shown')
-  const [showSlides, setShowSlides] = useState(!onboardingDone)
-
-  const [splashDone, setSplashDone] = useState(() => !!sessionStorage.getItem('fc_logo_splash_done'))
-  const [splashFading, setSplashFading] = useState(false)
-
-  function handleOnboardingDone() {
-    localStorage.setItem('fc_onboarding_done', '1')
-    setShowSlides(false)
-  }
-
-  useEffect(() => {
-    if (showSlides || splashDone) return
-    sessionStorage.setItem('fc_logo_splash_done', '1')
-    const t1 = setTimeout(() => setSplashFading(true), 2200)
-    const t2 = setTimeout(() => setSplashDone(true), 2700)
-    return () => { clearTimeout(t1); clearTimeout(t2) }
-  }, [showSlides])
-
   return (
-    <>
-      {showSlides && <WelcomeSlides onDone={handleOnboardingDone} />}
-      {!showSlides && !splashDone && <Splash fading={splashFading} />}
+    <BrowserRouter>
       <AuthProvider>
         <DarkModeProvider>
-        <FamilyProvider>
-          <SubscriptionProvider>
-          <BrowserRouter>
-            <Routes>
-              <Route path="/login"       element={<Login />} />
-              <Route path="/register"    element={<Register />} />
-              <Route path="/onboarding"  element={<P><Onboarding /></P>} />
-              <Route path="/dashboard"   element={<P><Dashboard /></P>} />
-              <Route path="/medications" element={<P><Medications />  </P>} />
-              <Route path="/historial"   element={<P><MedicationTimeline /></P>} />
-              <Route path="/calendar"    element={<P><Calendar /></P>} />
-              <Route path="/notes"       element={<P><Notes /></P>} />
-              <Route path="/chat"        element={<P><Chat /></P>} />
-              <Route path="/album"       element={<P><MemoryAlbum /></P>} />
-              <Route path="/diario-voz"  element={<P><Memorias /></P>} />
-              <Route path="/memorias"   element={<P><Memorias /></P>} />
-              <Route path="/hoy"        element={<P><Hoy /></P>} />
-              <Route path="/familia"    element={<P><Familia /></P>} />
-              <Route path="/reportes"    element={<P><Reports /></P>} />
-              <Route path="/perfil"      element={<P><FamilyProfile /></P>} />
-              <Route path="/mas"         element={<P><More /></P>} />
-              <Route path="/gastos"      element={<P><Expenses /></P>} />
-              <Route path="/directorio"   element={<P><Directory /></P>} />
-              <Route path="/join"        element={<JoinFamily />} />
-              <Route path="/permisos"    element={<P><Permissions /></P>} />
-              <Route path="/pricing"     element={<Pricing />} />
-              <Route path="/ajustes"    element={<P><Settings /></P>} />
-              <Route path="/terminos"    element={<TermsOfService />} />
-              <Route path="/privacidad"  element={<PrivacyPolicy />} />
-              <Route path="/"            element={<HomeRoute />} />
-              <Route path="*"            element={<Navigate to="/login" replace />} />
-            </Routes>
-          </BrowserRouter>
-          </SubscriptionProvider>
-        </FamilyProvider>
+          <FamilyProvider>
+            <SubscriptionProvider>
+              <AppShell />
+            </SubscriptionProvider>
+          </FamilyProvider>
         </DarkModeProvider>
       </AuthProvider>
-    </>
+    </BrowserRouter>
   )
 }
