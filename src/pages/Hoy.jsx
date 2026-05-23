@@ -760,6 +760,7 @@ export default function Hoy() {
                               </div>
                             )}
                           </div>
+                        </div>
                         )
                       })}
                     </div>
