@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { AuthProvider } from './contexts/AuthContext'
+import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { FamilyProvider } from './contexts/FamilyContext'
 import { SubscriptionProvider } from './contexts/SubscriptionContext'
 import { DarkModeProvider } from './contexts/DarkModeContext'
@@ -30,8 +30,15 @@ import Permissions from './pages/Permissions'
 import Directory from './pages/Directory'
 import Pricing from './pages/Pricing'
 import Settings from './pages/Settings'
+import Landing from './pages/Landing'
 
 const P = ({ children }) => <ProtectedRoute>{children}</ProtectedRoute>
+
+function HomeRoute() {
+  const { user, loading } = useAuth()
+  if (loading) return null
+  return user ? <Navigate to="/hoy" replace /> : <Landing />
+}
 
 function Splash({ fading }) {
   return (
@@ -148,6 +155,7 @@ export default function App() {
               <Route path="/ajustes"    element={<P><Settings /></P>} />
               <Route path="/terminos"    element={<TermsOfService />} />
               <Route path="/privacidad"  element={<PrivacyPolicy />} />
+              <Route path="/"            element={<HomeRoute />} />
               <Route path="*"            element={<Navigate to="/login" replace />} />
             </Routes>
           </BrowserRouter>
