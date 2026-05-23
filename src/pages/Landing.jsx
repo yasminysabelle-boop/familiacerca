@@ -394,126 +394,115 @@ export default function Landing() {
           </div>
         </div>
 
-        {/* Right: blob photo + floating phone mockup */}
+        {/* Right: edge-to-edge family photo */}
         <div className="landing-hero-right" style={{
           position: 'relative', zIndex: 1,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          padding: '60px 48px 60px 24px',
+          overflow: 'hidden',
           minHeight: '100vh',
         }}>
-          {/* Soft glow behind blob */}
-          <div style={{
-            position: 'absolute',
-            width: '85%', height: '85%',
-            background: `radial-gradient(ellipse at center, rgba(201,136,42,0.07) 0%, transparent 70%)`,
-            borderRadius: '50%',
+          {/* Full-bleed photo — no border-radius, covers 100% of right half */}
+          <img src={HERO_IMG} alt="Familia cuidando juntos" style={{
+            position: 'absolute', inset: 0,
+            width: '100%', height: '100%',
+            objectFit: 'cover', objectPosition: 'center top',
+            display: 'block',
           }} />
 
-          {/* Photo blob wrapper */}
-          <div style={{ position: 'relative', width: '100%', maxWidth: 500 }}>
-            {/* Organic blob photo */}
-            <div style={{
-              borderRadius: '62% 38% 46% 54% / 60% 44% 56% 40%',
-              overflow: 'hidden',
-              aspectRatio: '4/5',
-              boxShadow: `0 60px 120px rgba(139,26,26,0.16), 0 20px 40px rgba(0,0,0,0.10)`,
-            }}>
-              <img src={HERO_IMG} alt="Familia cuidando juntos" style={{
-                width: '100%', height: '100%',
-                objectFit: 'cover', objectPosition: 'center top',
-                display: 'block',
-              }} />
-            </div>
+          {/* Left-edge blend into white hero bg */}
+          <div style={{
+            position: 'absolute', inset: 0, zIndex: 1,
+            background: 'linear-gradient(to right, rgba(255,255,255,0.20) 0%, transparent 22%)',
+            pointerEvents: 'none',
+          }} />
 
-            {/* Phone mockup — bottom-left of photo */}
+          {/* Phone mockup — floating bottom-left of photo */}
+          <div style={{
+            position: 'absolute', bottom: 48, left: 40, zIndex: 3,
+            filter: 'drop-shadow(0 32px 64px rgba(0,0,0,0.38))',
+          }}>
             <div style={{
-              position: 'absolute', bottom: 24, left: -64,
-              zIndex: 3, filter: 'drop-shadow(0 32px 64px rgba(0,0,0,0.30))',
+              width: 196, height: 390,
+              background: DK, borderRadius: 34, padding: 8, position: 'relative',
             }}>
               <div style={{
-                width: 196, height: 390,
-                background: DK, borderRadius: 34, padding: 8, position: 'relative',
+                position: 'absolute', top: 8, left: '50%', transform: 'translateX(-50%)',
+                width: 52, height: 16, background: DK,
+                borderRadius: '0 0 10px 10px', zIndex: 2,
+              }} />
+              <div style={{
+                width: '100%', height: '100%', borderRadius: 27,
+                background: 'white', overflow: 'hidden',
+                display: 'flex', flexDirection: 'column',
               }}>
-                <div style={{
-                  position: 'absolute', top: 8, left: '50%', transform: 'translateX(-50%)',
-                  width: 52, height: 16, background: DK,
-                  borderRadius: '0 0 10px 10px', zIndex: 2,
-                }} />
-                <div style={{
-                  width: '100%', height: '100%', borderRadius: 27,
-                  background: 'white', overflow: 'hidden',
-                  display: 'flex', flexDirection: 'column',
-                }}>
-                  <div style={{ background: P, padding: '26px 12px 14px', textAlign: 'center' }}>
-                    <p style={{ margin: 0, color: 'white', fontSize: 10, fontWeight: 500, fontFamily: SANS, letterSpacing: '0.12em' }}>
-                      FAMILIACERCA
-                    </p>
-                    <p style={{ margin: '3px 0 0', color: 'rgba(255,255,255,0.65)', fontSize: 8, fontFamily: SANS }}>
-                      Buenos días ☀️
-                    </p>
-                  </div>
-                  <div style={{ padding: '10px 8px', flex: 1, display: 'flex', flexDirection: 'column', gap: 5, overflow: 'hidden' }}>
-                    <p style={{ margin: '0 0 4px', fontSize: 8, fontWeight: 500, fontFamily: SANS, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                      Hoy
-                    </p>
-                    {[
-                      { icon: '💊', label: 'Atenolol 25mg', done: true },
-                      { icon: '💊', label: 'Metformina', done: false },
-                      { icon: '✅', label: 'Baño diario', done: true },
-                      { icon: '🍽️', label: 'Almuerzo', done: true },
-                    ].map((item, i) => (
-                      <div key={i} style={{
-                        background: item.done ? '#F0F9F4' : '#FFF8F5',
-                        borderRadius: 8, padding: '6px 8px',
-                        display: 'flex', alignItems: 'center', gap: 6,
-                        border: `1px solid ${item.done ? 'rgba(45,106,79,0.15)' : BD}`,
-                      }}>
-                        <span style={{ fontSize: 11 }}>{item.icon}</span>
-                        <span style={{ fontSize: 9, fontFamily: SANS, fontWeight: 400, color: DK, flex: 1 }}>{item.label}</span>
-                        <span style={{ fontSize: 9, fontWeight: 500, fontFamily: SANS, color: item.done ? SG : AU }}>
-                          {item.done ? '✓' : '⏰'}
-                        </span>
-                      </div>
-                    ))}
-                    <div style={{ background: SF, borderRadius: 8, padding: '6px 8px', border: `1px solid ${BD}`, marginTop: 2 }}>
-                      <p style={{ margin: 0, fontSize: 8, fontFamily: SANS, color: '#6B7280', lineHeight: 1.5 }}>
-                        <span style={{ fontWeight: 500, color: DK }}>María: </span>
-                        Ya le di el desayuno 👍
-                      </p>
+                <div style={{ background: P, padding: '26px 12px 14px', textAlign: 'center' }}>
+                  <p style={{ margin: 0, color: 'white', fontSize: 10, fontWeight: 500, fontFamily: SANS, letterSpacing: '0.12em' }}>
+                    FAMILIACERCA
+                  </p>
+                  <p style={{ margin: '3px 0 0', color: 'rgba(255,255,255,0.65)', fontSize: 8, fontFamily: SANS }}>
+                    Buenos días ☀️
+                  </p>
+                </div>
+                <div style={{ padding: '10px 8px', flex: 1, display: 'flex', flexDirection: 'column', gap: 5, overflow: 'hidden' }}>
+                  <p style={{ margin: '0 0 4px', fontSize: 8, fontWeight: 500, fontFamily: SANS, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                    Hoy
+                  </p>
+                  {[
+                    { icon: '💊', label: 'Atenolol 25mg', done: true },
+                    { icon: '💊', label: 'Metformina', done: false },
+                    { icon: '✅', label: 'Baño diario', done: true },
+                    { icon: '🍽️', label: 'Almuerzo', done: true },
+                  ].map((item, i) => (
+                    <div key={i} style={{
+                      background: item.done ? '#F0F9F4' : '#FFF8F5',
+                      borderRadius: 8, padding: '6px 8px',
+                      display: 'flex', alignItems: 'center', gap: 6,
+                      border: `1px solid ${item.done ? 'rgba(45,106,79,0.15)' : BD}`,
+                    }}>
+                      <span style={{ fontSize: 11 }}>{item.icon}</span>
+                      <span style={{ fontSize: 9, fontFamily: SANS, fontWeight: 400, color: DK, flex: 1 }}>{item.label}</span>
+                      <span style={{ fontSize: 9, fontWeight: 500, fontFamily: SANS, color: item.done ? SG : AU }}>
+                        {item.done ? '✓' : '⏰'}
+                      </span>
                     </div>
+                  ))}
+                  <div style={{ background: SF, borderRadius: 8, padding: '6px 8px', border: `1px solid ${BD}`, marginTop: 2 }}>
+                    <p style={{ margin: 0, fontSize: 8, fontFamily: SANS, color: '#6B7280', lineHeight: 1.5 }}>
+                      <span style={{ fontWeight: 500, color: DK }}>María: </span>
+                      Ya le di el desayuno 👍
+                    </p>
                   </div>
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Floating badge — top right */}
-            <div style={{
-              position: 'absolute', top: 32, right: -44,
-              background: 'white', borderRadius: 16, padding: '11px 14px',
-              boxShadow: '0 12px 44px rgba(0,0,0,0.13)',
-              display: 'flex', alignItems: 'center', gap: 9, zIndex: 4,
-              border: `1px solid ${BD}`,
-            }}>
-              <span style={{ fontSize: 19 }}>💊</span>
-              <div>
-                <p style={{ margin: 0, fontSize: 10, fontWeight: 500, fontFamily: SANS, color: DK }}>Medicamento dado</p>
-                <p style={{ margin: 0, fontSize: 9, fontFamily: SANS, color: SG, fontWeight: 300 }}>✓ Con foto de prueba</p>
-              </div>
+          {/* Floating notification badge */}
+          <div style={{
+            position: 'absolute', top: 80, right: 40, zIndex: 4,
+            background: 'white', borderRadius: 16, padding: '11px 14px',
+            boxShadow: '0 12px 44px rgba(0,0,0,0.18)',
+            display: 'flex', alignItems: 'center', gap: 9,
+            border: `1px solid ${BD}`,
+          }}>
+            <span style={{ fontSize: 19 }}>💊</span>
+            <div>
+              <p style={{ margin: 0, fontSize: 10, fontWeight: 500, fontFamily: SANS, color: DK }}>Medicamento dado</p>
+              <p style={{ margin: 0, fontSize: 9, fontFamily: SANS, color: SG, fontWeight: 300 }}>✓ Con foto de prueba</p>
             </div>
+          </div>
 
-            {/* Floating badge — mid-left */}
-            <div style={{
-              position: 'absolute', top: '42%', left: -52,
-              background: 'white', borderRadius: 14, padding: '10px 12px',
-              boxShadow: '0 10px 36px rgba(0,0,0,0.11)',
-              display: 'flex', alignItems: 'center', gap: 8, zIndex: 4,
-              border: `1px solid ${BD}`,
-            }}>
-              <span style={{ fontSize: 17 }}>👨‍👩‍👧</span>
-              <div>
-                <p style={{ margin: 0, fontSize: 10, fontWeight: 500, fontFamily: SANS, color: DK }}>3 cuidadores</p>
-                <p style={{ margin: 0, fontSize: 9, fontFamily: SANS, color: '#9CA3AF', fontWeight: 300 }}>en línea ahora</p>
-              </div>
+          {/* Floating cuidadores badge */}
+          <div style={{
+            position: 'absolute', top: '44%', right: 40, zIndex: 4,
+            background: 'white', borderRadius: 14, padding: '10px 12px',
+            boxShadow: '0 10px 36px rgba(0,0,0,0.16)',
+            display: 'flex', alignItems: 'center', gap: 8,
+            border: `1px solid ${BD}`,
+          }}>
+            <span style={{ fontSize: 17 }}>👨‍👩‍👧</span>
+            <div>
+              <p style={{ margin: 0, fontSize: 10, fontWeight: 500, fontFamily: SANS, color: DK }}>3 cuidadores</p>
+              <p style={{ margin: 0, fontSize: 9, fontFamily: SANS, color: '#9CA3AF', fontWeight: 300 }}>en línea ahora</p>
             </div>
           </div>
         </div>
@@ -550,27 +539,35 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ── PROBLEMA — white bg, photo left ── */}
-      <section style={{ padding: '128px 32px', background: 'white' }}>
-        <div style={{ maxWidth: 1140, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 72, flexWrap: 'wrap' }}>
-          <div style={{ flex: '1 1 360px' }}>
+      {/* ── PROBLEMA — full-bleed photo left, dark #0F0A00 right ── */}
+      <section style={{ overflow: 'hidden' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }} className="landing-problema-grid">
+          {/* Left: full-bleed photo — no padding, no border-radius */}
+          <div style={{ position: 'relative', minHeight: 700, overflow: 'hidden' }} className="landing-problema-img">
             <img src={PROB_IMG} alt="El reto del cuidado familiar" style={{
-              width: '100%', borderRadius: 28,
-              boxShadow: `0 32px 88px rgba(139,26,26,0.14), 0 8px 24px rgba(0,0,0,0.08)`,
+              position: 'absolute', inset: 0,
+              width: '100%', height: '100%',
+              objectFit: 'cover', objectPosition: 'center',
               display: 'block',
             }} />
           </div>
-          <div style={{ flex: '1 1 340px' }}>
-            <p style={{ fontSize: 11, fontWeight: 500, color: P, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 20px', fontFamily: SANS }}>
+
+          {/* Right: #0F0A00 dark background, white text — high contrast */}
+          <div style={{
+            background: DK,
+            display: 'flex', flexDirection: 'column', justifyContent: 'center',
+            padding: 'clamp(56px, 8vw, 112px) clamp(40px, 6vw, 88px)',
+          }}>
+            <p style={{ fontSize: 11, fontWeight: 500, color: AU, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 20px', fontFamily: SANS }}>
               El problema
             </p>
             <h2 style={{
-              fontFamily: SERIF, fontSize: 'clamp(36px, 4.5vw, 58px)',
-              fontWeight: 600, color: DK, lineHeight: 1.1, margin: '0 0 24px',
+              fontFamily: SERIF, fontSize: 'clamp(32px, 4vw, 52px)',
+              fontWeight: 600, color: 'white', lineHeight: 1.1, margin: '0 0 24px',
             }}>
               Cuidar a un familiar mayor es un trabajo en equipo sin coordinación
             </h2>
-            <p style={{ fontSize: 16, color: '#6B5848', lineHeight: 1.85, margin: '0 0 36px', fontFamily: SANS, fontWeight: 300 }}>
+            <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.65)', lineHeight: 1.85, margin: '0 0 36px', fontFamily: SANS, fontWeight: 300 }}>
               ¿Cuántas veces te has preguntado si tu mamá ya tomó su medicamento? Sin una herramienta común, los mensajes se pierden en WhatsApp y los errores se repiten.
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
@@ -582,10 +579,10 @@ export default function Landing() {
                 <div key={p.text} style={{ display: 'flex', alignItems: 'flex-start', gap: 16 }}>
                   <span style={{
                     fontSize: 18, width: 48, height: 48, borderRadius: 14,
-                    background: SF, border: `1px solid ${BD}`,
+                    background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
                   }}>{p.icon}</span>
-                  <p style={{ fontSize: 15, color: '#6B5848', lineHeight: 1.7, margin: 0, paddingTop: 12, fontFamily: SANS, fontWeight: 300 }}>
+                  <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.78)', lineHeight: 1.7, margin: 0, paddingTop: 12, fontFamily: SANS, fontWeight: 300 }}>
                     {p.text}
                   </p>
                 </div>
@@ -599,12 +596,12 @@ export default function Landing() {
       <section style={{ padding: '128px 32px', background: DK }}>
         <div style={{ maxWidth: 900, margin: '0 auto', textAlign: 'center' }}>
           <div style={{
-            fontFamily: SERIF, fontSize: 'clamp(80px, 10vw, 140px)',
+            fontFamily: SERIF, fontSize: 120,
             color: AU, lineHeight: 0.7, marginBottom: 24, opacity: 0.4,
           }}>"</div>
           <blockquote style={{
             fontFamily: SERIF, fontStyle: 'italic',
-            fontSize: 'clamp(28px, 4vw, 52px)',
+            fontSize: 'clamp(32px, 4vw, 56px)',
             fontWeight: 500, color: AU, lineHeight: 1.4,
             margin: '0 0 40px',
           }}>
@@ -668,12 +665,13 @@ export default function Landing() {
                 border: `1px solid ${BD}`, padding: '40px 34px',
                 boxShadow: '0 8px 40px rgba(0,0,0,0.07)',
                 transition: 'box-shadow 0.2s',
+                minHeight: 280, position: 'relative', overflow: 'hidden',
               }}>
                 <div style={{
                   width: 72, height: 72, borderRadius: 18,
                   background: `rgba(139,26,26,0.07)`, border: `1px solid ${BD}`,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 32, marginBottom: 24,
+                  fontSize: 56, marginBottom: 24,
                 }}>{f.icon}</div>
                 <div style={{
                   display: 'inline-flex', alignItems: 'center',
@@ -684,12 +682,17 @@ export default function Landing() {
                     {f.tag}
                   </span>
                 </div>
-                <h3 style={{ fontFamily: SERIF, fontSize: 24, fontWeight: 600, color: DK, margin: '0 0 14px', lineHeight: 1.2 }}>
+                <h3 style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 600, color: DK, margin: '0 0 14px', lineHeight: 1.2 }}>
                   {f.title}
                 </h3>
                 <p style={{ fontSize: 15, color: '#6B5848', lineHeight: 1.8, margin: 0, fontFamily: SANS, fontWeight: 300 }}>
                   {f.desc}
                 </p>
+                <div style={{
+                  position: 'absolute', bottom: 0, left: 0, right: 0, height: 80,
+                  background: 'linear-gradient(to top, rgba(139,26,26,0.04) 0%, transparent 100%)',
+                  pointerEvents: 'none',
+                }} />
               </div>
             ))}
           </div>
@@ -755,6 +758,8 @@ export default function Landing() {
                 background: 'white', borderRadius: 20,
                 border: `1px solid ${BD}`, padding: '36px 30px',
                 boxShadow: '0 4px 28px rgba(0,0,0,0.06)',
+                borderLeft: `4px solid ${AU}`,
+                minHeight: 220, display: 'flex', flexDirection: 'column',
               }}>
                 {/* Gold quote mark */}
                 <div style={{
@@ -768,7 +773,7 @@ export default function Landing() {
                     <span key={s} style={{ color: AU, fontSize: 14 }}>★</span>
                   ))}
                 </div>
-                <p style={{ fontSize: 15, color: '#5A4840', lineHeight: 1.85, margin: '0 0 28px', fontFamily: SANS, fontWeight: 300, fontStyle: 'italic' }}>
+                <p style={{ fontSize: 16, color: '#5A4840', lineHeight: 1.85, margin: '0 0 28px', fontFamily: SANS, fontWeight: 300, fontStyle: 'italic', flex: 1 }}>
                   {t.text}
                 </p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -945,53 +950,65 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ── CTA FINAL — #8B1A1A gradient ── */}
+      {/* ── CTA FINAL — full-bleed image bg at 40% opacity under crimson gradient ── */}
       <section style={{ padding: '0 32px 128px', background: SF }}>
         <div style={{
           maxWidth: 1140, margin: '0 auto',
           borderRadius: 32, overflow: 'hidden',
-          background: `linear-gradient(135deg, ${P} 0%, ${PD} 100%)`,
+          position: 'relative', background: DK,
+          minHeight: 480,
         }}>
-          <div style={{ display: 'flex', alignItems: 'stretch', flexWrap: 'wrap' }}>
-            <div style={{ flex: '1 1 340px', padding: '80px 64px' }}>
-              <p style={{ fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 20px', fontFamily: SANS }}>
-                Empieza hoy
-              </p>
-              <h2 style={{
-                fontFamily: SERIF, fontStyle: 'italic',
-                fontSize: 'clamp(32px, 4vw, 54px)',
-                fontWeight: 700, color: 'white', lineHeight: 1.1, margin: '0 0 20px',
+          {/* Full-bleed background image at 40% opacity */}
+          <img src={CTA_IMG} alt="" aria-hidden="true" style={{
+            position: 'absolute', inset: 0,
+            width: '100%', height: '100%',
+            objectFit: 'cover', objectPosition: 'center top',
+            opacity: 0.4, display: 'block',
+          }} />
+          {/* Crimson gradient overlay on top of image */}
+          <div style={{
+            position: 'absolute', inset: 0,
+            background: `linear-gradient(135deg, rgba(139,26,26,0.93) 0%, rgba(107,16,16,0.93) 100%)`,
+          }} />
+          {/* Content */}
+          <div style={{
+            position: 'relative', zIndex: 1,
+            padding: 'clamp(64px, 8vw, 100px) clamp(40px, 6vw, 80px)',
+            maxWidth: 680,
+          }}>
+            <p style={{ fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.50)', textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 20px', fontFamily: SANS }}>
+              Empieza hoy
+            </p>
+            <h2 style={{
+              fontFamily: SERIF, fontStyle: 'italic',
+              fontSize: 'clamp(32px, 4vw, 60px)',
+              fontWeight: 700, color: 'white', lineHeight: 1.1, margin: '0 0 20px',
+            }}>
+              Cuida mejor, juntos
+            </h2>
+            <p style={{ fontSize: 17, color: 'rgba(255,255,255,0.75)', lineHeight: 1.8, margin: '0 0 44px', fontFamily: SANS, fontWeight: 300 }}>
+              Únete a las familias que ya coordinan el cuidado de sus seres queridos con FamiliaCerca. Gratis para siempre en el plan básico.
+            </p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14 }}>
+              <Link to="/login" style={{
+                padding: '18px 44px', borderRadius: 9999,
+                background: 'white', color: P,
+                fontWeight: 500, fontSize: 16, textDecoration: 'none',
+                fontFamily: SANS, letterSpacing: '0.02em',
+                boxShadow: '0 12px 44px rgba(0,0,0,0.24)',
+                display: 'inline-flex', alignItems: 'center', gap: 8,
               }}>
-                Cuida mejor, juntos
-              </h2>
-              <p style={{ fontSize: 17, color: 'rgba(255,255,255,0.75)', lineHeight: 1.8, margin: '0 0 44px', fontFamily: SANS, fontWeight: 300 }}>
-                Únete a las familias que ya coordinan el cuidado de sus seres queridos con FamiliaCerca. Gratis para siempre en el plan básico.
-              </p>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14 }}>
-                <Link to="/login" style={{
-                  padding: '18px 44px', borderRadius: 9999,
-                  background: 'white', color: P,
-                  fontWeight: 500, fontSize: 16, textDecoration: 'none',
-                  fontFamily: SANS, letterSpacing: '0.02em',
-                  boxShadow: '0 12px 44px rgba(0,0,0,0.20)',
-                  display: 'inline-flex', alignItems: 'center', gap: 8,
-                }}>
-                  Crear cuenta gratis →
-                </Link>
-                <Link to="/login" style={{
-                  padding: '18px 30px', borderRadius: 9999,
-                  border: '1.5px solid rgba(255,255,255,0.35)',
-                  color: 'white', fontWeight: 400, fontSize: 15,
-                  textDecoration: 'none', fontFamily: SANS,
-                  display: 'inline-flex', alignItems: 'center',
-                }}>
-                  Iniciar sesión
-                </Link>
-              </div>
-            </div>
-            <div style={{ flex: '1 1 300px', alignSelf: 'flex-end', overflow: 'hidden', maxHeight: 520 }}>
-              <img src={CTA_IMG} alt="Familia feliz usando FamiliaCerca"
-                style={{ width: '100%', height: 520, objectFit: 'cover', objectPosition: 'center top', display: 'block' }} />
+                Crear cuenta gratis →
+              </Link>
+              <Link to="/login" style={{
+                padding: '18px 30px', borderRadius: 9999,
+                border: '1.5px solid rgba(255,255,255,0.35)',
+                color: 'white', fontWeight: 400, fontSize: 15,
+                textDecoration: 'none', fontFamily: SANS,
+                display: 'inline-flex', alignItems: 'center',
+              }}>
+                Iniciar sesión
+              </Link>
             </div>
           </div>
         </div>
@@ -1033,6 +1050,8 @@ export default function Landing() {
           .landing-hero-grid { grid-template-columns: 1fr !important; min-height: auto !important; }
           .landing-hero-right { display: none !important; }
           .landing-hero-text { padding: 80px 28px 64px !important; min-height: auto !important; }
+          .landing-problema-grid { grid-template-columns: 1fr !important; }
+          .landing-problema-img { min-height: 320px !important; }
         }
         @media (max-width: 640px) {
           .landing-divider { display: none !important; }
