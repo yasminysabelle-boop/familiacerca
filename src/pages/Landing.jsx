@@ -27,7 +27,7 @@ const CTABtn = ({ to, children, style = {} }) => (
     background: `linear-gradient(135deg, ${P} 0%, ${PD} 100%)`,
     color: 'white', fontWeight: 500, fontSize: 16,
     textDecoration: 'none', fontFamily: SANS, letterSpacing: '0.025em',
-    boxShadow: `0 22px 64px rgba(139,26,26,0.48), 0 8px 24px rgba(139,26,26,0.28)`,
+    boxShadow: `0 12px 40px rgba(74,124,89,0.40)`,
     ...style,
   }}>
     {children}
@@ -345,7 +345,7 @@ export default function Landing() {
               background: `linear-gradient(135deg, ${P}, ${PD})`,
               color: 'white', fontWeight: 500, fontSize: 14,
               textDecoration: 'none', fontFamily: SANS,
-              boxShadow: `0 4px 18px rgba(139,26,26,0.32)`,
+              boxShadow: `0 4px 18px rgba(74,124,89,0.32)`,
             }}>Iniciar sesión</Link>
           </div>
 
@@ -542,8 +542,8 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ── EMOTIONAL QUOTE — FC watermark pattern ── */}
-      <section style={{ padding: '128px 32px', background: DK, backgroundImage: FC_PATTERN, backgroundSize: '120px 120px' }}>
+      {/* ── EMOTIONAL QUOTE ── */}
+      <section style={{ padding: '128px 32px', background: '#0F0A00' }}>
         <div style={{ maxWidth: 860, margin: '0 auto', textAlign: 'center' }}>
           <div style={{ fontFamily: SERIF, fontSize: 110, color: AU, lineHeight: 0.7, marginBottom: 20, opacity: 0.30 }}>"</div>
           <blockquote className="reveal" style={{
