@@ -212,10 +212,26 @@ export default function Landing() {
     { icon: '🔒', val: '0', label: 'contratos ni trampas' },
   ]
 
-  const marqueeNames = [
-    'María de Monterrey', 'Carlos de Miami', 'Ana de Bogotá',
-    'Lucía de Santiago', 'Roberto de Buenos Aires', 'Carmen de Guadalajara',
-    'Jorge de Ciudad de México', 'Patricia de Lima', 'Miguel de Los Ángeles', 'Rosa de Madrid',
+  const marqueePain = [
+    '✓ Ya no discutimos sobre los medicamentos',
+    '✓ Todos ven el historial en tiempo real',
+    '✓ Sin más WhatsApp caótico',
+    '✓ El doctor ve el registro completo',
+    "✓ Nunca más '¿ya le diste la pastilla?'",
+    '✓ Coordinamos desde distintas ciudades',
+    '✓ Sin App Store, funciona en cualquier celular',
+    '✓ Gratis para empezar',
+  ]
+
+  const marqueeFeatures = [
+    '💊 Control de medicamentos',
+    '💬 Chat familiar',
+    '🎙️ Álbum de memorias',
+    '✅ Checklist diario',
+    '🚨 Botón SOS',
+    '💰 Gastos de salud',
+    '📍 Ubicación en tiempo real',
+    '📋 Historial médico',
   ]
 
   const plans = [
@@ -457,22 +473,39 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Separator between stats and marquee */}
+      {/* Separator between stats and marquees */}
       <div style={{ background: `linear-gradient(to right, ${DK}, rgba(201,136,42,0.35), ${DK})`, height: 1 }} />
+      <div style={{ height: 24, background: P }} />
 
-      {/* ── SOCIAL PROOF MARQUEE ── */}
-      <section style={{ background: P, padding: '18px 0', overflow: 'hidden' }}>
-        <div className="marquee-container">
+      {/* ── MARQUEE STRIP ── */}
+      <section style={{ background: P, paddingBottom: 0, overflow: 'hidden' }}>
+        {/* Row 1 — pain points, left-to-right */}
+        <div className="marquee-container" style={{ marginBottom: 10 }}>
           <div className="marquee-track">
-            {[...marqueeNames, ...marqueeNames].map((name, i) => (
+            {[...marqueePain, ...marqueePain].map((item, i) => (
               <span key={i} style={{
                 display: 'inline-flex', alignItems: 'center', gap: 10,
-                padding: '0 28px', whiteSpace: 'nowrap',
-                fontSize: 14, color: 'rgba(255,255,255,0.80)', fontFamily: SANS, fontWeight: 300,
+                padding: '0 32px', whiteSpace: 'nowrap',
+                fontSize: 14, color: 'rgba(255,255,255,0.85)', fontFamily: SANS, fontWeight: 400,
               }}>
-                <span style={{ color: AU }}>❤️</span>
-                {name}
-                <span style={{ color: 'rgba(255,255,255,0.22)', fontSize: 20, lineHeight: 1 }}>·</span>
+                {item}
+                <span style={{ color: 'rgba(255,255,255,0.20)', fontSize: 18, lineHeight: 1 }}>·</span>
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* Row 2 — features, right-to-left */}
+        <div className="marquee-container" style={{ paddingBottom: 18 }}>
+          <div className="marquee-track marquee-track-reverse">
+            {[...marqueeFeatures, ...marqueeFeatures].map((item, i) => (
+              <span key={i} style={{
+                display: 'inline-flex', alignItems: 'center', gap: 10,
+                padding: '0 32px', whiteSpace: 'nowrap',
+                fontSize: 14, color: 'rgba(255,255,255,0.65)', fontFamily: SANS, fontWeight: 300,
+              }}>
+                {item}
+                <span style={{ color: 'rgba(255,255,255,0.18)', fontSize: 18, lineHeight: 1 }}>·</span>
               </span>
             ))}
           </div>
@@ -977,9 +1010,11 @@ export default function Landing() {
 
         /* Marquee */
         @keyframes marquee-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+        @keyframes marquee-scroll-reverse { from { transform: translateX(-50%); } to { transform: translateX(0); } }
         .marquee-container { overflow: hidden; }
-        .marquee-track { display: flex; width: max-content; animation: marquee-scroll 48s linear infinite; }
-        .marquee-track:hover { animation-play-state: paused; }
+        .marquee-track { display: flex; width: max-content; animation: marquee-scroll 52s linear infinite; }
+        .marquee-track-reverse { animation: marquee-scroll-reverse 52s linear infinite; }
+        .marquee-track:hover, .marquee-track-reverse:hover { animation-play-state: paused; }
 
         /* Feature card hover lift */
         .feature-hero-card { transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s ease; }
