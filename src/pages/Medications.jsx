@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
@@ -66,7 +66,9 @@ export default function Medications() {
   const [showForm, setShowForm] = useState(false)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState(null)
   const [confirmDialog, setConfirmDialog] = useState(null) // { onConfirm }
+  const editOpenedRef = useRef(false)
 
   const isAdmin = user?.id === ownerId
   const isCuidador = !isAdmin && memberRole === 'cuidador'
@@ -90,8 +92,10 @@ export default function Medications() {
   useEffect(() => {
     const editId = searchParams.get('edit')
     if (!editId || loading) return
+    if (editOpenedRef.current) return
     const med = medications.find(m => m.id === editId)
     if (!med) return
+    editOpenedRef.current = true
     openEdit(med)
     setSearchParams({}, { replace: true })
   }, [searchParams, medications, loading])
@@ -155,6 +159,7 @@ export default function Medications() {
   async function handleSubmit(e) {
     e.preventDefault()
     setSaving(true)
+    setSaveError(null)
     const scheduled_times = computeScheduledTimes(form.frequency, scheduledTimes)
     const payload = {
       name: form.name,
@@ -164,17 +169,22 @@ export default function Medications() {
       scheduled_times,
       user_id: ownerId,
     }
+    let error
     if (editId) {
-      await supabase.from('medications').update(payload).eq('id', editId)
+      ;({ error } = await supabase.from('medications').update(payload).eq('id', editId))
     } else {
-      await supabase.from('medications').insert({ ...payload, created_by_user_id: user.id })
-      track('medication_added', { name: payload.name, frequency: payload.frequency })
+      ;({ error } = await supabase.from('medications').insert({ ...payload, created_by_user_id: user.id }))
+      if (!error) track('medication_added', { name: payload.name, frequency: payload.frequency })
+    }
+    setSaving(false)
+    if (error) {
+      setSaveError('No se pudo guardar el medicamento. Intenta de nuevo.')
+      return
     }
     setForm(emptyForm)
     setScheduledTimes([''])
     setEditId(null)
     setShowForm(false)
-    setSaving(false)
     fetchMedications()
   }
 
@@ -558,6 +568,9 @@ export default function Medications() {
                     </span>
                   ) : editId ? 'Guardar cambios' : 'Guardar medicamento'}
                 </button>
+                {saveError && (
+                  <p style={{ color: '#B91C1C', fontSize: 13, margin: '4px 0 0', textAlign: 'center' }}>{saveError}</p>
+                )}
               </div>
             </form>
           </div>

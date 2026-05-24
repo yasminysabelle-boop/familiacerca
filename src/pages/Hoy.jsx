@@ -201,34 +201,37 @@ export default function Hoy() {
 
   async function confirmMed(med) {
     setConfirming(med.id)
-    const loc = await getLocation({ force: true })
-    const confirmedAt = new Date().toISOString()
-    await supabase.from('medication_logs').upsert({
-      medication_id: med.id,
-      user_id: ownerId,
-      status: 'confirmed',
-      log_date: today,
-      confirmed_by_name: displayName,
-      confirmed_at: confirmedAt,
-      latitude: loc?.latitude ?? null,
-      longitude: loc?.longitude ?? null,
-      address: loc?.address ?? null,
-    }, { onConflict: 'medication_id,log_date,user_id' })
-    track('medication_marked_given', { medication_name: med.name, has_location: !!loc })
-    setLogs(prev => ({
-      ...prev,
-      [med.id]: {
+    try {
+      const loc = await getLocation({ force: true })
+      const confirmedAt = new Date().toISOString()
+      await supabase.from('medication_logs').upsert({
+        medication_id: med.id,
+        user_id: ownerId,
         status: 'confirmed',
+        log_date: today,
         confirmed_by_name: displayName,
         confirmed_at: confirmedAt,
         latitude: loc?.latitude ?? null,
         longitude: loc?.longitude ?? null,
         address: loc?.address ?? null,
-        photo_url: null,
-      },
-    }))
-    setConfirming(null)
-    openProofSheet(med)
+      }, { onConflict: 'medication_id,log_date,user_id' })
+      track('medication_marked_given', { medication_name: med.name, has_location: !!loc })
+      setLogs(prev => ({
+        ...prev,
+        [med.id]: {
+          status: 'confirmed',
+          confirmed_by_name: displayName,
+          confirmed_at: confirmedAt,
+          latitude: loc?.latitude ?? null,
+          longitude: loc?.longitude ?? null,
+          address: loc?.address ?? null,
+          photo_url: null,
+        },
+      }))
+      openProofSheet(med)
+    } finally {
+      setConfirming(null)
+    }
   }
 
   async function unconfirmMed(med) {
@@ -578,6 +581,7 @@ export default function Hoy() {
                             <button
                               onClick={() => {
                                 if (isFamiliar) return
+                                if (isEarly) return
                                 if (!isConfirmed && isAdmin) { setAdminWarningMed(med); return }
                                 isConfirmed ? unconfirmMed(med) : confirmMed(med)
                               }}
