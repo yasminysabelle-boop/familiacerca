@@ -577,7 +577,7 @@ export default function Landing() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 24, marginBottom: 24 }}>
 
             {/* Medicamentos */}
-            <div className="feature-hero-card reveal" style={{ background: '#1F0A0A', borderRadius: 20, border: '1px solid rgba(139,26,26,0.28)', padding: '36px 30px', boxShadow: '0 8px 40px rgba(0,0,0,0.32)', minHeight: 380, position: 'relative' }}>
+            <div className="feature-hero-card reveal" style={{ background: '#1F0A0A', borderRadius: 20, border: '1px solid rgba(201,136,42,0.30)', padding: '36px 30px', boxShadow: '0 8px 40px rgba(0,0,0,0.32)', minHeight: 380, position: 'relative' }}>
               <div style={{ width: 60, height: 60, borderRadius: 16, background: 'rgba(139,26,26,0.22)', border: '1px solid rgba(139,26,26,0.40)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, marginBottom: 18 }}>💊</div>
               <div style={{ display: 'inline-flex', padding: '4px 12px', borderRadius: 9999, border: '1px solid rgba(201,136,42,0.25)', marginBottom: 12, background: 'rgba(201,136,42,0.08)' }}>
                 <span style={{ fontSize: 10, fontWeight: 500, color: AU, letterSpacing: '0.08em', fontFamily: SANS }}>Lo más importante</span>
@@ -603,7 +603,7 @@ export default function Landing() {
             </div>
 
             {/* Chat */}
-            <div className="feature-hero-card reveal reveal-delay-1" style={{ background: '#1F0A0A', borderRadius: 20, border: '1px solid rgba(139,26,26,0.28)', padding: '36px 30px', boxShadow: '0 8px 40px rgba(0,0,0,0.32)', minHeight: 380, position: 'relative' }}>
+            <div className="feature-hero-card reveal reveal-delay-1" style={{ background: '#1F0A0A', borderRadius: 20, border: '1px solid rgba(201,136,42,0.30)', padding: '36px 30px', boxShadow: '0 8px 40px rgba(0,0,0,0.32)', minHeight: 380, position: 'relative' }}>
               <div style={{ width: 60, height: 60, borderRadius: 16, background: 'rgba(139,26,26,0.22)', border: '1px solid rgba(139,26,26,0.40)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, marginBottom: 18 }}>💬</div>
               <div style={{ display: 'inline-flex', padding: '4px 12px', borderRadius: 9999, border: '1px solid rgba(201,136,42,0.25)', marginBottom: 12, background: 'rgba(201,136,42,0.08)' }}>
                 <span style={{ fontSize: 10, fontWeight: 500, color: AU, letterSpacing: '0.08em', fontFamily: SANS }}>En tiempo real</span>
@@ -629,7 +629,7 @@ export default function Landing() {
             </div>
 
             {/* Memorias */}
-            <div className="feature-hero-card reveal reveal-delay-2" style={{ background: '#1F0A0A', borderRadius: 20, border: '1px solid rgba(139,26,26,0.28)', padding: '36px 30px', boxShadow: '0 8px 40px rgba(0,0,0,0.32)', minHeight: 380, position: 'relative' }}>
+            <div className="feature-hero-card reveal reveal-delay-2" style={{ background: '#1F0A0A', borderRadius: 20, border: '1px solid rgba(201,136,42,0.30)', padding: '36px 30px', boxShadow: '0 8px 40px rgba(0,0,0,0.32)', minHeight: 380, position: 'relative' }}>
               <div style={{ width: 60, height: 60, borderRadius: 16, background: 'rgba(139,26,26,0.22)', border: '1px solid rgba(139,26,26,0.40)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, marginBottom: 18 }}>📸</div>
               <div style={{ display: 'inline-flex', padding: '4px 12px', borderRadius: 9999, border: '1px solid rgba(201,136,42,0.25)', marginBottom: 12, background: 'rgba(201,136,42,0.08)' }}>
                 <span style={{ fontSize: 10, fontWeight: 500, color: AU, letterSpacing: '0.08em', fontFamily: SANS }}>Exclusivo Familiar</span>
@@ -640,7 +640,7 @@ export default function Landing() {
               </p>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 7 }}>
                 {['🌻','👴','❤️','🎂','🌿','💐'].map((em, i) => (
-                  <div key={i} style={{ aspectRatio: '1', borderRadius: 10, background: i % 2 === 0 ? 'rgba(255,255,255,0.05)' : 'rgba(139,26,26,0.18)', border: '1px solid rgba(139,26,26,0.28)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>{em}</div>
+                  <div key={i} style={{ aspectRatio: '1', borderRadius: 10, background: i % 2 === 0 ? 'rgba(255,255,255,0.05)' : 'rgba(139,26,26,0.18)', border: '1px solid rgba(201,136,42,0.30)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>{em}</div>
                 ))}
               </div>
             </div>
@@ -653,7 +653,7 @@ export default function Landing() {
               { icon: '🆘', title: 'Botón SOS', desc: 'Alerta instantánea a todos los cuidadores con un solo toque en caso de emergencia.' },
               { icon: '💰', title: 'Gastos de salud', desc: 'Control de medicamentos, consultas y terapias sin perder ningún gasto deducible.' },
             ].map((f, i) => (
-              <div key={f.title} className={`reveal reveal-delay-${i}`} style={{ background: '#1F0A0A', borderRadius: 16, border: '1px solid rgba(139,26,26,0.28)', padding: '26px 24px', display: 'flex', gap: 16, alignItems: 'flex-start' }}>
+              <div key={f.title} className={`reveal reveal-delay-${i}`} style={{ background: '#1F0A0A', borderRadius: 16, border: '1px solid rgba(201,136,42,0.30)', padding: '26px 24px', display: 'flex', gap: 16, alignItems: 'flex-start' }}>
                 <div style={{ width: 46, height: 46, borderRadius: 12, background: 'rgba(139,26,26,0.28)', border: '1px solid rgba(139,26,26,0.40)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>{f.icon}</div>
                 <div>
                   <h3 style={{ fontFamily: SERIF, fontSize: 18, fontWeight: 600, color: 'white', margin: '0 0 6px' }}>{f.title}</h3>
