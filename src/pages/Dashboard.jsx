@@ -872,13 +872,31 @@ function EventDetailSheet({ evt, onClose }) {
 // ── Timeline event dispatcher ─────────────────────────────────────────────────
 
 function TimelineEvent({ evt, confirming, expandedAudio, onConfirm, onToggleAudio, todayKey, tomorrowKey, reactions, userId, onReact, onTap, isFamiliar }) {
-  const bar = evt.type !== 'MED_PENDING' && evt.type !== 'CAREGIVER_CARD' && (
+  const bar = evt.type !== 'MED_PENDING' && evt.type !== 'CAREGIVER_CARD' && evt.type !== 'MED_MISSED' && (
     <ReactionBar eventKey={evt.id} reactions={reactions?.[evt.id]} userId={userId} onToggle={onReact} />
   )
   if (evt.type === 'MED_PENDING') {
     return <PendingCard evt={evt} confirming={confirming} onConfirm={onConfirm} todayKey={todayKey} isFamiliar={isFamiliar} />
   }
-  if (evt.type === 'MED_CONFIRMED') return <div><ConfirmedCard evt={evt} onTap={() => onTap(evt)} />{bar}</div>
+  if (evt.type === 'MED_MISSED') {
+    return (
+      <div style={{
+        background: '#FFF5F5', border: '1px solid #FCA5A5', borderRadius: 12,
+        padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 10,
+        opacity: 0.85,
+      }}>
+        <span style={{ fontSize: 18, flexShrink: 0 }}>⚠️</span>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <p style={{ margin: 0, fontSize: 14, fontWeight: 500, color: '#B91C1C' }}>
+            {evt.medName}{evt.medDosage ? ` · ${evt.medDosage}` : ''}
+          </p>
+          <p style={{ margin: '2px 0 0', fontSize: 12, color: '#EF4444' }}>
+            No dado{evt.medTime ? ` · ${evt.medTime}` : ''}
+          </p>
+        </div>
+      </div>
+    )
+  }
   if (evt.type === 'VOICE_MEMORY') {
     return (
       <div>
@@ -937,7 +955,7 @@ function EmptyState({ profile }) {
 // ── Category groups for expanded timeline ────────────────────────────────────
 
 const CATEGORY_GROUPS = [
-  { id: 'meds',    emoji: '💊', label: 'Medicamentos', types: ['MED_PENDING', 'MED_CONFIRMED'] },
+  { id: 'meds',    emoji: '💊', label: 'Medicamentos', types: ['MED_PENDING', 'MED_CONFIRMED', 'MED_MISSED'] },
   { id: 'citas',   emoji: '📅', label: 'Citas',        types: ['APPOINTMENT', 'APPOINTMENT_PROOF'] },
   { id: 'familia', emoji: '👥', label: 'Familia',      types: ['PHOTO', 'CAREGIVER_CARD'] },
   { id: 'notas',   emoji: '💬', label: 'Notas',        types: ['VOICE_MEMORY', 'NOTE'] },
@@ -954,12 +972,15 @@ function DaySection({
 }) {
   const confirmedCount = section.events.filter(e => e.type === 'MED_CONFIRMED').length
   const pendingCount   = section.events.filter(e => e.type === 'MED_PENDING').length
+  const missedCount    = section.events.filter(e => e.type === 'MED_MISSED').length
 
   // Status based on medication coverage for this day
   let status = 'none'
   if (medTotal > 0) {
-    if (pendingCount === 0 && confirmedCount >= medTotal) status = 'green'
+    if (pendingCount === 0 && missedCount === 0 && confirmedCount >= medTotal) status = 'green'
+    else if (confirmedCount > 0 && missedCount > 0) status = 'yellow'
     else if (confirmedCount > 0) status = 'yellow'
+    else if (missedCount > 0) status = 'red'
     else status = 'red'
   }
 
@@ -1578,6 +1599,39 @@ export default function Dashboard() {
           medTime: times[0] ?? null,
           allTimes: times,
           medStatus: calcularEstadoMedicamento(times[0] ?? null),
+        })
+      }
+    }
+
+    // ── Missed medications for past days (no confirmation found) ──
+    const pastDays = []
+    for (let i = 1; i <= 6; i++) {
+      const d = new Date(now)
+      d.setDate(d.getDate() - i)
+      pastDays.push(d.toISOString().split("T")[0])
+    }
+    const confirmedByDay = {}
+    for (const log of (confirmedLogs ?? [])) {
+      if (!confirmedByDay[log.log_date]) confirmedByDay[log.log_date] = new Set()
+      confirmedByDay[log.log_date].add(log.medication_id)
+    }
+    for (const dayKey of pastDays) {
+      for (const med of (meds ?? [])) {
+        if (confirmedByDay[dayKey]?.has(med.id)) continue
+        const times = med.scheduled_times?.length
+          ? [...med.scheduled_times].sort()
+          : (med.time ? [med.time] : [])
+        allEvents.push({
+          id: `missed-${dayKey}-${med.id}`,
+          type: "MED_MISSED",
+          timestamp: times[0]
+            ? new Date(`${dayKey}T${times[0]}:00`)
+            : new Date(`${dayKey}T08:00:00`),
+          dateKey: dayKey,
+          medicationId: med.id,
+          medName: med.name,
+          medDosage: med.dosage,
+          medTime: times[0] ?? null,
         })
       }
     }
