@@ -411,22 +411,7 @@ export default function Landing() {
               FamiliaCerca coordina medicamentos, rutinas y bienestar de tu familiar entre todos los cuidadores — en tiempo real, desde el celular.
             </p>
 
-            <div className="hero-reveal hero-delay-4" style={{ display: 'flex', flexWrap: 'wrap', gap: 14, marginBottom: 40, justifyContent: 'center' }}>
-              <CTABtn to="/login">
-                Empezar gratis <span style={{ fontSize: 18, opacity: 0.8 }}>→</span>
-              </CTABtn>
-              <a href="#como" style={{
-                padding: '18px 30px', borderRadius: 9999,
-                border: '1.5px solid rgba(255,255,255,0.14)', background: 'rgba(255,255,255,0.05)',
-                color: 'rgba(255,255,255,0.70)', fontWeight: 400, fontSize: 15,
-                textDecoration: 'none', fontFamily: SANS,
-                display: 'inline-flex', alignItems: 'center', gap: 9,
-              }}>
-                <span style={{ fontSize: 11 }}>▶</span> Ver cómo funciona
-              </a>
-            </div>
-
-            <div className="hero-reveal hero-delay-5" style={{ display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap', justifyContent: 'center' }}>
+            <div className="hero-reveal hero-delay-4" style={{ display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap', justifyContent: 'center' }}>
               {['Gratis para empezar', 'Sin App Store', 'iPhone y Android'].map(t => (
                 <div key={t} style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
                   <span style={{ fontSize: 12, color: SG, fontWeight: 600 }}>✓</span>
@@ -782,8 +767,7 @@ export default function Landing() {
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 14, background: 'white', borderRadius: 18, padding: '18px 30px', border: `1px solid ${BD}`, boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}>
               <span style={{ fontSize: 26 }}>🛡️</span>
               <div style={{ textAlign: 'left' }}>
-                <p style={{ margin: 0, fontSize: 14, fontWeight: 500, color: DK, fontFamily: SANS }}>Garantía de 14 días o te devolvemos tu dinero</p>
-                <p style={{ margin: 0, fontSize: 13, color: '#6B5848', fontFamily: SANS, fontWeight: 300 }}>Sin preguntas, sin complicaciones.</p>
+                <p style={{ margin: 0, fontSize: 14, fontWeight: 500, color: DK, fontFamily: SANS }}>Prueba 14 días gratis — sin tarjeta de crédito</p>
               </div>
             </div>
           </div>
