@@ -142,6 +142,7 @@ export default function Landing() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [annual, setAnnual] = useState(false)
   const [counts, setCounts] = useState([0, 0, 0, 0])
+  const [showBar, setShowBar] = useState(false)
   const statsRef = useRef(null)
 
   useEffect(() => {
@@ -186,6 +187,12 @@ export default function Landing() {
     }, { threshold: 0.4 })
     io.observe(el)
     return () => io.disconnect()
+  }, [])
+
+  useEffect(() => {
+    const onScroll = () => setShowBar(window.scrollY > 300)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
   if (loading) return null
@@ -940,6 +947,29 @@ export default function Landing() {
           </div>
         </div>
       </footer>
+
+      {/* ── STICKY BOTTOM BAR ── */}
+      <div style={{
+        position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 9000,
+        background: P,
+        padding: '14px 24px',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        boxShadow: '0 -4px 24px rgba(139,26,26,0.28)',
+        opacity: showBar ? 1 : 0,
+        transform: showBar ? 'translateY(0)' : 'translateY(100%)',
+        transition: 'opacity 0.35s ease, transform 0.35s cubic-bezier(0.16,1,0.3,1)',
+        pointerEvents: showBar ? 'all' : 'none',
+      }}>
+        <Link to="/login" style={{
+          color: 'white', fontFamily: SANS, fontWeight: 500,
+          fontSize: 'clamp(14px, 2vw, 16px)', textDecoration: 'none',
+          display: 'inline-flex', alignItems: 'center', gap: 10,
+          letterSpacing: '0.01em',
+        }}>
+          Instalar FamiliaCerca — es gratis
+          <span style={{ fontSize: 18, opacity: 0.85 }}>→</span>
+        </Link>
+      </div>
 
       <style>{`
         /* Scroll reveal */
