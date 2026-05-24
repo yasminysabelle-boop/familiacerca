@@ -361,9 +361,10 @@ export default function Landing() {
         <div className="landing-hero-text" style={{
           background: DK,
           position: 'relative',
-          display: 'flex', flexDirection: 'column', justifyContent: 'center',
-          padding: 'clamp(80px,8vw,140px) clamp(24px,4vw,56px) clamp(80px,8vw,140px) max(28px, calc((100vw - 1140px)/2 + 32px))',
+          display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center',
+          padding: 'clamp(80px,8vw,120px) clamp(32px,5vw,72px)',
           overflow: 'hidden',
+          textAlign: 'center',
         }}>
           {/* Subtle crimson radial glow */}
           <div style={{
@@ -371,11 +372,11 @@ export default function Landing() {
             background: 'radial-gradient(ellipse 70% 55% at 25% 55%, rgba(139,26,26,0.18) 0%, transparent 70%)',
           }} />
 
-          <div style={{ position: 'relative' }}>
+          <div style={{ position: 'relative', width: '100%', maxWidth: 520, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <div className="hero-reveal hero-delay-1" style={{
               display: 'inline-flex', alignItems: 'center', gap: 8,
               border: '1px solid rgba(201,136,42,0.25)', borderRadius: 9999,
-              padding: '7px 18px', marginBottom: 36, width: 'fit-content',
+              padding: '7px 18px', marginBottom: 36,
               background: 'rgba(201,136,42,0.08)',
             }}>
               <span style={{ fontSize: 13 }}>💊</span>
@@ -386,23 +387,24 @@ export default function Landing() {
 
             <h1 className="hero-reveal hero-delay-2" style={{
               fontFamily: SERIF, fontStyle: 'italic',
-              fontSize: 'clamp(48px, 6vw, 84px)',
-              fontWeight: 700, color: 'white', lineHeight: 1.02,
+              fontSize: 'clamp(36px, 4.5vw, 72px)',
+              fontWeight: 700, color: 'white', lineHeight: 1.08,
               margin: '0 0 28px', letterSpacing: '-1px',
+              textAlign: 'center',
             }}>
               Cuida a quien amas,{' '}
               <span style={{ color: AU }}>sin perder ningún detalle</span>
             </h1>
 
             <p className="hero-reveal hero-delay-3" style={{
-              fontSize: 'clamp(15px, 1.5vw, 18px)', color: 'rgba(255,255,255,0.60)',
-              lineHeight: 1.80, margin: '0 0 48px', maxWidth: 440,
-              fontFamily: SANS, fontWeight: 300,
+              fontSize: 'clamp(14px, 1.4vw, 17px)', color: 'rgba(255,255,255,0.60)',
+              lineHeight: 1.80, margin: '0 0 48px',
+              fontFamily: SANS, fontWeight: 300, textAlign: 'center',
             }}>
               FamiliaCerca coordina medicamentos, rutinas y bienestar de tu familiar entre todos los cuidadores — en tiempo real, desde el celular.
             </p>
 
-            <div className="hero-reveal hero-delay-4" style={{ display: 'flex', flexWrap: 'wrap', gap: 14, marginBottom: 40 }}>
+            <div className="hero-reveal hero-delay-4" style={{ display: 'flex', flexWrap: 'wrap', gap: 14, marginBottom: 40, justifyContent: 'center' }}>
               <CTABtn to="/login">
                 Empezar gratis <span style={{ fontSize: 18, opacity: 0.8 }}>→</span>
               </CTABtn>
@@ -417,7 +419,7 @@ export default function Landing() {
               </a>
             </div>
 
-            <div className="hero-reveal hero-delay-5" style={{ display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap' }}>
+            <div className="hero-reveal hero-delay-5" style={{ display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap', justifyContent: 'center' }}>
               {['Gratis para empezar', 'Sin App Store', 'iPhone y Android'].map(t => (
                 <div key={t} style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
                   <span style={{ fontSize: 12, color: SG, fontWeight: 600 }}>✓</span>
