@@ -8,12 +8,14 @@ const COMO_IMG = 'https://i.postimg.cc/hGTq3cd4/Chat-GPT-Image-May-22-2026-10-22
 const CTA_IMG  = 'https://i.postimg.cc/hj8chcDs/Chat-GPT-Image-May-22-2026-10-23-48-PM.png'
 
 const P  = '#4A7C59'
-const PD = '#3A6147'
+const PD = '#3A6347'
 const AU = '#C9882A'
 const SG = '#2D6A4F'
-const DK = '#0F0A00'
-const SF = '#FDF8F5'
-const BD = 'rgba(139,26,26,0.10)'
+const DK = '#0F1A12'      // verde-noche (antes negro-marrón)
+const SF = '#F7F3ED'      // lino cálido — fondo claro principal
+const SA = '#EDE8DF'      // arena — superficies/cards claras
+const SW = '#FFFFFF'      // blanco puro para precio cards
+const BD = 'rgba(74,124,89,0.12)'  // borde tenue verde
 
 const SERIF = "'Cormorant Garamond', Georgia, serif"
 const SANS  = "'Inter', system-ui, sans-serif"
@@ -34,10 +36,14 @@ const CTABtn = ({ to, children, style = {} }) => (
   </Link>
 )
 
-function FAQItem({ q, a }) {
+function FAQItem({ q, a, light = false }) {
   const [open, setOpen] = useState(false)
+  const textColor = light ? '#3A5C45' : 'rgba(255,255,255,0.82)'
+  const answerColor = light ? '#6B7E70' : 'rgba(255,255,255,0.50)'
+  const borderColor = light ? 'rgba(74,124,89,0.18)' : 'rgba(201,136,42,0.12)'
+  const iconBorder = light ? 'rgba(74,124,89,0.35)' : 'rgba(201,136,42,0.40)'
   return (
-    <div className="faq-dark-item" style={{ borderBottom: '1px solid rgba(201,136,42,0.12)' }}>
+    <div className={light ? 'faq-light-item' : 'faq-dark-item'} style={{ borderBottom: `1px solid ${borderColor}` }}>
       <button
         onClick={() => setOpen(o => !o)}
         style={{
@@ -46,20 +52,20 @@ function FAQItem({ q, a }) {
           background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left',
         }}
       >
-        <span style={{ fontSize: 16, fontWeight: 400, color: 'rgba(255,255,255,0.82)', lineHeight: 1.5, paddingRight: 16, fontFamily: SANS }}>
+        <span style={{ fontSize: 16, fontWeight: 400, color: textColor, lineHeight: 1.5, paddingRight: 16, fontFamily: SANS }}>
           {q}
         </span>
         <span style={{
           width: 32, height: 32, borderRadius: '50%',
-          border: `1.5px solid rgba(201,136,42,0.40)`,
+          border: `1.5px solid ${iconBorder}`,
           display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 18, color: AU, flexShrink: 0,
+          fontSize: 18, color: light ? P : AU, flexShrink: 0,
           transition: 'transform 0.25s ease',
           transform: open ? 'rotate(45deg)' : 'none',
         }}>+</span>
       </button>
       {open && (
-        <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.50)', lineHeight: 1.85, padding: '0 16px 24px', margin: 0, fontFamily: SANS, fontWeight: 300 }}>
+        <p style={{ fontSize: 15, color: answerColor, lineHeight: 1.85, padding: '0 16px 24px', margin: 0, fontFamily: SANS, fontWeight: 300 }}>
           {a}
         </p>
       )}
@@ -76,7 +82,7 @@ function PriceCard({ name, price, period, highlight, badge, features, cta, annua
         flex: '1 1 280px', borderRadius: 24,
         background: highlight ? P : 'white',
         padding: '44px 32px',
-        boxShadow: highlight ? `0 32px 96px rgba(139,26,26,0.42)` : `0 4px 28px rgba(0,0,0,0.07)`,
+        boxShadow: highlight ? `0 32px 96px rgba(74,124,89,0.35)` : `0 4px 28px rgba(0,0,0,0.07)`,
         border: highlight ? 'none' : `1px solid ${BD}`,
         position: 'relative', display: 'flex', flexDirection: 'column',
       }}
@@ -392,7 +398,7 @@ export default function Landing() {
           {/* Subtle crimson radial glow */}
           <div style={{
             position: 'absolute', inset: 0, pointerEvents: 'none',
-            background: 'radial-gradient(ellipse 70% 55% at 25% 55%, rgba(139,26,26,0.18) 0%, transparent 70%)',
+            background: 'radial-gradient(ellipse 70% 55% at 25% 55%, rgba(74,124,89,0.18) 0%, transparent 70%)',
           }} />
 
           <div style={{ position: 'relative', width: '100%', maxWidth: 520, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -465,27 +471,24 @@ export default function Landing() {
       </section>
 
       {/* ── STATS BAR ── */}
-      <section ref={statsRef} style={{ background: DK, padding: '60px 32px 72px' }}>
+      <section ref={statsRef} style={{ background: SF, padding: '60px 32px 72px', borderBottom: `1px solid ${BD}` }}>
         <div style={{ maxWidth: 1140, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', gap: 0 }}>
           {statItems.flatMap((s, i) => {
             const el = (
               <div key={`s${i}`} style={{ textAlign: 'center', padding: '0 44px' }}>
                 <div style={{ fontSize: 26, marginBottom: 10 }}>{s.icon}</div>
-                <p style={{ margin: 0, fontFamily: SERIF, fontSize: 'clamp(34px, 4.5vw, 58px)', fontWeight: 700, color: AU, lineHeight: 1 }}>{s.val}</p>
-                <p style={{ margin: '10px 0 0', fontSize: 13, fontFamily: SANS, fontWeight: 300, color: 'rgba(255,255,255,0.38)', letterSpacing: '0.02em' }}>{s.label}</p>
+                <p style={{ margin: 0, fontFamily: SERIF, fontSize: 'clamp(34px, 4.5vw, 58px)', fontWeight: 700, color: P, lineHeight: 1 }}>{s.val}</p>
+                <p style={{ margin: '10px 0 0', fontSize: 13, fontFamily: SANS, fontWeight: 300, color: '#7A6E62', letterSpacing: '0.02em' }}>{s.label}</p>
               </div>
             )
             const div = i < statItems.length - 1 ? (
               <div key={`d${i}`} className="landing-divider"
-                style={{ width: 1, height: 88, background: 'linear-gradient(to bottom, transparent, rgba(201,136,42,0.22), transparent)', flexShrink: 0 }} />
+                style={{ width: 1, height: 88, background: `linear-gradient(to bottom, transparent, rgba(74,124,89,0.25), transparent)`, flexShrink: 0 }} />
             ) : null
             return div ? [el, div] : [el]
           })}
         </div>
       </section>
-
-      {/* Separator between stats and next section */}
-      <div style={{ background: `linear-gradient(to right, ${DK}, rgba(201,136,42,0.35), ${DK})`, height: 1 }} />
 
       {/* ── PROBLEMA — before/after ── */}
       <section style={{ overflow: 'hidden' }}>
@@ -501,21 +504,21 @@ export default function Landing() {
               Cuidar a un familiar mayor es un trabajo en equipo sin coordinación
             </h2>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-              <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 14, padding: '18px 16px' }}>
-                <p style={{ margin: '0 0 14px', fontSize: 10, fontWeight: 500, color: 'rgba(255,255,255,0.30)', fontFamily: SANS, letterSpacing: '0.10em', textTransform: 'uppercase' }}>Sin FamiliaCerca</p>
+              <div style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: 14, padding: '18px 16px' }}>
+                <p style={{ margin: '0 0 14px', fontSize: 10, fontWeight: 500, color: 'rgba(255,255,255,0.35)', fontFamily: SANS, letterSpacing: '0.10em', textTransform: 'uppercase' }}>Sin FamiliaCerca</p>
                 {['¿Ya le diste el medicamento?', 'Listas en papel que nadie ve', 'Duplicaciones y olvidos', 'WhatsApp caótico'].map(t => (
                   <div key={t} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 9 }}>
-                    <span style={{ color: '#D63031', fontWeight: 700, fontSize: 12, flexShrink: 0, marginTop: 1 }}>✕</span>
-                    <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.50)', fontFamily: SANS, fontWeight: 300, lineHeight: 1.5 }}>{t}</span>
+                    <span style={{ color: '#E05555', fontWeight: 700, fontSize: 12, flexShrink: 0, marginTop: 1 }}>✕</span>
+                    <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', fontFamily: SANS, fontWeight: 300, lineHeight: 1.5 }}>{t}</span>
                   </div>
                 ))}
               </div>
-              <div style={{ background: 'rgba(45,106,79,0.10)', border: '1px solid rgba(45,106,79,0.22)', borderRadius: 14, padding: '18px 16px' }}>
-                <p style={{ margin: '0 0 14px', fontSize: 10, fontWeight: 500, color: SG, fontFamily: SANS, letterSpacing: '0.10em', textTransform: 'uppercase' }}>Con FamiliaCerca</p>
+              <div style={{ background: 'rgba(74,124,89,0.12)', border: `1px solid rgba(74,124,89,0.30)`, borderRadius: 14, padding: '18px 16px' }}>
+                <p style={{ margin: '0 0 14px', fontSize: 10, fontWeight: 500, color: '#6DBF8A', fontFamily: SANS, letterSpacing: '0.10em', textTransform: 'uppercase' }}>Con FamiliaCerca</p>
                 {['Todos ven el mismo historial', 'Confirmación con foto', 'Notificaciones en tiempo real', 'Todo en un solo lugar'].map(t => (
                   <div key={t} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 9 }}>
-                    <span style={{ color: SG, fontWeight: 700, fontSize: 12, flexShrink: 0, marginTop: 1 }}>✓</span>
-                    <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)', fontFamily: SANS, fontWeight: 300, lineHeight: 1.5 }}>{t}</span>
+                    <span style={{ color: '#6DBF8A', fontWeight: 700, fontSize: 12, flexShrink: 0, marginTop: 1 }}>✓</span>
+                    <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.80)', fontFamily: SANS, fontWeight: 300, lineHeight: 1.5 }}>{t}</span>
                   </div>
                 ))}
               </div>
@@ -543,7 +546,7 @@ export default function Landing() {
       </section>
 
       {/* ── EMOTIONAL QUOTE ── */}
-      <section style={{ padding: '128px 32px', background: '#0F0A00' }}>
+      <section style={{ padding: '128px 32px', background: DK }}>
         <div style={{ maxWidth: 860, margin: '0 auto', textAlign: 'center' }}>
           <div style={{ fontFamily: SERIF, fontSize: 110, color: AU, lineHeight: 0.7, marginBottom: 20, opacity: 0.30 }}>"</div>
           <blockquote className="reveal" style={{
@@ -572,20 +575,20 @@ export default function Landing() {
       </section>
 
       {/* ── FEATURES ── */}
-      <section id="funciones" style={{ padding: '128px 32px', background: '#1A1208', position: 'relative', overflow: 'hidden' }}>
-        {/* Gold radial glow behind title */}
+      <section id="funciones" style={{ padding: '128px 32px', background: SF, position: 'relative', overflow: 'hidden' }}>
+        {/* Subtle green radial glow behind title */}
         <div style={{
           position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)',
           width: 800, height: 400, pointerEvents: 'none',
-          background: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(201,136,42,0.08) 0%, transparent 70%)',
+          background: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(74,124,89,0.06) 0%, transparent 70%)',
         }} />
         <div style={{ maxWidth: 1140, margin: '0 auto', position: 'relative' }}>
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 80 }}>
-            <p style={{ fontSize: 11, fontWeight: 500, color: AU, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>Funciones</p>
-            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(36px,4.5vw,58px)', fontWeight: 600, color: 'white', lineHeight: 1.1, margin: '0 0 20px' }}>
+            <p style={{ fontSize: 11, fontWeight: 500, color: P, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>Funciones</p>
+            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(36px,4.5vw,58px)', fontWeight: 600, color: '#1C2B20', lineHeight: 1.1, margin: '0 0 20px' }}>
               Todo lo que necesitas en un solo lugar
             </h2>
-            <p style={{ fontSize: 17, color: 'rgba(255,255,255,0.50)', lineHeight: 1.78, maxWidth: 540, margin: '0 auto', fontFamily: SANS, fontWeight: 300 }}>
+            <p style={{ fontSize: 17, color: '#6B7E70', lineHeight: 1.78, maxWidth: 540, margin: '0 auto', fontFamily: SANS, fontWeight: 300 }}>
               FamiliaCerca coordina a toda la familia para que ningún detalle del cuidado quede sin atender.
             </p>
           </div>
@@ -594,51 +597,51 @@ export default function Landing() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 24, marginBottom: 24 }}>
 
             {/* Medicamentos */}
-            <div className="feature-hero-card reveal" style={{ background: '#1F0A0A', borderRadius: 20, border: '1px solid rgba(201,136,42,0.30)', padding: '36px 30px', boxShadow: '0 8px 40px rgba(0,0,0,0.32)', minHeight: 380, position: 'relative' }}>
-              <div style={{ width: 60, height: 60, borderRadius: 16, background: 'rgba(139,26,26,0.22)', border: '1px solid rgba(139,26,26,0.40)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, marginBottom: 18 }}>💊</div>
-              <div style={{ display: 'inline-flex', padding: '4px 12px', borderRadius: 9999, border: '1px solid rgba(201,136,42,0.25)', marginBottom: 12, background: 'rgba(201,136,42,0.08)' }}>
+            <div className="feature-hero-card reveal" style={{ background: SW, borderRadius: 20, border: `1px solid rgba(74,124,89,0.20)`, padding: '36px 30px', boxShadow: '0 4px 24px rgba(74,124,89,0.08)', minHeight: 380, position: 'relative' }}>
+              <div style={{ width: 60, height: 60, borderRadius: 16, background: 'rgba(74,124,89,0.12)', border: '1px solid rgba(74,124,89,0.20)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, marginBottom: 18 }}>💊</div>
+              <div style={{ display: 'inline-flex', padding: '4px 12px', borderRadius: 9999, border: `1px solid rgba(201,136,42,0.30)`, marginBottom: 12, background: 'rgba(201,136,42,0.07)' }}>
                 <span style={{ fontSize: 10, fontWeight: 500, color: AU, letterSpacing: '0.08em', fontFamily: SANS }}>Lo más importante</span>
               </div>
-              <h3 style={{ fontFamily: SERIF, fontSize: 21, fontWeight: 600, color: 'white', margin: '0 0 10px', lineHeight: 1.2 }}>Control de medicamentos</h3>
-              <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.50)', lineHeight: 1.75, margin: '0 0 20px', fontFamily: SANS, fontWeight: 300 }}>
+              <h3 style={{ fontFamily: SERIF, fontSize: 21, fontWeight: 600, color: '#1C2B20', margin: '0 0 10px', lineHeight: 1.2 }}>Control de medicamentos</h3>
+              <p style={{ fontSize: 14, color: '#6B7E70', lineHeight: 1.75, margin: '0 0 20px', fontFamily: SANS, fontWeight: 300 }}>
                 Registra cada medicamento con horario y dosis. Confirma con foto de prueba y notifica a todos en tiempo real.
               </p>
-              <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 12, padding: '12px 14px', border: '1px solid rgba(139,26,26,0.22)' }}>
+              <div style={{ background: SA, borderRadius: 12, padding: '12px 14px', border: `1px solid rgba(74,124,89,0.12)` }}>
                 {[
                   { label: 'Atenolol 25mg · 8am', done: true },
                   { label: 'Metformina 500mg · 1pm', done: true },
                   { label: 'Losartán 50mg · 8pm', done: false },
                 ].map((item, i, arr) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '7px 0', borderBottom: i < arr.length - 1 ? '1px solid rgba(255,255,255,0.06)' : 'none' }}>
-                    <span style={{ width: 18, height: 18, borderRadius: '50%', background: item.done ? SG : 'transparent', border: `1.5px solid ${item.done ? SG : 'rgba(255,255,255,0.18)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '7px 0', borderBottom: i < arr.length - 1 ? `1px solid rgba(74,124,89,0.10)` : 'none' }}>
+                    <span style={{ width: 18, height: 18, borderRadius: '50%', background: item.done ? P : 'transparent', border: `1.5px solid ${item.done ? P : 'rgba(74,124,89,0.30)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                       {item.done && <span style={{ color: 'white', fontSize: 9 }}>✓</span>}
                     </span>
-                    <span style={{ fontSize: 11, fontFamily: SANS, color: item.done ? 'rgba(255,255,255,0.30)' : 'rgba(255,255,255,0.72)', textDecoration: item.done ? 'line-through' : 'none' }}>{item.label}</span>
+                    <span style={{ fontSize: 11, fontFamily: SANS, color: item.done ? '#9BA89F' : '#3A5C45', textDecoration: item.done ? 'line-through' : 'none' }}>{item.label}</span>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Chat */}
-            <div className="feature-hero-card reveal reveal-delay-1" style={{ background: '#1F0A0A', borderRadius: 20, border: '1px solid rgba(201,136,42,0.30)', padding: '36px 30px', boxShadow: '0 8px 40px rgba(0,0,0,0.32)', minHeight: 380, position: 'relative' }}>
-              <div style={{ width: 60, height: 60, borderRadius: 16, background: 'rgba(139,26,26,0.22)', border: '1px solid rgba(139,26,26,0.40)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, marginBottom: 18 }}>💬</div>
-              <div style={{ display: 'inline-flex', padding: '4px 12px', borderRadius: 9999, border: '1px solid rgba(201,136,42,0.25)', marginBottom: 12, background: 'rgba(201,136,42,0.08)' }}>
+            <div className="feature-hero-card reveal reveal-delay-1" style={{ background: SW, borderRadius: 20, border: `1px solid rgba(74,124,89,0.20)`, padding: '36px 30px', boxShadow: '0 4px 24px rgba(74,124,89,0.08)', minHeight: 380, position: 'relative' }}>
+              <div style={{ width: 60, height: 60, borderRadius: 16, background: 'rgba(74,124,89,0.12)', border: '1px solid rgba(74,124,89,0.20)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, marginBottom: 18 }}>💬</div>
+              <div style={{ display: 'inline-flex', padding: '4px 12px', borderRadius: 9999, border: `1px solid rgba(201,136,42,0.30)`, marginBottom: 12, background: 'rgba(201,136,42,0.07)' }}>
                 <span style={{ fontSize: 10, fontWeight: 500, color: AU, letterSpacing: '0.08em', fontFamily: SANS }}>En tiempo real</span>
               </div>
-              <h3 style={{ fontFamily: SERIF, fontSize: 21, fontWeight: 600, color: 'white', margin: '0 0 10px', lineHeight: 1.2 }}>Chat familiar coordinado</h3>
-              <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.50)', lineHeight: 1.75, margin: '0 0 20px', fontFamily: SANS, fontWeight: 300 }}>
+              <h3 style={{ fontFamily: SERIF, fontSize: 21, fontWeight: 600, color: '#1C2B20', margin: '0 0 10px', lineHeight: 1.2 }}>Chat familiar coordinado</h3>
+              <p style={{ fontSize: 14, color: '#6B7E70', lineHeight: 1.75, margin: '0 0 20px', fontFamily: SANS, fontWeight: 300 }}>
                 Un grupo dedicado solo al cuidado. Sin mezclar con WhatsApp. Notas de turno visibles para todos.
               </p>
-              <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 12, padding: '12px', border: '1px solid rgba(139,26,26,0.22)', display: 'flex', flexDirection: 'column', gap: 7 }}>
+              <div style={{ background: SA, borderRadius: 12, padding: '12px', border: `1px solid rgba(74,124,89,0.12)`, display: 'flex', flexDirection: 'column', gap: 7 }}>
                 {[
                   { from: 'María', msg: 'Ya le di las pastillas 💊', mine: false },
                   { from: 'Yo', msg: 'Perfecto! Voy al doctor a las 3', mine: true },
                   { from: 'Carlos', msg: 'Llego a las 5 para relevarte', mine: false },
                 ].map((b, i) => (
                   <div key={i} style={{ display: 'flex', justifyContent: b.mine ? 'flex-end' : 'flex-start' }}>
-                    <div style={{ maxWidth: '82%', padding: '6px 10px', borderRadius: 10, background: b.mine ? P : 'rgba(255,255,255,0.07)', border: b.mine ? 'none' : '1px solid rgba(255,255,255,0.08)' }}>
+                    <div style={{ maxWidth: '82%', padding: '6px 10px', borderRadius: 10, background: b.mine ? P : 'white', border: b.mine ? 'none' : `1px solid rgba(74,124,89,0.15)` }}>
                       {!b.mine && <p style={{ margin: '0 0 2px', fontSize: 9, color: AU, fontFamily: SANS, fontWeight: 500 }}>{b.from}</p>}
-                      <p style={{ margin: 0, fontSize: 11, color: 'rgba(255,255,255,0.80)', fontFamily: SANS, lineHeight: 1.4 }}>{b.msg}</p>
+                      <p style={{ margin: 0, fontSize: 11, color: b.mine ? 'white' : '#3A5C45', fontFamily: SANS, lineHeight: 1.4 }}>{b.msg}</p>
                     </div>
                   </div>
                 ))}
@@ -646,18 +649,18 @@ export default function Landing() {
             </div>
 
             {/* Memorias */}
-            <div className="feature-hero-card reveal reveal-delay-2" style={{ background: '#1F0A0A', borderRadius: 20, border: '1px solid rgba(201,136,42,0.30)', padding: '36px 30px', boxShadow: '0 8px 40px rgba(0,0,0,0.32)', minHeight: 380, position: 'relative' }}>
-              <div style={{ width: 60, height: 60, borderRadius: 16, background: 'rgba(139,26,26,0.22)', border: '1px solid rgba(139,26,26,0.40)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, marginBottom: 18 }}>📸</div>
-              <div style={{ display: 'inline-flex', padding: '4px 12px', borderRadius: 9999, border: '1px solid rgba(201,136,42,0.25)', marginBottom: 12, background: 'rgba(201,136,42,0.08)' }}>
+            <div className="feature-hero-card reveal reveal-delay-2" style={{ background: SW, borderRadius: 20, border: `1px solid rgba(74,124,89,0.20)`, padding: '36px 30px', boxShadow: '0 4px 24px rgba(74,124,89,0.08)', minHeight: 380, position: 'relative' }}>
+              <div style={{ width: 60, height: 60, borderRadius: 16, background: 'rgba(74,124,89,0.12)', border: '1px solid rgba(74,124,89,0.20)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, marginBottom: 18 }}>📸</div>
+              <div style={{ display: 'inline-flex', padding: '4px 12px', borderRadius: 9999, border: `1px solid rgba(201,136,42,0.30)`, marginBottom: 12, background: 'rgba(201,136,42,0.07)' }}>
                 <span style={{ fontSize: 10, fontWeight: 500, color: AU, letterSpacing: '0.08em', fontFamily: SANS }}>Exclusivo Familiar</span>
               </div>
-              <h3 style={{ fontFamily: SERIF, fontSize: 21, fontWeight: 600, color: 'white', margin: '0 0 10px', lineHeight: 1.2 }}>Álbum de memorias</h3>
-              <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.50)', lineHeight: 1.75, margin: '0 0 20px', fontFamily: SANS, fontWeight: 300 }}>
+              <h3 style={{ fontFamily: SERIF, fontSize: 21, fontWeight: 600, color: '#1C2B20', margin: '0 0 10px', lineHeight: 1.2 }}>Álbum de memorias</h3>
+              <p style={{ fontSize: 14, color: '#6B7E70', lineHeight: 1.75, margin: '0 0 20px', fontFamily: SANS, fontWeight: 300 }}>
                 Guarda fotos, notas de voz y momentos especiales junto al registro de salud. El cuidado también es amor.
               </p>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 7 }}>
                 {['🌻','👴','❤️','🎂','🌿','💐'].map((em, i) => (
-                  <div key={i} style={{ aspectRatio: '1', borderRadius: 10, background: i % 2 === 0 ? 'rgba(255,255,255,0.05)' : 'rgba(139,26,26,0.18)', border: '1px solid rgba(201,136,42,0.30)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>{em}</div>
+                  <div key={i} style={{ aspectRatio: '1', borderRadius: 10, background: i % 2 === 0 ? SA : 'rgba(74,124,89,0.08)', border: `1px solid rgba(74,124,89,0.15)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>{em}</div>
                 ))}
               </div>
             </div>
@@ -670,11 +673,11 @@ export default function Landing() {
               { icon: '🆘', title: 'Botón SOS', desc: 'Alerta instantánea a todos los cuidadores con un solo toque en caso de emergencia.' },
               { icon: '💰', title: 'Gastos de salud', desc: 'Control de medicamentos, consultas y terapias sin perder ningún gasto deducible.' },
             ].map((f, i) => (
-              <div key={f.title} className={`reveal reveal-delay-${i}`} style={{ background: '#1F0A0A', borderRadius: 16, border: '1px solid rgba(201,136,42,0.30)', padding: '26px 24px', display: 'flex', gap: 16, alignItems: 'flex-start' }}>
-                <div style={{ width: 46, height: 46, borderRadius: 12, background: 'rgba(139,26,26,0.28)', border: '1px solid rgba(139,26,26,0.40)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>{f.icon}</div>
+              <div key={f.title} className={`reveal reveal-delay-${i}`} style={{ background: SW, borderRadius: 16, border: `1px solid rgba(74,124,89,0.18)`, padding: '26px 24px', display: 'flex', gap: 16, alignItems: 'flex-start', boxShadow: '0 2px 12px rgba(74,124,89,0.06)' }}>
+                <div style={{ width: 46, height: 46, borderRadius: 12, background: 'rgba(74,124,89,0.10)', border: `1px solid rgba(74,124,89,0.18)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>{f.icon}</div>
                 <div>
-                  <h3 style={{ fontFamily: SERIF, fontSize: 18, fontWeight: 600, color: 'white', margin: '0 0 6px' }}>{f.title}</h3>
-                  <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.48)', lineHeight: 1.7, margin: 0, fontFamily: SANS, fontWeight: 300 }}>{f.desc}</p>
+                  <h3 style={{ fontFamily: SERIF, fontSize: 18, fontWeight: 600, color: '#1C2B20', margin: '0 0 6px' }}>{f.title}</h3>
+                  <p style={{ fontSize: 13, color: '#6B7E70', lineHeight: 1.7, margin: 0, fontFamily: SANS, fontWeight: 300 }}>{f.desc}</p>
                 </div>
               </div>
             ))}
@@ -701,25 +704,25 @@ export default function Landing() {
               { name: 'Lucía R.',    initial: 'L', role: 'Hija única',               location: 'Chicago, Illinois',          text: 'Cuido sola a mis dos padres mayores desde hace 3 años. FamiliaCerca me ayuda a organizarme y el botón SOS me da tranquilidad cuando no estoy en casa. No sé cómo lo hacía antes.' },
             ].map((t, i) => (
               <div key={t.name} className={`reveal reveal-delay-${i % 3}`} style={{
-                background: '#1F0A0A', borderRadius: 20,
-                border: '1px solid rgba(74,124,89,0.40)',
-                padding: '32px 28px', boxShadow: '0 8px 40px rgba(0,0,0,0.32)',
+                background: 'rgba(255,255,255,0.04)', borderRadius: 20,
+                border: `1px solid rgba(74,124,89,0.28)`,
+                padding: '32px 28px', boxShadow: '0 4px 24px rgba(0,0,0,0.20)',
                 display: 'flex', flexDirection: 'column',
               }}>
                 <div style={{ display: 'flex', gap: 3, marginBottom: 18 }}>
                   {[1,2,3,4,5].map(s => <span key={s} style={{ color: AU, fontSize: 13 }}>★</span>)}
                 </div>
-                <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.68)', lineHeight: 1.85, margin: '0 0 24px', fontFamily: SANS, fontWeight: 300, fontStyle: 'italic', flex: 1 }}>
+                <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.72)', lineHeight: 1.85, margin: '0 0 24px', fontFamily: SANS, fontWeight: 300, fontStyle: 'italic', flex: 1 }}>
                   "{t.text}"
                 </p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div style={{ width: 46, height: 46, borderRadius: '50%', background: '#4A7C59', border: '1px solid rgba(74,124,89,0.60)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <div style={{ width: 46, height: 46, borderRadius: '50%', background: P, border: `1px solid rgba(74,124,89,0.60)`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                     <span style={{ fontFamily: SERIF, fontSize: 20, fontWeight: 700, color: 'white' }}>{t.initial}</span>
                   </div>
                   <div>
                     <p style={{ margin: 0, fontSize: 14, fontWeight: 500, color: 'white', fontFamily: SANS }}>{t.name}</p>
                     <p style={{ margin: '2px 0 6px', fontSize: 12, color: 'rgba(255,255,255,0.38)', fontFamily: SANS, fontWeight: 300 }}>{t.role}</p>
-                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: 'rgba(201,136,42,0.08)', borderRadius: 9999, padding: '2px 10px' }}>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: 'rgba(201,136,42,0.10)', borderRadius: 9999, padding: '2px 10px' }}>
                       <span style={{ fontSize: 9 }}>📍</span>
                       <span style={{ fontSize: 10, color: AU, fontFamily: SANS, fontWeight: 300 }}>{t.location}</span>
                     </div>
@@ -731,16 +734,16 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ── CÓMO FUNCIONA — dark bg, animated line ── */}
-      <section id="como" style={{ padding: '128px 32px', background: DK }}>
+      {/* ── CÓMO FUNCIONA — light bg ── */}
+      <section id="como" style={{ padding: '128px 32px', background: SF }}>
         <div style={{ maxWidth: 1140, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 88, flexWrap: 'wrap' }} className="como-grid">
           <div style={{ flex: '1 1 360px' }}>
-            <p style={{ fontSize: 11, fontWeight: 500, color: AU, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 18px', fontFamily: SANS }}>Cómo funciona</p>
-            <h2 className="reveal" style={{ fontFamily: SERIF, fontSize: 'clamp(30px,3.8vw,50px)', fontWeight: 600, color: 'white', lineHeight: 1.12, margin: '0 0 52px' }}>
+            <p style={{ fontSize: 11, fontWeight: 500, color: P, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 18px', fontFamily: SANS }}>Cómo funciona</p>
+            <h2 className="reveal" style={{ fontFamily: SERIF, fontSize: 'clamp(30px,3.8vw,50px)', fontWeight: 600, color: '#1C2B20', lineHeight: 1.12, margin: '0 0 52px' }}>
               Listo en 3 minutos, funciona para siempre
             </h2>
             <div style={{ display: 'flex', flexDirection: 'column', position: 'relative' }}>
-              <div className="como-line" style={{ position: 'absolute', left: 39, top: 64, bottom: 64, width: 2, background: `linear-gradient(to bottom, ${P}, rgba(139,26,26,0.15))` }} />
+              <div className="como-line" style={{ position: 'absolute', left: 39, top: 64, bottom: 64, width: 2, background: `linear-gradient(to bottom, ${P}, rgba(74,124,89,0.10))` }} />
               {[
                 { n: '1', title: 'Crea tu cuenta gratis', desc: 'Regístrate con tu correo. Sin tarjeta de crédito, sin descarga en tienda de apps.' },
                 { n: '2', title: 'Agrega a tu familiar y los cuidadores', desc: 'Invita a tus hermanos, pareja o cualquier persona que cuide al familiar. Cada uno tiene su propio acceso.' },
@@ -749,11 +752,11 @@ export default function Landing() {
               ].map((s, i, arr) => (
                 <div key={s.n} className={`reveal reveal-delay-${i}`} style={{ display: 'flex', gap: 24, marginBottom: i < arr.length - 1 ? 32 : 0 }}>
                   <div style={{ flexShrink: 0, zIndex: 1 }}>
-                    <div style={{ width: 80, height: 80, borderRadius: '50%', background: `linear-gradient(135deg, ${P} 0%, ${PD} 100%)`, color: 'white', fontWeight: 700, fontSize: 28, fontFamily: SERIF, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 12px 40px rgba(139,26,26,0.48)`, border: '2px solid rgba(201,136,42,0.20)' }}>{s.n}</div>
+                    <div style={{ width: 80, height: 80, borderRadius: '50%', background: `linear-gradient(135deg, ${P} 0%, ${PD} 100%)`, color: 'white', fontWeight: 700, fontSize: 28, fontFamily: SERIF, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 12px 40px rgba(74,124,89,0.30)` }}>{s.n}</div>
                   </div>
                   <div style={{ paddingTop: 22 }}>
-                    <h3 style={{ fontFamily: SERIF, fontSize: 20, fontWeight: 600, color: 'white', margin: '0 0 8px' }}>{s.title}</h3>
-                    <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.48)', lineHeight: 1.78, margin: 0, fontFamily: SANS, fontWeight: 300 }}>{s.desc}</p>
+                    <h3 style={{ fontFamily: SERIF, fontSize: 20, fontWeight: 600, color: '#1C2B20', margin: '0 0 8px' }}>{s.title}</h3>
+                    <p style={{ fontSize: 14, color: '#6B7E70', lineHeight: 1.78, margin: 0, fontFamily: SANS, fontWeight: 300 }}>{s.desc}</p>
                   </div>
                 </div>
               ))}
@@ -763,7 +766,7 @@ export default function Landing() {
             </div>
           </div>
           <div style={{ flex: '1 1 360px', display: 'flex', justifyContent: 'center' }} className="como-img">
-            <img src={COMO_IMG} alt="Cómo funciona FamiliaCerca" style={{ width: '100%', borderRadius: 24, boxShadow: '0 32px 96px rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.06)' }} />
+            <img src={COMO_IMG} alt="Cómo funciona FamiliaCerca" style={{ width: '100%', borderRadius: 24, boxShadow: '0 16px 64px rgba(74,124,89,0.18)', border: `1px solid rgba(74,124,89,0.12)` }} />
           </div>
         </div>
       </section>
@@ -840,8 +843,8 @@ export default function Landing() {
             ))}
           </div>
           {/* Phone home screen mockup */}
-          <div style={{ flex: '0 0 auto', display: 'flex', justifyContent: 'center', alignItems: 'center', paddingRight: 40 }}>
-            <div style={{ width: 260, maxWidth: 280, height: 520, background: '#1A1A1A', borderRadius: 40, padding: 10, boxShadow: '0 32px 80px rgba(0,0,0,0.50)', position: 'relative', transform: 'none' }}>
+          <div style={{ flex: '0 0 280px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <div style={{ width: 260, height: 520, background: '#1A1A1A', borderRadius: 40, padding: 10, boxShadow: '0 32px 80px rgba(0,0,0,0.50)', position: 'relative', flexShrink: 0 }}>
               <div style={{ position: 'absolute', top: 10, left: '50%', transform: 'translateX(-50%)', width: 56, height: 18, background: '#1A1A1A', borderRadius: '0 0 12px 12px', zIndex: 2 }} />
               <div style={{ width: '100%', height: '100%', borderRadius: 32, background: 'linear-gradient(160deg, #1C1C2E 0%, #0F0F1A 100%)', overflow: 'hidden', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '32px 16px 16px' }}>
                 <p style={{ margin: '0 0 3px', fontSize: 11, color: 'rgba(255,255,255,0.35)', fontFamily: SANS }}>9:41</p>
@@ -874,16 +877,16 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ── FAQ — dark ── */}
-      <section id="faq" style={{ padding: '128px 32px', background: DK }}>
+      {/* ── FAQ — light ── */}
+      <section id="faq" style={{ padding: '128px 32px', background: SA }}>
         <div style={{ maxWidth: 740, margin: '0 auto' }}>
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 72 }}>
-            <p style={{ fontSize: 11, fontWeight: 500, color: AU, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>Preguntas frecuentes</p>
-            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(36px,4.5vw,58px)', fontWeight: 600, color: 'white', lineHeight: 1.1, margin: 0 }}>
+            <p style={{ fontSize: 11, fontWeight: 500, color: P, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>Preguntas frecuentes</p>
+            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(36px,4.5vw,58px)', fontWeight: 600, color: '#1C2B20', lineHeight: 1.1, margin: 0 }}>
               Todo lo que necesitas saber
             </h2>
           </div>
-          {faqs.map(f => <FAQItem key={f.q} q={f.q} a={f.a} />)}
+          {faqs.map(f => <FAQItem key={f.q} q={f.q} a={f.a} light />)}
         </div>
       </section>
 
@@ -891,7 +894,7 @@ export default function Landing() {
       <section style={{ position: 'relative', padding: '160px 32px', overflow: 'hidden', minHeight: 560, display: 'flex', alignItems: 'center' }}>
         <img src={CTA_IMG} alt="" aria-hidden="true" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(15,10,0,0.84)' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(139,26,26,0.50) 0%, transparent 52%)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(15,26,18,0.60) 0%, transparent 52%)' }} />
         <div style={{ position: 'relative', zIndex: 1, maxWidth: 1140, margin: '0 auto', width: '100%' }}>
           <div style={{ maxWidth: 680 }}>
             <p style={{ fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 20px', fontFamily: SANS }}>Empieza hoy</p>
@@ -981,7 +984,7 @@ export default function Landing() {
         background: P,
         padding: '14px 24px',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        boxShadow: '0 -4px 24px rgba(139,26,26,0.28)',
+        boxShadow: '0 -4px 24px rgba(0,0,0,0.20)',
         opacity: showBar ? 1 : 0,
         transform: showBar ? 'translateY(0)' : 'translateY(100%)',
         transition: 'opacity 0.35s ease, transform 0.35s cubic-bezier(0.16,1,0.3,1)',
@@ -1025,7 +1028,7 @@ export default function Landing() {
 
         /* Feature card hover lift */
         .feature-hero-card { transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s ease; }
-        .feature-hero-card:hover { transform: translateY(-8px) !important; box-shadow: 0 28px 80px rgba(139,26,26,0.18) !important; }
+        .feature-hero-card:hover { transform: translateY(-8px) !important; box-shadow: 0 28px 80px rgba(74,124,89,0.14) !important; }
 
         /* Badge pulse (gold ring) */
         @keyframes badge-pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(201,136,42,0.55); } 70% { box-shadow: 0 0 0 10px rgba(201,136,42,0); } 100% { box-shadow: 0 0 0 0 rgba(201,136,42,0); } }
@@ -1044,9 +1047,11 @@ export default function Landing() {
         @keyframes grow-line { from { transform: scaleY(0); opacity: 0; } to { transform: scaleY(1); opacity: 1; } }
         .como-line { transform-origin: top; animation: grow-line 1s ease-out 0.6s both; }
 
-        /* FAQ dark hover */
+        /* FAQ dark/light hover */
         .faq-dark-item { transition: background 0.18s ease; border-radius: 8px; }
         .faq-dark-item:hover { background: rgba(201,136,42,0.04); }
+        .faq-light-item { transition: background 0.18s ease; border-radius: 8px; }
+        .faq-light-item:hover { background: rgba(74,124,89,0.05); }
 
         /* Responsive */
         @media (max-width: 768px) {
