@@ -975,10 +975,15 @@ function DaySection({
   const lastTs = section.events.length > 0
     ? section.events.reduce((a, b) => (a.timestamp > b.timestamp ? a : b)).timestamp
     : null
-  const lastUpdateText = lastTs
-    ? lastTs.toLocaleTimeString('es-US', { hour: 'numeric', minute: '2-digit', hour12: true })
-    : null
-
+  const lastUpdateText = (() => {
+    if (!lastTs) return null
+    const now = new Date()
+    const isToday = lastTs.toDateString() === now.toDateString()
+    if (isToday) {
+      return lastTs.toLocaleTimeString('es-US', { hour: 'numeric', minute: '2-digit', hour12: true })
+    }
+    return lastTs.toLocaleDateString('es-US', { weekday: 'short', month: 'short', day: 'numeric' })
+  })()
   return (
     <div style={{ marginBottom: 14 }}>
       {/* Tappable header — card style when collapsed, plain label when expanded */}
