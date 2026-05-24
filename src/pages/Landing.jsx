@@ -442,70 +442,6 @@ export default function Landing() {
             pointerEvents: 'none',
           }} />
 
-          {/* Phone mockup */}
-          <div style={{ position: 'absolute', bottom: 48, left: 40, zIndex: 3, filter: 'drop-shadow(0 32px 64px rgba(0,0,0,0.42))' }}>
-            <div style={{ width: 196, height: 390, background: DK, borderRadius: 34, padding: 8, position: 'relative' }}>
-              <div style={{ position: 'absolute', top: 8, left: '50%', transform: 'translateX(-50%)', width: 52, height: 16, background: DK, borderRadius: '0 0 10px 10px', zIndex: 2 }} />
-              <div style={{ width: '100%', height: '100%', borderRadius: 27, background: 'white', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-                <div style={{ background: P, padding: '26px 12px 14px', textAlign: 'center' }}>
-                  <p style={{ margin: 0, color: 'white', fontSize: 10, fontWeight: 500, fontFamily: SANS, letterSpacing: '0.12em' }}>FAMILIACERCA</p>
-                  <p style={{ margin: '3px 0 0', color: 'rgba(255,255,255,0.65)', fontSize: 8, fontFamily: SANS }}>Buenos días ☀️</p>
-                </div>
-                <div style={{ padding: '10px 8px', flex: 1, display: 'flex', flexDirection: 'column', gap: 5, overflow: 'hidden' }}>
-                  <p style={{ margin: '0 0 4px', fontSize: 8, fontWeight: 500, fontFamily: SANS, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Hoy</p>
-                  {[
-                    { icon: '💊', label: 'Atenolol 25mg', done: true },
-                    { icon: '💊', label: 'Metformina', done: false },
-                    { icon: '✅', label: 'Baño diario', done: true },
-                    { icon: '🍽️', label: 'Almuerzo', done: true },
-                  ].map((item, i) => (
-                    <div key={i} style={{
-                      background: item.done ? '#F0F9F4' : '#FFF8F5', borderRadius: 8, padding: '6px 8px',
-                      display: 'flex', alignItems: 'center', gap: 6,
-                      border: `1px solid ${item.done ? 'rgba(45,106,79,0.15)' : BD}`,
-                    }}>
-                      <span style={{ fontSize: 11 }}>{item.icon}</span>
-                      <span style={{ fontSize: 9, fontFamily: SANS, color: DK, flex: 1 }}>{item.label}</span>
-                      <span style={{ fontSize: 9, fontWeight: 500, color: item.done ? SG : AU }}>{item.done ? '✓' : '⏰'}</span>
-                    </div>
-                  ))}
-                  <div style={{ background: SF, borderRadius: 8, padding: '6px 8px', border: `1px solid ${BD}`, marginTop: 2 }}>
-                    <p style={{ margin: 0, fontSize: 8, fontFamily: SANS, color: '#6B7280', lineHeight: 1.5 }}>
-                      <span style={{ fontWeight: 500, color: DK }}>María: </span>Ya le di el desayuno 👍
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Notification badge 1 */}
-          <div className="notif-badge" style={{
-            position: 'absolute', top: 80, right: 40, zIndex: 4,
-            background: 'white', borderRadius: 16, padding: '11px 14px',
-            boxShadow: '0 12px 44px rgba(0,0,0,0.18)',
-            display: 'flex', alignItems: 'center', gap: 9, border: `1px solid ${BD}`,
-          }}>
-            <span style={{ fontSize: 19 }}>💊</span>
-            <div>
-              <p style={{ margin: 0, fontSize: 10, fontWeight: 500, fontFamily: SANS, color: DK }}>Medicamento dado</p>
-              <p style={{ margin: 0, fontSize: 9, fontFamily: SANS, color: SG, fontWeight: 300 }}>✓ Con foto de prueba</p>
-            </div>
-          </div>
-
-          {/* Notification badge 2 */}
-          <div className="notif-badge-2" style={{
-            position: 'absolute', top: '44%', right: 40, zIndex: 4,
-            background: 'white', borderRadius: 14, padding: '10px 12px',
-            boxShadow: '0 10px 36px rgba(0,0,0,0.16)',
-            display: 'flex', alignItems: 'center', gap: 8, border: `1px solid ${BD}`,
-          }}>
-            <span style={{ fontSize: 17 }}>👨‍👩‍👧</span>
-            <div>
-              <p style={{ margin: 0, fontSize: 10, fontWeight: 500, fontFamily: SANS, color: DK }}>3 cuidadores</p>
-              <p style={{ margin: 0, fontSize: 9, fontFamily: SANS, color: '#9CA3AF', fontWeight: 300 }}>en línea ahora</p>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -1038,8 +974,6 @@ export default function Landing() {
 
         /* Notification badges soft pulse */
         @keyframes soft-pulse { 0%, 100% { box-shadow: 0 8px 32px rgba(0,0,0,0.15); } 50% { box-shadow: 0 8px 32px rgba(0,0,0,0.15), 0 0 0 5px rgba(45,106,79,0.10); } }
-        .notif-badge { animation: soft-pulse 3s ease-in-out infinite; }
-        .notif-badge-2 { animation: soft-pulse 3s ease-in-out 1.5s infinite; }
 
         /* Price cards */
         .price-card-hover { transition: transform 0.25s ease, box-shadow 0.25s ease; }
@@ -1072,7 +1006,7 @@ export default function Landing() {
         }
         @media (prefers-reduced-motion: reduce) {
           .reveal, .hero-reveal, .marquee-track, .feature-hero-card,
-          .badge-pulse-anim, .notif-badge, .notif-badge-2, .como-line {
+          .badge-pulse-anim, .como-line {
             animation: none !important;
             transition: none !important;
             opacity: 1 !important;
