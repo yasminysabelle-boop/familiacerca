@@ -817,8 +817,8 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ── PWA — crimson gradient ── */}
-      <section style={{ padding: '128px 32px', background: `linear-gradient(135deg, ${P} 0%, ${PD} 55%, #4A0808 100%)` }}>
+      {/* ── PWA — green gradient ── */}
+      <section style={{ padding: '128px 32px', background: 'linear-gradient(135deg, #2D5016 0%, #4A7C59 100%)' }}>
         <div style={{ maxWidth: 980, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 72, flexWrap: 'wrap' }}>
           <div style={{ flex: '1 1 300px' }}>
             <p style={{ fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 18px', fontFamily: SANS }}>Sin App Store</p>
