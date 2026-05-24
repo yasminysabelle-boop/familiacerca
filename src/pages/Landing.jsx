@@ -691,7 +691,7 @@ export default function Landing() {
             ].map((t, i) => (
               <div key={t.name} className={`reveal reveal-delay-${i % 3}`} style={{
                 background: '#1F0A0A', borderRadius: 20,
-                border: '1px solid rgba(201,136,42,0.30)',
+                border: '1px solid rgba(74,124,89,0.40)',
                 padding: '32px 28px', boxShadow: '0 8px 40px rgba(0,0,0,0.32)',
                 display: 'flex', flexDirection: 'column',
               }}>
@@ -702,8 +702,8 @@ export default function Landing() {
                   "{t.text}"
                 </p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div style={{ width: 46, height: 46, borderRadius: '50%', background: 'rgba(201,136,42,0.14)', border: '1px solid rgba(201,136,42,0.28)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <span style={{ fontFamily: SERIF, fontSize: 20, fontWeight: 700, color: AU }}>{t.initial}</span>
+                  <div style={{ width: 46, height: 46, borderRadius: '50%', background: '#4A7C59', border: '1px solid rgba(74,124,89,0.60)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <span style={{ fontFamily: SERIF, fontSize: 20, fontWeight: 700, color: 'white' }}>{t.initial}</span>
                   </div>
                   <div>
                     <p style={{ margin: 0, fontSize: 14, fontWeight: 500, color: 'white', fontFamily: SANS }}>{t.name}</p>
