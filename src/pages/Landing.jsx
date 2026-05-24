@@ -473,44 +473,8 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Separator between stats and marquees */}
+      {/* Separator between stats and next section */}
       <div style={{ background: `linear-gradient(to right, ${DK}, rgba(201,136,42,0.35), ${DK})`, height: 1 }} />
-      <div style={{ height: 24, background: P }} />
-
-      {/* ── MARQUEE STRIP ── */}
-      <section style={{ background: P, paddingBottom: 0, overflow: 'hidden' }}>
-        {/* Row 1 — pain points, left-to-right */}
-        <div className="marquee-container" style={{ marginBottom: 10 }}>
-          <div className="marquee-track">
-            {[...marqueePain, ...marqueePain].map((item, i) => (
-              <span key={i} style={{
-                display: 'inline-flex', alignItems: 'center', gap: 10,
-                padding: '0 32px', whiteSpace: 'nowrap',
-                fontSize: 14, color: 'rgba(255,255,255,0.85)', fontFamily: SANS, fontWeight: 400,
-              }}>
-                {item}
-                <span style={{ color: 'rgba(255,255,255,0.20)', fontSize: 18, lineHeight: 1 }}>·</span>
-              </span>
-            ))}
-          </div>
-        </div>
-
-        {/* Row 2 — features, right-to-left */}
-        <div className="marquee-container" style={{ paddingBottom: 18 }}>
-          <div className="marquee-track marquee-track-reverse">
-            {[...marqueeFeatures, ...marqueeFeatures].map((item, i) => (
-              <span key={i} style={{
-                display: 'inline-flex', alignItems: 'center', gap: 10,
-                padding: '0 32px', whiteSpace: 'nowrap',
-                fontSize: 14, color: 'rgba(255,255,255,0.65)', fontFamily: SANS, fontWeight: 300,
-              }}>
-                {item}
-                <span style={{ color: 'rgba(255,255,255,0.18)', fontSize: 18, lineHeight: 1 }}>·</span>
-              </span>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* ── PROBLEMA — before/after ── */}
       <section style={{ overflow: 'hidden' }}>
@@ -545,6 +509,24 @@ export default function Landing() {
                 ))}
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── PAIN POINTS MARQUEE ── */}
+      <section style={{ background: P, padding: '18px 0', overflow: 'hidden' }}>
+        <div className="marquee-container">
+          <div className="marquee-track">
+            {[...marqueePain, ...marqueePain].map((item, i) => (
+              <span key={i} style={{
+                display: 'inline-flex', alignItems: 'center', gap: 10,
+                padding: '0 32px', whiteSpace: 'nowrap',
+                fontSize: 14, color: 'rgba(255,255,255,0.85)', fontFamily: SANS, fontWeight: 400,
+              }}>
+                {item}
+                <span style={{ color: 'rgba(255,255,255,0.20)', fontSize: 18, lineHeight: 1 }}>·</span>
+              </span>
+            ))}
           </div>
         </div>
       </section>
@@ -775,6 +757,24 @@ export default function Landing() {
           </div>
           <div style={{ flex: '1 1 360px', display: 'flex', justifyContent: 'center' }} className="como-img">
             <img src={COMO_IMG} alt="Cómo funciona FamiliaCerca" style={{ width: '100%', borderRadius: 24, boxShadow: '0 32px 96px rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.06)' }} />
+          </div>
+        </div>
+      </section>
+
+      {/* ── FEATURES MARQUEE ── */}
+      <section style={{ background: P, padding: '18px 0', overflow: 'hidden' }}>
+        <div className="marquee-container">
+          <div className="marquee-track marquee-track-reverse">
+            {[...marqueeFeatures, ...marqueeFeatures].map((item, i) => (
+              <span key={i} style={{
+                display: 'inline-flex', alignItems: 'center', gap: 10,
+                padding: '0 32px', whiteSpace: 'nowrap',
+                fontSize: 14, color: 'rgba(255,255,255,0.65)', fontFamily: SANS, fontWeight: 300,
+              }}>
+                {item}
+                <span style={{ color: 'rgba(255,255,255,0.18)', fontSize: 18, lineHeight: 1 }}>·</span>
+              </span>
+            ))}
           </div>
         </div>
       </section>
