@@ -561,8 +561,14 @@ export default function Landing() {
       </section>
 
       {/* ── FEATURES ── */}
-      <section id="funciones" style={{ padding: '128px 32px', background: '#1a0a0a' }}>
-        <div style={{ maxWidth: 1140, margin: '0 auto' }}>
+      <section id="funciones" style={{ padding: '128px 32px', background: '#1C0F0F', position: 'relative', overflow: 'hidden' }}>
+        {/* Gold radial glow behind title */}
+        <div style={{
+          position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)',
+          width: 800, height: 400, pointerEvents: 'none',
+          background: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(201,136,42,0.08) 0%, transparent 70%)',
+        }} />
+        <div style={{ maxWidth: 1140, margin: '0 auto', position: 'relative' }}>
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 80 }}>
             <p style={{ fontSize: 11, fontWeight: 500, color: AU, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>Funciones</p>
             <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(36px,4.5vw,58px)', fontWeight: 600, color: 'white', lineHeight: 1.1, margin: '0 0 20px' }}>
