@@ -561,14 +561,14 @@ export default function Landing() {
       </section>
 
       {/* ── FEATURES ── */}
-      <section id="funciones" style={{ padding: '128px 32px', background: 'white' }}>
+      <section id="funciones" style={{ padding: '128px 32px', background: '#1a0a0a' }}>
         <div style={{ maxWidth: 1140, margin: '0 auto' }}>
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 80 }}>
-            <p style={{ fontSize: 11, fontWeight: 500, color: P, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>Funciones</p>
-            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(36px,4.5vw,58px)', fontWeight: 600, color: DK, lineHeight: 1.1, margin: '0 0 20px' }}>
+            <p style={{ fontSize: 11, fontWeight: 500, color: AU, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>Funciones</p>
+            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(36px,4.5vw,58px)', fontWeight: 600, color: 'white', lineHeight: 1.1, margin: '0 0 20px' }}>
               Todo lo que necesitas en un solo lugar
             </h2>
-            <p style={{ fontSize: 17, color: '#6B5848', lineHeight: 1.78, maxWidth: 540, margin: '0 auto', fontFamily: SANS, fontWeight: 300 }}>
+            <p style={{ fontSize: 17, color: 'rgba(255,255,255,0.50)', lineHeight: 1.78, maxWidth: 540, margin: '0 auto', fontFamily: SANS, fontWeight: 300 }}>
               FamiliaCerca coordina a toda la familia para que ningún detalle del cuidado quede sin atender.
             </p>
           </div>
@@ -577,51 +577,51 @@ export default function Landing() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 24, marginBottom: 24 }}>
 
             {/* Medicamentos */}
-            <div className="feature-hero-card reveal" style={{ background: 'white', borderRadius: 20, border: `1px solid ${BD}`, padding: '36px 30px', boxShadow: '0 8px 40px rgba(0,0,0,0.07)', minHeight: 380, position: 'relative' }}>
-              <div style={{ width: 60, height: 60, borderRadius: 16, background: `rgba(139,26,26,0.07)`, border: `1px solid ${BD}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, marginBottom: 18 }}>💊</div>
-              <div style={{ display: 'inline-flex', padding: '4px 12px', borderRadius: 9999, border: `1px solid ${BD}`, marginBottom: 12 }}>
-                <span style={{ fontSize: 10, fontWeight: 500, color: P, letterSpacing: '0.08em', fontFamily: SANS }}>Lo más importante</span>
+            <div className="feature-hero-card reveal" style={{ background: '#1F0A0A', borderRadius: 20, border: '1px solid rgba(139,26,26,0.28)', padding: '36px 30px', boxShadow: '0 8px 40px rgba(0,0,0,0.32)', minHeight: 380, position: 'relative' }}>
+              <div style={{ width: 60, height: 60, borderRadius: 16, background: 'rgba(139,26,26,0.22)', border: '1px solid rgba(139,26,26,0.40)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, marginBottom: 18 }}>💊</div>
+              <div style={{ display: 'inline-flex', padding: '4px 12px', borderRadius: 9999, border: '1px solid rgba(201,136,42,0.25)', marginBottom: 12, background: 'rgba(201,136,42,0.08)' }}>
+                <span style={{ fontSize: 10, fontWeight: 500, color: AU, letterSpacing: '0.08em', fontFamily: SANS }}>Lo más importante</span>
               </div>
-              <h3 style={{ fontFamily: SERIF, fontSize: 21, fontWeight: 600, color: DK, margin: '0 0 10px', lineHeight: 1.2 }}>Control de medicamentos</h3>
-              <p style={{ fontSize: 14, color: '#6B5848', lineHeight: 1.75, margin: '0 0 20px', fontFamily: SANS, fontWeight: 300 }}>
+              <h3 style={{ fontFamily: SERIF, fontSize: 21, fontWeight: 600, color: 'white', margin: '0 0 10px', lineHeight: 1.2 }}>Control de medicamentos</h3>
+              <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.50)', lineHeight: 1.75, margin: '0 0 20px', fontFamily: SANS, fontWeight: 300 }}>
                 Registra cada medicamento con horario y dosis. Confirma con foto de prueba y notifica a todos en tiempo real.
               </p>
-              <div style={{ background: SF, borderRadius: 12, padding: '12px 14px', border: `1px solid ${BD}` }}>
+              <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 12, padding: '12px 14px', border: '1px solid rgba(139,26,26,0.22)' }}>
                 {[
                   { label: 'Atenolol 25mg · 8am', done: true },
                   { label: 'Metformina 500mg · 1pm', done: true },
                   { label: 'Losartán 50mg · 8pm', done: false },
                 ].map((item, i, arr) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '7px 0', borderBottom: i < arr.length - 1 ? `1px solid ${BD}` : 'none' }}>
-                    <span style={{ width: 18, height: 18, borderRadius: '50%', background: item.done ? SG : 'transparent', border: `1.5px solid ${item.done ? SG : BD}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '7px 0', borderBottom: i < arr.length - 1 ? '1px solid rgba(255,255,255,0.06)' : 'none' }}>
+                    <span style={{ width: 18, height: 18, borderRadius: '50%', background: item.done ? SG : 'transparent', border: `1.5px solid ${item.done ? SG : 'rgba(255,255,255,0.18)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                       {item.done && <span style={{ color: 'white', fontSize: 9 }}>✓</span>}
                     </span>
-                    <span style={{ fontSize: 11, fontFamily: SANS, color: item.done ? '#9CA3AF' : DK, textDecoration: item.done ? 'line-through' : 'none' }}>{item.label}</span>
+                    <span style={{ fontSize: 11, fontFamily: SANS, color: item.done ? 'rgba(255,255,255,0.30)' : 'rgba(255,255,255,0.72)', textDecoration: item.done ? 'line-through' : 'none' }}>{item.label}</span>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Chat */}
-            <div className="feature-hero-card reveal reveal-delay-1" style={{ background: 'white', borderRadius: 20, border: `1px solid ${BD}`, padding: '36px 30px', boxShadow: '0 8px 40px rgba(0,0,0,0.07)', minHeight: 380, position: 'relative' }}>
-              <div style={{ width: 60, height: 60, borderRadius: 16, background: `rgba(139,26,26,0.07)`, border: `1px solid ${BD}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, marginBottom: 18 }}>💬</div>
-              <div style={{ display: 'inline-flex', padding: '4px 12px', borderRadius: 9999, border: `1px solid ${BD}`, marginBottom: 12 }}>
-                <span style={{ fontSize: 10, fontWeight: 500, color: P, letterSpacing: '0.08em', fontFamily: SANS }}>En tiempo real</span>
+            <div className="feature-hero-card reveal reveal-delay-1" style={{ background: '#1F0A0A', borderRadius: 20, border: '1px solid rgba(139,26,26,0.28)', padding: '36px 30px', boxShadow: '0 8px 40px rgba(0,0,0,0.32)', minHeight: 380, position: 'relative' }}>
+              <div style={{ width: 60, height: 60, borderRadius: 16, background: 'rgba(139,26,26,0.22)', border: '1px solid rgba(139,26,26,0.40)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, marginBottom: 18 }}>💬</div>
+              <div style={{ display: 'inline-flex', padding: '4px 12px', borderRadius: 9999, border: '1px solid rgba(201,136,42,0.25)', marginBottom: 12, background: 'rgba(201,136,42,0.08)' }}>
+                <span style={{ fontSize: 10, fontWeight: 500, color: AU, letterSpacing: '0.08em', fontFamily: SANS }}>En tiempo real</span>
               </div>
-              <h3 style={{ fontFamily: SERIF, fontSize: 21, fontWeight: 600, color: DK, margin: '0 0 10px', lineHeight: 1.2 }}>Chat familiar coordinado</h3>
-              <p style={{ fontSize: 14, color: '#6B5848', lineHeight: 1.75, margin: '0 0 20px', fontFamily: SANS, fontWeight: 300 }}>
+              <h3 style={{ fontFamily: SERIF, fontSize: 21, fontWeight: 600, color: 'white', margin: '0 0 10px', lineHeight: 1.2 }}>Chat familiar coordinado</h3>
+              <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.50)', lineHeight: 1.75, margin: '0 0 20px', fontFamily: SANS, fontWeight: 300 }}>
                 Un grupo dedicado solo al cuidado. Sin mezclar con WhatsApp. Notas de turno visibles para todos.
               </p>
-              <div style={{ background: SF, borderRadius: 12, padding: '12px', border: `1px solid ${BD}`, display: 'flex', flexDirection: 'column', gap: 7 }}>
+              <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 12, padding: '12px', border: '1px solid rgba(139,26,26,0.22)', display: 'flex', flexDirection: 'column', gap: 7 }}>
                 {[
                   { from: 'María', msg: 'Ya le di las pastillas 💊', mine: false },
                   { from: 'Yo', msg: 'Perfecto! Voy al doctor a las 3', mine: true },
                   { from: 'Carlos', msg: 'Llego a las 5 para relevarte', mine: false },
                 ].map((b, i) => (
                   <div key={i} style={{ display: 'flex', justifyContent: b.mine ? 'flex-end' : 'flex-start' }}>
-                    <div style={{ maxWidth: '82%', padding: '6px 10px', borderRadius: 10, background: b.mine ? P : 'white', border: b.mine ? 'none' : `1px solid ${BD}`, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+                    <div style={{ maxWidth: '82%', padding: '6px 10px', borderRadius: 10, background: b.mine ? P : 'rgba(255,255,255,0.07)', border: b.mine ? 'none' : '1px solid rgba(255,255,255,0.08)' }}>
                       {!b.mine && <p style={{ margin: '0 0 2px', fontSize: 9, color: AU, fontFamily: SANS, fontWeight: 500 }}>{b.from}</p>}
-                      <p style={{ margin: 0, fontSize: 11, color: b.mine ? 'white' : DK, fontFamily: SANS, lineHeight: 1.4 }}>{b.msg}</p>
+                      <p style={{ margin: 0, fontSize: 11, color: 'rgba(255,255,255,0.80)', fontFamily: SANS, lineHeight: 1.4 }}>{b.msg}</p>
                     </div>
                   </div>
                 ))}
@@ -629,31 +629,31 @@ export default function Landing() {
             </div>
 
             {/* Memorias */}
-            <div className="feature-hero-card reveal reveal-delay-2" style={{ background: 'white', borderRadius: 20, border: `1px solid ${BD}`, padding: '36px 30px', boxShadow: '0 8px 40px rgba(0,0,0,0.07)', minHeight: 380, position: 'relative' }}>
-              <div style={{ width: 60, height: 60, borderRadius: 16, background: `rgba(139,26,26,0.07)`, border: `1px solid ${BD}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, marginBottom: 18 }}>📸</div>
-              <div style={{ display: 'inline-flex', padding: '4px 12px', borderRadius: 9999, border: `1px solid ${BD}`, marginBottom: 12 }}>
-                <span style={{ fontSize: 10, fontWeight: 500, color: P, letterSpacing: '0.08em', fontFamily: SANS }}>Exclusivo Familiar</span>
+            <div className="feature-hero-card reveal reveal-delay-2" style={{ background: '#1F0A0A', borderRadius: 20, border: '1px solid rgba(139,26,26,0.28)', padding: '36px 30px', boxShadow: '0 8px 40px rgba(0,0,0,0.32)', minHeight: 380, position: 'relative' }}>
+              <div style={{ width: 60, height: 60, borderRadius: 16, background: 'rgba(139,26,26,0.22)', border: '1px solid rgba(139,26,26,0.40)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, marginBottom: 18 }}>📸</div>
+              <div style={{ display: 'inline-flex', padding: '4px 12px', borderRadius: 9999, border: '1px solid rgba(201,136,42,0.25)', marginBottom: 12, background: 'rgba(201,136,42,0.08)' }}>
+                <span style={{ fontSize: 10, fontWeight: 500, color: AU, letterSpacing: '0.08em', fontFamily: SANS }}>Exclusivo Familiar</span>
               </div>
-              <h3 style={{ fontFamily: SERIF, fontSize: 21, fontWeight: 600, color: DK, margin: '0 0 10px', lineHeight: 1.2 }}>Álbum de memorias</h3>
-              <p style={{ fontSize: 14, color: '#6B5848', lineHeight: 1.75, margin: '0 0 20px', fontFamily: SANS, fontWeight: 300 }}>
+              <h3 style={{ fontFamily: SERIF, fontSize: 21, fontWeight: 600, color: 'white', margin: '0 0 10px', lineHeight: 1.2 }}>Álbum de memorias</h3>
+              <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.50)', lineHeight: 1.75, margin: '0 0 20px', fontFamily: SANS, fontWeight: 300 }}>
                 Guarda fotos, notas de voz y momentos especiales junto al registro de salud. El cuidado también es amor.
               </p>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 7 }}>
                 {['🌻','👴','❤️','🎂','🌿','💐'].map((em, i) => (
-                  <div key={i} style={{ aspectRatio: '1', borderRadius: 10, background: i % 2 === 0 ? SF : `rgba(139,26,26,0.05)`, border: `1px solid ${BD}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>{em}</div>
+                  <div key={i} style={{ aspectRatio: '1', borderRadius: 10, background: i % 2 === 0 ? 'rgba(255,255,255,0.05)' : 'rgba(139,26,26,0.18)', border: '1px solid rgba(139,26,26,0.28)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>{em}</div>
                 ))}
               </div>
             </div>
           </div>
 
-          {/* 3 secondary cards — dark crimson */}
+          {/* 3 secondary cards */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 18 }}>
             {[
               { icon: '✅', title: 'Checklist diario', desc: 'Baño, comidas, ejercicio, cambios de posición — marcado en tiempo real.' },
               { icon: '🆘', title: 'Botón SOS', desc: 'Alerta instantánea a todos los cuidadores con un solo toque en caso de emergencia.' },
               { icon: '💰', title: 'Gastos de salud', desc: 'Control de medicamentos, consultas y terapias sin perder ningún gasto deducible.' },
             ].map((f, i) => (
-              <div key={f.title} className={`reveal reveal-delay-${i}`} style={{ background: '#1F0505', borderRadius: 16, border: '1px solid rgba(139,26,26,0.28)', padding: '26px 24px', display: 'flex', gap: 16, alignItems: 'flex-start' }}>
+              <div key={f.title} className={`reveal reveal-delay-${i}`} style={{ background: '#1F0A0A', borderRadius: 16, border: '1px solid rgba(139,26,26,0.28)', padding: '26px 24px', display: 'flex', gap: 16, alignItems: 'flex-start' }}>
                 <div style={{ width: 46, height: 46, borderRadius: 12, background: 'rgba(139,26,26,0.28)', border: '1px solid rgba(139,26,26,0.40)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>{f.icon}</div>
                 <div>
                   <h3 style={{ fontFamily: SERIF, fontSize: 18, fontWeight: 600, color: 'white', margin: '0 0 6px' }}>{f.title}</h3>
