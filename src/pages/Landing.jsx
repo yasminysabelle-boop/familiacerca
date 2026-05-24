@@ -671,56 +671,46 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ── TESTIMONIOS — 3 different colored cards ── */}
-      <section style={{ padding: '128px 32px', background: SF }}>
+      {/* ── TESTIMONIOS — 2×3 dark grid ── */}
+      <section style={{ padding: '128px 32px', background: DK }}>
         <div style={{ maxWidth: 1140, margin: '0 auto' }}>
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 72 }}>
-            <p style={{ fontSize: 11, fontWeight: 500, color: P, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>Testimonios</p>
-            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(36px,4.5vw,58px)', fontWeight: 600, color: DK, lineHeight: 1.1, margin: 0 }}>
+            <p style={{ fontSize: 11, fontWeight: 500, color: AU, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>Testimonios</p>
+            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(36px,4.5vw,58px)', fontWeight: 600, color: 'white', lineHeight: 1.1, margin: 0 }}>
               Familias que cuidan mejor juntas
             </h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 24 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }} className="testimonios-grid">
             {[
-              {
-                name: 'María G.', role: 'Hija cuidadora', location: 'Monterrey, México', initial: 'M',
-                text: 'Antes mi hermano y yo nos peleábamos porque ninguno sabía si mi mamá ya había tomado su pastilla. Ahora con FamiliaCerca todos vemos lo mismo al mismo tiempo. ¡Nos salvó la convivencia familiar!',
-                bg: P, textColor: 'rgba(255,255,255,0.82)', starColor: AU,
-                avatarBg: 'rgba(255,255,255,0.15)', avatarColor: 'white',
-                nameColor: 'white', metaColor: 'rgba(255,255,255,0.42)', locBg: 'rgba(255,255,255,0.10)',
-              },
-              {
-                name: 'Roberto S.', role: 'Hijo mayor', location: 'Ciudad de México', initial: 'R',
-                text: 'La función de foto de prueba fue un cambio total. Ahora tenemos evidencia de cada medicamento y podemos mostrársela al cardiólogo. El doctor quedó impresionado con el registro.',
-                bg: '#0A0500', textColor: 'rgba(255,255,255,0.72)', starColor: AU,
-                avatarBg: 'rgba(201,136,42,0.15)', avatarColor: AU,
-                nameColor: 'white', metaColor: 'rgba(255,255,255,0.38)', locBg: 'rgba(201,136,42,0.10)',
-              },
-              {
-                name: 'Carmen L.', role: 'Enfermera y cuidadora', location: 'Guadalajara, México', initial: 'C',
-                text: 'Llevo 15 años como enfermera y nunca había visto una app tan práctica para el cuidado en casa. La recomiendo a todas las familias de mis pacientes.',
-                bg: AU, textColor: 'rgba(15,10,0,0.78)', starColor: PD,
-                avatarBg: 'rgba(15,10,0,0.15)', avatarColor: DK,
-                nameColor: DK, metaColor: 'rgba(15,10,0,0.50)', locBg: 'rgba(15,10,0,0.08)',
-              },
+              { name: 'María G.',    initial: 'M', role: 'Hija cuidadora',          location: 'Houston, Texas',             text: 'Antes mi hermano y yo nos peleábamos porque ninguno sabía si mamá ya había tomado su pastilla. Ahora con FamiliaCerca todos vemos lo mismo al mismo tiempo. ¡Nos salvó la convivencia familiar!' },
+              { name: 'Roberto S.',  initial: 'R', role: 'Hijo mayor',               location: 'Los Ángeles, California',    text: 'La función de foto de prueba fue un cambio total. Ahora tenemos evidencia de cada medicamento y podemos mostrársela al cardiólogo. El doctor quedó impresionado con el registro.' },
+              { name: 'Carmen L.',   initial: 'C', role: 'Enfermera, uso personal',  location: 'Miami, Florida',             text: 'Llevo 15 años como enfermera y nunca había visto una app tan práctica para el cuidado en casa. La recomiendo a todas las familias de mis pacientes.' },
+              { name: 'Patricia V.', initial: 'P', role: 'Coordinadora familiar',    location: 'San Juan, Puerto Rico',      text: 'Somos 4 hermanos en distintos estados cuidando a nuestro papá. FamiliaCerca nos unió. Cada uno sabe qué le toca y cuándo. Ya no hay excusas ni confusiones.' },
+              { name: 'Jorge M.',    initial: 'J', role: 'Esposo cuidador',          location: 'Nueva York, NY',             text: 'Mi esposa tiene Alzheimer y el checklist diario me salvó. Puedo registrar cada comida, cada baño, cada medicamento. Por fin duermo tranquilo sabiendo que nada se me escapa.' },
+              { name: 'Lucía R.',    initial: 'L', role: 'Hija única',               location: 'Chicago, Illinois',          text: 'Cuido sola a mis dos padres mayores desde hace 3 años. FamiliaCerca me ayuda a organizarme y el botón SOS me da tranquilidad cuando no estoy en casa. No sé cómo lo hacía antes.' },
             ].map((t, i) => (
-              <div key={t.name} className={`reveal reveal-delay-${i}`} style={{ background: t.bg, borderRadius: 24, padding: '36px 30px', boxShadow: '0 16px 56px rgba(0,0,0,0.14)', minHeight: 300, display: 'flex', flexDirection: 'column' }}>
-                <div style={{ display: 'flex', gap: 3, marginBottom: 20 }}>
-                  {[1,2,3,4,5].map(s => <span key={s} style={{ color: t.starColor, fontSize: 14 }}>★</span>)}
+              <div key={t.name} className={`reveal reveal-delay-${i % 3}`} style={{
+                background: '#1F0A0A', borderRadius: 20,
+                border: '1px solid rgba(201,136,42,0.30)',
+                padding: '32px 28px', boxShadow: '0 8px 40px rgba(0,0,0,0.32)',
+                display: 'flex', flexDirection: 'column',
+              }}>
+                <div style={{ display: 'flex', gap: 3, marginBottom: 18 }}>
+                  {[1,2,3,4,5].map(s => <span key={s} style={{ color: AU, fontSize: 13 }}>★</span>)}
                 </div>
-                <p style={{ fontSize: 15, color: t.textColor, lineHeight: 1.85, margin: '0 0 28px', fontFamily: SANS, fontWeight: 300, fontStyle: 'italic', flex: 1 }}>
+                <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.68)', lineHeight: 1.85, margin: '0 0 24px', fontFamily: SANS, fontWeight: 300, fontStyle: 'italic', flex: 1 }}>
                   "{t.text}"
                 </p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div style={{ width: 52, height: 52, borderRadius: '50%', background: t.avatarBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <span style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 700, color: t.avatarColor }}>{t.initial}</span>
+                  <div style={{ width: 46, height: 46, borderRadius: '50%', background: 'rgba(201,136,42,0.14)', border: '1px solid rgba(201,136,42,0.28)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <span style={{ fontFamily: SERIF, fontSize: 20, fontWeight: 700, color: AU }}>{t.initial}</span>
                   </div>
                   <div>
-                    <p style={{ margin: 0, fontSize: 14, fontWeight: 500, color: t.nameColor, fontFamily: SANS }}>{t.name}</p>
-                    <p style={{ margin: '2px 0 6px', fontSize: 12, color: t.metaColor, fontFamily: SANS, fontWeight: 300 }}>{t.role}</p>
-                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: t.locBg, borderRadius: 9999, padding: '2px 10px' }}>
+                    <p style={{ margin: 0, fontSize: 14, fontWeight: 500, color: 'white', fontFamily: SANS }}>{t.name}</p>
+                    <p style={{ margin: '2px 0 6px', fontSize: 12, color: 'rgba(255,255,255,0.38)', fontFamily: SANS, fontWeight: 300 }}>{t.role}</p>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: 'rgba(201,136,42,0.08)', borderRadius: 9999, padding: '2px 10px' }}>
                       <span style={{ fontSize: 9 }}>📍</span>
-                      <span style={{ fontSize: 10, color: t.metaColor, fontFamily: SANS, fontWeight: 300 }}>{t.location}</span>
+                      <span style={{ fontSize: 10, color: AU, fontFamily: SANS, fontWeight: 300 }}>{t.location}</span>
                     </div>
                   </div>
                 </div>
@@ -1058,6 +1048,7 @@ export default function Landing() {
           .landing-problema-img { min-height: 300px !important; }
           .como-grid { flex-direction: column !important; gap: 52px !important; }
           .como-img { display: none !important; }
+          .testimonios-grid { grid-template-columns: 1fr !important; }
         }
         @media (max-width: 640px) {
           .landing-divider { display: none !important; }
