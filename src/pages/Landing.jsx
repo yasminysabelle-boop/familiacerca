@@ -7,8 +7,8 @@ const PROB_IMG = 'https://i.postimg.cc/3JdVcYsn/Chat-GPT-Image-May-22-2026-10-21
 const COMO_IMG = 'https://i.postimg.cc/hGTq3cd4/Chat-GPT-Image-May-22-2026-10-22-32-PM.png'
 const CTA_IMG  = 'https://i.postimg.cc/hj8chcDs/Chat-GPT-Image-May-22-2026-10-23-48-PM.png'
 
-const P  = '#8B1A1A'
-const PD = '#6B1010'
+const P  = '#4A7C59'
+const PD = '#3A6147'
 const AU = '#C9882A'
 const SG = '#2D6A4F'
 const DK = '#0F0A00'
