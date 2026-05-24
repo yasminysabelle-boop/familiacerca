@@ -398,12 +398,12 @@ export default function Landing() {
           <div style={{ position: 'relative', width: '100%', maxWidth: 520, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <div className="hero-reveal hero-delay-1" style={{
               display: 'inline-flex', alignItems: 'center', gap: 8,
-              border: '1px solid rgba(201,136,42,0.25)', borderRadius: 9999,
+              border: '1px solid rgba(74,124,89,0.35)', borderRadius: 9999,
               padding: '7px 18px', marginBottom: 36,
-              background: 'rgba(201,136,42,0.08)',
+              background: 'rgba(74,124,89,0.12)',
             }}>
-              <span style={{ fontSize: 13 }}>💊</span>
-              <span style={{ fontSize: 12, fontWeight: 500, color: AU, letterSpacing: '0.06em', fontFamily: SANS }}>
+              <span style={{ fontSize: 13 }}>🌿</span>
+              <span style={{ fontSize: 12, fontWeight: 500, color: '#4A7C59', letterSpacing: '0.06em', fontFamily: SANS }}>
                 Cuidado familiar coordinado
               </span>
             </div>
@@ -427,7 +427,18 @@ export default function Landing() {
               FamiliaCerca coordina medicamentos, rutinas y bienestar de tu familiar entre todos los cuidadores — en tiempo real, desde el celular.
             </p>
 
-            <div className="hero-reveal hero-delay-4" style={{ display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap', justifyContent: 'center' }}>
+            <Link to="/login" className="hero-reveal hero-delay-4" style={{
+              display: 'inline-flex', alignItems: 'center', gap: 10,
+              padding: '16px 44px', borderRadius: 9999, marginBottom: 32,
+              background: '#4A7C59', color: 'white',
+              fontWeight: 600, fontSize: 16, fontFamily: SANS,
+              textDecoration: 'none', letterSpacing: '0.02em',
+              boxShadow: '0 12px 40px rgba(74,124,89,0.40)',
+            }}>
+              Empezar gratis <span style={{ fontSize: 18, opacity: 0.85 }}>→</span>
+            </Link>
+
+            <div className="hero-reveal hero-delay-5" style={{ display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap', justifyContent: 'center' }}>
               {['Gratis para empezar', 'Sin App Store', 'iPhone y Android'].map(t => (
                 <div key={t} style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
                   <span style={{ fontSize: 12, color: SG, fontWeight: 600 }}>✓</span>
