@@ -45,7 +45,7 @@ const fieldStyle = {
   fontSize: 14, outline: 'none', boxSizing: 'border-box',
   transition: 'all 0.15s', appearance: 'none', WebkitAppearance: 'none',
 }
-const onFocus = e => { e.target.style.borderColor = '#C4623A'; e.target.style.boxShadow = '0 0 0 3px rgba(196,98,58,0.1)' }
+const onFocus = e => { e.target.style.borderColor = '#4A7C59'; e.target.style.boxShadow = '0 0 0 3px rgba(196,98,58,0.1)' }
 const onBlur  = e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.boxShadow = 'none' }
 const labelStyle = {
   display: 'block', fontSize: 11, fontWeight: 700, color: '#6B7280',
@@ -216,7 +216,7 @@ export default function Medications() {
             onClick={openAdd}
             style={{
               width: 40, height: 40, borderRadius: 12,
-              background: 'linear-gradient(135deg, #C4623A, #A85130)',
+              background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
               border: 'none', cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               boxShadow: '0 4px 12px rgba(196,98,58,0.3)',
@@ -236,9 +236,9 @@ export default function Medications() {
           }}>
             <div style={{
               width: 36, height: 36, borderRadius: 10, flexShrink: 0,
-              background: '#FDF0EB', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: '#EBF3EE', display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
-              <Bell size={18} color="#C4623A" strokeWidth={1.5} />
+              <Bell size={18} color="#4A7C59" strokeWidth={1.5} />
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', marginBottom: 1 }}>
@@ -252,7 +252,7 @@ export default function Medications() {
               onClick={requestAndSubscribe}
               style={{
                 padding: '7px 14px', borderRadius: 10,
-                background: 'linear-gradient(135deg, #C4623A, #A85130)',
+                background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
                 color: 'white', fontWeight: 700, fontSize: 12,
                 border: 'none', cursor: 'pointer', flexShrink: 0,
               }}
@@ -267,7 +267,7 @@ export default function Medications() {
           <div style={{ display: 'flex', justifyContent: 'center', padding: '48px 0' }}>
             <div style={{
               width: 28, height: 28, borderRadius: '50%',
-              border: '3px solid #EDE5D8', borderTopColor: '#C4623A',
+              border: '3px solid #EDE5D8', borderTopColor: '#4A7C59',
               animation: 'spin 0.8s linear infinite',
             }} />
           </div>
@@ -286,7 +286,7 @@ export default function Medications() {
               onClick={openAdd}
               style={{
                 padding: '10px 24px', borderRadius: 12,
-                background: 'linear-gradient(135deg, #C4623A, #A85130)',
+                background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
                 color: 'white', fontWeight: 700, fontSize: 13,
                 border: 'none', cursor: 'pointer',
               }}
@@ -307,7 +307,7 @@ export default function Medications() {
                   key={med.id}
                   style={{
                     background: 'white', borderRadius: 16,
-                    border: '1px solid #EDE5D8', borderLeft: '4px solid #C4623A',
+                    border: '1px solid #EDE5D8', borderLeft: '4px solid #4A7C59',
                     padding: '14px 16px',
                     boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
                   }}
@@ -323,7 +323,7 @@ export default function Medications() {
                         )}
                         {(opt?.label ?? med.frequency) && (
                           <span style={{
-                            background: '#FDF0EB', color: '#C4623A',
+                            background: '#EBF3EE', color: '#4A7C59',
                             padding: '2px 8px', borderRadius: 6, fontSize: 11, fontWeight: 600,
                           }}>
                             {opt?.label ?? med.frequency}
@@ -553,7 +553,7 @@ export default function Medications() {
                   onClick={!canEdit ? (e) => { e.preventDefault(); navigate('/pricing') } : undefined}
                   style={{
                     flex: 2, padding: '13px',
-                    background: (saving || !canEdit) ? '#D4C4B8' : 'linear-gradient(135deg, #C4623A, #A85130)',
+                    background: (saving || !canEdit) ? '#D4C4B8' : 'linear-gradient(135deg, #4A7C59, #3A6347)',
                     color: 'white', fontWeight: 700, fontSize: 14,
                     borderRadius: 14, border: 'none',
                     cursor: saving ? 'not-allowed' : 'pointer',

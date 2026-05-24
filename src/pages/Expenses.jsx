@@ -9,7 +9,7 @@ import { ChevronLeft, ChevronRight, Plus, XIcon, Camera } from '../components/Ic
 import { track } from '../lib/analytics'
 
 const CATEGORIES = [
-  { id: 'Medicamentos',    emoji: '💊', color: '#C4623A' },
+  { id: 'Medicamentos',    emoji: '💊', color: '#4A7C59' },
   { id: 'Citas médicas',   emoji: '🏥', color: '#2D86A0' },
   { id: 'Transporte',      emoji: '🚗', color: '#4A7C59' },
   { id: 'Cuidador',        emoji: '🤝', color: '#7C5CBF' },
@@ -232,7 +232,7 @@ export default function Expenses() {
     fontSize: 14, outline: 'none', background: 'white',
     boxSizing: 'border-box', color: '#1A1A1A', transition: 'all 0.15s',
   }
-  const onFocus = e => { e.target.style.borderColor = '#C4623A'; e.target.style.boxShadow = '0 0 0 3px rgba(196,98,58,0.1)' }
+  const onFocus = e => { e.target.style.borderColor = '#4A7C59'; e.target.style.boxShadow = '0 0 0 3px rgba(196,98,58,0.1)' }
   const onBlur  = e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.boxShadow = 'none' }
 
   const canSave = !saving && !!form.amount && !!form.paid_by.trim()
@@ -334,7 +334,7 @@ export default function Expenses() {
               <p style={{ fontSize: 14, color: '#D63031', marginBottom: 12 }}>{loadError}</p>
               <button onClick={loadExpenses} style={{
                 padding: '10px 20px', borderRadius: 12, border: 'none',
-                background: '#C4623A', color: 'white', fontWeight: 700, fontSize: 13, cursor: 'pointer',
+                background: '#4A7C59', color: 'white', fontWeight: 700, fontSize: 13, cursor: 'pointer',
               }}>Reintentar</button>
             </div>
           ) : expenses.length === 0 ? (
@@ -464,7 +464,7 @@ export default function Expenses() {
           style={{
             position: 'fixed', bottom: 84, right: 20, zIndex: 30,
             width: 54, height: 54, borderRadius: '50%',
-            background: 'linear-gradient(135deg, #C4623A, #A85130)',
+            background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
             border: 'none', cursor: 'pointer',
             boxShadow: '0 6px 20px rgba(196,98,58,0.4)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -728,7 +728,7 @@ export default function Expenses() {
                       }}
                     >
                       <span style={{ fontSize: 15 }}>📷</span>
-                      <span style={{ fontSize: 12, color: '#C4623A', fontWeight: 600 }}>Tomar foto</span>
+                      <span style={{ fontSize: 12, color: '#4A7C59', fontWeight: 600 }}>Tomar foto</span>
                     </button>
                     <button
                       type="button"
@@ -741,7 +741,7 @@ export default function Expenses() {
                       }}
                     >
                       <span style={{ fontSize: 15 }}>🖼️</span>
-                      <span style={{ fontSize: 12, color: '#C4623A', fontWeight: 600 }}>Elegir de galería</span>
+                      <span style={{ fontSize: 12, color: '#4A7C59', fontWeight: 600 }}>Elegir de galería</span>
                     </button>
                   </div>
                 )}
@@ -779,7 +779,7 @@ export default function Expenses() {
                 style={{
                   marginTop: 4, width: '100%', padding: '14px',
                   background: (canSave && canEdit)
-                    ? 'linear-gradient(135deg, #C4623A, #A85130)'
+                    ? 'linear-gradient(135deg, #4A7C59, #3A6347)'
                     : '#D4C4B8',
                   color: 'white', fontWeight: 700, fontSize: 14,
                   borderRadius: 14, border: 'none',

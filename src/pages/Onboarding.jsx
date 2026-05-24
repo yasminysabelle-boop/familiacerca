@@ -34,7 +34,7 @@ const cardStyle = {
 
 const primaryBtn = (disabled) => ({
   width: '100%', padding: '14px',
-  background: disabled ? '#D4C4B8' : 'linear-gradient(135deg, #C4623A, #A85130)',
+  background: disabled ? '#D4C4B8' : 'linear-gradient(135deg, #4A7C59, #3A6347)',
   color: 'white', fontWeight: 700, fontSize: 14,
   borderRadius: 16, border: 'none',
   cursor: disabled ? 'not-allowed' : 'pointer',
@@ -51,7 +51,7 @@ const secondaryBtn = {
 const inputStyle = (active) => ({
   width: '100%', padding: '14px 16px', textAlign: 'center',
   fontSize: 16, fontWeight: 600, color: '#1A1A1A',
-  border: `2px solid ${active ? '#C4623A' : '#EDE5D8'}`,
+  border: `2px solid ${active ? '#4A7C59' : '#EDE5D8'}`,
   borderRadius: 14, background: 'white', outline: 'none',
   boxShadow: active ? '0 0 0 4px rgba(196,98,58,0.1)' : 'none',
   transition: 'all 0.2s', boxSizing: 'border-box',
@@ -270,7 +270,7 @@ export default function Onboarding() {
           {step === 3 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div style={{
-                background: '#FFF8F0', border: '1px solid #EDE5D8',
+                background: '#F7F3ED', border: '1px solid #EDE5D8',
                 borderRadius: 14, padding: '14px 16px',
                 display: 'flex', flexDirection: 'column', gap: 10,
               }}>

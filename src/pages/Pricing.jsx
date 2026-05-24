@@ -33,7 +33,7 @@ const PLANS = [
     price: '$12.99',
     period: '/mes',
     badge: 'Más popular',
-    color: '#C4623A',
+    color: '#4A7C59',
     features: [
       'Todo lo del plan Gratis',
       'Miembros ilimitados',
@@ -115,7 +115,7 @@ export default function Pricing() {
   const currentPlan = sub?.plan
 
   return (
-    <div style={{ minHeight: '100svh', background: '#FFF8F0', paddingBottom: 60 }}>
+    <div style={{ minHeight: '100svh', background: '#F7F3ED', paddingBottom: 60 }}>
       {/* Header */}
       <div style={{ padding: '24px 20px 0', display: 'flex', alignItems: 'center', gap: 14 }}>
         <button
@@ -134,7 +134,7 @@ export default function Pricing() {
       {/* Hero */}
       <div style={{ textAlign: 'center', padding: '32px 24px 28px' }}>
         <p style={{
-          fontSize: 11, fontWeight: 700, color: '#C4623A', letterSpacing: '0.12em',
+          fontSize: 11, fontWeight: 700, color: '#4A7C59', letterSpacing: '0.12em',
           textTransform: 'uppercase', marginBottom: 10,
         }}>
           Planes y precios
@@ -154,11 +154,11 @@ export default function Pricing() {
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: 8,
             marginTop: 16, padding: '8px 16px', borderRadius: 20,
-            background: daysLeft <= 3 ? '#FEF2F2' : '#FFF8F0',
+            background: daysLeft <= 3 ? '#FEF2F2' : '#F7F3ED',
             border: `1px solid ${daysLeft <= 3 ? '#FECACA' : '#EDE5D8'}`,
           }}>
             <span style={{ fontSize: 14 }}>{daysLeft <= 3 ? '⚠️' : '🌱'}</span>
-            <span style={{ fontSize: 13, fontWeight: 600, color: daysLeft <= 3 ? '#DC2626' : '#C4623A' }}>
+            <span style={{ fontSize: 13, fontWeight: 600, color: daysLeft <= 3 ? '#DC2626' : '#4A7C59' }}>
               Te quedan {daysLeft} día{daysLeft !== 1 ? 's' : ''} de prueba gratuita
             </span>
           </div>
@@ -179,7 +179,7 @@ export default function Pricing() {
                 borderRadius: 20,
                 border: `2px solid ${isHighlighted ? plan.color : '#EDE5D8'}`,
                 background: isHighlighted
-                  ? 'linear-gradient(135deg, #FFF8F0, #FDF0EB)'
+                  ? 'linear-gradient(135deg, #F7F3ED, #EBF3EE)'
                   : plan.id === 'care_plus'
                   ? 'linear-gradient(135deg, #FAF5FF, #F5F0FF)'
                   : 'white',
@@ -301,7 +301,7 @@ export default function Pricing() {
                   {item.q}
                 </span>
                 <span style={{
-                  color: '#C4623A', fontSize: 18, flexShrink: 0,
+                  color: '#4A7C59', fontSize: 18, flexShrink: 0,
                   display: 'inline-block',
                   transform: openFaq === i ? 'rotate(180deg)' : 'rotate(0)',
                   transition: 'transform 0.2s',

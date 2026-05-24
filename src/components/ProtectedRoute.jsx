@@ -12,7 +12,7 @@ function Bone({ style }) {
 
 function PageSkeleton() {
   return (
-    <div style={{ background: '#FFF8F0', minHeight: '100dvh' }}>
+    <div style={{ background: '#F7F3ED', minHeight: '100dvh' }}>
       {/* Header */}
       <div style={{
         position: 'fixed', top: 0, left: 0, right: 0, height: 56, zIndex: 40,

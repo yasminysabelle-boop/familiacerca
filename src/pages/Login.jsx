@@ -78,7 +78,7 @@ export default function Login() {
 
   const fieldBase = { border: '1.5px solid #EDE5D8', background: '#FDFAF7' }
   function onFocus(e) {
-    e.target.style.borderColor = '#C4623A'
+    e.target.style.borderColor = '#4A7C59'
     e.target.style.boxShadow = '0 0 0 3px rgba(196,98,58,0.1)'
   }
   function onBlur(e) {
@@ -208,7 +208,7 @@ export default function Login() {
                     disabled={loading}
                     style={{
                       marginTop: 4, width: '100%', padding: '14px',
-                      background: loading ? '#D4C4B8' : 'linear-gradient(135deg, #C4623A, #A85130)',
+                      background: loading ? '#D4C4B8' : 'linear-gradient(135deg, #4A7C59, #3A6347)',
                       color: 'white', fontWeight: 700, fontSize: 14, borderRadius: 16,
                       border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
                       boxShadow: loading ? 'none' : '0 6px 20px rgba(196,98,58,0.35)',
@@ -228,7 +228,7 @@ export default function Login() {
           <>
             <button
               onClick={() => { setMode('login'); setError(''); setResetSent(false) }}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#C4623A', fontSize: 13, fontWeight: 600, padding: 0, marginBottom: 16 }}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#4A7C59', fontSize: 13, fontWeight: 600, padding: 0, marginBottom: 16 }}
             >
               ← Volver
             </button>
@@ -247,7 +247,7 @@ export default function Login() {
                   onClick={() => { setMode('login'); setResetSent(false) }}
                   style={{
                     marginTop: 20, padding: '12px 28px', borderRadius: 14,
-                    background: 'linear-gradient(135deg, #C4623A, #A85130)',
+                    background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
                     color: 'white', fontWeight: 700, fontSize: 14, border: 'none', cursor: 'pointer',
                   }}
                 >
@@ -281,7 +281,7 @@ export default function Login() {
                     type="submit" disabled={loading}
                     style={{
                       marginTop: 4, width: '100%', padding: '14px',
-                      background: loading ? '#D4C4B8' : 'linear-gradient(135deg, #C4623A, #A85130)',
+                      background: loading ? '#D4C4B8' : 'linear-gradient(135deg, #4A7C59, #3A6347)',
                       color: 'white', fontWeight: 700, fontSize: 14, borderRadius: 16,
                       border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
                       boxShadow: loading ? 'none' : '0 6px 20px rgba(196,98,58,0.35)',
@@ -334,7 +334,7 @@ export default function Login() {
                   <button
                     type="button"
                     onClick={() => { setMode('forgot'); setError('') }}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#C4623A', fontSize: 12, fontWeight: 600, padding: 0 }}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#4A7C59', fontSize: 12, fontWeight: 600, padding: 0 }}
                   >
                     ¿Olvidaste tu contraseña?
                   </button>
@@ -370,7 +370,7 @@ export default function Login() {
                 type="submit" disabled={loading}
                 style={{
                   marginTop: 4, width: '100%', padding: '14px',
-                  background: loading ? '#D4C4B8' : 'linear-gradient(135deg, #C4623A, #A85130)',
+                  background: loading ? '#D4C4B8' : 'linear-gradient(135deg, #4A7C59, #3A6347)',
                   color: 'white', fontWeight: 700, fontSize: 14, borderRadius: 16,
                   border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
                   boxShadow: loading ? 'none' : '0 6px 20px rgba(196,98,58,0.35)',
@@ -383,7 +383,7 @@ export default function Login() {
 
             <p style={{ marginTop: 20, textAlign: 'center', fontSize: 13, color: '#6B7280' }}>
               ¿No tienes cuenta?{' '}
-              <Link to="/register" style={{ color: '#C4623A', fontWeight: 700, textDecoration: 'none' }}>
+              <Link to="/register" style={{ color: '#4A7C59', fontWeight: 700, textDecoration: 'none' }}>
                 Regístrate gratis
               </Link>
             </p>

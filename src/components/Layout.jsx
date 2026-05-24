@@ -60,10 +60,10 @@ export default function Layout({ children }) {
   const fabHidden = HIDE_FAB_PATHS.has(location.pathname)
   const [fabOpen, setFabOpen] = useState(false)
 
-  const bg      = dark ? '#1C1208' : '#FFF8F0'
+  const bg      = dark ? '#0F1A12' : '#F7F3ED'
   const navBg   = dark ? 'rgba(28,18,8,0.97)' : 'rgba(255,255,255,0.97)'
   const hdrBg   = dark ? 'rgba(28,18,8,0.95)' : 'rgba(255,248,240,0.95)'
-  const border  = dark ? '#3D2A18' : '#EDE5D8'
+  const border  = dark ? '#1E3A28' : '#EDE5D8'
 
   function handleFabLink(to) {
     setFabOpen(false)
@@ -117,15 +117,15 @@ export default function Layout({ children }) {
             <img
               src={profile.photo_url} alt={profile.name}
               style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover',
-                border: '2px solid #C4623A', boxShadow: '0 0 0 2px #FDF0EB' }}
+                border: '2px solid #4A7C59', boxShadow: '0 0 0 2px #EBF3EE' }}
             />
           ) : (
             <div style={{
               width: 32, height: 32, borderRadius: '50%',
-              background: '#FDF0EB', border: '2px solid #EDE5D8',
+              background: '#EBF3EE', border: '2px solid #EDE5D8',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
-              <User size={16} color="#C4623A" strokeWidth={1.5} />
+              <User size={16} color="#4A7C59" strokeWidth={1.5} />
             </div>
           )}
         </Link>
@@ -157,8 +157,8 @@ export default function Layout({ children }) {
               onClick={() => switchFamily(activeFamily === 'owner' ? 'member' : 'owner')}
               style={{
                 fontSize: 12, fontWeight: 700,
-                color: activeFamily === 'member' ? '#2D86A0' : '#C4623A',
-                background: activeFamily === 'member' ? '#DBEAFE' : '#FDF0EB',
+                color: activeFamily === 'member' ? '#2D86A0' : '#4A7C59',
+                background: activeFamily === 'member' ? '#DBEAFE' : '#EBF3EE',
                 border: 'none', borderRadius: 8,
                 padding: '5px 10px', cursor: 'pointer',
                 flexShrink: 0,
@@ -191,7 +191,7 @@ export default function Layout({ children }) {
           style={{
             position: 'fixed', bottom: 82, right: 20, zIndex: 41,
             width: 50, height: 50, borderRadius: '50%',
-            background: 'linear-gradient(135deg, #C4623A, #A85130)',
+            background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
             boxShadow: '0 4px 20px rgba(196,98,58,0.45)',
             border: 'none', cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -243,7 +243,7 @@ export default function Layout({ children }) {
                   style={{
                     display: 'flex', flexDirection: 'column', alignItems: 'center',
                     gap: 6, padding: '14px 8px', borderRadius: 16,
-                    background: '#FFF8F0', border: '1px solid #EDE5D8',
+                    background: '#F7F3ED', border: '1px solid #EDE5D8',
                     cursor: 'pointer', transition: 'all 0.15s',
                   }}
                 >
@@ -304,7 +304,7 @@ export default function Layout({ children }) {
             onClick={() => window.dispatchEvent(new MouseEvent('mousemove'))}
             style={{
               padding: '10px 16px', borderRadius: 10, border: 'none',
-              background: '#C4623A', color: 'white', fontWeight: 700,
+              background: '#4A7C59', color: 'white', fontWeight: 700,
               fontSize: 13, cursor: 'pointer', alignSelf: 'flex-start',
             }}
           >
@@ -342,16 +342,16 @@ export default function Layout({ children }) {
             >
               <div style={{
                 width: 46, height: 32, borderRadius: 14,
-                background: isActive ? '#FDF0EB' : 'transparent',
+                background: isActive ? '#EBF3EE' : 'transparent',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 transition: 'all 0.2s',
                 transform: isActive ? 'scale(1.05)' : 'scale(1)',
               }}>
-                <Icon size={22} color={isActive ? '#C4623A' : '#BBBBBB'} strokeWidth={isActive ? 2 : 1.5} />
+                <Icon size={22} color={isActive ? '#4A7C59' : '#BBBBBB'} strokeWidth={isActive ? 2 : 1.5} />
               </div>
               <span style={{
                 fontSize: 9, fontWeight: 700, letterSpacing: '0.02em',
-                color: isActive ? '#C4623A' : '#BBBBBB', lineHeight: 1,
+                color: isActive ? '#4A7C59' : '#BBBBBB', lineHeight: 1,
               }}>
                 {label}
               </span>

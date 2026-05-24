@@ -13,7 +13,7 @@ import { ChevronRight, LogOut } from '../components/Icons'
 
 const PLAN_META = {
   free:      { label: 'Gratis',        color: '#9CA3AF', icon: '🌱' },
-  familiar:  { label: 'Plan Familiar', color: '#C4623A', icon: '❤️' },
+  familiar:  { label: 'Plan Familiar', color: '#4A7C59', icon: '❤️' },
   care_plus: { label: 'Care+',         color: '#7C3AED', icon: '✨' },
 }
 
@@ -65,7 +65,7 @@ function ToggleRow({ icon, label, subtitle, checked, onChange }) {
         onClick={() => onChange(!checked)}
         style={{
           width: 44, height: 26, borderRadius: 13, border: 'none',
-          background: checked ? '#C4623A' : '#D1D5DB',
+          background: checked ? '#4A7C59' : '#D1D5DB',
           position: 'relative', cursor: 'pointer',
           transition: 'background 0.2s', flexShrink: 0,
         }}
@@ -431,7 +431,7 @@ export default function Settings() {
                 disabled={portalLoading}
                 style={{
                   width: '100%', padding: '13px', borderRadius: 14, border: 'none',
-                  background: portalLoading ? '#D4C4B8' : 'linear-gradient(135deg, #C4623A, #A85130)',
+                  background: portalLoading ? '#D4C4B8' : 'linear-gradient(135deg, #4A7C59, #3A6347)',
                   color: 'white', fontWeight: 700, fontSize: 14,
                   cursor: portalLoading ? 'not-allowed' : 'pointer',
                   boxShadow: portalLoading ? 'none' : '0 6px 20px rgba(196,98,58,0.3)',
@@ -451,7 +451,7 @@ export default function Settings() {
               onClick={() => navigate('/pricing')}
               style={{
                 width: '100%', padding: '13px', borderRadius: 14, border: 'none',
-                background: 'linear-gradient(135deg, #C4623A, #A85130)',
+                background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
                 color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer',
                 boxShadow: '0 6px 20px rgba(196,98,58,0.3)',
               }}
@@ -526,7 +526,7 @@ export default function Settings() {
                 onClick={requestAndSubscribe}
                 style={{
                   width: '100%', padding: '12px', borderRadius: 14, border: 'none',
-                  background: 'linear-gradient(135deg, #C4623A, #A85130)',
+                  background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
                   color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer',
                   boxShadow: '0 4px 16px rgba(196,98,58,0.25)',
                   marginBottom: 8,
@@ -543,8 +543,8 @@ export default function Settings() {
                 disabled={testingPush}
                 style={{
                   width: '100%', padding: '12px', borderRadius: 14,
-                  border: '1.5px solid #C4623A', background: 'white',
-                  color: '#C4623A', fontWeight: 700, fontSize: 14,
+                  border: '1.5px solid #4A7C59', background: 'white',
+                  color: '#4A7C59', fontWeight: 700, fontSize: 14,
                   cursor: testingPush ? 'not-allowed' : 'pointer',
                   opacity: testingPush ? 0.6 : 1,
                   transition: 'all 0.2s',

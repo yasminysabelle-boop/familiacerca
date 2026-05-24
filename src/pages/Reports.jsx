@@ -263,7 +263,7 @@ export default function Reports() {
                   { n: events.length,      label: 'Eventos' },
                   { n: `${adherence7 ?? '—'}${adherence7 != null ? '%' : ''}`, label: 'Adherencia' },
                 ].map(({ n, label }) => (
-                  <div key={label} className="bg-[#FFF8F0] rounded-xl p-3">
+                  <div key={label} className="bg-[#F7F3ED] rounded-xl p-3">
                     <p className="text-xl font-bold text-gray-900">{n}</p>
                     <p className="text-xs text-gray-500 mt-0.5">{label}</p>
                   </div>

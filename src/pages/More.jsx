@@ -12,16 +12,16 @@ import {
 
 const MORE_ITEMS = [
   { to: '/gastos',     Icon: Receipt,        label: 'Cuentas Claras',      desc: 'Gastos del cuidado familiar',           color: '#4A7C59' },
-  { to: '/historial',  Icon: ClipboardCheck, label: 'Control de dosis',    desc: 'Historial y foto-pruebas selladas',      color: '#C4623A' },
-  { to: '/notes',      Icon: FileText,        label: 'Notas',               desc: 'Observaciones del cuidado diario',      color: '#C4623A' },
+  { to: '/historial',  Icon: ClipboardCheck, label: 'Control de dosis',    desc: 'Historial y foto-pruebas selladas',      color: '#4A7C59' },
+  { to: '/notes',      Icon: FileText,        label: 'Notas',               desc: 'Observaciones del cuidado diario',      color: '#4A7C59' },
   { to: '/album',      Icon: Image,           label: 'Álbum familiar',      desc: 'Fotos y videos de momentos especiales', color: '#D4A853' },
   { to: '/memorias',   Icon: Mic,             label: 'Memorias',            desc: 'Memorias de voz del familiar',          color: '#7C5CBF' },
   { to: '/reportes',   Icon: BarChart,        label: 'Reportes',            desc: 'Análisis semanal y PDF médico',          color: '#2D86A0' },
-  { to: '/perfil',     Icon: User,            label: 'Perfil familiar',     desc: 'Datos de la persona a cuidar',          color: '#C4623A' },
+  { to: '/perfil',     Icon: User,            label: 'Perfil familiar',     desc: 'Datos de la persona a cuidar',          color: '#4A7C59' },
   { to: '/ajustes',    Icon: Settings,        label: 'Mi cuenta',           desc: 'Suscripción y configuración',            color: '#6B7280' },
 ]
 
-const PLAN_COLORS = { free: '#9CA3AF', familiar: '#C4623A', care_plus: '#7C3AED' }
+const PLAN_COLORS = { free: '#9CA3AF', familiar: '#4A7C59', care_plus: '#7C3AED' }
 const PLAN_LABELS = { free: 'Prueba gratuita', familiar: 'Plan Familiar', care_plus: 'Care+' }
 
 export default function More() {
@@ -228,9 +228,9 @@ export default function More() {
         <button
           onClick={openModal}
           className="w-full py-3.5 rounded-2xl font-semibold text-sm flex items-center justify-center gap-2.5 mb-3 active:scale-[0.98] transition-transform"
-          style={{ border: '1.5px solid #C4623A', background: '#FFF8F4', color: '#C4623A' }}
+          style={{ border: '1.5px solid #4A7C59', background: '#FFF8F4', color: '#4A7C59' }}
         >
-          <UserPlus size={17} color="#C4623A" strokeWidth={1.75} />
+          <UserPlus size={17} color="#4A7C59" strokeWidth={1.75} />
           Invitar familiar
         </button>
 
@@ -310,7 +310,7 @@ export default function More() {
                     width: '100%', padding: '13px',
                     background: copied
                       ? 'linear-gradient(135deg, #4A7C59, #3A6147)'
-                      : 'linear-gradient(135deg, #C4623A, #A85130)',
+                      : 'linear-gradient(135deg, #4A7C59, #3A6347)',
                     color: 'white', fontWeight: 700, fontSize: 14,
                     borderRadius: 14, border: 'none', cursor: 'pointer',
                     boxShadow: '0 6px 20px rgba(196,98,58,0.3)',
@@ -349,7 +349,7 @@ export default function More() {
                     placeholder="familiar@correo.com"
                     autoFocus
                     style={fieldBase}
-                    onFocus={e => { e.target.style.borderColor = '#C4623A'; e.target.style.boxShadow = '0 0 0 3px rgba(196,98,58,0.1)' }}
+                    onFocus={e => { e.target.style.borderColor = '#4A7C59'; e.target.style.boxShadow = '0 0 0 3px rgba(196,98,58,0.1)' }}
                     onBlur={e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.boxShadow = 'none' }}
                   />
                 </div>
@@ -369,7 +369,7 @@ export default function More() {
                   style={{
                     width: '100%', padding: '14px',
                     background: inviteEmail.trim() && status !== 'sending'
-                      ? 'linear-gradient(135deg, #C4623A, #A85130)'
+                      ? 'linear-gradient(135deg, #4A7C59, #3A6347)'
                       : '#D4C4B8',
                     color: 'white', fontWeight: 700, fontSize: 14,
                     borderRadius: 14, border: 'none',

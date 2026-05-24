@@ -129,7 +129,7 @@ export default function InstallBanner() {
   return (
     <div style={{
       margin: '0 12px 12px',
-      background: 'linear-gradient(135deg, #C4623A, #A85130)',
+      background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
       borderRadius: 16,
       padding: '14px 16px',
       display: 'flex', alignItems: 'center', gap: 12,
@@ -150,7 +150,7 @@ export default function InstallBanner() {
           onClick={handleInstall}
           style={{
             padding: '8px 14px', borderRadius: 10, border: 'none',
-            background: 'white', color: '#C4623A',
+            background: 'white', color: '#4A7C59',
             fontWeight: 700, fontSize: 12, cursor: 'pointer',
             whiteSpace: 'nowrap',
           }}

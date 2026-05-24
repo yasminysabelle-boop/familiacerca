@@ -17,7 +17,7 @@ const TIME_GROUPS = [
 
 const CARE_MOMENTS = [
   { id: 'morning',   label: 'Mañana',            icon: '🌅', overdueHour: 14,   color: '#D97706', bg: '#FFFBEB' },
-  { id: 'afternoon', label: 'Tarde',              icon: '☀️',  overdueHour: 20,   color: '#C4623A', bg: '#FDF0EB' },
+  { id: 'afternoon', label: 'Tarde',              icon: '☀️',  overdueHour: 20,   color: '#4A7C59', bg: '#EBF3EE' },
   { id: 'night',     label: 'Noche',              icon: '🌙', overdueHour: null, color: '#6366F1', bg: '#EEF2FF' },
   { id: 'asneeded',  label: 'Cuando se necesita', icon: '🔔', overdueHour: null, color: '#6B7280', bg: '#F9FAFB' },
 ]
@@ -410,7 +410,7 @@ export default function Hoy() {
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
               padding: '12px 0', borderRadius: 14, marginBottom: 14,
-              background: 'linear-gradient(135deg, #C4623A, #A85130)',
+              background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
               color: 'white', fontWeight: 700, fontSize: 14,
               textDecoration: 'none',
               boxShadow: '0 4px 16px rgba(196,98,58,0.3)',
@@ -434,7 +434,7 @@ export default function Hoy() {
               <p style={{ fontSize: 13, fontWeight: 700, color: '#1A1A1A', fontFamily: 'Georgia, serif', margin: 0 }}>
                 {allDone ? '¡Todo dado hoy! ✅' : `${confirmedCount} de ${total} medicamentos`}
               </p>
-              <span style={{ fontSize: 11, fontWeight: 700, color: allDone ? '#16A34A' : '#C4623A' }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: allDone ? '#16A34A' : '#4A7C59' }}>
                 {total > 0 ? Math.round((confirmedCount / total) * 100) : 0}%
               </span>
             </div>
@@ -444,7 +444,7 @@ export default function Hoy() {
                 width: `${total ? (confirmedCount / total) * 100 : 0}%`,
                 background: allDone
                   ? 'linear-gradient(90deg, #22C55E, #16A34A)'
-                  : 'linear-gradient(90deg, #C4623A, #D4A853)',
+                  : 'linear-gradient(90deg, #4A7C59, #D4A853)',
                 transition: 'width 0.4s ease',
               }} />
             </div>
@@ -487,14 +487,14 @@ export default function Hoy() {
           <div style={{ display: 'flex', justifyContent: 'center', padding: 48 }}>
             <div style={{
               width: 28, height: 28, borderRadius: '50%',
-              border: '3px solid #EDE5D8', borderTopColor: '#C4623A',
+              border: '3px solid #EDE5D8', borderTopColor: '#4A7C59',
               animation: 'spin 0.8s linear infinite',
             }} />
           </div>
         ) : loadError ? (
           <div style={{ background: 'white', borderRadius: 20, border: '1px solid #EDE5D8', padding: '40px 24px', textAlign: 'center' }}>
             <p style={{ fontSize: 14, color: '#D63031', marginBottom: 12 }}>{loadError}</p>
-            <button onClick={fetchData} style={{ padding: '10px 24px', borderRadius: 12, background: '#C4623A', color: 'white', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>
+            <button onClick={fetchData} style={{ padding: '10px 24px', borderRadius: 12, background: '#4A7C59', color: 'white', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>
               Reintentar
             </button>
           </div>
@@ -519,7 +519,7 @@ export default function Hoy() {
                   style={{
                     display: 'inline-flex', alignItems: 'center', gap: 6,
                     padding: '10px 20px', borderRadius: 12,
-                    background: 'linear-gradient(135deg, #C4623A, #A85130)',
+                    background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
                     color: 'white', fontWeight: 700, fontSize: 13,
                     textDecoration: 'none',
                   }}
@@ -600,7 +600,7 @@ export default function Hoy() {
                               {isWorking && !isConfirmed && (
                                 <div style={{
                                   width: 10, height: 10, borderRadius: '50%',
-                                  border: '2px solid #D1D5DB', borderTopColor: '#C4623A',
+                                  border: '2px solid #D1D5DB', borderTopColor: '#4A7C59',
                                   animation: 'spin 0.6s linear infinite',
                                 }} />
                               )}
@@ -789,8 +789,8 @@ export default function Hoy() {
                 </p>
                 <span style={{
                   fontSize: 11, fontWeight: 700,
-                  color: completedRequired === requiredItems.length ? '#16A34A' : '#C4623A',
-                  background: completedRequired === requiredItems.length ? '#DCFCE7' : '#FDF0EB',
+                  color: completedRequired === requiredItems.length ? '#16A34A' : '#4A7C59',
+                  background: completedRequired === requiredItems.length ? '#DCFCE7' : '#EBF3EE',
                   padding: '3px 10px', borderRadius: 20,
                 }}>
                   {completedRequired}/{requiredItems.length}
@@ -965,8 +965,8 @@ export default function Hoy() {
                           {log.checked_by && (
                             <span style={{
                               fontSize: 10, fontWeight: 700, flexShrink: 0,
-                              color: mom?.color ?? '#C4623A',
-                              background: mom ? `${mom.color}18` : '#FDF0EB',
+                              color: mom?.color ?? '#4A7C59',
+                              background: mom ? `${mom.color}18` : '#EBF3EE',
                               padding: '2px 7px', borderRadius: 6,
                             }}>
                               {log.checked_by.split(' ')[0]}
@@ -1115,7 +1115,7 @@ export default function Hoy() {
                 <div style={{ padding: '40px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
                   <div style={{
                     width: 28, height: 28, borderRadius: '50%',
-                    border: '3px solid #EDE5D8', borderTopColor: '#C4623A',
+                    border: '3px solid #EDE5D8', borderTopColor: '#4A7C59',
                     animation: 'spin 0.8s linear infinite',
                   }} />
                   <p style={{ fontSize: 13, color: '#9CA3AF', margin: 0 }}>Aplicando sello...</p>
@@ -1139,7 +1139,7 @@ export default function Hoy() {
                   </div>
                   <div style={{ display: 'flex', gap: 8, padding: '8px 12px 12px' }}>
                     <button type="button" onClick={openCamera} disabled={proofUploading}
-                      style={{ flex: 1, padding: '8px 0', borderRadius: 10, border: '1.5px solid #C4623A', background: '#FDF0EB', color: '#C4623A', fontSize: 12, fontWeight: 700, cursor: proofUploading ? 'not-allowed' : 'pointer' }}>
+                      style={{ flex: 1, padding: '8px 0', borderRadius: 10, border: '1.5px solid #4A7C59', background: '#EBF3EE', color: '#4A7C59', fontSize: 12, fontWeight: 700, cursor: proofUploading ? 'not-allowed' : 'pointer' }}>
                       📷 Tomar foto
                     </button>
                     <button type="button" onClick={openGallery} disabled={proofUploading}
@@ -1152,14 +1152,14 @@ export default function Hoy() {
                 <div style={{ padding: '28px 16px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
                   <div style={{
                     width: 56, height: 56, borderRadius: '50%',
-                    background: '#FDF0EB', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: '#EBF3EE', display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}>
                     <span style={{ fontSize: 26 }}>📷</span>
                   </div>
                   <p style={{ fontSize: 12, color: '#9CA3AF', margin: 0 }}>Se sellará automáticamente con fecha y hora</p>
                   <div style={{ display: 'flex', gap: 8, width: '100%' }}>
                     <button type="button" onClick={openCamera}
-                      style={{ flex: 1, padding: '11px 0', borderRadius: 12, border: '1.5px solid #C4623A', background: '#FDF0EB', color: '#C4623A', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                      style={{ flex: 1, padding: '11px 0', borderRadius: 12, border: '1.5px solid #4A7C59', background: '#EBF3EE', color: '#4A7C59', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
                       📷 Tomar foto
                     </button>
                     <button type="button" onClick={openGallery}
@@ -1191,7 +1191,7 @@ export default function Hoy() {
                 width: '100%', padding: '14px', marginBottom: 10,
                 borderRadius: 14, border: 'none',
                 background: proofBlob && !proofUploading
-                  ? 'linear-gradient(135deg, #C4623A, #A85130)'
+                  ? 'linear-gradient(135deg, #4A7C59, #3A6347)'
                   : '#D4C4B8',
                 color: 'white', fontWeight: 700, fontSize: 14,
                 cursor: proofBlob && !proofUploading ? 'pointer' : 'not-allowed',

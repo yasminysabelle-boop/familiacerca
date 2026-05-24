@@ -165,7 +165,7 @@ export default function Permissions() {
                 onClick={markAndGo}
                 style={{
                   width: '100%', padding: '13px',
-                  background: 'linear-gradient(135deg, #C4623A, #A85130)',
+                  background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
                   color: 'white', fontWeight: 700, fontSize: 14,
                   borderRadius: 14, border: 'none', cursor: 'pointer',
                   boxShadow: '0 6px 20px rgba(196,98,58,0.3)',
@@ -242,7 +242,7 @@ export default function Permissions() {
                   width: '100%', padding: '14px',
                   background: status === 'requesting'
                     ? '#D4C4B8'
-                    : 'linear-gradient(135deg, #C4623A, #A85130)',
+                    : 'linear-gradient(135deg, #4A7C59, #3A6347)',
                   color: 'white', fontWeight: 700, fontSize: 15,
                   borderRadius: 16, border: 'none',
                   cursor: status === 'requesting' ? 'not-allowed' : 'pointer',

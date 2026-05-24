@@ -34,7 +34,7 @@ export default function Paywall() {
       >
         <div style={{
           width: 72, height: 72, borderRadius: '50%',
-          background: 'linear-gradient(135deg, #FDF0EB, #F5DDD3)',
+          background: 'linear-gradient(135deg, #EBF3EE, #F5DDD3)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           margin: '0 auto 20px', fontSize: 36,
         }}>
@@ -56,7 +56,7 @@ export default function Paywall() {
             onClick={() => navigate('/pricing')}
             style={{
               width: '100%', padding: '15px', borderRadius: 16, border: 'none',
-              background: 'linear-gradient(135deg, #C4623A, #A85130)',
+              background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
               color: 'white', fontWeight: 700, fontSize: 15, cursor: 'pointer',
               boxShadow: '0 8px 24px rgba(196,98,58,0.35)',
             }}

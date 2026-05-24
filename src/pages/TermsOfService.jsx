@@ -20,13 +20,13 @@ function Section({ title, children }) {
 function Item({ children }) {
   return (
     <div className="flex gap-2.5">
-      <span className="mt-1 flex-shrink-0 w-1.5 h-1.5 rounded-full" style={{ background: '#C4623A', marginTop: 6 }} />
+      <span className="mt-1 flex-shrink-0 w-1.5 h-1.5 rounded-full" style={{ background: '#4A7C59', marginTop: 6 }} />
       <p>{children}</p>
     </div>
   )
 }
 
-function Callout({ icon, children, color = '#FDF0EB', border = '#F0C8B0' }) {
+function Callout({ icon, children, color = '#EBF3EE', border = '#F0C8B0' }) {
   return (
     <div
       className="flex gap-3 px-4 py-3.5 rounded-2xl"
@@ -42,7 +42,7 @@ export default function TermsOfService() {
   const navigate = useNavigate()
 
   return (
-    <div className="min-h-screen" style={{ background: '#FFF8F0' }}>
+    <div className="min-h-screen" style={{ background: '#F7F3ED' }}>
 
       {/* ── Header ── */}
       <header
@@ -81,7 +81,7 @@ export default function TermsOfService() {
         <div className="mb-8 text-center">
           <div
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold mb-4"
-            style={{ background: '#FDF0EB', color: '#A85130' }}
+            style={{ background: '#EBF3EE', color: '#3A6347' }}
           >
             📄 Documento legal
           </div>
@@ -145,7 +145,7 @@ export default function TermsOfService() {
               >
                 <div className="flex items-center justify-between mb-1">
                   <p className="font-bold text-gray-900" style={{ fontFamily: 'Georgia, serif' }}>Plan Familiar</p>
-                  <span className="font-bold" style={{ color: '#C4623A' }}>$19 / mes</span>
+                  <span className="font-bold" style={{ color: '#4A7C59' }}>$19 / mes</span>
                 </div>
                 <p className="text-xs text-gray-500">Coordinación familiar básica: medicamentos, calendario, notas y álbum familiar.</p>
               </div>
@@ -281,7 +281,7 @@ export default function TermsOfService() {
         >
           <p className="text-xs text-gray-400 text-center leading-relaxed">
             ¿Prefieres leer esto en inglés? Escríbenos a{' '}
-            <a href="mailto:legal@familiacerca.com" className="underline" style={{ color: '#C4623A' }}>
+            <a href="mailto:legal@familiacerca.com" className="underline" style={{ color: '#4A7C59' }}>
               legal@familiacerca.com
             </a>{' '}
             y te enviamos la versión en inglés.
@@ -289,7 +289,7 @@ export default function TermsOfService() {
           <Link
             to="/privacidad"
             className="text-xs font-semibold underline"
-            style={{ color: '#C4623A' }}
+            style={{ color: '#4A7C59' }}
           >
             Ver Política de Privacidad →
           </Link>

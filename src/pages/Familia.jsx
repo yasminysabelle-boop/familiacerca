@@ -10,7 +10,7 @@ import { UserPlus, Phone, Mail, MapPin, XIcon, BookOpen, Users, LogOut } from '.
 import { track } from '../lib/analytics'
 
 const PLAN_LABELS = { free: 'Prueba gratuita', familiar: 'Plan Familiar', care_plus: 'Care+' }
-const PLAN_COLORS = { free: '#9CA3AF', familiar: '#C4623A', care_plus: '#7C3AED' }
+const PLAN_COLORS = { free: '#9CA3AF', familiar: '#4A7C59', care_plus: '#7C3AED' }
 
 export default function Familia() {
   const { user, signOut } = useAuth()
@@ -221,7 +221,7 @@ export default function Familia() {
         {profile && (
           <div style={{
             display: 'flex', alignItems: 'center', gap: 14,
-            background: 'linear-gradient(135deg, #BF5E37, #8C3E22)',
+            background: 'linear-gradient(135deg, #BF5E37, #2D6A4F)',
             borderRadius: 20, padding: '16px 18px', marginBottom: 16,
           }}>
             {profile.photo_url ? (
@@ -270,14 +270,14 @@ export default function Familia() {
               </p>
               {/* Today's caregiver highlight */}
               <div style={{
-                background: todayShift ? 'linear-gradient(135deg, #FDF0EB, #FFF8F0)' : '#F9F5F1',
-                borderRadius: 14, border: `1.5px solid ${todayShift ? '#C4623A' : '#EDE5D8'}`,
+                background: todayShift ? 'linear-gradient(135deg, #EBF3EE, #F7F3ED)' : '#F9F5F1',
+                borderRadius: 14, border: `1.5px solid ${todayShift ? '#4A7C59' : '#EDE5D8'}`,
                 padding: '12px 14px', marginBottom: 12,
                 display: 'flex', alignItems: 'center', gap: 10,
               }}>
                 <span style={{ fontSize: 24 }}>{todayShift ? '👤' : '❓'}</span>
                 <div style={{ flex: 1 }}>
-                  <p style={{ fontSize: 13, fontWeight: 700, color: todayShift ? '#C4623A' : '#9CA3AF', margin: 0 }}>
+                  <p style={{ fontSize: 13, fontWeight: 700, color: todayShift ? '#4A7C59' : '#9CA3AF', margin: 0 }}>
                     {todayShift ? todayShift.caregiver_name : 'Sin asignar'}
                   </p>
                   <p style={{ fontSize: 11, color: '#9CA3AF', margin: '2px 0 0' }}>Cuidador de hoy</p>
@@ -286,7 +286,7 @@ export default function Familia() {
                   onClick={() => { setShiftModal(todayKey); setShiftName(todayShift?.caregiver_name ?? '') }}
                   style={{
                     padding: '6px 12px', borderRadius: 10, fontSize: 11, fontWeight: 700,
-                    border: '1.5px solid #C4623A', background: 'white', color: '#C4623A', cursor: 'pointer',
+                    border: '1.5px solid #4A7C59', background: 'white', color: '#4A7C59', cursor: 'pointer',
                   }}
                 >
                   {todayShift ? 'Cambiar' : 'Asignar'}
@@ -306,7 +306,7 @@ export default function Familia() {
                       style={{
                         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
                         padding: '6px 2px', borderRadius: 10, border: 'none',
-                        background: isToday ? '#FDF0EB' : shift ? '#F0F8F4' : '#F9F5F1',
+                        background: isToday ? '#EBF3EE' : shift ? '#F0F8F4' : '#F9F5F1',
                         cursor: 'pointer', transition: 'all 0.15s',
                       }}
                     >
@@ -318,7 +318,7 @@ export default function Familia() {
                       </span>
                       <div style={{
                         width: 22, height: 22, borderRadius: '50%',
-                        background: isToday ? '#C4623A' : shift ? '#4A7C59' : '#E5E7EB',
+                        background: isToday ? '#4A7C59' : shift ? '#4A7C59' : '#E5E7EB',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         fontSize: 10, fontWeight: 700,
                         color: (isToday || shift) ? 'white' : '#9CA3AF',
@@ -394,11 +394,11 @@ export default function Familia() {
               style={{
                 display: 'flex', alignItems: 'center', gap: 6,
                 padding: '6px 14px', borderRadius: 10,
-                border: '1.5px solid #C4623A', background: '#FFF8F4',
-                color: '#C4623A', fontSize: 12, fontWeight: 700, cursor: 'pointer',
+                border: '1.5px solid #4A7C59', background: '#FFF8F4',
+                color: '#4A7C59', fontSize: 12, fontWeight: 700, cursor: 'pointer',
               }}
             >
-              <UserPlus size={14} color="#C4623A" strokeWidth={1.75} />
+              <UserPlus size={14} color="#4A7C59" strokeWidth={1.75} />
               Invitar
             </button>
           </div>
@@ -407,7 +407,7 @@ export default function Familia() {
             <div style={{ display: 'flex', justifyContent: 'center', padding: 24 }}>
               <div style={{
                 width: 24, height: 24, borderRadius: '50%',
-                border: '3px solid #EDE5D8', borderTopColor: '#C4623A',
+                border: '3px solid #EDE5D8', borderTopColor: '#4A7C59',
                 animation: 'spin 0.8s linear infinite',
               }} />
             </div>
@@ -433,19 +433,19 @@ export default function Familia() {
                     style={{
                       display: 'flex', alignItems: 'center', gap: 12,
                       padding: '12px 14px', borderRadius: 14,
-                      background: '#FDF8F5', border: '1.5px solid #C4623A22',
+                      background: '#FDF8F5', border: '1.5px solid #4A7C5922',
                       cursor: 'pointer', transition: 'all 0.15s',
                     }}
                   >
                     <div style={{ position: 'relative', flexShrink: 0 }}>
                       <div style={{
                         width: 44, height: 44, borderRadius: '50%', overflow: 'hidden',
-                        background: '#FDF0EB', border: '2px solid #C4623A44',
+                        background: '#EBF3EE', border: '2px solid #4A7C5944',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                       }}>
                         {adminMp?.avatar_url
                           ? <img src={adminMp.avatar_url} alt={displayName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                          : <span style={{ fontSize: 16, fontWeight: 700, color: '#C4623A' }}>{adminInitials}</span>
+                          : <span style={{ fontSize: 16, fontWeight: 700, color: '#4A7C59' }}>{adminInitials}</span>
                         }
                       </div>
                       <div style={{ position: 'absolute', bottom: 0, right: 0, width: 12, height: 12, borderRadius: '50%', border: '2px solid white', background: '#22C55E' }} />
@@ -453,12 +453,12 @@ export default function Familia() {
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p style={{ fontSize: 14, fontWeight: 600, color: '#1A1A1A', margin: '0 0 2px' }}>
                         {displayName.split(' ')[0]}
-                        <span style={{ marginLeft: 6, fontSize: 10, fontWeight: 700, color: '#C4623A', background: '#FDF0EB', padding: '2px 7px', borderRadius: 6 }}>Tú</span>
+                        <span style={{ marginLeft: 6, fontSize: 10, fontWeight: 700, color: '#4A7C59', background: '#EBF3EE', padding: '2px 7px', borderRadius: 6 }}>Tú</span>
                       </p>
                       <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>🟢 En línea</p>
                     </div>
                     <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
-                      <span style={{ fontSize: 10, fontWeight: 700, color: '#C4623A', background: '#FDF0EB', padding: '3px 10px', borderRadius: 6 }}>
+                      <span style={{ fontSize: 10, fontWeight: 700, color: '#4A7C59', background: '#EBF3EE', padding: '3px 10px', borderRadius: 6 }}>
                         Admin
                       </span>
                       <span style={{ color: '#D1D5DB', fontSize: 18, lineHeight: 1 }}>›</span>
@@ -494,13 +494,13 @@ export default function Familia() {
                     <div style={{ position: 'relative', flexShrink: 0 }}>
                       <div style={{
                         width: 44, height: 44, borderRadius: '50%', overflow: 'hidden',
-                        background: '#FDF0EB', border: '2px solid #EDE5D8',
+                        background: '#EBF3EE', border: '2px solid #EDE5D8',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                       }}>
                         {mp?.avatar_url ? (
                           <img src={mp.avatar_url} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         ) : (
-                          <span style={{ fontSize: 16, fontWeight: 700, color: '#C4623A' }}>{initials}</span>
+                          <span style={{ fontSize: 16, fontWeight: 700, color: '#4A7C59' }}>{initials}</span>
                         )}
                       </div>
                       <div style={{
@@ -523,8 +523,8 @@ export default function Familia() {
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
                         <span style={{
                           fontSize: 10, fontWeight: 700,
-                          color: isPending ? '#92400E' : isCuidador ? '#C4623A' : '#6B7280',
-                          background: isPending ? '#FEF3C7' : isCuidador ? '#FDF0EB' : '#F3F4F6',
+                          color: isPending ? '#92400E' : isCuidador ? '#4A7C59' : '#6B7280',
+                          background: isPending ? '#FEF3C7' : isCuidador ? '#EBF3EE' : '#F3F4F6',
                           padding: '3px 10px', borderRadius: 6,
                         }}>
                           {isPending ? 'Invitación pendiente' : isCuidador ? 'Cuidador' : 'Familiar'}
@@ -618,11 +618,11 @@ export default function Familia() {
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 20 }}>
                 <div style={{ position: 'relative', marginBottom: 12 }}>
                   <div style={{ width: 64, height: 64, borderRadius: '50%', overflow: 'hidden',
-                    background: '#FDF0EB', border: '3px solid #EDE5D8',
+                    background: '#EBF3EE', border: '3px solid #EDE5D8',
                     display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     {mp?.avatar_url
                       ? <img src={mp.avatar_url} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      : <span style={{ fontSize: 24, fontWeight: 700, color: '#C4623A' }}>{name.charAt(0)}</span>
+                      : <span style={{ fontSize: 24, fontWeight: 700, color: '#4A7C59' }}>{name.charAt(0)}</span>
                     }
                   </div>
                   <div style={{ position: 'absolute', bottom: 0, right: 0, width: 16, height: 16,
@@ -651,16 +651,16 @@ export default function Familia() {
                         disabled={savingRole || member.role === r.value}
                         style={{
                           flex: 1, padding: '11px 8px', borderRadius: 12,
-                          border: `1.5px solid ${member.role === r.value ? '#C4623A' : '#EDE5D8'}`,
-                          background: member.role === r.value ? '#FDF0EB' : 'white',
-                          color: member.role === r.value ? '#C4623A' : '#6B7280',
+                          border: `1.5px solid ${member.role === r.value ? '#4A7C59' : '#EDE5D8'}`,
+                          background: member.role === r.value ? '#EBF3EE' : 'white',
+                          color: member.role === r.value ? '#4A7C59' : '#6B7280',
                           cursor: member.role === r.value || savingRole ? 'default' : 'pointer',
                           fontWeight: 700, fontSize: 13,
                           transition: 'all 0.15s',
                         }}
                       >
                         <p style={{ margin: 0 }}>{r.label}</p>
-                        <p style={{ margin: '3px 0 0', fontSize: 10, fontWeight: 400, color: member.role === r.value ? '#A85130' : '#9CA3AF' }}>
+                        <p style={{ margin: '3px 0 0', fontSize: 10, fontWeight: 400, color: member.role === r.value ? '#3A6347' : '#9CA3AF' }}>
                           {r.desc}
                         </p>
                       </button>
@@ -766,9 +766,9 @@ export default function Familia() {
                   <button key={label} onClick={() => setShiftName(label)}
                     style={{
                       padding: '6px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: 'pointer',
-                      background: shiftName === label ? '#FDF0EB' : '#F3F4F6',
-                      border: shiftName === label ? '1.5px solid #C4623A' : '1.5px solid transparent',
-                      color: shiftName === label ? '#C4623A' : '#6B7280',
+                      background: shiftName === label ? '#EBF3EE' : '#F3F4F6',
+                      border: shiftName === label ? '1.5px solid #4A7C59' : '1.5px solid transparent',
+                      color: shiftName === label ? '#4A7C59' : '#6B7280',
                       transition: 'all 0.15s',
                     }}>
                     {label.split(' ')[0]}
@@ -785,7 +785,7 @@ export default function Familia() {
                 border: '1.5px solid #EDE5D8', background: '#FDFAF7',
                 fontSize: 14, outline: 'none', boxSizing: 'border-box', marginBottom: 14,
               }}
-              onFocus={e => { e.target.style.borderColor = '#C4623A' }}
+              onFocus={e => { e.target.style.borderColor = '#4A7C59' }}
               onBlur={e => { e.target.style.borderColor = '#EDE5D8' }}
             />
             <button
@@ -793,7 +793,7 @@ export default function Familia() {
               disabled={savingShift || !shiftName.trim()}
               style={{
                 width: '100%', padding: '13px', borderRadius: 14, border: 'none',
-                background: shiftName.trim() && !savingShift ? 'linear-gradient(135deg, #C4623A, #A85130)' : '#D4C4B8',
+                background: shiftName.trim() && !savingShift ? 'linear-gradient(135deg, #4A7C59, #3A6347)' : '#D4C4B8',
                 color: 'white', fontWeight: 700, fontSize: 14,
                 cursor: shiftName.trim() && !savingShift ? 'pointer' : 'not-allowed',
                 boxShadow: shiftName.trim() ? '0 6px 20px rgba(196,98,58,0.3)' : 'none',
@@ -852,7 +852,7 @@ export default function Familia() {
                     </div>
                     <button onClick={copyLink} style={{
                       width: '100%', padding: 13, borderRadius: 14, border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 14, color: 'white',
-                      background: copied ? 'linear-gradient(135deg, #4A7C59, #3A6147)' : 'linear-gradient(135deg, #C4623A, #A85130)',
+                      background: copied ? 'linear-gradient(135deg, #4A7C59, #3A6147)' : 'linear-gradient(135deg, #4A7C59, #3A6347)',
                       transition: 'all 0.2s', marginBottom: 10,
                     }}>
                       {copied ? '¡Copiado!' : 'Copiar enlace'}
@@ -874,7 +874,7 @@ export default function Familia() {
                     onChange={e => setInviteEmail(e.target.value)}
                     placeholder="familiar@correo.com" autoFocus
                     style={fieldStyle}
-                    onFocus={e => { e.target.style.borderColor = '#C4623A'; e.target.style.boxShadow = '0 0 0 3px rgba(196,98,58,0.1)' }}
+                    onFocus={e => { e.target.style.borderColor = '#4A7C59'; e.target.style.boxShadow = '0 0 0 3px rgba(196,98,58,0.1)' }}
                     onBlur={e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.boxShadow = 'none' }}
                   />
                 </div>
@@ -890,7 +890,7 @@ export default function Familia() {
                     width: '100%', padding: 14, borderRadius: 14, border: 'none',
                     fontWeight: 700, fontSize: 14, color: 'white', cursor: 'pointer',
                     background: inviteEmail.trim() && inviteStatus !== 'sending'
-                      ? 'linear-gradient(135deg, #C4623A, #A85130)' : '#D4C4B8',
+                      ? 'linear-gradient(135deg, #4A7C59, #3A6347)' : '#D4C4B8',
                     boxShadow: inviteEmail.trim() ? '0 6px 20px rgba(196,98,58,0.3)' : 'none',
                     transition: 'all 0.2s',
                   }}

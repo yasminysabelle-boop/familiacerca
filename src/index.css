@@ -1,49 +1,49 @@
 @import "tailwindcss";
 
 @theme {
-  /* Terracotta — primary brand */
-  --color-primary:       #C4623A;
-  --color-primary-dark:  #A85130;
-  --color-primary-light: #FDF0EB;
+  /* Verde bosque — primary brand */
+  --color-primary:       #4A7C59;
+  --color-primary-dark:  #3A6347;
+  --color-primary-light: #EBF3EE;
 
-  /* Sage green — secondary */
+  /* Sage green — secondary (mantener para compatibilidad) */
   --color-sage:          #4A7C59;
-  --color-sage-dark:     #3A6147;
+  --color-sage-dark:     #3A6347;
   --color-sage-light:    #EBF3EE;
 
   /* Golden amber — accent */
-  --color-accent:        #D4A853;
+  --color-accent:        #C9882A;
   --color-accent-light:  #FDF8EE;
 
   /* Emergency */
   --color-emergency:        #D63031;
   --color-emergency-light:  #FDECEA;
 
-  /* Warm overrides for the green scale used in legacy borders/hovers */
-  --color-green-50:  #F9F4EE;
-  --color-green-100: #EDE5D8;
-  --color-green-200: #DBCFBE;
+  /* Warm neutrals */
+  --color-green-50:  #F7F3ED;
+  --color-green-100: #EBF3EE;
+  --color-green-200: #C8DDD0;
 }
 
 body {
-  background-color: #FFF8F0;
+  background-color: #F7F3ED;
   -webkit-font-smoothing: antialiased;
   color: #1A1A1A;
 }
 
 /* ── Dark mode ────────────────────────────────────────────────────── */
 [data-theme="dark"] body {
-  background-color: #1C1208;
-  color: #F0E6D8;
+  background-color: #0F1A12;
+  color: #E8F0EA;
 }
-[data-theme="dark"] .bg-white         { background-color: #2A1E10 !important; }
-[data-theme="dark"] .bg-gray-50       { background-color: #231810 !important; }
-[data-theme="dark"] .border-green-100 { border-color: #3D2A18 !important; }
-[data-theme="dark"] .text-gray-900    { color: #F0E6D8 !important; }
-[data-theme="dark"] .text-gray-700    { color: #D4C4B0 !important; }
-[data-theme="dark"] .text-gray-600    { color: #C0AE98 !important; }
-[data-theme="dark"] .text-gray-500    { color: #9C8870 !important; }
-[data-theme="dark"] .text-gray-400    { color: #7A6A5A !important; }
+[data-theme="dark"] .bg-white         { background-color: #1A2E1F !important; }
+[data-theme="dark"] .bg-gray-50       { background-color: #142010 !important; }
+[data-theme="dark"] .border-green-100 { border-color: #1E3A28 !important; }
+[data-theme="dark"] .text-gray-900    { color: #E8F0EA !important; }
+[data-theme="dark"] .text-gray-700    { color: #C8DDD0 !important; }
+[data-theme="dark"] .text-gray-600    { color: #A8C8B4 !important; }
+[data-theme="dark"] .text-gray-500    { color: #7AAA8A !important; }
+[data-theme="dark"] .text-gray-400    { color: #5A8A6A !important; }
 
 /* Serif for all headings */
 h1, h2, h3 {
@@ -60,7 +60,7 @@ h1, h2, h3 {
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07), 0 1px 6px rgba(0, 0, 0, 0.04);
 }
 .shadow-warm-lg {
-  box-shadow: 0 8px 40px rgba(196, 98, 58, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 8px 40px rgba(74, 124, 89, 0.14), 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 /* Heartbeat animation for the love indicator */
@@ -94,7 +94,7 @@ h1, h2, h3 {
 }
 .animate-sos-pulse { animation: sos-pulse 1.6s ease-out infinite; }
 
-/* Double-beat heartbeat for SOS button — mimics a real cardiac rhythm */
+/* Double-beat heartbeat for SOS button */
 @keyframes sos-heartbeat {
   0%, 100% {
     transform: scale(1);

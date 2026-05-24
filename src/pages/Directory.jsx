@@ -33,7 +33,7 @@ const CONTACT_RELATIONSHIPS = [
 ]
 const INST_TYPE_COLORS = {
   Hospital: '#D63031', Clínica: '#2D86A0', Consultorio: '#4A7C59',
-  Laboratorio: '#7C5CBF', Farmacia: '#C4623A', Otro: '#9CA3AF',
+  Laboratorio: '#7C5CBF', Farmacia: '#4A7C59', Otro: '#9CA3AF',
 }
 
 const F = {
@@ -43,7 +43,7 @@ const F = {
   boxSizing: 'border-box', transition: 'border-color 0.15s',
   fontFamily: 'inherit',
 }
-const onFocus = e => { e.target.style.borderColor = '#C4623A'; e.target.style.boxShadow = '0 0 0 3px rgba(196,98,58,0.1)' }
+const onFocus = e => { e.target.style.borderColor = '#4A7C59'; e.target.style.boxShadow = '0 0 0 3px rgba(196,98,58,0.1)' }
 const onBlur  = e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.boxShadow = 'none' }
 
 // ── Shared small components ────────────────────────────────────────
@@ -117,7 +117,7 @@ function EmptyState({ Icon: Ic, title, subtitle }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '40px 0', gap: 12 }}>
       <div style={{ width: 56, height: 56, borderRadius: '50%', background: '#F5EEE6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Ic size={26} color="#C4623A" strokeWidth={1.3} />
+        <Ic size={26} color="#4A7C59" strokeWidth={1.3} />
       </div>
       <p style={{ fontSize: 14, fontWeight: 600, color: '#374151', textAlign: 'center' }}>{title}</p>
       <p style={{ fontSize: 12, color: '#9CA3AF', textAlign: 'center', maxWidth: 220, lineHeight: 1.6 }}>{subtitle}</p>
@@ -129,11 +129,11 @@ function AddBtn({ onClick, label }) {
   return (
     <button onClick={onClick} style={{
       width: '100%', padding: '14px', borderRadius: 16, marginTop: 8,
-      border: '1.5px dashed #C4623A', background: '#FFF8F4', color: '#C4623A',
+      border: '1.5px dashed #4A7C59', background: '#FFF8F4', color: '#4A7C59',
       fontWeight: 600, fontSize: 13, cursor: 'pointer',
       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
     }}>
-      <Plus size={16} color="#C4623A" strokeWidth={2} />
+      <Plus size={16} color="#4A7C59" strokeWidth={2} />
       {label}
     </button>
   )
@@ -158,7 +158,7 @@ function SheetModal({ title, subtitle, onClose, onSave, saveLabel, saving, child
         </div>
         <button onClick={onSave} disabled={saving} style={{
           width: '100%', marginTop: 24, padding: '14px', borderRadius: 16, border: 'none',
-          background: saving ? '#D4C4B8' : 'linear-gradient(135deg, #C4623A, #A85130)',
+          background: saving ? '#D4C4B8' : 'linear-gradient(135deg, #4A7C59, #3A6347)',
           color: 'white', fontWeight: 700, fontSize: 14,
           cursor: saving ? 'not-allowed' : 'pointer',
           boxShadow: saving ? 'none' : '0 6px 20px rgba(196,98,58,0.3)',
@@ -238,7 +238,7 @@ function ContactCard({ con, onEdit, onToggleEmergency, onDeleteRequest, canDelet
     <div style={{
       background: 'white', borderRadius: 16, padding: '14px 16px', marginBottom: 10,
       border: isEmergency ? '1.5px solid #FECACA' : '1px solid #EDE5D8',
-      borderTop: `3px solid ${isEmergency ? '#D63031' : '#C4623A'}`,
+      borderTop: `3px solid ${isEmergency ? '#D63031' : '#4A7C59'}`,
       boxShadow: isEmergency ? '0 2px 12px rgba(214,48,49,0.1)' : '0 2px 8px rgba(0,0,0,0.05)',
     }}>
       {isEmergency && (
@@ -328,7 +328,7 @@ function JoinedMemberCard({ member, inDirectory, onClick }) {
           {roleLabel}
         </span>
       </div>
-      <p style={{ fontSize: 11, color: inDirectory ? '#4A7C59' : '#C4623A', margin: '8px 0 0', fontWeight: 600 }}>
+      <p style={{ fontSize: 11, color: inDirectory ? '#4A7C59' : '#4A7C59', margin: '8px 0 0', fontWeight: 600 }}>
         {inDirectory ? '✓ En directorio — toca para editar' : '+ Toca para añadir al directorio'}
       </p>
     </div>
@@ -534,7 +534,7 @@ export default function Directory() {
   return (
     <Layout>
       {/* Sticky tab bar */}
-      <div style={{ position: 'sticky', top: 0, zIndex: 30, background: '#FFF8F0', borderBottom: '1px solid #EDE5D8', padding: '12px 16px 10px' }}>
+      <div style={{ position: 'sticky', top: 0, zIndex: 30, background: '#F7F3ED', borderBottom: '1px solid #EDE5D8', padding: '12px 16px 10px' }}>
         <div style={{ display: 'flex', gap: 4, padding: 4, borderRadius: 16, background: '#F3F4F6' }}>
           {TABS.map(t => (
             <button key={t.id} onClick={() => setTab(t.id)} style={{
@@ -560,7 +560,7 @@ export default function Directory() {
             {loading
               ? <p style={{ textAlign: 'center', color: '#9CA3AF', fontSize: 13, padding: '32px 0' }}>Cargando...</p>
               : loadError
-              ? <div style={{ textAlign: 'center', padding: '32px 0' }}><p style={{ fontSize: 13, color: '#D63031', marginBottom: 10 }}>{loadError}</p><button onClick={fetchAll} style={{ padding: '9px 20px', borderRadius: 12, background: '#C4623A', color: 'white', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>Reintentar</button></div>
+              ? <div style={{ textAlign: 'center', padding: '32px 0' }}><p style={{ fontSize: 13, color: '#D63031', marginBottom: 10 }}>{loadError}</p><button onClick={fetchAll} style={{ padding: '9px 20px', borderRadius: 12, background: '#4A7C59', color: 'white', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>Reintentar</button></div>
               : doctors.length === 0
               ? <EmptyState Icon={BookOpen} title="Sin médicos registrados" subtitle="Agrega los médicos tratantes para tenerlos siempre a la mano" />
               : doctors.map(d => (
@@ -580,7 +580,7 @@ export default function Directory() {
             {loading
               ? <p style={{ textAlign: 'center', color: '#9CA3AF', fontSize: 13, padding: '32px 0' }}>Cargando...</p>
               : loadError
-              ? <div style={{ textAlign: 'center', padding: '32px 0' }}><p style={{ fontSize: 13, color: '#D63031', marginBottom: 10 }}>{loadError}</p><button onClick={fetchAll} style={{ padding: '9px 20px', borderRadius: 12, background: '#C4623A', color: 'white', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>Reintentar</button></div>
+              ? <div style={{ textAlign: 'center', padding: '32px 0' }}><p style={{ fontSize: 13, color: '#D63031', marginBottom: 10 }}>{loadError}</p><button onClick={fetchAll} style={{ padding: '9px 20px', borderRadius: 12, background: '#4A7C59', color: 'white', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>Reintentar</button></div>
               : institutions.length === 0
               ? <EmptyState Icon={BookOpen} title="Sin instituciones registradas" subtitle="Agrega hospitales, clínicas y farmacias de referencia" />
               : institutions.map(i => (
@@ -600,7 +600,7 @@ export default function Directory() {
             {loading
               ? <p style={{ textAlign: 'center', color: '#9CA3AF', fontSize: 13, padding: '32px 0' }}>Cargando...</p>
               : loadError
-              ? <div style={{ textAlign: 'center', padding: '32px 0' }}><p style={{ fontSize: 13, color: '#D63031', marginBottom: 10 }}>{loadError}</p><button onClick={fetchAll} style={{ padding: '9px 20px', borderRadius: 12, background: '#C4623A', color: 'white', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>Reintentar</button></div>
+              ? <div style={{ textAlign: 'center', padding: '32px 0' }}><p style={{ fontSize: 13, color: '#D63031', marginBottom: 10 }}>{loadError}</p><button onClick={fetchAll} style={{ padding: '9px 20px', borderRadius: 12, background: '#4A7C59', color: 'white', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>Reintentar</button></div>
               : (
                 <>
                   {/* Joined app members */}

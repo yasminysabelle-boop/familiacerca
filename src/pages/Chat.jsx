@@ -25,7 +25,7 @@ function formatDate(ts) {
 
 // Stable warm color per sender based on their first letter
 const AVATAR_COLORS = [
-  '#C4623A', '#7C5CBF', '#2D86A0', '#4A7C59',
+  '#4A7C59', '#7C5CBF', '#2D86A0', '#4A7C59',
   '#D4A853', '#D63031', '#8B5E3C', '#5E86A0',
 ]
 function avatarColor(name = '') {
@@ -228,7 +228,7 @@ export default function Chat() {
       <div style={{
         display: 'flex', flexDirection: 'column',
         height: '100%', overflow: 'hidden',
-        background: '#FFF8F0',
+        background: '#F7F3ED',
       }}>
 
         {/* Messages area */}
@@ -264,7 +264,7 @@ export default function Chat() {
                 <div style={{ flex: 1, height: 1, background: '#EDE5D8' }} />
                 <span style={{
                   fontSize: 11, fontWeight: 600, color: '#9CA3AF',
-                  background: '#FFF8F0', padding: '0 4px',
+                  background: '#F7F3ED', padding: '0 4px',
                 }}>
                   {date}
                 </span>
@@ -330,7 +330,7 @@ export default function Chat() {
                             ? '18px 18px 4px 18px'
                             : '18px 18px 18px 4px',
                           background: mine
-                            ? 'linear-gradient(135deg, #C4623A, #A85130)'
+                            ? 'linear-gradient(135deg, #4A7C59, #3A6347)'
                             : 'white',
                           color: mine ? 'white' : '#1A1A1A',
                           fontSize: 14,
@@ -461,7 +461,7 @@ export default function Chat() {
                 fontFamily: 'inherit',
                 transition: 'border-color 0.15s',
               }}
-              onFocus={e => { e.target.style.borderColor = '#C4623A' }}
+              onFocus={e => { e.target.style.borderColor = '#4A7C59' }}
               onBlur={e => { e.target.style.borderColor = '#EDE5D8' }}
             />
             <MicButton recording={recording} onStart={start} onStop={stop} />
@@ -487,7 +487,7 @@ export default function Chat() {
                 padding: '10px 18px', borderRadius: 20, border: 'none',
                 background: (sending || !input.trim() || !canEdit)
                   ? '#D4C4B8'
-                  : 'linear-gradient(135deg, #C4623A, #A85130)',
+                  : 'linear-gradient(135deg, #4A7C59, #3A6347)',
                 color: 'white', fontWeight: 700, fontSize: 13,
                 cursor: (sending || !input.trim() || !canEdit) ? 'not-allowed' : 'pointer',
                 flexShrink: 0, transition: 'all 0.15s',

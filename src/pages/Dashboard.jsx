@@ -174,13 +174,13 @@ function ReactionBar({ eventKey, reactions, userId, onToggle }) {
             style={{
               display: 'flex', alignItems: 'center', gap: 3,
               padding: '3px 8px', borderRadius: 20,
-              background: mine ? '#FDF0EB' : '#F3F4F6',
-              border: mine ? '1px solid #C4623A' : '1px solid #E5E7EB',
+              background: mine ? '#EBF3EE' : '#F3F4F6',
+              border: mine ? '1px solid #4A7C59' : '1px solid #E5E7EB',
               cursor: 'pointer', fontSize: 13, lineHeight: 1,
               transition: 'all 0.15s',
             }}>
             <span>{emoji}</span>
-            {count > 0 && <span style={{ fontSize: 11, color: mine ? '#C4623A' : '#6B7280', fontWeight: 600 }}>{count}</span>}
+            {count > 0 && <span style={{ fontSize: 11, color: mine ? '#4A7C59' : '#6B7280', fontWeight: 600 }}>{count}</span>}
           </button>
         )
       })}
@@ -573,7 +573,7 @@ function MedConfirmedDetail({ evt }) {
             >
               {attachStamping ? (
                 <div style={{ height: 110, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, color: '#9CA3AF' }}>
-                  <div style={{ width: 20, height: 20, border: '2px solid #C4623A', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
+                  <div style={{ width: 20, height: 20, border: '2px solid #4A7C59', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
                   <span style={{ fontSize: 12 }}>Aplicando sello...</span>
                 </div>
               ) : attachPreview ? (
@@ -605,7 +605,7 @@ function MedConfirmedDetail({ evt }) {
               <button
                 onClick={submitAttachPhoto}
                 disabled={attachSaving || attachStamping}
-                style={{ flex: 1, padding: '11px', borderRadius: 12, border: 'none', background: '#C4623A', color: 'white', fontWeight: 700, fontSize: 13, cursor: (attachSaving || attachStamping) ? 'default' : 'pointer', opacity: (attachSaving || attachStamping) ? 0.6 : 1 }}
+                style={{ flex: 1, padding: '11px', borderRadius: 12, border: 'none', background: '#4A7C59', color: 'white', fontWeight: 700, fontSize: 13, cursor: (attachSaving || attachStamping) ? 'default' : 'pointer', opacity: (attachSaving || attachStamping) ? 0.6 : 1 }}
               >
                 {attachSaving ? 'Guardando...' : '✓ Guardar foto'}
               </button>
@@ -923,7 +923,7 @@ function EmptyState({ profile }) {
         style={{
           display: 'inline-flex', alignItems: 'center', gap: 6,
           padding: '10px 20px', borderRadius: 12,
-          background: 'linear-gradient(135deg, #C4623A, #A85130)',
+          background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
           color: 'white', fontWeight: 700, fontSize: 13,
           textDecoration: 'none',
         }}
@@ -1211,7 +1211,7 @@ function EmergencyCard({ onPress, sosSent }) {
 const RECENT_EVENT_CONFIG = {
   MED_CONFIRMED:     { icon: '💊', color: '#15803D', label: e => `${e.medName ?? 'Medicamento'} dado${e.confirmedBy ? ` por ${e.confirmedBy.split(' ')[0]}` : ''}` },
   VOICE_MEMORY:      { icon: '🎙️', color: '#7C5CBF', label: e => `Memoria de voz${e.recorderName ? ` de ${e.recorderName.split(' ')[0]}` : ''}` },
-  PHOTO:             { icon: '📸', color: '#C4623A', label: e => `Foto${e.uploaderName ? ` de ${e.uploaderName.split(' ')[0]}` : ' familiar'}` },
+  PHOTO:             { icon: '📸', color: '#4A7C59', label: e => `Foto${e.uploaderName ? ` de ${e.uploaderName.split(' ')[0]}` : ' familiar'}` },
   EXPENSE:           { icon: '💰', color: '#4A7C59', label: e => e.description ?? 'Gasto registrado' },
   SOS_ALERT:         { icon: '🚨', color: '#D63031', label: () => 'Alerta de emergencia' },
   APPOINTMENT:       { icon: '📅', color: '#3B82F6', label: e => e.appointmentTitle ?? 'Cita médica' },

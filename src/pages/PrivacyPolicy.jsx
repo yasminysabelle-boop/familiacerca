@@ -20,13 +20,13 @@ function Section({ title, children }) {
 function Item({ children }) {
   return (
     <div className="flex gap-2.5">
-      <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full" style={{ background: '#C4623A', marginTop: 6 }} />
+      <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full" style={{ background: '#4A7C59', marginTop: 6 }} />
       <p>{children}</p>
     </div>
   )
 }
 
-function Callout({ icon, children, color = '#FDF0EB', border = '#F0C8B0' }) {
+function Callout({ icon, children, color = '#EBF3EE', border = '#F0C8B0' }) {
   return (
     <div
       className="flex gap-3 px-4 py-3.5 rounded-2xl"
@@ -42,7 +42,7 @@ function DataChip({ label }) {
   return (
     <span
       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold"
-      style={{ background: '#FDF0EB', color: '#A85130', border: '1px solid #F0C8B0' }}
+      style={{ background: '#EBF3EE', color: '#3A6347', border: '1px solid #F0C8B0' }}
     >
       {label}
     </span>
@@ -53,7 +53,7 @@ export default function PrivacyPolicy() {
   const navigate = useNavigate()
 
   return (
-    <div className="min-h-screen" style={{ background: '#FFF8F0' }}>
+    <div className="min-h-screen" style={{ background: '#F7F3ED' }}>
 
       {/* ── Header ── */}
       <header
@@ -323,7 +323,7 @@ export default function PrivacyPolicy() {
         >
           <p className="text-xs text-gray-400 text-center leading-relaxed">
             ¿Prefieres leer esto en inglés? Escríbenos a{' '}
-            <a href="mailto:legal@familiacerca.com" className="underline" style={{ color: '#C4623A' }}>
+            <a href="mailto:legal@familiacerca.com" className="underline" style={{ color: '#4A7C59' }}>
               legal@familiacerca.com
             </a>{' '}
             y te enviamos la versión en inglés.
@@ -331,7 +331,7 @@ export default function PrivacyPolicy() {
           <Link
             to="/terminos"
             className="text-xs font-semibold underline"
-            style={{ color: '#C4623A' }}
+            style={{ color: '#4A7C59' }}
           >
             Ver Términos de Servicio →
           </Link>

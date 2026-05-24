@@ -144,7 +144,7 @@ export default function JoinFamily() {
     fontSize: 14, outline: 'none', background: 'white',
     boxSizing: 'border-box', transition: 'all 0.15s',
   }
-  const onFocus = e => { e.target.style.borderColor = '#C4623A'; e.target.style.boxShadow = '0 0 0 3px rgba(196,98,58,0.1)' }
+  const onFocus = e => { e.target.style.borderColor = '#4A7C59'; e.target.style.boxShadow = '0 0 0 3px rgba(196,98,58,0.1)' }
   const onBlur  = e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.boxShadow = 'none' }
 
   // Render nothing while the no-token redirect is in flight
@@ -220,7 +220,7 @@ export default function JoinFamily() {
                 onClick={() => navigate('/login')}
                 style={{
                   padding: '12px 28px', borderRadius: 14,
-                  background: 'linear-gradient(135deg, #C4623A, #A85130)',
+                  background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
                   color: 'white', fontWeight: 700, fontSize: 14,
                   border: 'none', cursor: 'pointer',
                   boxShadow: '0 6px 20px rgba(196,98,58,0.3)',
@@ -255,7 +255,7 @@ export default function JoinFamily() {
                 onClick={() => navigate('/login')}
                 style={{
                   padding: '12px 28px', borderRadius: 14,
-                  background: 'linear-gradient(135deg, #C4623A, #A85130)',
+                  background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
                   color: 'white', fontWeight: 700, fontSize: 14,
                   border: 'none', cursor: 'pointer',
                   boxShadow: '0 6px 20px rgba(196,98,58,0.3)',
@@ -287,7 +287,7 @@ export default function JoinFamily() {
                 onClick={() => navigate('/dashboard')}
                 style={{
                   padding: '12px 28px', borderRadius: 14,
-                  background: 'linear-gradient(135deg, #C4623A, #A85130)',
+                  background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
                   color: 'white', fontWeight: 700, fontSize: 14,
                   border: 'none', cursor: 'pointer',
                   boxShadow: '0 6px 20px rgba(196,98,58,0.3)',
@@ -309,7 +309,7 @@ export default function JoinFamily() {
               boxShadow: '0 24px 64px rgba(0,0,0,0.35)',
             }}>
               <div className="animate-heartbeat inline-flex" style={{ marginBottom: 16 }}>
-                <Heart size={56} color="#C4623A" strokeWidth={1.2} filled />
+                <Heart size={56} color="#4A7C59" strokeWidth={1.2} filled />
               </div>
               <p style={{ fontFamily: 'Georgia, serif', fontSize: 20, fontWeight: 700, color: '#1A1A1A', marginBottom: 8 }}>
                 ¡Bienvenido a la familia!
@@ -321,7 +321,7 @@ export default function JoinFamily() {
                 onClick={() => navigate('/dashboard')}
                 style={{
                   width: '100%', padding: '14px',
-                  background: 'linear-gradient(135deg, #C4623A, #A85130)',
+                  background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
                   color: 'white', fontWeight: 700, fontSize: 14,
                   borderRadius: 14, border: 'none', cursor: 'pointer',
                   boxShadow: '0 8px 24px rgba(196,98,58,0.35)',
@@ -349,7 +349,7 @@ export default function JoinFamily() {
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   margin: '0 auto 14px',
                 }}>
-                  <UserPlus size={24} color="#C4623A" strokeWidth={1.5} />
+                  <UserPlus size={24} color="#4A7C59" strokeWidth={1.5} />
                 </div>
                 <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#1A1A1A', lineHeight: 1.3, marginBottom: 6 }}>
                   {patientName ? `Te invitaron a cuidar a ${patientName}` : 'Invitación a FamiliaCerca'}
@@ -411,7 +411,7 @@ export default function JoinFamily() {
                         width: '100%', padding: '14px',
                         background: accepting
                           ? '#D4C4B8'
-                          : 'linear-gradient(135deg, #C4623A, #A85130)',
+                          : 'linear-gradient(135deg, #4A7C59, #3A6347)',
                         color: 'white', fontWeight: 700, fontSize: 14,
                         borderRadius: 14, border: 'none',
                         cursor: accepting ? 'not-allowed' : 'pointer',
@@ -516,7 +516,7 @@ export default function JoinFamily() {
                         marginTop: 4, width: '100%', padding: '13px',
                         background: authLoading
                           ? '#D4C4B8'
-                          : 'linear-gradient(135deg, #C4623A, #A85130)',
+                          : 'linear-gradient(135deg, #4A7C59, #3A6347)',
                         color: 'white', fontWeight: 700, fontSize: 14,
                         borderRadius: 14, border: 'none',
                         cursor: authLoading ? 'not-allowed' : 'pointer',
