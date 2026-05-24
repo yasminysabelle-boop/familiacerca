@@ -561,7 +561,7 @@ export default function Landing() {
       </section>
 
       {/* ── FEATURES ── */}
-      <section id="funciones" style={{ padding: '128px 32px', background: '#1C0F0F', position: 'relative', overflow: 'hidden' }}>
+      <section id="funciones" style={{ padding: '128px 32px', background: '#1A1208', position: 'relative', overflow: 'hidden' }}>
         {/* Gold radial glow behind title */}
         <div style={{
           position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)',
