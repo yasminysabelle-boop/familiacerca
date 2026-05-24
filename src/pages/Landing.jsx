@@ -817,8 +817,8 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ── PWA — green gradient ── */}
-      <section style={{ padding: '128px 32px', background: 'linear-gradient(135deg, #2D5016 0%, #4A7C59 100%)' }}>
+      {/* ── PWA ── */}
+      <section style={{ padding: '128px 32px', background: '#2D5016' }}>
         <div style={{ maxWidth: 980, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 72, flexWrap: 'wrap' }}>
           <div style={{ flex: '1 1 300px' }}>
             <p style={{ fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 18px', fontFamily: SANS }}>Sin App Store</p>
@@ -840,15 +840,15 @@ export default function Landing() {
             ))}
           </div>
           {/* Phone home screen mockup */}
-          <div style={{ flex: '0 0 auto' }}>
-            <div style={{ width: 220, height: 440, background: '#1A1A1A', borderRadius: 40, padding: 10, boxShadow: '0 48px 120px rgba(0,0,0,0.45)', position: 'relative' }}>
+          <div style={{ flex: '0 0 auto', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <div style={{ width: 220, height: 440, background: '#1A1A1A', borderRadius: 40, padding: 10, boxShadow: '0 32px 80px rgba(0,0,0,0.50)', position: 'relative', transform: 'none' }}>
               <div style={{ position: 'absolute', top: 10, left: '50%', transform: 'translateX(-50%)', width: 56, height: 18, background: '#1A1A1A', borderRadius: '0 0 12px 12px', zIndex: 2 }} />
               <div style={{ width: '100%', height: '100%', borderRadius: 32, background: 'linear-gradient(160deg, #1C1C2E 0%, #0F0F1A 100%)', overflow: 'hidden', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '32px 16px 16px' }}>
                 <p style={{ margin: '0 0 3px', fontSize: 11, color: 'rgba(255,255,255,0.35)', fontFamily: SANS }}>9:41</p>
                 <p style={{ margin: '0 0 24px', fontSize: 9, color: 'rgba(255,255,255,0.18)', fontFamily: SANS }}>sábado, 23 mayo</p>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, width: '100%' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-                    <div style={{ width: 44, height: 44, borderRadius: 12, background: `linear-gradient(135deg, ${P} 0%, ${PD} 100%)`, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 6px 20px rgba(139,26,26,0.55)` }}>
+                    <div style={{ width: 44, height: 44, borderRadius: 12, background: 'linear-gradient(135deg, #4A7C59 0%, #2D5016 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 6px 20px rgba(74,124,89,0.50)' }}>
                       <svg width={24} height={24} viewBox="0 0 40 40" fill="none">
                         <text x="20" y="19" textAnchor="middle" dominantBaseline="middle" fill="white" fontSize="13" fontWeight="800" fontFamily="Georgia,serif">FC</text>
                         <text x="20" y="30" textAnchor="middle" dominantBaseline="middle" fill="white" fillOpacity="0.75" fontSize="9">♥</text>
