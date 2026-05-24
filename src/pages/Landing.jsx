@@ -190,7 +190,7 @@ export default function Landing() {
   }, [])
 
   useEffect(() => {
-    const onScroll = () => setShowBar(window.scrollY > 300)
+    const onScroll = () => setShowBar(window.scrollY > 150)
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
@@ -438,7 +438,7 @@ export default function Landing() {
       </section>
 
       {/* ── STATS BAR ── */}
-      <section ref={statsRef} style={{ background: DK, padding: '60px 32px' }}>
+      <section ref={statsRef} style={{ background: DK, padding: '60px 32px 72px' }}>
         <div style={{ maxWidth: 1140, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', gap: 0 }}>
           {statItems.flatMap((s, i) => {
             const el = (
@@ -456,6 +456,9 @@ export default function Landing() {
           })}
         </div>
       </section>
+
+      {/* Separator between stats and marquee */}
+      <div style={{ background: `linear-gradient(to right, ${DK}, rgba(201,136,42,0.35), ${DK})`, height: 1 }} />
 
       {/* ── SOCIAL PROOF MARQUEE ── */}
       <section style={{ background: P, padding: '18px 0', overflow: 'hidden' }}>
