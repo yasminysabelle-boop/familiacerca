@@ -2,7 +2,7 @@
   "name": "FamiliaCerca",
   "short_name": "FamiliaCerca",
   "description": "Coordinación de cuidado familiar",
-  "start_url": "/?source=pwa",
+  "start_url": "/login?source=pwa",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
