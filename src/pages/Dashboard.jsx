@@ -130,6 +130,32 @@ function PendingCard({ evt, confirming, onConfirm, todayKey, isFamiliar }) {
   )
 }
 
+function MissedCard({ evt }) {
+  const medLabel = [evt.medName, evt.medDosage].filter(Boolean).join(' ')
+  return (
+    <div style={{
+      background: '#FFF5F5', borderRadius: 16,
+      border: '1px solid #FECACA', padding: '12px 14px',
+      display: 'flex', alignItems: 'center', gap: 10,
+    }}>
+      <span style={{ fontSize: 20, flexShrink: 0 }}>⚠️</span>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p style={{ fontSize: 13, fontWeight: 700, color: '#D63031', margin: 0 }}>
+          {medLabel} — no se dio
+        </p>
+        {evt.medTime && (
+          <p style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>
+            Programado a las {fmtTime(evt.medTime)}
+          </p>
+        )}
+      </div>
+      <span style={{ fontSize: 11, fontWeight: 700, color: '#D63031', background: '#FFF0F0', padding: '3px 8px', borderRadius: 6, flexShrink: 0 }}>
+        No dado
+      </span>
+    </div>
+  )
+}
+
 function ConfirmedCard({ evt, onTap }) {
   const time = evt.timestamp ? fmtTimestamp(evt.timestamp) : null
   const name = evt.confirmedBy ? evt.confirmedBy.split(' ')[0] : null
@@ -878,25 +904,8 @@ function TimelineEvent({ evt, confirming, expandedAudio, onConfirm, onToggleAudi
   if (evt.type === 'MED_PENDING') {
     return <PendingCard evt={evt} confirming={confirming} onConfirm={onConfirm} todayKey={todayKey} isFamiliar={isFamiliar} />
   }
-  if (evt.type === 'MED_MISSED') {
-    return (
-      <div style={{
-        background: '#FFF5F5', border: '1px solid #FCA5A5', borderRadius: 12,
-        padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 10,
-        opacity: 0.85,
-      }}>
-        <span style={{ fontSize: 18, flexShrink: 0 }}>⚠️</span>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ margin: 0, fontSize: 14, fontWeight: 500, color: '#B91C1C' }}>
-            {evt.medName}{evt.medDosage ? ` · ${evt.medDosage}` : ''}
-          </p>
-          <p style={{ margin: '2px 0 0', fontSize: 12, color: '#EF4444' }}>
-            No dado{evt.medTime ? ` · ${evt.medTime}` : ''}
-          </p>
-        </div>
-      </div>
-    )
-  }
+  if (evt.type === 'MED_MISSED') return <MissedCard evt={evt} />
+  if (evt.type === 'MED_CONFIRMED') return <div><ConfirmedCard evt={evt} onTap={() => onTap(evt)} />{bar}</div>
   if (evt.type === 'VOICE_MEMORY') {
     return (
       <div>
@@ -977,8 +986,7 @@ function DaySection({
   // Status based on medication coverage for this day
   let status = 'none'
   if (medTotal > 0) {
-    if (pendingCount === 0 && missedCount === 0 && confirmedCount >= medTotal) status = 'green'
-    else if (confirmedCount > 0 && missedCount > 0) status = 'yellow'
+    if (missedCount === 0 && pendingCount === 0 && confirmedCount >= medTotal) status = 'green'
     else if (confirmedCount > 0) status = 'yellow'
     else if (missedCount > 0) status = 'red'
     else status = 'red'
@@ -1284,7 +1292,7 @@ function RecentEventRow({ evt, onTap }) {
 // ── Main component ─────────────────────────────────────────────────────────────
 
 export default function Dashboard() {
-  const { user } = useAuth()
+  const { user, signOut } = useAuth()
   const { profile, ownerId, memberRole } = useFamily()
   const isFamiliar = memberRole === 'familiar'
   const isAdmin = memberRole === null
@@ -1654,6 +1662,39 @@ export default function Dashboard() {
         address: log.address ?? null,
         photoUrl: log.photo_url ?? null,
       })
+    }
+
+    // ── Missed medications for past days (generates entries for days with no activity) ──
+    const confirmedByDate = {}
+    for (const log of (confirmedLogs ?? [])) {
+      if (!confirmedByDate[log.log_date]) confirmedByDate[log.log_date] = new Set()
+      confirmedByDate[log.log_date].add(log.medication_id)
+    }
+    const dayMs = 86400000
+    const sevenAgoTs = new Date(sevenAgoKey + 'T12:00:00').getTime()
+    const yesterdayTs = new Date(yesterdayKey + 'T12:00:00').getTime()
+    for (let ts = sevenAgoTs; ts <= yesterdayTs; ts += dayMs) {
+      const dk = new Date(ts).toISOString().split('T')[0]
+      const confirmedOnDay = confirmedByDate[dk] ?? new Set()
+      for (const med of (meds ?? [])) {
+        if (confirmedOnDay.has(med.id)) continue
+        const times = med.scheduled_times?.length
+          ? [...med.scheduled_times].sort()
+          : (med.time ? [med.time] : [])
+        if (times.length === 0) continue
+        allEvents.push({
+          id: `missed-${dk}-${med.id}`,
+          type: 'MED_MISSED',
+          timestamp: times[0]
+            ? new Date(`${dk}T${times[0]}:00`)
+            : new Date(`${dk}T12:00:00`),
+          dateKey: dk,
+          medicationId: med.id,
+          medName: med.name,
+          medDosage: med.dosage,
+          medTime: times[0] ?? null,
+        })
+      }
     }
 
     // ── Voice memories ──
@@ -2196,6 +2237,25 @@ export default function Dashboard() {
               />
             ))
           ))}
+        </div>
+
+        {/* ── Sign out ─────────────────────────────────────────────────── */}
+        <div style={{ marginTop: 24, paddingBottom: 8, display: 'flex', justifyContent: 'center' }}>
+          <button
+            onClick={async () => {
+              localStorage.removeItem('fc_active_family')
+              localStorage.removeItem('fc_member_owner_id')
+              try { await signOut() } catch { }
+              window.location.href = '/login'
+            }}
+            style={{
+              background: 'none', border: '1px solid #EDE5D8',
+              color: '#9CA3AF', fontSize: 13, fontWeight: 600,
+              borderRadius: 12, padding: '10px 24px', cursor: 'pointer',
+            }}
+          >
+            Cerrar sesión
+          </button>
         </div>
       </div>
 

@@ -467,9 +467,10 @@ export default function Familia() {
                 )
               })()}
 
-              {/* Invited members list — exclude self (by id or email) to avoid duplicating the admin card */}
+              {/* Invited members list — exclude current user to avoid duplicating the admin card */}
               {members.filter(m =>
-                !(m.member_user_id === user.id || m.member_email?.toLowerCase() === user.email?.toLowerCase())
+                !(m.member_user_id === user?.id ||
+                  m.member_email?.trim().toLowerCase() === user?.email?.trim().toLowerCase())
               ).map(member => {
                 const mp = memberProfiles[member.member_user_id]
                 const online = isOnline(mp)

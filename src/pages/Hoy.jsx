@@ -16,10 +16,10 @@ const TIME_GROUPS = [
 ]
 
 const CARE_MOMENTS = [
-  { id: 'morning',   label: 'Mañana',            icon: '🌅', overdueHour: 14,   color: '#D97706', bg: '#FFFBEB' },
-  { id: 'afternoon', label: 'Tarde',              icon: '☀️',  overdueHour: 20,   color: '#4A7C59', bg: '#EBF3EE' },
-  { id: 'night',     label: 'Noche',              icon: '🌙', overdueHour: null, color: '#6366F1', bg: '#EEF2FF' },
-  { id: 'asneeded',  label: 'Cuando se necesita', icon: '🔔', overdueHour: null, color: '#6B7280', bg: '#F9FAFB' },
+  { id: 'morning',   label: 'Mañana',            icon: '🌅', overdueHour: 14,   color: '#D97706', bg: '#FFFBEB', scheduledTime: '8:00 AM' },
+  { id: 'afternoon', label: 'Tarde',              icon: '☀️',  overdueHour: 20,   color: '#4A7C59', bg: '#EBF3EE', scheduledTime: '2:00 PM' },
+  { id: 'night',     label: 'Noche',              icon: '🌙', overdueHour: null, color: '#6366F1', bg: '#EEF2FF', scheduledTime: '8:00 PM' },
+  { id: 'asneeded',  label: 'Cuando se necesita', icon: '🔔', overdueHour: null, color: '#6B7280', bg: '#F9FAFB', scheduledTime: null },
 ]
 
 const CARE_ITEMS = [
@@ -897,6 +897,11 @@ export default function Hoy() {
                                   ✓ {checkedTime}
                                   {log?.checked_by ? ` · ${log.checked_by.split(' ')[0]}` : ''}
                                   {item.weekly && log?.log_date !== today ? ' · esta semana' : ''}
+                                </p>
+                              )}
+                              {!isChecked && !isOverdue && moment.scheduledTime && (
+                                <p style={{ fontSize: 10, color: '#9CA3AF', margin: '2px 0 0' }}>
+                                  {moment.scheduledTime}
                                 </p>
                               )}
                             </div>
