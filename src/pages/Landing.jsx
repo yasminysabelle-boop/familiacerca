@@ -9,18 +9,18 @@ const PROB_IMG = 'https://i.postimg.cc/3JdVcYsn/Chat-GPT-Image-May-22-2026-10-21
 const COMO_IMG = 'https://i.postimg.cc/hGTq3cd4/Chat-GPT-Image-May-22-2026-10-22-32-PM.png'
 const CTA_IMG  = 'https://i.postimg.cc/hj8chcDs/Chat-GPT-Image-May-22-2026-10-23-48-PM.png'
 
-const P  = '#4A7C59'
-const PD = '#3A6347'
-const AU = '#C9882A'
-const SG = '#2D6A4F'
-const DK = '#0F1A12'      // verde-noche (antes negro-marrón)
-const SF = '#F7F3ED'      // lino cálido — fondo claro principal
-const SA = '#EDE8DF'      // arena — superficies/cards claras
-const SW = '#FFFFFF'      // blanco puro para precio cards
-const BD = 'rgba(74,124,89,0.12)'  // borde tenue verde
+const P  = '#3D6B52'
+const PD = '#2E5240'
+const AU = '#C4923A'
+const SG = '#7BA492'
+const DK = '#1E2D26'
+const SF = '#F5F0E8'
+const SA = '#EDE6D8'
+const SW = '#FFFFFF'
+const BD = 'rgba(61,107,82,0.10)'
 
-const SERIF = "'Cormorant Garamond', Georgia, serif"
-const SANS  = "'Inter', system-ui, sans-serif"
+const SERIF = "'Fraunces', 'Cormorant Garamond', Georgia, serif"
+const SANS  = "'Plus Jakarta Sans', 'Inter', system-ui, sans-serif"
 
 const FC_PATTERN = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Ctext x='60' y='65' text-anchor='middle' dominant-baseline='middle' fill='rgba(201%2C136%2C42%2C0.06)' font-size='32' font-family='Georgia%2Cserif' font-weight='700'%3EFC%3C/text%3E%3C/svg%3E")`
 
@@ -324,23 +324,18 @@ export default function Landing() {
       {/* ── NAV ── */}
       <nav style={{
         position: 'sticky', top: 0, zIndex: 100,
-        background: 'rgba(15,10,0,0.92)',
-        backdropFilter: 'blur(16px)',
-        borderBottom: '1px solid rgba(201,136,42,0.12)',
+        background: 'rgba(30,45,38,0.96)',
+        backdropFilter: 'blur(20px)',
+        borderBottom: '1px solid rgba(196,146,58,0.12)',
       }}>
         <div style={{
           maxWidth: 1140, margin: '0 auto', padding: '0 32px',
           height: 72, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <svg width={36} height={36} viewBox="0 0 40 40" fill="none">
-              <circle cx="20" cy="20" r="20" fill={P} fillOpacity="0.15" />
-              <circle cx="20" cy="20" r="17" fill={P} />
-              <text x="20" y="19.5" textAnchor="middle" dominantBaseline="middle" fill="white" fontSize="13" fontWeight="800" fontFamily="Georgia,serif" letterSpacing="-0.5">FC</text>
-              <text x="20" y="31" textAnchor="middle" dominantBaseline="middle" fill="white" fillOpacity="0.75" fontSize="9">♥</text>
-            </svg>
-            <span style={{ fontFamily: SERIF, fontSize: 20, fontWeight: 600, color: 'white', letterSpacing: '0.01em' }}>
-              FamiliaCerca
+            <img src="/icon-192.png" alt="FamiliaCerca" style={{ width: 38, height: 38, borderRadius: 10, objectFit: 'cover' }} />
+            <span style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 500, color: 'white', letterSpacing: '0.01em' }}>
+              Familia<span style={{ color: AU }}>Cerca</span>
             </span>
           </div>
 
@@ -356,7 +351,7 @@ export default function Landing() {
               background: `linear-gradient(135deg, ${P}, ${PD})`,
               color: 'white', fontWeight: 500, fontSize: 14,
               textDecoration: 'none', fontFamily: SANS,
-              boxShadow: `0 4px 18px rgba(74,124,89,0.32)`,
+              boxShadow: `0 4px 18px rgba(61,107,82,0.35)`,
             }}>Iniciar sesión</Link>
           </div>
 
@@ -980,7 +975,7 @@ export default function Landing() {
                   <text x="20" y="19.5" textAnchor="middle" dominantBaseline="middle" fill="white" fontSize="13" fontWeight="800" fontFamily="Georgia,serif" letterSpacing="-0.5">FC</text>
                   <text x="20" y="31" textAnchor="middle" dominantBaseline="middle" fill="white" fillOpacity="0.75" fontSize="9">♥</text>
                 </svg>
-                <span style={{ fontFamily: SERIF, fontSize: 19, fontWeight: 600, color: 'white' }}>FamiliaCerca</span>
+                <span style={{ fontFamily: SERIF, fontSize: 19, fontWeight: 500, color: 'white' }}>Familia<span style={{ color: AU }}>Cerca</span></span>
               </div>
               <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.32)', lineHeight: 1.7, fontFamily: SANS, fontWeight: 300, margin: '0 0 24px' }}>
                 Cuidado familiar coordinado para la comunidad hispana. Medicamentos, rutinas y amor — todo en un solo lugar.
