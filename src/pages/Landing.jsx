@@ -995,6 +995,19 @@ export default function Landing() {
             </div>
             <div style={{ display: 'flex', gap: 56, flexWrap: 'wrap' }}>
               <div>
+                <p style={{ fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.28)', textTransform: 'uppercase', letterSpacing: '0.12em', margin: '0 0 18px', fontFamily: SANS }}>Contacto</p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  <a href="mailto:hola@familiacerca.com" style={{ fontSize: 14, color: 'rgba(255,255,255,0.38)', textDecoration: 'none', fontFamily: SANS, fontWeight: 300 }}
+                    onMouseEnter={e => e.currentTarget.style.color = AU}
+                    onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.38)'}
+                  >hola@familiacerca.com</a>
+                  <a href="https://www.instagram.com/familia.cerca/" target="_blank" rel="noopener noreferrer" style={{ fontSize: 14, color: 'rgba(255,255,255,0.38)', textDecoration: 'none', fontFamily: SANS, fontWeight: 300 }}
+                    onMouseEnter={e => e.currentTarget.style.color = AU}
+                    onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.38)'}
+                  >@familia.cerca</a>
+                </div>
+              </div>
+              <div>
                 <p style={{ fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.28)', textTransform: 'uppercase', letterSpacing: '0.12em', margin: '0 0 18px', fontFamily: SANS }}>Producto</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                   {[{label:'Funciones',href:'#funciones'},{label:'Precios',href:'#precios'},{label:'Cómo funciona',href:'#como'},{label:'Preguntas',href:'#faq'}].map(l => (
