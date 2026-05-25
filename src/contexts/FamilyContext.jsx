@@ -48,7 +48,7 @@ export function FamilyProvider({ children }) {
       // Always fetch own profile and membership in parallel so we can detect both
       const [{ data: ownData }, { data: membership }] = await Promise.all([
         supabase.from('care_profiles').select('*').eq('user_id', user.id).maybeSingle(),
-        supabase.from('family_members').select('user_id, role').eq('member_user_id', user.id).maybeSingle(),
+        supabase.from('family_members').select('user_id, role').eq('member_user_id', user.id).neq('user_id', user.id).maybeSingle(),
       ])
 
       // ------------------------------------------------------------------
