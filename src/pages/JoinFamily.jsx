@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabase'
 import Logo from '../components/Logo'
 import { Heart, UserPlus, Eye, EyeOff } from '../components/Icons'
 import imgFamilia from '../assets/images/splash-familia.png'
+import PWAInstallBanner from '../components/PWAInstallBanner'
 
 export default function JoinFamily() {
   const [searchParams] = useSearchParams()
@@ -107,7 +108,7 @@ export default function JoinFamily() {
 
     setAccepting(false)
     setAccepted(true)
-    localStorage.setItem('fc_active_family', 'member')
+    localStorage.setItem('fc_active_context', invitation.user_id)
     localStorage.setItem('fc_member_owner_id', invitation.user_id)
     refreshFamily() // connect member to family group immediately
   }
@@ -325,10 +326,14 @@ export default function JoinFamily() {
                   color: 'white', fontWeight: 700, fontSize: 14,
                   borderRadius: 14, border: 'none', cursor: 'pointer',
                   boxShadow: '0 8px 24px rgba(74,124,89,0.35)',
+                  marginBottom: 12,
                 }}
               >
                 Ir al panel →
               </button>
+              <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0, lineHeight: 1.5 }}>
+                Instala la app para recibir alertas cuando haya cambios
+              </p>
             </div>
           )}
 
@@ -544,6 +549,9 @@ export default function JoinFamily() {
           Tus datos están cifrados y son solo tuyos.
         </p>
       </div>
+
+      {/* Show install banner once the invitation is accepted */}
+      {accepted && <PWAInstallBanner />}
     </div>
   )
 }

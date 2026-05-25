@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import { usePWAInstall } from '../hooks/usePWAInstall'
+import PWAInstallBanner from '../components/PWAInstallBanner'
 
 const HERO_IMG = 'https://i.postimg.cc/CKYvSgQ7/Chat-GPT-Image-May-22-2026-10-19-49-PM.png'
 const PROB_IMG = 'https://i.postimg.cc/3JdVcYsn/Chat-GPT-Image-May-22-2026-10-21-19-PM.png'
@@ -145,6 +147,8 @@ function PriceCard({ name, price, period, highlight, badge, features, cta, annua
 
 export default function Landing() {
   const { user, loading } = useAuth()
+  const { installed, isIOS, isAndroid, canPrompt, install, isMobile } = usePWAInstall()
+  const [pwaInstallClicked, setPwaInstallClicked] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [annual, setAnnual] = useState(false)
   const [counts, setCounts] = useState([0, 0, 0, 0])
@@ -831,16 +835,50 @@ export default function Landing() {
             <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.62)', lineHeight: 1.80, margin: '0 0 40px', fontFamily: SANS, fontWeight: 300 }}>
               FamiliaCerca es una PWA — funciona como una app normal sin pasar por la App Store ni Google Play.
             </p>
-            {[
-              { n: '1', text: '🍎 Safari: toca Compartir → "Agregar a inicio"' },
-              { n: '2', text: '🤖 Chrome: toca ⋮ → "Instalar aplicación"' },
-              { n: '3', text: '🚀 ¡Ya tienes FamiliaCerca en tu pantalla de inicio!' },
-            ].map(s => (
+            {(isIOS || !isMobile
+              ? [
+                  { n: '1', text: '🍎 Safari: toca Compartir ↑ en la barra inferior' },
+                  { n: '2', text: 'Desliza y toca "Agregar a pantalla de inicio"' },
+                  { n: '3', text: '🚀 ¡Ya tienes FamiliaCerca en tu pantalla de inicio!' },
+                ]
+              : [
+                  { n: '1', text: '🤖 Toca el botón de abajo para instalación directa' },
+                  { n: '2', text: 'O toca ⋮ en Chrome → "Instalar aplicación"' },
+                  { n: '3', text: '🚀 ¡Acceso directo y notificaciones push activadas!' },
+                ]
+            ).map(s => (
               <div key={s.n} style={{ display: 'flex', alignItems: 'flex-start', gap: 14, marginBottom: 16 }}>
                 <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(255,255,255,0.14)', border: '1.5px solid rgba(255,255,255,0.22)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: SERIF, fontSize: 17, fontWeight: 700, color: 'white', flexShrink: 0 }}>{s.n}</div>
                 <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.75)', fontFamily: SANS, fontWeight: 300, paddingTop: 8, margin: 0 }}>{s.text}</p>
               </div>
             ))}
+
+            {/* Real install button — Android prompt or iOS hint */}
+            {installed ? (
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '13px 22px', borderRadius: 9999, background: 'rgba(255,255,255,0.12)', border: '1.5px solid rgba(255,255,255,0.30)', marginTop: 8 }}>
+                <span style={{ fontSize: 18 }}>✅</span>
+                <span style={{ fontSize: 14, fontWeight: 600, color: 'white', fontFamily: SANS }}>¡App ya instalada!</span>
+              </div>
+            ) : canPrompt ? (
+              <button
+                onClick={async () => {
+                  const outcome = await install()
+                  if (outcome === 'accepted') setPwaInstallClicked(true)
+                }}
+                style={{
+                  marginTop: 8,
+                  display: 'inline-flex', alignItems: 'center', gap: 10,
+                  padding: '15px 32px', borderRadius: 9999, border: 'none',
+                  background: 'white', color: '#4A7C59',
+                  fontWeight: 700, fontSize: 15, fontFamily: SANS,
+                  cursor: 'pointer', letterSpacing: '0.02em',
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.20)',
+                  transition: 'transform 0.15s, box-shadow 0.15s',
+                }}
+              >
+                {pwaInstallClicked ? '¡Instalando! 🎉' : '📲 Instalar ahora'}
+              </button>
+            ) : null}
           </div>
           {/* Phone home screen mockup */}
           <div style={{ flex: '0 0 280px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
@@ -977,6 +1015,9 @@ export default function Landing() {
           </div>
         </div>
       </footer>
+
+      {/* PWA install banner — shown to mobile visitors who haven't installed yet */}
+      <PWAInstallBanner />
 
       {/* ── STICKY BOTTOM BAR ── */}
       <div style={{
