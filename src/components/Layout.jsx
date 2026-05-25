@@ -192,7 +192,7 @@ export default function Layout({ children }) {
             position: 'fixed', bottom: 82, right: 20, zIndex: 41,
             width: 50, height: 50, borderRadius: '50%',
             background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
-            boxShadow: '0 4px 20px rgba(196,98,58,0.45)',
+            boxShadow: '0 4px 20px rgba(74,124,89,0.45)',
             border: 'none', cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             transition: 'transform 0.2s',

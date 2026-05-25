@@ -133,7 +133,7 @@ export default function InstallBanner() {
       borderRadius: 16,
       padding: '14px 16px',
       display: 'flex', alignItems: 'center', gap: 12,
-      boxShadow: '0 4px 20px rgba(196,98,58,0.3)',
+      boxShadow: '0 4px 20px rgba(74,124,89,0.3)',
     }}>
       <img src="/icon-72.png" alt="" width={40} height={40}
         style={{ borderRadius: 10, flexShrink: 0 }} />

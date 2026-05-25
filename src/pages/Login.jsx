@@ -79,7 +79,7 @@ export default function Login() {
   const fieldBase = { border: '1.5px solid #EDE5D8', background: '#FDFAF7' }
   function onFocus(e) {
     e.target.style.borderColor = '#4A7C59'
-    e.target.style.boxShadow = '0 0 0 3px rgba(196,98,58,0.1)'
+    e.target.style.boxShadow = '0 0 0 3px rgba(74,124,89,0.1)'
   }
   function onBlur(e) {
     e.target.style.borderColor = '#EDE5D8'
@@ -208,10 +208,10 @@ export default function Login() {
                     disabled={loading}
                     style={{
                       marginTop: 4, width: '100%', padding: '14px',
-                      background: loading ? '#D4C4B8' : 'linear-gradient(135deg, #4A7C59, #3A6347)',
+                      background: loading ? '#C0CCC5' : 'linear-gradient(135deg, #4A7C59, #3A6347)',
                       color: 'white', fontWeight: 700, fontSize: 14, borderRadius: 16,
                       border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
-                      boxShadow: loading ? 'none' : '0 6px 20px rgba(196,98,58,0.35)',
+                      boxShadow: loading ? 'none' : '0 6px 20px rgba(74,124,89,0.35)',
                       transition: 'all 0.15s',
                     }}
                   >
@@ -281,10 +281,10 @@ export default function Login() {
                     type="submit" disabled={loading}
                     style={{
                       marginTop: 4, width: '100%', padding: '14px',
-                      background: loading ? '#D4C4B8' : 'linear-gradient(135deg, #4A7C59, #3A6347)',
+                      background: loading ? '#C0CCC5' : 'linear-gradient(135deg, #4A7C59, #3A6347)',
                       color: 'white', fontWeight: 700, fontSize: 14, borderRadius: 16,
                       border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
-                      boxShadow: loading ? 'none' : '0 6px 20px rgba(196,98,58,0.35)',
+                      boxShadow: loading ? 'none' : '0 6px 20px rgba(74,124,89,0.35)',
                       transition: 'all 0.15s',
                     }}
                   >
@@ -370,10 +370,10 @@ export default function Login() {
                 type="submit" disabled={loading}
                 style={{
                   marginTop: 4, width: '100%', padding: '14px',
-                  background: loading ? '#D4C4B8' : 'linear-gradient(135deg, #4A7C59, #3A6347)',
+                  background: loading ? '#C0CCC5' : 'linear-gradient(135deg, #4A7C59, #3A6347)',
                   color: 'white', fontWeight: 700, fontSize: 14, borderRadius: 16,
                   border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
-                  boxShadow: loading ? 'none' : '0 6px 20px rgba(196,98,58,0.35)',
+                  boxShadow: loading ? 'none' : '0 6px 20px rgba(74,124,89,0.35)',
                   transition: 'all 0.15s',
                 }}
               >

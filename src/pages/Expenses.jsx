@@ -13,7 +13,7 @@ const CATEGORIES = [
   { id: 'Citas médicas',   emoji: '🏥', color: '#2D86A0' },
   { id: 'Transporte',      emoji: '🚗', color: '#4A7C59' },
   { id: 'Cuidador',        emoji: '🤝', color: '#7C5CBF' },
-  { id: 'Equipos médicos', emoji: '🩺', color: '#D4A853' },
+  { id: 'Equipos médicos', emoji: '🩺', color: '#C9882A' },
   { id: 'Otros',           emoji: '📋', color: '#9CA3AF' },
 ]
 
@@ -232,7 +232,7 @@ export default function Expenses() {
     fontSize: 14, outline: 'none', background: 'white',
     boxSizing: 'border-box', color: '#1A1A1A', transition: 'all 0.15s',
   }
-  const onFocus = e => { e.target.style.borderColor = '#4A7C59'; e.target.style.boxShadow = '0 0 0 3px rgba(196,98,58,0.1)' }
+  const onFocus = e => { e.target.style.borderColor = '#4A7C59'; e.target.style.boxShadow = '0 0 0 3px rgba(74,124,89,0.1)' }
   const onBlur  = e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.boxShadow = 'none' }
 
   const canSave = !saving && !!form.amount && !!form.paid_by.trim()
@@ -266,9 +266,9 @@ export default function Expenses() {
         {/* Total card */}
         <div style={{ padding: '0 20px 16px' }}>
           <div style={{
-            background: 'linear-gradient(145deg, #BF5E37 0%, #7A3418 100%)',
+            background: 'linear-gradient(145deg, #4A7C59 0%, #2E5240 100%)',
             borderRadius: 22, padding: '22px 24px',
-            boxShadow: '0 8px 28px rgba(196,98,58,0.28)',
+            boxShadow: '0 8px 28px rgba(74,124,89,0.28)',
           }}>
             <p style={{
               color: 'rgba(255,255,255,0.65)', fontSize: 11, fontWeight: 700,
@@ -466,7 +466,7 @@ export default function Expenses() {
             width: 54, height: 54, borderRadius: '50%',
             background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
             border: 'none', cursor: 'pointer',
-            boxShadow: '0 6px 20px rgba(196,98,58,0.4)',
+            boxShadow: '0 6px 20px rgba(74,124,89,0.4)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             transition: 'transform 0.15s',
           }}
@@ -723,7 +723,7 @@ export default function Expenses() {
                       style={{
                         flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                         padding: '10px 12px', borderRadius: 12,
-                        border: '1.5px dashed #D4C4B8', background: '#FDF8F4',
+                        border: '1.5px dashed #C0CCC5', background: '#FDF8F4',
                         cursor: 'pointer',
                       }}
                     >
@@ -736,7 +736,7 @@ export default function Expenses() {
                       style={{
                         flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                         padding: '10px 12px', borderRadius: 12,
-                        border: '1.5px dashed #D4C4B8', background: '#FDF8F4',
+                        border: '1.5px dashed #C0CCC5', background: '#FDF8F4',
                         cursor: 'pointer',
                       }}
                     >
@@ -780,11 +780,11 @@ export default function Expenses() {
                   marginTop: 4, width: '100%', padding: '14px',
                   background: (canSave && canEdit)
                     ? 'linear-gradient(135deg, #4A7C59, #3A6347)'
-                    : '#D4C4B8',
+                    : '#C0CCC5',
                   color: 'white', fontWeight: 700, fontSize: 14,
                   borderRadius: 14, border: 'none',
                   cursor: (canSave && canEdit) ? 'pointer' : 'not-allowed',
-                  boxShadow: canSave ? '0 6px 20px rgba(196,98,58,0.3)' : 'none',
+                  boxShadow: canSave ? '0 6px 20px rgba(74,124,89,0.3)' : 'none',
                   transition: 'all 0.2s',
                 }}
               >

@@ -8,7 +8,7 @@ import { useSpeechToText } from '../hooks/useSpeechToText'
 
 const MOODS = [
   { value: 'good',    emoji: '😊', label: 'Buen día',   color: '#22C55E' },
-  { value: 'regular', emoji: '😐', label: 'Regular',    color: '#D4A853' },
+  { value: 'regular', emoji: '😐', label: 'Regular',    color: '#C9882A' },
   { value: 'hard',    emoji: '😔', label: 'Difícil',    color: '#D63031' },
 ]
 
@@ -525,7 +525,7 @@ export default function Memorias() {
                               <button
                                 onClick={e => { e.stopPropagation(); deleteRecording(rec.id) }}
                                 style={{
-                                  background: 'none', border: 'none', color: '#D4C4B8',
+                                  background: 'none', border: 'none', color: '#C0CCC5',
                                   cursor: 'pointer', padding: 2, flexShrink: 0, fontSize: 14,
                                 }}
                               >✕</button>

@@ -43,7 +43,7 @@ const F = {
   boxSizing: 'border-box', transition: 'border-color 0.15s',
   fontFamily: 'inherit',
 }
-const onFocus = e => { e.target.style.borderColor = '#4A7C59'; e.target.style.boxShadow = '0 0 0 3px rgba(196,98,58,0.1)' }
+const onFocus = e => { e.target.style.borderColor = '#4A7C59'; e.target.style.boxShadow = '0 0 0 3px rgba(74,124,89,0.1)' }
 const onBlur  = e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.boxShadow = 'none' }
 
 // ── Shared small components ────────────────────────────────────────
@@ -158,10 +158,10 @@ function SheetModal({ title, subtitle, onClose, onSave, saveLabel, saving, child
         </div>
         <button onClick={onSave} disabled={saving} style={{
           width: '100%', marginTop: 24, padding: '14px', borderRadius: 16, border: 'none',
-          background: saving ? '#D4C4B8' : 'linear-gradient(135deg, #4A7C59, #3A6347)',
+          background: saving ? '#C0CCC5' : 'linear-gradient(135deg, #4A7C59, #3A6347)',
           color: 'white', fontWeight: 700, fontSize: 14,
           cursor: saving ? 'not-allowed' : 'pointer',
-          boxShadow: saving ? 'none' : '0 6px 20px rgba(196,98,58,0.3)',
+          boxShadow: saving ? 'none' : '0 6px 20px rgba(74,124,89,0.3)',
         }}>
           {saving ? 'Guardando...' : saveLabel}
         </button>

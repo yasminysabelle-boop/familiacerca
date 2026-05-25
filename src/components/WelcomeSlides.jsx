@@ -77,7 +77,7 @@ export default function WelcomeSlides({ onDone }) {
           <div style={{
             position: 'absolute',
             width: 260, height: 260, borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(196,98,58,0.25) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(74,124,89,0.25) 0%, transparent 70%)',
           }} />
 
           <div style={{ position: 'relative', zIndex: 1, textAlign: 'center', padding: '0 36px' }}>

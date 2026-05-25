@@ -14,7 +14,7 @@ const MORE_ITEMS = [
   { to: '/gastos',     Icon: Receipt,        label: 'Cuentas Claras',      desc: 'Gastos del cuidado familiar',           color: '#4A7C59' },
   { to: '/historial',  Icon: ClipboardCheck, label: 'Control de dosis',    desc: 'Historial y foto-pruebas selladas',      color: '#4A7C59' },
   { to: '/notes',      Icon: FileText,        label: 'Notas',               desc: 'Observaciones del cuidado diario',      color: '#4A7C59' },
-  { to: '/album',      Icon: Image,           label: 'Álbum familiar',      desc: 'Fotos y videos de momentos especiales', color: '#D4A853' },
+  { to: '/album',      Icon: Image,           label: 'Álbum familiar',      desc: 'Fotos y videos de momentos especiales', color: '#C9882A' },
   { to: '/memorias',   Icon: Mic,             label: 'Memorias',            desc: 'Memorias de voz del familiar',          color: '#7C5CBF' },
   { to: '/reportes',   Icon: BarChart,        label: 'Reportes',            desc: 'Análisis semanal y PDF médico',          color: '#2D86A0' },
   { to: '/perfil',     Icon: User,            label: 'Perfil familiar',     desc: 'Datos de la persona a cuidar',          color: '#4A7C59' },
@@ -123,7 +123,7 @@ export default function More() {
         {/* Profile hero card */}
         <div
           className="rounded-3xl overflow-hidden mb-5"
-          style={{ background: 'linear-gradient(145deg, #BF5E37 0%, #7A3418 100%)' }}
+          style={{ background: 'linear-gradient(145deg, #4A7C59 0%, #2E5240 100%)' }}
         >
           <div className="p-6 flex items-center gap-4">
             {profile?.photo_url ? (
@@ -133,7 +133,7 @@ export default function More() {
                 className="object-cover flex-shrink-0"
                 style={{
                   width: 68, height: 68, borderRadius: '50%',
-                  border: '2.5px solid rgba(212,168,83,0.5)',
+                  border: '2.5px solid rgba(201,136,42,0.5)',
                   boxShadow: '0 4px 16px rgba(0,0,0,0.2)',
                 }}
               />
@@ -313,7 +313,7 @@ export default function More() {
                       : 'linear-gradient(135deg, #4A7C59, #3A6347)',
                     color: 'white', fontWeight: 700, fontSize: 14,
                     borderRadius: 14, border: 'none', cursor: 'pointer',
-                    boxShadow: '0 6px 20px rgba(196,98,58,0.3)',
+                    boxShadow: '0 6px 20px rgba(74,124,89,0.3)',
                     transition: 'all 0.2s',
                   }}
                 >
@@ -349,7 +349,7 @@ export default function More() {
                     placeholder="familiar@correo.com"
                     autoFocus
                     style={fieldBase}
-                    onFocus={e => { e.target.style.borderColor = '#4A7C59'; e.target.style.boxShadow = '0 0 0 3px rgba(196,98,58,0.1)' }}
+                    onFocus={e => { e.target.style.borderColor = '#4A7C59'; e.target.style.boxShadow = '0 0 0 3px rgba(74,124,89,0.1)' }}
                     onBlur={e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.boxShadow = 'none' }}
                   />
                 </div>
@@ -370,11 +370,11 @@ export default function More() {
                     width: '100%', padding: '14px',
                     background: inviteEmail.trim() && status !== 'sending'
                       ? 'linear-gradient(135deg, #4A7C59, #3A6347)'
-                      : '#D4C4B8',
+                      : '#C0CCC5',
                     color: 'white', fontWeight: 700, fontSize: 14,
                     borderRadius: 14, border: 'none',
                     cursor: inviteEmail.trim() && status !== 'sending' ? 'pointer' : 'not-allowed',
-                    boxShadow: inviteEmail.trim() ? '0 6px 20px rgba(196,98,58,0.3)' : 'none',
+                    boxShadow: inviteEmail.trim() ? '0 6px 20px rgba(74,124,89,0.3)' : 'none',
                     transition: 'all 0.2s',
                   }}
                 >

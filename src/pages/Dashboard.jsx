@@ -14,10 +14,10 @@ import { track } from '../lib/analytics'
 // Mood lookup — handles both stored text values and emoji values
 const MOOD_MAP = {
   good:    { emoji: '😊', color: '#22C55E' },
-  regular: { emoji: '😐', color: '#D4A853' },
+  regular: { emoji: '😐', color: '#C9882A' },
   hard:    { emoji: '😔', color: '#D63031' },
   '😊':   { emoji: '😊', color: '#22C55E' },
-  '😐':   { emoji: '😐', color: '#D4A853' },
+  '😐':   { emoji: '😐', color: '#C9882A' },
   '😔':   { emoji: '😔', color: '#D63031' },
 }
 
@@ -88,17 +88,17 @@ function PendingCard({ evt, confirming, onConfirm, todayKey, isFamiliar }) {
       background: '#FFFBEB', borderRadius: 16,
       border: '1.5px solid #FDE68A',
       padding: '12px 14px',
-      boxShadow: '0 2px 8px rgba(196,98,58,0.06)',
+      boxShadow: '0 2px 8px rgba(74,124,89,0.06)',
     }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
         <span style={{ fontSize: 20, flexShrink: 0, marginTop: 1 }}>⚠️</span>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ fontSize: 14, fontWeight: 700, color: '#92400E', margin: 0, lineHeight: 1.4 }}>
+          <p style={{ fontSize: 14, fontWeight: 700, color: '#7A5A18', margin: 0, lineHeight: 1.4 }}>
             {medLabel} pendiente
-            {ago && <span style={{ fontWeight: 400, color: '#B45309' }}> — {ago}</span>}
+            {ago && <span style={{ fontWeight: 400, color: '#A07020' }}> — {ago}</span>}
           </p>
           {evt.medTime && (
-            <p style={{ fontSize: 11, color: '#B45309', marginTop: 2 }}>
+            <p style={{ fontSize: 11, color: '#A07020', marginTop: 2 }}>
               Programado a las {fmtTime(evt.medTime)}
             </p>
           )}
@@ -110,7 +110,7 @@ function PendingCard({ evt, confirming, onConfirm, todayKey, isFamiliar }) {
           disabled={busy}
           style={{
             marginTop: 10, width: '100%', padding: '9px 0',
-            background: busy ? '#D4C4B8' : 'linear-gradient(135deg, #22C55E, #16A34A)',
+            background: busy ? '#C0CCC5' : 'linear-gradient(135deg, #22C55E, #16A34A)',
             color: 'white', fontWeight: 700, fontSize: 13,
             borderRadius: 10, border: 'none',
             cursor: busy ? 'not-allowed' : 'pointer',
@@ -1051,7 +1051,7 @@ function DaySection({
           )}
         </div>
         <span style={{
-          fontSize: 14, color: '#C4B0A0', flexShrink: 0,
+          fontSize: 14, color: '#9AADA3', flexShrink: 0,
           display: 'inline-block',
           transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
           transition: 'transform 0.25s ease',
@@ -1087,7 +1087,7 @@ function DaySection({
                     <span style={{ fontSize: 10, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                       {group.label}
                     </span>
-                    <span style={{ fontSize: 10, color: '#C4B0A0' }}>{groupEvts.length}</span>
+                    <span style={{ fontSize: 10, color: '#9AADA3' }}>{groupEvts.length}</span>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                     {groupEvts.map(evt => (
@@ -1130,7 +1130,7 @@ function weekKey(d = new Date()) {
 }
 
 const AI_CARD_CONFIGS = {
-  morning: { gradient: 'linear-gradient(135deg, #FEF3C7, #FFFBEB)', border: '#FDE68A',   icon: '🌅', label: 'Tu momento del día',  textColor: '#78350F' },
+  morning: { gradient: 'linear-gradient(135deg, #FEF3C7, #FFFBEB)', border: '#FDE68A',   icon: '🌅', label: 'Tu momento del día',  textColor: '#5A4010' },
   evening: { gradient: 'linear-gradient(135deg, #EDE9FE, #F5F3FF)', border: '#C4B5FD',   icon: '🌙', label: 'Resumen del día',      textColor: '#5B21B6' },
   burnout: { gradient: 'linear-gradient(135deg, #FEE2E2, #FFF5F5)', border: '#FECACA',   icon: '💙', label: 'Un mensaje para ti',   textColor: '#7F1D1D' },
   weekly:  { gradient: 'linear-gradient(135deg, #D1FAE5, #ECFDF5)', border: '#6EE7B7',   icon: '🌿', label: 'Resumen semanal',      textColor: '#064E3B' },
@@ -1163,7 +1163,7 @@ function AiCard({ type, text }) {
 function StatusCard({ icon, title, subtitle, status, statusType, to, onClick }) {
   const styles = {
     ok:      { bg: '#F0FDF4', border: '#86EFAC', statusColor: '#15803D', statusIcon: '✅' },
-    warning: { bg: '#FFFBEB', border: '#FDE68A', statusColor: '#92400E', statusIcon: '⚠️' },
+    warning: { bg: '#FFFBEB', border: '#FDE68A', statusColor: '#7A5A18', statusIcon: '⚠️' },
     urgent:  { bg: '#FFF0F0', border: '#FECACA', statusColor: '#D63031', statusIcon: '🔴' },
     info:    { bg: '#FFFFFF', border: '#C8BEB4', statusColor: '#6B7280', statusIcon: '💙' },
   }
@@ -2053,9 +2053,9 @@ export default function Dashboard() {
 
         {/* ── Greeting header ───────────────────────────────────────────── */}
         <div style={{
-          background: 'linear-gradient(135deg, #BF5E37 0%, #7A3418 100%)',
+          background: 'linear-gradient(135deg, #4A7C59 0%, #2E5240 100%)',
           borderRadius: 20, padding: '18px 20px', marginBottom: 16,
-          boxShadow: '0 4px 20px rgba(196,98,58,0.3)',
+          boxShadow: '0 4px 20px rgba(74,124,89,0.3)',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             {profile?.photo_url ? (
@@ -2064,7 +2064,7 @@ export default function Dashboard() {
                 alt={profile.name}
                 style={{
                   width: 52, height: 52, borderRadius: '50%', objectFit: 'cover',
-                  border: '2px solid rgba(212,168,83,0.5)', flexShrink: 0,
+                  border: '2px solid rgba(201,136,42,0.5)', flexShrink: 0,
                 }}
               />
             ) : (
@@ -2344,7 +2344,7 @@ export default function Dashboard() {
             <p style={{ fontFamily: 'Georgia, serif', fontSize: 17, fontWeight: 700, color: '#1A1A1A', marginBottom: 8 }}>
               Confirmar como administrador
             </p>
-            <p style={{ fontSize: 13, color: '#92400E', lineHeight: 1.6, marginBottom: 8, background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 12, padding: '10px 14px' }}>
+            <p style={{ fontSize: 13, color: '#7A5A18', lineHeight: 1.6, marginBottom: 8, background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 12, padding: '10px 14px' }}>
               Confirmando como administrador — solo en caso de emergencia
             </p>
             <p style={{ fontSize: 12, color: '#6B7280', lineHeight: 1.6, marginBottom: 24 }}>
@@ -2359,7 +2359,7 @@ export default function Dashboard() {
               </button>
               <button
                 onClick={() => { const evt = adminConfirmEvt; setAdminConfirmEvt(null); quickConfirm(evt) }}
-                style={{ flex: 1, padding: '12px', borderRadius: 12, border: 'none', background: '#D97706', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer', boxShadow: '0 4px 16px rgba(217,119,6,0.3)' }}
+                style={{ flex: 1, padding: '12px', borderRadius: 12, border: 'none', background: '#C9882A', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer', boxShadow: '0 4px 16px rgba(201,136,42,0.3)' }}
               >
                 Confirmar
               </button>

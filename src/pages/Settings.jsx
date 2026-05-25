@@ -328,7 +328,7 @@ export default function Settings() {
 
         {/* Account card */}
         <div style={{
-          background: 'linear-gradient(135deg, #BF5E37, #7A3418)',
+          background: 'linear-gradient(135deg, #4A7C59, #2E5240)',
           borderRadius: 20, padding: '20px 20px', marginBottom: 16,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
@@ -431,10 +431,10 @@ export default function Settings() {
                 disabled={portalLoading}
                 style={{
                   width: '100%', padding: '13px', borderRadius: 14, border: 'none',
-                  background: portalLoading ? '#D4C4B8' : 'linear-gradient(135deg, #4A7C59, #3A6347)',
+                  background: portalLoading ? '#C0CCC5' : 'linear-gradient(135deg, #4A7C59, #3A6347)',
                   color: 'white', fontWeight: 700, fontSize: 14,
                   cursor: portalLoading ? 'not-allowed' : 'pointer',
-                  boxShadow: portalLoading ? 'none' : '0 6px 20px rgba(196,98,58,0.3)',
+                  boxShadow: portalLoading ? 'none' : '0 6px 20px rgba(74,124,89,0.3)',
                   transition: 'all 0.2s',
                 }}
               >
@@ -453,7 +453,7 @@ export default function Settings() {
                 width: '100%', padding: '13px', borderRadius: 14, border: 'none',
                 background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
                 color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer',
-                boxShadow: '0 6px 20px rgba(196,98,58,0.3)',
+                boxShadow: '0 6px 20px rgba(74,124,89,0.3)',
               }}
             >
               {trialExpired ? 'Reactivar acceso →' : 'Ver planes →'}
@@ -510,7 +510,7 @@ export default function Settings() {
               </span>
               <span style={{
                 fontSize: 12, fontWeight: 600,
-                color: permission === 'granted' && subscribed ? '#15803D' : '#92400E',
+                color: permission === 'granted' && subscribed ? '#15803D' : '#7A5A18',
               }}>
                 {permission === 'granted' && subscribed
                   ? 'Notificaciones activas'
@@ -528,7 +528,7 @@ export default function Settings() {
                   width: '100%', padding: '12px', borderRadius: 14, border: 'none',
                   background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
                   color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer',
-                  boxShadow: '0 4px 16px rgba(196,98,58,0.25)',
+                  boxShadow: '0 4px 16px rgba(74,124,89,0.25)',
                   marginBottom: 8,
                 }}
               >
@@ -581,7 +581,7 @@ export default function Settings() {
             disabled={exportingPdf}
             style={{
               width: '100%', padding: '12px', borderRadius: 14, border: 'none',
-              background: exportingPdf ? '#D4C4B8' : 'linear-gradient(135deg, #4A7C59, #3A6147)',
+              background: exportingPdf ? '#C0CCC5' : 'linear-gradient(135deg, #4A7C59, #3A6147)',
               color: 'white', fontWeight: 700, fontSize: 14,
               cursor: exportingPdf ? 'not-allowed' : 'pointer',
               boxShadow: exportingPdf ? 'none' : '0 4px 16px rgba(74,124,89,0.3)',

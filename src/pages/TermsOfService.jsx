@@ -151,7 +151,7 @@ export default function TermsOfService() {
               </div>
               <div
                 className="rounded-2xl p-4"
-                style={{ background: 'white', border: '1.5px solid #D4A853', boxShadow: '0 2px 12px rgba(212,168,83,0.1)' }}
+                style={{ background: 'white', border: '1.5px solid #C9882A', boxShadow: '0 2px 12px rgba(201,136,42,0.1)' }}
               >
                 <div className="flex items-center justify-between mb-1">
                   <p className="font-bold text-gray-900" style={{ fontFamily: 'Georgia, serif' }}>Plan Premium</p>

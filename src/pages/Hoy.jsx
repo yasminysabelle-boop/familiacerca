@@ -16,7 +16,7 @@ const TIME_GROUPS = [
 ]
 
 const CARE_MOMENTS = [
-  { id: 'morning',   label: 'Mañana',            icon: '🌅', overdueHour: 14,   color: '#D97706', bg: '#FFFBEB', scheduledTime: '8:00 AM' },
+  { id: 'morning',   label: 'Mañana',            icon: '🌅', overdueHour: 14,   color: '#C9882A', bg: '#FFFBEB', scheduledTime: '8:00 AM' },
   { id: 'afternoon', label: 'Tarde',              icon: '☀️',  overdueHour: 20,   color: '#4A7C59', bg: '#EBF3EE', scheduledTime: '2:00 PM' },
   { id: 'night',     label: 'Noche',              icon: '🌙', overdueHour: null, color: '#6366F1', bg: '#EEF2FF', scheduledTime: '8:00 PM' },
   { id: 'asneeded',  label: 'Cuando se necesita', icon: '🔔', overdueHour: null, color: '#6B7280', bg: '#F9FAFB', scheduledTime: null },
@@ -413,7 +413,7 @@ export default function Hoy() {
               background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
               color: 'white', fontWeight: 700, fontSize: 14,
               textDecoration: 'none',
-              boxShadow: '0 4px 16px rgba(196,98,58,0.3)',
+              boxShadow: '0 4px 16px rgba(74,124,89,0.3)',
             }}
           >
             <Plus size={16} color="white" strokeWidth={2.5} />
@@ -444,7 +444,7 @@ export default function Hoy() {
                 width: `${total ? (confirmedCount / total) * 100 : 0}%`,
                 background: allDone
                   ? 'linear-gradient(90deg, #22C55E, #16A34A)'
-                  : 'linear-gradient(90deg, #4A7C59, #D4A853)',
+                  : 'linear-gradient(90deg, #4A7C59, #C9882A)',
                 transition: 'width 0.4s ease',
               }} />
             </div>
@@ -473,10 +473,10 @@ export default function Hoy() {
             >
               <span style={{ fontSize: 18, flexShrink: 0 }}>📷</span>
               <div style={{ flex: 1 }}>
-                <p style={{ fontSize: 13, fontWeight: 700, color: '#92400E', margin: 0 }}>
+                <p style={{ fontSize: 13, fontWeight: 700, color: '#7A5A18', margin: 0 }}>
                   Agrega foto de prueba — {minLeft} min restantes
                 </p>
-                <p style={{ fontSize: 11, color: '#B45309', margin: '2px 0 0' }}>{med.name}</p>
+                <p style={{ fontSize: 11, color: '#A07020', margin: '2px 0 0' }}>{med.name}</p>
               </div>
               <span style={{ fontSize: 11, color: '#F59E0B', fontWeight: 700 }}>📷 Agregar</span>
             </div>
@@ -642,7 +642,7 @@ export default function Hoy() {
                                   </span>
                                 ) : proofExpired ? (
                                   <span style={{
-                                    fontSize: 10, fontWeight: 700, color: '#92400E',
+                                    fontSize: 10, fontWeight: 700, color: '#7A5A18',
                                     background: '#FFFBEB', padding: '3px 8px', borderRadius: 6,
                                     display: 'block',
                                   }}>
@@ -686,7 +686,7 @@ export default function Hoy() {
                             )}
                             {!isConfirmed && timingStatus === 'tarde' && (
                               <span style={{
-                                fontSize: 10, fontWeight: 700, color: '#B45309',
+                                fontSize: 10, fontWeight: 700, color: '#A07020',
                                 background: '#FFFBEB', padding: '3px 8px', borderRadius: 6,
                                 whiteSpace: 'nowrap',
                               }}>
@@ -919,7 +919,7 @@ export default function Hoy() {
                             {isOverdue && !isChecked && (
                               <span style={{
                                 fontSize: 10, fontWeight: 700,
-                                color: '#92400E', background: '#FEF3C7',
+                                color: '#7A5A18', background: '#FEF3C7',
                                 padding: '2px 8px', borderRadius: 6, flexShrink: 0,
                               }}>
                                 Pendiente
@@ -1031,7 +1031,7 @@ export default function Hoy() {
             <p style={{ fontFamily: 'Georgia, serif', fontSize: 17, fontWeight: 700, color: '#1A1A1A', marginBottom: 8 }}>
               Confirmar como administrador
             </p>
-            <p style={{ fontSize: 13, color: '#92400E', lineHeight: 1.6, marginBottom: 8, background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 12, padding: '10px 14px' }}>
+            <p style={{ fontSize: 13, color: '#7A5A18', lineHeight: 1.6, marginBottom: 8, background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 12, padding: '10px 14px' }}>
               Confirmando como administrador — solo en caso de emergencia
             </p>
             <p style={{ fontSize: 12, color: '#6B7280', lineHeight: 1.6, marginBottom: 24 }}>
@@ -1046,7 +1046,7 @@ export default function Hoy() {
               </button>
               <button
                 onClick={() => { const m = adminWarningMed; setAdminWarningMed(null); confirmMed(m) }}
-                style={{ flex: 1, padding: '12px', borderRadius: 12, border: 'none', background: '#D97706', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer', boxShadow: '0 4px 16px rgba(217,119,6,0.3)' }}
+                style={{ flex: 1, padding: '12px', borderRadius: 12, border: 'none', background: '#C9882A', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer', boxShadow: '0 4px 16px rgba(201,136,42,0.3)' }}
               >
                 Confirmar
               </button>
@@ -1083,7 +1083,7 @@ export default function Hoy() {
                     ? Math.max(0, 30 - Math.floor((Date.now() - new Date(confirmedAt).getTime()) / 60_000))
                     : 30
                   return (
-                    <p style={{ fontSize: 13, color: minLeft <= 5 ? '#D97706' : '#6B7280', marginTop: 4 }}>
+                    <p style={{ fontSize: 13, color: minLeft <= 5 ? '#C9882A' : '#6B7280', marginTop: 4 }}>
                       {proofSheet.med.name} — {minLeft > 0 ? `${minLeft} min restantes` : 'Tiempo agotado'}
                     </p>
                   )
@@ -1105,7 +1105,7 @@ export default function Hoy() {
                 display: 'flex', alignItems: 'center', gap: 8,
               }}>
                 <span style={{ fontSize: 14 }}>⚠️</span>
-                <p style={{ fontSize: 12, color: '#92400E', margin: 0, lineHeight: 1.5 }}>
+                <p style={{ fontSize: 12, color: '#7A5A18', margin: 0, lineHeight: 1.5 }}>
                   Dado fuera del horario programado · Foto subida fuera del horario
                 </p>
               </div>
@@ -1148,7 +1148,7 @@ export default function Hoy() {
                       📷 Tomar foto
                     </button>
                     <button type="button" onClick={openGallery} disabled={proofUploading}
-                      style={{ flex: 1, padding: '8px 0', borderRadius: 10, border: '1.5px solid #D4C4B8', background: '#FDFAF7', color: '#6B7280', fontSize: 12, fontWeight: 700, cursor: proofUploading ? 'not-allowed' : 'pointer' }}>
+                      style={{ flex: 1, padding: '8px 0', borderRadius: 10, border: '1.5px solid #C0CCC5', background: '#FDFAF7', color: '#6B7280', fontSize: 12, fontWeight: 700, cursor: proofUploading ? 'not-allowed' : 'pointer' }}>
                       🖼 De galería
                     </button>
                   </div>
@@ -1168,7 +1168,7 @@ export default function Hoy() {
                       📷 Tomar foto
                     </button>
                     <button type="button" onClick={openGallery}
-                      style={{ flex: 1, padding: '11px 0', borderRadius: 12, border: '1.5px solid #D4C4B8', background: '#FDFAF7', color: '#6B7280', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+                      style={{ flex: 1, padding: '11px 0', borderRadius: 12, border: '1.5px solid #C0CCC5', background: '#FDFAF7', color: '#6B7280', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
                       🖼 Elegir de galería
                     </button>
                   </div>
@@ -1197,10 +1197,10 @@ export default function Hoy() {
                 borderRadius: 14, border: 'none',
                 background: proofBlob && !proofUploading
                   ? 'linear-gradient(135deg, #4A7C59, #3A6347)'
-                  : '#D4C4B8',
+                  : '#C0CCC5',
                 color: 'white', fontWeight: 700, fontSize: 14,
                 cursor: proofBlob && !proofUploading ? 'pointer' : 'not-allowed',
-                boxShadow: proofBlob && !proofUploading ? '0 6px 20px rgba(196,98,58,0.3)' : 'none',
+                boxShadow: proofBlob && !proofUploading ? '0 6px 20px rgba(74,124,89,0.3)' : 'none',
                 transition: 'all 0.2s',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
               }}

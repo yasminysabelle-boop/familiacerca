@@ -144,7 +144,7 @@ export default function JoinFamily() {
     fontSize: 14, outline: 'none', background: 'white',
     boxSizing: 'border-box', transition: 'all 0.15s',
   }
-  const onFocus = e => { e.target.style.borderColor = '#4A7C59'; e.target.style.boxShadow = '0 0 0 3px rgba(196,98,58,0.1)' }
+  const onFocus = e => { e.target.style.borderColor = '#4A7C59'; e.target.style.boxShadow = '0 0 0 3px rgba(74,124,89,0.1)' }
   const onBlur  = e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.boxShadow = 'none' }
 
   // Render nothing while the no-token redirect is in flight
@@ -223,7 +223,7 @@ export default function JoinFamily() {
                   background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
                   color: 'white', fontWeight: 700, fontSize: 14,
                   border: 'none', cursor: 'pointer',
-                  boxShadow: '0 6px 20px rgba(196,98,58,0.3)',
+                  boxShadow: '0 6px 20px rgba(74,124,89,0.3)',
                 }}
               >
                 Ir al inicio
@@ -258,7 +258,7 @@ export default function JoinFamily() {
                   background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
                   color: 'white', fontWeight: 700, fontSize: 14,
                   border: 'none', cursor: 'pointer',
-                  boxShadow: '0 6px 20px rgba(196,98,58,0.3)',
+                  boxShadow: '0 6px 20px rgba(74,124,89,0.3)',
                 }}
               >
                 Ir al inicio
@@ -290,7 +290,7 @@ export default function JoinFamily() {
                   background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
                   color: 'white', fontWeight: 700, fontSize: 14,
                   border: 'none', cursor: 'pointer',
-                  boxShadow: '0 6px 20px rgba(196,98,58,0.3)',
+                  boxShadow: '0 6px 20px rgba(74,124,89,0.3)',
                 }}
               >
                 Ir al panel
@@ -324,7 +324,7 @@ export default function JoinFamily() {
                   background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
                   color: 'white', fontWeight: 700, fontSize: 14,
                   borderRadius: 14, border: 'none', cursor: 'pointer',
-                  boxShadow: '0 8px 24px rgba(196,98,58,0.35)',
+                  boxShadow: '0 8px 24px rgba(74,124,89,0.35)',
                 }}
               >
                 Ir al panel →
@@ -345,7 +345,7 @@ export default function JoinFamily() {
               <div style={{ textAlign: 'center', marginBottom: 24 }}>
                 <div style={{
                   width: 52, height: 52, borderRadius: '50%',
-                  background: 'rgba(196,98,58,0.1)',
+                  background: 'rgba(74,124,89,0.1)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   margin: '0 auto 14px',
                 }}>
@@ -410,12 +410,12 @@ export default function JoinFamily() {
                       style={{
                         width: '100%', padding: '14px',
                         background: accepting
-                          ? '#D4C4B8'
+                          ? '#C0CCC5'
                           : 'linear-gradient(135deg, #4A7C59, #3A6347)',
                         color: 'white', fontWeight: 700, fontSize: 14,
                         borderRadius: 14, border: 'none',
                         cursor: accepting ? 'not-allowed' : 'pointer',
-                        boxShadow: accepting ? 'none' : '0 8px 24px rgba(196,98,58,0.35)',
+                        boxShadow: accepting ? 'none' : '0 8px 24px rgba(74,124,89,0.35)',
                         transition: 'all 0.2s',
                       }}
                     >
@@ -515,12 +515,12 @@ export default function JoinFamily() {
                       style={{
                         marginTop: 4, width: '100%', padding: '13px',
                         background: authLoading
-                          ? '#D4C4B8'
+                          ? '#C0CCC5'
                           : 'linear-gradient(135deg, #4A7C59, #3A6347)',
                         color: 'white', fontWeight: 700, fontSize: 14,
                         borderRadius: 14, border: 'none',
                         cursor: authLoading ? 'not-allowed' : 'pointer',
-                        boxShadow: authLoading ? 'none' : '0 6px 20px rgba(196,98,58,0.3)',
+                        boxShadow: authLoading ? 'none' : '0 6px 20px rgba(74,124,89,0.3)',
                         transition: 'all 0.2s',
                       }}
                     >

@@ -26,7 +26,7 @@ function formatDate(ts) {
 // Stable warm color per sender based on their first letter
 const AVATAR_COLORS = [
   '#4A7C59', '#7C5CBF', '#2D86A0', '#4A7C59',
-  '#D4A853', '#D63031', '#8B5E3C', '#5E86A0',
+  '#C9882A', '#D63031', '#8B5E3C', '#5E86A0',
 ]
 function avatarColor(name = '') {
   const code = name.charCodeAt(0) || 0
@@ -336,7 +336,7 @@ export default function Chat() {
                           fontSize: 14,
                           lineHeight: 1.45,
                           boxShadow: mine
-                            ? '0 2px 8px rgba(196,98,58,0.25)'
+                            ? '0 2px 8px rgba(74,124,89,0.25)'
                             : '0 1px 4px rgba(0,0,0,0.08)',
                           border: mine ? 'none' : '1px solid #EDE5D8',
                           wordBreak: 'break-word',
@@ -423,7 +423,7 @@ export default function Chat() {
                   disabled={aiLoading || !aiInput.trim()}
                   style={{
                     padding: '8px 14px', borderRadius: 12, border: 'none',
-                    background: aiLoading || !aiInput.trim() ? '#D4C4B8' : 'linear-gradient(135deg, #7C5CBF, #5B21B6)',
+                    background: aiLoading || !aiInput.trim() ? '#C0CCC5' : 'linear-gradient(135deg, #7C5CBF, #5B21B6)',
                     color: 'white', fontWeight: 700, fontSize: 12, flexShrink: 0,
                     cursor: aiLoading || !aiInput.trim() ? 'not-allowed' : 'pointer',
                   }}
@@ -486,12 +486,12 @@ export default function Chat() {
               style={{
                 padding: '10px 18px', borderRadius: 20, border: 'none',
                 background: (sending || !input.trim() || !canEdit)
-                  ? '#D4C4B8'
+                  ? '#C0CCC5'
                   : 'linear-gradient(135deg, #4A7C59, #3A6347)',
                 color: 'white', fontWeight: 700, fontSize: 13,
                 cursor: (sending || !input.trim() || !canEdit) ? 'not-allowed' : 'pointer',
                 flexShrink: 0, transition: 'all 0.15s',
-                boxShadow: (!sending && input.trim() && canEdit) ? '0 3px 12px rgba(196,98,58,0.3)' : 'none',
+                boxShadow: (!sending && input.trim() && canEdit) ? '0 3px 12px rgba(74,124,89,0.3)' : 'none',
               }}
             >
               Enviar

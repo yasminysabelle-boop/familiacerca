@@ -45,7 +45,7 @@ const fieldStyle = {
   fontSize: 14, outline: 'none', boxSizing: 'border-box',
   transition: 'all 0.15s', appearance: 'none', WebkitAppearance: 'none',
 }
-const onFocus = e => { e.target.style.borderColor = '#4A7C59'; e.target.style.boxShadow = '0 0 0 3px rgba(196,98,58,0.1)' }
+const onFocus = e => { e.target.style.borderColor = '#4A7C59'; e.target.style.boxShadow = '0 0 0 3px rgba(74,124,89,0.1)' }
 const onBlur  = e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.boxShadow = 'none' }
 const labelStyle = {
   display: 'block', fontSize: 11, fontWeight: 700, color: '#6B7280',
@@ -219,7 +219,7 @@ export default function Medications() {
               background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
               border: 'none', cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 4px 12px rgba(196,98,58,0.3)',
+              boxShadow: '0 4px 12px rgba(74,124,89,0.3)',
             }}
           >
             <Plus size={20} color="white" strokeWidth={2.5} />
@@ -553,11 +553,11 @@ export default function Medications() {
                   onClick={!canEdit ? (e) => { e.preventDefault(); navigate('/pricing') } : undefined}
                   style={{
                     flex: 2, padding: '13px',
-                    background: (saving || !canEdit) ? '#D4C4B8' : 'linear-gradient(135deg, #4A7C59, #3A6347)',
+                    background: (saving || !canEdit) ? '#C0CCC5' : 'linear-gradient(135deg, #4A7C59, #3A6347)',
                     color: 'white', fontWeight: 700, fontSize: 14,
                     borderRadius: 14, border: 'none',
                     cursor: saving ? 'not-allowed' : 'pointer',
-                    boxShadow: saving ? 'none' : '0 6px 20px rgba(196,98,58,0.3)',
+                    boxShadow: saving ? 'none' : '0 6px 20px rgba(74,124,89,0.3)',
                     transition: 'all 0.15s',
                   }}
                 >

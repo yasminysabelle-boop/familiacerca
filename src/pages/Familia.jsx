@@ -221,7 +221,7 @@ export default function Familia() {
         {profile && (
           <div style={{
             display: 'flex', alignItems: 'center', gap: 14,
-            background: 'linear-gradient(135deg, #BF5E37, #2D6A4F)',
+            background: 'linear-gradient(135deg, #4A7C59, #2D6A4F)',
             borderRadius: 20, padding: '16px 18px', marginBottom: 16,
           }}>
             {profile.photo_url ? (
@@ -524,7 +524,7 @@ export default function Familia() {
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
                         <span style={{
                           fontSize: 10, fontWeight: 700,
-                          color: isPending ? '#92400E' : isCuidador ? '#4A7C59' : '#6B7280',
+                          color: isPending ? '#7A5A18' : isCuidador ? '#4A7C59' : '#6B7280',
                           background: isPending ? '#FEF3C7' : isCuidador ? '#EBF3EE' : '#F3F4F6',
                           padding: '3px 10px', borderRadius: 6,
                         }}>
@@ -679,8 +679,8 @@ export default function Familia() {
                 )}
                 {mc === undefined ? (
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 0' }}>
-                    <Phone size={15} color="#D4C4B8" strokeWidth={1.5} />
-                    <span style={{ fontSize: 13, color: '#D4C4B8' }}>Cargando...</span>
+                    <Phone size={15} color="#C0CCC5" strokeWidth={1.5} />
+                    <span style={{ fontSize: 13, color: '#C0CCC5' }}>Cargando...</span>
                   </div>
                 ) : mc?.phone ? (
                   <a href={`tel:${mc.phone}`} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 0', borderBottom: mc?.address ? '1px solid #EDE5D8' : 'none', textDecoration: 'none' }}>
@@ -794,10 +794,10 @@ export default function Familia() {
               disabled={savingShift || !shiftName.trim()}
               style={{
                 width: '100%', padding: '13px', borderRadius: 14, border: 'none',
-                background: shiftName.trim() && !savingShift ? 'linear-gradient(135deg, #4A7C59, #3A6347)' : '#D4C4B8',
+                background: shiftName.trim() && !savingShift ? 'linear-gradient(135deg, #4A7C59, #3A6347)' : '#C0CCC5',
                 color: 'white', fontWeight: 700, fontSize: 14,
                 cursor: shiftName.trim() && !savingShift ? 'pointer' : 'not-allowed',
-                boxShadow: shiftName.trim() ? '0 6px 20px rgba(196,98,58,0.3)' : 'none',
+                boxShadow: shiftName.trim() ? '0 6px 20px rgba(74,124,89,0.3)' : 'none',
               }}
             >
               {savingShift ? 'Guardando...' : 'Guardar turno'}
@@ -845,8 +845,8 @@ export default function Familia() {
                 ) : (
                   <div>
                     <div style={{ padding: 12, background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 12, marginBottom: 12 }}>
-                      <p style={{ fontSize: 13, fontWeight: 600, color: '#92400E', margin: '0 0 2px' }}>⚠ No pudimos enviar el email</p>
-                      <p style={{ fontSize: 12, color: '#78350F', margin: 0 }}>Comparte este enlace directamente con {inviteEmail}:</p>
+                      <p style={{ fontSize: 13, fontWeight: 600, color: '#7A5A18', margin: '0 0 2px' }}>⚠ No pudimos enviar el email</p>
+                      <p style={{ fontSize: 12, color: '#5A4010', margin: 0 }}>Comparte este enlace directamente con {inviteEmail}:</p>
                     </div>
                     <div style={{ padding: '12px 14px', background: '#F9F5F1', border: '1.5px solid #EDE5D8', borderRadius: 12, marginBottom: 12 }}>
                       <p style={{ fontSize: 11, color: '#6B7280', wordBreak: 'break-all', margin: 0 }}>{inviteLink}</p>
@@ -875,7 +875,7 @@ export default function Familia() {
                     onChange={e => setInviteEmail(e.target.value)}
                     placeholder="familiar@correo.com" autoFocus
                     style={fieldStyle}
-                    onFocus={e => { e.target.style.borderColor = '#4A7C59'; e.target.style.boxShadow = '0 0 0 3px rgba(196,98,58,0.1)' }}
+                    onFocus={e => { e.target.style.borderColor = '#4A7C59'; e.target.style.boxShadow = '0 0 0 3px rgba(74,124,89,0.1)' }}
                     onBlur={e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.boxShadow = 'none' }}
                   />
                 </div>
@@ -891,8 +891,8 @@ export default function Familia() {
                     width: '100%', padding: 14, borderRadius: 14, border: 'none',
                     fontWeight: 700, fontSize: 14, color: 'white', cursor: 'pointer',
                     background: inviteEmail.trim() && inviteStatus !== 'sending'
-                      ? 'linear-gradient(135deg, #4A7C59, #3A6347)' : '#D4C4B8',
-                    boxShadow: inviteEmail.trim() ? '0 6px 20px rgba(196,98,58,0.3)' : 'none',
+                      ? 'linear-gradient(135deg, #4A7C59, #3A6347)' : '#C0CCC5',
+                    boxShadow: inviteEmail.trim() ? '0 6px 20px rgba(74,124,89,0.3)' : 'none',
                     transition: 'all 0.2s',
                   }}
                 >
