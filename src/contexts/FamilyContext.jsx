@@ -6,127 +6,160 @@ const FamilyContext = createContext(null)
 
 export function FamilyProvider({ children }) {
   const { user } = useAuth()
-  const [profile, setProfile] = useState(null)
-  const [ownerId, setOwnerId] = useState(null)
-  const [memberRole, setMemberRole] = useState(null) // null = owner/admin, 'cuidador' | 'familiar' = invited member
+  const [families, setFamilies] = useState([])
+  const [activeOwnerId, setActiveOwnerId] = useState(null)
   const [loading, setLoading] = useState(true)
-
-  // Switcher state — only populated when the user belongs to 2+ families
-  const [hasBoth, setHasBoth] = useState(false)
-  const [activeFamily, setActiveFamily] = useState('owner') // 'owner' | 'member'
-  const [ownPatientName, setOwnPatientName] = useState(null)
-  const [memberPatientName, setMemberPatientName] = useState(null)
+  const [needsSelector, setNeedsSelector] = useState(false)
 
   useEffect(() => {
-    if (user) {
-      fetchProfile()
-    } else {
-      setProfile(null)
-      setOwnerId(null)
-      setMemberRole(null)
-      setHasBoth(false)
-      setActiveFamily('owner')
-      setOwnPatientName(null)
-      setMemberPatientName(null)
-      setLoading(false)
-    }
+    if (user) loadFamilies()
+    else reset()
   }, [user])
 
-  async function fetchProfile() {
+  function reset() {
+    setFamilies([])
+    setActiveOwnerId(null)
+    setNeedsSelector(false)
+    setLoading(false)
+  }
+
+  async function loadFamilies() {
     setLoading(true)
-    // Safety net: if Supabase never responds on slow mobile, unblock after 8 s
     const timer = setTimeout(() => {
-      setOwnerId(user.id)
-      setMemberRole(null)
-      setProfile(null)
-      setActiveFamily('owner')
+      const fallback = [{ ownerId: user.id, patientName: null, patientPhotoUrl: null, role: null, profile: null }]
+      setFamilies(fallback)
+      setActiveOwnerId(user.id)
+      setNeedsSelector(false)
       setLoading(false)
     }, 8000)
-    try {
-      const preferMember = localStorage.getItem('fc_active_family') === 'member'
 
-      // Always fetch own profile and membership in parallel so we can detect both
-      const [{ data: ownData }, { data: membership }] = await Promise.all([
+    try {
+      const [{ data: ownData }, { data: memberships }] = await Promise.all([
         supabase.from('care_profiles').select('*').eq('user_id', user.id).maybeSingle(),
-        supabase.from('family_members').select('user_id, role').eq('member_user_id', user.id).neq('user_id', user.id).maybeSingle(),
+        supabase.from('family_members').select('user_id, role').eq('member_user_id', user.id).neq('user_id', user.id),
       ])
 
-      // ------------------------------------------------------------------
-      // If the family_members RLS policy hasn't been applied yet, the query
-      // above silently returns null for invited members.  Fall back to the
-      // owner_id we stored in localStorage during the join flow.
-      // ------------------------------------------------------------------
-      let effectiveMembership = membership
-      if (!membership) {
+      const built = []
+
+      if (ownData) {
+        built.push({
+          ownerId: user.id,
+          patientName: ownData.name ?? null,
+          patientPhotoUrl: ownData.photo_url ?? null,
+          role: null,
+          profile: ownData,
+        })
+      }
+
+      if (memberships?.length) {
+        const memberOwnerIds = memberships.map(m => m.user_id)
+        const { data: ownerProfiles } = await supabase
+          .from('care_profiles').select('*').in('user_id', memberOwnerIds)
+        const profileMap = {}
+        ;(ownerProfiles ?? []).forEach(p => { profileMap[p.user_id] = p })
+
+        for (const m of memberships) {
+          const op = profileMap[m.user_id]
+          built.push({
+            ownerId: m.user_id,
+            patientName: op?.name ?? null,
+            patientPhotoUrl: op?.photo_url ?? null,
+            role: m.role ?? 'familiar',
+            profile: op ?? null,
+          })
+        }
+      }
+
+      // Fallback: localStorage for when RLS hasn't propagated to family_members yet
+      if (built.length <= 1) {
         const storedOwnerId = localStorage.getItem('fc_member_owner_id')
-        if (storedOwnerId && preferMember) {
-          const { data: ownerProfile } = await supabase
-            .from('care_profiles').select('*').eq('user_id', storedOwnerId).maybeSingle()
-          if (ownerProfile) {
-            setHasBoth(!!ownData)
-            setOwnPatientName(ownData?.name ?? null)
-            setMemberPatientName(ownerProfile.name ?? null)
-            const useMember = !ownData || preferMember
-            if (useMember) {
-              setOwnerId(storedOwnerId)
-              setMemberRole('familiar')
-              setProfile(ownerProfile)
-              setActiveFamily('member')
-              return
+        const storedContext = localStorage.getItem('fc_active_context')
+        if (storedOwnerId && storedContext === storedOwnerId) {
+          const alreadyAdded = built.some(f => f.ownerId === storedOwnerId)
+          if (!alreadyAdded) {
+            const { data: ownerProfile } = await supabase
+              .from('care_profiles').select('*').eq('user_id', storedOwnerId).maybeSingle()
+            if (ownerProfile) {
+              built.push({
+                ownerId: storedOwnerId,
+                patientName: ownerProfile.name ?? null,
+                patientPhotoUrl: ownerProfile.photo_url ?? null,
+                role: 'familiar',
+                profile: ownerProfile,
+              })
             }
           }
         }
       }
 
-      const both = !!(ownData && effectiveMembership)
-      setHasBoth(both)
-      setOwnPatientName(ownData?.name ?? null)
-
-      const useMember = !!effectiveMembership && (!ownData || preferMember)
-
-      if (effectiveMembership) {
-        // Fetch the invited family's care profile — needed for the switcher label
-        // and as the active profile when viewing as member
-        const { data: ownerProfile } = await supabase
-          .from('care_profiles').select('*').eq('user_id', effectiveMembership.user_id).maybeSingle()
-        setMemberPatientName(ownerProfile?.name ?? null)
-
-        if (useMember) {
-          setOwnerId(effectiveMembership.user_id)
-          setMemberRole(effectiveMembership.role ?? 'familiar')
-          setProfile(ownerProfile ?? null)
-          setActiveFamily('member')
-          return
-        }
-      } else {
-        setMemberPatientName(null)
+      if (built.length === 0) {
+        built.push({ ownerId: user.id, patientName: null, patientPhotoUrl: null, role: null, profile: null })
       }
 
-      // Viewing as owner
-      setOwnerId(user.id)
-      setMemberRole(null)
-      setProfile(ownData ?? null)
-      setActiveFamily('owner')
+      setFamilies(built)
+
+      const stored = localStorage.getItem('fc_active_context')
+      const storedValid = built.some(f => f.ownerId === stored)
+
+      if (built.length === 1) {
+        setActiveOwnerId(built[0].ownerId)
+        setNeedsSelector(false)
+      } else if (storedValid) {
+        setActiveOwnerId(stored)
+        setNeedsSelector(false)
+      } else {
+        setActiveOwnerId(null)
+        setNeedsSelector(true)
+      }
     } catch {
-      setOwnerId(user.id)
-      setMemberRole(null)
-      setProfile(null)
-      setActiveFamily('owner')
+      const fallback = [{ ownerId: user.id, patientName: null, patientPhotoUrl: null, role: null, profile: null }]
+      setFamilies(fallback)
+      setActiveOwnerId(user.id)
+      setNeedsSelector(false)
     } finally {
       clearTimeout(timer)
       setLoading(false)
     }
   }
 
-  function switchFamily(target) {
-    localStorage.setItem('fc_active_family', target)
-    fetchProfile()
+  function switchFamily(ownerId) {
+    localStorage.setItem('fc_active_context', ownerId)
+    setActiveOwnerId(ownerId)
+    setNeedsSelector(false)
   }
+
+  const activeEntry = families.find(f => f.ownerId === activeOwnerId) ?? families[0] ?? null
+  const profile = activeEntry?.profile ?? null
+  const memberRole = activeEntry?.role ?? null
+  const ownerId = activeOwnerId ?? user?.id ?? null
+  const activeFamilyLabel = activeEntry?.patientName ?? 'Mi familia'
+
+  // Legacy compatibility
+  const ownFamily = families.find(f => f.role === null)
+  const memberFamily = families.find(f => f.role !== null)
+  const hasBoth = families.length > 1
+  const ownPatientName = ownFamily?.patientName ?? null
+  const memberPatientName = memberFamily?.patientName ?? null
 
   return (
     <FamilyContext.Provider value={{
-      profile, ownerId, memberRole, loading, refresh: fetchProfile,
-      hasBoth, activeFamily, ownPatientName, memberPatientName, switchFamily,
+      ownerId,
+      profile,
+      memberRole,
+      loading,
+      refresh: loadFamilies,
+
+      families,
+      hasMultiple: families.length > 1,
+      needsSelector,
+      switchFamily,
+      activeFamilyLabel,
+      activeOwnerId,
+
+      hasBoth,
+      activeFamily: activeOwnerId === user?.id ? 'owner' : 'member',
+      ownPatientName,
+      memberPatientName,
     }}>
       {children}
     </FamilyContext.Provider>

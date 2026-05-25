@@ -14,7 +14,7 @@ const PLAN_COLORS = { free: '#9CA3AF', familiar: '#4A7C59', care_plus: '#7C3AED'
 
 export default function Familia() {
   const { user, signOut } = useAuth()
-  const { profile, ownerId, ownPatientName } = useFamily()
+  const { profile, ownerId } = useFamily()
   const { sub, isPaid, isTrialing, daysLeft } = useSubscription()
   const navigate = useNavigate()
   const [members, setMembers] = useState([])
@@ -38,10 +38,7 @@ export default function Familia() {
   const [confirmRemoveDialog, setConfirmRemoveDialog] = useState(null) // { member, name }
 
   const displayName = user?.user_metadata?.full_name?.trim() || user?.email?.trim() || 'Familiar'
-  // If the user has their own family (ownPatientName set), always manage it
-  // directly — even when FamilyContext is in member mode (hasBoth scenario).
-  const myOwnerId = ownPatientName !== null ? user?.id : ownerId
-  const isAdmin = user?.id === myOwnerId
+  const isAdmin = user?.id === ownerId
 
   const today = new Date()
   const todayKey = today.toISOString().split('T')[0]
@@ -58,8 +55,8 @@ export default function Familia() {
   }
 
   useEffect(() => {
-    if (user && myOwnerId) { fetchMembers(); loadShifts() }
-  }, [user, myOwnerId])
+    if (user && ownerId) { fetchMembers(); loadShifts() }
+  }, [user, ownerId])
 
   async function loadShifts() {
     const weekDays = getWeekDays()
@@ -68,7 +65,7 @@ export default function Familia() {
     const { data } = await supabase
       .from('care_shifts')
       .select('*')
-      .eq('owner_id', myOwnerId)
+      .eq('owner_id', ownerId)
       .gte('shift_date', from)
       .lte('shift_date', to)
     const map = {}
@@ -80,7 +77,7 @@ export default function Familia() {
     if (!shiftName.trim()) return
     setSavingShift(true)
     await supabase.from('care_shifts').upsert({
-      owner_id: myOwnerId,
+      owner_id: ownerId,
       shift_date: dateKey,
       caregiver_user_id: user.id,
       caregiver_name: shiftName.trim(),
@@ -96,7 +93,7 @@ export default function Familia() {
     const { data: memberRows } = await supabase
       .from('family_members')
       .select('member_user_id, member_email, joined_at, role')
-      .eq('user_id', myOwnerId)
+      .eq('user_id', ownerId)
 
     setMembers(memberRows ?? [])
 
@@ -123,7 +120,7 @@ export default function Familia() {
     supabase
       .from('contacts')
       .select('*')
-      .eq('user_id', myOwnerId)
+      .eq('user_id', ownerId)
       .ilike('email', member.member_email ?? '')
       .maybeSingle()
       .then(({ data }) => setMemberContact(data ?? null))
@@ -194,7 +191,7 @@ export default function Familia() {
   async function handleRemoveMember(memberUserId) {
     await supabase.from('family_members')
       .delete()
-      .eq('user_id', myOwnerId)
+      .eq('user_id', ownerId)
       .eq('member_user_id', memberUserId)
     setMembers(prev => prev.filter(m => m.member_user_id !== memberUserId))
     setConfirmRemoveDialog(null)
@@ -205,7 +202,8 @@ export default function Familia() {
   async function handleSignOut() {
     try { await signOut() } catch { }
     finally {
-      localStorage.removeItem('fc_active_family')
+      localStorage.removeItem('fc_active_context')
+      localStorage.removeItem('fc_member_owner_id')
       window.location.href = '/login'
     }
   }

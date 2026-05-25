@@ -8,6 +8,8 @@ import Paywall from './Paywall'
 import InstallBanner from './InstallBanner'
 import OfflineBanner from './OfflineBanner'
 import { useDarkMode } from '../contexts/DarkModeContext'
+import FamilySelector from './FamilySelector'
+import FamilySwitcher from './FamilySwitcher'
 
 const PAGE_TITLES = {
   '/dashboard':   'Inicio',
@@ -52,7 +54,7 @@ const HIDE_FAB_PATHS = new Set(['/gastos', '/medications', '/notes'])
 
 export default function Layout({ children }) {
   const { inactivityWarning, signOut } = useAuth()
-  const { profile, hasBoth, activeFamily, ownPatientName, memberPatientName, switchFamily } = useFamily()
+  const { profile } = useFamily()
   const { dark } = useDarkMode()
   const location = useLocation()
   const navigate = useNavigate()
@@ -74,7 +76,7 @@ export default function Layout({ children }) {
     setFabOpen(false)
     try { await signOut() } catch { }
     finally {
-      localStorage.removeItem('fc_active_family')
+      localStorage.removeItem('fc_active_context')
       localStorage.removeItem('fc_member_owner_id')
       window.location.href = '/login'
     }
@@ -136,38 +138,7 @@ export default function Layout({ children }) {
         <InstallBanner />
         <OfflineBanner />
 
-        {/* Family switcher — only visible when user belongs to 2+ families */}
-        {hasBoth && (
-          <div style={{
-            position: 'sticky', top: 0, zIndex: 10,
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            padding: '8px 16px',
-            background: activeFamily === 'member' ? '#EFF6FF' : '#FDF8F0',
-            borderBottom: `1px solid ${activeFamily === 'member' ? '#BFDBFE' : '#EDE5D8'}`,
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ fontSize: 13 }}>{activeFamily === 'member' ? '👁' : '🏠'}</span>
-              <span style={{ fontSize: 12, fontWeight: 600, color: '#374151' }}>
-                {activeFamily === 'member'
-                  ? `Viendo familia de ${memberPatientName ?? 'otro familiar'}`
-                  : `Tu familia${ownPatientName ? ` · ${ownPatientName}` : ''}`}
-              </span>
-            </div>
-            <button
-              onClick={() => switchFamily(activeFamily === 'owner' ? 'member' : 'owner')}
-              style={{
-                fontSize: 12, fontWeight: 700,
-                color: activeFamily === 'member' ? '#2D86A0' : '#4A7C59',
-                background: activeFamily === 'member' ? '#DBEAFE' : '#EBF3EE',
-                border: 'none', borderRadius: 8,
-                padding: '5px 10px', cursor: 'pointer',
-                flexShrink: 0,
-              }}
-            >
-              Cambiar ↔
-            </button>
-          </div>
-        )}
+        <FamilySwitcher />
 
         {children}
         <footer style={{ padding: '24px 16px', textAlign: 'center', borderTop: '1px solid #EDE5D8' }}>
@@ -286,6 +257,7 @@ export default function Layout({ children }) {
         </div>
       )}
 
+      <FamilySelector />
       <Paywall />
 
       {/* Inactivity warning banner */}
