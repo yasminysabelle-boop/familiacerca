@@ -830,10 +830,10 @@ export default function Landing() {
           <div style={{ flex: '1 1 300px' }}>
             <p style={{ fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 18px', fontFamily: SANS }}>Sin App Store</p>
             <h2 className="reveal" style={{ fontFamily: SERIF, fontSize: 'clamp(30px,3.8vw,50px)', fontWeight: 600, color: 'white', lineHeight: 1.12, margin: '0 0 18px' }}>
-              Instálala como una app nativa
+              Agrégala a tu celular en segundos
             </h2>
             <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.62)', lineHeight: 1.80, margin: '0 0 40px', fontFamily: SANS, fontWeight: 300 }}>
-              FamiliaCerca es una PWA — funciona como una app normal sin pasar por la App Store ni Google Play.
+              Sin pasar por la App Store ni Google Play — funciona como una app nativa directo desde tu navegador.
             </p>
             {(isIOS || !isMobile
               ? [
@@ -889,11 +889,8 @@ export default function Landing() {
                 <p style={{ margin: '0 0 24px', fontSize: 9, color: 'rgba(255,255,255,0.18)', fontFamily: SANS }}>sábado, 23 mayo</p>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, width: '100%' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-                    <div style={{ width: 44, height: 44, borderRadius: 12, background: 'linear-gradient(135deg, #4A7C59 0%, #2D5016 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 6px 20px rgba(74,124,89,0.50)' }}>
-                      <svg width={24} height={24} viewBox="0 0 40 40" fill="none">
-                        <text x="20" y="19" textAnchor="middle" dominantBaseline="middle" fill="white" fontSize="13" fontWeight="800" fontFamily="Georgia,serif">FC</text>
-                        <text x="20" y="30" textAnchor="middle" dominantBaseline="middle" fill="white" fillOpacity="0.75" fontSize="9">♥</text>
-                      </svg>
+                    <div style={{ width: 44, height: 44, borderRadius: 12, overflow: 'hidden', boxShadow: '0 6px 20px rgba(74,124,89,0.50)', flexShrink: 0 }}>
+                      <img src="/icon-192.png" alt="FamiliaCerca" style={{ width: 44, height: 44, display: 'block' }} />
                     </div>
                     <span style={{ fontSize: 8, color: 'white', fontFamily: SANS, textAlign: 'center', lineHeight: 1.2 }}>Familia Cerca</span>
                   </div>
