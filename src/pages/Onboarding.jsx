@@ -79,10 +79,10 @@ export default function Onboarding() {
   const firstName = user?.user_metadata?.full_name?.split(' ')[0] ?? ''
   const cfg = STEP_CONFIG[step - 1]
 
-  // If onboarding already done, skip to dashboard
+  // If onboarding already done, skip to hoy
   useEffect(() => {
     if (user?.user_metadata?.onboarding_completed) {
-      navigate('/dashboard', { replace: true })
+      navigate('/hoy', { replace: true })
     }
   }, [user, navigate])
 
@@ -91,13 +91,14 @@ export default function Onboarding() {
     if (familyLoading || !user) return
     if (ownerId && ownerId !== user.id) {
       supabase.auth.updateUser({ data: { onboarding_completed: true } })
-      navigate('/dashboard', { replace: true })
+      navigate('/hoy', { replace: true })
     }
   }, [user, ownerId, familyLoading, navigate])
 
   // User already has their own care profile — skip step 1
+  // Guard: don't skip if onboarding_completed (first useEffect will redirect instead)
   useEffect(() => {
-    if (!familyLoading && profile && ownerId === user?.id && step === 1) {
+    if (!familyLoading && profile && ownerId === user?.id && step === 1 && !user?.user_metadata?.onboarding_completed) {
       setStep(2)
     }
   }, [familyLoading, profile, ownerId])
@@ -140,7 +141,7 @@ export default function Onboarding() {
     } catch { /* clipboard unavailable */ }
   }
 
-  async function finish(dest = '/dashboard') {
+  async function finish(dest = '/hoy') {
     await supabase.auth.updateUser({ data: { onboarding_completed: true } })
     navigate(dest, { replace: true })
   }
@@ -288,7 +289,7 @@ export default function Onboarding() {
               <button onClick={() => finish('/medications')} style={primaryBtn(false)}>
                 Agregar medicamentos →
               </button>
-              <button onClick={() => finish('/dashboard')} style={secondaryBtn}>
+              <button onClick={() => finish('/hoy')} style={secondaryBtn}>
                 Explorar primero
               </button>
             </div>
@@ -297,7 +298,7 @@ export default function Onboarding() {
 
         {/* Global skip */}
         <button
-          onClick={() => finish('/dashboard')}
+          onClick={() => finish('/hoy')}
           style={{ marginTop: 20, background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', fontSize: 12, cursor: 'pointer', padding: '8px 20px' }}
         >
           Saltar todo
