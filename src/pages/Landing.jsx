@@ -148,6 +148,7 @@ function PriceCard({ name, price, period, highlight, badge, features, cta, annua
 export default function Landing() {
   const { user, loading } = useAuth()
   const { installed, isIOS, isAndroid, canPrompt, install, isMobile } = usePWAInstall()
+  const [pwaTab, setPwaTab] = useState(() => isAndroid ? 'android' : 'iphone')
   const [pwaInstallClicked, setPwaInstallClicked] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [annual, setAnnual] = useState(false)
@@ -835,31 +836,48 @@ export default function Landing() {
             <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.62)', lineHeight: 1.80, margin: '0 0 40px', fontFamily: SANS, fontWeight: 300 }}>
               Sin pasar por la App Store ni Google Play — funciona como una app nativa directo desde tu navegador.
             </p>
-            {(isIOS || !isMobile
-              ? [
-                  { n: '1', text: '🍎 Safari: toca Compartir ↑ en la barra inferior' },
-                  { n: '2', text: 'Desliza y toca "Agregar a pantalla de inicio"' },
-                  { n: '3', text: '🚀 ¡Ya tienes FamiliaCerca en tu pantalla de inicio!' },
-                ]
-              : [
-                  { n: '1', text: '🤖 Toca el botón de abajo para instalación directa' },
-                  { n: '2', text: 'O toca ⋮ en Chrome → "Instalar aplicación"' },
-                  { n: '3', text: '🚀 ¡Acceso directo y notificaciones push activadas!' },
-                ]
-            ).map(s => (
+            {/* Platform tabs */}
+            <div style={{ display: 'flex', background: 'rgba(255,255,255,0.10)', borderRadius: 9999, padding: 4, marginBottom: 28, width: 'fit-content' }}>
+              {[{ id: 'iphone', label: '🍎 iPhone' }, { id: 'android', label: '🤖 Android' }].map(tab => (
+                <button
+                  key={tab.id}
+                  onClick={() => setPwaTab(tab.id)}
+                  style={{
+                    padding: '8px 20px', borderRadius: 9999, border: 'none',
+                    background: pwaTab === tab.id ? 'white' : 'transparent',
+                    color: pwaTab === tab.id ? '#4A7C59' : 'rgba(255,255,255,0.60)',
+                    fontWeight: pwaTab === tab.id ? 700 : 400,
+                    fontSize: 13, fontFamily: SANS, cursor: 'pointer',
+                    transition: 'all 0.18s',
+                  }}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            {(pwaTab === 'iphone' ? [
+              { n: '1', text: 'Abre esta página en Safari (no Chrome)' },
+              { n: '2', text: 'Toca el botón Compartir ↑ en la barra inferior' },
+              { n: '3', text: 'Desliza y toca "Agregar a pantalla de inicio" → Agregar' },
+            ] : [
+              { n: '1', text: 'Abre esta página en Chrome' },
+              { n: '2', text: 'Toca los 3 puntos ⋮ en la esquina superior derecha' },
+              { n: '3', text: 'Toca "Instalar aplicación" → ¡Listo!' },
+            ]).map(s => (
               <div key={s.n} style={{ display: 'flex', alignItems: 'flex-start', gap: 14, marginBottom: 16 }}>
                 <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(255,255,255,0.14)', border: '1.5px solid rgba(255,255,255,0.22)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: SERIF, fontSize: 17, fontWeight: 700, color: 'white', flexShrink: 0 }}>{s.n}</div>
                 <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.75)', fontFamily: SANS, fontWeight: 300, paddingTop: 8, margin: 0 }}>{s.text}</p>
               </div>
             ))}
 
-            {/* Real install button — Android prompt or iOS hint */}
+            {/* Install button — only on Android tab when native prompt is ready */}
             {installed ? (
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '13px 22px', borderRadius: 9999, background: 'rgba(255,255,255,0.12)', border: '1.5px solid rgba(255,255,255,0.30)', marginTop: 8 }}>
                 <span style={{ fontSize: 18 }}>✅</span>
                 <span style={{ fontSize: 14, fontWeight: 600, color: 'white', fontFamily: SANS }}>¡App ya instalada!</span>
               </div>
-            ) : canPrompt ? (
+            ) : (pwaTab === 'android' && canPrompt) ? (
               <button
                 onClick={async () => {
                   const outcome = await install()
@@ -873,7 +891,6 @@ export default function Landing() {
                   fontWeight: 700, fontSize: 15, fontFamily: SANS,
                   cursor: 'pointer', letterSpacing: '0.02em',
                   boxShadow: '0 8px 32px rgba(0,0,0,0.20)',
-                  transition: 'transform 0.15s, box-shadow 0.15s',
                 }}
               >
                 {pwaInstallClicked ? '¡Instalando! 🎉' : '📲 Instalar ahora'}
