@@ -18,7 +18,7 @@ const TIME_GROUPS = [
 const CARE_MOMENTS = [
   { id: 'morning',   label: 'Mañana',            icon: '🌅', overdueHour: 14,   color: '#C9882A', bg: '#FFFBEB', scheduledTime: '8:00 AM' },
   { id: 'afternoon', label: 'Tarde',              icon: '☀️',  overdueHour: 20,   color: '#4A7C59', bg: '#EBF3EE', scheduledTime: '2:00 PM' },
-  { id: 'night',     label: 'Noche',              icon: '🌙', overdueHour: null, color: '#6366F1', bg: '#EEF2FF', scheduledTime: '8:00 PM' },
+  { id: 'night',     label: 'Noche',              icon: '🌙', overdueHour: null, color: '#4A7C59', bg: '#EBF3EE', scheduledTime: '8:00 PM' },
   { id: 'asneeded',  label: 'Cuando se necesita', icon: '🔔', overdueHour: null, color: '#6B7280', bg: '#F9FAFB', scheduledTime: null },
 ]
 
@@ -110,7 +110,7 @@ export default function Hoy() {
   const [confirmDialog, setConfirmDialog] = useState(null)
 
   const isFamiliar = memberRole === 'familiar'
-  const isAdmin = memberRole === null
+  const isAdmin = memberRole === null || ownerId === user?.id
   const isCuidador = memberRole === 'cuidador'
   function canActOn(med) {
     if (isFamiliar) return false
@@ -192,7 +192,8 @@ export default function Hoy() {
         }
       }
       setCareLogs(cmap)
-    } catch {
+    } catch (err) {
+      console.error(err)
       setLoadError('No se pudieron cargar los datos. Verifica tu conexión.')
     } finally {
       setLoading(false)
@@ -359,7 +360,8 @@ export default function Hoy() {
       if (dbError) throw dbError
       setLogs(prev => ({ ...prev, [medId]: { ...prev[medId], ...updateFields } }))
       closeProofSheet()
-    } catch {
+    } catch (err) {
+      console.error(err)
       setUploadError('No se pudo guardar la foto. Verifica tu conexión e intenta de nuevo.')
     } finally {
       setProofUploading(false)
@@ -398,10 +400,55 @@ export default function Hoy() {
     .filter(l => l.log_date === today)
     .sort((a, b) => a.checked_at.localeCompare(b.checked_at))
 
+  function fmtMedTime(t) {
+    if (!t) return ''
+    const [h, m] = t.split(':').map(Number)
+    const hh = h > 12 ? h - 12 : (h === 0 ? 12 : h)
+    return `${hh}${m ? ':' + String(m).padStart(2, '0') : ''}${h >= 12 ? 'pm' : 'am'}`
+  }
+
+  const overdueMeds = !loading
+    ? medications.filter(m => {
+        if (logs[m.id]?.status === 'confirmed') return false
+        return calcularEstadoMedicamento(firstTime(m)) === 'tarde'
+      })
+    : []
+
+  const overdueCareMoments = !loading
+    ? CARE_MOMENTS.filter(moment => {
+        if (!moment.overdueHour) return false
+        if (new Date().getHours() < moment.overdueHour) return false
+        const items = CARE_ITEMS.filter(i => i.moment === moment.id && !i.weekly)
+        return items.some(i => !careLogs[i.key])
+      })
+    : []
+
+  const showOverdueAlert = !isFamiliar && !loading && (overdueMeds.length > 0 || overdueCareMoments.length > 0)
+
   return (
     <Layout>
 
       <div style={{ padding: '16px 16px 96px', maxWidth: 600 }}>
+
+        {/* Overdue alert banner */}
+        {showOverdueAlert && (
+          <div style={{
+            background: '#FEF2F2', border: '1px solid #FCA5A5',
+            borderRadius: 14, padding: '10px 16px', marginBottom: 14,
+            display: 'flex', alignItems: 'flex-start', gap: 8,
+          }}>
+            <span style={{ fontSize: 16, flexShrink: 0, marginTop: 1 }}>⚠️</span>
+            <p style={{ fontSize: 13, fontWeight: 700, color: '#DC2626', margin: 0, lineHeight: 1.5 }}>
+              {overdueMeds.length > 0
+                ? `${overdueMeds.length} sin dar · ${overdueMeds.slice(0, 2).map(m => {
+                    const t = firstTime(m)
+                    return t ? `${m.name} ${fmtMedTime(t)}` : m.name
+                  }).join(' · ')}${overdueMeds.length > 2 ? ` · +${overdueMeds.length - 2} más` : ''}`
+                : overdueCareMoments.map(m => `${m.icon} ${m.label} pendiente`).join(' · ')
+              }
+            </p>
+          </div>
+        )}
 
         {/* Add medication button */}
         {!isFamiliar && (

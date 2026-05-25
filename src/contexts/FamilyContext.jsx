@@ -87,6 +87,17 @@ export function FamilyProvider({ children }) {
                 role: 'familiar',
                 profile: ownerProfile,
               })
+              // RLS may not have propagated yet — re-verify membership after 3 s
+              setTimeout(async () => {
+                try {
+                  const { data: recheck } = await supabase
+                    .from('family_members')
+                    .select('user_id, role')
+                    .eq('member_user_id', user.id)
+                    .neq('user_id', user.id)
+                  if (recheck?.length) loadFamilies()
+                } catch { }
+              }, 3000)
             }
           }
         }
@@ -111,7 +122,8 @@ export function FamilyProvider({ children }) {
         setActiveOwnerId(null)
         setNeedsSelector(true)
       }
-    } catch {
+    } catch (err) {
+      console.error(err)
       const fallback = [{ ownerId: user.id, patientName: null, patientPhotoUrl: null, role: null, profile: null }]
       setFamilies(fallback)
       setActiveOwnerId(user.id)

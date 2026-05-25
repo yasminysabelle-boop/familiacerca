@@ -1073,7 +1073,15 @@ function DaySection({
               ? 'opacity 0.22s ease 0.08s, transform 0.22s ease 0.08s'
               : 'opacity 0.12s ease, transform 0.12s ease',
           }}>
-            {CATEGORY_GROUPS.map(group => {
+            {section.events.length === 0 ? (
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: 10,
+                padding: '14px 4px',
+              }}>
+                <span style={{ fontSize: 16, opacity: 0.4 }}>🗓️</span>
+                <p style={{ fontSize: 13, color: '#9CA3AF', margin: 0 }}>Sin actividad registrada</p>
+              </div>
+            ) : CATEGORY_GROUPS.map(group => {
               const groupEvts = section.events.filter(e => group.types.includes(e.type))
               if (groupEvts.length === 0) return null
               return (
@@ -1295,7 +1303,7 @@ export default function Dashboard() {
   const { user, signOut } = useAuth()
   const { profile, ownerId, memberRole } = useFamily()
   const isFamiliar = memberRole === 'familiar'
-  const isAdmin = memberRole === null
+  const isAdmin = memberRole === null || ownerId === user?.id
   const { refresh: refreshSub } = useSubscription()
   const [searchParams, setSearchParams] = useSearchParams()
 
@@ -1809,6 +1817,12 @@ export default function Dashboard() {
       dateMap[evt.dateKey].push(evt)
     }
 
+    // Ensure all 7 days appear even when they have no events
+    for (let ts = sevenAgoTs; ts <= new Date(todayKey + 'T12:00:00').getTime(); ts += dayMs) {
+      const dk = new Date(ts).toISOString().split('T')[0]
+      if (!dateMap[dk]) dateMap[dk] = []
+    }
+
     const sortedKeys = Object.keys(dateMap).sort((a, b) => b.localeCompare(a))
     const newSections = sortedKeys.map(dk => ({
       dateKey: dk,
@@ -1836,6 +1850,7 @@ export default function Dashboard() {
       setReactions(map)
     }
     } catch (err) {
+      console.error(err)
       clearTimeout(timeoutTimer)
       setTimelineError('No se pudo cargar el historial. Verifica tu conexión.')
       setLoading(false)
@@ -1897,13 +1912,11 @@ export default function Dashboard() {
         confirmedBy: fullName,
       }
       setSections(prev =>
-        prev
-          .map(section => {
-            if (section.dateKey !== todayKey) return section
-            const filtered = section.events.filter(e => e.id !== evt.id)
-            return { ...section, events: sortSection([...filtered, confirmedEvt]) }
-          })
-          .filter(s => s.events.length > 0)
+        prev.map(section => {
+          if (section.dateKey !== todayKey) return section
+          const filtered = section.events.filter(e => e.id !== evt.id)
+          return { ...section, events: sortSection([...filtered, confirmedEvt]) }
+        })
       )
     }
     setConfirming(null)
@@ -2243,7 +2256,7 @@ export default function Dashboard() {
         <div style={{ marginTop: 24, paddingBottom: 8, display: 'flex', justifyContent: 'center' }}>
           <button
             onClick={async () => {
-              localStorage.removeItem('fc_active_family')
+              localStorage.removeItem('fc_active_context')
               localStorage.removeItem('fc_member_owner_id')
               try { await signOut() } catch { }
               window.location.href = '/login'

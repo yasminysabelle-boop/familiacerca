@@ -168,7 +168,8 @@ export default function Familia() {
     try {
       const url = await createPortalSession()
       window.location.href = url
-    } catch {
+    } catch (err) {
+      console.error(err)
       setPortalLoading(false)
       setPortalError('No se pudo abrir el portal. Intenta de nuevo.')
     }
@@ -470,8 +471,8 @@ export default function Familia() {
 
               {/* Invited members list — exclude current user to avoid duplicating the admin card */}
               {members.filter(m =>
-                !(m.member_user_id === user?.id ||
-                  m.member_email?.trim().toLowerCase() === user?.email?.trim().toLowerCase())
+                m.member_user_id !== user?.id &&
+                !(user?.email && m.member_email?.trim().toLowerCase() === user.email.trim().toLowerCase())
               ).map(member => {
                 const mp = memberProfiles[member.member_user_id]
                 const online = isOnline(mp)
