@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { usePWAInstall } from '../hooks/usePWAInstall'
-import PWAInstallBanner from '../components/PWAInstallBanner'
+import InstallBanner from '../components/InstallBanner'
 import CompanionChat from '../components/CompanionChat'
 
 const HERO_IMG = '/images/hero.jpg'
@@ -1040,7 +1040,7 @@ export default function Landing() {
       </footer>
 
       {/* PWA install banner — shown to mobile visitors who haven't installed yet */}
-      <PWAInstallBanner />
+      <InstallBanner />
 
       {/* ── STICKY BOTTOM BAR ── */}
       <div style={{
