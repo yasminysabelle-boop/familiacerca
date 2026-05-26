@@ -167,8 +167,8 @@ export default function EmergencyAlert() {
 
             {sent && pushFailed && (
               <div style={{ marginTop: 8 }}>
-                <p className="text-xs font-semibold flex items-center gap-1.5" style={{ color: '#D97706' }}>
-                  <AlertTriangle size={12} color="#D97706" strokeWidth={2} />
+                <p className="text-xs font-semibold flex items-center gap-1.5" style={{ color: '#4A7C59' }}>
+                  <AlertTriangle size={12} color="#4A7C59" strokeWidth={2} />
                   Sin señal push — llama directamente:
                 </p>
                 {fallbackContacts.length > 0 ? (
@@ -183,7 +183,7 @@ export default function EmergencyAlert() {
                           background: '#FEF3C7', textDecoration: 'none',
                         }}
                       >
-                        <Phone size={13} color="#D97706" strokeWidth={2} />
+                        <Phone size={13} color="#4A7C59" strokeWidth={2} />
                         <span style={{ fontSize: 12, fontWeight: 600, color: '#92400E' }}>
                           {c.name} {c.relationship ? `(${c.relationship})` : ''} — {c.phone}
                         </span>
@@ -213,7 +213,7 @@ export default function EmergencyAlert() {
               className="absolute inset-0 rounded-full text-white font-black flex items-center justify-center active:scale-90"
               style={{
                 background: sent
-                  ? (pushFailed ? '#D97706' : '#15803D')
+                  ? (pushFailed ? '#4A7C59' : '#15803D')
                   : 'linear-gradient(135deg, #D63031, #B82020)',
                 fontSize: sending ? 10 : 13,
                 letterSpacing: '0.05em',
