@@ -184,7 +184,7 @@ export default function EmergencyAlert() {
                         }}
                       >
                         <Phone size={13} color="#4A7C59" strokeWidth={2} />
-                        <span style={{ fontSize: 12, fontWeight: 600, color: '#92400E' }}>
+                        <span style={{ fontSize: 12, fontWeight: 600, color: '#3A6347' }}>
                           {c.name} {c.relationship ? `(${c.relationship})` : ''} — {c.phone}
                         </span>
                       </a>
