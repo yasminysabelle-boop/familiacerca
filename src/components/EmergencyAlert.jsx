@@ -180,7 +180,7 @@ export default function EmergencyAlert() {
                         style={{
                           display: 'flex', alignItems: 'center', gap: 8,
                           padding: '8px 10px', borderRadius: 10,
-                          background: '#FEF3C7', textDecoration: 'none',
+                          background: '#EBF3EE', textDecoration: 'none',
                         }}
                       >
                         <Phone size={13} color="#4A7C59" strokeWidth={2} />
