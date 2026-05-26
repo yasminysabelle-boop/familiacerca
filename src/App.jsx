@@ -100,6 +100,8 @@ function AppShell() {
 }
 
 function Splash({ fading }) {
+  const { user } = useAuth()
+  const displayName = user?.user_metadata?.full_name ?? 'FamiliaCerca'
   return (
     <div
       style={{
@@ -141,7 +143,7 @@ function Splash({ fading }) {
             letterSpacing: '-0.5px', lineHeight: 1,
             margin: 0,
           }}>
-            FamiliaCerca
+            {displayName}
           </p>
           <p style={{
             color: 'rgba(255,255,255,0.78)',
