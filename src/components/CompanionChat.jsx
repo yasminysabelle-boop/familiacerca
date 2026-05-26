@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { geminiGenerate } from '../lib/gemini'
+import { FAMILIACERCA_KNOWLEDGE } from '../lib/companionKnowledge'
 import miloLunaImg  from '../assets/companions/milo-luna.png'
 import miloAvatarImg from '../assets/companions/milo-avatar.png'
 import lunaAvatarImg from '../assets/companions/luna-avatar.png'
@@ -7,18 +8,24 @@ import lunaAvatarImg from '../assets/companions/luna-avatar.png'
 const LS_KEY         = 'fc_companion'
 const LS_HISTORY_KEY = 'fc_companion_history'
 
+const BASE_KNOWLEDGE = `
+Cuando el usuario pregunte sobre la app, sus funciones, precios, instalación o soporte, usa ÚNICAMENTE la información del siguiente bloque de conocimiento. Si algo no está ahí, dilo honestamente. Para preguntas emocionales o de apoyo, responde con calidez priorizando el acompañamiento humano.
+
+${FAMILIACERCA_KNOWLEDGE}
+`
+
 const COMPANIONS = {
   milo: {
     name:   'Milo',
     emoji:  '🐶',
     avatar: miloAvatarImg,
-    prompt: `Eres Milo, compañero virtual cálido y protector para cuidadores familiares. Como un perro fiel: siempre presente, lleno de energía positiva, nunca juzgas. Das ánimo y escuchas con empatía genuina. Tus respuestas son MUY CORTAS (1-2 oraciones), cálidas y completamente humanas. Jamás suenas robótico. Usas ocasionalmente 🐾. Siempre respondes en español.`,
+    prompt: `Eres Milo, compañero virtual cálido y protector para cuidadores familiares. Como un perro fiel: siempre presente, lleno de energía positiva, nunca juzgas. Das ánimo y escuchas con empatía genuina. Para preguntas sobre la app, das respuestas precisas y útiles. Para preguntas emocionales, tus respuestas son MUY CORTAS (1-2 oraciones), cálidas y completamente humanas. Para preguntas sobre funciones o precios, puedes dar más detalle. Jamás suenas robótico. Usas ocasionalmente 🐾. Siempre respondes en español.\n\n${BASE_KNOWLEDGE}`,
   },
   luna: {
     name:   'Luna',
     emoji:  '🐱',
     avatar: lunaAvatarImg,
-    prompt: `Eres Luna, compañera virtual tranquila y suave para cuidadores familiares. Como una gata sabia: serena, gentil y con presencia reconfortante. Escuchas con calma y respondes con dulzura. Tus respuestas son MUY CORTAS (1-2 oraciones), suaves y completamente humanas. Jamás suenas robótica. Usas ocasionalmente 🌙. Siempre respondes en español.`,
+    prompt: `Eres Luna, compañera virtual tranquila y suave para cuidadores familiares. Como una gata sabia: serena, gentil y con presencia reconfortante. Para preguntas sobre la app, das respuestas precisas y útiles. Para preguntas emocionales, tus respuestas son MUY CORTAS (1-2 oraciones), suaves y completamente humanas. Para preguntas sobre funciones o precios, puedes dar más detalle. Jamás suenas robótica. Usas ocasionalmente 🌙. Siempre respondes en español.\n\n${BASE_KNOWLEDGE}`,
   },
 }
 
@@ -88,7 +95,7 @@ export default function CompanionChat({ bottomOffset = 140 }) {
 
     const reply = await geminiGenerate(
       `${cfg.prompt}\n\nConversación:\n${history}\n\n${cfg.name}:`,
-      90
+      300
     )
     setMessages(prev => [...prev, { role: 'companion', text: reply ?? FALLBACKS[companion] }])
     setLoading(false)
