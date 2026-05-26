@@ -37,12 +37,46 @@ SELECT cron.schedule(
   $$
 );
 
+-- 3. Evening push notification — UTC-5 users (9pm = 02:00 UTC next day)
+SELECT cron.schedule(
+  'fc-evening-push-utc5',
+  '0 2 * * *',
+  $$
+  SELECT net.http_post(
+    url     := 'https://ofubzbqaxaepxjicyegz.supabase.co/functions/v1/send-evening-push',
+    headers := jsonb_build_object(
+      'Content-Type', 'application/json',
+      'Authorization', 'Bearer ' || current_setting('app.service_role_key', true)
+    ),
+    body    := '{"utc_offset": -5}'::jsonb
+  );
+  $$
+);
+
+-- 4. Evening push notification — UTC-6 users (9pm = 03:00 UTC next day)
+SELECT cron.schedule(
+  'fc-evening-push-utc6',
+  '0 3 * * *',
+  $$
+  SELECT net.http_post(
+    url     := 'https://ofubzbqaxaepxjicyegz.supabase.co/functions/v1/send-evening-push',
+    headers := jsonb_build_object(
+      'Content-Type', 'application/json',
+      'Authorization', 'Bearer ' || current_setting('app.service_role_key', true)
+    ),
+    body    := '{"utc_offset": -6}'::jsonb
+  );
+  $$
+);
+
 -- To verify cron jobs are scheduled:
 -- SELECT * FROM cron.job;
 
 -- To remove a cron job:
 -- SELECT cron.unschedule('fc-med-notifications');
 -- SELECT cron.unschedule('fc-proof-reminders');
+-- SELECT cron.unschedule('fc-evening-push-utc5');
+-- SELECT cron.unschedule('fc-evening-push-utc6');
 
 -- Alternative: set the service role key directly
 -- UPDATE cron.job SET command = replace(command, 'current_setting(...)', '''<YOUR_SERVICE_ROLE_KEY>''')
