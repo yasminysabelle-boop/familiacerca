@@ -3,7 +3,7 @@
 // subscribed family members with a push notification.
 // Deploy: supabase functions deploy send-evening-push
 // Secrets: VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, VAPID_CONTACT_EMAIL
-// Cron: see supabase/setup_cron.sql (fc-evening-push-utc5 / fc-evening-push-utc6)
+// Cron: see supabase/setup_cron.sql (fc-evening-push-utc4 / fc-evening-push-utc5 / fc-evening-push-utc6)
 
 import webpush from 'npm:web-push@3.6.7'
 import { createClient } from 'npm:@supabase/supabase-js@2'

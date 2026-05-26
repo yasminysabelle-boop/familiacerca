@@ -37,7 +37,23 @@ SELECT cron.schedule(
   $$
 );
 
--- 3. Evening push notification — UTC-5 users (9pm = 02:00 UTC next day)
+-- 3. Evening push notification — UTC-4 users / Venezuela (9pm = 01:00 UTC next day)
+SELECT cron.schedule(
+  'fc-evening-push-utc4',
+  '0 1 * * *',
+  $$
+  SELECT net.http_post(
+    url     := 'https://ofubzbqaxaepxjicyegz.supabase.co/functions/v1/send-evening-push',
+    headers := jsonb_build_object(
+      'Content-Type', 'application/json',
+      'Authorization', 'Bearer ' || current_setting('app.service_role_key', true)
+    ),
+    body    := '{"utc_offset": -4}'::jsonb
+  );
+  $$
+);
+
+-- 5. Evening push notification — UTC-5 users (9pm = 02:00 UTC next day)
 SELECT cron.schedule(
   'fc-evening-push-utc5',
   '0 2 * * *',
@@ -75,6 +91,7 @@ SELECT cron.schedule(
 -- To remove a cron job:
 -- SELECT cron.unschedule('fc-med-notifications');
 -- SELECT cron.unschedule('fc-proof-reminders');
+-- SELECT cron.unschedule('fc-evening-push-utc4');
 -- SELECT cron.unschedule('fc-evening-push-utc5');
 -- SELECT cron.unschedule('fc-evening-push-utc6');
 
