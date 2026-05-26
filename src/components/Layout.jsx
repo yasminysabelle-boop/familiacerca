@@ -10,6 +10,7 @@ import OfflineBanner from './OfflineBanner'
 import { useDarkMode } from '../contexts/DarkModeContext'
 import FamilySelector from './FamilySelector'
 import FamilySwitcher from './FamilySwitcher'
+import CompanionChat from './CompanionChat'
 
 const PAGE_TITLES = {
   '/dashboard':   'Inicio',
@@ -256,6 +257,8 @@ export default function Layout({ children }) {
           </div>
         </div>
       )}
+
+      <CompanionChat />
 
       <FamilySelector />
       <Paywall />

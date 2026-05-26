@@ -3,6 +3,7 @@ import { Link, Navigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { usePWAInstall } from '../hooks/usePWAInstall'
 import PWAInstallBanner from '../components/PWAInstallBanner'
+import CompanionChat from '../components/CompanionChat'
 
 const HERO_IMG = '/images/hero.jpg'
 const PROB_IMG = '/images/problema.jpg'
@@ -1142,6 +1143,8 @@ export default function Landing() {
           }
         }
       `}</style>
+
+      <CompanionChat bottomOffset={24} />
     </div>
   )
 }
