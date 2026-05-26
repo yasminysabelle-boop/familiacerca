@@ -123,6 +123,7 @@ export default function Hoy() {
   // Care checklist state
   const [careLogs, setCareLogs] = useState({})
   const [careToggling, setCareToggling] = useState(null)
+  const [weekHistory, setWeekHistory] = useState([])
 
   // Bottom sheet for proof photo
   const [proofSheet, setProofSheet] = useState(null)
@@ -164,14 +165,24 @@ export default function Hoy() {
     setLoading(true)
     setLoadError('')
     try {
+      const histDays = Array.from({ length: 7 }, (_, i) => {
+        const d = new Date()
+        d.setDate(d.getDate() - (i + 1))
+        return toLocalDate(d)
+      }).reverse()
+
       const [
-        { data: meds,      error: e1 },
-        { data: todayLogs, error: e2 },
+        { data: meds,          error: e1 },
+        { data: todayLogs,     error: e2 },
         { data: careRows },
+        { data: histMedLogs },
+        { data: histCareLogs },
       ] = await Promise.all([
         supabase.from('medications').select('*').eq('user_id', ownerId),
         supabase.from('medication_logs').select('*').eq('user_id', ownerId).eq('log_date', today),
         supabase.from('daily_care_logs').select('*').eq('user_id', ownerId).gte('log_date', weekStart),
+        supabase.from('medication_logs').select('medication_id,log_date,status').eq('user_id', ownerId).in('log_date', histDays),
+        supabase.from('daily_care_logs').select('item_key,log_date').eq('user_id', ownerId).in('log_date', histDays),
       ])
       if (e1 || e2) throw e1 ?? e2
       setMedications(meds ?? [])
@@ -192,6 +203,35 @@ export default function Hoy() {
         }
       }
       setCareLogs(cmap)
+
+      const dailyCareKeys = CARE_ITEMS
+        .filter(i => i.moment !== 'asneeded' && !i.weekly)
+        .map(i => i.key)
+      const usedCareKeys = new Set((histCareLogs ?? []).map(l => l.item_key))
+      const activeDailyCareKeys = dailyCareKeys.filter(k => usedCareKeys.has(k))
+
+      const DAY_LABELS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
+      setWeekHistory(histDays.map(date => {
+        const d = new Date(date + 'T12:00:00')
+        const confirmedIds = new Set(
+          (histMedLogs ?? [])
+            .filter(l => l.log_date === date && l.status === 'confirmed')
+            .map(l => l.medication_id)
+        )
+        const medFail = (meds ?? []).length > 0
+          ? (meds ?? []).filter(m => !confirmedIds.has(m.id)).length
+          : 0
+        const loggedKeys = new Set(
+          (histCareLogs ?? []).filter(l => l.log_date === date).map(l => l.item_key)
+        )
+        const careFail = activeDailyCareKeys.filter(k => !loggedKeys.has(k)).length
+        return {
+          date,
+          dayLabel: DAY_LABELS[d.getDay()],
+          dayNum: d.getDate(),
+          failures: medFail + careFail,
+        }
+      }))
     } catch (err) {
       console.error(err)
       setLoadError('No se pudieron cargar los datos. Verifica tu conexión.')
@@ -447,6 +487,39 @@ export default function Hoy() {
                 : overdueCareMoments.map(m => `${m.icon} ${m.label} pendiente`).join(' · ')
               }
             </p>
+          </div>
+        )}
+
+        {/* 7-day history */}
+        {!isFamiliar && !loading && weekHistory.length > 0 && (
+          <div style={{
+            background: 'white', borderRadius: 16, padding: '14px 16px',
+            border: '1px solid #EDE5D8', marginBottom: 14,
+            boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
+          }}>
+            <p style={{ fontSize: 13, fontWeight: 700, color: '#1A1A1A', fontFamily: 'Georgia, serif', margin: '0 0 10px' }}>
+              Últimos 7 días
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {weekHistory.map(({ date, dayLabel, dayNum, failures }) => (
+                <div key={date} style={{
+                  display: 'flex', alignItems: 'center', gap: 8,
+                  padding: '6px 10px', borderRadius: 10,
+                  background: failures === 0 ? '#F0FDF4' : '#FEF2F2',
+                }}>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: '#6B7280', minWidth: 52 }}>
+                    {dayLabel} {dayNum}
+                  </span>
+                  <span style={{ fontSize: 13 }}>{failures === 0 ? '✅' : '⚠️'}</span>
+                  <span style={{
+                    fontSize: 12, fontWeight: 600,
+                    color: failures === 0 ? '#16A34A' : '#DC2626',
+                  }}>
+                    {failures === 0 ? 'Todo completado' : `${failures} sin completar`}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
