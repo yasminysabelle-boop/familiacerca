@@ -14,7 +14,7 @@ import { ChevronRight, LogOut } from '../components/Icons'
 const PLAN_META = {
   free:      { label: 'Gratis',        color: '#9CA3AF', icon: '🌱' },
   familiar:  { label: 'Plan Familiar', color: '#4A7C59', icon: '❤️' },
-  care_plus: { label: 'Care+',         color: '#7C3AED', icon: '✨' },
+  care_plus: { label: 'Cuidado Total',  color: '#7C3AED', icon: '⭐' },
 }
 
 const STATUS_LABEL = {
@@ -27,24 +27,29 @@ const STATUS_LABEL = {
 const PLAN_FEATURES = {
   free: [
     'Perfil del familiar',
-    'Hasta 3 miembros del equipo',
+    'Hasta 2 cuidadores',
     'Chat familiar',
-    'Timeline de cuidado',
+    'Checklist de cuidado diario',
+    'Medicamentos básicos',
+    'Historial 7 días',
   ],
   familiar: [
-    'Miembros ilimitados',
-    'Recordatorios automáticos',
-    'Notas, álbum y gastos',
-    'Historial completo de dosis',
-    'Directorio de contactos',
-    'Resúmenes básicos con IA',
+    'Hasta 6 cuidadores',
+    'Recordatorios automáticos de medicamentos',
+    'Notas de voz y texto',
+    'Foto-prueba de medicamentos',
+    'Reportes y exportación PDF',
+    'Álbum familiar',
+    'Gastos compartidos',
   ],
   care_plus: [
+    'Cuidadores ilimitados',
     'Todo lo del Plan Familiar',
-    'Asistente IA 24/7',
+    'Directorio médico completo',
+    'Alertas SOS prioritarias',
     'Detección de agotamiento del cuidador',
-    'Reporte semanal familiar',
-    'Resumen médico en PDF',
+    'Reporte semanal automático',
+    'Historial indefinido',
     'Soporte prioritario',
   ],
 }

@@ -22,7 +22,7 @@ const MORE_ITEMS = [
 ]
 
 const PLAN_COLORS = { free: '#9CA3AF', familiar: '#4A7C59', care_plus: '#7C3AED' }
-const PLAN_LABELS = { free: 'Prueba gratuita', familiar: 'Plan Familiar', care_plus: 'Care+' }
+const PLAN_LABELS = { free: 'Prueba gratuita', familiar: 'Plan Familiar', care_plus: 'Cuidado Total' }
 
 export default function More() {
   const { user, signOut } = useAuth()
