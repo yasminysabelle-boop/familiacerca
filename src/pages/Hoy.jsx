@@ -4,36 +4,16 @@ import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
-import { CheckIcon, MoreVertical, Pencil, Plus, Trash, XIcon } from '../components/Icons'
+import { CheckIcon, MoreVertical, Pencil, Plus, Settings, Trash, XIcon } from '../components/Icons'
 import { getLocation, mapsUrl } from '../lib/gps'
 import { track } from '../lib/analytics'
+import { CARE_CATEGORIES, CARE_ITEMS } from '../lib/careItems'
 
 const TIME_GROUPS = [
   { id: 0, label: 'Mañana',      icon: '🌅', range: [0, 12] },
   { id: 1, label: 'Tarde',       icon: '☀️',  range: [12, 18] },
   { id: 2, label: 'Noche',       icon: '🌙', range: [18, 24] },
   { id: 3, label: 'Sin horario', icon: '💊', range: null },
-]
-
-const CARE_CATEGORIES = [
-  { id: 'daily',    label: 'Rutina diaria',  icon: '📋', color: '#4A7C59', bg: '#EBF3EE' },
-  { id: 'optional', label: 'Otros cuidados', icon: '✨', color: '#6B7280', bg: '#F9FAFB' },
-]
-
-const CARE_ITEMS = [
-  { key: 'bath',             label: 'Baño',                     icon: '🛁', category: 'daily',    scheduledTime: '08:00' },
-  { key: 'dental_morning',   label: 'Cepillado dientes mañana', icon: '🦷', category: 'daily',    scheduledTime: '08:30' },
-  { key: 'dental_afternoon', label: 'Cepillado dientes tarde',  icon: '🦷', category: 'daily',    scheduledTime: '14:00' },
-  { key: 'dental_night',     label: 'Cepillado dientes noche',  icon: '🦷', category: 'daily',    scheduledTime: '21:00' },
-  { key: 'clothes',          label: 'Cambio de ropa',           icon: '👕', category: 'daily',    scheduledTime: '09:00' },
-  { key: 'breakfast',        label: 'Desayuno',                 icon: '🍽️', category: 'daily',    scheduledTime: '08:00' },
-  { key: 'lunch',            label: 'Almuerzo',                 icon: '🍽️', category: 'daily',    scheduledTime: '13:00' },
-  { key: 'dinner',           label: 'Cena',                     icon: '🍽️', category: 'daily',    scheduledTime: '19:00' },
-  { key: 'bed_sheets',       label: 'Cambio de sábanas',        icon: '🛏️', category: 'optional' },
-  { key: 'nail_trim',        label: 'Corte de uñas',            icon: '💅', category: 'optional' },
-  { key: 'exercise',         label: 'Ejercicio/caminata',       icon: '🚶', category: 'optional' },
-  { key: 'haircut',          label: 'Corte de cabello',         icon: '✂️', category: 'optional' },
-  { key: 'home_therapy',     label: 'Terapia en casa',          icon: '🧘', category: 'optional' },
 ]
 
 function groupIndex(timeStr) {
@@ -81,10 +61,11 @@ async function stampProof(file, confirmerName) {
   })
 }
 
-function calcularEstadoCuidado(item, isChecked = false) {
+function calcularEstadoCuidado(item, isChecked = false, customTime = null) {
   if (isChecked) return 'completado'
-  if (item.category !== 'daily' || !item.scheduledTime) return 'pendiente'
-  const [h, m] = item.scheduledTime.split(':').map(Number)
+  const time = customTime ?? item.scheduledTime
+  if (item.category !== 'daily' || !time) return 'pendiente'
+  const [h, m] = time.split(':').map(Number)
   const now = new Date()
   const diff = (now.getHours() * 60 + now.getMinutes()) - (h * 60 + m)
   if (diff < 0)   return 'programado'
@@ -130,6 +111,7 @@ export default function Hoy() {
 
   // Care checklist state
   const [careLogs, setCareLogs] = useState({})
+  const [careSchedules, setCareSchedules] = useState({})
   const [careToggling, setCareToggling] = useState(null)
   const [weekHistory, setWeekHistory] = useState([])
 
@@ -177,12 +159,14 @@ export default function Hoy() {
         { data: careRows },
         { data: histMedLogs },
         { data: histCareLogs },
+        { data: scheduleRows },
       ] = await Promise.all([
         supabase.from('medications').select('*').eq('user_id', ownerId),
         supabase.from('medication_logs').select('*').eq('user_id', ownerId).eq('log_date', today),
         supabase.from('daily_care_logs').select('*').eq('user_id', ownerId).eq('log_date', today),
         supabase.from('medication_logs').select('medication_id,log_date,status').eq('user_id', ownerId).in('log_date', histDays),
         supabase.from('daily_care_logs').select('item_key,log_date').eq('user_id', ownerId).in('log_date', histDays),
+        supabase.from('care_item_schedules').select('item_key,scheduled_time').eq('user_id', ownerId),
       ])
       if (e1 || e2) throw e1 ?? e2
       setMedications(meds ?? [])
@@ -193,6 +177,10 @@ export default function Hoy() {
       const cmap = {}
       for (const row of (careRows ?? [])) cmap[row.item_key] = row
       setCareLogs(cmap)
+
+      const smap = {}
+      for (const row of (scheduleRows ?? [])) smap[row.item_key] = row.scheduled_time
+      setCareSchedules(smap)
 
       const dailyCareKeys = CARE_ITEMS
         .filter(i => i.category === 'daily')
@@ -308,7 +296,7 @@ export default function Hoy() {
 
   function isCareItemOverdue(item) {
     if (careLogs[item.key] || item.category !== 'daily') return false
-    return calcularEstadoCuidado(item) === 'tarde'
+    return calcularEstadoCuidado(item, false, careSchedules[item.key]) === 'tarde'
   }
 
   function openProofSheet(med) {
@@ -443,7 +431,7 @@ export default function Hoy() {
     : []
 
   const overdueCareItems = !loading
-    ? CARE_ITEMS.filter(i => calcularEstadoCuidado(i, !!careLogs[i.key]) === 'tarde')
+    ? CARE_ITEMS.filter(i => calcularEstadoCuidado(i, !!careLogs[i.key], careSchedules[i.key]) === 'tarde')
     : []
 
   const showOverdueAlert = !isFamiliar && !loading && (overdueMeds.length > 0 || overdueCareItems.length > 0)
@@ -891,14 +879,30 @@ export default function Hoy() {
                 }}>
                   Cuidado de hoy
                 </p>
-                <span style={{
-                  fontSize: 11, fontWeight: 700,
-                  color: completedRequired === requiredItems.length ? '#16A34A' : '#4A7C59',
-                  background: completedRequired === requiredItems.length ? '#DCFCE7' : '#EBF3EE',
-                  padding: '3px 10px', borderRadius: 20,
-                }}>
-                  {completedRequired}/{requiredItems.length}
-                </span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{
+                    fontSize: 11, fontWeight: 700,
+                    color: completedRequired === requiredItems.length ? '#16A34A' : '#4A7C59',
+                    background: completedRequired === requiredItems.length ? '#DCFCE7' : '#EBF3EE',
+                    padding: '3px 10px', borderRadius: 20,
+                  }}>
+                    {completedRequired}/{requiredItems.length}
+                  </span>
+                  {!isFamiliar && (
+                    <button
+                      onClick={() => navigate('/cuidado/horarios')}
+                      style={{
+                        width: 30, height: 30, borderRadius: 8,
+                        border: '1px solid #EDE5D8', background: 'white',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        cursor: 'pointer',
+                      }}
+                      aria-label="Configurar horarios"
+                    >
+                      <Settings size={14} color="#9CA3AF" strokeWidth={1.75} />
+                    </button>
+                  )}
+                </div>
               </div>
 
               {isFamiliar && (
@@ -933,7 +937,7 @@ export default function Hoy() {
                     }}>
                       {items.map((item, idx) => {
                         const isChecked  = !!careLogs[item.key]
-                        const status     = calcularEstadoCuidado(item, isChecked)
+                        const status     = calcularEstadoCuidado(item, isChecked, careSchedules[item.key])
                         const isOverdue  = status === 'tarde'
                         const isEarly    = status === 'programado'
                         const isToggling = careToggling === item.key
@@ -997,9 +1001,9 @@ export default function Hoy() {
                                   {log?.checked_by ? ` · ${log.checked_by.split(' ')[0]}` : ''}
                                 </p>
                               )}
-                              {!isChecked && item.scheduledTime && !isOverdue && (
+                              {!isChecked && (careSchedules[item.key] ?? item.scheduledTime) && !isOverdue && (
                                 <p style={{ fontSize: 10, color: '#9CA3AF', margin: '2px 0 0' }}>
-                                  ⏰ {fmtMedTime(item.scheduledTime)}
+                                  ⏰ {fmtMedTime(careSchedules[item.key] ?? item.scheduledTime)}
                                 </p>
                               )}
                             </div>
@@ -1022,14 +1026,14 @@ export default function Hoy() {
                                 ⚠ Tarde
                               </span>
                             )}
-                            {!isChecked && isEarly && item.scheduledTime && (
+                            {!isChecked && isEarly && (careSchedules[item.key] ?? item.scheduledTime) && (
                               <span style={{
                                 fontSize: 10, fontWeight: 700,
                                 color: '#6B7280', background: '#F3F4F6',
                                 padding: '2px 8px', borderRadius: 6, flexShrink: 0,
                                 whiteSpace: 'nowrap',
                               }}>
-                                🕐 {fmtMedTime(item.scheduledTime)}
+                                🕐 {fmtMedTime(careSchedules[item.key] ?? item.scheduledTime)}
                               </span>
                             )}
                           </div>

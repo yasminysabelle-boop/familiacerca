@@ -30,6 +30,7 @@ import Permissions from './pages/Permissions'
 import Directory from './pages/Directory'
 import Pricing from './pages/Pricing'
 import Settings from './pages/Settings'
+import CareSchedule from './pages/CareSchedule'
 import Landing from './pages/Landing'
 
 const P = ({ children }) => <ProtectedRoute>{children}</ProtectedRoute>
@@ -90,7 +91,8 @@ function AppShell() {
         <Route path="/join"        element={<JoinFamily />} />
         <Route path="/permisos"    element={<P><Permissions /></P>} />
         <Route path="/pricing"     element={<Pricing />} />
-        <Route path="/ajustes"     element={<P><Settings /></P>} />
+        <Route path="/ajustes"            element={<P><Settings /></P>} />
+        <Route path="/cuidado/horarios"   element={<P><CareSchedule /></P>} />
         <Route path="/terminos"    element={<TermsOfService />} />
         <Route path="/privacidad"  element={<PrivacyPolicy />} />
         <Route path="*"            element={<Navigate to="/login" replace />} />
