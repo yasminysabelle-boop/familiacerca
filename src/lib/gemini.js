@@ -47,14 +47,12 @@ export async function geminiChat(systemPrompt, history, userMessage, maxTokens =
         generationConfig: { maxOutputTokens: maxTokens, temperature: 0.75 },
       }),
     })
-    if (!res.ok) {
-      if (import.meta.env.DEV) res.text().then(t => console.error('[Gemini]', res.status, t))
-      return null
-    }
     const data = await res.json()
+    console.log('[Gemini] status:', res.status, '| response:', JSON.stringify(data, null, 2))
+    if (!res.ok) return null
     return data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? null
   } catch (e) {
-    if (import.meta.env.DEV) console.error('[Gemini]', e)
+    console.error('[Gemini] fetch error:', e)
     return null
   }
 }
