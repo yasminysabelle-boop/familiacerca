@@ -298,6 +298,22 @@ export default function CompanionChat({ bottomOffset = 140 }) {
             padding: '10px 12px', borderTop: '1px solid #EDE5D8',
             display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0,
           }}>
+            <button
+              onClick={() => {
+                setMessages([{ role: 'companion', text: GREETINGS[companion] }])
+                localStorage.removeItem(LS_HISTORY_KEY)
+              }}
+              aria-label="Volver al menú"
+              title="Volver al menú"
+              style={{
+                flexShrink: 0, padding: '5px 8px', borderRadius: 12,
+                border: '1px solid #EDE5D8', background: '#F7F3ED',
+                color: '#9CA3AF', fontSize: 10, fontWeight: 600,
+                cursor: 'pointer', lineHeight: 1.2, whiteSpace: 'nowrap',
+              }}
+            >
+              🏠 Menú
+            </button>
             <input
               ref={inputRef}
               value={input}
