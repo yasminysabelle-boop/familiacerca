@@ -1,58 +1,40 @@
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY
-const ENDPOINT =
-  'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent'
+const ANTHROPIC_ENDPOINT = 'https://api.anthropic.com/v1/messages'
+const API_KEY = import.meta.env.VITE_ANTHROPIC_API_KEY
 
-export async function geminiGenerate(prompt, maxTokens = 150) {
-  if (!API_KEY) return null
+export async function geminiGenerate() { return null }
+
+export async function geminiChat(systemPrompt, history, text, maxTokens = 300) {
   try {
-    const res = await fetch(`${ENDPOINT}?key=${API_KEY}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { maxOutputTokens: maxTokens, temperature: 0.75 },
-      }),
-    })
-    if (!res.ok) return null
-    const data = await res.json()
-    return data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? null
-  } catch {
-    return null
-  }
-}
+    const messages = [
+      ...history.map(m => ({
+        role: m.role === 'user' ? 'user' : 'assistant',
+        content: m.text
+      })),
+      { role: 'user', content: text }
+    ]
 
-// Structured chat using systemInstruction + turn-by-turn contents.
-// history: array of { role: 'user'|'companion', text } prior messages.
-export async function geminiChat(systemPrompt, history, userMessage, maxTokens = 300) {
-  if (!API_KEY) return null
-  try {
-    // Build alternating user/model turns — Gemini requires strict alternation starting with user
-    const turns = []
-    for (const msg of history) {
-      const role = msg.role === 'user' ? 'user' : 'model'
-      // Skip consecutive same-role messages (e.g. greeting followed by another companion msg)
-      if (turns.length > 0 && turns[turns.length - 1].role === role) continue
-      turns.push({ role, parts: [{ text: msg.text }] })
-    }
-    // If the last prior turn is user, drop it — the current message takes that slot
-    if (turns.length > 0 && turns[turns.length - 1].role === 'user') turns.pop()
-    turns.push({ role: 'user', parts: [{ text: userMessage }] })
-
-    const res = await fetch(`${ENDPOINT}?key=${API_KEY}`, {
+    const res = await fetch(ANTHROPIC_ENDPOINT, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': API_KEY,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
       body: JSON.stringify({
-        systemInstruction: { parts: [{ text: systemPrompt }] },
-        contents: turns,
-        generationConfig: { maxOutputTokens: maxTokens, temperature: 0.75 },
-      }),
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: maxTokens,
+        system: systemPrompt,
+        messages
+      })
     })
+
     const data = await res.json()
-    console.log('[Gemini] status:', res.status, '| response:', JSON.stringify(data, null, 2))
+    console.log('[Claude] status:', res.status, '| response:', JSON.stringify(data, null, 2))
     if (!res.ok) return null
-    return data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? null
+    return data.content?.[0]?.text?.trim() ?? null
   } catch (e) {
-    console.error('[Gemini] fetch error:', e)
+    console.error('[Claude] fetch error:', e)
     return null
   }
 }
