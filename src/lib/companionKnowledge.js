@@ -200,6 +200,168 @@ Al confirmar que un medicamento fue administrado, puedes tomar una foto como evi
 
 ---
 
+### DIRECTORIO MÉDICO
+
+El Directorio guarda dos tipos de contactos:
+- **Médicos y especialistas**: nombre, especialidad, teléfono, correo, clínica u hospital, notas.
+- **Contactos de emergencia**: familiares, vecinos o personas de confianza. Se puede marcar quién es contacto de emergencia prioritario — estos aparecen primero al activar el botón SOS.
+
+**Disponibilidad:** El Directorio completo está disponible en el Plan Cuidado Total. En planes inferiores, los contactos de emergencia del familiar se pueden guardar en el perfil familiar.
+
+---
+
+### CONTROL DE GASTOS DE SALUD (CUENTAS CLARAS)
+
+Registra todos los gastos relacionados con el cuidado: medicamentos, consultas médicas, exámenes, transporte, insumos y más. Cada gasto lleva fecha, monto, categoría y quién lo pagó.
+
+**Para qué sirve:**
+- Ver cuánto se está gastando en total
+- Saber quién ha puesto más dinero en el cuidado
+- Tener un registro organizado para seguros o reembolsos
+- Distribuir los gastos de forma justa entre los cuidadores
+
+Disponible en Plan Familiar y superior.
+
+---
+
+### FOTO-PRUEBA DE MEDICAMENTOS
+
+Al confirmar que un medicamento fue administrado, puedes tomar una foto como evidencia. La foto queda sellada automáticamente con:
+- Fecha y hora exacta
+- Nombre del cuidador que la registró
+
+**Para qué sirve:** Cuando hay varios cuidadores rotando turnos, la foto-prueba evita la doble dosificación. Si alguien pregunta "¿ya le dieron el medicamento?", se puede verificar en el historial con foto y hora.
+
+Disponible en Plan Familiar y superior. Se accede desde Historial > Control de dosis.
+
+---
+
+### REPORTES PDF Y EXPORTACIÓN
+
+**Reporte semanal automático** (Plan Cuidado Total): resumen generado automáticamente cada semana con el estado del cuidado, medicamentos administrados y actividad del equipo.
+
+**Exportación manual a PDF** (Plan Familiar y superior): genera un PDF descargable con los últimos 30 días, que incluye:
+- Medicamentos administrados (fecha, nombre, dosis, quién lo dio)
+- Notas del cuidado
+- Eventos del calendario
+- Memorias de voz (transcripción)
+
+**Cómo exportar:** Mi cuenta (ícono de perfil) > "Exportar historial PDF" > el archivo se descarga automáticamente al dispositivo.
+
+Útil para compartir con médicos, llevar a consultas o guardar como respaldo.
+
+---
+
+### ALERTAS SOS — CÓMO FUNCIONAN
+
+El botón SOS está diseñado para situaciones de emergencia con el familiar.
+
+**Qué hace al activarlo:**
+1. Envía una notificación push urgente instantánea a **todos** los cuidadores del equipo que tengan notificaciones activas
+2. Muestra en pantalla los contactos de emergencia guardados en el Directorio, listos para llamar con un toque
+
+**Dónde está:** en la pantalla de inicio (Dashboard), visible con el ícono de alerta. También accesible desde el perfil del familiar.
+
+**Importante:** El botón SOS no llama al 911 automáticamente — muestra los contactos para que el cuidador decida a quién llamar. Las alertas prioritarias (notificación más destacada) están disponibles en Plan Cuidado Total.
+
+---
+
+### NOTAS DE VOZ Y MEMORIAS
+
+**Notas de voz** (Plan Familiar y superior): grabaciones cortas del cuidador sobre el estado del familiar — observaciones médicas, cambios de ánimo, instrucciones para el próximo turno. Se transcriben automáticamente.
+
+**Memorias de voz**: grabaciones del familiar o sobre el familiar para preservar momentos importantes — historias, recuerdos, frases especiales. Se almacenan en la sección "Memorias" y quedan guardadas indefinidamente.
+
+**Diferencia:** las notas son operativas (para el equipo de cuidado), las memorias son emocionales (para la familia).
+
+---
+
+### HISTORIAL COMPLETO VS HISTORIAL 7 DÍAS
+
+**Plan Gratis — historial 7 días:**
+- Solo puedes ver los registros de los últimos 7 días
+- Los datos más antiguos no desaparecen, pero no son accesibles desde la app
+
+**Plan Familiar — historial completo:**
+- Acceso a todos los registros desde el inicio
+- Filtros por fecha, medicamento o cuidador
+- Exportación a PDF de los últimos 30 días
+
+**Plan Cuidado Total — historial indefinido:**
+- Todo el historial sin límite de tiempo
+- Exportación sin restricciones
+
+---
+
+### CÓMO CAMBIAR DE PLAN
+
+**Para subir de plan:**
+1. Ir a Mi cuenta (ícono de perfil, arriba a la derecha)
+2. Tocar "Ver planes" o "Gestionar suscripción"
+3. Elegir el nuevo plan y completar el pago con Stripe
+El cambio es inmediato — accedes a las nuevas funciones al instante.
+
+**Para bajar de plan o cancelar:**
+1. Mi cuenta > Suscripción > "Gestionar suscripción"
+2. Esto abre el portal de Stripe donde puedes cambiar o cancelar
+3. Al cancelar, conservas el acceso al plan actual hasta el final del período ya pagado
+4. Luego el plan baja automáticamente a Gratis
+
+No hay penalizaciones, ni contratos, ni períodos mínimos.
+
+---
+
+### CÓMO CANCELO MI SUSCRIPCIÓN
+
+1. Tocar el ícono de perfil (arriba a la derecha) para ir a Mi cuenta
+2. En la sección "Suscripción", tocar "Gestionar suscripción"
+3. Se abre el portal de Stripe (el mismo sistema que procesa el pago)
+4. Seleccionar "Cancelar plan"
+5. Confirmar la cancelación
+
+Seguirás teniendo acceso al plan pagado hasta que termine el período actual. Después baja a Gratis automáticamente. Puedes reactivar en cualquier momento.
+
+---
+
+### SEGURIDAD DE LOS DATOS
+
+Toda la información de FamiliaCerca está protegida de estas formas:
+- **Cifrado en tránsito**: todos los datos viajan encriptados entre tu dispositivo y los servidores (HTTPS)
+- **Cifrado en reposo**: los datos almacenados están cifrados en Supabase, infraestructura nivel empresarial usada por miles de compañías
+- **Acceso privado**: solo tú y los cuidadores que tú invites personalmente pueden ver los datos del familiar
+- **Sin venta de datos**: FamiliaCerca no vende ni comparte información con terceros, anunciantes ni ninguna otra empresa
+- **Cumplimiento**: los datos médicos se manejan con los estándares de seguridad más altos
+
+Si quieres eliminar tu cuenta y todos tus datos, escribe a hola@familiacerca.com.
+
+---
+
+### POR DÓNDE EMPIEZO (ONBOARDING)
+
+Al crear tu cuenta por primera vez, FamiliaCerca te guía paso a paso:
+
+1. **Crea tu cuenta** — correo y contraseña, sin tarjeta de crédito
+2. **Agrega el perfil del familiar** — nombre, edad, condiciones médicas principales, foto (opcional)
+3. **Agrega los medicamentos** — nombre, dosis y horario de cada uno
+4. **Invita a tu equipo** — comparte el enlace con otros cuidadores (hermanos, pareja, enfermera)
+5. **Activa las notificaciones** — para recibir recordatorios de medicamentos
+6. **Instala la app** — sigue las instrucciones para agregar FamiliaCerca a tu pantalla de inicio
+
+Con solo los pasos 1-3 ya puedes empezar a usar el checklist diario. Los demás pasos mejoran la experiencia pero no son obligatorios para comenzar.
+
+---
+
+### CÓMO FUNCIONA LA PRUEBA DE 14 DÍAS
+
+- Al registrarte, tienes **14 días de acceso completo** a todas las funciones, sin costo y sin tarjeta
+- Durante la prueba puedes usar todo: medicamentos, historial, álbum, chat, reportes, directorio
+- Al día 14, si no eliges un plan, el acceso se limita al Plan Gratis
+- Tus datos no se borran — siguen ahí cuando decidas activar un plan
+- Puedes ver cuántos días te quedan en Mi cuenta o en la barra de prueba que aparece en la app
+- Si eliges un plan durante la prueba, el período pagado empieza desde ese día
+
+---
+
 ### CONTACTO Y SOPORTE
 
 Para ayuda técnica, preguntas sobre facturación o reportar un problema:
