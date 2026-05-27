@@ -214,7 +214,11 @@ export default function CompanionChat({ bottomOffset = 140 }) {
               </p>
             </div>
             <button
-              onClick={() => setOpen(false)}
+              onClick={() => {
+                setOpen(false)
+                setMessages(companion ? [{ role: 'companion', text: GREETINGS[companion] }] : [])
+                localStorage.removeItem(LS_HISTORY_KEY)
+              }}
               aria-label="Cerrar chat"
               style={{ background: 'none', border: 'none',
                 color: 'rgba(255,255,255,0.8)', cursor: 'pointer',
