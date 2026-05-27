@@ -35,6 +35,20 @@ const GREETINGS = {
   luna: 'Hola... Soy Luna 🌙 Aquí contigo, sin prisa. ¿Cómo te sientes?',
 }
 
+const QUICK_OPTIONS = [
+  { emoji: '💊', label: 'Quiero agregar medicamentos' },
+  { emoji: '👨‍👩‍👧', label: 'Quiero invitar a mi familia' },
+  { emoji: '🤔', label: 'No sé por dónde empezar' },
+  { emoji: '💳', label: 'Quiero conocer los planes' },
+  { emoji: '📲', label: 'Quiero instalar la app' },
+  { emoji: '🔔', label: '¿Cómo funcionan las alertas SOS?' },
+  { emoji: '🔑', label: 'Olvidé mi contraseña' },
+  { emoji: '🔄', label: 'Quiero cambiar mi plan' },
+  { emoji: '❌', label: 'Quiero cancelar mi plan' },
+  { emoji: '🔒', label: '¿Están seguros mis datos?' },
+  { emoji: '📞', label: 'Quiero contactar soporte' },
+]
+
 const FALLBACKS = {
   milo: 'Aquí estoy 🐾',
   luna: 'Te escucho 🌙',
@@ -105,6 +119,17 @@ export default function CompanionChat({ bottomOffset = 140 }) {
   function onKey(e) {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send() }
   }
+
+  async function sendQuick(text) {
+    if (loading || !cfg) return
+    setMessages(prev => [...prev, { role: 'user', text }])
+    setLoading(true)
+    const reply = await geminiChat(cfg.prompt, [], text, 300)
+    setMessages(prev => [...prev, { role: 'companion', text: reply ?? FALLBACKS[companion] }])
+    setLoading(false)
+  }
+
+  const showQuickOptions = messages.length > 0 && !messages.some(m => m.role === 'user')
 
   // ─── No companion chosen yet ──────────────────────────────────────────────
   if (!companion) {
@@ -221,6 +246,34 @@ export default function CompanionChat({ bottomOffset = 140 }) {
                 </div>
               </div>
             ))}
+
+            {/* Quick option chips — only when no user message yet */}
+            {showQuickOptions && !loading && (
+              <div style={{
+                display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6,
+                marginTop: 4,
+              }}>
+                {QUICK_OPTIONS.map(({ emoji, label }, i) => (
+                  <button
+                    key={i}
+                    onClick={() => sendQuick(`${emoji} ${label}`)}
+                    style={{
+                      padding: '7px 10px',
+                      borderRadius: 20,
+                      border: `1.5px solid ${i % 2 === 0 ? '#4A7C59' : '#C9882A'}`,
+                      background: i % 2 === 0 ? '#F0F7F3' : '#FDF6EC',
+                      color: i % 2 === 0 ? '#3A6347' : '#9A6420',
+                      fontSize: 11, fontWeight: 600,
+                      cursor: 'pointer', textAlign: 'left',
+                      lineHeight: 1.35,
+                      transition: 'all 0.15s',
+                    }}
+                  >
+                    {emoji} {label}
+                  </button>
+                ))}
+              </div>
+            )}
 
             {loading && (
               <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
