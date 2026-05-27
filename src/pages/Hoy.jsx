@@ -157,14 +157,6 @@ export default function Hoy() {
   const today = toLocalDate()
   const displayName = user?.user_metadata?.full_name ?? user?.email ?? 'Familiar'
 
-  // Monday of the current week — used to fetch weekly care items
-  const weekStart = (() => {
-    const d = new Date()
-    const day = d.getDay()
-    d.setDate(d.getDate() - (day === 0 ? 6 : day - 1))
-    return toLocalDate(d)
-  })()
-
   useEffect(() => {
     if (user && ownerId) fetchData()
   }, [user, ownerId])
