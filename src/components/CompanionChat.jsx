@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
-import { geminiGenerate } from '../lib/gemini'
+import { geminiChat } from '../lib/gemini'
 import { FAMILIACERCA_KNOWLEDGE } from '../lib/companionKnowledge'
 import miloLunaImg  from '../assets/companions/milo-luna.png'
 import miloAvatarImg from '../assets/companions/milo-avatar.png'
@@ -89,19 +89,15 @@ export default function CompanionChat({ bottomOffset = 140 }) {
     const text = input.trim()
     if (!text || loading || !cfg) return
     setInput('')
-    const updated = [...messages, { role: 'user', text }]
-    setMessages(updated)
+    setMessages(prev => [...prev, { role: 'user', text }])
     setLoading(true)
 
-    // Build compact conversation context
-    const history = updated.slice(-8)
-      .map(m => m.role === 'user' ? `Usuario: ${m.text}` : `${cfg.name}: ${m.text}`)
-      .join('\n')
+    // Prior messages as structured history; start from first user msg so turns are valid
+    const prior = messages.slice(-8)
+    const firstUser = prior.findIndex(m => m.role === 'user')
+    const history = firstUser >= 0 ? prior.slice(firstUser) : []
 
-    const reply = await geminiGenerate(
-      `${cfg.prompt}\n\nConversación:\n${history}\n\n${cfg.name}:`,
-      300
-    )
+    const reply = await geminiChat(cfg.prompt, history, text, 300)
     setMessages(prev => [...prev, { role: 'companion', text: reply ?? FALLBACKS[companion] }])
     setLoading(false)
   }
