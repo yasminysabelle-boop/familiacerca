@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { useLocation } from 'react-router-dom'
 import { geminiGenerate } from '../lib/gemini'
 import { FAMILIACERCA_KNOWLEDGE } from '../lib/companionKnowledge'
 import miloLunaImg  from '../assets/companions/milo-luna.png'
@@ -55,6 +56,10 @@ export default function CompanionChat({ bottomOffset = 140 }) {
   const bottomRef = useRef(null)
   const inputRef  = useRef(null)
   const cfg = companion ? COMPANIONS[companion] : null
+  const { pathname } = useLocation()
+
+  // Close chat on navigation
+  useEffect(() => { setOpen(false) }, [pathname])
 
   // Scroll to latest message
   useEffect(() => {
