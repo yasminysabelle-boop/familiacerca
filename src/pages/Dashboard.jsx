@@ -1168,7 +1168,7 @@ function AiCard({ type, text }) {
 
 // ── Dashboard Status Cards ────────────────────────────────────────────────────
 
-function StatusCard({ icon, title, subtitle, status, statusType, to, onClick }) {
+function StatusCard({ icon, title, subtitle, status, statusType, to, onClick, pulse }) {
   const styles = {
     ok:      { bg: '#F0FDF4', border: '#86EFAC', statusColor: '#15803D', statusIcon: '✅' },
     warning: { bg: '#FFFBEB', border: '#FDE68A', statusColor: '#7A5A18', statusIcon: '⚠️' },
@@ -1201,7 +1201,8 @@ function StatusCard({ icon, title, subtitle, status, statusType, to, onClick }) 
   return (
     <div
       onClick={to ? () => navigate(to) : onClick}
-      style={{ cursor: 'pointer' }}
+      style={{ cursor: 'pointer', borderRadius: 20 }}
+      className={pulse ? 'animate-card-pulse' : undefined}
     >
       {inner}
     </div>
@@ -2091,6 +2092,9 @@ export default function Dashboard() {
     medCardSubtitle = medTotal > 0 ? 'Aún no hay dosis' : 'Sin meds configurados'
   }
 
+  const medsPulsing = !loading && nextPendingMed?.medStatus === 'tarde'
+  const carePulsing = !loading && careStatusType === 'urgent'
+
   // Memorias card status
   let memStatus, memStatusType, memSubtitle
   if (lastMemory) {
@@ -2247,6 +2251,7 @@ export default function Dashboard() {
             subtitle={medTotal > 0 ? `${medTotal} med${medTotal !== 1 ? 's' : ''} programado${medTotal !== 1 ? 's' : ''}` : 'Rutina de cuidado'}
             status={careStatus}
             statusType={careStatusType}
+            pulse={carePulsing}
             to="/hoy"
           />
           <StatusCard
@@ -2255,6 +2260,7 @@ export default function Dashboard() {
             subtitle={medCardSubtitle}
             status={medCardStatus}
             statusType={medCardStatusType}
+            pulse={medsPulsing}
             to="/hoy"
           />
           <StatusCard

@@ -165,7 +165,7 @@ export default function Hoy() {
         supabase.from('medication_logs').select('*').eq('user_id', ownerId).eq('log_date', today),
         supabase.from('daily_care_logs').select('*').eq('user_id', ownerId).eq('log_date', today),
         supabase.from('medication_logs').select('medication_id,log_date,status').eq('user_id', ownerId).in('log_date', histDays),
-        supabase.from('daily_care_logs').select('item_key,log_date').eq('user_id', ownerId).in('log_date', histDays),
+        supabase.from('daily_care_logs').select('item_key,log_date,status').eq('user_id', ownerId).in('log_date', histDays),
         supabase.from('care_item_schedules').select('item_key,scheduled_time').eq('user_id', ownerId),
       ])
       if (e1 || e2) throw e1 ?? e2
@@ -188,6 +188,22 @@ export default function Hoy() {
       const usedCareKeys = new Set((histCareLogs ?? []).map(l => l.item_key))
       const activeDailyCareKeys = dailyCareKeys.filter(k => usedCareKeys.has(k))
 
+      // Auto-register no_completado for past days where care items were never logged
+      const missingInserts = []
+      for (const date of histDays) {
+        const existingKeys = new Set(
+          (histCareLogs ?? []).filter(l => l.log_date === date).map(l => l.item_key)
+        )
+        for (const key of activeDailyCareKeys) {
+          if (!existingKeys.has(key)) {
+            missingInserts.push({ user_id: ownerId, item_key: key, log_date: date, status: 'no_completado' })
+          }
+        }
+      }
+      if (missingInserts.length > 0) {
+        supabase.from('daily_care_logs').insert(missingInserts) // fire-and-forget
+      }
+
       const DAY_LABELS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
       setWeekHistory(histDays.map(date => {
         const d = new Date(date + 'T12:00:00')
@@ -199,15 +215,21 @@ export default function Hoy() {
         const medFail = (meds ?? []).length > 0
           ? (meds ?? []).filter(m => !confirmedIds.has(m.id)).length
           : 0
-        const loggedKeys = new Set(
-          (histCareLogs ?? []).filter(l => l.log_date === date).map(l => l.item_key)
+        const completedCareKeys = new Set(
+          (histCareLogs ?? [])
+            .filter(l => l.log_date === date && (l.status === 'completed' || !l.status))
+            .map(l => l.item_key)
         )
-        const careFail = activeDailyCareKeys.filter(k => !loggedKeys.has(k)).length
+        const failedCareItems = activeDailyCareKeys
+          .filter(k => !completedCareKeys.has(k))
+          .map(k => CARE_ITEMS.find(i => i.key === k))
+          .filter(Boolean)
         return {
           date,
           dayLabel: DAY_LABELS[d.getDay()],
           dayNum: d.getDate(),
-          failures: medFail + careFail,
+          failures: medFail + failedCareItems.length,
+          failedItems: failedCareItems,
         }
       }))
     } catch (err) {
@@ -473,22 +495,40 @@ export default function Hoy() {
               Últimos 7 días
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              {weekHistory.map(({ date, dayLabel, dayNum, failures }) => (
+              {weekHistory.map(({ date, dayLabel, dayNum, failures, failedItems }) => (
                 <div key={date} style={{
-                  display: 'flex', alignItems: 'center', gap: 8,
-                  padding: '6px 10px', borderRadius: 10,
+                  padding: failures === 0 ? '6px 10px' : '8px 10px',
+                  borderRadius: 10,
                   background: failures === 0 ? '#F0FDF4' : '#FEF2F2',
                 }}>
-                  <span style={{ fontSize: 12, fontWeight: 600, color: '#6B7280', minWidth: 52 }}>
-                    {dayLabel} {dayNum}
-                  </span>
-                  <span style={{ fontSize: 13 }}>{failures === 0 ? '✅' : '⚠️'}</span>
-                  <span style={{
-                    fontSize: 12, fontWeight: 600,
-                    color: failures === 0 ? '#16A34A' : '#DC2626',
-                  }}>
-                    {failures === 0 ? 'Todo completado' : `${failures} sin completar`}
-                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: '#6B7280', minWidth: 52 }}>
+                      {dayLabel} {dayNum}
+                    </span>
+                    <span style={{ fontSize: 13 }}>{failures === 0 ? '✅' : '⚠️'}</span>
+                    <span style={{
+                      fontSize: 12, fontWeight: 600,
+                      color: failures === 0 ? '#16A34A' : '#DC2626',
+                    }}>
+                      {failures === 0 ? 'Todo completado' : `${failures} sin completar`}
+                    </span>
+                  </div>
+                  {failures > 0 && failedItems?.length > 0 && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px 6px', marginTop: 5, paddingLeft: 60 }}>
+                      {failedItems.slice(0, 4).map(item => (
+                        <span key={item.key} style={{
+                          fontSize: 11, color: '#DC2626',
+                          background: 'rgba(220,38,38,0.08)',
+                          borderRadius: 4, padding: '1px 5px',
+                        }}>
+                          {item.icon} {item.label}
+                        </span>
+                      ))}
+                      {failedItems.length > 4 && (
+                        <span style={{ fontSize: 11, color: '#B91C1C' }}>+{failedItems.length - 4} más</span>
+                      )}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
