@@ -5,7 +5,7 @@ import { useFamily } from '../contexts/FamilyContext'
 import { useSubscription } from '../contexts/SubscriptionContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
-import { AlertTriangle, CheckIcon, User, XIcon } from '../components/Icons'
+import { AlertTriangle, CheckIcon, User, XIcon, Pill, ClipboardCheck, Chat, Calendar, Receipt, Users, Camera, Heart, Clock, Menu } from '../components/Icons'
 import { geminiGenerate } from '../lib/gemini'
 import TrialBanner from '../components/TrialBanner'
 import { getLocation, mapsUrl } from '../lib/gps'
@@ -1316,7 +1316,7 @@ const DASH_STATUS = {
   info:    { color: '#6B7280', bg: '#F3F4F6' },
 }
 
-function DashCard({ icon, title, subtitle, status, statusType, to, onClick }) {
+function DashCard({ Icon, title, subtitle, status, statusType, to, onClick }) {
   const navigate = useNav()
   const s = DASH_STATUS[statusType ?? 'info']
   const isClickable = !!(to || onClick)
@@ -1324,36 +1324,38 @@ function DashCard({ icon, title, subtitle, status, statusType, to, onClick }) {
     <div
       onClick={to ? () => navigate(to) : onClick}
       style={{
-        background: 'white', borderRadius: 16,
-        border: '1px solid #EDE5D8',
-        padding: '14px 16px',
-        display: 'flex', alignItems: 'center', gap: 14,
-        boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+        background: 'white',
+        borderRadius: 16,
+        boxShadow: '0 2px 12px rgba(0,0,0,0.07)',
+        padding: '16px 14px 14px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 10,
         cursor: isClickable ? 'pointer' : 'default',
         WebkitTapHighlightColor: 'transparent',
         boxSizing: 'border-box',
+        minHeight: 130,
       }}
     >
       <div style={{
-        width: 44, height: 44, borderRadius: 13,
-        background: 'rgba(74,124,89,0.08)',
+        width: 42, height: 42, borderRadius: '50%',
+        background: 'rgba(74,124,89,0.12)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: 22, lineHeight: 1, flexShrink: 0,
+        flexShrink: 0,
       }}>
-        {icon}
+        <Icon size={20} color="#4A7C59" strokeWidth={1.75} />
       </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ fontSize: 14, fontWeight: 700, color: '#1A1A1A', margin: 0, lineHeight: 1.2 }}>{title}</p>
+      <div style={{ flex: 1 }}>
+        <p style={{ fontSize: 15, fontWeight: 700, color: '#2d3748', margin: 0, lineHeight: 1.25 }}>{title}</p>
         {subtitle && (
-          <p style={{ fontSize: 12, color: '#9CA3AF', margin: '2px 0 0', lineHeight: 1.3 }}>
-            {subtitle}
-          </p>
+          <p style={{ fontSize: 12, color: '#718096', margin: '4px 0 0', lineHeight: 1.4 }}>{subtitle}</p>
         )}
       </div>
       {status && (
         <div style={{
-          flexShrink: 0, display: 'inline-flex', alignItems: 'center',
-          gap: 4, padding: '4px 10px', borderRadius: 20, background: s.bg,
+          alignSelf: 'flex-start',
+          display: 'inline-flex', alignItems: 'center',
+          gap: 4, padding: '3px 9px', borderRadius: 20, background: s.bg,
         }}>
           <span style={{ width: 5, height: 5, borderRadius: '50%', background: s.color, flexShrink: 0 }} />
           <span style={{ fontSize: 10, fontWeight: 700, color: s.color, whiteSpace: 'nowrap' }}>{status}</span>
@@ -2608,85 +2610,109 @@ export default function Dashboard() {
           )}
         </div>
 
-        {/* ════ Cards list ═══════════════════════════════════════════════ */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 24 }}>
-          <DashCard
-            icon="🆘"
-            title="Emergencia"
-            subtitle="Alertar a toda la familia"
-            status={sosSent ? 'Alerta enviada' : 'Toca para activar'}
-            statusType="urgent"
-            onClick={prepareSOS}
-          />
-          <DashCard
-            icon="💊"
-            title="Medicamentos"
-            subtitle={medCardSubtitle}
-            status={medCardStatus}
-            statusType={medCardStatusType}
-            to="/hoy"
-          />
-          <DashCard
-            icon="🏥"
-            title="Cuidado de hoy"
-            subtitle={medTotal > 0 ? `${medTotal} med${medTotal !== 1 ? 's' : ''} programados` : 'Rutina diaria'}
-            status={careStatus}
-            statusType={careStatusType}
-            to="/hoy"
-          />
+        {/* ════ 2-col grid ════════════════════════════════════════════════ */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
 
-          <DashCard
-            icon="📋"
-            title="Detalle del Cuidado"
-            subtitle={detailSubtitle}
-            status="Ver historial"
-            statusType={detailStatusType}
-            to="/historial"
-          />
+          {/* Fila 1: Medicamentos | Cuidado de hoy */}
+          <DashCard Icon={Pill}           title="Medicamentos"       subtitle={medCardSubtitle}                                                                                         status={medCardStatus}  statusType={medCardStatusType}  to="/hoy" />
+          <DashCard Icon={ClipboardCheck} title="Cuidado de hoy"     subtitle={medTotal > 0 ? `${medTotal} med${medTotal !== 1 ? 's' : ''} programados` : 'Rutina diaria'}              status={careStatus}     statusType={careStatusType}     to="/hoy" />
 
+          {/* Fila 2: Historial | Chat familiar */}
+          <DashCard Icon={Clock}          title="Historial"           subtitle={detailSubtitle}                                                                                          status="Ver historial"  statusType={detailStatusType}   to="/historial" />
+          <DashCard Icon={Chat}           title="Chat familiar"       subtitle="Mensajes del equipo"                                                                                     status="Ver chat"       statusType="info"                to="/chat" />
+
+          {/* Fila 3: Citas médicas | Cuentas Claras */}
           <DashCard
-            icon="📹"
-            title="Videollamada"
-            subtitle="Conectar con la familia"
-            status="Próximamente"
-            statusType="info"
-            onClick={() => {}}
-          />
-          <DashCard
-            icon="📅"
-            title="Próxima cita"
+            Icon={Calendar}
+            title="Citas médicas"
             subtitle={nextAppointment?.appointmentTitle ?? 'Sin citas próximas'}
-            status={nextAppointment
-              ? (nextAppointment.dateKey === todayKey ? 'Hoy' : nextAppointment.dateKey === tomorrowKey ? 'Mañana' : 'Esta semana')
-              : 'Ver calendario'}
+            status={nextAppointment ? (nextAppointment.dateKey === todayKey ? 'Hoy' : nextAppointment.dateKey === tomorrowKey ? 'Mañana' : 'Esta semana') : 'Ver calendario'}
             statusType={nextAppointment ? 'warning' : 'info'}
             to="/calendar"
           />
-          <DashCard
-            icon="🏨"
-            title="Modo Hospital"
-            subtitle="Gestión en internación"
-            status="Próximamente"
-            statusType="info"
-            onClick={() => {}}
-          />
-          <DashCard
-            icon="👥"
-            title="Mi equipo"
-            subtitle="Cuidadores y familiares"
-            status="Ver equipo"
-            statusType="info"
-            to="/familia"
-          />
-          <DashCard
-            icon="⊞"
-            title="Otras funciones"
-            subtitle="Notas, Álbum, Reportes y más"
-            status="Ver todo"
-            statusType="info"
-            to="/mas"
-          />
+          <DashCard Icon={Receipt}        title="Cuentas Claras"      subtitle="Control de gastos"                                                                                       status="Ver gastos"     statusType="info"                to="/gastos" />
+
+          {/* Fila 4: Perfil del paciente | Mi equipo */}
+          <DashCard Icon={User}           title="Perfil del paciente" subtitle="Diagnósticos y alergias"                                                                                 status="Ver perfil"     statusType="info"                to="/paciente/perfil" />
+          <DashCard Icon={Users}          title="Mi equipo"           subtitle="Cuidadores y familiares"                                                                                 status="Ver equipo"     statusType="info"                to="/familia" />
+
+          {/* Fila 5: Videollamada | Modo Hospital */}
+          <DashCard Icon={Camera}         title="Videollamada"        subtitle="Conectar con la familia"                                                                                 status="Próximamente"   statusType="info"                onClick={() => {}} />
+          <DashCard Icon={Heart}          title="Modo Hospital"       subtitle="Gestión en internación"                                                                                  status="Próximamente"   statusType="info"                onClick={() => {}} />
         </div>
+
+        {/* Fila 6: Emergencia SOS — ancho completo */}
+        <button
+          onClick={prepareSOS}
+          style={{
+            width: '100%', border: 'none', cursor: 'pointer',
+            background: 'rgba(220,38,38,0.06)',
+            borderRadius: 16,
+            boxShadow: '0 2px 12px rgba(0,0,0,0.07)',
+            padding: '16px 18px',
+            display: 'flex', alignItems: 'center', gap: 14,
+            WebkitTapHighlightColor: 'transparent',
+            marginBottom: 10,
+          }}
+        >
+          <div style={{
+            width: 46, height: 46, borderRadius: '50%',
+            background: 'rgba(220,38,38,0.12)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            flexShrink: 0,
+          }}>
+            <AlertTriangle size={22} color="#DC2626" strokeWidth={1.75} />
+          </div>
+          <div style={{ flex: 1, textAlign: 'left' }}>
+            <p style={{ fontSize: 15, fontWeight: 700, color: '#DC2626', margin: 0 }}>Emergencia SOS</p>
+            <p style={{ fontSize: 12, color: '#718096', margin: '3px 0 0' }}>
+              {sosSent ? 'Alerta enviada — familia notificada' : 'Toca para alertar a toda la familia'}
+            </p>
+          </div>
+          <div style={{
+            flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 4,
+            padding: '4px 10px', borderRadius: 20,
+            background: sosSent ? '#DCFCE7' : '#FEE2E2',
+          }}>
+            <span style={{ width: 5, height: 5, borderRadius: '50%', background: sosSent ? '#15803D' : '#DC2626', flexShrink: 0 }} />
+            <span style={{ fontSize: 10, fontWeight: 700, color: sosSent ? '#15803D' : '#DC2626', whiteSpace: 'nowrap' }}>
+              {sosSent ? 'Enviada' : 'Urgente'}
+            </span>
+          </div>
+        </button>
+
+        {/* Otras funciones — ancho completo */}
+        <Link
+          to="/mas"
+          style={{
+            display: 'flex', alignItems: 'center', gap: 14,
+            background: 'white', borderRadius: 16,
+            boxShadow: '0 2px 12px rgba(0,0,0,0.07)',
+            padding: '16px 18px', textDecoration: 'none',
+            WebkitTapHighlightColor: 'transparent',
+            marginBottom: 24,
+          }}
+        >
+          <div style={{
+            width: 46, height: 46, borderRadius: '50%',
+            background: 'rgba(74,124,89,0.12)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            flexShrink: 0,
+          }}>
+            <Menu size={22} color="#4A7C59" strokeWidth={1.75} />
+          </div>
+          <div style={{ flex: 1 }}>
+            <p style={{ fontSize: 15, fontWeight: 700, color: '#2d3748', margin: 0 }}>Otras funciones</p>
+            <p style={{ fontSize: 12, color: '#718096', margin: '3px 0 0' }}>Álbum, Memorias, Reportes, Directorio, Ajustes</p>
+          </div>
+          <div style={{
+            flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 4,
+            padding: '4px 10px', borderRadius: 20, background: '#F3F4F6',
+          }}>
+            <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#6B7280', flexShrink: 0 }} />
+            <span style={{ fontSize: 10, fontWeight: 700, color: '#6B7280', whiteSpace: 'nowrap' }}>Ver todo</span>
+          </div>
+        </Link>
 
         {/* Sign out */}
         <div style={{ marginTop: 8, paddingBottom: 8, display: 'flex', justifyContent: 'center' }}>
