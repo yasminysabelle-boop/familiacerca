@@ -1297,6 +1297,15 @@ function RecentEventRow({ evt, onTap }) {
   )
 }
 
+function calcAge(dateStr) {
+  if (!dateStr) return null
+  const birth = new Date(dateStr + 'T12:00:00')
+  const today = new Date()
+  let age = today.getFullYear() - birth.getFullYear()
+  if (today.getMonth() < birth.getMonth() || (today.getMonth() === birth.getMonth() && today.getDate() < birth.getDate())) age--
+  return age
+}
+
 // ── Main component ─────────────────────────────────────────────────────────────
 
 export default function Dashboard() {
@@ -1325,6 +1334,10 @@ export default function Dashboard() {
   const [selectedEvent, setSelectedEvent] = useState(null)
   const [chatCount, setChatCount] = useState(0)
   const [patientProfileIncomplete, setPatientProfileIncomplete] = useState(false)
+  const [patientProfile, setPatientProfile] = useState(null)
+  const [dailyMood, setDailyMood] = useState(null)
+  const [savingMood, setSavingMood] = useState(false)
+  const [weekShifts, setWeekShifts] = useState([])
   // Initialized to today's key so today is expanded; past days start collapsed
   const [expandedDays, setExpandedDays] = useState(() => new Set([new Date().toISOString().split('T')[0]]))
 
@@ -1377,11 +1390,39 @@ export default function Dashboard() {
     if (!ownerId) return
     supabase
       .from('patient_profiles')
-      .select('nombre_completo')
+      .select('nombre_completo, diagnostico_principal, fecha_nacimiento')
       .eq('owner_id', ownerId)
       .maybeSingle()
-      .then(({ data: pp }) => setPatientProfileIncomplete(!pp?.nombre_completo))
+      .then(({ data: pp }) => {
+        setPatientProfile(pp ?? null)
+        setPatientProfileIncomplete(!pp?.nombre_completo)
+      })
   }, [ownerId])
+
+  useEffect(() => {
+    if (!ownerId) return
+    supabase
+      .from('daily_moods')
+      .select('mood')
+      .eq('owner_id', ownerId)
+      .eq('log_date', todayKey)
+      .maybeSingle()
+      .then(({ data }) => setDailyMood(data?.mood ?? null))
+  }, [ownerId, todayKey])
+
+  useEffect(() => {
+    if (!ownerId) return
+    const days = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(); d.setDate(d.getDate() + i)
+      return d.toISOString().split('T')[0]
+    })
+    supabase
+      .from('care_shifts')
+      .select('shift_date, caregiver_name')
+      .eq('owner_id', ownerId)
+      .in('shift_date', days)
+      .then(({ data }) => setWeekShifts(data ?? []))
+  }, [ownerId, todayKey])
 
   // Schedule daily browser notifications (fires when app is open/in background)
   useEffect(() => {
@@ -1982,6 +2023,25 @@ export default function Dashboard() {
     })
   }
 
+  async function saveMood(mood) {
+    if (savingMood || isFamiliar) return
+    setSavingMood(true)
+    await supabase.from('daily_moods').upsert({
+      owner_id: ownerId,
+      user_id: user.id,
+      log_date: todayKey,
+      mood,
+    }, { onConflict: 'owner_id,log_date' })
+    setDailyMood(mood)
+    setSavingMood(false)
+  }
+
+  const todayShift = weekShifts.find(s => s.shift_date === todayKey) ?? null
+  const weekDays = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(); d.setDate(d.getDate() + i)
+    return d.toISOString().split('T')[0]
+  })
+
   const todaySection = sections.find(s => s.dateKey === todayKey)
   const pendingCount = todaySection?.events.filter(e => e.type === 'MED_PENDING').length ?? 0
   const confirmedTodayCount = todaySection?.events.filter(e => e.type === 'MED_CONFIRMED').length ?? 0
@@ -1991,6 +2051,8 @@ export default function Dashboard() {
 
   // Last voice/photo memory across any day
   const lastMemory = sections.flatMap(s => s.events).find(e => e.type === 'VOICE_MEMORY' || e.type === 'PHOTO') ?? null
+
+  const nextAppointment = sections.flatMap(s => s.events).find(e => e.type === 'APPOINTMENT') ?? null
 
   // Recent events from today (non-pending, non-AI) for "Últimas novedades"
   const recentEvents = (todaySection?.events ?? [])
@@ -2075,58 +2137,97 @@ export default function Dashboard() {
       )}
       <div style={{ padding: '12px 16px 96px', maxWidth: 600 }}>
 
-        {/* ── Greeting header ───────────────────────────────────────────── */}
-        <div style={{
-          background: 'linear-gradient(135deg, #4A7C59 0%, #2E5240 100%)',
-          borderRadius: 20, padding: '18px 20px', marginBottom: 16,
-          boxShadow: '0 4px 20px rgba(74,124,89,0.3)',
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-            {profile?.photo_url ? (
-              <img
-                src={profile.photo_url}
-                alt={profile.name}
-                style={{
-                  width: 52, height: 52, borderRadius: '50%', objectFit: 'cover',
-                  border: '2px solid rgba(201,136,42,0.5)', flexShrink: 0,
-                }}
-              />
-            ) : (
+        {/* ── ZONA 1: Card del paciente ─────────────────────────────────── */}
+        <Link to="/paciente/perfil" style={{ textDecoration: 'none', display: 'block', marginBottom: 14 }}>
+          <div style={{
+            background: 'linear-gradient(135deg, #4A7C59 0%, #2E5240 100%)',
+            borderRadius: 20, padding: '16px 20px',
+            boxShadow: '0 4px 20px rgba(74,124,89,0.3)',
+          }}>
+            <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, margin: '0 0 10px', letterSpacing: '0.03em' }}>
+              {timeIcon} {timeGreeting}, {firstName}
+            </p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              {profile?.photo_url ? (
+                <img
+                  src={profile.photo_url}
+                  alt={profile.name}
+                  style={{
+                    width: 54, height: 54, borderRadius: '50%', objectFit: 'cover',
+                    border: '2px solid rgba(201,136,42,0.5)', flexShrink: 0,
+                  }}
+                />
+              ) : (
+                <div style={{
+                  width: 54, height: 54, borderRadius: '50%', flexShrink: 0,
+                  background: 'rgba(255,255,255,0.15)',
+                  border: '2px solid rgba(255,255,255,0.2)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 22, color: 'rgba(255,255,255,0.85)',
+                }}>
+                  {(patientProfile?.nombre_completo || profile?.name)?.charAt(0) ?? '👴'}
+                </div>
+              )}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                {(patientProfile?.nombre_completo || profile?.name) ? (
+                  <>
+                    <p style={{
+                      color: 'white', fontSize: 17, fontWeight: 800,
+                      fontFamily: 'Georgia, serif', margin: 0, lineHeight: 1.2,
+                      overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                    }}>
+                      {patientProfile?.nombre_completo || profile?.name}
+                    </p>
+                    <div style={{ display: 'flex', gap: 6, marginTop: 3, flexWrap: 'wrap' }}>
+                      {calcAge(patientProfile?.fecha_nacimiento) !== null && (
+                        <span style={{ color: 'rgba(255,255,255,0.65)', fontSize: 12 }}>
+                          {calcAge(patientProfile?.fecha_nacimiento)} años
+                        </span>
+                      )}
+                      {patientProfile?.diagnostico_principal && (
+                        <span style={{
+                          color: 'rgba(255,255,255,0.55)', fontSize: 12,
+                          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                          maxWidth: 180,
+                        }}>
+                          · {patientProfile.diagnostico_principal}
+                        </span>
+                      )}
+                    </div>
+                    <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: 11, margin: '4px 0 0' }}>
+                      Cuida hoy: {todayShift?.caregiver_name ?? firstName}
+                    </p>
+                  </>
+                ) : (
+                  <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: 14, fontWeight: 600, margin: 0, textDecoration: 'underline' }}>
+                    + Agregar perfil del paciente →
+                  </p>
+                )}
+              </div>
+              <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: 18, flexShrink: 0 }}>›</span>
+            </div>
+            {patientProfileIncomplete && (
               <div style={{
-                width: 52, height: 52, borderRadius: '50%', flexShrink: 0,
-                background: 'rgba(255,255,255,0.15)',
-                border: '2px solid rgba(255,255,255,0.2)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 22, fontWeight: 700, color: 'rgba(255,255,255,0.85)',
+                marginTop: 12, padding: '9px 13px',
+                background: 'rgba(255,255,255,0.12)',
+                border: '1px solid rgba(255,255,255,0.18)',
+                borderRadius: 11,
+                display: 'flex', alignItems: 'center', gap: 8,
               }}>
-                {profile?.name?.charAt(0) ?? '👴'}
+                <span style={{ fontSize: 15, flexShrink: 0 }}>📋</span>
+                <div style={{ flex: 1 }}>
+                  <p style={{ color: 'white', fontSize: 12, fontWeight: 700, margin: 0 }}>
+                    Completa el perfil del paciente
+                  </p>
+                  <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 11, margin: '1px 0 0' }}>
+                    Diagnóstico, alergias y médico tratante
+                  </p>
+                </div>
+                <span style={{ color: 'rgba(255,255,255,0.45)', fontSize: 13 }}>›</span>
               </div>
             )}
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 12, margin: 0 }}>
-                {timeIcon} {timeGreeting}, {firstName}
-              </p>
-              {profile ? (
-                <p style={{
-                  color: 'white', fontSize: 18, fontWeight: 800,
-                  fontFamily: 'Georgia, serif', margin: '3px 0 0', lineHeight: 1.25,
-                }}>
-                  Así estuvo {(profile.name ?? 'el familiar').toUpperCase()} hoy 👴
-                </p>
-              ) : (
-                <Link
-                  to="/onboarding"
-                  style={{
-                    color: 'rgba(255,255,255,0.8)', fontSize: 14,
-                    display: 'block', marginTop: 4, textDecoration: 'underline', fontWeight: 600,
-                  }}
-                >
-                  + Agregar familiar →
-                </Link>
-              )}
-            </div>
           </div>
-        </div>
+        </Link>
 
         {/* ── AI cards ─────────────────────────────────────────────────── */}
         {Object.keys(aiCards).length > 0 && (
@@ -2136,33 +2237,6 @@ export default function Dashboard() {
             {aiCards.burnout && <AiCard type="burnout" text={aiCards.burnout} />}
             {aiCards.weekly  && <AiCard type="weekly"  text={aiCards.weekly} />}
           </div>
-        )}
-
-        {/* ── Patient profile incomplete banner ────────────────────────── */}
-        {patientProfileIncomplete && (
-          <Link
-            to="/paciente/perfil"
-            style={{
-              display: 'flex', alignItems: 'center', gap: 12,
-              padding: '13px 16px', borderRadius: 14, marginBottom: 14,
-              background: 'linear-gradient(135deg, #FFFBEB, #FEF3C7)',
-              border: '1.5px solid #FDE68A', textDecoration: 'none',
-              boxShadow: '0 2px 8px rgba(201,136,42,0.12)',
-            }}
-          >
-            <span style={{ fontSize: 22, flexShrink: 0 }}>📋</span>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ fontSize: 13, fontWeight: 700, color: '#92400E', margin: 0, lineHeight: 1.3 }}>
-                Perfil del paciente incompleto
-              </p>
-              <p style={{ fontSize: 12, color: '#A07020', margin: '2px 0 0' }}>
-                {isFamiliar ? 'El administrador puede completarlo' : 'Toca para agregar información médica'}
-              </p>
-            </div>
-            {!isFamiliar && (
-              <span style={{ fontSize: 18, color: '#C9882A', flexShrink: 0 }}>›</span>
-            )}
-          </Link>
         )}
 
         {/* ── Status cards grid ─────────────────────────────────────────── */}
@@ -2199,6 +2273,182 @@ export default function Dashboard() {
             statusType="info"
             to="/chat"
           />
+        </div>
+
+        {/* ── ZONA 3: Estado del día ────────────────────────────────────── */}
+        <div style={{
+          background: 'white', borderRadius: 16, padding: '14px 16px',
+          marginBottom: 12, border: '1px solid #EDE5D8',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+        }}>
+          <p style={{
+            fontSize: 11, fontWeight: 700, color: '#9CA3AF',
+            textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 10px',
+          }}>
+            Estado del día
+          </p>
+          {dailyMood ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ fontSize: 26 }}>
+                {dailyMood === 'good' ? '😊' : dailyMood === 'regular' ? '😐' : '😔'}
+              </span>
+              <div style={{ flex: 1 }}>
+                <p style={{ fontSize: 14, fontWeight: 700, color: '#1F2937', margin: 0 }}>
+                  {dailyMood === 'good' ? 'Buen día' : dailyMood === 'regular' ? 'Día regular' : 'Día difícil'}
+                </p>
+                <p style={{ fontSize: 12, color: '#9CA3AF', margin: '2px 0 0' }}>
+                  Registrado hoy
+                  {!isFamiliar && (
+                    <button
+                      onClick={() => setDailyMood(null)}
+                      style={{
+                        background: 'none', border: 'none', color: '#C9882A',
+                        fontSize: 12, cursor: 'pointer', marginLeft: 8, padding: 0,
+                      }}
+                    >
+                      Cambiar
+                    </button>
+                  )}
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div>
+              <p style={{ fontSize: 13, color: '#6B7280', margin: '0 0 10px' }}>
+                ¿Cómo estuvo {profile?.name ?? 'el paciente'} hoy?
+              </p>
+              <div style={{ display: 'flex', gap: 8 }}>
+                {[
+                  { mood: 'good',    emoji: '😊', label: 'Buen día', bg: '#F0FDF4', border: '#BBF7D0', color: '#15803D' },
+                  { mood: 'regular', emoji: '😐', label: 'Regular',  bg: '#FFFBEB', border: '#FDE68A', color: '#92400E' },
+                  { mood: 'hard',    emoji: '😔', label: 'Difícil',  bg: '#FFF5F5', border: '#FECACA', color: '#DC2626' },
+                ].map(({ mood, emoji, label, bg, border, color }) => (
+                  <button
+                    key={mood}
+                    onClick={() => saveMood(mood)}
+                    disabled={savingMood || isFamiliar}
+                    style={{
+                      flex: 1, padding: '10px 4px', borderRadius: 12,
+                      border: `1.5px solid ${border}`, background: bg,
+                      cursor: savingMood || isFamiliar ? 'not-allowed' : 'pointer',
+                      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+                      opacity: savingMood ? 0.6 : 1, transition: 'transform 0.1s',
+                    }}
+                  >
+                    <span style={{ fontSize: 22 }}>{emoji}</span>
+                    <span style={{ fontSize: 11, fontWeight: 700, color }}>{label}</span>
+                  </button>
+                ))}
+              </div>
+              {isFamiliar && (
+                <p style={{ fontSize: 11, color: '#C9B99A', margin: '8px 0 0', textAlign: 'center' }}>
+                  El administrador o cuidador registra el estado del día
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* ── ZONA 4: Equipo de cuidado ─────────────────────────────────── */}
+        <div style={{
+          background: 'white', borderRadius: 16, padding: '14px 16px',
+          marginBottom: 12, border: '1px solid #EDE5D8',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+        }}>
+          <p style={{
+            fontSize: 11, fontWeight: 700, color: '#9CA3AF',
+            textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 12px',
+          }}>
+            Equipo de cuidado
+          </p>
+
+          {/* Weekly mini calendar */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 14 }}>
+            {weekDays.map(day => {
+              const shift = weekShifts.find(s => s.shift_date === day)
+              const isToday = day === todayKey
+              const d = new Date(day + 'T12:00:00')
+              const dayLabel = d.toLocaleDateString('es-MX', { weekday: 'short' }).slice(0, 2).toUpperCase()
+              const initials = shift?.caregiver_name
+                ? shift.caregiver_name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()
+                : null
+              return (
+                <div key={day} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                  <span style={{ fontSize: 10, fontWeight: 700, color: isToday ? '#4A7C59' : '#9CA3AF' }}>
+                    {dayLabel}
+                  </span>
+                  <div style={{
+                    width: 32, height: 32, borderRadius: '50%',
+                    background: isToday ? '#4A7C59' : (initials ? '#EBF3EE' : '#F3F4F6'),
+                    border: `1.5px solid ${isToday ? '#4A7C59' : (initials ? '#A8D5B8' : '#E5E7EB')}`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    {initials ? (
+                      <span style={{ fontSize: 10, fontWeight: 800, color: isToday ? 'white' : '#2E5240' }}>
+                        {initials}
+                      </span>
+                    ) : isToday ? (
+                      <span style={{ fontSize: 11, fontWeight: 800, color: 'white' }}>
+                        {firstName.charAt(0).toUpperCase()}
+                      </span>
+                    ) : (
+                      <span style={{ fontSize: 14, color: '#D1D5DB' }}>–</span>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Quick links */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <Link
+              to="/chat"
+              style={{
+                display: 'flex', alignItems: 'center', gap: 10,
+                padding: '10px 12px', borderRadius: 12,
+                background: '#F7F3ED', textDecoration: 'none',
+                border: '1px solid #EDE5D8',
+              }}
+            >
+              <span style={{ fontSize: 18 }}>💬</span>
+              <div style={{ flex: 1 }}>
+                <p style={{ fontSize: 13, fontWeight: 600, color: '#1F2937', margin: 0 }}>Chat familiar</p>
+                <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>{chatStatus}</p>
+              </div>
+              {chatCount > 0 && (
+                <div style={{
+                  background: '#4A7C59', color: 'white', borderRadius: 10,
+                  minWidth: 20, height: 20, fontSize: 11, fontWeight: 700,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 6px',
+                }}>
+                  {chatCount}
+                </div>
+              )}
+            </Link>
+
+            {nextAppointment && (
+              <Link
+                to="/calendar"
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 10,
+                  padding: '10px 12px', borderRadius: 12,
+                  background: '#F0F9FF', textDecoration: 'none',
+                  border: '1px solid #BAE6FD',
+                }}
+              >
+                <span style={{ fontSize: 18 }}>🏥</span>
+                <div style={{ flex: 1 }}>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: '#1F2937', margin: 0 }}>Próxima cita</p>
+                  <p style={{ fontSize: 11, color: '#0369A1', margin: 0, fontWeight: 500 }}>
+                    {nextAppointment.appointmentTitle}
+                    {nextAppointment.appointmentTime ? ` · ${fmtTime(nextAppointment.appointmentTime)}` : ''}
+                  </p>
+                </div>
+                <span style={{ color: '#9CA3AF', fontSize: 14 }}>›</span>
+              </Link>
+            )}
+          </div>
         </div>
 
         {/* ── Emergency card ────────────────────────────────────────────── */}
