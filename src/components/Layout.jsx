@@ -62,10 +62,10 @@ export default function Layout({ children }) {
   const fabHidden = HIDE_FAB_PATHS.has(location.pathname)
   const [fabOpen, setFabOpen] = useState(false)
 
-  const bg      = dark ? '#0F1A12' : '#F7F3ED'
-  const navBg   = dark ? 'rgba(28,18,8,0.97)' : 'rgba(255,255,255,0.97)'
-  const hdrBg   = dark ? 'rgba(28,18,8,0.95)' : 'rgba(255,248,240,0.95)'
-  const border  = dark ? '#1E3A28' : '#EDE5D8'
+  const bg      = dark ? '#0F1A12' : '#F0EDE6'
+  const navBg   = dark ? 'rgba(28,18,8,0.97)' : '#2D4A1E'
+  const hdrBg   = dark ? 'rgba(28,18,8,0.95)' : '#2D4A1E'
+  const border  = dark ? '#1E3A28' : 'rgba(255,255,255,0.08)'
 
   function handleFabLink(to) {
     setFabOpen(false)
@@ -105,7 +105,7 @@ export default function Layout({ children }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <Logo size={28} />
             <h1 style={{
-              fontSize: 15, fontWeight: 700, color: '#1A1A1A',
+              fontSize: 15, fontWeight: 700, color: 'white',
               fontFamily: 'Georgia, serif', margin: 0,
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
             }}>
@@ -119,15 +119,15 @@ export default function Layout({ children }) {
             <img
               src={profile.photo_url} alt={profile.name}
               style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover',
-                border: '2px solid #4A7C59', boxShadow: '0 0 0 2px #EBF3EE' }}
+                border: '2px solid rgba(255,255,255,0.3)' }}
             />
           ) : (
             <div style={{
               width: 32, height: 32, borderRadius: '50%',
-              background: '#EBF3EE', border: '2px solid #EDE5D8',
+              background: 'rgba(255,255,255,0.15)', border: '2px solid rgba(255,255,255,0.25)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
-              <User size={16} color="#4A7C59" strokeWidth={1.5} />
+              <User size={16} color="white" strokeWidth={1.5} />
             </div>
           )}
         </Link>
@@ -293,10 +293,8 @@ export default function Layout({ children }) {
           position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 40,
           height: 68,
           background: navBg,
-          backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
           borderTop: `1px solid ${border}`,
-          boxShadow: '0 -4px 24px rgba(0,0,0,0.06)',
+          boxShadow: '0 -2px 16px rgba(0,0,0,0.25)',
           display: 'flex',
         }}
       >
@@ -314,21 +312,23 @@ export default function Layout({ children }) {
                 gap: 2, paddingTop: 4, textDecoration: 'none',
               }}
             >
-              <div style={{
-                width: 46, height: 32, borderRadius: 14,
-                background: isActive ? '#EBF3EE' : 'transparent',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                transition: 'all 0.2s',
-                transform: isActive ? 'scale(1.05)' : 'scale(1)',
-              }}>
-                <Icon size={22} color={isActive ? '#4A7C59' : '#BBBBBB'} strokeWidth={isActive ? 2 : 1.5} />
-              </div>
+              <Icon
+                size={22}
+                color={isActive ? 'white' : 'rgba(255,255,255,0.4)'}
+                strokeWidth={isActive ? 2 : 1.5}
+              />
               <span style={{
                 fontSize: 9, fontWeight: 700, letterSpacing: '0.02em',
-                color: isActive ? '#4A7C59' : '#BBBBBB', lineHeight: 1,
+                color: isActive ? 'white' : 'rgba(255,255,255,0.4)', lineHeight: 1,
               }}>
                 {label}
               </span>
+              {isActive && (
+                <span style={{
+                  width: 4, height: 4, borderRadius: '50%',
+                  background: '#C9894A', marginTop: 2,
+                }} />
+              )}
             </Link>
           )
         })}

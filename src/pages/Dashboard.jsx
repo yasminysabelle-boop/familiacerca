@@ -24,6 +24,17 @@ const MOOD_MAP = {
 function getMoodEmoji(val) { return MOOD_MAP[val]?.emoji ?? '🎙️' }
 function getMoodColor(val) { return MOOD_MAP[val]?.color ?? '#7C5CBF' }
 
+const MOOD_OPTIONS = [
+  { mood: 'good',    emoji: '😊', label: 'Buen día', bg: '#FEF3C7',                border: '#C9894A',               shadow: '0 3px 0px #C9894A' },
+  { mood: 'regular', emoji: '😐', label: 'Regular',  bg: 'rgba(255,255,255,0.14)', border: 'rgba(255,255,255,0.2)', shadow: '0 3px 0px rgba(0,0,0,0.08)' },
+  { mood: 'hard',    emoji: '😔', label: 'Difícil',  bg: 'rgba(239,68,68,0.18)',   border: 'rgba(239,68,68,0.4)',   shadow: '0 3px 0px rgba(239,68,68,0.3)' },
+]
+const MOOD_FEEDBACK = {
+  good: '¡Qué bueno saberlo!', '😊': '¡Qué bueno saberlo!',
+  regular: 'Gracias por avisar', '😐': 'Gracias por avisar',
+  hard: 'Estamos aquí contigo', '😔': 'Estamos aquí contigo',
+}
+
 function fmtTime(t) {
   if (!t) return ''
   const [h, m] = t.split(':').map(Number)
@@ -1320,14 +1331,20 @@ function DashCard({ Icon, title, subtitle, status, statusType, to, onClick }) {
   const navigate = useNav()
   const s = DASH_STATUS[statusType ?? 'info']
   const isClickable = !!(to || onClick)
+  const [pressed, setPressed] = useState(false)
   return (
     <div
       onClick={to ? () => navigate(to) : onClick}
+      onPointerDown={() => isClickable && setPressed(true)}
+      onPointerUp={() => setPressed(false)}
+      onPointerLeave={() => setPressed(false)}
       style={{
         background: 'white',
         borderRadius: 16,
-        boxShadow: '0 2px 12px rgba(0,0,0,0.07)',
-        padding: '16px 14px 14px',
+        border: '0.5px solid #E8E4DC',
+        boxShadow: pressed ? 'none' : '0 2px 0px #E0DBD2',
+        transform: pressed ? 'translateY(2px)' : 'none',
+        padding: '14px 12px',
         display: 'flex',
         flexDirection: 'column',
         gap: 10,
@@ -1335,32 +1352,34 @@ function DashCard({ Icon, title, subtitle, status, statusType, to, onClick }) {
         WebkitTapHighlightColor: 'transparent',
         boxSizing: 'border-box',
         minHeight: 130,
+        transition: 'transform 0.08s ease, box-shadow 0.08s ease',
       }}
     >
-      <div style={{
-        width: 42, height: 42, borderRadius: '50%',
-        background: 'rgba(74,124,89,0.12)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        flexShrink: 0,
-      }}>
-        <Icon size={20} color="#4A7C59" strokeWidth={1.75} />
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div style={{
+          width: 40, height: 40, borderRadius: 10,
+          background: '#EAF0E6',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          flexShrink: 0,
+        }}>
+          <Icon size={20} color="#4A7C59" strokeWidth={1.75} />
+        </div>
+        {status && (
+          <div style={{
+            display: 'inline-flex', alignItems: 'center',
+            gap: 4, padding: '3px 8px', borderRadius: 20, background: s.bg,
+          }}>
+            <span style={{ width: 4, height: 4, borderRadius: '50%', background: s.color, flexShrink: 0 }} />
+            <span style={{ fontSize: 10, fontWeight: 700, color: s.color, whiteSpace: 'nowrap' }}>{status}</span>
+          </div>
+        )}
       </div>
       <div style={{ flex: 1 }}>
-        <p style={{ fontSize: 15, fontWeight: 700, color: '#2d3748', margin: 0, lineHeight: 1.25 }}>{title}</p>
+        <p style={{ fontSize: 14, fontWeight: 700, color: '#2d3748', margin: 0, lineHeight: 1.25 }}>{title}</p>
         {subtitle && (
           <p style={{ fontSize: 12, color: '#718096', margin: '4px 0 0', lineHeight: 1.4 }}>{subtitle}</p>
         )}
       </div>
-      {status && (
-        <div style={{
-          alignSelf: 'flex-start',
-          display: 'inline-flex', alignItems: 'center',
-          gap: 4, padding: '3px 9px', borderRadius: 20, background: s.bg,
-        }}>
-          <span style={{ width: 5, height: 5, borderRadius: '50%', background: s.color, flexShrink: 0 }} />
-          <span style={{ fontSize: 10, fontWeight: 700, color: s.color, whiteSpace: 'nowrap' }}>{status}</span>
-        </div>
-      )}
     </div>
   )
 }
@@ -1616,6 +1635,8 @@ export default function Dashboard() {
   const [patientProfile, setPatientProfile] = useState(null)
   const [dailyMood, setDailyMood] = useState(null)
   const [savingMood, setSavingMood] = useState(false)
+  const [pressedMood, setPressedMood] = useState(null)
+  const [pressedSOS, setPressedSOS] = useState(false)
   const [weekShifts, setWeekShifts] = useState([])
   // Initialized to today's key so today is expanded; past days start collapsed
   const [expandedDays, setExpandedDays] = useState(() => new Set([new Date().toISOString().split('T')[0]]))
@@ -2436,7 +2457,7 @@ export default function Dashboard() {
         {/* ════ ZONA 1 — Paciente + Estado del día ══════════════════════ */}
         <Link to="/paciente/perfil" style={{ textDecoration: 'none', display: 'block', marginBottom: 12 }}>
           <div style={{
-            background: 'linear-gradient(135deg, #4A7C59 0%, #2E5240 100%)',
+            background: '#2D4A1E',
             borderRadius: 20, padding: '16px 20px',
             boxShadow: '0 4px 20px rgba(74,124,89,0.3)',
           }}>
@@ -2538,75 +2559,54 @@ export default function Dashboard() {
         {/* Estado del día */}
         <div style={{
           background: 'white', borderRadius: 16, padding: '14px 16px',
-          marginBottom: 20, border: '1px solid #EDE5D8',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+          marginBottom: 12, border: '0.5px solid #E8E4DC',
+          boxShadow: '0 2px 0px #E0DBD2',
         }}>
           <p style={{
             fontSize: 11, fontWeight: 700, color: '#9CA3AF',
-            textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 10px',
+            textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 12px',
           }}>
             Estado del día
           </p>
-          {dailyMood ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span style={{ fontSize: 26 }}>
-                {dailyMood === 'good' ? '😊' : dailyMood === 'regular' ? '😐' : '😔'}
-              </span>
-              <div style={{ flex: 1 }}>
-                <p style={{ fontSize: 14, fontWeight: 700, color: '#1F2937', margin: 0 }}>
-                  {dailyMood === 'good' ? 'Buen día' : dailyMood === 'regular' ? 'Día regular' : 'Día difícil'}
-                </p>
-                <p style={{ fontSize: 12, color: '#9CA3AF', margin: '2px 0 0' }}>
-                  Registrado hoy
-                  {!isFamiliar && (
-                    <button
-                      onClick={() => setDailyMood(null)}
-                      style={{
-                        background: 'none', border: 'none', color: '#C9882A',
-                        fontSize: 12, cursor: 'pointer', marginLeft: 8, padding: 0,
-                      }}
-                    >
-                      Cambiar
-                    </button>
-                  )}
-                </p>
-              </div>
-            </div>
-          ) : (
-            <div>
-              <p style={{ fontSize: 13, color: '#6B7280', margin: '0 0 10px' }}>
-                ¿Cómo estuvo {profile?.name ?? 'el paciente'} hoy?
-              </p>
-              <div style={{ display: 'flex', gap: 8 }}>
-                {[
-                  { mood: 'good',    emoji: '😊', label: 'Buen día', color: '#15803D' },
-                  { mood: 'regular', emoji: '😐', label: 'Regular',  color: '#92400E' },
-                  { mood: 'hard',    emoji: '😔', label: 'Difícil',  color: '#DC2626' },
-                ].map(({ mood, emoji, label, color }) => (
-                  <button
-                    key={mood}
-                    onClick={() => saveMood(mood)}
-                    disabled={savingMood || isFamiliar}
-                    style={{
-                      flex: 1, padding: '10px 4px', borderRadius: 12,
-                      border: '1.5px solid #f0ede8', background: 'white',
-                      cursor: savingMood || isFamiliar ? 'not-allowed' : 'pointer',
-                      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-                      opacity: savingMood ? 0.6 : 1, transition: 'border-color 0.15s',
-                      boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
-                    }}
-                  >
-                    <span style={{ fontSize: 22 }}>{emoji}</span>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: '#2d3748' }}>{label}</span>
-                  </button>
-                ))}
-              </div>
-              {isFamiliar && (
-                <p style={{ fontSize: 11, color: '#C9B99A', margin: '8px 0 0', textAlign: 'center' }}>
-                  El administrador o cuidador registra el estado del día
-                </p>
-              )}
-            </div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            {MOOD_OPTIONS.map(({ mood, emoji, label, bg, border: btnBorder, shadow }) => {
+              const isSelected = !!dailyMood && (dailyMood === mood || dailyMood === emoji)
+              const isPressed  = pressedMood === mood
+              return (
+                <button
+                  key={mood}
+                  onClick={() => !isFamiliar && saveMood(mood)}
+                  onPointerDown={() => !isFamiliar && setPressedMood(mood)}
+                  onPointerUp={() => setPressedMood(null)}
+                  onPointerLeave={() => setPressedMood(null)}
+                  disabled={savingMood || isFamiliar}
+                  style={{
+                    flex: 1, padding: '12px 4px', borderRadius: 12,
+                    border: `1.5px solid ${isSelected ? btnBorder : '#E8E4DC'}`,
+                    background: isSelected ? bg : 'white',
+                    cursor: savingMood || isFamiliar ? 'default' : 'pointer',
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+                    boxShadow: isPressed ? 'none' : isSelected ? shadow : '0 2px 0px #E0DBD2',
+                    transform: isPressed ? 'translateY(3px)' : isSelected ? 'scale(1.04)' : 'none',
+                    transition: 'transform 0.08s ease, box-shadow 0.08s ease',
+                    opacity: savingMood ? 0.6 : 1,
+                  }}
+                >
+                  <span style={{ fontSize: 22 }}>{emoji}</span>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: '#2d3748' }}>{label}</span>
+                </button>
+              )
+            })}
+          </div>
+          {dailyMood && (
+            <p style={{ fontSize: 12, color: '#C9894A', fontWeight: 600, textAlign: 'center', margin: '10px 0 0' }}>
+              {MOOD_FEEDBACK[dailyMood] ?? ''}
+            </p>
+          )}
+          {isFamiliar && !dailyMood && (
+            <p style={{ fontSize: 11, color: '#C9B99A', margin: '8px 0 0', textAlign: 'center' }}>
+              El administrador o cuidador registra el estado del día
+            </p>
           )}
         </div>
 
@@ -2616,38 +2616,43 @@ export default function Dashboard() {
           {/* SOS — ancho completo */}
           <button
             onClick={prepareSOS}
+            onPointerDown={() => setPressedSOS(true)}
+            onPointerUp={() => setPressedSOS(false)}
+            onPointerLeave={() => setPressedSOS(false)}
             style={{
               gridColumn: 'span 2',
               border: 'none', cursor: 'pointer',
-              background: 'rgba(220,38,38,0.06)',
+              background: '#DC2626',
               borderRadius: 16,
-              boxShadow: '0 2px 12px rgba(0,0,0,0.07)',
+              boxShadow: pressedSOS ? 'none' : '0 3px 0px #991B1B',
+              transform: pressedSOS ? 'translateY(3px)' : 'none',
+              transition: 'transform 0.08s ease, box-shadow 0.08s ease',
               padding: '16px 18px',
               display: 'flex', alignItems: 'center', gap: 14,
               WebkitTapHighlightColor: 'transparent',
             }}
           >
             <div style={{
-              width: 46, height: 46, borderRadius: '50%',
-              background: 'rgba(220,38,38,0.12)',
+              width: 44, height: 44, borderRadius: 12,
+              background: 'rgba(255,255,255,0.15)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               flexShrink: 0,
             }}>
-              <AlertTriangle size={22} color="#DC2626" strokeWidth={1.75} />
+              <AlertTriangle size={22} color="white" strokeWidth={2} />
             </div>
             <div style={{ flex: 1, textAlign: 'left' }}>
-              <p style={{ fontSize: 15, fontWeight: 700, color: '#DC2626', margin: 0 }}>Emergencia SOS</p>
-              <p style={{ fontSize: 12, color: '#718096', margin: '3px 0 0' }}>
+              <p style={{ fontSize: 15, fontWeight: 800, color: 'white', margin: 0 }}>Emergencia SOS</p>
+              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)', margin: '3px 0 0' }}>
                 {sosSent ? 'Alerta enviada — familia notificada' : 'Toca para alertar a toda la familia'}
               </p>
             </div>
             <div style={{
               flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 4,
               padding: '4px 10px', borderRadius: 20,
-              background: sosSent ? '#DCFCE7' : '#FEE2E2',
+              background: sosSent ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.2)',
             }}>
-              <span style={{ width: 5, height: 5, borderRadius: '50%', background: sosSent ? '#15803D' : '#DC2626', flexShrink: 0 }} />
-              <span style={{ fontSize: 10, fontWeight: 700, color: sosSent ? '#15803D' : '#DC2626', whiteSpace: 'nowrap' }}>
+              <span style={{ width: 4, height: 4, borderRadius: '50%', background: 'white', flexShrink: 0 }} />
+              <span style={{ fontSize: 10, fontWeight: 700, color: 'white', whiteSpace: 'nowrap' }}>
                 {sosSent ? 'Enviada' : 'Urgente'}
               </span>
             </div>
