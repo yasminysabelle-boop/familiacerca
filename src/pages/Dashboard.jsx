@@ -1307,6 +1307,284 @@ function calcAge(dateStr) {
   return age
 }
 
+// ── Unified DashCard ─────────────────────────────────────────────────────────
+
+const DASH_STATUS = {
+  ok:      { color: '#15803D', bg: '#DCFCE7' },
+  warning: { color: '#92400E', bg: '#FEF3C7' },
+  urgent:  { color: '#DC2626', bg: '#FEE2E2' },
+  info:    { color: '#6B7280', bg: '#F3F4F6' },
+}
+
+function DashCard({ icon, title, subtitle, status, statusType, to, onClick }) {
+  const navigate = useNav()
+  const s = DASH_STATUS[statusType ?? 'info']
+  const isClickable = !!(to || onClick)
+  return (
+    <div
+      onClick={to ? () => navigate(to) : onClick}
+      style={{
+        background: 'white', borderRadius: 12,
+        border: '1px solid #f0ede8',
+        padding: '14px 12px 12px',
+        display: 'flex', flexDirection: 'column', gap: 6,
+        boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+        cursor: isClickable ? 'pointer' : 'default',
+        WebkitTapHighlightColor: 'transparent',
+        minHeight: 120, boxSizing: 'border-box',
+      }}
+    >
+      <div style={{
+        width: 36, height: 36, borderRadius: 10,
+        background: 'rgba(74,124,89,0.1)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontSize: 20, lineHeight: 1, flexShrink: 0,
+      }}>
+        {icon}
+      </div>
+      <div style={{ flex: 1 }}>
+        <p style={{ fontSize: 14, fontWeight: 700, color: '#2d3748', margin: 0, lineHeight: 1.2 }}>{title}</p>
+        {subtitle && (
+          <p style={{ fontSize: 11, color: '#9CA3AF', margin: '3px 0 0', lineHeight: 1.3,
+            overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box',
+            WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+            {subtitle}
+          </p>
+        )}
+      </div>
+      {status && (
+        <div style={{
+          alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center',
+          gap: 4, padding: '3px 8px', borderRadius: 20, background: s.bg,
+        }}>
+          <span style={{ width: 5, height: 5, borderRadius: '50%', background: s.color, flexShrink: 0 }} />
+          <span style={{ fontSize: 10, fontWeight: 700, color: s.color, whiteSpace: 'nowrap' }}>{status}</span>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── Care Day Detail components ────────────────────────────────────────────────
+
+function CareDaySection({ title, emoji, count, children }) {
+  if (count === 0) return null
+  return (
+    <div style={{ marginBottom: 18 }}>
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 6,
+        paddingBottom: 6, marginBottom: 10,
+        borderBottom: '1px solid #F3F4F6',
+      }}>
+        <span style={{ fontSize: 13 }}>{emoji}</span>
+        <span style={{ fontSize: 10, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+          {title}
+        </span>
+        <span style={{
+          fontSize: 10, fontWeight: 700, color: '#9CA3AF',
+          background: '#F3F4F6', borderRadius: 10, padding: '1px 7px', marginLeft: 2,
+        }}>
+          {count}
+        </span>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {children}
+      </div>
+    </div>
+  )
+}
+
+function MedDetailRow({ evt, isToday, confirming, onConfirm, isFamiliar }) {
+  const medLabel = [evt.medName, evt.medDosage].filter(Boolean).join(' · ')
+  const isConfirmed = evt.type === 'MED_CONFIRMED'
+  const isPending = evt.type === 'MED_PENDING'
+  const sc = isConfirmed
+    ? { icon: '✅', color: '#15803D', bg: '#F0FDF4', border: '#BBF7D0', label: evt.confirmedBy ? evt.confirmedBy.split(' ')[0] : 'Dado' }
+    : (isPending && isToday)
+      ? { icon: '⏳', color: '#92400E', bg: '#FFFBEB', border: '#FDE68A', label: 'Pendiente' }
+      : { icon: '❌', color: '#DC2626', bg: '#FFF5F5', border: '#FECACA', label: 'No dado' }
+  const timeStr = isConfirmed
+    ? (evt.timestamp ? fmtTimestamp(evt.timestamp) : null)
+    : evt.medTime ? fmtTime(evt.medTime) : null
+  const busy = confirming === evt.medicationId
+  return (
+    <div style={{
+      background: sc.bg, borderRadius: 12, border: `1px solid ${sc.border}`,
+      padding: '10px 12px', display: 'flex', alignItems: 'center', gap: 10,
+    }}>
+      <span style={{ fontSize: 18, flexShrink: 0 }}>💊</span>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', margin: 0, lineHeight: 1.3 }}>
+          {medLabel}
+        </p>
+        {timeStr && (
+          <p style={{ fontSize: 11, color: '#9CA3AF', margin: '2px 0 0' }}>
+            {isConfirmed ? `Dado a las ${timeStr}` : `Programado ${timeStr}`}
+          </p>
+        )}
+      </div>
+      <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>
+        <span style={{ fontSize: 15 }}>{sc.icon}</span>
+        <span style={{ fontSize: 10, fontWeight: 700, color: sc.color }}>{sc.label}</span>
+      </div>
+      {isPending && isToday && !isFamiliar && (
+        <button
+          onClick={() => onConfirm(evt)}
+          disabled={busy}
+          style={{
+            padding: '6px 11px', borderRadius: 8, border: 'none',
+            background: busy ? '#C0CCC5' : '#22C55E',
+            color: 'white', fontSize: 11, fontWeight: 700,
+            cursor: busy ? 'not-allowed' : 'pointer', flexShrink: 0,
+          }}
+        >
+          {busy ? '...' : 'Dar'}
+        </button>
+      )}
+    </div>
+  )
+}
+
+const CARE_ROW_CONFIG = {
+  VOICE_MEMORY:      { icon: '🎙️', label: e => e.recorderName ? `Memoria de ${e.recorderName.split(' ')[0]}` : 'Memoria de voz', sub: e => e.transcription ? `"${e.transcription.slice(0, 50)}${e.transcription.length > 50 ? '…' : ''}"` : null },
+  PHOTO:             { icon: '📸', label: e => e.caption || (e.uploaderName ? `Foto de ${e.uploaderName.split(' ')[0]}` : 'Foto familiar'), sub: () => null },
+  NOTE:              { icon: '📝', label: e => e.noteText ? e.noteText.slice(0, 45) + (e.noteText.length > 45 ? '…' : '') : 'Nota', sub: e => e.authorName ? `Por ${e.authorName.split(' ')[0]}` : null },
+  EXPENSE:           { icon: '💰', label: e => e.description || 'Gasto', sub: e => e.amount != null ? `$${Number(e.amount).toFixed(2)}` : null },
+  APPOINTMENT:       { icon: '📅', label: e => e.appointmentTitle || 'Cita médica', sub: e => e.appointmentTime ? `Programada ${fmtTime(e.appointmentTime)}` : 'Próxima cita' },
+  APPOINTMENT_PROOF: { icon: '✅', label: e => e.appointmentTitle || 'Cita médica', sub: () => 'Asistencia confirmada' },
+}
+
+function CareEventRow({ evt, onTap }) {
+  const cfg = CARE_ROW_CONFIG[evt.type]
+  if (!cfg) return null
+  const time = evt.timestamp ? fmtTimestamp(evt.timestamp) : null
+  const tappable = evt.type !== 'APPOINTMENT'
+  return (
+    <div
+      onClick={tappable ? () => onTap(evt) : undefined}
+      style={{
+        background: 'white', borderRadius: 12, border: '1px solid #EDE5D8',
+        padding: '10px 12px', display: 'flex', alignItems: 'center', gap: 10,
+        cursor: tappable ? 'pointer' : 'default',
+        boxShadow: '0 1px 4px rgba(0,0,0,0.03)',
+      }}
+    >
+      <div style={{
+        width: 34, height: 34, borderRadius: 9, flexShrink: 0,
+        background: evt.type === 'APPOINTMENT' ? '#EFF6FF' : '#F0FDF4',
+        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16,
+      }}>
+        {cfg.icon}
+      </div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', margin: 0, lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {cfg.label(evt)}
+        </p>
+        <div style={{ display: 'flex', gap: 8, marginTop: 2, alignItems: 'center' }}>
+          {time && <span style={{ fontSize: 11, color: '#9CA3AF' }}>{time}</span>}
+          {cfg.sub(evt) && (
+            <span style={{ fontSize: 11, color: evt.type === 'APPOINTMENT_PROOF' ? '#15803D' : '#6B7280', fontWeight: evt.type === 'APPOINTMENT_PROOF' ? 600 : 400 }}>
+              {cfg.sub(evt)}
+            </span>
+          )}
+        </div>
+      </div>
+      {tappable && <span style={{ fontSize: 14, color: '#D4C0B0', flexShrink: 0 }}>›</span>}
+    </div>
+  )
+}
+
+function AlertDetailRow({ evt, onTap }) {
+  const time = evt.timestamp ? fmtTimestamp(evt.timestamp) : null
+  return (
+    <div
+      onClick={() => onTap(evt)}
+      style={{
+        background: evt.resolved ? '#F9FAFB' : '#FFF0F0',
+        borderRadius: 12,
+        border: `1px solid ${evt.resolved ? '#E5E7EB' : '#FECACA'}`,
+        padding: '10px 12px', display: 'flex', alignItems: 'center', gap: 10,
+        cursor: 'pointer',
+      }}
+    >
+      <span style={{ fontSize: 18, flexShrink: 0 }}>{evt.resolved ? '✅' : '🚨'}</span>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p style={{ fontSize: 13, fontWeight: 700, color: evt.resolved ? '#374151' : '#D63031', margin: 0 }}>
+          {evt.resolved ? 'Emergencia resuelta' : 'Emergencia SOS'}
+        </p>
+        <div style={{ display: 'flex', gap: 8, marginTop: 2 }}>
+          {evt.triggeredBy && <span style={{ fontSize: 11, color: '#6B7280' }}>{evt.triggeredBy.split(' ')[0]}</span>}
+          {time && <span style={{ fontSize: 11, color: '#9CA3AF' }}>{time}</span>}
+        </div>
+      </div>
+      <span style={{ fontSize: 14, color: '#D4C0B0', flexShrink: 0 }}>›</span>
+    </div>
+  )
+}
+
+function CareDayDetail({ section, todayKey, confirming, onConfirm, isFamiliar, onTap }) {
+  const events = section?.events ?? []
+  const isToday = section?.dateKey === todayKey
+
+  const medEvents = events
+    .filter(e => ['MED_CONFIRMED', 'MED_PENDING', 'MED_MISSED'].includes(e.type))
+    .sort((a, b) => {
+      const order = { MED_CONFIRMED: 0, MED_PENDING: 1, MED_MISSED: 2 }
+      return (order[a.type] - order[b.type]) || (a.timestamp - b.timestamp)
+    })
+
+  const careEvents = events
+    .filter(e => ['VOICE_MEMORY', 'PHOTO', 'NOTE', 'EXPENSE', 'APPOINTMENT', 'APPOINTMENT_PROOF'].includes(e.type))
+    .sort((a, b) => b.timestamp - a.timestamp)
+
+  const alertEvents = events
+    .filter(e => e.type === 'SOS_ALERT')
+    .sort((a, b) => b.timestamp - a.timestamp)
+
+  if (medEvents.length === 0 && careEvents.length === 0 && alertEvents.length === 0) {
+    return (
+      <div style={{
+        background: 'white', borderRadius: 16, border: '1px solid #EDE5D8',
+        padding: '32px 16px', textAlign: 'center',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+      }}>
+        <span style={{ fontSize: 32, display: 'block', marginBottom: 10 }}>🗓️</span>
+        <p style={{ fontSize: 13, color: '#9CA3AF', margin: 0 }}>Sin actividad registrada este día</p>
+      </div>
+    )
+  }
+
+  return (
+    <div style={{
+      background: 'white', borderRadius: 16, border: '1px solid #EDE5D8',
+      padding: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+    }}>
+      <CareDaySection title="Medicamentos" emoji="💊" count={medEvents.length}>
+        {medEvents.map(evt => (
+          <MedDetailRow
+            key={evt.id}
+            evt={evt}
+            isToday={isToday}
+            confirming={confirming}
+            onConfirm={onConfirm}
+            isFamiliar={isFamiliar}
+          />
+        ))}
+      </CareDaySection>
+      <CareDaySection title="Cuidado" emoji="🏥" count={careEvents.length}>
+        {careEvents.map(evt => (
+          <CareEventRow key={evt.id} evt={evt} onTap={onTap} />
+        ))}
+      </CareDaySection>
+      <CareDaySection title="Alertas" emoji="🚨" count={alertEvents.length}>
+        {alertEvents.map(evt => (
+          <AlertDetailRow key={evt.id} evt={evt} onTap={onTap} />
+        ))}
+      </CareDaySection>
+    </div>
+  )
+}
+
 // ── Main component ─────────────────────────────────────────────────────────────
 
 export default function Dashboard() {
@@ -1341,6 +1619,7 @@ export default function Dashboard() {
   const [weekShifts, setWeekShifts] = useState([])
   // Initialized to today's key so today is expanded; past days start collapsed
   const [expandedDays, setExpandedDays] = useState(() => new Set([new Date().toISOString().split('T')[0]]))
+  const [selectedDayTab, setSelectedDayTab] = useState(() => new Date().toISOString().split('T')[0])
 
   useEffect(() => {
     if (searchParams.get('checkout') === 'success') {
@@ -1359,6 +1638,10 @@ export default function Dashboard() {
   const tomorrowKey = tomorrow.toISOString().split('T')[0]
   const sevenAgo = new Date(now); sevenAgo.setDate(sevenAgo.getDate() - 6)
   const sevenAgoKey = sevenAgo.toISOString().split('T')[0]
+  const tabDays = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(now); d.setDate(d.getDate() - i)
+    return d.toISOString().split('T')[0]
+  })
 
   const fullName = user?.user_metadata?.full_name ?? user?.email ?? 'Cuidador'
   const firstName = fullName.split(' ')[0]
@@ -2141,8 +2424,8 @@ export default function Dashboard() {
       )}
       <div style={{ padding: '12px 16px 96px', maxWidth: 600 }}>
 
-        {/* ── ZONA 1: Card del paciente ─────────────────────────────────── */}
-        <Link to="/paciente/perfil" style={{ textDecoration: 'none', display: 'block', marginBottom: 14 }}>
+        {/* ════ ZONA 1 — Paciente + Estado del día ══════════════════════ */}
+        <Link to="/paciente/perfil" style={{ textDecoration: 'none', display: 'block', marginBottom: 12 }}>
           <div style={{
             background: 'linear-gradient(135deg, #4A7C59 0%, #2E5240 100%)',
             borderRadius: 20, padding: '16px 20px',
@@ -2233,9 +2516,9 @@ export default function Dashboard() {
           </div>
         </Link>
 
-        {/* ── AI cards ─────────────────────────────────────────────────── */}
+        {/* AI motivational cards */}
         {Object.keys(aiCards).length > 0 && (
-          <div style={{ marginBottom: 16 }}>
+          <div style={{ marginBottom: 12 }}>
             {aiCards.morning && <AiCard type="morning" text={aiCards.morning} />}
             {aiCards.evening && <AiCard type="evening" text={aiCards.evening} />}
             {aiCards.burnout && <AiCard type="burnout" text={aiCards.burnout} />}
@@ -2243,48 +2526,10 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* ── Status cards grid ─────────────────────────────────────────── */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 14 }}>
-          <StatusCard
-            icon="🏥"
-            title="Cuidado de hoy"
-            subtitle={medTotal > 0 ? `${medTotal} med${medTotal !== 1 ? 's' : ''} programado${medTotal !== 1 ? 's' : ''}` : 'Rutina de cuidado'}
-            status={careStatus}
-            statusType={careStatusType}
-            pulse={carePulsing}
-            to="/hoy"
-          />
-          <StatusCard
-            icon="💊"
-            title="Medicamentos"
-            subtitle={medCardSubtitle}
-            status={medCardStatus}
-            statusType={medCardStatusType}
-            pulse={medsPulsing}
-            to="/hoy"
-          />
-          <StatusCard
-            icon="🎙️"
-            title="Memorias"
-            subtitle={memSubtitle}
-            status={memStatus}
-            statusType={memStatusType}
-            to="/memorias"
-          />
-          <StatusCard
-            icon="💬"
-            title="Chat familiar"
-            subtitle="Mensajes del día"
-            status={chatStatus}
-            statusType="info"
-            to="/chat"
-          />
-        </div>
-
-        {/* ── ZONA 3: Estado del día ────────────────────────────────────── */}
+        {/* Estado del día */}
         <div style={{
           background: 'white', borderRadius: 16, padding: '14px 16px',
-          marginBottom: 12, border: '1px solid #EDE5D8',
+          marginBottom: 20, border: '1px solid #EDE5D8',
           boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
         }}>
           <p style={{
@@ -2325,24 +2570,25 @@ export default function Dashboard() {
               </p>
               <div style={{ display: 'flex', gap: 8 }}>
                 {[
-                  { mood: 'good',    emoji: '😊', label: 'Buen día', bg: '#F0FDF4', border: '#BBF7D0', color: '#15803D' },
-                  { mood: 'regular', emoji: '😐', label: 'Regular',  bg: '#FFFBEB', border: '#FDE68A', color: '#92400E' },
-                  { mood: 'hard',    emoji: '😔', label: 'Difícil',  bg: '#FFF5F5', border: '#FECACA', color: '#DC2626' },
-                ].map(({ mood, emoji, label, bg, border, color }) => (
+                  { mood: 'good',    emoji: '😊', label: 'Buen día', color: '#15803D' },
+                  { mood: 'regular', emoji: '😐', label: 'Regular',  color: '#92400E' },
+                  { mood: 'hard',    emoji: '😔', label: 'Difícil',  color: '#DC2626' },
+                ].map(({ mood, emoji, label, color }) => (
                   <button
                     key={mood}
                     onClick={() => saveMood(mood)}
                     disabled={savingMood || isFamiliar}
                     style={{
                       flex: 1, padding: '10px 4px', borderRadius: 12,
-                      border: `1.5px solid ${border}`, background: bg,
+                      border: '1.5px solid #f0ede8', background: 'white',
                       cursor: savingMood || isFamiliar ? 'not-allowed' : 'pointer',
                       display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-                      opacity: savingMood ? 0.6 : 1, transition: 'transform 0.1s',
+                      opacity: savingMood ? 0.6 : 1, transition: 'border-color 0.15s',
+                      boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
                     }}
                   >
                     <span style={{ fontSize: 22 }}>{emoji}</span>
-                    <span style={{ fontSize: 11, fontWeight: 700, color }}>{label}</span>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: '#2d3748' }}>{label}</span>
                   </button>
                 ))}
               </div>
@@ -2355,21 +2601,179 @@ export default function Dashboard() {
           )}
         </div>
 
-        {/* ── ZONA 4: Equipo de cuidado ─────────────────────────────────── */}
+        {/* ════ ZONA 2 — Acciones urgentes (2 × 2) ══════════════════════ */}
+        <p style={{ fontSize: 10, fontWeight: 700, color: '#4A7C59', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 10px' }}>
+          Acciones
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 20 }}>
+          <DashCard
+            icon="🆘"
+            title="Emergencia"
+            subtitle="Alertar a toda la familia"
+            status={sosSent ? 'Alerta enviada' : 'Toca para activar'}
+            statusType="urgent"
+            onClick={prepareSOS}
+          />
+          <DashCard
+            icon="💊"
+            title="Medicamentos"
+            subtitle={medCardSubtitle}
+            status={medCardStatus}
+            statusType={medCardStatusType}
+            to="/hoy"
+          />
+          <DashCard
+            icon="🏥"
+            title="Cuidado de hoy"
+            subtitle={medTotal > 0 ? `${medTotal} med${medTotal !== 1 ? 's' : ''} programados` : 'Rutina diaria'}
+            status={careStatus}
+            statusType={careStatusType}
+            to="/hoy"
+          />
+          <DashCard
+            icon="📹"
+            title="Videollamada"
+            subtitle="Conectar con la familia"
+            status="Próximamente"
+            statusType="info"
+            onClick={() => {}}
+          />
+        </div>
+
+        {/* ════ ZONA 3 — Seguimiento ════════════════════════════════════ */}
+        <p style={{ fontSize: 10, fontWeight: 700, color: '#4A7C59', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 10px' }}>
+          Seguimiento
+        </p>
+
+        {/* Detalle del Cuidado */}
         <div style={{
-          background: 'white', borderRadius: 16, padding: '14px 16px',
-          marginBottom: 12, border: '1px solid #EDE5D8',
+          background: 'white', borderRadius: 16, border: '1px solid #EDE5D8',
+          padding: '14px 14px 4px', marginBottom: 10,
           boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
         }}>
-          <p style={{
-            fontSize: 11, fontWeight: 700, color: '#9CA3AF',
-            textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 12px',
-          }}>
-            Equipo de cuidado
+          <p style={{ fontSize: 13, fontWeight: 700, color: '#1A1A1A', margin: '0 0 12px' }}>
+            📋 Detalle del Cuidado
           </p>
+          <div style={{
+            display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4,
+            marginBottom: 14, scrollbarWidth: 'none', msOverflowStyle: 'none',
+          }}>
+            {tabDays.map(dayKey => {
+              const isSelected = selectedDayTab === dayKey
+              const isToday = dayKey === todayKey
+              const d = new Date(dayKey + 'T12:00:00')
+              const raw = d.toLocaleDateString('es-MX', { weekday: 'short' }).replace(/\.$/, '')
+              const wd = raw.charAt(0).toUpperCase() + raw.slice(1, 3)
+              const dayNum = d.getDate()
+              const sec = sections.find(s => s.dateKey === dayKey)
+              const secEvts = sec?.events ?? []
+              const hasPending = secEvts.some(e => e.type === 'MED_PENDING' || e.type === 'MED_MISSED')
+              const hasOk = !hasPending && secEvts.some(e => e.type === 'MED_CONFIRMED')
+              return (
+                <button
+                  key={dayKey}
+                  onClick={() => setSelectedDayTab(dayKey)}
+                  style={{
+                    flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center',
+                    padding: isToday ? '9px 16px' : '6px 10px', borderRadius: 12,
+                    border: `1.5px solid ${isSelected ? '#4A7C59' : '#EDE5D8'}`,
+                    background: isSelected ? '#4A7C59' : 'white',
+                    cursor: 'pointer', gap: 0,
+                    boxShadow: isSelected ? '0 2px 8px rgba(74,124,89,0.25)' : 'none',
+                    transition: 'all 0.15s', minWidth: isToday ? 52 : 46,
+                  }}
+                >
+                  <span style={{ fontSize: 11, fontWeight: 700, color: isSelected ? 'white' : '#6B7280', lineHeight: 1.4 }}>
+                    {isToday ? 'Hoy' : wd}
+                  </span>
+                  {!isToday && (
+                    <span style={{ fontSize: 15, fontWeight: 800, color: isSelected ? 'white' : '#1A1A1A', lineHeight: 1.2 }}>
+                      {dayNum}
+                    </span>
+                  )}
+                  {!isSelected && (hasPending || hasOk) && (
+                    <span style={{ fontSize: 6, lineHeight: 1, marginTop: 2 }}>{hasPending ? '🔴' : '🟢'}</span>
+                  )}
+                </button>
+              )
+            })}
+          </div>
+          {timelineError && (
+            <div style={{
+              background: '#FFF0F0', border: '1px solid #FFBABA',
+              borderRadius: 14, padding: '14px 16px', marginBottom: 16,
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+            }}>
+              <p style={{ fontSize: 13, color: '#D63031', margin: 0 }}>⚠️ {timelineError}</p>
+              <button onClick={fetchTimeline} style={{ padding: '6px 14px', borderRadius: 8, border: 'none', background: '#D63031', color: 'white', fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
+                Reintentar
+              </button>
+            </div>
+          )}
+          {ownerId && (loading ? (
+            <div>
+              {[1, 2, 3].map(i => (
+                <div key={i} style={{ background: '#F9FAFB', borderRadius: 12, padding: '12px', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div className="animate-pulse" style={{ width: 38, height: 38, borderRadius: 10, background: '#EDE5D8', flexShrink: 0 }} />
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <div className="animate-pulse" style={{ height: 12, width: '55%', background: '#EDE5D8', borderRadius: 6 }} />
+                    <div className="animate-pulse" style={{ height: 10, width: '35%', background: '#EDE5D8', borderRadius: 6 }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : sections.length === 0 && !timelineError ? (
+            <EmptyState profile={profile} />
+          ) : (
+            <CareDayDetail
+              section={sections.find(s => s.dateKey === selectedDayTab)}
+              todayKey={todayKey}
+              confirming={confirming}
+              onConfirm={handleConfirmMed}
+              isFamiliar={isFamiliar}
+              onTap={setSelectedEvent}
+            />
+          ))}
+        </div>
 
-          {/* Weekly mini calendar */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 14 }}>
+        {/* Próxima cita + Modo Hospital */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 20 }}>
+          <DashCard
+            icon="📅"
+            title="Próxima cita"
+            subtitle={nextAppointment?.appointmentTitle ?? 'Sin citas próximas'}
+            status={nextAppointment
+              ? (nextAppointment.dateKey === todayKey ? 'Hoy' : nextAppointment.dateKey === tomorrowKey ? 'Mañana' : 'Esta semana')
+              : 'Ver calendario'}
+            statusType={nextAppointment ? 'warning' : 'info'}
+            to="/calendar"
+          />
+          <DashCard
+            icon="🏨"
+            title="Modo Hospital"
+            subtitle="Gestión en internación"
+            status="Próximamente"
+            statusType="info"
+            onClick={() => {}}
+          />
+        </div>
+
+        {/* ════ ZONA 4 — Mi equipo ══════════════════════════════════════ */}
+        <p style={{ fontSize: 10, fontWeight: 700, color: '#4A7C59', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 10px' }}>
+          Mi equipo
+        </p>
+
+        {/* Turnos semanales */}
+        <div style={{
+          background: 'white', borderRadius: 16, padding: '14px 16px',
+          marginBottom: 10, border: '1px solid #EDE5D8',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+            <p style={{ fontSize: 13, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>👥 Turnos de cuidado</p>
+            <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>Hoy: {todayShift?.caregiver_name?.split(' ')[0] ?? firstName}</p>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
             {weekDays.map(day => {
               const shift = weekShifts.find(s => s.shift_date === day)
               const isToday = day === todayKey
@@ -2380,9 +2784,7 @@ export default function Dashboard() {
                 : null
               return (
                 <div key={day} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-                  <span style={{ fontSize: 10, fontWeight: 700, color: isToday ? '#4A7C59' : '#9CA3AF' }}>
-                    {dayLabel}
-                  </span>
+                  <span style={{ fontSize: 10, fontWeight: 700, color: isToday ? '#4A7C59' : '#9CA3AF' }}>{dayLabel}</span>
                   <div style={{
                     width: 32, height: 32, borderRadius: '50%',
                     background: isToday ? '#4A7C59' : (initials ? '#EBF3EE' : '#F3F4F6'),
@@ -2390,13 +2792,9 @@ export default function Dashboard() {
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}>
                     {initials ? (
-                      <span style={{ fontSize: 10, fontWeight: 800, color: isToday ? 'white' : '#2E5240' }}>
-                        {initials}
-                      </span>
+                      <span style={{ fontSize: 10, fontWeight: 800, color: isToday ? 'white' : '#2E5240' }}>{initials}</span>
                     ) : isToday ? (
-                      <span style={{ fontSize: 11, fontWeight: 800, color: 'white' }}>
-                        {firstName.charAt(0).toUpperCase()}
-                      </span>
+                      <span style={{ fontSize: 11, fontWeight: 800, color: 'white' }}>{firstName.charAt(0).toUpperCase()}</span>
                     ) : (
                       <span style={{ fontSize: 14, color: '#D1D5DB' }}>–</span>
                     )}
@@ -2405,68 +2803,32 @@ export default function Dashboard() {
               )
             })}
           </div>
-
-          {/* Quick links */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <Link
-              to="/chat"
-              style={{
-                display: 'flex', alignItems: 'center', gap: 10,
-                padding: '10px 12px', borderRadius: 12,
-                background: '#F7F3ED', textDecoration: 'none',
-                border: '1px solid #EDE5D8',
-              }}
-            >
-              <span style={{ fontSize: 18 }}>💬</span>
-              <div style={{ flex: 1 }}>
-                <p style={{ fontSize: 13, fontWeight: 600, color: '#1F2937', margin: 0 }}>Chat familiar</p>
-                <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>{chatStatus}</p>
-              </div>
-              {chatCount > 0 && (
-                <div style={{
-                  background: '#4A7C59', color: 'white', borderRadius: 10,
-                  minWidth: 20, height: 20, fontSize: 11, fontWeight: 700,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 6px',
-                }}>
-                  {chatCount}
-                </div>
-              )}
-            </Link>
-
-            {nextAppointment && (
-              <Link
-                to="/calendar"
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 10,
-                  padding: '10px 12px', borderRadius: 12,
-                  background: '#F0F9FF', textDecoration: 'none',
-                  border: '1px solid #BAE6FD',
-                }}
-              >
-                <span style={{ fontSize: 18 }}>🏥</span>
-                <div style={{ flex: 1 }}>
-                  <p style={{ fontSize: 13, fontWeight: 600, color: '#1F2937', margin: 0 }}>Próxima cita</p>
-                  <p style={{ fontSize: 11, color: '#0369A1', margin: 0, fontWeight: 500 }}>
-                    {nextAppointment.appointmentTitle}
-                    {nextAppointment.appointmentTime ? ` · ${fmtTime(nextAppointment.appointmentTime)}` : ''}
-                  </p>
-                </div>
-                <span style={{ color: '#9CA3AF', fontSize: 14 }}>›</span>
-              </Link>
-            )}
-          </div>
+          <Link to="/familia" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 12, background: '#F7F3ED', textDecoration: 'none', border: '1px solid #EDE5D8' }}>
+            <span style={{ fontSize: 18 }}>👥</span>
+            <div style={{ flex: 1 }}>
+              <p style={{ fontSize: 13, fontWeight: 600, color: '#1F2937', margin: 0 }}>Ver equipo completo</p>
+              <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>Turnos, roles e invitaciones</p>
+            </div>
+            <span style={{ color: '#9CA3AF', fontSize: 14 }}>›</span>
+          </Link>
         </div>
 
-        {/* ── Emergency card ────────────────────────────────────────────── */}
-        <EmergencyCard onPress={prepareSOS} sosSent={sosSent} />
+        {/* Directorio */}
+        <div style={{ marginBottom: 20 }}>
+          <DashCard
+            icon="📒"
+            title="Directorio"
+            subtitle="Médicos, hospitales y contactos de emergencia"
+            status="Ver directorio"
+            statusType="info"
+            to="/directorio"
+          />
+        </div>
 
-        {/* ── Últimas novedades ─────────────────────────────────────────── */}
+        {/* Últimas novedades */}
         {!loading && recentEvents.length > 0 && (
-          <div style={{ marginBottom: 24 }}>
-            <p style={{
-              fontSize: 11, fontWeight: 700, color: '#9CA3AF',
-              textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 10px',
-            }}>
+          <div style={{ marginBottom: 20 }}>
+            <p style={{ fontSize: 10, fontWeight: 700, color: '#4A7C59', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 10px' }}>
               Últimas novedades
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -2477,77 +2839,36 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* ── Historial ────────────────────────────────────────────────── */}
-        <div>
-          <p style={{
-            fontSize: 11, fontWeight: 700, color: '#9CA3AF',
-            textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 10px',
-          }}>
-            Historial
-          </p>
-          {timelineError && (
-            <div style={{
-              background: '#FFF0F0', border: '1px solid #FFBABA',
-              borderRadius: 14, padding: '14px 16px', marginBottom: 16,
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+        {/* ════ ZONA 5 — Otras funciones (3 columnas) ══════════════════ */}
+        <p style={{ fontSize: 10, fontWeight: 700, color: '#4A7C59', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 10px' }}>
+          Otras funciones
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginBottom: 24 }}>
+          {[
+            { to: '/chat',            emoji: '💬', label: 'Chat' },
+            { to: '/notes',           emoji: '📝', label: 'Notas' },
+            { to: '/album',           emoji: '📸', label: 'Álbum' },
+            { to: '/memorias',        emoji: '🎙️', label: 'Memorias' },
+            { to: '/gastos',          emoji: '💰', label: 'Gastos' },
+            { to: '/reportes',        emoji: '📊', label: 'Reportes' },
+            { to: '/paciente/perfil', emoji: '🏥', label: 'Perfil' },
+          ].map(({ to, emoji, label }) => (
+            <Link key={to} to={to} style={{
+              display: 'flex', flexDirection: 'column', alignItems: 'center',
+              gap: 6, padding: '14px 8px',
+              background: 'white', borderRadius: 16, border: '1px solid #EDE5D8',
+              textDecoration: 'none', boxShadow: '0 1px 6px rgba(0,0,0,0.04)',
             }}>
-              <p style={{ fontSize: 13, color: '#D63031', margin: 0 }}>⚠️ {timelineError}</p>
-              <button
-                onClick={fetchTimeline}
-                style={{
-                  padding: '6px 14px', borderRadius: 8, border: 'none',
-                  background: '#D63031', color: 'white', fontSize: 12,
-                  fontWeight: 700, cursor: 'pointer', flexShrink: 0,
-                }}
-              >
-                Reintentar
-              </button>
-            </div>
-          )}
-          {ownerId && (loading ? (
-            <div>
-              {[1, 2, 3].map(i => (
-                <div key={i} style={{
-                  background: 'white', borderRadius: 16, padding: '14px 14px',
-                  marginBottom: 10, border: '1px solid #EDE5D8',
-                  display: 'flex', alignItems: 'center', gap: 12,
-                }}>
-                  <div className="animate-pulse" style={{ width: 44, height: 44, borderRadius: 12, background: '#EDE5D8', flexShrink: 0 }} />
-                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    <div className="animate-pulse" style={{ height: 14, width: '55%', background: '#EDE5D8', borderRadius: 6 }} />
-                    <div className="animate-pulse" style={{ height: 11, width: '35%', background: '#EDE5D8', borderRadius: 6 }} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : sections.length === 0 && !timelineError ? (
-            <EmptyState profile={profile} />
-          ) : (
-            sections.map(section => (
-              <DaySection
-                key={section.dateKey}
-                section={section}
-                isExpanded={expandedDays.has(section.dateKey)}
-                onToggle={() => toggleDay(section.dateKey)}
-                medTotal={medTotal}
-                confirming={confirming}
-                expandedAudio={expandedAudio}
-                onConfirm={handleConfirmMed}
-                onToggleAudio={id => setExpandedAudio(prev => prev === id ? null : id)}
-                todayKey={todayKey}
-                tomorrowKey={tomorrowKey}
-                reactions={reactions}
-                userId={user.id}
-                onReact={toggleReaction}
-                onTap={setSelectedEvent}
-                isFamiliar={isFamiliar}
-              />
-            ))
+              <span style={{ fontSize: 22 }}>{emoji}</span>
+              <span style={{ fontSize: 11, fontWeight: 600, color: '#374151', textAlign: 'center', lineHeight: 1.3 }}>
+                {label}
+              </span>
+            </Link>
           ))}
         </div>
 
-        {/* ── Sign out ─────────────────────────────────────────────────── */}
-        <div style={{ marginTop: 24, paddingBottom: 8, display: 'flex', justifyContent: 'center' }}>
+        {/* Sign out */}
+        <div style={{ marginTop: 8, paddingBottom: 8, display: 'flex', justifyContent: 'center' }}>
           <button
             onClick={async () => {
               localStorage.removeItem('fc_active_context')

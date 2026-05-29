@@ -16,7 +16,6 @@ const MORE_ITEMS = [
   { to: '/notes',      Icon: FileText,        label: 'Notas',               desc: 'Observaciones del cuidado diario',      color: '#4A7C59' },
   { to: '/album',      Icon: Image,           label: 'Álbum familiar',      desc: 'Fotos y videos de momentos especiales', color: '#C9882A' },
   { to: '/reportes',   Icon: BarChart,        label: 'Reportes',            desc: 'Análisis semanal y PDF médico',          color: '#2D86A0' },
-  { to: '/perfil',          Icon: User,            label: 'Perfil familiar',     desc: 'Datos de la persona a cuidar',          color: '#4A7C59' },
   { to: '/paciente/perfil', Icon: ClipboardCheck, label: 'Perfil del paciente', desc: 'Diagnósticos, alergias y médico',        color: '#D63031' },
   { to: '/ajustes',    Icon: Settings,        label: 'Mi cuenta',           desc: 'Suscripción y configuración',            color: '#6B7280' },
 ]
@@ -202,11 +201,7 @@ export default function More() {
                     </Link>
                   )}
                 </>
-              ) : (
-                <Link to="/perfil" style={{ color: 'rgba(255,255,255,0.75)', fontSize: 13, textDecoration: 'underline' }}>
-                  + Agregar perfil familiar
-                </Link>
-              )}
+              ) : null}
               <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: 11, marginTop: 4, letterSpacing: '0.03em' }}>
                 Cuidado por {caretakerName}
               </p>

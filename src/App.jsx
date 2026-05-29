@@ -14,7 +14,6 @@ import Medications from './pages/Medications'
 import MedicationTimeline from './pages/MedicationTimeline'
 import Calendar from './pages/Calendar'
 import Notes from './pages/Notes'
-import FamilyProfile from './pages/FamilyProfile'
 import Chat from './pages/Chat'
 import MemoryAlbum from './pages/MemoryAlbum'
 import Memorias from './pages/Memorias'
@@ -85,7 +84,6 @@ function AppShell() {
         <Route path="/hoy"         element={<P><Hoy /></P>} />
         <Route path="/familia"     element={<P><Familia /></P>} />
         <Route path="/reportes"    element={<P><Reports /></P>} />
-        <Route path="/perfil"      element={<P><FamilyProfile /></P>} />
         <Route path="/mas"         element={<P><More /></P>} />
         <Route path="/gastos"      element={<P><Expenses /></P>} />
         <Route path="/directorio"  element={<P><Directory /></P>} />
