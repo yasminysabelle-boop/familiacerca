@@ -2610,48 +2610,48 @@ export default function Dashboard() {
           )}
         </div>
 
-        {/* Fila 6: Emergencia SOS — ancho completo */}
-        <button
-          onClick={prepareSOS}
-          style={{
-            width: '100%', border: 'none', cursor: 'pointer',
-            background: 'rgba(220,38,38,0.06)',
-            borderRadius: 16,
-            boxShadow: '0 2px 12px rgba(0,0,0,0.07)',
-            padding: '16px 18px',
-            display: 'flex', alignItems: 'center', gap: 14,
-            WebkitTapHighlightColor: 'transparent',
-            marginBottom: 10,
-          }}
-        >
-          <div style={{
-            width: 46, height: 46, borderRadius: '50%',
-            background: 'rgba(220,38,38,0.12)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            flexShrink: 0,
-          }}>
-            <AlertTriangle size={22} color="#DC2626" strokeWidth={1.75} />
-          </div>
-          <div style={{ flex: 1, textAlign: 'left' }}>
-            <p style={{ fontSize: 15, fontWeight: 700, color: '#DC2626', margin: 0 }}>Emergencia SOS</p>
-            <p style={{ fontSize: 12, color: '#718096', margin: '3px 0 0' }}>
-              {sosSent ? 'Alerta enviada — familia notificada' : 'Toca para alertar a toda la familia'}
-            </p>
-          </div>
-          <div style={{
-            flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 4,
-            padding: '4px 10px', borderRadius: 20,
-            background: sosSent ? '#DCFCE7' : '#FEE2E2',
-          }}>
-            <span style={{ width: 5, height: 5, borderRadius: '50%', background: sosSent ? '#15803D' : '#DC2626', flexShrink: 0 }} />
-            <span style={{ fontSize: 10, fontWeight: 700, color: sosSent ? '#15803D' : '#DC2626', whiteSpace: 'nowrap' }}>
-              {sosSent ? 'Enviada' : 'Urgente'}
-            </span>
-          </div>
-        </button>
+        {/* ════ 2-col grid — SOS y Otras funciones span 2 ════════════════ */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', padding: '0 16px', marginBottom: 24 }}>
 
-        {/* ════ 2-col grid ════════════════════════════════════════════════ */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, marginBottom: 12 }}>
+          {/* SOS — ancho completo */}
+          <button
+            onClick={prepareSOS}
+            style={{
+              gridColumn: 'span 2',
+              border: 'none', cursor: 'pointer',
+              background: 'rgba(220,38,38,0.06)',
+              borderRadius: 16,
+              boxShadow: '0 2px 12px rgba(0,0,0,0.07)',
+              padding: '16px 18px',
+              display: 'flex', alignItems: 'center', gap: 14,
+              WebkitTapHighlightColor: 'transparent',
+            }}
+          >
+            <div style={{
+              width: 46, height: 46, borderRadius: '50%',
+              background: 'rgba(220,38,38,0.12)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flexShrink: 0,
+            }}>
+              <AlertTriangle size={22} color="#DC2626" strokeWidth={1.75} />
+            </div>
+            <div style={{ flex: 1, textAlign: 'left' }}>
+              <p style={{ fontSize: 15, fontWeight: 700, color: '#DC2626', margin: 0 }}>Emergencia SOS</p>
+              <p style={{ fontSize: 12, color: '#718096', margin: '3px 0 0' }}>
+                {sosSent ? 'Alerta enviada — familia notificada' : 'Toca para alertar a toda la familia'}
+              </p>
+            </div>
+            <div style={{
+              flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 4,
+              padding: '4px 10px', borderRadius: 20,
+              background: sosSent ? '#DCFCE7' : '#FEE2E2',
+            }}>
+              <span style={{ width: 5, height: 5, borderRadius: '50%', background: sosSent ? '#15803D' : '#DC2626', flexShrink: 0 }} />
+              <span style={{ fontSize: 10, fontWeight: 700, color: sosSent ? '#15803D' : '#DC2626', whiteSpace: 'nowrap' }}>
+                {sosSent ? 'Enviada' : 'Urgente'}
+              </span>
+            </div>
+          </button>
 
           {/* Fila 1: Medicamentos | Cuidado de hoy */}
           <DashCard Icon={Pill}           title="Medicamentos"       subtitle={medCardSubtitle}                                                                                         status={medCardStatus}  statusType={medCardStatusType}  to="/hoy" />
@@ -2679,40 +2679,40 @@ export default function Dashboard() {
           {/* Fila 5: Videollamada | Modo Hospital */}
           <DashCard Icon={Camera}         title="Videollamada"        subtitle="Conectar con la familia"                                                                                 status="Próximamente"   statusType="info"                onClick={() => {}} />
           <DashCard Icon={Heart}          title="Modo Hospital"       subtitle="Gestión en internación"                                                                                  status="Próximamente"   statusType="info"                onClick={() => {}} />
-        </div>
 
-        {/* Otras funciones — ancho completo */}
-        <Link
-          to="/mas"
-          style={{
-            display: 'flex', alignItems: 'center', gap: 14,
-            background: 'white', borderRadius: 16,
-            boxShadow: '0 2px 12px rgba(0,0,0,0.07)',
-            padding: '16px 18px', textDecoration: 'none',
-            WebkitTapHighlightColor: 'transparent',
-            marginBottom: 24,
-          }}
-        >
-          <div style={{
-            width: 46, height: 46, borderRadius: '50%',
-            background: 'rgba(74,124,89,0.12)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            flexShrink: 0,
-          }}>
-            <Menu size={22} color="#4A7C59" strokeWidth={1.75} />
-          </div>
-          <div style={{ flex: 1 }}>
-            <p style={{ fontSize: 15, fontWeight: 700, color: '#2d3748', margin: 0 }}>Otras funciones</p>
-            <p style={{ fontSize: 12, color: '#718096', margin: '3px 0 0' }}>Álbum, Memorias, Reportes, Directorio, Ajustes</p>
-          </div>
-          <div style={{
-            flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 4,
-            padding: '4px 10px', borderRadius: 20, background: '#F3F4F6',
-          }}>
-            <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#6B7280', flexShrink: 0 }} />
-            <span style={{ fontSize: 10, fontWeight: 700, color: '#6B7280', whiteSpace: 'nowrap' }}>Ver todo</span>
-          </div>
-        </Link>
+          {/* Otras funciones — ancho completo */}
+          <Link
+            to="/mas"
+            style={{
+              gridColumn: 'span 2',
+              display: 'flex', alignItems: 'center', gap: 14,
+              background: 'white', borderRadius: 16,
+              boxShadow: '0 2px 12px rgba(0,0,0,0.07)',
+              padding: '16px 18px', textDecoration: 'none',
+              WebkitTapHighlightColor: 'transparent',
+            }}
+          >
+            <div style={{
+              width: 46, height: 46, borderRadius: '50%',
+              background: 'rgba(74,124,89,0.12)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flexShrink: 0,
+            }}>
+              <Menu size={22} color="#4A7C59" strokeWidth={1.75} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <p style={{ fontSize: 15, fontWeight: 700, color: '#2d3748', margin: 0 }}>Otras funciones</p>
+              <p style={{ fontSize: 12, color: '#718096', margin: '3px 0 0' }}>Álbum, Memorias, Reportes, Directorio, Ajustes</p>
+            </div>
+            <div style={{
+              flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 4,
+              padding: '4px 10px', borderRadius: 20, background: '#F3F4F6',
+            }}>
+              <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#6B7280', flexShrink: 0 }} />
+              <span style={{ fontSize: 10, fontWeight: 700, color: '#6B7280', whiteSpace: 'nowrap' }}>Ver todo</span>
+            </div>
+          </Link>
+        </div>
 
         {/* Sign out */}
         <div style={{ marginTop: 8, paddingBottom: 8, display: 'flex', justifyContent: 'center' }}>
