@@ -2762,111 +2762,30 @@ export default function Dashboard() {
         <p style={{ fontSize: 10, fontWeight: 700, color: '#4A7C59', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 10px' }}>
           Mi equipo
         </p>
-
-        {/* Turnos semanales */}
-        <div style={{
-          background: 'white', borderRadius: 16, padding: '14px 16px',
-          marginBottom: 10, border: '1px solid #EDE5D8',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-            <p style={{ fontSize: 13, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>👥 Turnos de cuidado</p>
-            <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>Hoy: {todayShift?.caregiver_name?.split(' ')[0] ?? firstName}</p>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
-            {weekDays.map(day => {
-              const shift = weekShifts.find(s => s.shift_date === day)
-              const isToday = day === todayKey
-              const d = new Date(day + 'T12:00:00')
-              const dayLabel = d.toLocaleDateString('es-MX', { weekday: 'short' }).slice(0, 2).toUpperCase()
-              const initials = shift?.caregiver_name
-                ? shift.caregiver_name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()
-                : null
-              return (
-                <div key={day} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-                  <span style={{ fontSize: 10, fontWeight: 700, color: isToday ? '#4A7C59' : '#9CA3AF' }}>{dayLabel}</span>
-                  <div style={{
-                    width: 32, height: 32, borderRadius: '50%',
-                    background: isToday ? '#4A7C59' : (initials ? '#EBF3EE' : '#F3F4F6'),
-                    border: `1.5px solid ${isToday ? '#4A7C59' : (initials ? '#A8D5B8' : '#E5E7EB')}`,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}>
-                    {initials ? (
-                      <span style={{ fontSize: 10, fontWeight: 800, color: isToday ? 'white' : '#2E5240' }}>{initials}</span>
-                    ) : isToday ? (
-                      <span style={{ fontSize: 11, fontWeight: 800, color: 'white' }}>{firstName.charAt(0).toUpperCase()}</span>
-                    ) : (
-                      <span style={{ fontSize: 14, color: '#D1D5DB' }}>–</span>
-                    )}
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-          <Link to="/familia" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 12, background: '#F7F3ED', textDecoration: 'none', border: '1px solid #EDE5D8' }}>
-            <span style={{ fontSize: 18 }}>👥</span>
-            <div style={{ flex: 1 }}>
-              <p style={{ fontSize: 13, fontWeight: 600, color: '#1F2937', margin: 0 }}>Ver equipo completo</p>
-              <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>Turnos, roles e invitaciones</p>
-            </div>
-            <span style={{ color: '#9CA3AF', fontSize: 14 }}>›</span>
-          </Link>
-        </div>
-
-        {/* Directorio */}
         <div style={{ marginBottom: 20 }}>
           <DashCard
-            icon="📒"
-            title="Directorio"
-            subtitle="Médicos, hospitales y contactos de emergencia"
-            status="Ver directorio"
+            icon="👥"
+            title="Mi equipo"
+            subtitle="Cuidadores y familiares"
+            status="Ver equipo"
             statusType="info"
-            to="/directorio"
+            to="/familia"
           />
         </div>
 
-        {/* Últimas novedades */}
-        {!loading && recentEvents.length > 0 && (
-          <div style={{ marginBottom: 20 }}>
-            <p style={{ fontSize: 10, fontWeight: 700, color: '#4A7C59', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 10px' }}>
-              Últimas novedades
-            </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {recentEvents.map(evt => (
-                <RecentEventRow key={evt.id} evt={evt} onTap={setSelectedEvent} />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* ════ ZONA 5 — Otras funciones (3 columnas) ══════════════════ */}
+        {/* ════ ZONA 5 — Otras funciones ════════════════════════════════ */}
         <p style={{ fontSize: 10, fontWeight: 700, color: '#4A7C59', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 10px' }}>
           Otras funciones
         </p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginBottom: 24 }}>
-          {[
-            { to: '/medications',      emoji: '💊', label: 'Medicamentos' },
-            { to: '/cuidado/horarios', emoji: '🗓️', label: 'Horarios' },
-            { to: '/directorio',       emoji: '📒', label: 'Directorio' },
-            { to: '/notes',            emoji: '📝', label: 'Notas' },
-            { to: '/album',            emoji: '📸', label: 'Álbum' },
-            { to: '/memorias',         emoji: '🎙️', label: 'Memorias' },
-            { to: '/gastos',           emoji: '💰', label: 'Gastos' },
-            { to: '/reportes',         emoji: '📊', label: 'Reportes' },
-            { to: '/paciente/perfil',  emoji: '🏥', label: 'Perfil' },
-          ].map(({ to, emoji, label }) => (
-            <Link key={to} to={to} style={{
-              display: 'flex', flexDirection: 'column', alignItems: 'center',
-              gap: 6, padding: '14px 8px',
-              background: 'white', borderRadius: 16, border: '1px solid #EDE5D8',
-              textDecoration: 'none', boxShadow: '0 1px 6px rgba(0,0,0,0.04)',
-            }}>
-              <span style={{ fontSize: 22 }}>{emoji}</span>
-              <span style={{ fontSize: 11, fontWeight: 600, color: '#374151', textAlign: 'center', lineHeight: 1.3 }}>
-                {label}
-              </span>
-            </Link>
-          ))}
+        <div style={{ marginBottom: 24 }}>
+          <DashCard
+            icon="⊞"
+            title="Otras funciones"
+            subtitle="Notas, Álbum, Reportes y más"
+            status="Ver todo"
+            statusType="info"
+            to="/mas"
+          />
         </div>
 
         {/* Sign out */}
