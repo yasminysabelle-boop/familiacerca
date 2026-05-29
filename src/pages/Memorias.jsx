@@ -275,6 +275,14 @@ export default function Memorias() {
           0%   { transform: scale(1);   opacity: 0.55; }
           100% { transform: scale(2.1); opacity: 0; }
         }
+        @keyframes wave-bar {
+          0%, 100% { transform: scaleY(0.25); }
+          50%       { transform: scaleY(1);    }
+        }
+        @keyframes rec-ring {
+          0%   { transform: scale(1);   opacity: 0.5; }
+          100% { transform: scale(2.4); opacity: 0; }
+        }
       `}</style>
       <div style={{ padding: '16px 16px 0', maxWidth: 600 }}>
 
@@ -385,27 +393,60 @@ export default function Memorias() {
 
           {/* Recording */}
           {step === 'recording' && (
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ position: 'relative', width: 96, height: 96, margin: '0 auto 16px' }}>
+            <div style={{ textAlign: 'center', padding: '8px 0' }}>
+
+              {/* Red radiating rings + mic */}
+              <div style={{ position: 'relative', width: 88, height: 88, margin: '0 auto 20px' }}>
+                {[0, 0.55, 1.1].map((delay, i) => (
+                  <div key={i} style={{
+                    position: 'absolute', inset: 0, borderRadius: '50%',
+                    background: 'rgba(214,48,49,0.18)',
+                    animation: `rec-ring 1.6s ease-out infinite ${delay}s`,
+                    pointerEvents: 'none',
+                  }} />
+                ))}
                 <div style={{
                   position: 'absolute', inset: 0, borderRadius: '50%',
-                  background: 'rgba(214,48,49,0.15)', animation: 'ping 1.2s infinite',
-                }} />
-                <div style={{
-                  position: 'absolute', inset: 8, borderRadius: '50%',
-                  background: 'rgba(214,48,49,0.08)', animation: 'pulse 1.5s infinite',
-                }} />
-                <div style={{
-                  position: 'absolute', inset: 0, borderRadius: '50%', background: '#FFF5F5',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36,
+                  background: 'linear-gradient(145deg, #EF4444, #B91C1C)',
+                  boxShadow: '0 10px 32px rgba(185,28,28,0.45)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 34,
                 }}>
                   🎙️
                 </div>
               </div>
-              <p style={{ fontSize: 32, fontWeight: 700, fontFamily: 'monospace', marginBottom: 6 }}>
+
+              {/* Equalizer bars */}
+              <div style={{
+                display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
+                gap: 4, height: 32, marginBottom: 16,
+              }}>
+                {[
+                  { h: 28, delay: '0s'    },
+                  { h: 20, delay: '0.15s' },
+                  { h: 32, delay: '0.3s'  },
+                  { h: 16, delay: '0.08s' },
+                  { h: 26, delay: '0.45s' },
+                  { h: 22, delay: '0.22s' },
+                  { h: 30, delay: '0.38s' },
+                ].map(({ h, delay }, i) => (
+                  <div key={i} style={{
+                    width: 4, borderRadius: 3,
+                    height: h,
+                    background: 'linear-gradient(to top, #D63031, #FF6B6B)',
+                    transformOrigin: 'bottom',
+                    animation: `wave-bar ${0.55 + (i % 3) * 0.12}s ease-in-out infinite ${delay}`,
+                  }} />
+                ))}
+              </div>
+
+              {/* Timer */}
+              <p style={{ fontSize: 34, fontWeight: 700, fontFamily: 'monospace', color: '#1A1A1A', marginBottom: 4 }}>
                 {fmt(elapsed)}
               </p>
-              <p style={{ fontSize: 12, color: '#D63031', fontWeight: 600, marginBottom: 20 }}>Grabando...</p>
+              <p style={{ fontSize: 11, color: '#D63031', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 22 }}>
+                ● Grabando
+              </p>
+
               <div style={{ display: 'flex', gap: 10 }}>
                 <button
                   onClick={stopAndSave}
