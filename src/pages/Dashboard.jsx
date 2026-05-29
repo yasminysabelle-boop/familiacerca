@@ -2651,7 +2651,7 @@ export default function Dashboard() {
         </button>
 
         {/* ════ 2-col grid ════════════════════════════════════════════════ */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, marginBottom: 12 }}>
 
           {/* Fila 1: Medicamentos | Cuidado de hoy */}
           <DashCard Icon={Pill}           title="Medicamentos"       subtitle={medCardSubtitle}                                                                                         status={medCardStatus}  statusType={medCardStatusType}  to="/hoy" />
