@@ -1324,6 +1324,7 @@ export default function Dashboard() {
   const [adminConfirmEvt, setAdminConfirmEvt] = useState(null)
   const [selectedEvent, setSelectedEvent] = useState(null)
   const [chatCount, setChatCount] = useState(0)
+  const [patientProfileIncomplete, setPatientProfileIncomplete] = useState(false)
   // Initialized to today's key so today is expanded; past days start collapsed
   const [expandedDays, setExpandedDays] = useState(() => new Set([new Date().toISOString().split('T')[0]]))
 
@@ -1371,6 +1372,16 @@ export default function Dashboard() {
       .gte('created_at', todayKey + 'T00:00:00Z')
       .then(({ count }) => setChatCount(count ?? 0))
   }, [ownerId, todayKey])
+
+  useEffect(() => {
+    if (!ownerId) return
+    supabase
+      .from('patient_profiles')
+      .select('nombre_completo')
+      .eq('owner_id', ownerId)
+      .maybeSingle()
+      .then(({ data: pp }) => setPatientProfileIncomplete(!pp?.nombre_completo))
+  }, [ownerId])
 
   // Schedule daily browser notifications (fires when app is open/in background)
   useEffect(() => {
@@ -2125,6 +2136,33 @@ export default function Dashboard() {
             {aiCards.burnout && <AiCard type="burnout" text={aiCards.burnout} />}
             {aiCards.weekly  && <AiCard type="weekly"  text={aiCards.weekly} />}
           </div>
+        )}
+
+        {/* ── Patient profile incomplete banner ────────────────────────── */}
+        {patientProfileIncomplete && (
+          <Link
+            to="/paciente/perfil"
+            style={{
+              display: 'flex', alignItems: 'center', gap: 12,
+              padding: '13px 16px', borderRadius: 14, marginBottom: 14,
+              background: 'linear-gradient(135deg, #FFFBEB, #FEF3C7)',
+              border: '1.5px solid #FDE68A', textDecoration: 'none',
+              boxShadow: '0 2px 8px rgba(201,136,42,0.12)',
+            }}
+          >
+            <span style={{ fontSize: 22, flexShrink: 0 }}>📋</span>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ fontSize: 13, fontWeight: 700, color: '#92400E', margin: 0, lineHeight: 1.3 }}>
+                Perfil del paciente incompleto
+              </p>
+              <p style={{ fontSize: 12, color: '#A07020', margin: '2px 0 0' }}>
+                {isFamiliar ? 'El administrador puede completarlo' : 'Toca para agregar información médica'}
+              </p>
+            </div>
+            {!isFamiliar && (
+              <span style={{ fontSize: 18, color: '#C9882A', flexShrink: 0 }}>›</span>
+            )}
+          </Link>
         )}
 
         {/* ── Status cards grid ─────────────────────────────────────────── */}

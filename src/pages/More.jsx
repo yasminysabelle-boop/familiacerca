@@ -17,7 +17,8 @@ const MORE_ITEMS = [
   { to: '/album',      Icon: Image,           label: 'Álbum familiar',      desc: 'Fotos y videos de momentos especiales', color: '#C9882A' },
   { to: '/memorias',   Icon: Mic,             label: 'Memorias',            desc: 'Memorias de voz del familiar',          color: '#7C5CBF' },
   { to: '/reportes',   Icon: BarChart,        label: 'Reportes',            desc: 'Análisis semanal y PDF médico',          color: '#2D86A0' },
-  { to: '/perfil',     Icon: User,            label: 'Perfil familiar',     desc: 'Datos de la persona a cuidar',          color: '#4A7C59' },
+  { to: '/perfil',          Icon: User,            label: 'Perfil familiar',     desc: 'Datos de la persona a cuidar',          color: '#4A7C59' },
+  { to: '/paciente/perfil', Icon: ClipboardCheck, label: 'Perfil del paciente', desc: 'Diagnósticos, alergias y médico',        color: '#D63031' },
   { to: '/ajustes',    Icon: Settings,        label: 'Mi cuenta',           desc: 'Suscripción y configuración',            color: '#6B7280' },
 ]
 
