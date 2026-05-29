@@ -2376,6 +2376,15 @@ export default function Dashboard() {
   const medsPulsing = !loading && nextPendingMed?.medStatus === 'tarde'
   const carePulsing = !loading && careStatusType === 'urgent'
 
+  const detailSubtitle = loading
+    ? 'Cargando...'
+    : pendingCount > 0
+      ? `Hoy: ${pendingCount} pendiente${pendingCount !== 1 ? 's' : ''} · ${confirmedTodayCount} dado${confirmedTodayCount !== 1 ? 's' : ''}`
+      : confirmedTodayCount > 0
+        ? `Hoy: todo al día · ${confirmedTodayCount} dado${confirmedTodayCount !== 1 ? 's' : ''}`
+        : 'Sin actividad registrada hoy'
+  const detailStatusType = loading ? 'info' : pendingCount > 0 ? 'warning' : confirmedTodayCount > 0 ? 'ok' : 'info'
+
   // Memorias card status
   let memStatus, memStatusType, memSubtitle
   if (lastMemory) {
@@ -2626,96 +2635,14 @@ export default function Dashboard() {
             to="/hoy"
           />
 
-        {/* Detalle del Cuidado */}
-        <div style={{
-          background: 'white', borderRadius: 16, border: '1px solid #EDE5D8',
-          padding: '14px 16px 4px',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-        }}>
-          <p style={{ fontSize: 13, fontWeight: 700, color: '#1A1A1A', margin: '0 0 12px' }}>
-            📋 Detalle del Cuidado
-          </p>
-          <div style={{
-            display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4,
-            marginBottom: 14, scrollbarWidth: 'none', msOverflowStyle: 'none',
-          }}>
-            {tabDays.map(dayKey => {
-              const isSelected = selectedDayTab === dayKey
-              const isToday = dayKey === todayKey
-              const d = new Date(dayKey + 'T12:00:00')
-              const raw = d.toLocaleDateString('es-MX', { weekday: 'short' }).replace(/\.$/, '')
-              const wd = raw.charAt(0).toUpperCase() + raw.slice(1, 3)
-              const dayNum = d.getDate()
-              const sec = sections.find(s => s.dateKey === dayKey)
-              const secEvts = sec?.events ?? []
-              const hasPending = secEvts.some(e => e.type === 'MED_PENDING' || e.type === 'MED_MISSED')
-              const hasOk = !hasPending && secEvts.some(e => e.type === 'MED_CONFIRMED')
-              return (
-                <button
-                  key={dayKey}
-                  onClick={() => setSelectedDayTab(dayKey)}
-                  style={{
-                    flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center',
-                    padding: isToday ? '9px 16px' : '6px 10px', borderRadius: 12,
-                    border: `1.5px solid ${isSelected ? '#4A7C59' : '#EDE5D8'}`,
-                    background: isSelected ? '#4A7C59' : 'white',
-                    cursor: 'pointer', gap: 0,
-                    boxShadow: isSelected ? '0 2px 8px rgba(74,124,89,0.25)' : 'none',
-                    transition: 'all 0.15s', minWidth: isToday ? 52 : 46,
-                  }}
-                >
-                  <span style={{ fontSize: 11, fontWeight: 700, color: isSelected ? 'white' : '#6B7280', lineHeight: 1.4 }}>
-                    {isToday ? 'Hoy' : wd}
-                  </span>
-                  {!isToday && (
-                    <span style={{ fontSize: 15, fontWeight: 800, color: isSelected ? 'white' : '#1A1A1A', lineHeight: 1.2 }}>
-                      {dayNum}
-                    </span>
-                  )}
-                  {!isSelected && (hasPending || hasOk) && (
-                    <span style={{ fontSize: 6, lineHeight: 1, marginTop: 2 }}>{hasPending ? '🔴' : '🟢'}</span>
-                  )}
-                </button>
-              )
-            })}
-          </div>
-          {timelineError && (
-            <div style={{
-              background: '#FFF0F0', border: '1px solid #FFBABA',
-              borderRadius: 14, padding: '14px 16px', marginBottom: 16,
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
-            }}>
-              <p style={{ fontSize: 13, color: '#D63031', margin: 0 }}>⚠️ {timelineError}</p>
-              <button onClick={fetchTimeline} style={{ padding: '6px 14px', borderRadius: 8, border: 'none', background: '#D63031', color: 'white', fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
-                Reintentar
-              </button>
-            </div>
-          )}
-          {ownerId && (loading ? (
-            <div>
-              {[1, 2, 3].map(i => (
-                <div key={i} style={{ background: '#F9FAFB', borderRadius: 12, padding: '12px', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div className="animate-pulse" style={{ width: 38, height: 38, borderRadius: 10, background: '#EDE5D8', flexShrink: 0 }} />
-                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                    <div className="animate-pulse" style={{ height: 12, width: '55%', background: '#EDE5D8', borderRadius: 6 }} />
-                    <div className="animate-pulse" style={{ height: 10, width: '35%', background: '#EDE5D8', borderRadius: 6 }} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : sections.length === 0 && !timelineError ? (
-            <EmptyState profile={profile} />
-          ) : (
-            <CareDayDetail
-              section={sections.find(s => s.dateKey === selectedDayTab)}
-              todayKey={todayKey}
-              confirming={confirming}
-              onConfirm={handleConfirmMed}
-              isFamiliar={isFamiliar}
-              onTap={setSelectedEvent}
-            />
-          ))}
-        </div>
+          <DashCard
+            icon="📋"
+            title="Detalle del Cuidado"
+            subtitle={detailSubtitle}
+            status="Ver historial"
+            statusType={detailStatusType}
+            to="/historial"
+          />
 
           <DashCard
             icon="📹"
