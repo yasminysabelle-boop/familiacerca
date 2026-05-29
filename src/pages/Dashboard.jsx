@@ -2610,37 +2610,6 @@ export default function Dashboard() {
           )}
         </div>
 
-        {/* ════ 2-col grid ════════════════════════════════════════════════ */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
-
-          {/* Fila 1: Medicamentos | Cuidado de hoy */}
-          <DashCard Icon={Pill}           title="Medicamentos"       subtitle={medCardSubtitle}                                                                                         status={medCardStatus}  statusType={medCardStatusType}  to="/hoy" />
-          <DashCard Icon={ClipboardCheck} title="Cuidado de hoy"     subtitle={medTotal > 0 ? `${medTotal} med${medTotal !== 1 ? 's' : ''} programados` : 'Rutina diaria'}              status={careStatus}     statusType={careStatusType}     to="/hoy" />
-
-          {/* Fila 2: Historial | Chat familiar */}
-          <DashCard Icon={Clock}          title="Historial"           subtitle={detailSubtitle}                                                                                          status="Ver historial"  statusType={detailStatusType}   to="/historial" />
-          <DashCard Icon={Chat}           title="Chat familiar"       subtitle="Mensajes del equipo"                                                                                     status="Ver chat"       statusType="info"                to="/chat" />
-
-          {/* Fila 3: Citas médicas | Cuentas Claras */}
-          <DashCard
-            Icon={Calendar}
-            title="Citas médicas"
-            subtitle={nextAppointment?.appointmentTitle ?? 'Sin citas próximas'}
-            status={nextAppointment ? (nextAppointment.dateKey === todayKey ? 'Hoy' : nextAppointment.dateKey === tomorrowKey ? 'Mañana' : 'Esta semana') : 'Ver calendario'}
-            statusType={nextAppointment ? 'warning' : 'info'}
-            to="/calendar"
-          />
-          <DashCard Icon={Receipt}        title="Cuentas Claras"      subtitle="Control de gastos"                                                                                       status="Ver gastos"     statusType="info"                to="/gastos" />
-
-          {/* Fila 4: Perfil del paciente | Mi equipo */}
-          <DashCard Icon={User}           title="Perfil del paciente" subtitle="Diagnósticos y alergias"                                                                                 status="Ver perfil"     statusType="info"                to="/paciente/perfil" />
-          <DashCard Icon={Users}          title="Mi equipo"           subtitle="Cuidadores y familiares"                                                                                 status="Ver equipo"     statusType="info"                to="/familia" />
-
-          {/* Fila 5: Videollamada | Modo Hospital */}
-          <DashCard Icon={Camera}         title="Videollamada"        subtitle="Conectar con la familia"                                                                                 status="Próximamente"   statusType="info"                onClick={() => {}} />
-          <DashCard Icon={Heart}          title="Modo Hospital"       subtitle="Gestión en internación"                                                                                  status="Próximamente"   statusType="info"                onClick={() => {}} />
-        </div>
-
         {/* Fila 6: Emergencia SOS — ancho completo */}
         <button
           onClick={prepareSOS}
@@ -2680,6 +2649,37 @@ export default function Dashboard() {
             </span>
           </div>
         </button>
+
+        {/* ════ 2-col grid ════════════════════════════════════════════════ */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
+
+          {/* Fila 1: Medicamentos | Cuidado de hoy */}
+          <DashCard Icon={Pill}           title="Medicamentos"       subtitle={medCardSubtitle}                                                                                         status={medCardStatus}  statusType={medCardStatusType}  to="/hoy" />
+          <DashCard Icon={ClipboardCheck} title="Cuidado de hoy"     subtitle={medTotal > 0 ? `${medTotal} med${medTotal !== 1 ? 's' : ''} programados` : 'Rutina diaria'}              status={careStatus}     statusType={careStatusType}     to="/hoy" />
+
+          {/* Fila 2: Historial | Chat familiar */}
+          <DashCard Icon={Clock}          title="Historial"           subtitle={detailSubtitle}                                                                                          status="Ver historial"  statusType={detailStatusType}   to="/historial" />
+          <DashCard Icon={Chat}           title="Chat familiar"       subtitle="Mensajes del equipo"                                                                                     status="Ver chat"       statusType="info"                to="/chat" />
+
+          {/* Fila 3: Citas médicas | Cuentas Claras */}
+          <DashCard
+            Icon={Calendar}
+            title="Citas médicas"
+            subtitle={nextAppointment?.appointmentTitle ?? 'Sin citas próximas'}
+            status={nextAppointment ? (nextAppointment.dateKey === todayKey ? 'Hoy' : nextAppointment.dateKey === tomorrowKey ? 'Mañana' : 'Esta semana') : 'Ver calendario'}
+            statusType={nextAppointment ? 'warning' : 'info'}
+            to="/calendar"
+          />
+          <DashCard Icon={Receipt}        title="Cuentas Claras"      subtitle="Control de gastos"                                                                                       status="Ver gastos"     statusType="info"                to="/gastos" />
+
+          {/* Fila 4: Perfil del paciente | Mi equipo */}
+          <DashCard Icon={User}           title="Perfil del paciente" subtitle="Diagnósticos y alergias"                                                                                 status="Ver perfil"     statusType="info"                to="/paciente/perfil" />
+          <DashCard Icon={Users}          title="Mi equipo"           subtitle="Cuidadores y familiares"                                                                                 status="Ver equipo"     statusType="info"                to="/familia" />
+
+          {/* Fila 5: Videollamada | Modo Hospital */}
+          <DashCard Icon={Camera}         title="Videollamada"        subtitle="Conectar con la familia"                                                                                 status="Próximamente"   statusType="info"                onClick={() => {}} />
+          <DashCard Icon={Heart}          title="Modo Hospital"       subtitle="Gestión en internación"                                                                                  status="Próximamente"   statusType="info"                onClick={() => {}} />
+        </div>
 
         {/* Otras funciones — ancho completo */}
         <Link
