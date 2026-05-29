@@ -25,9 +25,9 @@ function getMoodEmoji(val) { return MOOD_MAP[val]?.emoji ?? '🎙️' }
 function getMoodColor(val) { return MOOD_MAP[val]?.color ?? '#7C5CBF' }
 
 const MOOD_OPTIONS = [
-  { mood: 'good',    emoji: '😊', label: 'Buen día', bg: '#FEF3C7',                border: '#C9894A',               shadow: '0 3px 0px #C9894A' },
-  { mood: 'regular', emoji: '😐', label: 'Regular',  bg: 'rgba(255,255,255,0.14)', border: 'rgba(255,255,255,0.2)', shadow: '0 3px 0px rgba(0,0,0,0.08)' },
-  { mood: 'hard',    emoji: '😔', label: 'Difícil',  bg: 'rgba(239,68,68,0.18)',   border: 'rgba(239,68,68,0.4)',   shadow: '0 3px 0px rgba(239,68,68,0.3)' },
+  { mood: 'good',    emoji: '😊', label: 'Buen día', bg: '#FEF3C7',               border: '#C9894A',                   shadow: '0 3px 0px #C9894A' },
+  { mood: 'regular', emoji: '😐', label: 'Regular',  bg: 'rgba(255,255,255,0.18)', border: 'rgba(255,255,255,0.3)',     shadow: '0 3px 0px rgba(255,255,255,0.15)' },
+  { mood: 'hard',    emoji: '😔', label: 'Difícil',  bg: 'rgba(239,68,68,0.2)',   border: 'rgba(239,68,68,0.45)',      shadow: '0 3px 0px rgba(239,68,68,0.3)' },
 ]
 const MOOD_FEEDBACK = {
   good: '¡Qué bueno saberlo!', '😊': '¡Qué bueno saberlo!',
@@ -2581,14 +2581,14 @@ export default function Dashboard() {
                   onPointerLeave={() => setPressedMood(null)}
                   disabled={savingMood || isFamiliar}
                   style={{
-                    flex: 1, padding: '12px 4px', borderRadius: 12,
-                    border: `1.5px solid ${isSelected ? btnBorder : '#E8E4DC'}`,
-                    background: isSelected ? bg : 'white',
+                    flex: 1, padding: '12px 4px', borderRadius: 14,
+                    border: `1.5px solid ${isSelected ? btnBorder : 'rgba(255,255,255,0.15)'}`,
+                    background: isSelected ? bg : 'rgba(255,255,255,0.08)',
                     cursor: savingMood || isFamiliar ? 'default' : 'pointer',
                     display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-                    boxShadow: isPressed ? 'none' : isSelected ? shadow : '0 2px 0px #E0DBD2',
+                    boxShadow: isPressed ? 'none' : isSelected ? shadow : '0 3px 0px rgba(0,0,0,0.2)',
                     transform: isPressed ? 'translateY(3px)' : isSelected ? 'scale(1.04)' : 'none',
-                    transition: 'transform 0.08s ease, box-shadow 0.08s ease',
+                    transition: 'transform 0.1s ease, box-shadow 0.1s ease',
                     opacity: savingMood ? 0.6 : 1,
                   }}
                 >
