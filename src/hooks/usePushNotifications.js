@@ -19,39 +19,88 @@ export function usePushNotifications() {
     typeof Notification !== 'undefined' ? Notification.permission : 'default'
   )
   const [subscribed, setSubscribed] = useState(false)
+  const [subscribeError, setSubscribeError] = useState(null)
   const supported = typeof Notification !== 'undefined' && 'serviceWorker' in navigator && !!VAPID_PUBLIC_KEY
-
-  async function saveSubscription(sub) {
-    const json = sub.toJSON()
-    await supabase.from('push_subscriptions').upsert(
-      {
-        user_id: user.id,
-        endpoint: json.endpoint,
-        p256dh: json.keys.p256dh,
-        auth: json.keys.auth,
-      },
-      { onConflict: 'user_id,endpoint' }
-    )
-  }
 
   async function subscribe() {
     if (!supported || !user) return
+    setSubscribeError(null)
     try {
       const reg = await navigator.serviceWorker.ready
       const existing = await reg.pushManager.getSubscription()
       if (existing) {
-        await saveSubscription(existing)
-        setSubscribed(true)
-        return
+        // Verify the browser subscription is still in the DB (not deleted after a 410)
+        const { data: dbSub } = await supabase
+          .from('push_subscriptions')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('endpoint', existing.endpoint)
+          .maybeSingle()
+        if (dbSub) {
+          setSubscribed(true)
+          return
+        }
+        // DB record was deleted (stale 410) — clear browser subscription and create fresh one
+        await existing.unsubscribe()
       }
       const sub = await reg.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
       })
-      await saveSubscription(sub)
-      setSubscribed(true)
-    } catch {
-      // Permission denied or other error — silently fail
+      const json = sub.toJSON()
+      const { error } = await supabase.from('push_subscriptions').upsert(
+        {
+          user_id: user.id,
+          endpoint: json.endpoint,
+          p256dh: json.keys.p256dh,
+          auth: json.keys.auth,
+        },
+        { onConflict: 'user_id,endpoint' }
+      )
+      if (error) {
+        console.warn('[usePushNotifications] upsert error:', error)
+        setSubscribeError(error.message)
+      } else {
+        setSubscribed(true)
+      }
+    } catch (err) {
+      console.warn('[usePushNotifications] subscribe error:', err)
+      setSubscribeError(err?.message ?? 'Error al suscribirse')
+    }
+  }
+
+  // Force-clears the browser subscription and creates a new one — use after stale token detection
+  async function resubscribe() {
+    if (!supported || !user) return
+    setSubscribed(false)
+    setSubscribeError(null)
+    try {
+      const reg = await navigator.serviceWorker.ready
+      const existing = await reg.pushManager.getSubscription()
+      if (existing) await existing.unsubscribe()
+      const sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+      })
+      const json = sub.toJSON()
+      const { error } = await supabase.from('push_subscriptions').upsert(
+        {
+          user_id: user.id,
+          endpoint: json.endpoint,
+          p256dh: json.keys.p256dh,
+          auth: json.keys.auth,
+        },
+        { onConflict: 'user_id,endpoint' }
+      )
+      if (error) {
+        console.warn('[usePushNotifications] resubscribe upsert error:', error)
+        setSubscribeError(error.message)
+      } else {
+        setSubscribed(true)
+      }
+    } catch (err) {
+      console.warn('[usePushNotifications] resubscribe error:', err)
+      setSubscribeError(err?.message ?? 'Error al reactivar')
     }
   }
 
@@ -62,11 +111,10 @@ export function usePushNotifications() {
     if (result === 'granted') await subscribe()
   }
 
-  // Auto-subscribe on load if already granted
   useEffect(() => {
     if (!user || permission !== 'granted') return
     subscribe()
   }, [user])
 
-  return { permission, subscribed, supported, requestAndSubscribe }
+  return { permission, subscribed, supported, subscribeError, requestAndSubscribe, resubscribe }
 }

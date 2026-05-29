@@ -89,7 +89,7 @@ export default function Settings() {
   const { user, signOut } = useAuth()
   const { sub, isPaid, isTrialing, trialExpired, daysLeft } = useSubscription()
   const { dark, toggleDark } = useDarkMode()
-  const { permission, subscribed, supported, requestAndSubscribe } = usePushNotifications()
+  const { permission, subscribed, supported, subscribeError, requestAndSubscribe, resubscribe } = usePushNotifications()
   const navigate = useNavigate()
   const [portalLoading, setPortalLoading] = useState(false)
   const [locationOn, setLocationOn] = useState(() => isLocationEnabled())
@@ -142,12 +142,18 @@ export default function Settings() {
     try {
       const { data, error } = await supabase.functions.invoke('send-test-notification')
       if (error) throw error
-      if (data.sent > 0) {
-        setTestResult({ ok: true, msg: `✅ Enviado a ${data.sent} dispositivo${data.sent !== 1 ? 's' : ''}` })
+      const sent = data.sent ?? 0
+      const failed = data.failed ?? 0
+      if (sent > 0 && failed === 0) {
+        setTestResult({ ok: true, msg: `✅ Enviado a ${sent} dispositivo${sent !== 1 ? 's' : ''}` })
+      } else if (failed > 0 && sent === 0) {
+        setTestResult({ ok: false, stale: true, msg: `Token expirado — suscripción eliminada. Toca "Reactivar" para renovarla.` })
+      } else if (sent > 0 && failed > 0) {
+        setTestResult({ ok: true, stale: true, msg: `Enviado a ${sent} dispositivo. ${failed} suscripción expirada eliminada.` })
       } else if (data.error) {
         setTestResult({ ok: false, msg: `Sin suscripciones guardadas. Activa las notificaciones primero.` })
       } else {
-        setTestResult({ ok: false, msg: `No se encontraron suscripciones (sent=0). ¿El servicio worker está registrado?` })
+        setTestResult({ ok: false, msg: `No se encontraron suscripciones. ¿El servicio worker está registrado?` })
       }
     } catch (err) {
       setTestResult({ ok: false, msg: `Error: ${err.message ?? 'Desconocido'}` })
@@ -390,14 +396,29 @@ export default function Settings() {
 
             {/* Result message */}
             {testResult && (
-              <p style={{
-                fontSize: 12, fontWeight: 600, margin: '10px 0 0',
-                color: testResult.ok ? '#15803D' : '#DC2626',
-                padding: '8px 12px', borderRadius: 10,
-                background: testResult.ok ? '#F0FDF4' : '#FEF2F2',
-              }}>
-                {testResult.msg}
-              </p>
+              <>
+                <p style={{
+                  fontSize: 12, fontWeight: 600, margin: '10px 0 0',
+                  color: testResult.ok ? '#15803D' : '#DC2626',
+                  padding: '8px 12px', borderRadius: 10,
+                  background: testResult.ok ? '#F0FDF4' : '#FEF2F2',
+                }}>
+                  {testResult.msg}
+                </p>
+                {testResult.stale && (
+                  <button
+                    onClick={() => { setTestResult(null); resubscribe() }}
+                    style={{
+                      width: '100%', padding: '11px', borderRadius: 14, border: 'none',
+                      background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
+                      color: 'white', fontWeight: 700, fontSize: 13, cursor: 'pointer',
+                      marginTop: 8, boxShadow: '0 4px 14px rgba(74,124,89,0.25)',
+                    }}
+                  >
+                    🔄 Reactivar suscripción
+                  </button>
+                )}
+              </>
             )}
           </div>
         )}
