@@ -270,6 +270,12 @@ export default function Memorias() {
 
   return (
     <Layout>
+      <style>{`
+        @keyframes wave-out {
+          0%   { transform: scale(1);   opacity: 0.55; }
+          100% { transform: scale(2.1); opacity: 0; }
+        }
+      `}</style>
       <div style={{ padding: '16px 16px 0', maxWidth: 600 }}>
 
         {/* "1 year ago" banner */}
@@ -309,18 +315,19 @@ export default function Memorias() {
           boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
         }}>
 
-          {/* Idle state — record button */}
+          {/* Idle state — animated record button */}
           {step === 'idle' && (
-            <div style={{ textAlign: 'center' }}>
+            <div style={{ textAlign: 'center', padding: '12px 0 8px' }}>
               <p style={{
-                fontFamily: 'Georgia, serif', fontSize: 15, fontWeight: 700,
-                color: '#1A1A1A', marginBottom: 16,
+                fontSize: 12, fontWeight: 600, letterSpacing: '0.06em',
+                textTransform: 'uppercase', color: '#9CA3AF', marginBottom: 24,
               }}>
-                Grabar memoria de {patientName}
+                Memoria de {patientName}
               </p>
+
               {micError && (
                 <div style={{
-                  marginBottom: 12, padding: '10px 14px', borderRadius: 12,
+                  marginBottom: 20, padding: '10px 14px', borderRadius: 12,
                   background: '#FFF0F0', border: '1px solid #FFBABA', color: '#D63031', fontSize: 13,
                 }}>
                   🎤 {micError}
@@ -328,7 +335,7 @@ export default function Memorias() {
               )}
               {saveError && (
                 <div style={{
-                  marginBottom: 16, padding: '12px 16px', borderRadius: 14,
+                  marginBottom: 20, padding: '12px 16px', borderRadius: 14,
                   background: '#FFF0F0', border: '1.5px solid #FFBABA',
                   color: '#B91C1C', fontSize: 13, fontWeight: 500,
                   lineHeight: 1.5, textAlign: 'left',
@@ -338,22 +345,41 @@ export default function Memorias() {
                   <p style={{ margin: 0 }}>{saveError}</p>
                 </div>
               )}
-              <button
-                onClick={startRecording}
-                style={{
-                  width: '100%', padding: '14px',
-                  background: 'linear-gradient(135deg, #7C5CBF, #5E3FA3)',
-                  color: 'white',
-                  fontWeight: 700, fontSize: 14, borderRadius: 16, border: 'none',
-                  cursor: 'pointer',
-                  boxShadow: '0 6px 20px rgba(124,92,191,0.3)',
-                  transition: 'all 0.15s',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-                }}
-              >
-                <span style={{ fontSize: 20 }}>🎙️</span>
-                Grabar memoria
-              </button>
+
+              {/* Wave button */}
+              <div style={{ position: 'relative', width: 88, height: 88, margin: '0 auto 18px' }}>
+                {/* 3 ripple rings */}
+                {[0, 0.7, 1.4].map((delay, i) => (
+                  <div key={i} style={{
+                    position: 'absolute', inset: 0, borderRadius: '50%',
+                    background: 'rgba(124,92,191,0.18)',
+                    animation: `wave-out 2.1s ease-out infinite ${delay}s`,
+                    pointerEvents: 'none',
+                  }} />
+                ))}
+                {/* Mic circle */}
+                <button
+                  onClick={startRecording}
+                  style={{
+                    position: 'absolute', inset: 0, borderRadius: '50%', border: 'none',
+                    background: 'linear-gradient(145deg, #8B6CC9, #5E3FA3)',
+                    boxShadow: '0 10px 32px rgba(94,63,163,0.45)',
+                    cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 34, transition: 'transform 0.12s, box-shadow 0.12s',
+                  }}
+                  onMouseDown={e => { e.currentTarget.style.transform = 'scale(0.94)'; e.currentTarget.style.boxShadow = '0 4px 16px rgba(94,63,163,0.35)' }}
+                  onMouseUp={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 10px 32px rgba(94,63,163,0.45)' }}
+                  onTouchStart={e => { e.currentTarget.style.transform = 'scale(0.94)' }}
+                  onTouchEnd={e => { e.currentTarget.style.transform = 'scale(1)' }}
+                >
+                  🎙️
+                </button>
+              </div>
+
+              <p style={{ fontSize: 13, fontWeight: 700, color: '#7C5CBF', letterSpacing: '0.03em' }}>
+                Toca para grabar
+              </p>
             </div>
           )}
 
