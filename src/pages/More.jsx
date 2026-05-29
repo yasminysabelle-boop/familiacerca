@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
@@ -27,12 +27,25 @@ const PLAN_LABELS = { free: 'Prueba gratuita', familiar: 'Plan Familiar', care_p
 
 export default function More() {
   const { user, signOut } = useAuth()
-  const { profile } = useFamily()
+  const { profile, ownerId, memberRole } = useFamily()
+  const canEdit = memberRole === null || memberRole === 'cuidador'
   const { sub, isTrialing, daysLeft, trialExpired } = useSubscription()
   const navigate = useNavigate()
   const caretakerName = user?.user_metadata?.full_name ?? user?.email ?? ''
   const planColor = PLAN_COLORS[sub?.plan] ?? '#9CA3AF'
   const planLabel = PLAN_LABELS[sub?.plan] ?? 'Cargando...'
+
+  const [patientProfile, setPatientProfile] = useState(null)
+
+  useEffect(() => {
+    if (!ownerId) return
+    supabase
+      .from('patient_profiles')
+      .select('nombre_completo, diagnostico_principal, alergias, condiciones_secundarias, medico_tratante, especialidad_medico')
+      .eq('owner_id', ownerId)
+      .maybeSingle()
+      .then(({ data }) => setPatientProfile(data ?? null))
+  }, [ownerId])
 
   const [showModal, setShowModal]     = useState(false)
   const [inviteEmail, setInviteEmail] = useState('')
@@ -157,12 +170,37 @@ export default function More() {
                     className="font-bold text-white leading-tight truncate"
                     style={{ fontFamily: 'Georgia, serif', fontSize: 20 }}
                   >
-                    {profile.name}
+                    {patientProfile?.nombre_completo || profile.name}
                   </p>
                   {profile.age && (
                     <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 13, marginTop: 2 }}>
                       {profile.age} años
                     </p>
+                  )}
+                  {patientProfile?.diagnostico_principal && (
+                    <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: 12, marginTop: 3, lineHeight: 1.4 }} className="truncate">
+                      {patientProfile.diagnostico_principal}
+                    </p>
+                  )}
+                  {patientProfile?.alergias?.length > 0 && (
+                    <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginTop: 5 }}>
+                      <span style={{ fontSize: 10, color: '#FCA5A5', fontWeight: 700 }}>⚠</span>
+                      {patientProfile.alergias.slice(0, 3).map(a => (
+                        <span key={a} style={{
+                          fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 8,
+                          background: 'rgba(220,38,38,0.25)', color: '#FCA5A5',
+                          border: '1px solid rgba(220,38,38,0.3)',
+                        }}>{a}</span>
+                      ))}
+                      {patientProfile.alergias.length > 3 && (
+                        <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.4)' }}>+{patientProfile.alergias.length - 3}</span>
+                      )}
+                    </div>
+                  )}
+                  {!patientProfile?.nombre_completo && canEdit && (
+                    <Link to="/paciente/perfil" style={{ color: 'rgba(255,255,255,0.65)', fontSize: 11, display: 'block', marginTop: 4, textDecoration: 'underline' }}>
+                      + Completar perfil del paciente
+                    </Link>
                   )}
                 </>
               ) : (

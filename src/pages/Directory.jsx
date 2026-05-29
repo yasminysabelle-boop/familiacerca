@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams, Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { supabase } from '../lib/supabase'
@@ -338,8 +338,9 @@ function JoinedMemberCard({ member, inDirectory, onClick }) {
 // ── Main page ──────────────────────────────────────────────────────
 export default function Directory() {
   const { user } = useAuth()
-  const { ownerId } = useFamily()
+  const { ownerId, memberRole } = useFamily()
   const isAdmin = user?.id === ownerId
+  const canEdit = memberRole === null || memberRole === 'cuidador'
   const [searchParams] = useSearchParams()
   const autoOpenEmail = searchParams.get('member')
   const autoOpenedRef = useRef(false)
@@ -349,6 +350,7 @@ export default function Directory() {
   const [institutions, setInstitutions] = useState([])
   const [contacts,      setContacts]      = useState([])
   const [familyMembers, setFamilyMembers] = useState([])
+  const [patientProfile, setPatientProfile] = useState(null)
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
   const [confirmDialog, setConfirmDialog] = useState(null)
@@ -397,16 +399,18 @@ export default function Directory() {
     setLoading(true)
     setLoadError('')
     try {
-      const [{ data: docs, error: e1 }, { data: inss, error: e2 }, { data: cons, error: e3 }, { data: members }] = await Promise.all([
+      const [{ data: docs, error: e1 }, { data: inss, error: e2 }, { data: cons, error: e3 }, { data: members }, { data: pp }] = await Promise.all([
         supabase.from('directory_doctors').select('*').eq('owner_id', ownerId).order('name'),
         supabase.from('directory_institutions').select('*').eq('owner_id', ownerId).order('name'),
         supabase.from('directory_contacts').select('*').eq('owner_id', ownerId).order('name'),
         supabase.from('family_members').select('member_user_id, member_email, role, joined_at').eq('user_id', ownerId).not('member_user_id', 'is', null),
+        supabase.from('patient_profiles').select('*').eq('owner_id', ownerId).maybeSingle(),
       ])
       if (e1 || e2 || e3) throw e1 ?? e2 ?? e3
       setDoctors(docs ?? [])
       setInstitutions(inss ?? [])
       setContacts(cons ?? [])
+      setPatientProfile(pp ?? null)
 
       // Enrich family members with names from user_profiles
       if (members?.length) {
@@ -525,10 +529,11 @@ export default function Directory() {
   const topInstitutions = institutions.filter(i => i.emergency_phone).slice(0, 2)
 
   const TABS = [
-    { id: 'medicos',       label: 'Médicos'      },
-    { id: 'instituciones', label: 'Instituciones' },
-    { id: 'familiares',    label: 'Familiares'    },
-    { id: 'emergencia',    label: '🆘 Emergencia', accent: '#D63031' },
+    { id: 'medicos',       label: 'Médicos'   },
+    { id: 'instituciones', label: 'Lugares'   },
+    { id: 'familiares',    label: 'Familia'   },
+    { id: 'paciente',      label: 'Paciente'  },
+    { id: 'emergencia',    label: '🆘', accent: '#D63031' },
   ]
 
   return (
@@ -649,6 +654,145 @@ export default function Directory() {
             }
             <AddBtn onClick={() => openCon()} label="Agregar familiar" />
           </>
+        )}
+
+        {/* ── Paciente ──────────────────────────────────────────── */}
+        {tab === 'paciente' && (
+          <div>
+            {loading ? (
+              <p style={{ textAlign: 'center', color: '#9CA3AF', fontSize: 13, padding: '32px 0' }}>Cargando...</p>
+            ) : !patientProfile?.nombre_completo ? (
+              <div>
+                <EmptyState Icon={User} title="Perfil del paciente vacío" subtitle="Agrega diagnósticos, alergias y médico tratante para tenerlos siempre disponibles" />
+                {canEdit && (
+                  <Link
+                    to="/paciente/perfil"
+                    style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                      padding: '14px', borderRadius: 16, marginTop: 4,
+                      background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
+                      color: 'white', fontWeight: 700, fontSize: 14, textDecoration: 'none',
+                      boxShadow: '0 4px 16px rgba(74,124,89,0.3)',
+                    }}
+                  >
+                    Completar perfil del paciente →
+                  </Link>
+                )}
+              </div>
+            ) : (
+              <div>
+                {/* Header card */}
+                <div style={{
+                  background: 'linear-gradient(135deg, #4A7C59, #2E5240)',
+                  borderRadius: 18, padding: '18px 20px', marginBottom: 16,
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+                    <div>
+                      <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: 'white', margin: 0 }}>
+                        {patientProfile.nombre_completo}
+                      </p>
+                      {patientProfile.fecha_nacimiento && (
+                        <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', margin: '3px 0 0' }}>
+                          {new Date(patientProfile.fecha_nacimiento + 'T12:00:00').toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' })}
+                          {patientProfile.sexo ? ` · ${patientProfile.sexo.charAt(0).toUpperCase() + patientProfile.sexo.slice(1)}` : ''}
+                        </p>
+                      )}
+                    </div>
+                    {canEdit && (
+                      <Link
+                        to="/paciente/perfil"
+                        style={{
+                          padding: '7px 14px', borderRadius: 20,
+                          background: 'rgba(255,255,255,0.15)',
+                          border: '1px solid rgba(255,255,255,0.25)',
+                          color: 'white', fontSize: 12, fontWeight: 600,
+                          textDecoration: 'none', flexShrink: 0,
+                        }}
+                      >
+                        Editar
+                      </Link>
+                    )}
+                  </div>
+                </div>
+
+                {/* Alergias — destacadas primero */}
+                {patientProfile.alergias?.length > 0 && (
+                  <div style={{
+                    background: '#FFF0F0', border: '1.5px solid #FECACA',
+                    borderRadius: 14, padding: '14px 16px', marginBottom: 12,
+                  }}>
+                    <p style={{ fontSize: 11, fontWeight: 800, color: '#DC2626', letterSpacing: '0.1em', textTransform: 'uppercase', margin: '0 0 8px' }}>
+                      ⚠ Alergias
+                    </p>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                      {patientProfile.alergias.map(a => (
+                        <span key={a} style={{
+                          padding: '5px 11px', borderRadius: 20,
+                          background: 'white', border: '1px solid #FECACA',
+                          color: '#DC2626', fontSize: 13, fontWeight: 600,
+                        }}>{a}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Diagnóstico */}
+                {patientProfile.diagnostico_principal && (
+                  <div style={{ background: 'white', border: '1px solid #EDE5D8', borderRadius: 14, padding: '14px 16px', marginBottom: 10 }}>
+                    <p style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 6px' }}>
+                      Diagnóstico principal
+                    </p>
+                    <p style={{ fontSize: 14, color: '#1F2937', margin: 0, lineHeight: 1.5 }}>{patientProfile.diagnostico_principal}</p>
+                  </div>
+                )}
+
+                {/* Condiciones secundarias */}
+                {patientProfile.condiciones_secundarias?.length > 0 && (
+                  <div style={{ background: 'white', border: '1px solid #EDE5D8', borderRadius: 14, padding: '14px 16px', marginBottom: 10 }}>
+                    <p style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 8px' }}>
+                      Condiciones secundarias
+                    </p>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                      {patientProfile.condiciones_secundarias.map(c => (
+                        <span key={c} style={{
+                          padding: '4px 10px', borderRadius: 20,
+                          background: '#EBF3EE', color: '#2E5240', fontSize: 13, fontWeight: 600,
+                        }}>{c}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Médico tratante */}
+                {patientProfile.medico_tratante && (
+                  <div style={{ background: 'white', border: '1px solid #EDE5D8', borderTop: '3px solid #2563EB', borderRadius: 14, padding: '14px 16px', marginBottom: 10 }}>
+                    <p style={{ fontFamily: 'Georgia, serif', fontSize: 14, fontWeight: 700, color: '#1A1A1A', margin: '0 0 2px' }}>
+                      {patientProfile.medico_tratante}
+                    </p>
+                    {patientProfile.especialidad_medico && (
+                      <p style={{ fontSize: 12, color: '#2563EB', fontWeight: 600, margin: '0 0 6px' }}>{patientProfile.especialidad_medico}</p>
+                    )}
+                    {patientProfile.telefono_medico && (
+                      <a href={`tel:${patientProfile.telefono_medico}`} style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 6, textDecoration: 'none' }}>
+                        <Phone size={13} color="#2563EB" strokeWidth={2} />
+                        <span style={{ fontSize: 12, color: '#2563EB', fontWeight: 600 }}>{patientProfile.telefono_medico}</span>
+                      </a>
+                    )}
+                  </div>
+                )}
+
+                {/* Notas generales */}
+                {patientProfile.notas_generales && (
+                  <div style={{ background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 14, padding: '14px 16px', marginBottom: 10 }}>
+                    <p style={{ fontSize: 11, fontWeight: 700, color: '#92400E', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 6px' }}>
+                      Notas
+                    </p>
+                    <p style={{ fontSize: 13, color: '#78350F', margin: 0, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{patientProfile.notas_generales}</p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         )}
 
         {/* ── Emergencia ────────────────────────────────────────── */}
