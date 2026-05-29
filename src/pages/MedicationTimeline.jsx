@@ -69,7 +69,7 @@ async function stampImage(file, confirmerName) {
 
 export default function MedicationTimeline() {
   const { user } = useAuth()
-  const { memberRole } = useFamily()
+  const { memberRole, ownerId } = useFamily()
   const isFamiliar = memberRole === 'familiar'
   const isAdmin = memberRole === null
   const [medications, setMedications] = useState([])
@@ -93,8 +93,8 @@ export default function MedicationTimeline() {
   const today = new Date().toISOString().split('T')[0]
 
   useEffect(() => {
-    if (user) { fetchToday(); fetchHistory() }
-  }, [user])
+    if (user && ownerId) { fetchToday(); fetchHistory() }
+  }, [user, ownerId])
 
   useEffect(() => {
     if (!confirming) return
@@ -104,8 +104,8 @@ export default function MedicationTimeline() {
 
   async function fetchToday() {
     const [{ data: meds }, { data: logs }] = await Promise.all([
-      supabase.from('medications').select('*').eq('user_id', user.id).order('time'),
-      supabase.from('medication_logs').select('*').eq('user_id', user.id).eq('log_date', today),
+      supabase.from('medications').select('*').eq('user_id', ownerId).order('time'),
+      supabase.from('medication_logs').select('*').eq('user_id', ownerId).eq('log_date', today),
     ])
     setMedications(meds ?? [])
     const map = {}
@@ -118,7 +118,7 @@ export default function MedicationTimeline() {
     const { data } = await supabase
       .from('medication_logs')
       .select('*, medications(name)')
-      .eq('user_id', user.id)
+      .eq('user_id', ownerId)
       .gte('log_date', since.toISOString().split('T')[0])
       .order('log_date', { ascending: false })
     setHistory(data ?? [])
@@ -163,7 +163,7 @@ export default function MedicationTimeline() {
 
     await supabase.from('medication_logs').upsert({
       medication_id: confirming.id,
-      user_id: user.id,
+      user_id: ownerId,
       status: 'confirmed',
       photo_url: publicUrl,
       confirmed_by_name: displayName,
@@ -214,7 +214,7 @@ export default function MedicationTimeline() {
   async function markMissed(med) {
     await supabase.from('medication_logs').upsert({
       medication_id: med.id,
-      user_id: user.id,
+      user_id: ownerId,
       status: 'missed',
       log_date: today,
       scheduled_time: med.time,
