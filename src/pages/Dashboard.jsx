@@ -2454,13 +2454,15 @@ export default function Dashboard() {
       )}
       <div style={{ padding: '12px 16px 96px', maxWidth: 600 }}>
 
-        {/* ════ ZONA 1 — Paciente + Estado del día ══════════════════════ */}
-        <Link to="/paciente/perfil" style={{ textDecoration: 'none', display: 'block', marginBottom: 12 }}>
-          <div style={{
-            background: '#2D4A1E',
-            borderRadius: 20, padding: '16px 20px',
-            boxShadow: '0 4px 20px rgba(74,124,89,0.3)',
-          }}>
+        {/* ════ ZONA 1 — Paciente + Estado del día (fondo verde) ══════════ */}
+        <div style={{
+          background: '#2D4A1E',
+          borderRadius: 20, padding: '16px 20px',
+          boxShadow: '0 4px 20px rgba(45,74,30,0.4)',
+          marginBottom: 12,
+        }}>
+          {/* Info del paciente — tocable */}
+          <Link to="/paciente/perfil" style={{ textDecoration: 'none', display: 'block' }}>
             <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, margin: '0 0 10px', letterSpacing: '0.03em' }}>
               {timeIcon} {timeGreeting}, {firstName}
             </p>
@@ -2543,27 +2545,14 @@ export default function Dashboard() {
                 <span style={{ color: 'rgba(255,255,255,0.45)', fontSize: 13 }}>›</span>
               </div>
             )}
-          </div>
-        </Link>
+          </Link>
 
-        {/* AI motivational cards */}
-        {Object.keys(aiCards).length > 0 && (
-          <div style={{ marginBottom: 12 }}>
-            {aiCards.morning && <AiCard type="morning" text={aiCards.morning} />}
-            {aiCards.evening && <AiCard type="evening" text={aiCards.evening} />}
-            {aiCards.burnout && <AiCard type="burnout" text={aiCards.burnout} />}
-            {aiCards.weekly  && <AiCard type="weekly"  text={aiCards.weekly} />}
-          </div>
-        )}
+          {/* Separador */}
+          <div style={{ height: 1, background: 'rgba(255,255,255,0.1)', margin: '16px 0' }} />
 
-        {/* Estado del día */}
-        <div style={{
-          background: 'white', borderRadius: 16, padding: '14px 16px',
-          marginBottom: 12, border: '0.5px solid #E8E4DC',
-          boxShadow: '0 2px 0px #E0DBD2',
-        }}>
+          {/* Estado del día — sobre fondo verde, sin contenedor blanco */}
           <p style={{
-            fontSize: 11, fontWeight: 700, color: '#9CA3AF',
+            fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)',
             textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 12px',
           }}>
             Estado del día
@@ -2586,14 +2575,16 @@ export default function Dashboard() {
                     background: isSelected ? bg : 'rgba(255,255,255,0.08)',
                     cursor: savingMood || isFamiliar ? 'default' : 'pointer',
                     display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-                    boxShadow: isPressed ? 'none' : isSelected ? shadow : '0 3px 0px rgba(0,0,0,0.2)',
+                    boxShadow: isPressed ? 'none' : isSelected ? shadow : '0 3px 0px rgba(0,0,0,0.25)',
                     transform: isPressed ? 'translateY(3px)' : isSelected ? 'scale(1.04)' : 'none',
                     transition: 'transform 0.1s ease, box-shadow 0.1s ease',
                     opacity: savingMood ? 0.6 : 1,
                   }}
                 >
                   <span style={{ fontSize: 22 }}>{emoji}</span>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: '#2d3748' }}>{label}</span>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: isSelected && mood === 'good' ? '#92400E' : 'rgba(255,255,255,0.9)' }}>
+                    {label}
+                  </span>
                 </button>
               )
             })}
@@ -2604,11 +2595,21 @@ export default function Dashboard() {
             </p>
           )}
           {isFamiliar && !dailyMood && (
-            <p style={{ fontSize: 11, color: '#C9B99A', margin: '8px 0 0', textAlign: 'center' }}>
+            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', margin: '8px 0 0', textAlign: 'center' }}>
               El administrador o cuidador registra el estado del día
             </p>
           )}
         </div>
+
+        {/* AI motivational cards */}
+        {Object.keys(aiCards).length > 0 && (
+          <div style={{ marginBottom: 12 }}>
+            {aiCards.morning && <AiCard type="morning" text={aiCards.morning} />}
+            {aiCards.evening && <AiCard type="evening" text={aiCards.evening} />}
+            {aiCards.burnout && <AiCard type="burnout" text={aiCards.burnout} />}
+            {aiCards.weekly  && <AiCard type="weekly"  text={aiCards.weekly} />}
+          </div>
+        )}
 
         {/* ════ 2-col grid — SOS y Otras funciones span 2 ════════════════ */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', padding: '0 16px', marginBottom: 24 }}>
