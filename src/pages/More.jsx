@@ -6,7 +6,7 @@ import { useSubscription } from '../contexts/SubscriptionContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import {
-  ClipboardCheck, FileText, Image, Mic, BarChart, User,
+  ClipboardCheck, FileText, Image, BarChart, User,
   Receipt, UserPlus, LogOut, ChevronRight, XIcon, Settings,
 } from '../components/Icons'
 
@@ -15,7 +15,6 @@ const MORE_ITEMS = [
   { to: '/historial',  Icon: ClipboardCheck, label: 'Control de dosis',    desc: 'Historial y foto-pruebas selladas',      color: '#4A7C59' },
   { to: '/notes',      Icon: FileText,        label: 'Notas',               desc: 'Observaciones del cuidado diario',      color: '#4A7C59' },
   { to: '/album',      Icon: Image,           label: 'Álbum familiar',      desc: 'Fotos y videos de momentos especiales', color: '#C9882A' },
-  { to: '/memorias',   Icon: Mic,             label: 'Memorias',            desc: 'Memorias de voz del familiar',          color: '#7C5CBF' },
   { to: '/reportes',   Icon: BarChart,        label: 'Reportes',            desc: 'Análisis semanal y PDF médico',          color: '#2D86A0' },
   { to: '/perfil',          Icon: User,            label: 'Perfil familiar',     desc: 'Datos de la persona a cuidar',          color: '#4A7C59' },
   { to: '/paciente/perfil', Icon: ClipboardCheck, label: 'Perfil del paciente', desc: 'Diagnósticos, alergias y médico',        color: '#D63031' },

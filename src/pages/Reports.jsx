@@ -10,13 +10,16 @@ const CONCERN_KEYWORDS = ['dolor', 'caída', 'se cayó', 'fiebre', 'triste', 'de
 
 export default function Reports() {
   const { user } = useAuth()
-  const { profile } = useFamily()
+  const { profile, ownerId } = useFamily()
   const [medications, setMedications] = useState([])
   const [notes, setNotes] = useState([])
   const [events, setEvents] = useState([])
   const [logs, setLogs] = useState([])
   const [loading, setLoading] = useState(true)
   const [generating, setGenerating] = useState(false)
+  const [exportingHistory, setExportingHistory] = useState(false)
+  const [historyDone, setHistoryDone] = useState(false)
+  const [historyError, setHistoryError] = useState('')
 
   useEffect(() => { if (user) fetchData() }, [user])
 
@@ -160,6 +163,151 @@ export default function Reports() {
     setGenerating(false)
   }
 
+  async function exportHistory() {
+    setExportingHistory(true)
+    setHistoryError('')
+    setHistoryDone(false)
+    try {
+      const thirtyDaysAgo = new Date()
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+      const fromDate = thirtyDaysAgo.toISOString().split('T')[0]
+      const today = new Date().toISOString().split('T')[0]
+
+      const exportId = ownerId ?? user.id
+      const [
+        { data: meds },
+        { data: histNotes },
+        { data: histEvents },
+        { data: memories },
+      ] = await Promise.all([
+        supabase.from('medication_logs')
+          .select('*, medications(name, dosage)')
+          .eq('user_id', exportId)
+          .gte('log_date', fromDate)
+          .eq('status', 'confirmed')
+          .order('log_date', { ascending: false }),
+        supabase.from('notes')
+          .select('*')
+          .eq('user_id', exportId)
+          .gte('created_at', fromDate + 'T00:00:00Z')
+          .order('created_at', { ascending: false }),
+        supabase.from('events')
+          .select('*')
+          .eq('user_id', exportId)
+          .gte('date', fromDate)
+          .order('date', { ascending: false }),
+        supabase.from('voice_diary')
+          .select('*')
+          .eq('user_id', exportId)
+          .gte('created_at', fromDate + 'T00:00:00Z')
+          .order('created_at', { ascending: false }),
+      ])
+
+      const doc = new jsPDF()
+      const pageW = doc.internal.pageSize.getWidth()
+
+      doc.setFillColor(196, 98, 58)
+      doc.rect(0, 0, pageW, 32, 'F')
+      doc.setTextColor(255, 255, 255)
+      doc.setFontSize(18); doc.setFont('helvetica', 'bold')
+      doc.text('FamiliaCerca — Historial de Cuidado', 14, 14)
+      doc.setFontSize(10); doc.setFont('helvetica', 'normal')
+      doc.text(`Últimos 30 días · Generado el ${new Date().toLocaleDateString('es-US', { day: 'numeric', month: 'long', year: 'numeric' })}`, 14, 24)
+
+      let y = 42
+      doc.setTextColor(26, 26, 26)
+
+      function sectionTitle(title, emoji) {
+        if (y > 260) { doc.addPage(); y = 20 }
+        doc.setFontSize(13); doc.setFont('helvetica', 'bold')
+        doc.setTextColor(196, 98, 58)
+        doc.text(`${emoji}  ${title}`, 14, y)
+        doc.setTextColor(26, 26, 26)
+        y += 6
+      }
+
+      if (meds?.length) {
+        sectionTitle('Medicamentos administrados', '💊')
+        autoTable(doc, {
+          startY: y,
+          head: [['Fecha', 'Medicamento', 'Dosis', 'Administrado por']],
+          body: meds.map(m => [m.log_date, m.medications?.name ?? '—', m.medications?.dosage ?? '—', m.confirmed_by_name ?? '—']),
+          styles: { fontSize: 9, cellPadding: 3 },
+          headStyles: { fillColor: [196, 98, 58], textColor: 255, fontStyle: 'bold' },
+          alternateRowStyles: { fillColor: [255, 248, 240] },
+          margin: { left: 14, right: 14 },
+        })
+        y = doc.lastAutoTable.finalY + 10
+      }
+
+      if (histNotes?.length) {
+        if (y > 260) { doc.addPage(); y = 20 }
+        sectionTitle('Notas', '📝')
+        autoTable(doc, {
+          startY: y,
+          head: [['Fecha', 'Título', 'Contenido']],
+          body: histNotes.map(n => [
+            n.created_at?.split('T')[0] ?? '—', n.title ?? '—',
+            (n.content ?? '').substring(0, 80) + ((n.content?.length ?? 0) > 80 ? '…' : ''),
+          ]),
+          styles: { fontSize: 9, cellPadding: 3 },
+          headStyles: { fillColor: [74, 124, 89], textColor: 255, fontStyle: 'bold' },
+          alternateRowStyles: { fillColor: [235, 243, 238] },
+          margin: { left: 14, right: 14 },
+          columnStyles: { 2: { cellWidth: 90 } },
+        })
+        y = doc.lastAutoTable.finalY + 10
+      }
+
+      if (histEvents?.length) {
+        if (y > 260) { doc.addPage(); y = 20 }
+        sectionTitle('Eventos del calendario', '📅')
+        autoTable(doc, {
+          startY: y,
+          head: [['Fecha', 'Evento', 'Hora']],
+          body: histEvents.map(ev => [ev.date, ev.title ?? '—', ev.time ?? '—']),
+          styles: { fontSize: 9, cellPadding: 3 },
+          headStyles: { fillColor: [59, 130, 246], textColor: 255, fontStyle: 'bold' },
+          alternateRowStyles: { fillColor: [239, 246, 255] },
+          margin: { left: 14, right: 14 },
+        })
+        y = doc.lastAutoTable.finalY + 10
+      }
+
+      if (memories?.length) {
+        if (y > 260) { doc.addPage(); y = 20 }
+        sectionTitle('Memorias de voz', '🎙️')
+        autoTable(doc, {
+          startY: y,
+          head: [['Fecha', 'Transcripción']],
+          body: memories.map(m => [
+            m.created_at?.split('T')[0] ?? '—',
+            (m.transcription ?? '').substring(0, 100) + ((m.transcription?.length ?? 0) > 100 ? '…' : ''),
+          ]),
+          styles: { fontSize: 9, cellPadding: 3 },
+          headStyles: { fillColor: [124, 92, 191], textColor: 255, fontStyle: 'bold' },
+          alternateRowStyles: { fillColor: [245, 243, 255] },
+          margin: { left: 14, right: 14 },
+          columnStyles: { 1: { cellWidth: 120 } },
+        })
+      }
+
+      const totalPages = doc.getNumberOfPages()
+      for (let i = 1; i <= totalPages; i++) {
+        doc.setPage(i)
+        doc.setFontSize(8); doc.setTextColor(156, 163, 175)
+        doc.text(`FamiliaCerca LLC · Página ${i} de ${totalPages}`, 14, doc.internal.pageSize.getHeight() - 8)
+      }
+
+      doc.save(`historial-familiacerca-${today}.pdf`)
+      setHistoryDone(true)
+    } catch (err) {
+      setHistoryError('Error al generar el PDF: ' + (err.message ?? 'Intenta de nuevo.'))
+    } finally {
+      setExportingHistory(false)
+    }
+  }
+
   return (
     <Layout>
       <div className="p-4 md:p-8 max-w-3xl pb-24">
@@ -235,7 +383,7 @@ export default function Reports() {
         </div>
 
         {/* PDF Report */}
-        <div className="bg-white rounded-xl border border-green-100 p-6">
+        <div className="bg-white rounded-xl border border-green-100 p-6 mb-6">
           <div className="flex gap-4 mb-5">
             <div className="w-12 h-12 bg-primary-light rounded-xl flex items-center justify-center text-2xl flex-shrink-0">📄</div>
             <div>
@@ -276,6 +424,45 @@ export default function Reports() {
                   : <><span>📄</span> Descargar reporte PDF</>}
               </button>
             </>
+          )}
+        </div>
+
+        {/* Historial completo export */}
+        <div className="bg-white rounded-xl border border-green-100 p-6">
+          <div className="flex gap-4 mb-4">
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0" style={{ background: 'rgba(196,98,58,0.1)' }}>📋</div>
+            <div>
+              <h3 className="font-semibold text-gray-900">Exportar historial completo (PDF)</h3>
+              <p className="text-sm text-gray-500 mt-0.5">
+                Últimos 30 días: dosis confirmadas, notas, citas y memorias de voz. Para archivo o segunda opinión médica.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={exportHistory}
+            disabled={exportingHistory}
+            className="w-full py-3.5 font-semibold rounded-xl flex items-center justify-center gap-2 transition-colors disabled:opacity-60"
+            style={{
+              background: exportingHistory ? '#C0CCC5' : 'linear-gradient(135deg, #C4623A, #A04D2A)',
+              color: 'white',
+              border: 'none',
+              cursor: exportingHistory ? 'not-allowed' : 'pointer',
+              boxShadow: exportingHistory ? 'none' : '0 4px 16px rgba(196,98,58,0.3)',
+            }}
+          >
+            {exportingHistory
+              ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Generando PDF...</>
+              : <><span>📋</span> Exportar historial PDF</>}
+          </button>
+          {historyDone && (
+            <p className="text-xs mt-2 px-3 py-2 rounded-lg" style={{ color: '#15803D', background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
+              ✓ PDF descargado correctamente
+            </p>
+          )}
+          {historyError && (
+            <p className="text-xs mt-2 px-3 py-2 rounded-lg" style={{ color: '#D63031', background: '#FFF0F0', border: '1px solid #FFBABA' }}>
+              ⚠ {historyError}
+            </p>
           )}
         </div>
       </div>

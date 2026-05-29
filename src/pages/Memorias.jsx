@@ -51,7 +51,6 @@ export default function Memorias() {
   const [recordings, setRecordings] = useState([])
   const [loading, setLoading] = useState(true)
   const [step, setStep] = useState('idle') // 'idle' | 'recording' | 'saving'
-  const [selectedMood, setSelectedMood] = useState(null)
   const [elapsed, setElapsed] = useState(0)
   const [saveError, setSaveError] = useState('')
   const [micError, setMicError] = useState('')
@@ -113,7 +112,6 @@ export default function Memorias() {
   }
 
   async function startRecording() {
-    if (!selectedMood) return
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
       setMicError('')
@@ -215,16 +213,14 @@ export default function Memorias() {
     const { data: { publicUrl } } = supabase.storage.from('voice-diary').getPublicUrl(path)
     console.log('[stopAndSave] upload OK — publicUrl:', publicUrl)
 
-    const moodLabel = MOODS.find(m => m.value === selectedMood)?.label ?? ''
-    const defaultTitle = `${moodLabel} — ${new Date().toLocaleDateString('es-US', { weekday: 'long', day: 'numeric', month: 'long' })}`
+    const defaultTitle = new Date().toLocaleDateString('es-US', { weekday: 'long', day: 'numeric', month: 'long' })
 
-    console.log('[stopAndSave] insertando en voice_diary — mood:', selectedMood, 'duration:', duration)
+    console.log('[stopAndSave] insertando en voice_diary — duration:', duration)
     const { error: insertError } = await supabase.from('voice_diary').insert({
       user_id: user.id,
       audio_url: publicUrl,
       title: defaultTitle,
       duration_seconds: duration,
-      mood: selectedMood,
       transcription: transcriptRef.current || null,
     })
 
@@ -236,9 +232,8 @@ export default function Memorias() {
     }
 
     console.log('[stopAndSave] guardado correctamente')
-    track('memory_recorded', { mood: selectedMood, duration_seconds: elapsed })
+    track('memory_recorded', { duration_seconds: elapsed })
     setSaveError('')
-    setSelectedMood(null)
     setElapsed(0)
     setStep('idle')
     fetchRecordings()
@@ -314,40 +309,15 @@ export default function Memorias() {
           boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
         }}>
 
-          {/* Idle state — mood picker */}
+          {/* Idle state — record button */}
           {step === 'idle' && (
             <div style={{ textAlign: 'center' }}>
               <p style={{
                 fontFamily: 'Georgia, serif', fontSize: 15, fontWeight: 700,
-                color: '#1A1A1A', marginBottom: 4,
+                color: '#1A1A1A', marginBottom: 16,
               }}>
-                ¿Cómo estuvo hoy {patientName}?
+                Grabar memoria de {patientName}
               </p>
-              <p style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 16 }}>
-                Elige el estado del día antes de grabar
-              </p>
-              <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginBottom: 20 }}>
-                {MOODS.map(({ value, emoji, label, color }) => (
-                  <button
-                    key={value}
-                    onClick={() => setSelectedMood(prev => prev === value ? null : value)}
-                    style={{
-                      flex: 1, padding: '12px 6px', borderRadius: 14, cursor: 'pointer',
-                      border: `2px solid ${selectedMood === value ? color : '#EDE5D8'}`,
-                      background: selectedMood === value ? `${color}15` : 'white',
-                      transition: 'all 0.15s',
-                    }}
-                  >
-                    <div style={{ fontSize: 26, marginBottom: 4 }}>{emoji}</div>
-                    <div style={{
-                      fontSize: 10, fontWeight: 700,
-                      color: selectedMood === value ? color : '#9CA3AF',
-                    }}>
-                      {label}
-                    </div>
-                  </button>
-                ))}
-              </div>
               {micError && (
                 <div style={{
                   marginBottom: 12, padding: '10px 14px', borderRadius: 12,
@@ -370,22 +340,19 @@ export default function Memorias() {
               )}
               <button
                 onClick={startRecording}
-                disabled={!selectedMood}
                 style={{
                   width: '100%', padding: '14px',
-                  background: selectedMood
-                    ? 'linear-gradient(135deg, #7C5CBF, #5E3FA3)'
-                    : '#E5E7EB',
-                  color: selectedMood ? 'white' : '#9CA3AF',
+                  background: 'linear-gradient(135deg, #7C5CBF, #5E3FA3)',
+                  color: 'white',
                   fontWeight: 700, fontSize: 14, borderRadius: 16, border: 'none',
-                  cursor: selectedMood ? 'pointer' : 'not-allowed',
-                  boxShadow: selectedMood ? '0 6px 20px rgba(124,92,191,0.3)' : 'none',
+                  cursor: 'pointer',
+                  boxShadow: '0 6px 20px rgba(124,92,191,0.3)',
                   transition: 'all 0.15s',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
                 }}
               >
                 <span style={{ fontSize: 20 }}>🎙️</span>
-                {selectedMood ? 'Grabar memoria' : 'Selecciona el estado del día'}
+                Grabar memoria
               </button>
             </div>
           )}
@@ -413,14 +380,6 @@ export default function Memorias() {
                 {fmt(elapsed)}
               </p>
               <p style={{ fontSize: 12, color: '#D63031', fontWeight: 600, marginBottom: 20 }}>Grabando...</p>
-              {MOODS.find(m => m.value === selectedMood) && (
-                <p style={{ fontSize: 20, marginBottom: 16 }}>
-                  {MOODS.find(m => m.value === selectedMood).emoji}
-                  {' '}<span style={{ fontSize: 12, color: '#6B7280' }}>
-                    {MOODS.find(m => m.value === selectedMood).label}
-                  </span>
-                </p>
-              )}
               <div style={{ display: 'flex', gap: 10 }}>
                 <button
                   onClick={stopAndSave}
