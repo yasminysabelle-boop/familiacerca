@@ -6,18 +6,49 @@ import { useSubscription } from '../contexts/SubscriptionContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import {
-  ClipboardCheck, FileText, Image, BarChart, User,
-  Receipt, UserPlus, LogOut, ChevronRight, XIcon, Settings,
+  Pill, Clock, ClipboardCheck, Calendar, BookOpen,
+  FileText, Image, Mic, Receipt,
+  BarChart, User,
+  Settings, Shield, Star,
+  UserPlus, LogOut, ChevronRight, XIcon,
 } from '../components/Icons'
 
-const MORE_ITEMS = [
-  { to: '/gastos',     Icon: Receipt,        label: 'Cuentas Claras',      desc: 'Gastos del cuidado familiar',           color: '#4A7C59' },
-  { to: '/historial',  Icon: ClipboardCheck, label: 'Control de dosis',    desc: 'Historial y foto-pruebas selladas',      color: '#4A7C59' },
-  { to: '/notes',      Icon: FileText,        label: 'Notas',               desc: 'Observaciones del cuidado diario',      color: '#4A7C59' },
-  { to: '/album',      Icon: Image,           label: 'Álbum familiar',      desc: 'Fotos y videos de momentos especiales', color: '#C9882A' },
-  { to: '/reportes',   Icon: BarChart,        label: 'Reportes',            desc: 'Análisis semanal y PDF médico',          color: '#2D86A0' },
-  { to: '/paciente/perfil', Icon: ClipboardCheck, label: 'Perfil del paciente', desc: 'Diagnósticos, alergias y médico',        color: '#D63031' },
-  { to: '/ajustes',    Icon: Settings,        label: 'Mi cuenta',           desc: 'Suscripción y configuración',            color: '#6B7280' },
+const MORE_SECTIONS = [
+  {
+    label: 'Cuidado',
+    items: [
+      { to: '/medications',      Icon: Pill,           label: 'Medicamentos',        desc: 'Gestión de medicamentos',               color: '#4A7C59' },
+      { to: '/cuidado/horarios', Icon: Clock,          label: 'Horarios de cuidado', desc: 'Turnos y rutinas del cuidado',          color: '#4A7C59' },
+      { to: '/historial',        Icon: ClipboardCheck, label: 'Historial',           desc: 'Control de dosis y foto-pruebas',       color: '#4A7C59' },
+      { to: '/calendar',         Icon: Calendar,       label: 'Calendario',          desc: 'Citas y eventos del cuidado',           color: '#3B82F6' },
+      { to: '/directorio',       Icon: BookOpen,       label: 'Directorio',          desc: 'Médicos, hospitales y contactos',       color: '#2D86A0' },
+    ],
+  },
+  {
+    label: 'Registro',
+    items: [
+      { to: '/notes',    Icon: FileText, label: 'Notas',          desc: 'Observaciones del cuidado diario',        color: '#4A7C59' },
+      { to: '/album',    Icon: Image,    label: 'Álbum familiar', desc: 'Fotos y videos de momentos especiales',   color: '#C9882A' },
+      { to: '/memorias', Icon: Mic,      label: 'Memorias',       desc: 'Diario de voz familiar',                  color: '#7C5CBF' },
+      { to: '/gastos',   Icon: Receipt,  label: 'Cuentas Claras', desc: 'Gastos del cuidado familiar',             color: '#4A7C59' },
+    ],
+  },
+  {
+    label: 'Reportes y perfil',
+    items: [
+      { to: '/reportes',        Icon: BarChart,       label: 'Reportes',            desc: 'Análisis semanal y PDF médico',         color: '#2D86A0' },
+      { to: '/paciente/perfil', Icon: User,           label: 'Perfil del paciente', desc: 'Diagnósticos, alergias y médico',       color: '#D63031' },
+      { to: '/historial',       Icon: ClipboardCheck, label: 'Control de dosis',    desc: 'Historial y foto-pruebas selladas',     color: '#4A7C59' },
+    ],
+  },
+  {
+    label: 'Cuenta',
+    items: [
+      { to: '/ajustes',  Icon: Settings, label: 'Mi cuenta', desc: 'Suscripción y configuración',  color: '#6B7280' },
+      { to: '/permisos', Icon: Shield,   label: 'Permisos',  desc: 'Control de acceso familiar',   color: '#6B7280' },
+      { to: '/pricing',  Icon: Star,     label: 'Planes',    desc: 'Actualizar suscripción',        color: '#C9882A' },
+    ],
+  },
 ]
 
 const PLAN_COLORS = { free: '#9CA3AF', familiar: '#4A7C59', care_plus: '#7C3AED' }
@@ -231,51 +262,87 @@ export default function More() {
           </div>
         </div>
 
-        {/* Feature items */}
-        <div className="space-y-3 mb-5">
-          {MORE_ITEMS.map(({ to, Icon: IconComp, label, desc, color }) => (
-            <Link
-              key={to}
-              to={to}
-              className="flex items-center gap-4 p-4 rounded-2xl bg-white active:scale-[0.98] transition-transform"
-              style={{ boxShadow: '0 2px 16px rgba(0,0,0,0.06)', border: '1px solid #EDE5D8' }}
-            >
-              <div
-                className="flex items-center justify-center flex-shrink-0"
-                style={{ width: 48, height: 48, borderRadius: 15, background: `${color}12` }}
-              >
-                <IconComp size={22} color={color} strokeWidth={1.5} />
+        {/* Feature sections */}
+        <div className="space-y-6 mb-5">
+          {MORE_SECTIONS.map(({ label: sectionLabel, items }) => (
+            <div key={sectionLabel}>
+              <p style={{
+                fontSize: 10, fontWeight: 700, color: '#9CA3AF',
+                textTransform: 'uppercase', letterSpacing: '0.08em',
+                margin: '0 0 8px 4px',
+              }}>
+                {sectionLabel}
+              </p>
+              <div className="space-y-2">
+                {items.map(({ to, Icon: IconComp, label, desc, color }) => (
+                  <Link
+                    key={to + label}
+                    to={to}
+                    className="flex items-center gap-4 p-4 rounded-2xl bg-white active:scale-[0.98] transition-transform"
+                    style={{ boxShadow: '0 2px 16px rgba(0,0,0,0.06)', border: '1px solid #EDE5D8' }}
+                  >
+                    <div
+                      className="flex items-center justify-center flex-shrink-0"
+                      style={{ width: 44, height: 44, borderRadius: 13, background: `${color}12` }}
+                    >
+                      <IconComp size={20} color={color} strokeWidth={1.5} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-gray-900 text-sm" style={{ fontFamily: 'Georgia, serif' }}>
+                        {label}
+                      </p>
+                      <p className="text-xs text-gray-400 mt-0.5">{desc}</p>
+                    </div>
+                    <ChevronRight size={16} color="#CCCCCC" strokeWidth={2} />
+                  </Link>
+                ))}
+
+                {sectionLabel === 'Cuenta' && (
+                  <>
+                    <button
+                      onClick={openModal}
+                      className="w-full flex items-center gap-4 p-4 rounded-2xl bg-white active:scale-[0.98] transition-transform"
+                      style={{ boxShadow: '0 2px 16px rgba(0,0,0,0.06)', border: '1px solid #EDE5D8', cursor: 'pointer' }}
+                    >
+                      <div
+                        className="flex items-center justify-center flex-shrink-0"
+                        style={{ width: 44, height: 44, borderRadius: 13, background: '#4A7C5912' }}
+                      >
+                        <UserPlus size={20} color="#4A7C59" strokeWidth={1.5} />
+                      </div>
+                      <div className="flex-1 min-w-0 text-left">
+                        <p className="font-bold text-gray-900 text-sm" style={{ fontFamily: 'Georgia, serif' }}>
+                          Invitar familiar
+                        </p>
+                        <p className="text-xs text-gray-400 mt-0.5">Agregar miembro a la familia</p>
+                      </div>
+                      <ChevronRight size={16} color="#CCCCCC" strokeWidth={2} />
+                    </button>
+
+                    <button
+                      onClick={handleSignOut}
+                      className="w-full flex items-center gap-4 p-4 rounded-2xl active:scale-[0.98] transition-transform"
+                      style={{ border: '1px solid #FFBABA', background: '#FFF8F8', cursor: 'pointer' }}
+                    >
+                      <div
+                        className="flex items-center justify-center flex-shrink-0"
+                        style={{ width: 44, height: 44, borderRadius: 13, background: '#D6303112' }}
+                      >
+                        <LogOut size={20} color="#D63031" strokeWidth={1.5} />
+                      </div>
+                      <div className="flex-1 min-w-0 text-left">
+                        <p className="font-bold text-sm" style={{ fontFamily: 'Georgia, serif', color: '#D63031' }}>
+                          Cerrar sesión
+                        </p>
+                        <p className="text-xs text-gray-400 mt-0.5">Salir de la cuenta</p>
+                      </div>
+                    </button>
+                  </>
+                )}
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-bold text-gray-900 text-sm" style={{ fontFamily: 'Georgia, serif' }}>
-                  {label}
-                </p>
-                <p className="text-xs text-gray-400 mt-0.5">{desc}</p>
-              </div>
-              <ChevronRight size={16} color="#CCCCCC" strokeWidth={2} />
-            </Link>
+            </div>
           ))}
         </div>
-
-        {/* Invite button */}
-        <button
-          onClick={openModal}
-          className="w-full py-3.5 rounded-2xl font-semibold text-sm flex items-center justify-center gap-2.5 mb-3 active:scale-[0.98] transition-transform"
-          style={{ border: '1.5px solid #4A7C59', background: '#FFF8F4', color: '#4A7C59' }}
-        >
-          <UserPlus size={17} color="#4A7C59" strokeWidth={1.75} />
-          Invitar familiar
-        </button>
-
-        {/* Sign out */}
-        <button
-          onClick={handleSignOut}
-          className="w-full py-3.5 rounded-2xl font-semibold text-sm flex items-center justify-center gap-2.5 active:scale-[0.98] transition-transform"
-          style={{ border: '1px solid #FFBABA', background: '#FFF8F8', color: '#D63031' }}
-        >
-          <LogOut size={16} color="#D63031" strokeWidth={1.75} />
-          Cerrar sesión
-        </button>
       </div>
 
       {/* Invite modal */}

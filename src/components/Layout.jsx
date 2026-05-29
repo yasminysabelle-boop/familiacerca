@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import Logo from './Logo'
-import { Home, Pill, Mic, Users, User, Plus, XIcon, LogOut, Chat } from './Icons'
+import { Home, Users, User, Plus, XIcon, LogOut, Menu, Settings } from './Icons'
 import Paywall from './Paywall'
 import InstallBanner from './InstallBanner'
 import OfflineBanner from './OfflineBanner'
@@ -36,11 +36,10 @@ const PAGE_TITLES = {
 }
 
 const BOTTOM_TABS = [
-  { to: '/dashboard', Icon: Home,  label: 'Inicio' },
-  { to: '/hoy',       Icon: Pill,  label: 'Hoy' },
-  { to: '/chat',      Icon: Chat,  label: 'Chat' },
-  { to: '/memorias',  Icon: Mic,   label: 'Memorias' },
-  { to: '/familia',   Icon: Users, label: 'Familia' },
+  { to: '/dashboard', Icon: Home,     label: 'Inicio' },
+  { to: '/familia',   Icon: Users,    label: 'Familia' },
+  { to: '/mas',       Icon: Menu,     label: 'Más' },
+  { to: '/ajustes',   Icon: Settings, label: 'Ajustes' },
 ]
 
 const FAB_ITEMS = [
@@ -303,7 +302,7 @@ export default function Layout({ children }) {
       >
         {BOTTOM_TABS.map(({ to, Icon, label }) => {
           const isActive = location.pathname === to ||
-            (to === '/memorias' && location.pathname === '/diario-voz')
+            (to === '/mas' && location.pathname.startsWith('/mas'))
           return (
             <Link
               key={to}

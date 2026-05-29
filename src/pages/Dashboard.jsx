@@ -2845,13 +2845,15 @@ export default function Dashboard() {
         </p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginBottom: 24 }}>
           {[
-            { to: '/chat',            emoji: '💬', label: 'Chat' },
-            { to: '/notes',           emoji: '📝', label: 'Notas' },
-            { to: '/album',           emoji: '📸', label: 'Álbum' },
-            { to: '/memorias',        emoji: '🎙️', label: 'Memorias' },
-            { to: '/gastos',          emoji: '💰', label: 'Gastos' },
-            { to: '/reportes',        emoji: '📊', label: 'Reportes' },
-            { to: '/paciente/perfil', emoji: '🏥', label: 'Perfil' },
+            { to: '/medications',      emoji: '💊', label: 'Medicamentos' },
+            { to: '/cuidado/horarios', emoji: '🗓️', label: 'Horarios' },
+            { to: '/directorio',       emoji: '📒', label: 'Directorio' },
+            { to: '/notes',            emoji: '📝', label: 'Notas' },
+            { to: '/album',            emoji: '📸', label: 'Álbum' },
+            { to: '/memorias',         emoji: '🎙️', label: 'Memorias' },
+            { to: '/gastos',           emoji: '💰', label: 'Gastos' },
+            { to: '/reportes',         emoji: '📊', label: 'Reportes' },
+            { to: '/paciente/perfil',  emoji: '🏥', label: 'Perfil' },
           ].map(({ to, emoji, label }) => (
             <Link key={to} to={to} style={{
               display: 'flex', flexDirection: 'column', alignItems: 'center',
