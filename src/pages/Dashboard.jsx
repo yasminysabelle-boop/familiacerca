@@ -1324,38 +1324,36 @@ function DashCard({ icon, title, subtitle, status, statusType, to, onClick }) {
     <div
       onClick={to ? () => navigate(to) : onClick}
       style={{
-        background: 'white', borderRadius: 12,
-        border: '1px solid #f0ede8',
-        padding: '14px 12px 12px',
-        display: 'flex', flexDirection: 'column', gap: 6,
-        boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+        background: 'white', borderRadius: 16,
+        border: '1px solid #EDE5D8',
+        padding: '14px 16px',
+        display: 'flex', alignItems: 'center', gap: 14,
+        boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
         cursor: isClickable ? 'pointer' : 'default',
         WebkitTapHighlightColor: 'transparent',
-        minHeight: 120, boxSizing: 'border-box',
+        boxSizing: 'border-box',
       }}
     >
       <div style={{
-        width: 36, height: 36, borderRadius: 10,
-        background: 'rgba(74,124,89,0.1)',
+        width: 44, height: 44, borderRadius: 13,
+        background: 'rgba(74,124,89,0.08)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: 20, lineHeight: 1, flexShrink: 0,
+        fontSize: 22, lineHeight: 1, flexShrink: 0,
       }}>
         {icon}
       </div>
-      <div style={{ flex: 1 }}>
-        <p style={{ fontSize: 14, fontWeight: 700, color: '#2d3748', margin: 0, lineHeight: 1.2 }}>{title}</p>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <p style={{ fontSize: 14, fontWeight: 700, color: '#1A1A1A', margin: 0, lineHeight: 1.2 }}>{title}</p>
         {subtitle && (
-          <p style={{ fontSize: 11, color: '#9CA3AF', margin: '3px 0 0', lineHeight: 1.3,
-            overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box',
-            WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+          <p style={{ fontSize: 12, color: '#9CA3AF', margin: '2px 0 0', lineHeight: 1.3 }}>
             {subtitle}
           </p>
         )}
       </div>
       {status && (
         <div style={{
-          alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center',
-          gap: 4, padding: '3px 8px', borderRadius: 20, background: s.bg,
+          flexShrink: 0, display: 'inline-flex', alignItems: 'center',
+          gap: 4, padding: '4px 10px', borderRadius: 20, background: s.bg,
         }}>
           <span style={{ width: 5, height: 5, borderRadius: '50%', background: s.color, flexShrink: 0 }} />
           <span style={{ fontSize: 10, fontWeight: 700, color: s.color, whiteSpace: 'nowrap' }}>{status}</span>
@@ -2601,11 +2599,8 @@ export default function Dashboard() {
           )}
         </div>
 
-        {/* ════ ZONA 2 — Acciones urgentes (2 × 2) ══════════════════════ */}
-        <p style={{ fontSize: 10, fontWeight: 700, color: '#4A7C59', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 10px' }}>
-          Acciones
-        </p>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 20 }}>
+        {/* ════ Cards list ═══════════════════════════════════════════════ */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 24 }}>
           <DashCard
             icon="🆘"
             title="Emergencia"
@@ -2630,26 +2625,12 @@ export default function Dashboard() {
             statusType={careStatusType}
             to="/hoy"
           />
-          <DashCard
-            icon="📹"
-            title="Videollamada"
-            subtitle="Conectar con la familia"
-            status="Próximamente"
-            statusType="info"
-            onClick={() => {}}
-          />
-        </div>
-
-        {/* ════ ZONA 3 — Seguimiento ════════════════════════════════════ */}
-        <p style={{ fontSize: 10, fontWeight: 700, color: '#4A7C59', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 10px' }}>
-          Seguimiento
-        </p>
 
         {/* Detalle del Cuidado */}
         <div style={{
           background: 'white', borderRadius: 16, border: '1px solid #EDE5D8',
-          padding: '14px 14px 4px', marginBottom: 10,
-          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+          padding: '14px 16px 4px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
         }}>
           <p style={{ fontSize: 13, fontWeight: 700, color: '#1A1A1A', margin: '0 0 12px' }}>
             📋 Detalle del Cuidado
@@ -2736,8 +2717,14 @@ export default function Dashboard() {
           ))}
         </div>
 
-        {/* Próxima cita + Modo Hospital */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 20 }}>
+          <DashCard
+            icon="📹"
+            title="Videollamada"
+            subtitle="Conectar con la familia"
+            status="Próximamente"
+            statusType="info"
+            onClick={() => {}}
+          />
           <DashCard
             icon="📅"
             title="Próxima cita"
@@ -2756,13 +2743,6 @@ export default function Dashboard() {
             statusType="info"
             onClick={() => {}}
           />
-        </div>
-
-        {/* ════ ZONA 4 — Mi equipo ══════════════════════════════════════ */}
-        <p style={{ fontSize: 10, fontWeight: 700, color: '#4A7C59', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 10px' }}>
-          Mi equipo
-        </p>
-        <div style={{ marginBottom: 20 }}>
           <DashCard
             icon="👥"
             title="Mi equipo"
@@ -2771,13 +2751,6 @@ export default function Dashboard() {
             statusType="info"
             to="/familia"
           />
-        </div>
-
-        {/* ════ ZONA 5 — Otras funciones ════════════════════════════════ */}
-        <p style={{ fontSize: 10, fontWeight: 700, color: '#4A7C59', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '0 0 10px' }}>
-          Otras funciones
-        </p>
-        <div style={{ marginBottom: 24 }}>
           <DashCard
             icon="⊞"
             title="Otras funciones"
