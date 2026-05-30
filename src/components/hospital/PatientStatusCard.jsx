@@ -1,15 +1,17 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useHospitalMode } from '../../contexts/HospitalModeContext'
-import { supabase } from '../../lib/supabase'
-import { useAuth } from '../../contexts/AuthContext'
 import VoiceInput from '../VoiceInput'
 
 export default function PatientStatusCard() {
   const { hospitalMode, updateHospitalMode } = useHospitalMode()
-  const { user } = useAuth()
-  const [text, setText] = useState(hospitalMode?.patient_status ?? '')
+  const [text, setText] = useState('')
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+
+  // Sync when hospitalMode loads or changes from another device via Realtime
+  useEffect(() => {
+    if (!saving) setText(hospitalMode?.patient_status ?? '')
+  }, [hospitalMode?.patient_status])
 
   async function handleSave() {
     setSaving(true)

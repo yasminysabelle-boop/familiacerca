@@ -1,12 +1,17 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useHospitalMode } from '../../contexts/HospitalModeContext'
 import VoiceInput from '../VoiceInput'
 
 export default function DoctorNotesCard() {
   const { hospitalMode, updateHospitalMode } = useHospitalMode()
-  const [text, setText] = useState(hospitalMode?.doctor_notes ?? '')
+  const [text, setText] = useState('')
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+
+  // Sync when hospitalMode loads or changes from another device via Realtime
+  useEffect(() => {
+    if (!saving) setText(hospitalMode?.doctor_notes ?? '')
+  }, [hospitalMode?.doctor_notes])
 
   async function handleSave() {
     setSaving(true)

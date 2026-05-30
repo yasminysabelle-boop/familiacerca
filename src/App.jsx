@@ -47,7 +47,7 @@ function AppShell() {
   const location = useLocation()
   const isLanding = location.pathname === '/'
 
-  const onboardingDone = !!localStorage.getItem('fc_onboarding_done') || !!localStorage.getItem('fc_splash_shown')
+  const onboardingDone = !!localStorage.getItem('fc_onboarding_done')
   const [showSlides, setShowSlides] = useState(!onboardingDone)
   const [splashDone, setSplashDone] = useState(() => !!sessionStorage.getItem('fc_logo_splash_done'))
   const [splashFading, setSplashFading] = useState(false)

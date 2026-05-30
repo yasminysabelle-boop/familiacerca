@@ -1,11 +1,16 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useHospitalMode } from '../../contexts/HospitalModeContext'
 
 export default function DischargeDateCard() {
   const { hospitalMode, updateHospitalMode } = useHospitalMode()
   const [editing, setEditing] = useState(false)
-  const [date, setDate] = useState(hospitalMode?.discharge_date ?? '')
+  const [date, setDate] = useState('')
   const [saving, setSaving] = useState(false)
+
+  // Sync when hospitalMode loads or changes from another device via Realtime
+  useEffect(() => {
+    if (!editing) setDate(hospitalMode?.discharge_date ?? '')
+  }, [hospitalMode?.discharge_date])
 
   function fmtDate(d) {
     if (!d) return null

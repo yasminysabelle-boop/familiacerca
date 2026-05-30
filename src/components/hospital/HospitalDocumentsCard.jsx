@@ -29,6 +29,7 @@ export default function HospitalDocumentsCard() {
   const [notes, setNotes] = useState('')
   const [file, setFile] = useState(null)
   const [uploading, setUploading] = useState(false)
+  const [uploadError, setUploadError] = useState('')
   const fileRef = useRef()
 
   useEffect(() => {
@@ -48,21 +49,27 @@ export default function HospitalDocumentsCard() {
   async function handleUpload() {
     if (!file || !title.trim()) return
     setUploading(true)
+    setUploadError('')
     const ext = file.name.split('.').pop()
     const path = `${ownerId}/${Date.now()}.${ext}`
+
     const { error: upErr } = await supabase.storage
       .from('hospital-docs')
       .upload(path, file, { contentType: file.type })
-    if (upErr) { setUploading(false); return }
+    if (upErr) {
+      setUploadError('Error al subir el archivo. Intenta de nuevo.')
+      setUploading(false)
+      return
+    }
 
-    const { data: { publicUrl } } = supabase.storage.from('hospital-docs').getPublicUrl(path)
-    // If bucket is private, use signed URL instead
+    // Prefer signed URL (private bucket); fall back to public URL
     const { data: signedData } = await supabase.storage
       .from('hospital-docs')
       .createSignedUrl(path, 60 * 60 * 24 * 365)
+    const { data: { publicUrl } } = supabase.storage.from('hospital-docs').getPublicUrl(path)
     const docUrl = signedData?.signedUrl ?? publicUrl
 
-    const { data } = await supabase
+    const { data, error: insertErr } = await supabase
       .from('hospital_documents')
       .insert({
         owner_id: ownerId,
@@ -74,6 +81,12 @@ export default function HospitalDocumentsCard() {
       })
       .select()
       .single()
+
+    if (insertErr) {
+      setUploadError('Archivo subido pero no se pudo registrar. Intenta de nuevo.')
+      setUploading(false)
+      return
+    }
 
     if (data) setDocs(prev => [data, ...prev])
     setTitle('')
@@ -227,9 +240,14 @@ export default function HospitalDocumentsCard() {
             />
           </div>
 
+          {uploadError && (
+            <p style={{ margin: 0, fontSize: 12, color: '#DC2626', padding: '6px 10px', borderRadius: 8, background: '#FEF2F2' }}>
+              {uploadError}
+            </p>
+          )}
           <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
             <button
-              onClick={() => setShowForm(false)}
+              onClick={() => { setShowForm(false); setUploadError('') }}
               style={{
                 padding: '8px 16px', borderRadius: 8, border: '1px solid #D1C9BF',
                 background: 'white', fontSize: 13, cursor: 'pointer', color: '#6B7280',

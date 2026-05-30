@@ -15,6 +15,7 @@ export default function HospitalVisitsCard() {
   const [visitTime, setVisitTime] = useState('')
   const [notes, setNotes] = useState('')
   const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState('')
 
   useEffect(() => {
     if (!ownerId) return
@@ -34,7 +35,8 @@ export default function HospitalVisitsCard() {
   async function addVisit() {
     if (!visitorName.trim()) return
     setSaving(true)
-    const { data } = await supabase
+    setSaveError('')
+    const { data, error } = await supabase
       .from('hospital_visits')
       .insert({
         owner_id: ownerId,
@@ -46,12 +48,16 @@ export default function HospitalVisitsCard() {
       })
       .select()
       .single()
+    setSaving(false)
+    if (error) {
+      setSaveError('No se pudo guardar. Intenta de nuevo.')
+      return
+    }
     if (data) setVisits(prev => [...prev, data])
     setVisitorName('')
     setVisitTime('')
     setNotes('')
     setShowForm(false)
-    setSaving(false)
   }
 
   async function toggleConfirm(visit) {
@@ -188,9 +194,14 @@ export default function HospitalVisitsCard() {
             rows={1}
             label="Nota"
           />
+          {saveError && (
+            <p style={{ margin: 0, fontSize: 12, color: '#DC2626', padding: '6px 10px', borderRadius: 8, background: '#FEF2F2' }}>
+              {saveError}
+            </p>
+          )}
           <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
             <button
-              onClick={() => setShowForm(false)}
+              onClick={() => { setShowForm(false); setSaveError('') }}
               style={{
                 padding: '8px 16px', borderRadius: 8,
                 border: '1px solid #D1C9BF', background: 'white',

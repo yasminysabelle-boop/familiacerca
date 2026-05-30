@@ -90,7 +90,8 @@ export default function Onboarding() {
   useEffect(() => {
     if (familyLoading || !user) return
     if (ownerId && ownerId !== user.id) {
-      supabase.auth.updateUser({ data: { onboarding_completed: true } })
+      // Fire-and-forget is intentional here — member redirect must not block on metadata update
+      supabase.auth.updateUser({ data: { onboarding_completed: true } }).catch(() => {})
       navigate('/hoy', { replace: true })
     }
   }, [user, ownerId, familyLoading, navigate])
@@ -129,7 +130,7 @@ export default function Onboarding() {
       p_invited_by: displayName,
     })
     setInviting(false)
-    if (error) { setInviteError('No se pudo crear la invitación. Intenta de nuevo.'); return }
+    if (error || !token) { setInviteError('No se pudo crear la invitación. Intenta de nuevo.'); return }
     setInviteLink(`${window.location.origin}/join?token=${token}`)
   }
 
@@ -142,7 +143,11 @@ export default function Onboarding() {
   }
 
   async function finish(dest = '/hoy') {
-    await supabase.auth.updateUser({ data: { onboarding_completed: true } })
+    const { error } = await supabase.auth.updateUser({ data: { onboarding_completed: true } })
+    if (error) {
+      console.error('[Onboarding] updateUser failed:', error)
+      // Still navigate — the localStorage flag in App.jsx will prevent the slides from showing again
+    }
     navigate(dest, { replace: true })
   }
 

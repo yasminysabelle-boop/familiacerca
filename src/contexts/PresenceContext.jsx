@@ -27,7 +27,10 @@ export function PresenceProvider({ children }) {
         }
       })
 
-    return () => { supabase.removeChannel(channel) }
+    return () => {
+      channel.unsubscribe()
+      supabase.removeChannel(channel)
+    }
   }, [user?.id, ownerId])
 
   return (

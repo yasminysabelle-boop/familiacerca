@@ -13,7 +13,10 @@ export default function MedicationsPausedCard() {
       .select('id, name, dosage, scheduled_times')
       .eq('user_id', ownerId)
       .order('name')
-      .then(({ data }) => setMeds(data ?? []))
+      .then(({ data, error }) => {
+        if (!error) setMeds(data ?? [])
+      })
+      .catch(err => console.error('[MedicationsPausedCard]', err))
   }, [ownerId])
 
   return (

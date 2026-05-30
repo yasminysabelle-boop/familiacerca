@@ -28,16 +28,21 @@ export function HospitalModeProvider({ children }) {
 
   async function load() {
     setLoading(true)
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('hospital_mode')
       .select('*')
       .eq('owner_id', ownerId)
       .maybeSingle()
-    setHospitalMode(data ?? null)
+    if (error) {
+      console.error('[HospitalModeContext] load error:', error)
+    } else {
+      setHospitalMode(data ?? null)
+    }
     setLoading(false)
   }
 
   function subscribe() {
+    if (!ownerId) return
     channelRef.current?.unsubscribe()
     const channel = supabase
       .channel(`hospital-mode:${ownerId}`)
