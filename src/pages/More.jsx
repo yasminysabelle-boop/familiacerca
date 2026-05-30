@@ -6,8 +6,8 @@ import { useSubscription } from '../contexts/SubscriptionContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import {
-  Pill, Clock, ClipboardCheck, Calendar, BookOpen,
-  FileText, Image, Mic, Receipt,
+  Pill, Clock, BookOpen,
+  Image, Mic,
   BarChart, User,
   Settings, Shield, Star,
   UserPlus, LogOut, ChevronRight, XIcon,
@@ -17,35 +17,25 @@ const MORE_SECTIONS = [
   {
     label: 'Cuidado',
     items: [
-      { to: '/medications',      Icon: Pill,           label: 'Medicamentos',        desc: 'Gestión de medicamentos',               color: '#4A7C59' },
-      { to: '/cuidado/horarios', Icon: Clock,          label: 'Horarios de cuidado', desc: 'Turnos y rutinas del cuidado',          color: '#4A7C59' },
-      { to: '/historial',        Icon: ClipboardCheck, label: 'Historial',           desc: 'Control de dosis y foto-pruebas',       color: '#4A7C59' },
-      { to: '/calendar',         Icon: Calendar,       label: 'Citas médicas',       desc: 'Citas y eventos del cuidado',           color: '#3B82F6' },
-      { to: '/directorio',       Icon: BookOpen,       label: 'Directorio',          desc: 'Médicos, hospitales y contactos',       color: '#2D86A0' },
+      { to: '/medications',      Icon: Pill,     label: 'Medicamentos',        desc: 'Agregar y editar medicamentos',        color: '#4A7C59' },
+      { to: '/cuidado/horarios', Icon: Clock,    label: 'Horarios de cuidado', desc: 'Turnos y rutinas del cuidado',         color: '#4A7C59' },
+      { to: '/directorio',       Icon: BookOpen, label: 'Directorio',          desc: 'Médicos, hospitales y contactos',      color: '#2D86A0' },
     ],
   },
   {
-    label: 'Registro',
+    label: 'Memorias y reportes',
     items: [
-      { to: '/album',    Icon: Image,    label: 'Álbum familiar', desc: 'Fotos y videos de momentos especiales',   color: '#C9882A' },
-      { to: '/memorias', Icon: Mic,      label: 'Memorias',       desc: 'Diario de voz familiar',                  color: '#7C5CBF' },
-      { to: '/gastos',   Icon: Receipt,  label: 'Cuentas Claras', desc: 'Gastos del cuidado familiar',             color: '#4A7C59' },
-    ],
-  },
-  {
-    label: 'Reportes y perfil',
-    items: [
-      { to: '/reportes',        Icon: BarChart,       label: 'Reportes',            desc: 'Análisis semanal y PDF médico',         color: '#2D86A0' },
-      { to: '/paciente/perfil', Icon: User,           label: 'Perfil del paciente', desc: 'Diagnósticos, alergias y médico',       color: '#D63031' },
-      { to: '/historial',       Icon: ClipboardCheck, label: 'Control de dosis',    desc: 'Historial y foto-pruebas selladas',     color: '#4A7C59' },
+      { to: '/album',    Icon: Image,   label: 'Álbum familiar', desc: 'Fotos y videos de momentos especiales', color: '#C9882A' },
+      { to: '/memorias', Icon: Mic,     label: 'Memorias',       desc: 'Diario de voz familiar',                color: '#7C5CBF' },
+      { to: '/reportes', Icon: BarChart,label: 'Reportes',       desc: 'Análisis semanal y PDF médico',         color: '#2D86A0' },
     ],
   },
   {
     label: 'Cuenta',
     items: [
-      { to: '/ajustes',  Icon: Settings, label: 'Mi cuenta', desc: 'Suscripción y configuración',  color: '#6B7280' },
-      { to: '/permisos', Icon: Shield,   label: 'Permisos',  desc: 'Control de acceso familiar',   color: '#6B7280' },
-      { to: '/pricing',  Icon: Star,     label: 'Planes',    desc: 'Actualizar suscripción',        color: '#C9882A' },
+      { to: '/ajustes',  Icon: Settings, label: 'Mi cuenta', desc: 'Suscripción y configuración', color: '#6B7280' },
+      { to: '/permisos', Icon: Shield,   label: 'Permisos',  desc: 'Control de acceso familiar',  color: '#6B7280' },
+      { to: '/pricing',  Icon: Star,     label: 'Planes',    desc: 'Actualizar suscripción',       color: '#C9882A' },
     ],
   },
 ]
