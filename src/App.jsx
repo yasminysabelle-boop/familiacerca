@@ -37,6 +37,7 @@ import PatientProfile from './pages/PatientProfile'
 import Landing from './pages/Landing'
 import VideoCall from './pages/VideoCall'
 import Admin from './pages/Admin'
+import DiarioMedico from './pages/DiarioMedico'
 
 const P = ({ children }) => <ProtectedRoute>{children}</ProtectedRoute>
 
@@ -117,6 +118,7 @@ function AppShell() {
         <Route path="/paciente/perfil"    element={<P><PatientProfile /></P>} />
         <Route path="/videollamada"       element={<P><VideoCall /></P>} />
         <Route path="/admin"              element={<P><Admin /></P>} />
+        <Route path="/diario-medico"      element={<P><DiarioMedico /></P>} />
         <Route path="/terminos"    element={<TermsOfService />} />
         <Route path="/privacidad"  element={<PrivacyPolicy />} />
         <Route path="*"            element={<Navigate to="/login" replace />} />

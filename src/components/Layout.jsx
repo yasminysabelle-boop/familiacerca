@@ -20,6 +20,7 @@ const PAGE_TITLES = {
   '/familia':     'Mi Familia',
   '/medications': 'Medicamentos',
   '/historial':   'Historial de cuidado',
+  '/diario-medico': 'Diario Médico',
   '/calendar':    'Calendario',
   '/notes':       'Notas',
   '/chat':        'Chat familiar',
