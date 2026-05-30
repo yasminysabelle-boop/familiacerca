@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
-import { FamilyProvider } from './contexts/FamilyContext'
+import { FamilyProvider, useFamily } from './contexts/FamilyContext'
 import { SubscriptionProvider } from './contexts/SubscriptionContext'
 import { DarkModeProvider } from './contexts/DarkModeContext'
 import { PresenceProvider } from './contexts/PresenceContext'
 import { HospitalModeProvider } from './contexts/HospitalModeContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import WelcomeSlides from './components/WelcomeSlides'
+import MemberOnboarding from './components/MemberOnboarding'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Onboarding from './pages/Onboarding'
@@ -46,7 +47,9 @@ function HomeRoute() {
 }
 
 function AppShell() {
-  const location = useLocation()
+  const location  = useLocation()
+  const { user }  = useAuth()
+  const { memberRole, loading: familyLoading } = useFamily()
   const isLanding = location.pathname === '/'
 
   const onboardingDone = !!localStorage.getItem('fc_onboarding_done')
@@ -54,9 +57,23 @@ function AppShell() {
   const [splashDone, setSplashDone] = useState(() => !!sessionStorage.getItem('fc_logo_splash_done'))
   const [splashFading, setSplashFading] = useState(false)
 
+  // Member onboarding: shown once to family members who haven't completed it
+  const [showMemberOnboarding, setShowMemberOnboarding] = useState(false)
+  useEffect(() => {
+    if (!user || familyLoading) return
+    const isMember = memberRole !== null
+    const notDone  = !localStorage.getItem('fc_member_onboarding_done')
+    setShowMemberOnboarding(isMember && notDone)
+  }, [user, familyLoading, memberRole])
+
   function handleOnboardingDone() {
     localStorage.setItem('fc_onboarding_done', '1')
     setShowSlides(false)
+  }
+
+  function handleMemberOnboardingDone() {
+    localStorage.setItem('fc_member_onboarding_done', '1')
+    setShowMemberOnboarding(false)
   }
 
   useEffect(() => {
@@ -71,6 +88,7 @@ function AppShell() {
     <>
       {showSlides && !isLanding && <WelcomeSlides onDone={handleOnboardingDone} />}
       {!showSlides && !splashDone && !isLanding && <Splash fading={splashFading} />}
+      {showMemberOnboarding && <MemberOnboarding onDone={handleMemberOnboardingDone} />}
       <Routes>
         <Route path="/"            element={<HomeRoute />} />
         <Route path="/login"       element={<Login />} />
