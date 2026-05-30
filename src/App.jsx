@@ -35,6 +35,7 @@ import CareSchedule from './pages/CareSchedule'
 import PatientProfile from './pages/PatientProfile'
 import Landing from './pages/Landing'
 import VideoCall from './pages/VideoCall'
+import Admin from './pages/Admin'
 
 const P = ({ children }) => <ProtectedRoute>{children}</ProtectedRoute>
 
@@ -97,6 +98,7 @@ function AppShell() {
         <Route path="/cuidado/horarios"   element={<P><CareSchedule /></P>} />
         <Route path="/paciente/perfil"    element={<P><PatientProfile /></P>} />
         <Route path="/videollamada"       element={<P><VideoCall /></P>} />
+        <Route path="/admin"              element={<P><Admin /></P>} />
         <Route path="/terminos"    element={<TermsOfService />} />
         <Route path="/privacidad"  element={<PrivacyPolicy />} />
         <Route path="*"            element={<Navigate to="/login" replace />} />

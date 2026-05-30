@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import { useFamily } from '../contexts/FamilyContext'
 import { useSubscription } from '../contexts/SubscriptionContext'
 import { useDarkMode } from '../contexts/DarkModeContext'
 import { usePushNotifications } from '../hooks/usePushNotifications'
@@ -89,6 +90,8 @@ function ToggleRow({ icon, label, subtitle, checked, onChange }) {
 
 export default function Settings() {
   const { user, signOut } = useAuth()
+  const { ownerId, memberRole } = useFamily()
+  const isAdmin = memberRole === null && ownerId === user?.id
   const { sub, isPaid, isTrialing, trialExpired, daysLeft } = useSubscription()
   const { dark, toggleDark } = useDarkMode()
   const { isHospitalMode, hospitalMode } = useHospitalMode()
@@ -424,6 +427,39 @@ export default function Settings() {
                 )}
               </>
             )}
+          </div>
+        )}
+
+        {/* Admin panel link — only for owners */}
+        {isAdmin && (
+          <div style={{
+            borderRadius: 20, overflow: 'hidden', marginBottom: 12,
+            border: '1px solid #2D4A1E30', background: '#F0F9F4',
+          }}>
+            <button
+              onClick={() => navigate('/admin')}
+              style={{
+                width: '100%', display: 'flex', alignItems: 'center', gap: 12,
+                padding: '16px', background: 'none', border: 'none',
+                cursor: 'pointer', textAlign: 'left',
+              }}
+            >
+              <div style={{
+                width: 44, height: 44, borderRadius: 12, flexShrink: 0,
+                background: '#2D4A1E18',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 22,
+              }}>⚙️</div>
+              <div style={{ flex: 1 }}>
+                <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#2D4A1E' }}>
+                  Panel de administración
+                </p>
+                <p style={{ margin: '2px 0 0', fontSize: 12, color: '#4A7C59' }}>
+                  Equipo, cuenta, datos y actividad
+                </p>
+              </div>
+              <ChevronRight size={16} color="#4A7C59" strokeWidth={2} />
+            </button>
           </div>
         )}
 
