@@ -8,7 +8,25 @@
   VITE_SUPABASE_ANON_KEY = "sb_publishable_xbbhMRO6XcgVu3yod6X1cA_63CwhlTM"
   SECRETS_SCAN_ENABLED = "false"
 
-# Cache hashed assets forever (Vite fingerprints all filenames)
+# sw.js must never be cached by CDN — browser needs to check it on every load
+# so it can detect a new version and trigger the update flow.
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
+# index.html must never be cached — always serve the latest deploy.
+[[headers]]
+  for = "/"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
+# Vite-hashed assets are immutable — safe to cache forever (new deploy = new filename)
 [[headers]]
   for = "/assets/*"
   [headers.values]
@@ -22,4 +40,4 @@
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
     X-XSS-Protection = "1; mode=block"
-    Permissions-Policy = "camera=(), geolocation=()"
+    Permissions-Policy = "camera=(self), microphone=(self), geolocation=(self)"
