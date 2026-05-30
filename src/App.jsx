@@ -43,7 +43,7 @@ const P = ({ children }) => <ProtectedRoute>{children}</ProtectedRoute>
 function HomeRoute() {
   const { user, loading } = useAuth()
   if (loading) return null
-  return user ? <Navigate to="/hoy" replace /> : <Landing />
+  return user ? <Navigate to="/dashboard" replace /> : <Landing />
 }
 
 function AppShell() {

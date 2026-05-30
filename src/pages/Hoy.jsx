@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { supabase } from '../lib/supabase'
@@ -90,6 +90,10 @@ export default function Hoy() {
   const { user } = useAuth()
   const { ownerId, profile, memberRole } = useFamily()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const [activeTab, setActiveTab] = useState(() =>
+    searchParams.get('view') === 'cuidado' ? 'cuidado' : 'medicamentos'
+  )
   const [medications, setMedications] = useState([])
   const [logs, setLogs] = useState({})
   const [loading, setLoading] = useState(true)
@@ -456,15 +460,47 @@ export default function Hoy() {
     ? CARE_ITEMS.filter(i => calcularEstadoCuidado(i, !!careLogs[i.key], careSchedules[i.key]) === 'tarde')
     : []
 
-  const showOverdueAlert = !isFamiliar && !loading && (overdueMeds.length > 0 || overdueCareItems.length > 0)
+  const showMedOverdue  = !isFamiliar && !loading && overdueMeds.length > 0
+  const showCareOverdue = !isFamiliar && !loading && overdueCareItems.length > 0
 
   return (
     <Layout>
 
       <div style={{ padding: '16px 16px 96px', maxWidth: 600 }}>
 
-        {/* Overdue alert banner */}
-        {showOverdueAlert && (
+        {/* Tab switcher */}
+        <div style={{
+          display: 'flex', gap: 4, marginBottom: 16,
+          background: '#F3F4F6', borderRadius: 14, padding: 4,
+        }}>
+          {[
+            { id: 'medicamentos', label: '💊 Medicamentos' },
+            { id: 'cuidado',      label: '📋 Cuidado' },
+          ].map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              style={{
+                flex: 1, padding: '10px 8px',
+                borderRadius: 10, border: 'none',
+                fontSize: 13, fontWeight: 700,
+                cursor: 'pointer',
+                background: activeTab === tab.id ? 'white' : 'transparent',
+                color: activeTab === tab.id ? '#1A1A1A' : '#9CA3AF',
+                boxShadow: activeTab === tab.id ? '0 1px 4px rgba(0,0,0,0.1)' : 'none',
+                transition: 'all 0.15s',
+              }}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* ── MEDICAMENTOS TAB ─────────────────────────────── */}
+        {activeTab === 'medicamentos' && <>
+
+        {/* Overdue meds alert */}
+        {showMedOverdue && (
           <div style={{
             background: '#FEF2F2', border: '1px solid #FCA5A5',
             borderRadius: 14, padding: '10px 16px', marginBottom: 14,
@@ -472,14 +508,10 @@ export default function Hoy() {
           }}>
             <span style={{ fontSize: 16, flexShrink: 0, marginTop: 1 }}>⚠️</span>
             <p style={{ fontSize: 13, fontWeight: 700, color: '#DC2626', margin: 0, lineHeight: 1.5 }}>
-              {overdueMeds.length > 0
-                ? `${overdueMeds.length} sin dar · ${overdueMeds.slice(0, 2).map(m => {
-                    const t = firstTime(m)
-                    return t ? `${m.name} ${fmtMedTime(t)}` : m.name
-                  }).join(' · ')}${overdueMeds.length > 2 ? ` · +${overdueMeds.length - 2} más` : ''}`
-                : overdueCareItems.slice(0, 3).map(i => `${i.icon} ${i.label}`).join(' · ') +
-                  (overdueCareItems.length > 3 ? ` · +${overdueCareItems.length - 3} más` : '')
-              }
+              {overdueMeds.length} sin dar · {overdueMeds.slice(0, 2).map(m => {
+                const t = firstTime(m)
+                return t ? `${m.name} ${fmtMedTime(t)}` : m.name
+              }).join(' · ')}{overdueMeds.length > 2 ? ` · +${overdueMeds.length - 2} más` : ''}
             </p>
           </div>
         )}
@@ -904,9 +936,30 @@ export default function Hoy() {
                 )
               })
             )}
+          </>
+        )}
+        </> /* end medicamentos tab */}
+
+        {/* ── CUIDADO TAB ──────────────────────────────────── */}
+        {activeTab === 'cuidado' && <>
+
+        {/* Overdue care alert */}
+        {showCareOverdue && (
+          <div style={{
+            background: '#FEF2F2', border: '1px solid #FCA5A5',
+            borderRadius: 14, padding: '10px 16px', marginBottom: 14,
+            display: 'flex', alignItems: 'flex-start', gap: 8,
+          }}>
+            <span style={{ fontSize: 16, flexShrink: 0, marginTop: 1 }}>⚠️</span>
+            <p style={{ fontSize: 13, fontWeight: 700, color: '#DC2626', margin: 0, lineHeight: 1.5 }}>
+              {overdueCareItems.slice(0, 3).map(i => `${i.icon} ${i.label}`).join(' · ')}
+              {overdueCareItems.length > 3 ? ` · +${overdueCareItems.length - 3} más` : ''}
+            </p>
+          </div>
+        )}
 
             {/* ── Cuidado de hoy ──────────────────────────────────── */}
-            <div style={{ marginTop: 28 }}>
+            <div style={{ marginTop: 0 }}>
 
               {/* Section header */}
               <div style={{
@@ -1135,8 +1188,9 @@ export default function Hoy() {
                 </div>
               )}
             </div>
-          </>
-        )}
+
+        </> /* end cuidado tab */}
+
       </div>
 
       {/* Delete confirmation dialog */}

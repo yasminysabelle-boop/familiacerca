@@ -2722,7 +2722,7 @@ export default function Dashboard() {
 
           {/* Fila 1: Medicamentos | Cuidado de hoy */}
           <DashCard Icon={Pill}           title="Medicamentos"       subtitle={medCardSubtitle}                                                                                         status={medCardStatus}  statusType={medCardStatusType}  to="/hoy" />
-          <DashCard Icon={ClipboardCheck} title="Cuidado de hoy"     subtitle={medTotal > 0 ? `${medTotal} med${medTotal !== 1 ? 's' : ''} programados` : 'Rutina diaria'}              status={careStatus}     statusType={careStatusType}     to="/hoy" />
+          <DashCard Icon={ClipboardCheck} title="Cuidado de hoy"     subtitle={medTotal > 0 ? `${medTotal} med${medTotal !== 1 ? 's' : ''} programados` : 'Rutina diaria'}              status={careStatus}     statusType={careStatusType}     to="/hoy?view=cuidado" />
 
           {/* Fila 2: Historial | Chat familiar */}
           <DashCard Icon={Clock}          title="Historial"           subtitle={detailSubtitle}                                                                                          status="Ver historial"  statusType={detailStatusType}   to="/historial" />

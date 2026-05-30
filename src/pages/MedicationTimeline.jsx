@@ -117,10 +117,11 @@ export default function MedicationTimeline() {
     const since = new Date(); since.setDate(since.getDate() - 6)
     const { data } = await supabase
       .from('medication_logs')
-      .select('*, medications(name)')
+      .select('*, medications(name, dosage)')
       .eq('user_id', ownerId)
       .gte('log_date', since.toISOString().split('T')[0])
       .order('log_date', { ascending: false })
+      .order('confirmed_at', { ascending: true })
     setHistory(data ?? [])
   }
 
@@ -359,65 +360,119 @@ export default function MedicationTimeline() {
         </div>
 
         {/* 7-day history */}
-        <div className="bg-white rounded-xl border border-green-100 p-5">
-          <h3 className="font-semibold text-gray-900 mb-5">Línea de tiempo — últimos 7 días</h3>
+        <div style={{ background: 'white', borderRadius: 18, border: '1px solid #EDE5D8', padding: '20px', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
+          <p style={{ fontFamily: 'Georgia, serif', fontSize: 16, fontWeight: 700, color: '#1A1A1A', margin: '0 0 16px' }}>
+            Línea de tiempo — últimos 7 días
+          </p>
           {Object.keys(historyByDate).length === 0 ? (
-            <p className="text-sm text-gray-400 text-center py-6">Sin historial todavía.</p>
+            <div style={{ textAlign: 'center', padding: '32px 0' }}>
+              <div style={{ fontSize: 40, marginBottom: 10 }}>📋</div>
+              <p style={{ fontSize: 13, color: '#9CA3AF' }}>Sin historial todavía.</p>
+            </div>
           ) : (
-            <div className="space-y-5">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
               {Object.entries(historyByDate).map(([date, logs]) => {
                 const confirmed = logs.filter(l => l.status === 'confirmed').length
-                const missed    = logs.filter(l => l.status === 'missed').length
-                const pct = logs.length ? Math.round((confirmed / logs.length) * 100) : 0
+                const total     = logs.length
+                const pct       = total ? Math.round((confirmed / total) * 100) : 0
+                const dateLabel = new Date(date + 'T12:00:00').toLocaleDateString('es-US', {
+                  weekday: 'long', day: 'numeric', month: 'long',
+                })
                 return (
                   <div key={date}>
-                    <div className="flex items-center justify-between mb-2">
-                      <p className="text-sm font-medium text-gray-700">
-                        {new Date(date + 'T12:00:00').toLocaleDateString('es-US', { weekday: 'long', day: 'numeric', month: 'short' })}
+                    {/* Day header */}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                      <p style={{ fontSize: 13, fontWeight: 700, color: '#374151', margin: 0, textTransform: 'capitalize' }}>
+                        {dateLabel}
                       </p>
-                      <span className={`text-xs font-semibold ${pct >= 80 ? 'text-primary' : pct >= 50 ? 'text-orange-600' : 'text-red-600'}`}>
-                        {pct}% · {confirmed}✓ {missed}✗
+                      <span style={{
+                        fontSize: 11, fontWeight: 700,
+                        color: pct >= 80 ? '#16A34A' : pct >= 50 ? '#C9882A' : '#DC2626',
+                        background: pct >= 80 ? '#DCFCE7' : pct >= 50 ? '#FEF3C7' : '#FEE2E2',
+                        padding: '3px 10px', borderRadius: 20,
+                      }}>
+                        {confirmed}/{total} dados
                       </span>
                     </div>
-                    <div className="h-1.5 bg-gray-100 rounded-full mb-3">
-                      <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${pct}%` }} />
-                    </div>
-                    <div className="flex gap-1.5 flex-wrap">
-                      {logs.map(log => (
-                        <div key={log.id} className="group relative">
-                          <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold cursor-default transition-transform hover:scale-110 ${
-                            log.status === 'confirmed' ? 'bg-primary text-white' :
-                            log.status === 'missed'    ? 'bg-red-500 text-white' :
-                                                         'bg-gray-200 text-gray-500'
-                          }`}>
-                            {log.status === 'confirmed' ? '✓' : '✗'}
-                          </div>
-                          {/* Proof + GPS micro-badges */}
-                          {log.status === 'confirmed' && (
-                            <div style={{ display: 'flex', gap: 2, justifyContent: 'center', marginTop: 2 }}>
-                              {log.photo_url
-                                ? <span title="Con foto de prueba" style={{ fontSize: 9 }}>📷</span>
-                                : <span title="Sin foto de prueba" style={{ fontSize: 9, opacity: 0.4 }}>📷</span>
-                              }
-                              {log.latitude && log.longitude && (
-                                <a
-                                  href={mapsUrl(log.latitude, log.longitude)}
-                                  target="_blank" rel="noopener noreferrer"
-                                  onClick={e => e.stopPropagation()}
-                                  title={log.address ?? 'Ver ubicación'}
-                                  style={{ fontSize: 9, textDecoration: 'none' }}
-                                >
-                                  📍
-                                </a>
+
+                    {/* Individual medication cards */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      {logs.map(log => {
+                        const isConfirmed = log.status === 'confirmed'
+                        const confirmedTime = log.confirmed_at
+                          ? new Date(log.confirmed_at).toLocaleTimeString('es-US', { hour: '2-digit', minute: '2-digit' })
+                          : null
+                        return (
+                          <div key={log.id} style={{
+                            background: isConfirmed ? '#F0FDF4' : '#FEF2F2',
+                            border: `1px solid ${isConfirmed ? '#BBF7D0' : '#FECACA'}`,
+                            borderRadius: 14, padding: '12px 14px',
+                          }}>
+                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                              {/* Status icon */}
+                              <div style={{
+                                width: 36, height: 36, borderRadius: 10, flexShrink: 0,
+                                background: isConfirmed ? '#22C55E' : '#EF4444',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                fontSize: 16, fontWeight: 700, color: 'white',
+                              }}>
+                                {isConfirmed ? '✓' : '✗'}
+                              </div>
+
+                              {/* Info */}
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <p style={{ fontSize: 14, fontWeight: 700, color: '#1A1A1A', margin: '0 0 4px', fontFamily: 'Georgia, serif' }}>
+                                  💊 {log.medications?.name ?? '—'}
+                                </p>
+                                {log.medications?.dosage && (
+                                  <p style={{ fontSize: 12, color: '#6B7280', margin: '0 0 6px' }}>
+                                    {log.medications.dosage}
+                                  </p>
+                                )}
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 12px' }}>
+                                  {log.scheduled_time && (
+                                    <span style={{ fontSize: 11, color: '#6B7280' }}>
+                                      ⏰ Programado: {log.scheduled_time}
+                                    </span>
+                                  )}
+                                  {isConfirmed && confirmedTime && (
+                                    <span style={{ fontSize: 11, color: '#16A34A', fontWeight: 600 }}>
+                                      ✅ Dado: {confirmedTime}
+                                    </span>
+                                  )}
+                                  {log.confirmed_by_name && (
+                                    <span style={{ fontSize: 11, color: '#6B7280' }}>
+                                      👤 {log.confirmed_by_name.split(' ')[0]}
+                                    </span>
+                                  )}
+                                  {log.latitude && log.longitude && (
+                                    <a
+                                      href={mapsUrl(log.latitude, log.longitude)}
+                                      target="_blank" rel="noopener noreferrer"
+                                      style={{ fontSize: 11, color: '#3B82F6', textDecoration: 'none' }}
+                                    >
+                                      📍 Ver mapa
+                                    </a>
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* Photo thumbnail */}
+                              {log.photo_url && (
+                                <img
+                                  src={log.photo_url}
+                                  alt="Prueba"
+                                  style={{
+                                    width: 52, height: 52, borderRadius: 10,
+                                    objectFit: 'cover', flexShrink: 0,
+                                    border: '1.5px solid #BBF7D0',
+                                  }}
+                                />
                               )}
                             </div>
-                          )}
-                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 bg-gray-900 text-white text-xs rounded-lg px-2 py-1 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-10 pointer-events-none">
-                            {log.medications?.name}
-                            {log.scheduled_time && ` · ${log.scheduled_time}`}
                           </div>
-                        </div>
-                      ))}
+                        )
+                      })}
                     </div>
                   </div>
                 )
