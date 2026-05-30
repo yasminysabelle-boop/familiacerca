@@ -8,6 +8,9 @@ import Layout from '../components/Layout'
 import { AlertTriangle, CheckIcon, User, XIcon, Pill, ClipboardCheck, Chat, Calendar, Receipt, Users, Camera, Heart, Clock, Menu } from '../components/Icons'
 import { geminiGenerate } from '../lib/gemini'
 import TrialBanner from '../components/TrialBanner'
+import { useHospitalMode } from '../contexts/HospitalModeContext'
+import HospitalDashboard from '../components/hospital/HospitalDashboard'
+import HospitalModeModal from '../components/hospital/HospitalModeModal'
 import { getLocation, mapsUrl } from '../lib/gps'
 import { track } from '../lib/analytics'
 
@@ -1611,6 +1614,8 @@ export default function Dashboard() {
   const { profile, ownerId, memberRole } = useFamily()
   const isFamiliar = memberRole === 'familiar'
   const isAdmin = memberRole === null || ownerId === user?.id
+  const { isHospitalMode } = useHospitalMode()
+  const [showHospitalModal, setShowHospitalModal] = useState(false)
   const { refresh: refreshSub } = useSubscription()
   const [searchParams, setSearchParams] = useSearchParams()
 
@@ -2426,6 +2431,58 @@ export default function Dashboard() {
     ? `${chatCount} mensaje${chatCount !== 1 ? 's' : ''} hoy`
     : 'Sin mensajes nuevos'
 
+  if (isHospitalMode) {
+    return (
+      <Layout>
+        <HospitalModeModal open={showHospitalModal} onClose={() => setShowHospitalModal(false)} />
+        <HospitalDashboard
+          onManageMode={() => setShowHospitalModal(true)}
+          onSOS={prepareSOS}
+        />
+        {sosConfirming && (
+          <div
+            style={{
+              position: 'fixed', inset: 0, zIndex: 200,
+              background: 'rgba(0,0,0,0.6)',
+              display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
+            }}
+            onClick={e => { if (e.target === e.currentTarget) setSosConfirming(false) }}
+          >
+            <div style={{
+              width: '100%', maxWidth: 480,
+              background: 'white', borderRadius: '24px 24px 0 0',
+              padding: '28px 24px 96px',
+              boxShadow: '0 -8px 48px rgba(0,0,0,0.2)',
+            }}>
+              <div style={{ textAlign: 'center', marginBottom: 24 }}>
+                <div style={{
+                  width: 64, height: 64, borderRadius: '50%', margin: '0 auto 16px',
+                  background: '#FFF0F0', border: '2px solid #FFBABA',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 28,
+                }}>🚨</div>
+                <h3 style={{ fontSize: 20, fontWeight: 700, color: '#1A1A1A', fontFamily: 'Georgia, serif', margin: '0 0 8px' }}>
+                  ¿Activar emergencia?
+                </h3>
+                <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, margin: 0 }}>
+                  Todos los miembros de la familia recibirán una alerta inmediata.
+                </p>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <button onClick={triggerSOS} style={{ width: '100%', padding: '14px', borderRadius: 16, border: 'none', background: 'linear-gradient(135deg, #D63031, #B82020)', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>
+                  Sí, es una emergencia real
+                </button>
+                <button onClick={() => setSosConfirming(false)} style={{ width: '100%', padding: '13px', borderRadius: 14, border: '1px solid #EDE5D8', background: 'white', color: '#6B7280', fontWeight: 600, fontSize: 14, cursor: 'pointer' }}>
+                  Cancelar — fue un error
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </Layout>
+    )
+  }
+
   return (
     <Layout>
       {checkoutSuccess && (
@@ -2684,7 +2741,21 @@ export default function Dashboard() {
 
           {/* Fila 5: Videollamada | Modo Hospital */}
           <DashCard Icon={Camera}         title="Videollamada"        subtitle="Conectar con la familia"                                                                                 status="Próximamente"   statusType="info"                onClick={() => {}} />
-          <DashCard Icon={Heart}          title="Modo Hospital"       subtitle="Gestión en internación"                                                                                  status="Próximamente"   statusType="info"                onClick={() => {}} />
+          <button
+            onClick={() => setShowHospitalModal(true)}
+            style={{
+              border: '1.5px solid #B91C1C', borderRadius: 16,
+              background: 'linear-gradient(135deg, #FFF5F5, #FFF0F0)',
+              padding: '14px', cursor: 'pointer', textAlign: 'left',
+              display: 'flex', flexDirection: 'column', gap: 4,
+              WebkitTapHighlightColor: 'transparent',
+            }}
+          >
+            <span style={{ fontSize: 22 }}>🏥</span>
+            <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#B91C1C' }}>Modo Hospital</p>
+            <p style={{ margin: 0, fontSize: 11, color: '#DC2626', opacity: 0.8 }}>Activar gestión hospitalaria</p>
+          </button>
+          <HospitalModeModal open={showHospitalModal} onClose={() => setShowHospitalModal(false)} />
 
           {/* Otras funciones — ancho completo */}
           <Link

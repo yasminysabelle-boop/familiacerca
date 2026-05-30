@@ -5,6 +5,7 @@ import { FamilyProvider } from './contexts/FamilyContext'
 import { SubscriptionProvider } from './contexts/SubscriptionContext'
 import { DarkModeProvider } from './contexts/DarkModeContext'
 import { PresenceProvider } from './contexts/PresenceContext'
+import { HospitalModeProvider } from './contexts/HospitalModeContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import WelcomeSlides from './components/WelcomeSlides'
 import Login from './pages/Login'
@@ -170,7 +171,9 @@ export default function App() {
           <FamilyProvider>
             <PresenceProvider>
               <SubscriptionProvider>
-                <AppShell />
+                <HospitalModeProvider>
+                  <AppShell />
+                </HospitalModeProvider>
               </SubscriptionProvider>
             </PresenceProvider>
           </FamilyProvider>

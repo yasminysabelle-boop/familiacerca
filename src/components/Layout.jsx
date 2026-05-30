@@ -10,6 +10,7 @@ import { useDarkMode } from '../contexts/DarkModeContext'
 import FamilySelector from './FamilySelector'
 import FamilySwitcher from './FamilySwitcher'
 import CompanionChat from './CompanionChat'
+import { useHospitalMode } from '../contexts/HospitalModeContext'
 
 const PAGE_TITLES = {
   '/dashboard':   'Inicio',
@@ -45,6 +46,7 @@ export default function Layout({ children }) {
   const { inactivityWarning } = useAuth()
   const { profile } = useFamily()
   const { dark } = useDarkMode()
+  const { isHospitalMode, hospitalMode } = useHospitalMode() ?? {}
   const location = useLocation()
   const isHome = location.pathname === '/dashboard'
 
@@ -53,12 +55,38 @@ export default function Layout({ children }) {
   const hdrBg   = dark ? 'rgba(28,18,8,0.95)' : '#2D4A1E'
   const border  = dark ? '#1E3A28' : 'rgba(255,255,255,0.08)'
 
+  const hospitalBarHeight = isHospitalMode ? 28 : 0
+
   return (
     <div style={{ background: bg }}>
+      {/* Hospital mode alert bar — fixed, above the main header */}
+      {isHospitalMode && (
+        <Link
+          to="/dashboard"
+          style={{
+            position: 'fixed', top: 0, left: 0, right: 0, zIndex: 41,
+            height: hospitalBarHeight,
+            background: '#B91C1C',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            gap: 8, textDecoration: 'none',
+          }}
+        >
+          <span style={{ fontSize: 13 }}>🏥</span>
+          <span style={{ fontSize: 11, fontWeight: 800, color: 'white', letterSpacing: '0.05em' }}>
+            MODO HOSPITAL ACTIVO
+            {hospitalMode?.hospital_name ? ` · ${hospitalMode.hospital_name}` : ''}
+          </span>
+          <span style={{
+            width: 6, height: 6, borderRadius: '50%', background: 'white',
+            animation: 'hbPulse 2s ease-in-out infinite',
+          }} />
+        </Link>
+      )}
+
       {/* Fixed header */}
       <header
         style={{
-          position: 'fixed', top: 0, left: 0, right: 0, zIndex: 40,
+          position: 'fixed', top: hospitalBarHeight, left: 0, right: 0, zIndex: 40,
           height: 'calc(56px + env(safe-area-inset-top))',
           paddingTop: 'env(safe-area-inset-top)',
           background: hdrBg,
@@ -108,7 +136,7 @@ export default function Layout({ children }) {
       </header>
 
       {/* Scrollable main */}
-      <main style={{ position: 'fixed', inset: 0, overflowY: 'auto', top: 'calc(56px + env(safe-area-inset-top))', bottom: 68 }}>
+      <main style={{ position: 'fixed', inset: 0, overflowY: 'auto', top: `calc(${hospitalBarHeight}px + 56px + env(safe-area-inset-top))`, bottom: 68 }}>
         <InstallBanner />
         <OfflineBanner />
 
@@ -156,6 +184,10 @@ export default function Layout({ children }) {
           </button>
         </div>
       )}
+
+      <style>{`
+        @keyframes hbPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+      `}</style>
 
       {/* Bottom navigation — 4 tabs */}
       <nav
