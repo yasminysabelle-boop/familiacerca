@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { supabase } from '../lib/supabase'
@@ -12,6 +12,40 @@ function calcAge(dateStr) {
   if (now.getMonth() < b.getMonth() || (now.getMonth() === b.getMonth() && now.getDate() < b.getDate())) age--
   return age >= 0 ? age : null
 }
+
+const FREQ_OPTIONS = [
+  { value: 'once_daily',  label: 'Una vez al día',    times: 1, interval: null },
+  { value: 'twice_daily', label: 'Dos veces al día',  times: 2, interval: null },
+  { value: 'three_daily', label: 'Tres veces al día', times: 3, interval: null },
+  { value: 'every_4h',    label: 'Cada 4 horas',      times: 1, interval: 4 },
+  { value: 'every_6h',    label: 'Cada 6 horas',      times: 1, interval: 6 },
+  { value: 'every_8h',    label: 'Cada 8 horas',      times: 1, interval: 8 },
+  { value: 'every_12h',   label: 'Cada 12 horas',     times: 1, interval: 12 },
+  { value: 'as_needed',   label: 'Según necesidad',   times: 0, interval: null },
+  { value: 'weekly',      label: 'Semanal',           times: 1, interval: null },
+]
+
+function computeScheduledTimes(frequency, startTimes) {
+  const opt = FREQ_OPTIONS.find(o => o.value === frequency)
+  if (!opt || opt.times === 0) return []
+  if (opt.interval) {
+    const start = startTimes[0]
+    if (!start) return []
+    const [h, m] = start.split(':').map(Number)
+    const dosesPerDay = 24 / opt.interval
+    return Array.from({ length: dosesPerDay }, (_, i) => {
+      const total = (h * 60 + m + i * opt.interval * 60) % (24 * 60)
+      return `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`
+    })
+  }
+  return startTimes.filter(Boolean)
+}
+
+const TIME_PRESETS = [
+  { label: '🌅 Mañana', time: '08:00' },
+  { label: '☀️ Tarde',  time: '14:00' },
+  { label: '🌙 Noche',  time: '20:00' },
+]
 
 const INPUT = {
   width: '100%', padding: '14px 16px', borderRadius: 14,
@@ -62,11 +96,15 @@ export default function OnboardingFlow() {
   const [birthDate, setBirthDate]     = useState('')
   const [photoFile, setPhotoFile]     = useState(null)
   const [photoPreview, setPhotoPreview] = useState(null)
+  const [photoMenuOpen, setPhotoMenuOpen] = useState(false)
+  const cameraRef  = useRef(null)
+  const galleryRef = useRef(null)
 
   // Step 2
-  const [medName, setMedName]       = useState('')
-  const [medDose, setMedDose]       = useState('')
-  const [schedule, setSchedule]     = useState('mañana')
+  const [medName, setMedName]           = useState('')
+  const [medDose, setMedDose]           = useState('')
+  const [medFrequency, setMedFrequency] = useState('')
+  const [medTimes, setMedTimes]         = useState([''])
 
   // Step 3
   const [inviteLink, setInviteLink] = useState('')
@@ -83,6 +121,21 @@ export default function OnboardingFlow() {
     if (!f) return
     setPhotoFile(f)
     setPhotoPreview(URL.createObjectURL(f))
+  }
+
+  function handleFreqChange(val) {
+    setMedFrequency(val)
+    const opt = FREQ_OPTIONS.find(o => o.value === val)
+    if (!opt || opt.times === 0) {
+      setMedTimes([])
+    } else {
+      const count = opt.interval ? 1 : opt.times
+      setMedTimes(prev => {
+        const next = [...prev]
+        while (next.length < count) next.push('')
+        return next.slice(0, count)
+      })
+    }
   }
 
   async function handleStep1() {
@@ -133,12 +186,16 @@ export default function OnboardingFlow() {
   async function handleStep2() {
     if (!medName.trim()) return
     setSaving(true)
-    const timeMap = { mañana: '08:00', tarde: '14:00', noche: '20:00' }
-    const t = timeMap[schedule]
+    const scheduled_times = computeScheduledTimes(medFrequency, medTimes)
+    const firstTime = scheduled_times[0] ?? null
     try {
       await supabase.from('medications').insert({
-        user_id: user.id, name: medName.trim(),
-        dosage: medDose.trim() || null, time: t, scheduled_times: [t],
+        user_id: user.id,
+        name: medName.trim(),
+        dosage: medDose.trim() || null,
+        frequency: medFrequency || null,
+        time: firstTime,
+        scheduled_times: scheduled_times.length ? scheduled_times : null,
       })
     } catch { }
     await generateLink()
@@ -168,6 +225,13 @@ export default function OnboardingFlow() {
 
   const pd = () => setPressed(true)
   const pu = () => setPressed(false)
+
+  const freqOpt = FREQ_OPTIONS.find(o => o.value === medFrequency)
+  const showTimePickers = freqOpt && freqOpt.times > 0
+  const isInterval = freqOpt?.interval != null
+  const previewTimes = isInterval && medTimes[0]
+    ? computeScheduledTimes(medFrequency, medTimes)
+    : []
 
   return (
     <div style={{ minHeight: '100dvh', background: '#F0EDE6', display: 'flex', flexDirection: 'column' }}>
@@ -200,23 +264,72 @@ export default function OnboardingFlow() {
             </p>
 
             {/* Photo */}
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 28 }}>
-              <label style={{ cursor: 'pointer', textAlign: 'center' }}>
-                <input type="file" accept="image/*" capture="environment" onChange={pickPhoto} style={{ display: 'none' }} />
-                <div style={{
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 28 }}>
+              {/* Hidden inputs */}
+              <input
+                ref={cameraRef}
+                type="file"
+                accept="image/*"
+                capture="environment"
+                onChange={pickPhoto}
+                style={{ display: 'none' }}
+              />
+              <input
+                ref={galleryRef}
+                type="file"
+                accept="image/*"
+                onChange={pickPhoto}
+                style={{ display: 'none' }}
+              />
+
+              {/* Circle */}
+              <div
+                onClick={() => setPhotoMenuOpen(o => !o)}
+                style={{
                   width: 88, height: 88, borderRadius: '50%',
                   background: photoPreview ? 'transparent' : '#EAF0E6',
                   border: '2px dashed #4A7C59',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
-                }}>
-                  {photoPreview
-                    ? <img src={photoPreview} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="foto" />
-                    : <span style={{ fontSize: 30 }}>📷</span>}
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  overflow: 'hidden', cursor: 'pointer',
+                }}
+              >
+                {photoPreview
+                  ? <img src={photoPreview} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="foto" />
+                  : <span style={{ fontSize: 30 }}>📷</span>}
+              </div>
+              <p style={{ fontSize: 11, color: '#9CA3AF', margin: '6px 0 0' }}>
+                {photoPreview ? 'Cambiar foto' : 'Foto (opcional)'}
+              </p>
+
+              {/* Source picker */}
+              {photoMenuOpen && (
+                <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
+                  <button
+                    onClick={() => { cameraRef.current.click(); setPhotoMenuOpen(false) }}
+                    style={{
+                      padding: '10px 18px', borderRadius: 12,
+                      border: '1.5px solid #4A7C59', background: 'white',
+                      color: '#2D4A1E', fontWeight: 700, fontSize: 13,
+                      cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
+                      fontFamily: 'inherit',
+                    }}
+                  >
+                    📷 Cámara
+                  </button>
+                  <button
+                    onClick={() => { galleryRef.current.click(); setPhotoMenuOpen(false) }}
+                    style={{
+                      padding: '10px 18px', borderRadius: 12,
+                      border: '1.5px solid #4A7C59', background: 'white',
+                      color: '#2D4A1E', fontWeight: 700, fontSize: 13,
+                      cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
+                      fontFamily: 'inherit',
+                    }}
+                  >
+                    🖼️ Galería
+                  </button>
                 </div>
-                <p style={{ fontSize: 11, color: '#9CA3AF', margin: '6px 0 0' }}>
-                  {photoPreview ? 'Cambiar foto' : 'Foto (opcional)'}
-                </p>
-              </label>
+              )}
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -275,32 +388,112 @@ export default function OnboardingFlow() {
                   placeholder="Ej: 500mg"
                 />
               </div>
+
+              {/* Frecuencia */}
               <div>
-                <label style={LABEL}>Horario</label>
-                <div style={{ display: 'flex', gap: 8 }}>
-                  {[
-                    { key: 'mañana', emoji: '🌅', label: 'Mañana' },
-                    { key: 'tarde',  emoji: '☀️',  label: 'Tarde' },
-                    { key: 'noche',  emoji: '🌙',  label: 'Noche' },
-                  ].map(({ key, emoji, label }) => (
-                    <button
-                      key={key}
-                      onClick={() => setSchedule(key)}
-                      style={{
-                        flex: 1, padding: '12px 4px', borderRadius: 12,
-                        border: `1.5px solid ${schedule === key ? '#2D4A1E' : '#E8E4DC'}`,
-                        background: schedule === key ? '#EAF0E6' : 'white',
-                        cursor: 'pointer', display: 'flex', flexDirection: 'column',
-                        alignItems: 'center', gap: 4,
-                        boxShadow: '0 2px 0px #E0DBD2',
-                      }}
-                    >
-                      <span style={{ fontSize: 20 }}>{emoji}</span>
-                      <span style={{ fontSize: 12, fontWeight: 700, color: schedule === key ? '#2D4A1E' : '#718096' }}>{label}</span>
-                    </button>
-                  ))}
+                <label style={LABEL}>Frecuencia</label>
+                <div style={{ position: 'relative' }}>
+                  <select
+                    value={medFrequency}
+                    onChange={e => handleFreqChange(e.target.value)}
+                    style={{
+                      ...INPUT,
+                      paddingRight: 36,
+                      appearance: 'none', WebkitAppearance: 'none',
+                    }}
+                  >
+                    <option value="">Seleccionar frecuencia...</option>
+                    {FREQ_OPTIONS.map(o => (
+                      <option key={o.value} value={o.value}>{o.label}</option>
+                    ))}
+                  </select>
+                  <span style={{
+                    position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)',
+                    pointerEvents: 'none', color: '#9CA3AF', fontSize: 12,
+                  }}>▼</span>
                 </div>
               </div>
+
+              {/* Hora(s) */}
+              {showTimePickers && (
+                <div>
+                  <label style={LABEL}>
+                    {isInterval ? 'Hora de inicio' : medTimes.length > 1 ? 'Horarios' : 'Hora'}
+                  </label>
+
+                  {/* Quick presets */}
+                  <div style={{ display: 'flex', gap: 6, marginBottom: 10 }}>
+                    {TIME_PRESETS.map(({ label, time }) => (
+                      <button
+                        key={time}
+                        type="button"
+                        onClick={() => {
+                          if (isInterval || medTimes.length === 1) {
+                            setMedTimes([time])
+                          } else {
+                            // for multi-dose, fill slots in order
+                            setMedTimes(prev => {
+                              const next = [...prev]
+                              const emptyIdx = next.findIndex(t => !t)
+                              if (emptyIdx !== -1) next[emptyIdx] = time
+                              else next[next.length - 1] = time
+                              return next
+                            })
+                          }
+                        }}
+                        style={{
+                          flex: 1, padding: '8px 4px', borderRadius: 10,
+                          border: '1.5px solid #E8E4DC', background: 'white',
+                          cursor: 'pointer', fontSize: 11, fontWeight: 700,
+                          color: '#4A7C59', fontFamily: 'inherit',
+                        }}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {medTimes.map((t, i) => (
+                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        {medTimes.length > 1 && (
+                          <span style={{ fontSize: 12, color: '#9CA3AF', width: 18, flexShrink: 0 }}>{i + 1}.</span>
+                        )}
+                        <input
+                          type="time"
+                          value={t}
+                          onChange={e => {
+                            const next = [...medTimes]
+                            next[i] = e.target.value
+                            setMedTimes(next)
+                          }}
+                          style={{ ...INPUT, flex: 1 }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Preview for interval-based */}
+                  {previewTimes.length > 0 && (
+                    <div style={{ marginTop: 8, padding: '10px 12px', background: '#EAF0E6', borderRadius: 10 }}>
+                      <p style={{ fontSize: 11, color: '#2D4A1E', fontWeight: 600, marginBottom: 6 }}>
+                        Horarios automáticos ({previewTimes.length} dosis al día):
+                      </p>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                        {previewTimes.map((t, i) => (
+                          <span key={i} style={{
+                            background: 'white', color: '#2D4A1E',
+                            padding: '2px 8px', borderRadius: 6,
+                            fontSize: 11, fontWeight: 600, border: '1px solid #C9DFC4',
+                          }}>
+                            {t}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             <div style={{ marginTop: 32, display: 'flex', flexDirection: 'column', gap: 10 }}>
