@@ -2725,7 +2725,7 @@ export default function Dashboard() {
           <DashCard Icon={ClipboardCheck} title="Cuidado de hoy"     subtitle={medTotal > 0 ? `${medTotal} med${medTotal !== 1 ? 's' : ''} programados` : 'Rutina diaria'}              status={careStatus}     statusType={careStatusType}     to="/hoy?view=cuidado" />
 
           {/* Fila 2: Historial | Chat familiar */}
-          <DashCard Icon={Clock}          title="Historial"           subtitle={detailSubtitle}                                                                                          status="Ver historial"  statusType={detailStatusType}   to="/historial" />
+          <DashCard Icon={Clock}          title="Historial"           subtitle="Registro completo de cuidado"                                                            status="Ver historial"  statusType="info"               to="/historial" />
           <DashCard Icon={Chat}           title="Chat familiar"       subtitle="Mensajes del equipo"                                                                                     status="Ver chat"       statusType="info"                to="/chat" />
 
           {/* Fila 3: Citas médicas | Cuentas Claras */}

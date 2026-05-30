@@ -1,674 +1,463 @@
 import { useEffect, useState } from 'react'
-import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
-import { getLocation, mapsUrl } from '../lib/gps'
+import { mapsUrl } from '../lib/gps'
+import { CARE_ITEMS } from '../lib/careItems'
 
-function calcularEstadoMedicamento(scheduledTime, isConfirmed = false) {
-  if (isConfirmed) return 'completado'
-  if (!scheduledTime) return 'pendiente'
-  const parts = scheduledTime.split(':')
-  const h = Math.min(Math.max(parseInt(parts[0], 10) || 0, 0), 23)
-  const m = Math.min(Math.max(parseInt(parts[1], 10) || 0, 0), 59)
-  const now = new Date()
-  const diff = (now.getHours() * 60 + now.getMinutes()) - (h * 60 + m)
-  if (diff < 0)   return 'programado'
-  if (diff <= 30) return 'pendiente'
-  return 'tarde'
+const EVENT_CONFIG = {
+  med_confirmed:      { icon: '💊', label: 'Medicamento',        color: '#4A7C59', bg: '#F0FDF4', border: '#BBF7D0' },
+  hospital_mode_on:   { icon: '🏥', label: 'Hospitalización',    color: '#B91C1C', bg: '#FFF5F5', border: '#FECACA' },
+  hospital_discharge: { icon: '🏠', label: 'Alta hospitalaria',  color: '#2563EB', bg: '#EFF6FF', border: '#BFDBFE' },
+  doctor_note:        { icon: '📋', label: 'Nota médica',        color: '#7C5CBF', bg: '#F5F3FF', border: '#DDD6FE' },
+  appointment:        { icon: '📅', label: 'Cita médica',        color: '#2D86A0', bg: '#F0F9FF', border: '#BAE6FD' },
+  caregiver_assigned: { icon: '👤', label: 'Turno asignado',     color: '#C9882A', bg: '#FFFBEB', border: '#FDE68A' },
+  sos:                { icon: '🆘', label: 'Alerta SOS',         color: '#DC2626', bg: '#FEF2F2', border: '#FECACA' },
+  expense:            { icon: '💰', label: 'Gasto registrado',   color: '#059669', bg: '#ECFDF5', border: '#A7F3D0' },
+  care_routine:       { icon: '✅', label: 'Rutina completada',  color: '#16A34A', bg: '#F0FDF4', border: '#BBF7D0' },
+  care_photo:         { icon: '📸', label: 'Foto de cuidado',    color: '#C9882A', bg: '#FFFBEB', border: '#FDE68A' },
 }
 
-function StatusBadge({ status, medState }) {
-  if (status === 'confirmed') return <span className="text-xs bg-primary-light text-primary px-2 py-0.5 rounded-full font-medium">✓ Confirmado</span>
-  if (status === 'missed')    return <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-medium">✗ Perdido</span>
-  if (medState === 'tarde')   return <span className="text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full font-medium">⚠ Retrasado +30 min</span>
-  return <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full font-medium">Pendiente</span>
+const FILTER_OPTIONS = [
+  { id: 'all',               label: 'Todo',          icon: '📖' },
+  { id: 'med_confirmed',     label: 'Medicamentos',  icon: '💊' },
+  { id: 'care_routine',      label: 'Rutinas',       icon: '✅' },
+  { id: 'hospital_mode_on',  label: 'Hospital',      icon: '🏥' },
+  { id: 'doctor_note',       label: 'Notas',         icon: '📋' },
+  { id: 'appointment',       label: 'Citas',         icon: '📅' },
+  { id: 'sos',               label: 'SOS',           icon: '🆘' },
+  { id: 'expense',           label: 'Gastos',        icon: '💰' },
+  { id: 'care_photo',        label: 'Fotos',         icon: '📸' },
+  { id: 'caregiver_assigned',label: 'Turnos',        icon: '👤' },
+]
+
+const RANGE_OPTIONS = [
+  { id: 7,  label: '7 días' },
+  { id: 30, label: '30 días' },
+  { id: 90, label: '3 meses' },
+]
+
+function careItemLabel(key) {
+  return CARE_ITEMS.find(i => i.key === key)?.label ?? key
+}
+function careItemIcon(key) {
+  return CARE_ITEMS.find(i => i.key === key)?.icon ?? '✅'
 }
 
-async function stampImage(file, confirmerName) {
-  return new Promise(resolve => {
-    const img = new Image()
-    const objUrl = URL.createObjectURL(file)
-    img.onload = () => {
-      const canvas = document.createElement('canvas')
-      canvas.width = img.naturalWidth
-      canvas.height = img.naturalHeight
-      const ctx = canvas.getContext('2d')
-      ctx.drawImage(img, 0, 0)
+function fmtTime(isoStr) {
+  if (!isoStr) return ''
+  return new Date(isoStr).toLocaleTimeString('es-US', { hour: '2-digit', minute: '2-digit' })
+}
 
-      const barH = Math.max(44, Math.round(img.naturalHeight * 0.07))
-      ctx.fillStyle = 'rgba(0,0,0,0.72)'
-      ctx.fillRect(0, img.naturalHeight - barH, img.naturalWidth, barH)
+function fmtCurrency(n) {
+  return new Intl.NumberFormat('es-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 }).format(n)
+}
 
-      const now = new Date()
-      const dateStr = now.toLocaleDateString('es-US', { day: 'numeric', month: 'long', year: 'numeric' })
-      const timeStr = now.toLocaleTimeString('es-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
-      const stamp = `${dateStr} · ${timeStr} · Confirmado por: ${confirmerName} · FamiliaCerca ✓`
-      const fs = Math.max(11, Math.round(img.naturalWidth * 0.022))
-      ctx.fillStyle = '#ffffff'
-      ctx.font = `bold ${fs}px Arial, sans-serif`
-      ctx.textAlign = 'center'
-      ctx.textBaseline = 'middle'
-      ctx.fillText(stamp, img.naturalWidth / 2, img.naturalHeight - barH / 2, img.naturalWidth - 16)
+function dayLabel(dateStr) {
+  const d = new Date(dateStr + 'T12:00:00')
+  const today = new Date().toISOString().split('T')[0]
+  const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0]
+  if (dateStr === today) return 'Hoy'
+  if (dateStr === yesterday) return 'Ayer'
+  const raw = d.toLocaleDateString('es-US', { weekday: 'long', day: 'numeric', month: 'long' })
+  return raw.charAt(0).toUpperCase() + raw.slice(1)
+}
 
-      URL.revokeObjectURL(objUrl)
-      function dataUrlToBlob(dataUrl) {
-        const [, b64] = dataUrl.split(',')
-        const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0))
-        return new Blob([bytes], { type: 'image/jpeg' })
-      }
-      if (typeof canvas.toBlob === 'function') {
-        canvas.toBlob(blob => resolve(blob ?? dataUrlToBlob(canvas.toDataURL('image/jpeg', 0.92))), 'image/jpeg', 0.92)
-      } else {
-        resolve(dataUrlToBlob(canvas.toDataURL('image/jpeg', 0.92)))
-      }
-    }
-    img.src = objUrl
-  })
+function EventMetadata({ type, meta }) {
+  if (!meta) return null
+
+  if (type === 'med_confirmed') {
+    return (
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 14px', marginTop: 6 }}>
+        {meta.med_dosage && (
+          <span style={{ fontSize: 11, color: '#6B7280' }}>{meta.med_dosage}</span>
+        )}
+        {meta.log_date && (
+          <span style={{ fontSize: 11, color: '#9CA3AF' }}>📅 {meta.log_date}</span>
+        )}
+        {meta.photo_url && (
+          <img
+            src={meta.photo_url}
+            alt="Prueba"
+            style={{ marginTop: 8, width: '100%', maxHeight: 160, objectFit: 'cover', borderRadius: 10, border: '1px solid #BBF7D0' }}
+          />
+        )}
+      </div>
+    )
+  }
+
+  if (type === 'care_routine') {
+    return (
+      <p style={{ fontSize: 12, color: '#4A7C59', fontWeight: 600, margin: '4px 0 0' }}>
+        {careItemIcon(meta.item_key)} {careItemLabel(meta.item_key)}
+        {meta.log_date ? <span style={{ color: '#9CA3AF', fontWeight: 400 }}> · {meta.log_date}</span> : null}
+      </p>
+    )
+  }
+
+  if (type === 'hospital_mode_on') {
+    return (
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 14px', marginTop: 4 }}>
+        {meta.hospital_name && <span style={{ fontSize: 11, color: '#6B7280' }}>🏥 {meta.hospital_name}</span>}
+        {meta.room_number   && <span style={{ fontSize: 11, color: '#6B7280' }}>🚪 Hab. {meta.room_number}</span>}
+        {meta.patient_status && <span style={{ fontSize: 11, color: '#6B7280' }}>Estado: {meta.patient_status}</span>}
+      </div>
+    )
+  }
+
+  if (type === 'hospital_discharge') {
+    return (
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 14px', marginTop: 4 }}>
+        {meta.hospital_name  && <span style={{ fontSize: 11, color: '#6B7280' }}>🏥 {meta.hospital_name}</span>}
+        {meta.discharge_date && <span style={{ fontSize: 11, color: '#6B7280' }}>📅 Alta: {meta.discharge_date}</span>}
+      </div>
+    )
+  }
+
+  if (type === 'doctor_note') {
+    const text = meta.doctor_notes ?? meta.content
+    return text ? (
+      <p style={{
+        fontSize: 12, color: '#374151', margin: '6px 0 0',
+        background: '#F5F3FF', borderRadius: 8, padding: '8px 10px',
+        lineHeight: 1.5, fontStyle: 'italic',
+      }}>
+        "{text}"
+      </p>
+    ) : null
+  }
+
+  if (type === 'appointment') {
+    return (
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 14px', marginTop: 4 }}>
+        {meta.date && <span style={{ fontSize: 11, color: '#6B7280' }}>📅 {meta.date}</span>}
+        {meta.time && <span style={{ fontSize: 11, color: '#6B7280' }}>⏰ {meta.time}</span>}
+        {meta.description && <span style={{ fontSize: 11, color: '#9CA3AF' }}>{meta.description}</span>}
+      </div>
+    )
+  }
+
+  if (type === 'caregiver_assigned') {
+    return (
+      <p style={{ fontSize: 12, color: '#9CA3AF', margin: '4px 0 0' }}>
+        📅 {meta.shift_date}
+      </p>
+    )
+  }
+
+  if (type === 'sos') {
+    return (
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 14px', marginTop: 4 }}>
+        {meta.address && <span style={{ fontSize: 11, color: '#6B7280' }}>📍 {meta.address}</span>}
+        {meta.latitude && meta.longitude && (
+          <a
+            href={mapsUrl(meta.latitude, meta.longitude)}
+            target="_blank" rel="noopener noreferrer"
+            style={{ fontSize: 11, color: '#3B82F6', textDecoration: 'none', fontWeight: 600 }}
+          >
+            Ver mapa →
+          </a>
+        )}
+        {meta.resolved && (
+          <span style={{ fontSize: 11, color: '#16A34A', fontWeight: 600 }}>✓ Resuelta</span>
+        )}
+      </div>
+    )
+  }
+
+  if (type === 'expense') {
+    return (
+      <div style={{ marginTop: 4 }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 14px' }}>
+          {meta.amount   && <span style={{ fontSize: 12, fontWeight: 700, color: '#059669' }}>{fmtCurrency(meta.amount)}</span>}
+          {meta.category && <span style={{ fontSize: 11, color: '#9CA3AF' }}>{meta.category}</span>}
+          {meta.paid_by  && <span style={{ fontSize: 11, color: '#9CA3AF' }}>Pagó: {meta.paid_by}</span>}
+        </div>
+        {meta.receipt_photo_url && (
+          <img
+            src={meta.receipt_photo_url}
+            alt="Recibo"
+            style={{ marginTop: 8, width: 80, height: 80, objectFit: 'cover', borderRadius: 8, border: '1px solid #A7F3D0' }}
+          />
+        )}
+      </div>
+    )
+  }
+
+  if (type === 'care_photo') {
+    return (
+      <div style={{ marginTop: 6 }}>
+        {meta.caption && (
+          <p style={{ fontSize: 12, color: '#6B7280', margin: '0 0 6px' }}>{meta.caption}</p>
+        )}
+        {meta.file_url && (
+          <img
+            src={meta.file_url}
+            alt={meta.caption ?? 'Foto'}
+            style={{ width: '100%', maxHeight: 180, objectFit: 'cover', borderRadius: 10, border: '1px solid #FDE68A' }}
+          />
+        )}
+      </div>
+    )
+  }
+
+  return null
+}
+
+function EventCard({ event }) {
+  const cfg = EVENT_CONFIG[event.type] ?? { icon: '📌', label: event.type, color: '#6B7280', bg: 'white', border: '#EDE5D8' }
+  const time = fmtTime(event.created_at)
+
+  return (
+    <div style={{
+      background: cfg.bg,
+      border: `1px solid ${cfg.border}`,
+      borderRadius: 16,
+      padding: '13px 15px',
+      display: 'flex',
+      gap: 12,
+    }}>
+      {/* Icon */}
+      <div style={{
+        width: 38, height: 38, borderRadius: 10, flexShrink: 0,
+        background: cfg.color + '18',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontSize: 18,
+      }}>
+        {cfg.icon}
+      </div>
+
+      {/* Content */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        {/* Type badge + time */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3 }}>
+          <span style={{
+            fontSize: 10, fontWeight: 700,
+            color: cfg.color,
+            background: cfg.color + '18',
+            padding: '2px 7px', borderRadius: 5,
+            letterSpacing: '0.03em',
+          }}>
+            {cfg.label}
+          </span>
+          <span style={{ fontSize: 11, color: '#9CA3AF', marginLeft: 'auto', flexShrink: 0 }}>
+            {time}
+          </span>
+        </div>
+
+        {/* Description */}
+        <p style={{
+          fontSize: 14, fontWeight: 600, color: '#1A1A1A',
+          margin: 0, lineHeight: 1.3,
+          overflow: 'hidden', textOverflow: 'ellipsis',
+          display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+        }}>
+          {event.type === 'care_routine'
+            ? `${careItemIcon(event.description)} ${careItemLabel(event.description)}`
+            : event.description}
+        </p>
+
+        {/* Actor */}
+        {event.actor_name && (
+          <p style={{ fontSize: 11, color: '#9CA3AF', margin: '3px 0 0' }}>
+            por {event.actor_name.split(' ')[0]}
+          </p>
+        )}
+
+        {/* Type-specific metadata */}
+        <EventMetadata type={event.type} meta={event.metadata} />
+      </div>
+    </div>
+  )
 }
 
 export default function MedicationTimeline() {
-  const { user } = useAuth()
-  const { memberRole, ownerId } = useFamily()
-  const isFamiliar = memberRole === 'familiar'
-  const isAdmin = memberRole === null
-  const [medications, setMedications] = useState([])
-  const [todayLogs, setTodayLogs] = useState({})
-  const [history, setHistory] = useState([])
-  const [confirming, setConfirming] = useState(null)
-  const [photoFile, setPhotoFile] = useState(null)
-  const [photoPreview, setPhotoPreview] = useState(null)
-  const [stamping, setStamping] = useState(false)
-  const [confirmNote, setConfirmNote] = useState('')
-  const [saving, setSaving] = useState(false)
-  const [photoError, setPhotoError] = useState('')
-  const [tick, setTick] = useState(0)
-  const [editingPhoto, setEditingPhoto] = useState(null)   // { log, medName }
-  const [attachFile, setAttachFile] = useState(null)
-  const [attachPreview, setAttachPreview] = useState(null)
-  const [attachStamping, setAttachStamping] = useState(false)
-  const [attachSaving, setAttachSaving] = useState(false)
-  const [attachError, setAttachError] = useState('')
-  const displayName = user?.user_metadata?.full_name ?? user?.email ?? 'Familiar'
-  const today = new Date().toISOString().split('T')[0]
+  const { ownerId } = useFamily()
+  const [events, setEvents] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [filterType, setFilterType] = useState('all')
+  const [daysRange, setDaysRange] = useState(30)
 
   useEffect(() => {
-    if (user && ownerId) { fetchToday(); fetchHistory() }
-  }, [user, ownerId])
+    if (ownerId) fetchLog()
+  }, [ownerId, filterType, daysRange])
 
-  useEffect(() => {
-    if (!confirming) return
-    const id = setInterval(() => setTick(t => t + 1), 15_000)
-    return () => clearInterval(id)
-  }, [!!confirming])
+  async function fetchLog() {
+    setLoading(true)
+    setError('')
+    try {
+      const since = new Date()
+      since.setDate(since.getDate() - daysRange)
 
-  async function fetchToday() {
-    const [{ data: meds }, { data: logs }] = await Promise.all([
-      supabase.from('medications').select('*').eq('user_id', ownerId).order('time'),
-      supabase.from('medication_logs').select('*').eq('user_id', ownerId).eq('log_date', today),
-    ])
-    setMedications(meds ?? [])
-    const map = {}
-    logs?.forEach(l => { map[l.medication_id] = l })
-    setTodayLogs(map)
+      let q = supabase
+        .from('activity_log')
+        .select('*')
+        .eq('owner_id', ownerId)
+        .gte('created_at', since.toISOString())
+        .order('created_at', { ascending: false })
+        .limit(300)
+
+      if (filterType !== 'all') q = q.eq('type', filterType)
+
+      const { data, error: err } = await q
+      if (err) throw err
+      setEvents(data ?? [])
+    } catch (e) {
+      setError('No se pudo cargar el historial.')
+      console.error(e)
+    } finally {
+      setLoading(false)
+    }
   }
 
-  async function fetchHistory() {
-    const since = new Date(); since.setDate(since.getDate() - 6)
-    const { data } = await supabase
-      .from('medication_logs')
-      .select('*, medications(name, dosage)')
-      .eq('user_id', ownerId)
-      .gte('log_date', since.toISOString().split('T')[0])
-      .order('log_date', { ascending: false })
-      .order('confirmed_at', { ascending: true })
-    setHistory(data ?? [])
+  // Group events by date (YYYY-MM-DD in local timezone)
+  const grouped = {}
+  for (const evt of events) {
+    const d = new Date(evt.created_at)
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
+    if (!grouped[key]) grouped[key] = []
+    grouped[key].push(evt)
   }
-
-  function pickCamera(onChange) {
-    const el = document.createElement('input')
-    el.type = 'file'; el.accept = 'image/*'; el.capture = 'environment'
-    el.addEventListener('change', onChange, { once: true })
-    el.click()
-  }
-
-  function pickGallery(onChange) {
-    const el = document.createElement('input')
-    el.type = 'file'; el.accept = 'image/*'
-    el.addEventListener('change', onChange, { once: true })
-    el.click()
-  }
-
-  function openConfirm(med) {
-    setConfirming(med); setPhotoFile(null); setPhotoPreview(null); setConfirmNote(''); setStamping(false); setPhotoError('')
-  }
-
-  async function handlePhotoChange(e) {
-    const f = e.target.files?.[0]; if (!f) return
-    setStamping(true)
-    const stamped = await stampImage(f, displayName)
-    setPhotoFile(stamped)
-    setPhotoPreview(URL.createObjectURL(stamped))
-    setStamping(false)
-  }
-
-  async function submitConfirm() {
-    if (!photoFile) { setPhotoError('Se requiere una foto como prueba de confirmación'); return }
-    setPhotoError('')
-    setSaving(true)
-    const loc = await getLocation()
-    const path = `${user.id}/${today}/${confirming.id}.jpg`
-    const { error: uploadErr } = await supabase.storage.from('confirmations').upload(path, photoFile, { upsert: true, contentType: 'image/jpeg' })
-    if (uploadErr) { setPhotoError('No se pudo subir la foto. Verifica tu conexión.'); setSaving(false); return }
-    const { data: { publicUrl } } = supabase.storage.from('confirmations').getPublicUrl(path)
-
-    await supabase.from('medication_logs').upsert({
-      medication_id: confirming.id,
-      user_id: ownerId,
-      status: 'confirmed',
-      photo_url: publicUrl,
-      confirmed_by_name: displayName,
-      scheduled_time: confirming.time,
-      confirmed_at: new Date().toISOString(),
-      notes: confirmNote || null,
-      log_date: today,
-      latitude: loc?.latitude ?? null,
-      longitude: loc?.longitude ?? null,
-      address: loc?.address ?? null,
-    }, { onConflict: 'medication_id,log_date,user_id' })
-
-    setConfirming(null); setSaving(false)
-    fetchToday(); fetchHistory()
-  }
-
-  function openAttachPhoto(log, medName) {
-    setEditingPhoto({ log, medName })
-    setAttachFile(null); setAttachPreview(null); setAttachError('')
-  }
-
-  async function handleAttachPhotoChange(e) {
-    const f = e.target.files?.[0]; if (!f) return
-    setAttachStamping(true)
-    const stamped = await stampImage(f, displayName)
-    setAttachFile(stamped)
-    setAttachPreview(URL.createObjectURL(stamped))
-    setAttachStamping(false)
-  }
-
-  async function submitAttachPhoto() {
-    if (!attachFile) { setAttachError('Selecciona una foto primero'); return }
-    setAttachSaving(true); setAttachError('')
-    const { log } = editingPhoto
-    const path = `${user.id}/${log.log_date}/${log.medication_id}.jpg`
-    const { error: upErr } = await supabase.storage.from('confirmations').upload(path, attachFile, { upsert: true, contentType: 'image/jpeg' })
-    if (upErr) { setAttachError('No se pudo subir la foto. Verifica tu conexión.'); setAttachSaving(false); return }
-    const { data: { publicUrl } } = supabase.storage.from('confirmations').getPublicUrl(path)
-    await supabase.from('medication_logs').update({
-      photo_url: publicUrl,
-      confirmed_by_name: displayName,
-      confirmed_at: new Date().toISOString(),
-    }).eq('id', log.id)
-    setEditingPhoto(null); setAttachSaving(false)
-    fetchToday(); fetchHistory()
-  }
-
-  async function markMissed(med) {
-    await supabase.from('medication_logs').upsert({
-      medication_id: med.id,
-      user_id: ownerId,
-      status: 'missed',
-      log_date: today,
-      scheduled_time: med.time,
-      confirmed_by_name: displayName,
-    }, { onConflict: 'medication_id,log_date,user_id' })
-    fetchToday(); fetchHistory()
-  }
-
-  const overdueCount = medications.filter(m => {
-    const s = todayLogs[m.id]?.status
-    return s !== 'confirmed' && s !== 'missed' && calcularEstadoMedicamento(m.time) === 'tarde'
-  }).length
-  const confirmTimingStatus = calcularEstadoMedicamento(confirming?.time)
-  const confirmScheduledLabel = (() => {
-    if (!confirming?.time) return null
-    const [h, m] = confirming.time.split(':').map(Number)
-    const d = new Date(); d.setHours(h, m, 0, 0)
-    return d.toLocaleTimeString('es-US', { hour: '2-digit', minute: '2-digit' })
-  })()
-  const attachTimingStatus = calcularEstadoMedicamento(editingPhoto?.log?.scheduled_time)
-
-  const historyByDate = history.reduce((acc, l) => {
-    if (!acc[l.log_date]) acc[l.log_date] = []
-    acc[l.log_date].push(l); return acc
-  }, {})
+  const days = Object.entries(grouped).sort((a, b) => b[0].localeCompare(a[0]))
 
   return (
     <Layout>
-      <div className="p-4 md:p-8 max-w-3xl">
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Control de medicamentos</h2>
-          <p className="text-gray-500 mt-1">Confirmaciones con foto sellada y línea de tiempo</p>
+      <div style={{ padding: '16px 16px 96px', maxWidth: 600 }}>
+
+        {/* Type filter — horizontal scroll */}
+        <div style={{
+          display: 'flex', gap: 6,
+          overflowX: 'auto', paddingBottom: 4,
+          marginBottom: 12,
+          scrollbarWidth: 'none',
+          WebkitOverflowScrolling: 'touch',
+        }}>
+          {FILTER_OPTIONS.map(opt => (
+            <button
+              key={opt.id}
+              onClick={() => setFilterType(opt.id)}
+              style={{
+                flexShrink: 0,
+                padding: '7px 14px',
+                borderRadius: 20, border: 'none',
+                fontSize: 12, fontWeight: 700,
+                cursor: 'pointer',
+                transition: 'all 0.15s',
+                background: filterType === opt.id ? '#2D4A1E' : '#F3F4F6',
+                color: filterType === opt.id ? 'white' : '#6B7280',
+                boxShadow: filterType === opt.id ? '0 2px 8px rgba(45,74,30,0.25)' : 'none',
+              }}
+            >
+              {opt.icon} {opt.label}
+            </button>
+          ))}
         </div>
 
-        {overdueCount > 0 && (
-          <div className="mb-5 p-4 bg-orange-50 border border-orange-200 rounded-xl flex gap-3 items-start">
-            <span className="text-2xl mt-0.5">⚠️</span>
-            <div>
-              <p className="font-semibold text-orange-800 text-sm">
-                {overdueCount} medicamento{overdueCount > 1 ? 's' : ''} con más de 30 minutos de retraso
-              </p>
-              <p className="text-xs text-orange-600 mt-0.5">
-                Confirma la dosis o márcala como perdida para informar a la familia
-              </p>
-            </div>
+        {/* Date range picker */}
+        <div style={{
+          display: 'flex', gap: 6, marginBottom: 20,
+          background: '#F3F4F6', borderRadius: 12, padding: 4,
+        }}>
+          {RANGE_OPTIONS.map(opt => (
+            <button
+              key={opt.id}
+              onClick={() => setDaysRange(opt.id)}
+              style={{
+                flex: 1, padding: '8px 0',
+                borderRadius: 9, border: 'none',
+                fontSize: 12, fontWeight: 700,
+                cursor: 'pointer',
+                transition: 'all 0.15s',
+                background: daysRange === opt.id ? 'white' : 'transparent',
+                color: daysRange === opt.id ? '#1A1A1A' : '#9CA3AF',
+                boxShadow: daysRange === opt.id ? '0 1px 4px rgba(0,0,0,0.1)' : 'none',
+              }}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Content */}
+        {loading ? (
+          <div style={{ display: 'flex', justifyContent: 'center', padding: 56 }}>
+            <div style={{
+              width: 28, height: 28, borderRadius: '50%',
+              border: '3px solid #EDE5D8', borderTopColor: '#4A7C59',
+              animation: 'spin 0.8s linear infinite',
+            }} />
+          </div>
+        ) : error ? (
+          <div style={{
+            background: '#FFF0F0', border: '1px solid #FFBABA',
+            borderRadius: 16, padding: '24px', textAlign: 'center',
+          }}>
+            <p style={{ fontSize: 14, color: '#D63031', marginBottom: 12 }}>{error}</p>
+            <button
+              onClick={fetchLog}
+              style={{
+                padding: '10px 24px', borderRadius: 12, border: 'none',
+                background: '#4A7C59', color: 'white', fontWeight: 700,
+                fontSize: 13, cursor: 'pointer',
+              }}
+            >
+              Reintentar
+            </button>
+          </div>
+        ) : days.length === 0 ? (
+          <div style={{
+            background: 'white', borderRadius: 20, border: '1px solid #EDE5D8',
+            padding: '56px 24px', textAlign: 'center',
+            boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
+          }}>
+            <div style={{ fontSize: 48, marginBottom: 14 }}>📖</div>
+            <p style={{
+              fontFamily: 'Georgia, serif', fontSize: 17, fontWeight: 700,
+              color: '#1A1A1A', marginBottom: 8,
+            }}>
+              Sin actividad registrada
+            </p>
+            <p style={{ fontSize: 13, color: '#9CA3AF', lineHeight: 1.6 }}>
+              {filterType !== 'all'
+                ? 'No hay eventos de este tipo en el período seleccionado.'
+                : 'Los eventos aparecerán aquí a medida que el equipo registre actividad.'}
+            </p>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+            {days.map(([dateKey, dayEvents]) => (
+              <div key={dateKey}>
+                {/* Day header */}
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10,
+                }}>
+                  <p style={{
+                    fontSize: 12, fontWeight: 700, color: '#6B7280',
+                    textTransform: 'uppercase', letterSpacing: '0.07em', margin: 0,
+                  }}>
+                    {dayLabel(dateKey)}
+                  </p>
+                  <div style={{ flex: 1, height: 1, background: '#EDE5D8' }} />
+                  <span style={{
+                    fontSize: 10, fontWeight: 700, color: '#9CA3AF',
+                    background: '#F3F4F6', padding: '2px 8px', borderRadius: 10,
+                  }}>
+                    {dayEvents.length}
+                  </span>
+                </div>
+
+                {/* Events for this day */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {dayEvents.map(evt => (
+                    <EventCard key={evt.id} event={evt} />
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         )}
-
-        {/* Today */}
-        <div className="bg-white rounded-xl border border-green-100 p-5 mb-5">
-          <h3 className="font-semibold text-gray-900 mb-4">
-            Hoy — {new Date().toLocaleDateString('es-US', { weekday: 'long', day: 'numeric', month: 'long' })}
-          </h3>
-
-          {medications.length === 0 ? (
-            <p className="text-sm text-gray-400 text-center py-6">Sin medicamentos registrados. Agrégalos en la sección Medicamentos.</p>
-          ) : (
-            <div className="space-y-3">
-              {medications.map(med => {
-                const log = todayLogs[med.id]
-                const medState = calcularEstadoMedicamento(med.time, log?.status === 'confirmed')
-                return (
-                  <div key={med.id} className={`rounded-xl border overflow-hidden transition-colors ${
-                    log?.status === 'confirmed'  ? 'bg-green-50 border-green-200' :
-                    log?.status === 'missed'     ? 'bg-red-50 border-red-200' :
-                    medState === 'tarde'         ? 'bg-orange-50 border-orange-200' :
-                                                   'bg-gray-50 border-gray-200'
-                  }`}>
-                    <div className="flex items-center justify-between p-4">
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 ${
-                          log?.status === 'confirmed' ? 'bg-primary text-white' :
-                          log?.status === 'missed'    ? 'bg-red-500 text-white' :
-                          medState === 'tarde'        ? 'bg-orange-400 text-white' :
-                                                        'bg-gray-300 text-white'
-                        }`}>
-                          {log?.status === 'confirmed' ? '✓' : log?.status === 'missed' ? '✗' : '💊'}
-                        </div>
-                        <div className="min-w-0">
-                          <p className="font-semibold text-gray-900 text-sm">{med.name}</p>
-                          <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-0.5">
-                            {med.time && <span className="text-xs text-gray-500">⏰ {med.time}</span>}
-                            {med.dosage && <span className="text-xs text-gray-500">{med.dosage}</span>}
-                            <StatusBadge status={log?.status} medState={medState} />
-                          </div>
-                        </div>
-                      </div>
-                      {!log && !isFamiliar && (
-                        <div className="flex gap-1.5 flex-shrink-0 ml-3">
-                          <button onClick={() => openConfirm(med)}
-                            className="px-3 py-2 bg-primary hover:bg-primary-dark text-white text-xs font-semibold rounded-lg transition-colors">
-                            📷 Confirmar
-                          </button>
-                          <button onClick={() => markMissed(med)}
-                            className="px-3 py-2 border border-red-200 text-red-600 hover:bg-red-50 text-xs font-medium rounded-lg transition-colors">
-                            No dada
-                          </button>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* No-photo warning */}
-                    {log?.status === 'confirmed' && !log?.photo_url && (
-                      <div className="border-t border-orange-200 px-4 py-3 bg-orange-50 flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-2">
-                          <span className="text-base">⚠️</span>
-                          <span className="text-xs font-medium text-orange-800">Falta la foto de prueba</span>
-                        </div>
-                        <button
-                          onClick={() => openAttachPhoto(log, med.name)}
-                          className="px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold rounded-lg transition-colors flex-shrink-0">
-                          📷 Agregar foto
-                        </button>
-                      </div>
-                    )}
-
-                    {/* Sealed proof card */}
-                    {log?.status === 'confirmed' && log?.photo_url && (
-                      <div className="border-t border-green-200">
-                        <img src={log.photo_url} className="w-full" alt="Prueba sellada" />
-                        <div className="flex items-center gap-2 px-3 py-2 bg-green-50">
-                          <span className="text-sm">🔒</span>
-                          <span className="text-xs font-semibold text-primary">Prueba sellada</span>
-                          {log.confirmed_by_name && (
-                            <span className="text-xs text-gray-400">
-                              {log.confirmed_by_name} · {new Date(log.confirmed_at).toLocaleTimeString('es-US', { hour: '2-digit', minute: '2-digit' })}
-                            </span>
-                          )}
-                          <button
-                            onClick={() => openAttachPhoto(log, med.name)}
-                            className="ml-auto px-2.5 py-1 border border-green-300 text-green-700 hover:bg-green-100 text-xs font-medium rounded-lg transition-colors">
-                            Cambiar
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )
-              })}
-            </div>
-          )}
-        </div>
-
-        {/* 7-day history */}
-        <div style={{ background: 'white', borderRadius: 18, border: '1px solid #EDE5D8', padding: '20px', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
-          <p style={{ fontFamily: 'Georgia, serif', fontSize: 16, fontWeight: 700, color: '#1A1A1A', margin: '0 0 16px' }}>
-            Línea de tiempo — últimos 7 días
-          </p>
-          {Object.keys(historyByDate).length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '32px 0' }}>
-              <div style={{ fontSize: 40, marginBottom: 10 }}>📋</div>
-              <p style={{ fontSize: 13, color: '#9CA3AF' }}>Sin historial todavía.</p>
-            </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-              {Object.entries(historyByDate).map(([date, logs]) => {
-                const confirmed = logs.filter(l => l.status === 'confirmed').length
-                const total     = logs.length
-                const pct       = total ? Math.round((confirmed / total) * 100) : 0
-                const dateLabel = new Date(date + 'T12:00:00').toLocaleDateString('es-US', {
-                  weekday: 'long', day: 'numeric', month: 'long',
-                })
-                return (
-                  <div key={date}>
-                    {/* Day header */}
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                      <p style={{ fontSize: 13, fontWeight: 700, color: '#374151', margin: 0, textTransform: 'capitalize' }}>
-                        {dateLabel}
-                      </p>
-                      <span style={{
-                        fontSize: 11, fontWeight: 700,
-                        color: pct >= 80 ? '#16A34A' : pct >= 50 ? '#C9882A' : '#DC2626',
-                        background: pct >= 80 ? '#DCFCE7' : pct >= 50 ? '#FEF3C7' : '#FEE2E2',
-                        padding: '3px 10px', borderRadius: 20,
-                      }}>
-                        {confirmed}/{total} dados
-                      </span>
-                    </div>
-
-                    {/* Individual medication cards */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                      {logs.map(log => {
-                        const isConfirmed = log.status === 'confirmed'
-                        const confirmedTime = log.confirmed_at
-                          ? new Date(log.confirmed_at).toLocaleTimeString('es-US', { hour: '2-digit', minute: '2-digit' })
-                          : null
-                        return (
-                          <div key={log.id} style={{
-                            background: isConfirmed ? '#F0FDF4' : '#FEF2F2',
-                            border: `1px solid ${isConfirmed ? '#BBF7D0' : '#FECACA'}`,
-                            borderRadius: 14, padding: '12px 14px',
-                          }}>
-                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                              {/* Status icon */}
-                              <div style={{
-                                width: 36, height: 36, borderRadius: 10, flexShrink: 0,
-                                background: isConfirmed ? '#22C55E' : '#EF4444',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                fontSize: 16, fontWeight: 700, color: 'white',
-                              }}>
-                                {isConfirmed ? '✓' : '✗'}
-                              </div>
-
-                              {/* Info */}
-                              <div style={{ flex: 1, minWidth: 0 }}>
-                                <p style={{ fontSize: 14, fontWeight: 700, color: '#1A1A1A', margin: '0 0 4px', fontFamily: 'Georgia, serif' }}>
-                                  💊 {log.medications?.name ?? '—'}
-                                </p>
-                                {log.medications?.dosage && (
-                                  <p style={{ fontSize: 12, color: '#6B7280', margin: '0 0 6px' }}>
-                                    {log.medications.dosage}
-                                  </p>
-                                )}
-                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 12px' }}>
-                                  {log.scheduled_time && (
-                                    <span style={{ fontSize: 11, color: '#6B7280' }}>
-                                      ⏰ Programado: {log.scheduled_time}
-                                    </span>
-                                  )}
-                                  {isConfirmed && confirmedTime && (
-                                    <span style={{ fontSize: 11, color: '#16A34A', fontWeight: 600 }}>
-                                      ✅ Dado: {confirmedTime}
-                                    </span>
-                                  )}
-                                  {log.confirmed_by_name && (
-                                    <span style={{ fontSize: 11, color: '#6B7280' }}>
-                                      👤 {log.confirmed_by_name.split(' ')[0]}
-                                    </span>
-                                  )}
-                                  {log.latitude && log.longitude && (
-                                    <a
-                                      href={mapsUrl(log.latitude, log.longitude)}
-                                      target="_blank" rel="noopener noreferrer"
-                                      style={{ fontSize: 11, color: '#3B82F6', textDecoration: 'none' }}
-                                    >
-                                      📍 Ver mapa
-                                    </a>
-                                  )}
-                                </div>
-                              </div>
-
-                              {/* Photo thumbnail */}
-                              {log.photo_url && (
-                                <img
-                                  src={log.photo_url}
-                                  alt="Prueba"
-                                  style={{
-                                    width: 52, height: 52, borderRadius: 10,
-                                    objectFit: 'cover', flexShrink: 0,
-                                    border: '1.5px solid #BBF7D0',
-                                  }}
-                                />
-                              )}
-                            </div>
-                          </div>
-                        )
-                      })}
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          )}
-        </div>
       </div>
-
-      {/* Attach / replace photo modal */}
-      {editingPhoto && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden">
-            <div className="px-6 pt-6 pb-4">
-              <h3 className="font-bold text-gray-900 mb-0.5">
-                {editingPhoto.log.photo_url ? 'Reemplazar foto de prueba' : 'Agregar foto de prueba'}
-              </h3>
-              <p className="text-sm text-gray-500">{editingPhoto.medName}</p>
-            </div>
-
-            <div className="w-full border-y border-dashed border-green-200">
-              {attachStamping ? (
-                <div className="h-36 flex flex-col items-center justify-center gap-2 text-gray-400">
-                  <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                  <p className="text-sm font-medium">Aplicando sello de tiempo...</p>
-                </div>
-              ) : attachPreview ? (
-                <div>
-                  <img src={attachPreview} className="w-full max-h-52 object-cover" alt="Nueva prueba" />
-                  <div className="flex items-center gap-1.5 px-3 py-2 bg-green-50">
-                    <span className="text-xs">🔒</span>
-                    <span className="text-xs font-semibold text-primary">Sello aplicado</span>
-                  </div>
-                  <div className="flex gap-2 px-3 py-2.5">
-                    <button type="button" onClick={() => pickCamera(handleAttachPhotoChange)}
-                      className="flex-1 py-2 text-xs font-semibold rounded-lg border border-primary text-primary bg-green-50 hover:bg-green-100 transition-colors">
-                      📷 Tomar foto
-                    </button>
-                    <button type="button" onClick={() => pickGallery(handleAttachPhotoChange)}
-                      className="flex-1 py-2 text-xs font-semibold rounded-lg border border-gray-200 text-gray-600 bg-gray-50 hover:bg-gray-100 transition-colors">
-                      🖼 Elegir de galería
-                    </button>
-                  </div>
-                </div>
-              ) : editingPhoto.log.photo_url ? (
-                <div>
-                  <div className="relative">
-                    <img src={editingPhoto.log.photo_url} className="w-full max-h-52 object-cover opacity-40" alt="Foto actual" />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-2xl">📷</span>
-                    </div>
-                  </div>
-                  <div className="flex gap-2 px-3 py-2.5">
-                    <button type="button" onClick={() => pickCamera(handleAttachPhotoChange)}
-                      className="flex-1 py-2 text-xs font-semibold rounded-lg border border-primary text-primary bg-green-50 hover:bg-green-100 transition-colors">
-                      📷 Tomar foto
-                    </button>
-                    <button type="button" onClick={() => pickGallery(handleAttachPhotoChange)}
-                      className="flex-1 py-2 text-xs font-semibold rounded-lg border border-gray-200 text-gray-600 bg-gray-50 hover:bg-gray-100 transition-colors">
-                      🖼 Elegir de galería
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center gap-3 py-5 px-4">
-                  <span className="text-3xl">📷</span>
-                  <div className="flex gap-2 w-full">
-                    <button type="button" onClick={() => pickCamera(handleAttachPhotoChange)}
-                      className="flex-1 py-2.5 text-sm font-semibold rounded-xl border border-primary text-primary bg-green-50 hover:bg-green-100 transition-colors">
-                      📷 Tomar foto
-                    </button>
-                    <button type="button" onClick={() => pickGallery(handleAttachPhotoChange)}
-                      className="flex-1 py-2.5 text-sm font-semibold rounded-xl border border-gray-200 text-gray-600 bg-gray-50 hover:bg-gray-100 transition-colors">
-                      🖼 Elegir de galería
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className="px-6 pt-4 pb-6">
-              {attachTimingStatus === 'tarde' && (
-                <div className="mb-3 px-3 py-2.5 bg-orange-50 border border-orange-200 rounded-xl text-sm text-orange-700 flex items-center gap-2">
-                  <span>⚠</span>Foto subida fuera del horario
-                </div>
-              )}
-              {attachError && (
-                <div className="mb-3 px-3 py-2.5 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700 flex items-center gap-2">
-                  <span>⚠</span>{attachError}
-                </div>
-              )}
-              <div className="flex gap-3">
-                <button onClick={submitAttachPhoto} disabled={attachSaving || attachStamping}
-                  className="flex-1 py-3 bg-primary hover:bg-primary-dark disabled:opacity-50 text-white font-semibold rounded-xl transition-colors text-sm">
-                  {attachSaving ? 'Guardando...' : '✓ Guardar foto'}
-                </button>
-                <button onClick={() => setEditingPhoto(null)}
-                  className="flex-1 py-3 border border-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors text-sm">
-                  Cancelar
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Confirm modal */}
-      {confirming && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden">
-            <div className="px-6 pt-6 pb-4">
-              <h3 className="font-bold text-gray-900 mb-0.5">Confirmar medicamento</h3>
-              <p className="text-sm text-gray-500">{confirming.name}{confirming.dosage ? ` · ${confirming.dosage}` : ''}</p>
-            </div>
-
-            <div className="w-full border-y border-dashed border-green-200">
-              {stamping ? (
-                <div className="h-36 flex flex-col items-center justify-center gap-2 text-gray-400">
-                  <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                  <p className="text-sm font-medium">Aplicando sello de tiempo...</p>
-                </div>
-              ) : photoPreview ? (
-                <div>
-                  <img src={photoPreview} className="w-full max-h-52 object-cover" alt="Prueba sellada" />
-                  <div className="flex items-center gap-1.5 px-3 py-2 bg-green-50">
-                    <span className="text-xs">🔒</span>
-                    <span className="text-xs font-semibold text-primary">Sello aplicado</span>
-                  </div>
-                  <div className="flex gap-2 px-3 py-2.5">
-                    <button type="button" onClick={() => pickCamera(handlePhotoChange)}
-                      className="flex-1 py-2 text-xs font-semibold rounded-lg border border-primary text-primary bg-green-50 hover:bg-green-100 transition-colors">
-                      📷 Tomar foto
-                    </button>
-                    <button type="button" onClick={() => pickGallery(handlePhotoChange)}
-                      className="flex-1 py-2 text-xs font-semibold rounded-lg border border-gray-200 text-gray-600 bg-gray-50 hover:bg-gray-100 transition-colors">
-                      🖼 Elegir de galería
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center gap-3 py-5 px-4">
-                  <span className="text-3xl">📷</span>
-                  <p className="text-xs text-gray-400">Requerida para confirmar · Se sellará automáticamente</p>
-                  <div className="flex gap-2 w-full">
-                    <button type="button" onClick={() => pickCamera(handlePhotoChange)}
-                      className="flex-1 py-2.5 text-sm font-semibold rounded-xl border border-primary text-primary bg-green-50 hover:bg-green-100 transition-colors">
-                      📷 Tomar foto
-                    </button>
-                    <button type="button" onClick={() => pickGallery(handlePhotoChange)}
-                      className="flex-1 py-2.5 text-sm font-semibold rounded-xl border border-gray-200 text-gray-600 bg-gray-50 hover:bg-gray-100 transition-colors">
-                      🖼 Elegir de galería
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className="px-6 pt-4 pb-6">
-              {isAdmin && (
-                <div className="mb-3 px-3 py-2.5 bg-amber-50 border border-amber-300 rounded-xl text-sm text-amber-800 flex items-center gap-2">
-                  <span>⚠️</span> Confirmando como administrador — solo en caso de emergencia
-                </div>
-              )}
-              {photoError && (
-                <div className="mb-3 px-3 py-2.5 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700 flex items-center gap-2">
-                  <span>⚠</span>{photoError}
-                </div>
-              )}
-              {confirmTimingStatus === 'tarde' && (
-                <div className="mb-3 px-3 py-2.5 bg-orange-50 border border-orange-200 rounded-xl text-sm text-orange-700 flex items-center gap-2">
-                  <span>⚠</span>Dado fuera del horario programado
-                </div>
-              )}
-              <textarea value={confirmNote} onChange={e => setConfirmNote(e.target.value)} rows={2}
-                placeholder="Nota opcional (ej. tomó bien, sin problemas...)"
-                className="w-full mb-4 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none" />
-
-              <div className="flex gap-3">
-                <button onClick={submitConfirm} disabled={saving || stamping || confirmTimingStatus === 'programado'}
-                  className="flex-1 py-3 bg-primary hover:bg-primary-dark disabled:opacity-50 text-white font-semibold rounded-xl transition-colors text-sm">
-                  {saving ? 'Guardando...' : '✓ Confirmar dosis'}
-                </button>
-                <button onClick={() => setConfirming(null)}
-                  className="flex-1 py-3 border border-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors text-sm">
-                  Cancelar
-                </button>
-              </div>
-              {confirmTimingStatus === 'programado' && confirmScheduledLabel && (
-                <p className="text-center text-xs text-gray-500 mt-2">
-                  Disponible a las {confirmScheduledLabel}
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
     </Layout>
   )
 }
