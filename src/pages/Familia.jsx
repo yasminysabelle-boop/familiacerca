@@ -99,7 +99,8 @@ export default function Familia() {
 
     setMembers(memberRows ?? [])
 
-    const ids = [...new Set([(memberRows ?? []).map(m => m.member_user_id).filter(Boolean), user.id].flat())]
+    // Include ownerId so the admin's profile is always available for non-admin views
+    const ids = [...new Set([(memberRows ?? []).map(m => m.member_user_id).filter(Boolean), user.id, ownerId].flat().filter(Boolean))]
     if (ids.length) {
       const { data: profiles } = await supabase
         .from('user_profiles')
@@ -423,13 +424,16 @@ export default function Familia() {
                 </div>
               )}
 
-              {/* Admin's own card */}
-              {isAdmin && (() => {
-                const adminMp = memberProfiles[user.id]
-                const adminInitials = displayName.charAt(0).toUpperCase()
+              {/* Admin card — always visible to everyone (bidirectional visibility) */}
+              {(() => {
+                const adminId = ownerId
+                const adminMp = memberProfiles[adminId]
+                const adminName = isAdmin ? displayName : (adminMp?.full_name ?? 'Administrador')
+                const adminInitials = adminName.charAt(0).toUpperCase()
+                const adminOnline = isAdmin ? true : onlineIds.has(adminId)
                 return (
                   <div
-                    onClick={() => navigate(`/directorio?member=${encodeURIComponent(user.email ?? '')}`)}
+                    onClick={() => navigate(`/directorio?member=${encodeURIComponent(isAdmin ? (user.email ?? '') : (adminMp?.email ?? ''))}`)}
                     style={{
                       display: 'flex', alignItems: 'center', gap: 12,
                       padding: '12px 14px', borderRadius: 14,
@@ -444,18 +448,20 @@ export default function Familia() {
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                       }}>
                         {adminMp?.avatar_url
-                          ? <img src={adminMp.avatar_url} alt={displayName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          ? <img src={adminMp.avatar_url} alt={adminName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                           : <span style={{ fontSize: 16, fontWeight: 700, color: '#4A7C59' }}>{adminInitials}</span>
                         }
                       </div>
-                      <div style={{ position: 'absolute', bottom: 0, right: 0, width: 12, height: 12, borderRadius: '50%', border: '2px solid white', background: '#22C55E' }} />
+                      <div style={{ position: 'absolute', bottom: 0, right: 0, width: 12, height: 12, borderRadius: '50%', border: '2px solid white', background: adminOnline ? '#22C55E' : '#9CA3AF' }} />
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p style={{ fontSize: 14, fontWeight: 600, color: '#1A1A1A', margin: '0 0 2px' }}>
-                        {displayName.split(' ')[0]}
-                        <span style={{ marginLeft: 6, fontSize: 10, fontWeight: 700, color: '#4A7C59', background: '#EBF3EE', padding: '2px 7px', borderRadius: 6 }}>Tú</span>
+                        {adminName.split(' ')[0]}
+                        {isAdmin && <span style={{ marginLeft: 6, fontSize: 10, fontWeight: 700, color: '#4A7C59', background: '#EBF3EE', padding: '2px 7px', borderRadius: 6 }}>Tú</span>}
                       </p>
-                      <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>🟢 En línea</p>
+                      <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>
+                        {adminOnline ? '🟢 En línea' : '⚫ Desconectado'}
+                      </p>
                     </div>
                     <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
                       <span style={{ fontSize: 10, fontWeight: 700, color: '#4A7C59', background: '#EBF3EE', padding: '3px 10px', borderRadius: 6 }}>

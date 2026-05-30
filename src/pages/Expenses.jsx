@@ -69,7 +69,7 @@ export default function Expenses() {
   const [saving,    setSaving]    = useState(false)
   const [saveError, setSaveError] = useState('')
 
-  useEffect(() => { loadExpenses() }, [year, month])
+  useEffect(() => { if (ownerId) loadExpenses() }, [year, month, ownerId])
 
   useEffect(() => {
     if (searchParams.get('add') === '1') {
@@ -121,14 +121,16 @@ export default function Expenses() {
   }
 
   function openModal(expense = null) {
-    if (expense) {
+    // Only treat as an existing expense if it has the expected DB shape (has an id)
+    const isExisting = expense && typeof expense === 'object' && typeof expense.id === 'string'
+    if (isExisting) {
       setEditExpense(expense)
       setForm({
-        amount:      String(expense.amount),
-        category:    expense.category,
+        amount:      String(expense.amount ?? ''),
+        category:    expense.category ?? 'Medicamentos',
         description: expense.description ?? '',
-        paid_by:     expense.paid_by,
-        date:        expense.date,
+        paid_by:     expense.paid_by ?? displayName,
+        date:        expense.date ?? new Date().toISOString().slice(0, 10),
       })
       setPhotoFile(null)
       setPhotoPreview(expense.receipt_photo_url ?? null)
@@ -235,7 +237,7 @@ export default function Expenses() {
   const onFocus = e => { e.target.style.borderColor = '#4A7C59'; e.target.style.boxShadow = '0 0 0 3px rgba(74,124,89,0.1)' }
   const onBlur  = e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.boxShadow = 'none' }
 
-  const canSave = !saving && !!form.amount && !!form.paid_by.trim()
+  const canSave = !saving && !!form.amount && !!(form.paid_by ?? '').trim()
 
   return (
     <Layout>
@@ -460,7 +462,7 @@ export default function Expenses() {
       {/* FAB — hidden for familiar (view only) */}
       {!isFamiliar && (
         <button
-          onClick={openModal}
+          onClick={() => openModal()}
           style={{
             position: 'fixed', bottom: 84, right: 20, zIndex: 30,
             width: 54, height: 54, borderRadius: '50%',

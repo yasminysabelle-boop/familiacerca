@@ -20,6 +20,8 @@ export default function VideoCall() {
   const [call, setCall] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [joined, setJoined] = useState(false)
+  const [permStatus, setPermStatus] = useState('idle') // 'idle' | 'requesting' | 'granted' | 'denied'
 
   useEffect(() => {
     if (!callId) { navigate('/dashboard', { replace: true }); return }
@@ -109,99 +111,176 @@ export default function VideoCall() {
     )
   }
 
-  return (
-    <div style={{ position: 'fixed', inset: 0, background: '#0A0A0A', display: 'flex', flexDirection: 'column' }}>
-      {/* Header */}
-      <div style={{
-        position: 'relative', zIndex: 10,
-        display: 'flex', alignItems: 'center', gap: 12,
-        padding: '12px 16px',
-        paddingTop: 'calc(12px + env(safe-area-inset-top))',
-        background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)',
-      }}>
-        <button
-          onClick={() => navigate(-1)}
-          style={{
-            width: 36, height: 36, borderRadius: '50%', border: 'none',
-            background: 'rgba(255,255,255,0.15)', cursor: 'pointer',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 18, color: 'white', flexShrink: 0,
-          }}
-        >
-          ←
-        </button>
-        <div style={{ flex: 1, minWidth: 0 }}>
+  async function requestPermissionsAndJoin() {
+    setPermStatus('requesting')
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+      // Stop tracks immediately — Daily.co will re-request inside the iframe
+      stream.getTracks().forEach(t => t.stop())
+      setPermStatus('granted')
+      setJoined(true)
+    } catch {
+      setPermStatus('denied')
+    }
+  }
+
+  // Lobby screen — shown before joining (and when too early)
+  if (!joined) {
+    return (
+      <div style={{ position: 'fixed', inset: 0, background: '#0A0A0A', display: 'flex', flexDirection: 'column' }}>
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 12,
+          padding: '12px 16px',
+          paddingTop: 'calc(12px + env(safe-area-inset-top))',
+          background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)',
+        }}>
+          <button
+            onClick={() => navigate(-1)}
+            style={{
+              width: 36, height: 36, borderRadius: '50%', border: 'none',
+              background: 'rgba(255,255,255,0.15)', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 18, color: 'white', flexShrink: 0,
+            }}
+          >
+            ←
+          </button>
           <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: 'white', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {call.title}
           </p>
-          <p style={{ margin: '1px 0 0', fontSize: 11, color: 'rgba(255,255,255,0.55)' }}>
-            {fmtScheduled(call.scheduled_at)}
-          </p>
         </div>
-        {isTooEarly && (
-          <span style={{
-            padding: '4px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700,
-            background: 'rgba(255,165,0,0.25)', color: '#FFA500',
-          }}>
-            En {minutesUntil} min
-          </span>
-        )}
-      </div>
 
-      {/* Daily.co iframe — toma todo el espacio restante */}
-      <div style={{ flex: 1, position: 'relative' }}>
-        {isTooEarly ? (
-          <div style={{
-            position: 'absolute', inset: 0,
-            display: 'flex', flexDirection: 'column',
-            alignItems: 'center', justifyContent: 'center', gap: 16, padding: 32,
-          }}>
-            <span style={{ fontSize: 56 }}>⏰</span>
-            <p style={{ color: 'white', fontSize: 20, fontWeight: 800, textAlign: 'center', fontFamily: 'Georgia, serif' }}>
+        <div style={{
+          flex: 1, display: 'flex', flexDirection: 'column',
+          alignItems: 'center', justifyContent: 'center',
+          gap: 20, padding: '32px 24px',
+        }}>
+          <span style={{ fontSize: 64 }}>{isTooEarly ? '⏰' : '📹'}</span>
+
+          <div style={{ textAlign: 'center' }}>
+            <p style={{ color: 'white', fontSize: 22, fontWeight: 800, fontFamily: 'Georgia, serif', margin: '0 0 8px' }}>
               {call.title}
             </p>
-            <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: 14, textAlign: 'center', lineHeight: 1.6 }}>
-              La sala abre 15 minutos antes de la llamada.
+            <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 14, margin: 0 }}>
+              {fmtScheduled(call.scheduled_at)}
             </p>
+          </div>
+
+          {isTooEarly ? (
             <div style={{
               padding: '16px 24px', borderRadius: 16,
               background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)',
               textAlign: 'center',
             }}>
               <p style={{ margin: 0, color: 'rgba(255,255,255,0.5)', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                Comienza en
+                La sala abre en
               </p>
-              <p style={{ margin: '6px 0 0', color: 'white', fontSize: 28, fontWeight: 800 }}>
+              <p style={{ margin: '6px 0 0', color: 'white', fontSize: 32, fontWeight: 800 }}>
                 {minutesUntil} min
               </p>
-              <p style={{ margin: '4px 0 0', color: 'rgba(255,255,255,0.55)', fontSize: 13 }}>
-                {fmtScheduled(call.scheduled_at)}
+              <p style={{ margin: '4px 0 0', color: 'rgba(255,255,255,0.45)', fontSize: 12 }}>
+                Disponible 15 minutos antes
               </p>
             </div>
-            <button
-              onClick={() => navigate('/dashboard')}
-              style={{
-                marginTop: 8, padding: '12px 28px', borderRadius: 12, border: 'none',
-                background: 'rgba(255,255,255,0.15)', color: 'white',
-                fontWeight: 700, fontSize: 14, cursor: 'pointer',
-              }}
-            >
-              Volver al inicio
-            </button>
-          </div>
-        ) : (
-          <iframe
-            src={call.room_url}
-            allow="camera; microphone; fullscreen; display-capture; autoplay"
+          ) : (
+            <>
+              {permStatus === 'denied' && (
+                <div style={{
+                  padding: '12px 16px', borderRadius: 12,
+                  background: 'rgba(220,38,38,0.2)', border: '1px solid rgba(220,38,38,0.4)',
+                  textAlign: 'center', maxWidth: 320,
+                }}>
+                  <p style={{ color: '#FCA5A5', fontSize: 13, fontWeight: 600, margin: '0 0 4px' }}>
+                    Permisos denegados
+                  </p>
+                  <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 12, margin: 0, lineHeight: 1.5 }}>
+                    Activa cámara y micrófono desde los ajustes de tu navegador para unirte.
+                  </p>
+                </div>
+              )}
+
+              <button
+                onClick={requestPermissionsAndJoin}
+                disabled={permStatus === 'requesting'}
+                style={{
+                  padding: '16px 40px', borderRadius: 20, border: 'none',
+                  background: permStatus === 'requesting'
+                    ? 'rgba(255,255,255,0.2)'
+                    : 'linear-gradient(135deg, #4A7C59, #2D6A4F)',
+                  color: 'white', fontWeight: 800, fontSize: 16,
+                  cursor: permStatus === 'requesting' ? 'default' : 'pointer',
+                  boxShadow: permStatus === 'requesting' ? 'none' : '0 8px 32px rgba(74,124,89,0.4)',
+                  transition: 'all 0.2s',
+                  display: 'flex', alignItems: 'center', gap: 10,
+                }}
+              >
+                {permStatus === 'requesting' ? (
+                  <>
+                    <div style={{ width: 18, height: 18, border: '2px solid white', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
+                    Conectando...
+                  </>
+                ) : (
+                  <>
+                    📹 Unirse a la llamada
+                  </>
+                )}
+              </button>
+            </>
+          )}
+
+          <button
+            onClick={() => navigate(-1)}
             style={{
-              position: 'absolute', inset: 0,
-              width: '100%', height: '100%',
-              border: 'none',
+              background: 'none', border: 'none',
+              color: 'rgba(255,255,255,0.45)', fontSize: 13, cursor: 'pointer',
             }}
-            title={call.title}
-          />
-        )}
+          >
+            Volver atrás
+          </button>
+        </div>
       </div>
+    )
+  }
+
+  // Active call screen — iframe + visible hang-up button
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: '#0A0A0A', display: 'flex', flexDirection: 'column' }}>
+      {/* Hang-up bar — always visible */}
+      <div style={{
+        position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 20,
+        paddingBottom: 'env(safe-area-inset-bottom)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        padding: '12px 16px',
+        background: 'linear-gradient(to top, rgba(0,0,0,0.85), transparent)',
+        pointerEvents: 'none',
+      }}>
+        <button
+          onClick={() => { setJoined(false) }}
+          style={{
+            pointerEvents: 'auto',
+            display: 'flex', alignItems: 'center', gap: 8,
+            padding: '14px 32px', borderRadius: 30, border: 'none',
+            background: '#DC2626',
+            color: 'white', fontWeight: 800, fontSize: 15,
+            cursor: 'pointer',
+            boxShadow: '0 4px 20px rgba(220,38,38,0.5)',
+          }}
+        >
+          📵 Colgar
+        </button>
+      </div>
+
+      {/* Daily.co iframe */}
+      <iframe
+        src={call.room_url}
+        allow="camera; microphone; fullscreen; display-capture; autoplay"
+        style={{
+          position: 'absolute', inset: 0,
+          width: '100%', height: '100%',
+          border: 'none',
+        }}
+        title={call.title}
+      />
     </div>
   )
 }

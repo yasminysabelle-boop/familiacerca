@@ -136,7 +136,7 @@ export default function Layout({ children }) {
       </header>
 
       {/* Scrollable main */}
-      <main style={{ position: 'fixed', inset: 0, overflowY: 'auto', top: `calc(${hospitalBarHeight}px + 56px + env(safe-area-inset-top))`, bottom: 68 }}>
+      <main style={{ position: 'fixed', inset: 0, overflowY: 'auto', top: `calc(${hospitalBarHeight}px + 56px + env(safe-area-inset-top))`, bottom: 'calc(68px + env(safe-area-inset-bottom))' }}>
         <InstallBanner />
         <OfflineBanner />
 
@@ -163,7 +163,7 @@ export default function Layout({ children }) {
       {/* Inactivity warning banner */}
       {inactivityWarning && (
         <div style={{
-          position: 'fixed', bottom: 68, left: 0, right: 0, zIndex: 50,
+          position: 'fixed', bottom: 'calc(68px + env(safe-area-inset-bottom))', left: 0, right: 0, zIndex: 50,
           background: '#1F2937',
           padding: '14px 20px 16px',
           boxShadow: '0 -4px 24px rgba(0,0,0,0.3)',
@@ -193,7 +193,8 @@ export default function Layout({ children }) {
       <nav
         style={{
           position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 40,
-          height: 68,
+          height: 'calc(68px + env(safe-area-inset-bottom))',
+          paddingBottom: 'env(safe-area-inset-bottom)',
           background: navBg,
           borderTop: `1px solid ${border}`,
           boxShadow: '0 -2px 16px rgba(0,0,0,0.25)',

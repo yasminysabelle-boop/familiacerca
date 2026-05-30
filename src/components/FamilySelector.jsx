@@ -18,17 +18,17 @@ export default function FamilySelector() {
             fontFamily: 'Georgia, serif', fontSize: 22, fontWeight: 700,
             color: '#1A1A1A', margin: '0 0 8px',
           }}>
-            ¿A quién vas a cuidar hoy?
+            ¿A qué familia quieres entrar?
           </h1>
           <p style={{ fontSize: 14, color: '#6B7280', margin: 0, lineHeight: 1.5 }}>
-            Selecciona la familia que quieres ver
+            Tienes acceso a más de una familia
           </p>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {families.map(fam => {
             const initials = fam.patientName?.charAt(0)?.toUpperCase() ?? '?'
-            const roleLabel = fam.role === null ? 'Administrador' : fam.role === 'cuidador' ? 'Cuidador' : 'Familiar'
+            const roleLabel = fam.role === null ? 'Eres el admin' : fam.role === 'cuidador' ? 'Eres cuidador' : 'Eres familiar'
             const roleColor = fam.role === null ? '#4A7C59' : fam.role === 'cuidador' ? '#2563EB' : '#6B7280'
             const roleBg = fam.role === null ? '#EBF3EE' : fam.role === 'cuidador' ? '#DBEAFE' : '#F3F4F6'
             return (

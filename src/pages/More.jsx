@@ -15,7 +15,7 @@ import {
 
 const MORE_SECTIONS = [
   {
-    label: 'Cuidado',
+    label: 'Gestión del cuidado',
     items: [
       { to: '/medications',      Icon: Pill,     label: 'Medicamentos',        desc: 'Agregar y editar medicamentos',        color: '#4A7C59' },
       { to: '/cuidado/horarios', Icon: Clock,    label: 'Horarios de cuidado', desc: 'Turnos y rutinas del cuidado',         color: '#4A7C59' },
@@ -31,11 +31,10 @@ const MORE_SECTIONS = [
     ],
   },
   {
-    label: 'Cuenta',
+    label: 'Suscripción',
     items: [
-      { to: '/ajustes',  Icon: Settings, label: 'Mi cuenta', desc: 'Suscripción y configuración', color: '#6B7280' },
-      { to: '/permisos', Icon: Shield,   label: 'Permisos',  desc: 'Control de acceso familiar',  color: '#6B7280' },
-      { to: '/pricing',  Icon: Star,     label: 'Planes',    desc: 'Actualizar suscripción',       color: '#C9882A' },
+      { to: '/permisos', Icon: Shield, label: 'Permisos',  desc: 'Control de acceso familiar',  color: '#6B7280' },
+      { to: '/pricing',  Icon: Star,   label: 'Planes',    desc: 'Actualizar suscripción',       color: '#C9882A' },
     ],
   },
 ]
