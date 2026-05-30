@@ -1,9 +1,8 @@
-import { useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import Logo from './Logo'
-import { Home, Users, User, Plus, XIcon, LogOut, Menu, Settings } from './Icons'
+import { Home, Users, User, Menu, Settings } from './Icons'
 import Paywall from './Paywall'
 import InstallBanner from './InstallBanner'
 import OfflineBanner from './OfflineBanner'
@@ -42,45 +41,17 @@ const BOTTOM_TABS = [
   { to: '/ajustes',   Icon: Settings, label: 'Ajustes' },
 ]
 
-const FAB_ITEMS = [
-  { to: '/notes?add=1',      emoji: '📝', label: 'Nota rápida' },
-  { to: '/gastos?add=1',     emoji: '💰', label: 'Gasto' },
-  { to: '/medications?add=1',emoji: '💊', label: 'Medicamento' },
-  { to: '/calendar',         emoji: '📅', label: 'Cita' },
-]
-
-// Pages that have their own add-button — hide the global FAB there
-const HIDE_FAB_PATHS = new Set(['/gastos', '/medications', '/notes'])
-
 export default function Layout({ children }) {
-  const { inactivityWarning, signOut } = useAuth()
+  const { inactivityWarning } = useAuth()
   const { profile } = useFamily()
   const { dark } = useDarkMode()
   const location = useLocation()
-  const navigate = useNavigate()
   const isHome = location.pathname === '/dashboard'
-  const fabHidden = HIDE_FAB_PATHS.has(location.pathname)
-  const [fabOpen, setFabOpen] = useState(false)
 
   const bg      = dark ? '#0F1A12' : '#F0EDE6'
   const navBg   = dark ? 'rgba(28,18,8,0.97)' : '#2D4A1E'
   const hdrBg   = dark ? 'rgba(28,18,8,0.95)' : '#2D4A1E'
   const border  = dark ? '#1E3A28' : 'rgba(255,255,255,0.08)'
-
-  function handleFabLink(to) {
-    setFabOpen(false)
-    navigate(to)
-  }
-
-  async function handleSignOut() {
-    setFabOpen(false)
-    try { await signOut() } catch { }
-    finally {
-      localStorage.removeItem('fc_active_context')
-      localStorage.removeItem('fc_member_owner_id')
-      window.location.href = '/login'
-    }
-  }
 
   return (
     <div style={{ background: bg }}>
@@ -155,108 +126,6 @@ export default function Layout({ children }) {
           <p style={{ fontSize: 10, color: '#D1D5DB', margin: 0 }}>© 2026 FamiliaCerca LLC</p>
         </footer>
       </main>
-
-      {/* Floating "+" button — hidden on pages with their own add button */}
-      {!fabHidden && (
-        <button
-          onClick={() => setFabOpen(v => !v)}
-          style={{
-            position: 'fixed', bottom: 82, right: 20, zIndex: 41,
-            width: 50, height: 50, borderRadius: '50%',
-            background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
-            boxShadow: '0 4px 20px rgba(74,124,89,0.45)',
-            border: 'none', cursor: 'pointer',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            transition: 'transform 0.2s',
-            transform: fabOpen ? 'rotate(45deg)' : 'rotate(0deg)',
-          }}
-          aria-label="Más opciones"
-        >
-          <Plus size={22} color="white" strokeWidth={2.5} />
-        </button>
-      )}
-
-      {/* FAB backdrop + sheet */}
-      {!fabHidden && fabOpen && (
-        <div
-          style={{
-            position: 'fixed', inset: 0, zIndex: 45,
-            background: 'rgba(0,0,0,0.45)',
-          }}
-          onClick={() => setFabOpen(false)}
-        >
-          <div
-            style={{
-              position: 'absolute', bottom: 68, left: 0, right: 0,
-              background: 'white',
-              borderRadius: '24px 24px 0 0',
-              padding: '20px 20px 28px',
-              boxShadow: '0 -8px 48px rgba(0,0,0,0.2)',
-            }}
-            onClick={e => e.stopPropagation()}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
-              <p style={{ fontFamily: 'Georgia, serif', fontSize: 16, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>
-                Acciones rápidas
-              </p>
-              <button
-                onClick={() => setFabOpen(false)}
-                aria-label="Cerrar menú rápido"
-                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4 }}
-              >
-                <XIcon size={18} color="#9CA3AF" strokeWidth={2} />
-              </button>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
-              {FAB_ITEMS.map(({ to, emoji, label }) => (
-                <button
-                  key={to}
-                  onClick={() => handleFabLink(to)}
-                  style={{
-                    display: 'flex', flexDirection: 'column', alignItems: 'center',
-                    gap: 6, padding: '14px 8px', borderRadius: 16,
-                    background: '#F7F3ED', border: '1px solid #EDE5D8',
-                    cursor: 'pointer', transition: 'all 0.15s',
-                  }}
-                >
-                  <span style={{ fontSize: 26 }}>{emoji}</span>
-                  <span style={{ fontSize: 11, fontWeight: 600, color: '#6B7280', textAlign: 'center' }}>{label}</span>
-                </button>
-              ))}
-            </div>
-
-            {/* Ver todo — link to /mas hub */}
-            <Link
-              to="/mas"
-              onClick={() => setFabOpen(false)}
-              style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                width: '100%', marginTop: 12, padding: '11px',
-                border: '1px solid #EDE5D8', borderRadius: 12,
-                background: '#FDFAF7', color: '#6B7280',
-                fontWeight: 600, fontSize: 13, textDecoration: 'none',
-              }}
-            >
-              ☰ Ver todas las funciones
-            </Link>
-
-            {/* Sign out — always visible at bottom of FAB sheet */}
-            <button
-              onClick={handleSignOut}
-              style={{
-                width: '100%', marginTop: 16, padding: '13px',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                border: '1.5px solid #FFBABA', borderRadius: 14,
-                background: '#FFF8F8', color: '#D63031',
-                fontWeight: 700, fontSize: 14, cursor: 'pointer',
-              }}
-            >
-              <LogOut size={16} color="#D63031" strokeWidth={1.75} />
-              Cerrar sesión
-            </button>
-          </div>
-        </div>
-      )}
 
       <CompanionChat />
 
