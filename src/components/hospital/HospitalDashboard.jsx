@@ -8,7 +8,7 @@ import HospitalDocumentsCard from './HospitalDocumentsCard'
 import DischargeDateCard from './DischargeDateCard'
 import MedicationsPausedCard from './MedicationsPausedCard'
 
-export default function HospitalDashboard({ onManageMode, onSOS }) {
+export default function HospitalDashboard({ onManageMode, onSOS, onVideoCall }) {
   const { hospitalMode } = useHospitalMode()
 
   return (
@@ -44,7 +44,7 @@ export default function HospitalDashboard({ onManageMode, onSOS }) {
       />
 
       {/* 8. Videollamadas */}
-      <VideoCallCard />
+      <VideoCallCard onOpen={onVideoCall} />
 
       {/* 9. Cuentas claras */}
       <QuickLink
@@ -87,41 +87,23 @@ function QuickLink({ to, emoji, title, subtitle, color, bg, border }) {
   )
 }
 
-function VideoCallCard() {
-  const options = [
-    { name: 'FaceTime', url: 'facetime://', emoji: '📱' },
-    { name: 'WhatsApp', url: 'https://wa.me/', emoji: '💚' },
-    { name: 'Zoom', url: 'https://zoom.us/join', emoji: '🎥' },
-  ]
+function VideoCallCard({ onOpen }) {
   return (
-    <div style={{
-      background: 'white', borderRadius: 16, padding: '16px 18px',
-      boxShadow: '0 2px 12px rgba(0,0,0,0.06)', border: '1px solid #F0EDE6',
-    }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-        <span style={{ fontSize: 20 }}>📹</span>
-        <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#1A1A1A' }}>
-          Videollamadas
-        </h3>
+    <button
+      onClick={onOpen}
+      style={{
+        width: '100%', background: 'white', borderRadius: 16, padding: '16px 18px',
+        boxShadow: '0 2px 12px rgba(0,0,0,0.06)', border: '1px solid #F0EDE6',
+        cursor: 'pointer', textAlign: 'left', display: 'flex', alignItems: 'center', gap: 12,
+      }}
+    >
+      <span style={{ fontSize: 28, flexShrink: 0 }}>📹</span>
+      <div style={{ flex: 1 }}>
+        <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#1A1A1A' }}>Videollamadas</p>
+        <p style={{ margin: '2px 0 0', fontSize: 12, color: '#6B7280' }}>Programar o unirse a la sala familiar</p>
       </div>
-      <div style={{ display: 'flex', gap: 8 }}>
-        {options.map(o => (
-          <a
-            key={o.name}
-            href={o.url}
-            style={{
-              flex: 1, display: 'flex', flexDirection: 'column',
-              alignItems: 'center', gap: 4, padding: '10px 8px',
-              borderRadius: 10, textDecoration: 'none',
-              background: '#F9F7F4', border: '1px solid #E5E0D8',
-            }}
-          >
-            <span style={{ fontSize: 20 }}>{o.emoji}</span>
-            <span style={{ fontSize: 11, color: '#374151', fontWeight: 600 }}>{o.name}</span>
-          </a>
-        ))}
-      </div>
-    </div>
+      <span style={{ color: '#4A7C59', fontSize: 18, flexShrink: 0 }}>›</span>
+    </button>
   )
 }
 

@@ -11,6 +11,7 @@ import TrialBanner from '../components/TrialBanner'
 import { useHospitalMode } from '../contexts/HospitalModeContext'
 import HospitalDashboard from '../components/hospital/HospitalDashboard'
 import HospitalModeModal from '../components/hospital/HospitalModeModal'
+import VideoCallScheduleModal from '../components/VideoCallScheduleModal'
 import { getLocation, mapsUrl } from '../lib/gps'
 import { track } from '../lib/analytics'
 
@@ -1616,6 +1617,7 @@ export default function Dashboard() {
   const isAdmin = memberRole === null || ownerId === user?.id
   const { isHospitalMode } = useHospitalMode()
   const [showHospitalModal, setShowHospitalModal] = useState(false)
+  const [showVideoCallModal, setShowVideoCallModal] = useState(false)
   const { refresh: refreshSub } = useSubscription()
   const [searchParams, setSearchParams] = useSearchParams()
 
@@ -2435,9 +2437,11 @@ export default function Dashboard() {
     return (
       <Layout>
         <HospitalModeModal open={showHospitalModal} onClose={() => setShowHospitalModal(false)} />
+        <VideoCallScheduleModal open={showVideoCallModal} onClose={() => setShowVideoCallModal(false)} />
         <HospitalDashboard
           onManageMode={() => setShowHospitalModal(true)}
           onSOS={prepareSOS}
+          onVideoCall={() => setShowVideoCallModal(true)}
         />
         {sosConfirming && (
           <div
@@ -2740,7 +2744,7 @@ export default function Dashboard() {
           <DashCard Icon={Users}          title="Mi equipo"           subtitle="Cuidadores y familiares"                                                                                 status="Ver equipo"     statusType="info"                to="/familia" />
 
           {/* Fila 5: Videollamada | Modo Hospital */}
-          <DashCard Icon={Camera}         title="Videollamada"        subtitle="Conectar con la familia"                                                                                 status="Próximamente"   statusType="info"                onClick={() => {}} />
+          <DashCard Icon={Camera}         title="Videollamada"        subtitle="Conectar con la familia"                                                                                 status="Programar"      statusType="info"                onClick={() => setShowVideoCallModal(true)} />
           <button
             onClick={() => setShowHospitalModal(true)}
             style={{
@@ -2891,6 +2895,7 @@ export default function Dashboard() {
       {selectedEvent && (
         <EventDetailSheet evt={selectedEvent} onClose={() => setSelectedEvent(null)} />
       )}
+      <VideoCallScheduleModal open={showVideoCallModal} onClose={() => setShowVideoCallModal(false)} />
     </Layout>
   )
 }
