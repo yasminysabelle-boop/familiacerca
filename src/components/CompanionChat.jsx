@@ -6,8 +6,9 @@ import miloLunaImg  from '../assets/companions/milo-luna.png'
 import miloAvatarImg from '../assets/companions/milo-avatar.png'
 import lunaAvatarImg from '../assets/companions/luna-avatar.png'
 
-const LS_KEY         = 'fc_companion'
+const LS_KEY         = 'fc_pet_preference'
 const LS_HISTORY_KEY = 'fc_companion_history'
+const SS_PROACTIVE   = 'fc_proactive_shown'
 
 const BASE_KNOWLEDGE = `
 Cuando el usuario pregunte sobre la app, sus funciones, precios, instalación o soporte, usa ÚNICAMENTE la información del siguiente bloque de conocimiento. Si algo no está ahí, dilo honestamente. Para preguntas emocionales o de apoyo, responde con calidez priorizando el acompañamiento humano.
@@ -35,6 +36,11 @@ const GREETINGS = {
   luna: 'Hola... Soy Luna 🌙 Aquí contigo, sin prisa. ¿Cómo te sientes?',
 }
 
+const PROACTIVE_GREETINGS = {
+  milo: '¡Hola! 🐾 ¿Cómo vas con el cuidado hoy? Aquí estoy si necesitas algo.',
+  luna: 'Hola... 🌙 ¿Todo bien por allá? Estoy aquí si quieres hablar.',
+}
+
 const QUICK_OPTIONS = [
   { emoji: '💊', label: 'Quiero agregar medicamentos' },
   { emoji: '👨‍👩‍👧', label: 'Quiero invitar a mi familia' },
@@ -57,7 +63,12 @@ const FALLBACKS = {
 // bottomOffset: px from bottom of viewport for the floating button.
 // Pass 24 on Landing (no nav bar), use default 140 inside Layout (above FAB).
 export default function CompanionChat({ bottomOffset = 140 }) {
-  const [companion,  setCompanion]  = useState(() => localStorage.getItem(LS_KEY))
+  const [companion,  setCompanion]  = useState(() => {
+    // migrate from old key
+    const old = localStorage.getItem('fc_companion')
+    if (old && !localStorage.getItem(LS_KEY)) { localStorage.setItem(LS_KEY, old) }
+    return localStorage.getItem(LS_KEY)
+  })
   const [open,       setOpen]       = useState(false)
   const [selecting,  setSelecting]  = useState(false)
   const [messages,   setMessages]   = useState(() => {
@@ -67,13 +78,37 @@ export default function CompanionChat({ bottomOffset = 140 }) {
   const [input,   setInput]   = useState('')
   const [loading, setLoading] = useState(false)
 
-  const bottomRef = useRef(null)
-  const inputRef  = useRef(null)
+  const bottomRef     = useRef(null)
+  const inputRef      = useRef(null)
+  const proactiveRef  = useRef(false)
   const cfg = companion ? COMPANIONS[companion] : null
   const { pathname } = useLocation()
 
   // Close chat on navigation
   useEffect(() => { setOpen(false) }, [pathname])
+
+  // Proactive trigger: open after 6 s on dashboard, once per session
+  useEffect(() => {
+    if (pathname !== '/dashboard') return
+    if (sessionStorage.getItem(SS_PROACTIVE)) return
+    if (proactiveRef.current) return
+
+    const timer = setTimeout(() => {
+      if (proactiveRef.current) return
+      proactiveRef.current = true
+      sessionStorage.setItem(SS_PROACTIVE, '1')
+
+      const chosen = localStorage.getItem(LS_KEY)
+      if (!chosen) {
+        setSelecting(true)
+      } else {
+        setMessages([{ role: 'companion', text: PROACTIVE_GREETINGS[chosen] }])
+        setOpen(true)
+      }
+    }, 6000)
+
+    return () => clearTimeout(timer)
+  }, [pathname])
 
   // Scroll to latest message
   useEffect(() => {
