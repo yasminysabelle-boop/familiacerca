@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
+import { usePresence } from '../contexts/PresenceContext'
 import { useSubscription } from '../contexts/SubscriptionContext'
 import { createPortalSession } from '../lib/stripe'
 import { supabase } from '../lib/supabase'
@@ -15,6 +16,7 @@ const PLAN_COLORS = { free: '#9CA3AF', familiar: '#4A7C59', care_plus: '#7C3AED'
 export default function Familia() {
   const { user, signOut } = useAuth()
   const { profile, ownerId } = useFamily()
+  const onlineIds = usePresence()
   const { sub, isPaid, isTrialing, daysLeft } = useSubscription()
   const navigate = useNavigate()
   const [members, setMembers] = useState([])
@@ -101,17 +103,13 @@ export default function Familia() {
     if (ids.length) {
       const { data: profiles } = await supabase
         .from('user_profiles')
-        .select('id, full_name, avatar_url, last_seen')
+        .select('id, full_name, avatar_url')
         .in('id', ids)
       const map = {}
       ;(profiles ?? []).forEach(p => { map[p.id] = p })
       setMemberProfiles(map)
     }
     setLoading(false)
-  }
-
-  function isOnline(mp) {
-    return mp?.last_seen && Date.now() - new Date(mp.last_seen).getTime() < 5 * 60 * 1000
   }
 
   function openModal(member, mp) {
@@ -475,7 +473,7 @@ export default function Familia() {
                 !(user?.email && m.member_email?.trim().toLowerCase() === user.email.trim().toLowerCase())
               ).map(member => {
                 const mp = memberProfiles[member.member_user_id]
-                const online = isOnline(mp)
+                const online = onlineIds.has(member.member_user_id)
                 const name = mp?.full_name ?? member.member_email?.split('@')[0] ?? '—'
                 const initials = name.charAt(0).toUpperCase()
                 const joined = member.joined_at
@@ -598,7 +596,7 @@ export default function Familia() {
       {memberModal && (() => {
         const { member, profile: mp } = memberModal
         const mc = memberContact
-        const online = mp?.last_seen && Date.now() - new Date(mp.last_seen).getTime() < 5 * 60 * 1000
+        const online = onlineIds.has(member.member_user_id)
         const name = mp?.full_name ?? member.member_email?.split('@')[0] ?? '—'
         return (
           <div

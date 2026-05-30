@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { FamilyProvider } from './contexts/FamilyContext'
 import { SubscriptionProvider } from './contexts/SubscriptionContext'
 import { DarkModeProvider } from './contexts/DarkModeContext'
+import { PresenceProvider } from './contexts/PresenceContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import WelcomeSlides from './components/WelcomeSlides'
 import Login from './pages/Login'
@@ -167,9 +168,11 @@ export default function App() {
       <AuthProvider>
         <DarkModeProvider>
           <FamilyProvider>
-            <SubscriptionProvider>
-              <AppShell />
-            </SubscriptionProvider>
+            <PresenceProvider>
+              <SubscriptionProvider>
+                <AppShell />
+              </SubscriptionProvider>
+            </PresenceProvider>
           </FamilyProvider>
         </DarkModeProvider>
       </AuthProvider>
