@@ -5,7 +5,7 @@ import { useFamily } from '../contexts/FamilyContext'
 import { useSubscription } from '../contexts/SubscriptionContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
-import { AlertTriangle, CheckIcon, User, XIcon, Pill, ClipboardCheck, Chat, Calendar, Receipt, Users, Camera, Heart, Clock, Menu } from '../components/Icons'
+import { AlertTriangle, CheckIcon, User, XIcon, Pill, ClipboardCheck, Chat, Calendar, Receipt, Users, Camera, Heart, Clock } from '../components/Icons'
 import { geminiGenerate } from '../lib/gemini'
 import TrialBanner from '../components/TrialBanner'
 import { useHospitalMode } from '../contexts/HospitalModeContext'
@@ -2757,38 +2757,6 @@ export default function Dashboard() {
           </button>
           <HospitalModeModal open={showHospitalModal} onClose={() => setShowHospitalModal(false)} />
 
-          {/* Otras funciones — ancho completo */}
-          <Link
-            to="/mas"
-            style={{
-              gridColumn: 'span 2',
-              display: 'flex', alignItems: 'center', gap: 14,
-              background: 'white', borderRadius: 16,
-              boxShadow: '0 2px 12px rgba(0,0,0,0.07)',
-              padding: '16px 18px', textDecoration: 'none',
-              WebkitTapHighlightColor: 'transparent',
-            }}
-          >
-            <div style={{
-              width: 46, height: 46, borderRadius: '50%',
-              background: 'rgba(74,124,89,0.12)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              flexShrink: 0,
-            }}>
-              <Menu size={22} color="#4A7C59" strokeWidth={1.75} />
-            </div>
-            <div style={{ flex: 1 }}>
-              <p style={{ fontSize: 15, fontWeight: 700, color: '#2d3748', margin: 0 }}>Otras funciones</p>
-              <p style={{ fontSize: 12, color: '#718096', margin: '3px 0 0' }}>Álbum, Memorias, Reportes, Directorio, Ajustes</p>
-            </div>
-            <div style={{
-              flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 4,
-              padding: '4px 10px', borderRadius: 20, background: '#F3F4F6',
-            }}>
-              <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#6B7280', flexShrink: 0 }} />
-              <span style={{ fontSize: 10, fontWeight: 700, color: '#6B7280', whiteSpace: 'nowrap' }}>Ver todo</span>
-            </div>
-          </Link>
         </div>
 
         {/* Sign out */}
