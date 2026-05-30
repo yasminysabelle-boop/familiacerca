@@ -6,47 +6,49 @@ export default function FamilySwitcher() {
   const { families, activeOwnerId, switchFamily, activeFamilyLabel, hasMultiple } = useFamily()
   const [open, setOpen] = useState(false)
 
-  if (!hasMultiple) return null
+  const patientName = activeFamilyLabel !== 'Mi familia' ? activeFamilyLabel : null
+  const displayLabel = patientName ? `Familia de ${patientName}` : 'Mi familia'
 
-  const activeEntry = families.find(f => f.ownerId === activeOwnerId)
-  const isOwn = activeEntry?.role === null
-  const roleLabel = isOwn ? 'Tu familia' : activeEntry?.role === 'cuidador' ? 'Cuidador' : 'Familiar'
-  const accentColor = isOwn ? '#4A7C59' : '#2563EB'
-  const stripBg = isOwn ? '#FDF8F0' : '#EFF6FF'
-  const stripBorder = isOwn ? '#EDE5D8' : '#BFDBFE'
-  const btnBg = isOwn ? '#EBF3EE' : '#DBEAFE'
+  if (!hasMultiple) {
+    if (!patientName) return null
+    return (
+      <span style={{
+        fontSize: 11, fontWeight: 600,
+        color: 'rgba(255,255,255,0.65)',
+        maxWidth: 110, overflow: 'hidden',
+        textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+        display: 'block',
+      }}>
+        {displayLabel}
+      </span>
+    )
+  }
 
   return (
     <>
-      <div style={{
-        position: 'sticky', top: 0, zIndex: 10,
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '8px 16px',
-        background: stripBg,
-        borderBottom: `1px solid ${stripBorder}`,
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontSize: 14 }}>{isOwn ? '🏠' : '👁'}</span>
-          <div>
-            <span style={{ fontSize: 12, fontWeight: 700, color: '#374151', display: 'block', lineHeight: 1.2 }}>
-              {activeFamilyLabel}
-            </span>
-            <span style={{ fontSize: 10, color: '#9CA3AF', lineHeight: 1.2 }}>{roleLabel}</span>
-          </div>
-        </div>
-        <button
-          onClick={() => setOpen(true)}
-          style={{
-            fontSize: 12, fontWeight: 700,
-            color: accentColor, background: btnBg,
-            border: 'none', borderRadius: 8,
-            padding: '5px 10px', cursor: 'pointer', flexShrink: 0,
-          }}
-        >
-          Cambiar ↔
-        </button>
-      </div>
+      {/* Header trigger chip */}
+      <button
+        onClick={() => setOpen(true)}
+        style={{
+          display: 'flex', alignItems: 'center', gap: 5,
+          background: 'rgba(255,255,255,0.12)',
+          border: '1px solid rgba(255,255,255,0.18)',
+          borderRadius: 20, padding: '5px 10px 5px 9px',
+          cursor: 'pointer', maxWidth: 140,
+          fontFamily: 'inherit',
+        }}
+      >
+        <span style={{
+          fontSize: 11, fontWeight: 700, color: 'white',
+          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+          lineHeight: 1.2,
+        }}>
+          {displayLabel}
+        </span>
+        <span style={{ fontSize: 7, color: 'rgba(255,255,255,0.55)', flexShrink: 0, marginTop: 1 }}>▼</span>
+      </button>
 
+      {/* Sheet */}
       {open && (
         <div
           style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.45)' }}
@@ -56,18 +58,21 @@ export default function FamilySwitcher() {
             style={{
               position: 'absolute', bottom: 0, left: 0, right: 0,
               background: 'white', borderRadius: '24px 24px 0 0',
-              padding: '20px 20px 56px',
+              padding: '22px 20px 56px',
               boxShadow: '0 -8px 48px rgba(0,0,0,0.2)',
             }}
             onClick={e => e.stopPropagation()}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <p style={{ fontFamily: 'Georgia, serif', fontSize: 16, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>
-                Cambiar familia
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+              <p style={{
+                fontFamily: 'Georgia, serif', fontSize: 17, fontWeight: 700,
+                color: '#1A1A1A', margin: 0,
+              }}>
+                Tus familias:
               </p>
               <button
                 onClick={() => setOpen(false)}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4 }}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 6 }}
               >
                 <XIcon size={18} color="#9CA3AF" strokeWidth={2} />
               </button>
@@ -77,22 +82,21 @@ export default function FamilySwitcher() {
               {families.map(fam => {
                 const isActive = fam.ownerId === activeOwnerId
                 const initials = fam.patientName?.charAt(0)?.toUpperCase() ?? '?'
-                const rl = fam.role === null ? 'Administrador' : fam.role === 'cuidador' ? 'Cuidador' : 'Familiar'
-                const rc = fam.role === null ? '#4A7C59' : fam.role === 'cuidador' ? '#2563EB' : '#6B7280'
-                const rb = fam.role === null ? '#EBF3EE' : fam.role === 'cuidador' ? '#DBEAFE' : '#F3F4F6'
+                const roleLabel = fam.role === null ? 'Administrador' : fam.role === 'cuidador' ? 'Cuidador' : 'Familiar'
+                const roleColor = fam.role === null ? '#4A7C59' : fam.role === 'cuidador' ? '#2563EB' : '#6B7280'
+                const roleBg   = fam.role === null ? '#EBF3EE' : fam.role === 'cuidador' ? '#DBEAFE' : '#F3F4F6'
+
                 return (
-                  <button
+                  <div
                     key={fam.ownerId}
-                    onClick={() => { switchFamily(fam.ownerId); setOpen(false) }}
                     style={{
                       display: 'flex', alignItems: 'center', gap: 14,
                       padding: '14px 16px', borderRadius: 16,
                       border: `1.5px solid ${isActive ? '#4A7C59' : '#EDE5D8'}`,
                       background: isActive ? '#EBF3EE' : '#FDFAF7',
-                      cursor: 'pointer', textAlign: 'left',
-                      transition: 'all 0.15s', width: '100%',
                     }}
                   >
+                    {/* Avatar */}
                     {fam.patientPhotoUrl ? (
                       <img
                         src={fam.patientPhotoUrl} alt={fam.patientName}
@@ -110,6 +114,8 @@ export default function FamilySwitcher() {
                         {initials}
                       </div>
                     )}
+
+                    {/* Info */}
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p style={{
                         fontSize: 15, fontWeight: 700, color: '#1A1A1A',
@@ -118,12 +124,38 @@ export default function FamilySwitcher() {
                       }}>
                         {fam.patientName ?? 'Mi familia'}
                       </p>
-                      <span style={{ fontSize: 10, fontWeight: 700, color: rc, background: rb, padding: '2px 8px', borderRadius: 5 }}>
-                        {rl}
+                      <span style={{
+                        fontSize: 10, fontWeight: 700,
+                        color: roleColor, background: roleBg,
+                        padding: '2px 8px', borderRadius: 5,
+                      }}>
+                        {roleLabel}
                       </span>
                     </div>
-                    {isActive && <span style={{ color: '#4A7C59', fontSize: 18, flexShrink: 0 }}>✓</span>}
-                  </button>
+
+                    {/* Action */}
+                    {isActive ? (
+                      <span style={{
+                        fontSize: 11, fontWeight: 700, color: '#4A7C59',
+                        flexShrink: 0,
+                      }}>
+                        ✓ Viendo
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => { switchFamily(fam.ownerId); setOpen(false) }}
+                        style={{
+                          padding: '8px 14px', borderRadius: 10,
+                          background: '#2D4A1E', color: 'white',
+                          border: 'none', cursor: 'pointer',
+                          fontSize: 13, fontWeight: 700,
+                          flexShrink: 0, fontFamily: 'inherit',
+                        }}
+                      >
+                        Ver →
+                      </button>
+                    )}
+                  </div>
                 )
               })}
             </div>

@@ -114,31 +114,32 @@ export default function Layout({ children }) {
           </div>
         )}
 
-        <Link to="/ajustes" aria-label="Ir a configuración" style={{ flexShrink: 0, lineHeight: 0 }}>
-          {profile?.photo_url ? (
-            <img
-              src={profile.photo_url} alt={profile.name}
-              style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover',
-                border: '2px solid rgba(255,255,255,0.3)' }}
-            />
-          ) : (
-            <div style={{
-              width: 32, height: 32, borderRadius: '50%',
-              background: 'rgba(255,255,255,0.15)', border: '2px solid rgba(255,255,255,0.25)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <User size={16} color="white" strokeWidth={1.5} />
-            </div>
-          )}
-        </Link>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+          <FamilySwitcher />
+          <Link to="/ajustes" aria-label="Ir a configuración" style={{ flexShrink: 0, lineHeight: 0 }}>
+            {profile?.photo_url ? (
+              <img
+                src={profile.photo_url} alt={profile.name}
+                style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover',
+                  border: '2px solid rgba(255,255,255,0.3)' }}
+              />
+            ) : (
+              <div style={{
+                width: 32, height: 32, borderRadius: '50%',
+                background: 'rgba(255,255,255,0.15)', border: '2px solid rgba(255,255,255,0.25)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <User size={16} color="white" strokeWidth={1.5} />
+              </div>
+            )}
+          </Link>
+        </div>
       </header>
 
       {/* Scrollable main */}
       <main style={{ position: 'fixed', inset: 0, overflowY: 'auto', top: 'calc(56px + env(safe-area-inset-top))', bottom: 68 }}>
         <InstallBanner />
         <OfflineBanner />
-
-        <FamilySwitcher />
 
         {children}
         <footer style={{ padding: '24px 16px', textAlign: 'center', borderTop: '1px solid #EDE5D8' }}>
