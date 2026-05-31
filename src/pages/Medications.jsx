@@ -139,6 +139,7 @@ export default function Medications() {
 
   // ── Stock form state ───────────────────────────────────────────────────────
   const [stockForm, setStockForm] = useState(emptyStock)
+  const [editStockRecord, setEditStockRecord] = useState(null)
 
   // ── Effects ────────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -217,6 +218,19 @@ export default function Medications() {
     } else {
       setScheduledTimes([''])
     }
+    const stock = stockByMedId[med.id] ?? null
+    setEditStockRecord(stock)
+    if (stock) {
+      setStockForm({
+        totalPills: String(stock.total_pills ?? ''),
+        renewalMethod: stock.renewal_method ?? '',
+        pharmacyName: stock.pharmacy_name ?? '',
+        refillsRemaining: stock.refills_remaining != null ? String(stock.refills_remaining) : '',
+        lastMailDate: stock.last_mail_date ?? '',
+      })
+    } else {
+      setStockForm(emptyStock)
+    }
     setEditId(med.id); setAddStep('form')
     setSaveError(null); setShowForm(true)
   }
@@ -224,7 +238,7 @@ export default function Medications() {
   function closeForm() {
     setShowForm(false); setAddStep(null); setEditId(null)
     setForm(emptyForm); setScheduledTimes(['']); setSaveError(null)
-    setStockForm(emptyStock); setAddPhotoFile(null); setAddPhotoPreview(null)
+    setStockForm(emptyStock); setEditStockRecord(null); setAddPhotoFile(null); setAddPhotoPreview(null)
     setAddAiExtracted(null); setAddAiError(''); setAddPhotoType(null)
   }
 
@@ -328,34 +342,44 @@ Return ONLY valid JSON.`
     const totalPills = parseInt(stockForm.totalPills)
     if (savedId && totalPills > 0) {
       const dosesPerDay = DOSES_PER_DAY[form.frequency] ?? 1
-      const days = Math.floor(totalPills / dosesPerDay)
+      // When editing without changing total, preserve current pills_remaining
+      const isRestocking = !editStockRecord || totalPills !== editStockRecord.total_pills
+      const pillsRemaining = isRestocking ? totalPills : (editStockRecord.pills_remaining ?? totalPills)
+      const days = Math.floor(pillsRemaining / dosesPerDay)
       const end  = new Date(); end.setDate(end.getDate() + days)
       const today = new Date().toISOString().split('T')[0]
 
-      await Promise.all([
+      const stockOps = [
         supabase.from('medication_stock').upsert({
           medication_id:  savedId,
           user_id:        ownerId,
           total_pills:    totalPills,
-          pills_remaining: totalPills,
+          pills_remaining: pillsRemaining,
           doses_per_day:  dosesPerDay,
-          start_date:     today,
+          start_date:     editStockRecord?.start_date ?? today,
           estimated_end_date: days > 0 ? end.toISOString().split('T')[0] : null,
           renewal_method: stockForm.renewalMethod || null,
           pharmacy_name:  stockForm.pharmacyName || null,
           refills_remaining: stockForm.refillsRemaining !== '' ? parseInt(stockForm.refillsRemaining) : null,
           last_mail_date: stockForm.lastMailDate || null,
-          alert_7_sent: false, alert_3_sent: false, alert_1_sent: false,
-          needs_renewal_ack: false,
+          alert_7_sent: editStockRecord?.alert_7_sent ?? false,
+          alert_3_sent: editStockRecord?.alert_3_sent ?? false,
+          alert_1_sent: editStockRecord?.alert_1_sent ?? false,
+          needs_renewal_ack: editStockRecord?.needs_renewal_ack ?? false,
           updated_at: new Date().toISOString(),
         }, { onConflict: 'medication_id,user_id' }),
-        supabase.from('medication_renewals').insert({
-          medication_id:  savedId,
-          user_id:        ownerId,
-          pill_count:     totalPills,
-          renewed_by_name: displayName,
-        }),
-      ])
+      ]
+      if (isRestocking) {
+        stockOps.push(
+          supabase.from('medication_renewals').insert({
+            medication_id:  savedId,
+            user_id:        ownerId,
+            pill_count:     totalPills,
+            renewed_by_name: displayName,
+          })
+        )
+      }
+      await Promise.all(stockOps)
     }
 
     setSaving(false)

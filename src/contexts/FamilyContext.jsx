@@ -60,11 +60,13 @@ export function FamilyProvider({ children }) {
 
         for (const m of memberships) {
           const op = profileMap[m.user_id]
+          const role = m.role ?? 'familiar'
+          localStorage.setItem('fc_member_role_' + m.user_id, role)
           built.push({
             ownerId: m.user_id,
             patientName: op?.name ?? null,
             patientPhotoUrl: op?.photo_url ?? null,
-            role: m.role ?? 'familiar',
+            role,
             profile: op ?? null,
           })
         }
@@ -84,7 +86,7 @@ export function FamilyProvider({ children }) {
                 ownerId: storedOwnerId,
                 patientName: ownerProfile.name ?? null,
                 patientPhotoUrl: ownerProfile.photo_url ?? null,
-                role: 'familiar',
+                role: localStorage.getItem('fc_member_role_' + storedOwnerId) ?? 'familiar',
                 profile: ownerProfile,
               })
               // RLS may not have propagated yet — re-verify membership after 3 s
@@ -112,16 +114,12 @@ export function FamilyProvider({ children }) {
       const stored = localStorage.getItem('fc_active_context')
       const storedValid = built.some(f => f.ownerId === stored)
 
-      if (built.length === 1) {
-        setActiveOwnerId(built[0].ownerId)
-        setNeedsSelector(false)
-      } else if (storedValid) {
+      if (storedValid) {
         setActiveOwnerId(stored)
-        setNeedsSelector(false)
       } else {
-        setActiveOwnerId(null)
-        setNeedsSelector(true)
+        setActiveOwnerId(built[0].ownerId)
       }
+      setNeedsSelector(false)
     } catch (err) {
       console.error(err)
       const fallback = [{ ownerId: user.id, patientName: null, patientPhotoUrl: null, role: null, profile: null }]

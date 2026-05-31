@@ -59,13 +59,18 @@ function AppShell() {
   const [splashDone, setSplashDone] = useState(() => !!sessionStorage.getItem('fc_logo_splash_done'))
   const [splashFading, setSplashFading] = useState(false)
 
-  // Member onboarding: shown once to family members who haven't completed it
+  // Member onboarding: shown once to family members who haven't completed it.
+  // Auth metadata is the source of truth — clears stale localStorage for re-invited users.
   const [showMemberOnboarding, setShowMemberOnboarding] = useState(false)
   useEffect(() => {
     if (!user || familyLoading) return
     const isMember = memberRole !== null
-    const notDone  = !localStorage.getItem('fc_member_onboarding_done')
-    setShowMemberOnboarding(isMember && notDone)
+    if (!isMember) { setShowMemberOnboarding(false); return }
+    const metaDone = !!user?.user_metadata?.onboarding_completed
+    if (!metaDone) {
+      localStorage.removeItem('fc_member_onboarding_done')
+    }
+    setShowMemberOnboarding(!metaDone)
   }, [user, familyLoading, memberRole])
 
   function handleOnboardingDone() {

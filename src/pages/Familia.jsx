@@ -473,11 +473,8 @@ export default function Familia() {
                 )
               })()}
 
-              {/* Invited members list — exclude current user to avoid duplicating the admin card */}
-              {members.filter(m =>
-                m.member_user_id !== user?.id &&
-                !(user?.email && m.member_email?.trim().toLowerCase() === user.email.trim().toLowerCase())
-              ).map(member => {
+              {/* All members — everyone sees the full team including themselves */}
+              {members.map(member => {
                 const mp = memberProfiles[member.member_user_id]
                 const online = onlineIds.has(member.member_user_id)
                 const name = mp?.full_name ?? member.member_email?.split('@')[0] ?? '—'
