@@ -1604,7 +1604,7 @@ function AlertDetailRow({ evt, onTap }) {
       <span style={{ fontSize: 18, flexShrink: 0 }}>{evt.resolved ? '✅' : '🚨'}</span>
       <div style={{ flex: 1, minWidth: 0 }}>
         <p style={{ fontSize: 13, fontWeight: 700, color: evt.resolved ? '#374151' : '#D63031', margin: 0 }}>
-          {evt.resolved ? 'Emergencia resuelta' : 'SOS Emergencia'}
+          {evt.resolved ? 'Emergencia resuelta' : 'SOS Familiar'}
         </p>
         <div style={{ display: 'flex', gap: 8, marginTop: 2 }}>
           {evt.triggeredBy && <span style={{ fontSize: 11, color: '#6B7280' }}>{evt.triggeredBy.split(' ')[0]}</span>}
@@ -2484,9 +2484,9 @@ export default function Dashboard() {
   const nextAppointment = sections.flatMap(s => s.events).find(e => e.type === 'APPOINTMENT') ?? null
 
   // Recent events from today (non-pending, non-AI) for "Últimas novedades"
-  const recentEvents = (todaySection?.events ?? [])
+  const recentEvents5 = (todaySection?.events ?? [])
     .filter(e => !['MED_PENDING', 'CAREGIVER_CARD'].includes(e.type))
-    .slice(0, 3)
+    .slice(0, 5)
 
   // Cuidado de hoy card status
   let careStatus, careStatusType
@@ -2768,12 +2768,12 @@ export default function Dashboard() {
           {/* Separador */}
           <div style={{ height: 1, background: 'rgba(255,255,255,0.1)', margin: '16px 0' }} />
 
-          {/* Estado del día — sobre fondo verde, sin contenedor blanco */}
+          {/* ¿Cómo estuvo hoy? */}
           <p style={{
-            fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)',
-            textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 12px',
+            fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.7)',
+            margin: '0 0 12px',
           }}>
-            Estado del día
+            ¿Cómo estuvo {(patientProfile?.nombre_completo || profile?.name)?.split(' ')[0] || 'el paciente'} hoy?
           </p>
           <div style={{ display: 'flex', gap: 8 }}>
             {MOOD_OPTIONS.map(({ mood, emoji, label, bg, border: btnBorder, shadow }) => {
@@ -2829,60 +2829,135 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* ════ 2-col grid — SOS y Otras funciones span 2 ════════════════ */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', padding: '0 16px', marginBottom: 24 }}>
-
-          {/* SOS — ancho completo */}
-          <button
-            onClick={prepareSOS}
-            onPointerDown={() => setPressedSOS(true)}
-            onPointerUp={() => setPressedSOS(false)}
-            onPointerLeave={() => setPressedSOS(false)}
-            style={{
-              gridColumn: 'span 2',
-              border: 'none', cursor: 'pointer',
-              background: '#DC2626',
-              borderRadius: 16,
-              boxShadow: pressedSOS ? 'none' : '0 3px 0px #991B1B',
-              transform: pressedSOS ? 'translateY(3px)' : 'none',
-              transition: 'transform 0.08s ease, box-shadow 0.08s ease',
-              padding: '16px 18px',
-              display: 'flex', alignItems: 'center', gap: 14,
-              WebkitTapHighlightColor: 'transparent',
-            }}
-          >
-            <div style={{
-              width: 44, height: 44, borderRadius: 12,
-              background: 'rgba(255,255,255,0.15)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              flexShrink: 0,
-            }}>
-              <AlertTriangle size={22} color="white" strokeWidth={2} />
-            </div>
-            <div style={{ flex: 1, textAlign: 'left' }}>
-              <p style={{ fontSize: 15, fontWeight: 800, color: 'white', margin: 0 }}>SOS Emergencia</p>
-              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)', margin: '3px 0 0' }}>
-                {sosSent ? 'Alerta enviada — familia notificada' : 'Toca para alertar a toda la familia'}
+        {/* ── 2 ─ Resumen del día ─────────────────────────────────────── */}
+        <div style={{
+          background: 'white', borderRadius: 20, border: '1px solid #EDE5D8',
+          padding: '16px 18px', marginBottom: 12,
+          boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
+        }}>
+          <p style={{ fontFamily: 'Georgia, serif', fontSize: 14, fontWeight: 700, color: '#1A1A1A', margin: '0 0 12px' }}>
+            Resumen del día
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ fontSize: 18, flexShrink: 0 }}>💊</span>
+              <p style={{ flex: 1, fontSize: 13, color: '#374151', margin: 0 }}>
+                {medTotal === 0
+                  ? 'Sin medicamentos configurados'
+                  : pendingCount === 0 && confirmedTodayCount >= medTotal
+                    ? `${confirmedTodayCount} de ${medTotal} medicamentos dados ✅`
+                    : `${pendingCount} medicamento${pendingCount !== 1 ? 's' : ''} pendiente${pendingCount !== 1 ? 's' : ''}`}
               </p>
             </div>
-            <div style={{
-              flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 4,
-              padding: '4px 10px', borderRadius: 20,
-              background: sosSent ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.2)',
-            }}>
-              <span style={{ width: 4, height: 4, borderRadius: '50%', background: 'white', flexShrink: 0 }} />
-              <span style={{ fontSize: 10, fontWeight: 700, color: 'white', whiteSpace: 'nowrap' }}>
-                {sosSent ? 'Enviada' : 'Urgente'}
-              </span>
+            {nextAppointment && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span style={{ fontSize: 18, flexShrink: 0 }}>📅</span>
+                <p style={{ flex: 1, fontSize: 13, color: '#374151', margin: 0 }}>
+                  {nextAppointment.appointmentTitle ?? 'Próxima cita médica'}
+                </p>
+              </div>
+            )}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ fontSize: 18, flexShrink: 0 }}>👤</span>
+              <p style={{ flex: 1, fontSize: 13, color: '#374151', margin: 0 }}>
+                Cuida hoy: <strong>{todayShift?.caregiver_name ?? firstName}</strong>
+              </p>
             </div>
-          </button>
+          </div>
+        </div>
+
+        {/* ── 3 ─ Actividad reciente (máx. 5) ────────────────────────── */}
+        {recentEvents5.length > 0 && (
+          <div style={{
+            background: 'white', borderRadius: 20, border: '1px solid #EDE5D8',
+            padding: '16px 18px', marginBottom: 12,
+            boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
+          }}>
+            <p style={{ fontFamily: 'Georgia, serif', fontSize: 14, fontWeight: 700, color: '#1A1A1A', margin: '0 0 12px' }}>
+              Actividad reciente
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              {recentEvents5.map((evt, i) => {
+                const actIcon = { MED_CONFIRMED: '💊', APPOINTMENT: '📅', VOICE_MEMORY: '🎙️', PHOTO: '📸', NOTE: '📝', EXPENSE: '💰', SOS_ALERT: '🚨', APPOINTMENT_PROOF: '📋' }[evt.type] ?? '📋'
+                const actLabel = {
+                  MED_CONFIRMED: evt.name ?? 'Medicamento dado',
+                  APPOINTMENT: evt.appointmentTitle ?? 'Cita médica',
+                  VOICE_MEMORY: 'Memoria de voz',
+                  PHOTO: evt.caption ?? 'Foto familiar',
+                  NOTE: evt.title ?? (evt.noteText?.slice(0, 40) ?? 'Nota'),
+                  EXPENSE: `$${evt.amount ?? ''} ${evt.description ?? ''}`.trim(),
+                  SOS_ALERT: 'Alerta SOS',
+                  APPOINTMENT_PROOF: 'Comprobante de cita',
+                }[evt.type] ?? evt.type
+                const evtTime = evt.timestamp ? fmtTimestamp(evt.timestamp) : null
+                return (
+                  <div key={evt.id ?? i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: i < recentEvents5.length - 1 ? '1px solid #F5EEE6' : 'none' }}>
+                    <span style={{ fontSize: 16, flexShrink: 0 }}>{actIcon}</span>
+                    <p style={{ flex: 1, fontSize: 13, color: '#374151', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {actLabel}
+                    </p>
+                    {evtTime && <span style={{ fontSize: 11, color: '#9CA3AF', flexShrink: 0 }}>{evtTime}</span>}
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* ── 4 ─ SOS Familiar — siempre visible ──────────────────────── */}
+        <button
+          onClick={prepareSOS}
+          onPointerDown={() => setPressedSOS(true)}
+          onPointerUp={() => setPressedSOS(false)}
+          onPointerLeave={() => setPressedSOS(false)}
+          style={{
+            width: '100%', marginBottom: 12,
+            border: 'none', cursor: 'pointer',
+            background: '#DC2626',
+            borderRadius: 16,
+            boxShadow: pressedSOS ? 'none' : '0 3px 0px #991B1B',
+            transform: pressedSOS ? 'translateY(3px)' : 'none',
+            transition: 'transform 0.08s ease, box-shadow 0.08s ease',
+            padding: '16px 18px',
+            display: 'flex', alignItems: 'center', gap: 14,
+            WebkitTapHighlightColor: 'transparent',
+          }}
+        >
+          <div style={{
+            width: 44, height: 44, borderRadius: 12,
+            background: 'rgba(255,255,255,0.15)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            flexShrink: 0,
+          }}>
+            <AlertTriangle size={22} color="white" strokeWidth={2} />
+          </div>
+          <div style={{ flex: 1, textAlign: 'left' }}>
+            <p style={{ fontSize: 15, fontWeight: 800, color: 'white', margin: 0 }}>SOS Familiar</p>
+            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)', margin: '3px 0 0' }}>
+              {sosSent ? 'Alerta enviada — familia notificada' : 'Toca para alertar a toda la familia'}
+            </p>
+          </div>
+          <div style={{
+            flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 4,
+            padding: '4px 10px', borderRadius: 20,
+            background: sosSent ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.2)',
+          }}>
+            <span style={{ width: 4, height: 4, borderRadius: '50%', background: 'white', flexShrink: 0 }} />
+            <span style={{ fontSize: 10, fontWeight: 700, color: 'white', whiteSpace: 'nowrap' }}>
+              {sosSent ? 'Enviada' : 'Urgente'}
+            </span>
+          </div>
+        </button>
+
+        {/* ════ Atajos rápidos ════════════════════════════════════════════ */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', padding: '0 16px', marginBottom: 24 }}>
 
           {/* Fila 1: Medicamentos | Rutinas de hoy */}
           <DashCard Icon={Pill}           title="Medicamentos"       subtitle={medCardSubtitle}                                                                                         status={medCardStatus}  statusType={medCardStatusType}  to="/hoy" />
           <DashCard Icon={ClipboardCheck} title="Rutinas de hoy"     subtitle={medTotal > 0 ? `${medTotal} med${medTotal !== 1 ? 's' : ''} programados` : 'Rutina diaria'}              status={careStatus}     statusType={careStatusType}     to="/cuidado" />
 
-          {/* Fila 2: Historial | Mensajes */}
-          <DashCard Icon={Clock}          title="Historial"           subtitle="Registro completo de cuidado"                                                            status="Ver historial"  statusType="info"               to="/historial" />
+          {/* Fila 2: Registros de cuidado | Mensajes */}
+          <DashCard Icon={Clock}          title="Registros de cuidado" subtitle="Historial completo de cuidado"                                                          status="Ver registros"  statusType="info"               to="/historial" />
           <DashCard Icon={Chat}           title="Mensajes"            subtitle="Chat con el equipo familiar"                                                                            status="Ver mensajes"   statusType="info"                to="/chat" />
 
           {/* Fila 3: Citas médicas | Cuentas Claras */}
@@ -2900,8 +2975,8 @@ export default function Dashboard() {
           <DashCard Icon={User}           title={`Perfil de ${profile?.name?.split(' ')[0] ?? 'paciente'}`} subtitle="Diagnósticos y alergias"                                          status="Ver perfil"     statusType="info"                to="/paciente/perfil" />
           <DashCard Icon={Users}          title="Equipo de cuidado"   subtitle="Cuidadores y familiares"                                                                                 status="Ver equipo"     statusType="info"                to="/familia" />
 
-          {/* Fila 5: Diario Médico | Videollamada */}
-          <DashCard Icon={BookOpen} title="Diario Médico"  subtitle="Historia clínica con IA"    status="Ver diario"  statusType="info" to="/diario-medico" />
+          {/* Fila 5: Notas Médicas IA | Videollamada */}
+          <DashCard Icon={BookOpen} title="Notas Médicas IA"  subtitle="Historia clínica con IA"    status="Ver notas"  statusType="info" to="/diario-medico" />
           <VideoCallDashCard
             onInstant={handleInstantCall}
             onSchedule={() => setShowVideoCallModal(true)}

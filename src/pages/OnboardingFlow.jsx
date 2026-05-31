@@ -513,15 +513,21 @@ export default function OnboardingFlow() {
           </>
         )}
 
-        {/* ── PASO 3 ── */}
+        {/* ── PASO 3 — Celebración ── */}
         {step === 3 && (
           <>
-            <p style={{ fontSize: 26, fontWeight: 800, color: '#1A1A1A', fontFamily: 'Georgia, serif', lineHeight: 1.25, margin: '0 0 6px' }}>
-              Invita a un familiar
-            </p>
-            <p style={{ fontSize: 14, color: '#718096', margin: '0 0 32px' }}>
-              Cuiden juntos — comparte el acceso a FamiliaCerca.
-            </p>
+            {/* Encabezado de celebración con nombre del paciente */}
+            <div style={{ textAlign: 'center', marginBottom: 28 }}>
+              <div style={{ fontSize: 52, marginBottom: 12, lineHeight: 1 }}>🎉</div>
+              <p style={{ fontSize: 26, fontWeight: 800, color: '#1A1A1A', fontFamily: 'Georgia, serif', lineHeight: 1.25, margin: '0 0 8px' }}>
+                {patientName.trim()
+                  ? `${patientName.trim().split(' ')[0]} ya está protegido.`
+                  : '¡Todo listo!'}
+              </p>
+              <p style={{ fontSize: 14, color: '#718096', margin: 0, lineHeight: 1.5 }}>
+                Tu equipo de cuidado está listo para comenzar.
+              </p>
+            </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {/* WhatsApp */}
@@ -539,7 +545,7 @@ export default function OnboardingFlow() {
                   fontFamily: 'inherit',
                 }}
               >
-                <span style={{ fontSize: 20 }}>💬</span> Compartir por WhatsApp
+                <span style={{ fontSize: 20 }}>💬</span> Invitar al equipo por WhatsApp
               </button>
 
               {/* Copy link */}
@@ -554,13 +560,13 @@ export default function OnboardingFlow() {
                   fontFamily: 'inherit',
                 }}
               >
-                {copied ? '✓ ¡Copiado!' : '🔗 Copiar link'}
+                {copied ? '✓ ¡Copiado!' : '🔗 Copiar enlace de invitación'}
               </button>
 
               {/* Finish */}
               <div style={{ marginTop: 8 }}>
                 <PrimaryBtn onClick={finish} pressed={pressed} onPD={pd} onPU={pu} onPL={pu}>
-                  Terminar y entrar a la app →
+                  Ir al panel principal →
                 </PrimaryBtn>
               </div>
             </div>

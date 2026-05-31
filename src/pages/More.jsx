@@ -17,7 +17,7 @@ const MORE_SECTIONS = [
   {
     label: 'Gestión del cuidado',
     items: [
-      { to: '/diario-medico', Icon: BookOpen, label: 'Diario Médico', desc: 'Historia clínica con IA — voz y foto', color: '#2D4A1E' },
+      { to: '/diario-medico', Icon: BookOpen, label: 'Notas Médicas IA', desc: 'Historia clínica con IA — voz y foto', color: '#2D4A1E' },
     ],
   },
   {

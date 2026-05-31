@@ -20,8 +20,8 @@ const PAGE_TITLES = {
   '/diario-voz':     'Memorias de voz',
   '/familia':        'Mi Familia',
   '/medications':    'Medicamentos',
-  '/historial':      'Historial de cuidado',
-  '/diario-medico':  'Diario Médico',
+  '/historial':      'Registros de cuidado',
+  '/diario-medico':  'Notas Médicas IA',
   '/calendar':       'Citas médicas',
   '/notes':          'Notas',
   '/chat':           'Mensajes',
@@ -33,7 +33,7 @@ const PAGE_TITLES = {
   '/permisos':       'Permisos',
   '/ajustes':        'Mi Cuenta',
   '/pricing':        'Planes',
-  '/paciente/perfil':'Perfil del paciente',
+  '/paciente/perfil': 'Perfil del paciente',
   '/videollamada':   'Videollamada',
 }
 
@@ -129,7 +129,9 @@ export default function Layout({ children }) {
               fontFamily: 'Georgia, serif', margin: 0,
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
             }}>
-              {PAGE_TITLES[location.pathname] ?? ''}
+              {location.pathname === '/paciente/perfil' && profile?.name
+                ? `Perfil de ${profile.name.split(' ')[0]}`
+                : PAGE_TITLES[location.pathname] ?? ''}
             </h1>
           </div>
         ) : (

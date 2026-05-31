@@ -239,7 +239,7 @@ export default function DiarioMedico() {
             <span style={{ fontSize: 28 }}>📓</span>
             <div>
               <p style={{ margin: 0, fontSize: 18, fontWeight: 800, color: 'white', fontFamily: 'Georgia, serif' }}>
-                Diario Médico
+                Notas Médicas IA
               </p>
               <p style={{ margin: '3px 0 0', fontSize: 12, color: 'rgba(255,255,255,0.55)' }}>
                 Historia clínica del cuidado familiar
