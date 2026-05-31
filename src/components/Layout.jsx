@@ -2,7 +2,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import Logo from './Logo'
-import { Home, Users, User, Menu, Settings, ChevronLeft } from './Icons'
+import { Home, Users, User, Settings, ChevronLeft } from './Icons'
 import Paywall from './Paywall'
 import InstallBanner from './InstallBanner'
 import OfflineBanner from './OfflineBanner'
@@ -37,12 +37,11 @@ const PAGE_TITLES = {
   '/videollamada':   'Videollamada',
 }
 
-const PRIMARY_PAGES = new Set(['/dashboard', '/familia', '/mas', '/ajustes'])
+const PRIMARY_PAGES = new Set(['/dashboard', '/familia', '/ajustes'])
 
 const BOTTOM_TABS = [
   { to: '/dashboard', Icon: Home,     label: 'Inicio' },
   { to: '/familia',   Icon: Users,    label: 'Familia' },
-  { to: '/mas',       Icon: Menu,     label: 'Más' },
   { to: '/ajustes',   Icon: Settings, label: 'Ajustes' },
 ]
 
@@ -239,8 +238,7 @@ export default function Layout({ children }) {
         }}
       >
         {BOTTOM_TABS.map(({ to, Icon, label }) => {
-          const isActive = location.pathname === to ||
-            (to === '/mas' && location.pathname.startsWith('/mas'))
+          const isActive = location.pathname === to
           return (
             <Link
               key={to}

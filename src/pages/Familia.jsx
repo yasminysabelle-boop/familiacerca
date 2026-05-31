@@ -582,6 +582,42 @@ export default function Familia() {
           <span style={{ color: '#D1D5DB', fontSize: 18 }}>›</span>
         </Link>
 
+        {/* Memorias y reportes */}
+        <div style={{
+          background: 'white', borderRadius: 16, border: '1px solid #EDE5D8',
+          overflow: 'hidden', marginBottom: 12,
+          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+        }}>
+          {[
+            { to: '/album',    icon: '📸', label: 'Álbum familiar',  desc: 'Fotos y videos de momentos especiales' },
+            { to: '/memorias', icon: '🎙️', label: 'Memorias',        desc: 'Diario de voz familiar' },
+            { to: '/reportes', icon: '📊', label: 'Reportes',        desc: 'Análisis semanal y PDF médico' },
+          ].map(({ to, icon, label, desc }, i, arr) => (
+            <Link
+              key={to}
+              to={to}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 12,
+                padding: '14px 16px', textDecoration: 'none',
+                borderBottom: i < arr.length - 1 ? '1px solid #F5EEE6' : 'none',
+              }}
+            >
+              <div style={{
+                width: 38, height: 38, borderRadius: 10, flexShrink: 0,
+                background: '#F0F8F4', display: 'flex', alignItems: 'center',
+                justifyContent: 'center', fontSize: 18,
+              }}>
+                {icon}
+              </div>
+              <div style={{ flex: 1 }}>
+                <p style={{ fontSize: 14, fontWeight: 600, color: '#1A1A1A', margin: '0 0 1px' }}>{label}</p>
+                <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>{desc}</p>
+              </div>
+              <span style={{ color: '#D1D5DB', fontSize: 18 }}>›</span>
+            </Link>
+          ))}
+        </div>
+
         {/* Sign out */}
         <button
           onClick={handleSignOut}

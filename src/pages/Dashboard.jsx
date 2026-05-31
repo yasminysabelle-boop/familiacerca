@@ -5,7 +5,7 @@ import { useFamily } from '../contexts/FamilyContext'
 import { useSubscription } from '../contexts/SubscriptionContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
-import { AlertTriangle, CheckIcon, User, XIcon, Pill, ClipboardCheck, Chat, Calendar, Receipt, Users, Camera, Heart, Clock } from '../components/Icons'
+import { AlertTriangle, CheckIcon, User, XIcon, Pill, ClipboardCheck, Chat, Calendar, Receipt, Users, Camera, Heart, Clock, BookOpen } from '../components/Icons'
 import { geminiGenerate } from '../lib/gemini'
 import TrialBanner from '../components/TrialBanner'
 import { useHospitalMode } from '../contexts/HospitalModeContext'
@@ -2840,7 +2840,8 @@ export default function Dashboard() {
           <DashCard Icon={User}           title="Perfil del paciente" subtitle="Diagnósticos y alergias"                                                                                 status="Ver perfil"     statusType="info"                to="/paciente/perfil" />
           <DashCard Icon={Users}          title="Mi equipo"           subtitle="Cuidadores y familiares"                                                                                 status="Ver equipo"     statusType="info"                to="/familia" />
 
-          {/* Fila 5: Videollamada | Modo Hospital */}
+          {/* Fila 5: Diario Médico | Videollamada */}
+          <DashCard Icon={BookOpen} title="Diario Médico"  subtitle="Historia clínica con IA"    status="Ver diario"  statusType="info" to="/diario-medico" />
           <VideoCallDashCard
             onInstant={handleInstantCall}
             onSchedule={() => setShowVideoCallModal(true)}
