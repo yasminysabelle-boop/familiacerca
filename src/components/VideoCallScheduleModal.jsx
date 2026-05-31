@@ -33,6 +33,9 @@ export default function VideoCallScheduleModal({ open, onClose }) {
   const [upcomingCalls, setUpcomingCalls] = useState([])
   const [loadingCalls, setLoadingCalls] = useState(false)
 
+  const [startingInstant, setStartingInstant] = useState(false)
+  const [instantError, setInstantError] = useState('')
+
   // Form state
   const [title, setTitle] = useState('')
   const [date, setDate] = useState('')
@@ -131,6 +134,27 @@ export default function VideoCallScheduleModal({ open, onClose }) {
     navigate(`/videollamada?id=${call.id}`)
   }
 
+  async function handleInstantCall() {
+    if (!ownerId || startingInstant) return
+    setStartingInstant(true)
+    setInstantError('')
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      const res = await fetch(SERVICE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+        body: JSON.stringify({ ownerId, title: 'Llamada ahora', scheduledAt: new Date().toISOString(), participants: 'all' }),
+      })
+      const body = await res.json()
+      if (!res.ok) throw new Error(body.error ?? 'Error al iniciar')
+      onClose()
+      navigate(`/videollamada?id=${body.callId}`)
+    } catch (err) {
+      setInstantError(err.message)
+      setStartingInstant(false)
+    }
+  }
+
   if (!open) return null
 
   const minDate = new Date().toISOString().slice(0, 10)
@@ -147,6 +171,7 @@ export default function VideoCallScheduleModal({ open, onClose }) {
       }}
       onClick={e => { if (e.target === e.currentTarget) onClose() }}
     >
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       <div style={{
         width: '100%', maxWidth: 480,
         background: 'white', borderRadius: '24px 24px 0 0',
@@ -195,7 +220,44 @@ export default function VideoCallScheduleModal({ open, onClose }) {
 
         {/* ─── VIEW: LISTA ─── */}
         {view === 'list' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+
+            {/* Botón principal — llamada instantánea */}
+            <button
+              onClick={handleInstantCall}
+              disabled={startingInstant}
+              style={{
+                width: '100%', padding: '15px', borderRadius: 16, border: 'none',
+                background: startingInstant
+                  ? '#9CA3AF'
+                  : 'linear-gradient(135deg, #4A7C59, #2D6A4F)',
+                color: 'white', fontWeight: 800, fontSize: 15,
+                cursor: startingInstant ? 'default' : 'pointer',
+                boxShadow: startingInstant ? 'none' : '0 6px 20px rgba(74,124,89,0.35)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+                transition: 'all 0.2s',
+              }}
+            >
+              {startingInstant ? (
+                <>
+                  <div style={{ width: 16, height: 16, border: '2px solid rgba(255,255,255,0.5)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
+                  Iniciando...
+                </>
+              ) : '📹 Iniciar llamada ahora'}
+            </button>
+
+            {instantError && (
+              <p style={{ margin: 0, fontSize: 12, color: '#DC2626', padding: '8px 12px', borderRadius: 8, background: '#FEF2F2' }}>
+                {instantError}
+              </p>
+            )}
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ flex: 1, height: 1, background: '#E5E7EB' }} />
+              <span style={{ fontSize: 11, color: '#9CA3AF', fontWeight: 600 }}>PROGRAMADAS</span>
+              <div style={{ flex: 1, height: 1, background: '#E5E7EB' }} />
+            </div>
+
             {loadingCalls && (
               <p style={{ textAlign: 'center', color: '#9CA3AF', fontSize: 13 }}>Cargando...</p>
             )}

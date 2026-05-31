@@ -1388,6 +1388,77 @@ function DashCard({ Icon, title, subtitle, status, statusType, to, onClick }) {
   )
 }
 
+function VideoCallDashCard({ onInstant, onSchedule, starting, error }) {
+  const [pressed, setPressed] = useState(false)
+  return (
+    <div
+      style={{
+        background: 'white', borderRadius: 16,
+        border: '0.5px solid #E8E4DC',
+        boxShadow: '0 2px 0px #E0DBD2',
+        padding: '14px 12px',
+        display: 'flex', flexDirection: 'column', gap: 8,
+        boxSizing: 'border-box', minHeight: 130,
+      }}
+    >
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div style={{
+          width: 40, height: 40, borderRadius: 10,
+          background: '#EAF0E6',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          flexShrink: 0,
+        }}>
+          <Camera size={20} color="#4A7C59" strokeWidth={1.75} />
+        </div>
+      </div>
+      <div style={{ flex: 1 }}>
+        <p style={{ fontSize: 14, fontWeight: 700, color: '#2d3748', margin: 0, lineHeight: 1.25 }}>Videollamada</p>
+        <p style={{ fontSize: 12, color: '#718096', margin: '4px 0 0' }}>Conectar con la familia</p>
+      </div>
+      <button
+        onClick={onInstant}
+        disabled={starting}
+        onPointerDown={() => !starting && setPressed(true)}
+        onPointerUp={() => setPressed(false)}
+        onPointerLeave={() => setPressed(false)}
+        style={{
+          width: '100%', padding: '8px 0', borderRadius: 10, border: 'none',
+          background: starting ? '#C0CCC5' : 'linear-gradient(135deg, #4A7C59, #3A6347)',
+          color: 'white', fontWeight: 700, fontSize: 12,
+          cursor: starting ? 'default' : 'pointer',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
+          transform: pressed ? 'translateY(1px)' : 'none',
+          boxShadow: starting ? 'none' : '0 3px 10px rgba(74,124,89,0.3)',
+          transition: 'all 0.1s',
+          WebkitTapHighlightColor: 'transparent',
+        }}
+      >
+        {starting ? (
+          <>
+            <div style={{ width: 10, height: 10, border: '2px solid rgba(255,255,255,0.5)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
+            Iniciando...
+          </>
+        ) : '📹 Iniciar ahora'}
+      </button>
+      <button
+        onClick={onSchedule}
+        style={{
+          background: 'none', border: 'none', cursor: 'pointer',
+          fontSize: 11, color: '#9CA3AF', padding: 0, textAlign: 'center',
+          WebkitTapHighlightColor: 'transparent',
+        }}
+      >
+        Ver programadas →
+      </button>
+      {error && (
+        <p style={{ fontSize: 10, color: '#DC2626', margin: 0, textAlign: 'center', lineHeight: 1.3 }}>
+          {error}
+        </p>
+      )}
+    </div>
+  )
+}
+
 // ── Care Day Detail components ────────────────────────────────────────────────
 
 function CareDaySection({ title, emoji, count, children }) {
@@ -1613,11 +1684,14 @@ function CareDayDetail({ section, todayKey, confirming, onConfirm, isFamiliar, o
 export default function Dashboard() {
   const { user, signOut } = useAuth()
   const { profile, ownerId, memberRole } = useFamily()
+  const navigate = useNav()
   const isFamiliar = memberRole === 'familiar'
   const isAdmin = memberRole === null || ownerId === user?.id
   const { isHospitalMode } = useHospitalMode()
   const [showHospitalModal, setShowHospitalModal] = useState(false)
   const [showVideoCallModal, setShowVideoCallModal] = useState(false)
+  const [startingInstantCall, setStartingInstantCall] = useState(false)
+  const [instantCallError, setInstantCallError] = useState('')
   const { refresh: refreshSub } = useSubscription()
   const [searchParams, setSearchParams] = useSearchParams()
 
@@ -2286,6 +2360,29 @@ export default function Dashboard() {
     setConfirming(null)
   }
 
+  async function handleInstantCall() {
+    if (!ownerId || startingInstantCall) return
+    setStartingInstantCall(true)
+    setInstantCallError('')
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-daily-room`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+          body: JSON.stringify({ ownerId, title: 'Llamada ahora', scheduledAt: new Date().toISOString(), participants: 'all' }),
+        }
+      )
+      const body = await res.json()
+      if (!res.ok) throw new Error(body.error ?? 'Error al iniciar')
+      navigate(`/videollamada?id=${body.callId}`)
+    } catch (err) {
+      setInstantCallError(err.message)
+      setStartingInstantCall(false)
+    }
+  }
+
   async function prepareSOS() {
     setSosConfirming(true)
     const loc = await getLocation()
@@ -2744,7 +2841,12 @@ export default function Dashboard() {
           <DashCard Icon={Users}          title="Mi equipo"           subtitle="Cuidadores y familiares"                                                                                 status="Ver equipo"     statusType="info"                to="/familia" />
 
           {/* Fila 5: Videollamada | Modo Hospital */}
-          <DashCard Icon={Camera}         title="Videollamada"        subtitle="Conectar con la familia"                                                                                 status="Programar"      statusType="info"                onClick={() => setShowVideoCallModal(true)} />
+          <VideoCallDashCard
+            onInstant={handleInstantCall}
+            onSchedule={() => setShowVideoCallModal(true)}
+            starting={startingInstantCall}
+            error={instantCallError}
+          />
           <button
             onClick={() => setShowHospitalModal(true)}
             style={{

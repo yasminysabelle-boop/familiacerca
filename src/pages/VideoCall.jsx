@@ -3,6 +3,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useFamily } from '../contexts/FamilyContext'
 
+const SERVICE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-daily-room`
+
 function fmtScheduled(isoStr) {
   if (!isoStr) return ''
   return new Date(isoStr).toLocaleString('es-MX', {
@@ -23,10 +25,33 @@ export default function VideoCall() {
   const [joined, setJoined] = useState(false)
   const [permStatus, setPermStatus] = useState('idle') // 'idle' | 'requesting' | 'granted' | 'denied'
 
+  const [startingInstant, setStartingInstant] = useState(false)
+  const [instantError, setInstantError] = useState('')
+
   useEffect(() => {
-    if (!callId) { navigate('/dashboard', { replace: true }); return }
+    if (!callId) return
     load()
   }, [callId])
+
+  async function handleInstantCall() {
+    if (!ownerId || startingInstant) return
+    setStartingInstant(true)
+    setInstantError('')
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      const res = await fetch(SERVICE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+        body: JSON.stringify({ ownerId, title: 'Llamada ahora', scheduledAt: new Date().toISOString(), participants: 'all' }),
+      })
+      const body = await res.json()
+      if (!res.ok) throw new Error(body.error ?? 'Error al iniciar')
+      navigate(`/videollamada?id=${body.callId}`, { replace: true })
+    } catch (err) {
+      setInstantError(err.message)
+      setStartingInstant(false)
+    }
+  }
 
   async function load() {
     setLoading(true)
@@ -41,6 +66,94 @@ export default function VideoCall() {
       setCall(data)
     }
     setLoading(false)
+  }
+
+  // No callId — pantalla de inicio rápido
+  if (!callId) {
+    return (
+      <div style={{ position: 'fixed', inset: 0, background: '#0A0A0A', display: 'flex', flexDirection: 'column' }}>
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 12,
+          padding: '12px 16px',
+          paddingTop: 'calc(12px + env(safe-area-inset-top))',
+          background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)',
+        }}>
+          <button
+            onClick={() => navigate('/dashboard')}
+            style={{
+              width: 36, height: 36, borderRadius: '50%', border: 'none',
+              background: 'rgba(255,255,255,0.15)', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 18, color: 'white', flexShrink: 0,
+            }}
+          >
+            ←
+          </button>
+          <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: 'white' }}>Videollamada</p>
+        </div>
+
+        <div style={{
+          flex: 1, display: 'flex', flexDirection: 'column',
+          alignItems: 'center', justifyContent: 'center',
+          gap: 24, padding: '32px 24px',
+        }}>
+          <span style={{ fontSize: 72 }}>📹</span>
+
+          <div style={{ textAlign: 'center' }}>
+            <p style={{ color: 'white', fontSize: 22, fontWeight: 800, fontFamily: 'Georgia, serif', margin: '0 0 8px' }}>
+              Videollamada familiar
+            </p>
+            <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 14, margin: 0 }}>
+              La sala se abre al instante para toda la familia
+            </p>
+          </div>
+
+          {instantError && (
+            <div style={{
+              padding: '12px 16px', borderRadius: 12, maxWidth: 320,
+              background: 'rgba(220,38,38,0.2)', border: '1px solid rgba(220,38,38,0.4)',
+            }}>
+              <p style={{ color: '#FCA5A5', fontSize: 13, fontWeight: 600, margin: 0 }}>{instantError}</p>
+            </div>
+          )}
+
+          <button
+            onClick={handleInstantCall}
+            disabled={startingInstant}
+            style={{
+              padding: '16px 40px', borderRadius: 20, border: 'none',
+              background: startingInstant
+                ? 'rgba(255,255,255,0.2)'
+                : 'linear-gradient(135deg, #4A7C59, #2D6A4F)',
+              color: 'white', fontWeight: 800, fontSize: 16,
+              cursor: startingInstant ? 'default' : 'pointer',
+              boxShadow: startingInstant ? 'none' : '0 8px 32px rgba(74,124,89,0.4)',
+              display: 'flex', alignItems: 'center', gap: 10,
+            }}
+          >
+            {startingInstant ? (
+              <>
+                <div style={{
+                  width: 18, height: 18, border: '2px solid white',
+                  borderTopColor: 'transparent', borderRadius: '50%',
+                  animation: 'spin 0.7s linear infinite',
+                }} />
+                Iniciando...
+              </>
+            ) : '📹 Iniciar llamada ahora'}
+          </button>
+
+          <button
+            onClick={() => navigate('/dashboard')}
+            style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.45)', fontSize: 13, cursor: 'pointer' }}
+          >
+            Volver al inicio
+          </button>
+        </div>
+
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    )
   }
 
   if (loading) {
