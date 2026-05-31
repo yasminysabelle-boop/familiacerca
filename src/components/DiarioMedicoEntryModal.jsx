@@ -5,9 +5,8 @@ import { useFamily } from '../contexts/FamilyContext'
 import { useSpeechToText } from '../hooks/useSpeechToText'
 import VoiceInput from './VoiceInput'
 
-const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages'
-const API_KEY       = import.meta.env.VITE_ANTHROPIC_API_KEY
-const MODEL         = 'claude-sonnet-4-6'
+const CLAUDE_PROXY = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/claude-proxy`
+const MODEL        = 'claude-sonnet-4-6'
 
 const PHOTO_TYPES = [
   { value: 'receta',       label: '💊 Receta' },
@@ -41,13 +40,12 @@ function toBase64(file) {
 }
 
 async function callClaude(messages, maxTokens = 1024) {
-  const res = await fetch(ANTHROPIC_URL, {
+  const { data: { session } } = await supabase.auth.getSession()
+  const res = await fetch(CLAUDE_PROXY, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-api-key': API_KEY,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true',
+      'Authorization': `Bearer ${session?.access_token}`,
     },
     body: JSON.stringify({ model: MODEL, max_tokens: maxTokens, messages }),
   })

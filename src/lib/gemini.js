@@ -1,10 +1,14 @@
-const ANTHROPIC_ENDPOINT = 'https://api.anthropic.com/v1/messages'
-const API_KEY = import.meta.env.VITE_ANTHROPIC_API_KEY
+import { supabase } from './supabase'
+
+const CLAUDE_PROXY = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/claude-proxy`
 
 export async function geminiGenerate() { return null }
 
 export async function geminiChat(systemPrompt, history, text, maxTokens = 300) {
   try {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) return null
+
     const messages = [
       ...history.map(m => ({
         role: m.role === 'user' ? 'user' : 'assistant',
@@ -13,13 +17,11 @@ export async function geminiChat(systemPrompt, history, text, maxTokens = 300) {
       { role: 'user', content: text }
     ]
 
-    const res = await fetch(ANTHROPIC_ENDPOINT, {
+    const res = await fetch(CLAUDE_PROXY, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': API_KEY,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
+        'Authorization': `Bearer ${session.access_token}`,
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-5',
@@ -29,9 +31,8 @@ export async function geminiChat(systemPrompt, history, text, maxTokens = 300) {
       })
     })
 
-    const data = await res.json()
-    console.log('[Claude] status:', res.status, '| response:', JSON.stringify(data, null, 2))
     if (!res.ok) return null
+    const data = await res.json()
     return data.content?.[0]?.text?.trim() ?? null
   } catch (e) {
     console.error('[Claude] fetch error:', e)

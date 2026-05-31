@@ -37,9 +37,8 @@ const RENEWAL_METHODS = [
   { value: 'manual',       label: '✍️ Lo agrego solo' },
 ]
 
-const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages'
-const AI_KEY        = import.meta.env.VITE_ANTHROPIC_API_KEY
-const AI_MODEL      = 'claude-sonnet-4-6'
+const CLAUDE_PROXY = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/claude-proxy`
+const AI_MODEL     = 'claude-sonnet-4-6'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -257,7 +256,8 @@ export default function Medications() {
   async function processPhoto(file, type) {
     setAddStep('ai-processing')
     setAddAiError('')
-    if (!AI_KEY) {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) {
       setAddAiError('Función no disponible. Ingresa los datos manualmente.')
       setAddStep('form')
       return
@@ -273,13 +273,11 @@ Return ONLY valid JSON.`
 {"name":"medication name","dosage":"strength and form","frequency":"one of: once_daily|twice_daily|three_daily|every_8h|every_12h|as_needed|weekly","total_pills":number_or_null,"notes":"doctor instructions or null"}
 Return ONLY valid JSON.`
 
-      const res  = await fetch(ANTHROPIC_URL, {
+      const res  = await fetch(CLAUDE_PROXY, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': AI_KEY,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true',
+          'Authorization': `Bearer ${session?.access_token}`,
         },
         body: JSON.stringify({
           model: AI_MODEL, max_tokens: 512,
