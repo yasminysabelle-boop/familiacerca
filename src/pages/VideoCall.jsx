@@ -227,11 +227,13 @@ export default function VideoCall() {
   async function requestPermissionsAndJoin() {
     setPermStatus('requesting')
     try {
+      // Keep the stream alive briefly so the browser registers the permission
+      // as active before the Daily.co iframe loads and requests it again.
       const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-      // Stop tracks immediately — Daily.co will re-request inside the iframe
-      stream.getTracks().forEach(t => t.stop())
       setPermStatus('granted')
       setJoined(true)
+      // Stop tracks after a short delay — the iframe will have initialized by then
+      setTimeout(() => stream.getTracks().forEach(t => t.stop()), 1500)
     } catch {
       setPermStatus('denied')
     }
@@ -386,7 +388,8 @@ export default function VideoCall() {
       {/* Daily.co iframe */}
       <iframe
         src={call.room_url}
-        allow="camera; microphone; fullscreen; display-capture; autoplay"
+        allow="camera *; microphone *; fullscreen *; display-capture *; autoplay *"
+        allowusermedia="true"
         style={{
           position: 'absolute', inset: 0,
           width: '100%', height: '100%',
