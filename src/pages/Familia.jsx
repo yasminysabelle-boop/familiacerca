@@ -42,6 +42,19 @@ export default function Familia() {
   const displayName = user?.user_metadata?.full_name?.trim() || user?.email?.trim() || 'Familiar'
   const isAdmin = user?.id === ownerId
 
+  function fmtLastSeen(lastSeenIso) {
+    if (!lastSeenIso) return null
+    const diffMs = Date.now() - new Date(lastSeenIso).getTime()
+    const mins = Math.floor(diffMs / 60000)
+    if (mins < 5) return null // treat as online
+    if (mins < 60) return `hace ${mins} min`
+    const hrs = Math.floor(mins / 60)
+    if (hrs < 24) return `hace ${hrs} h`
+    const days = Math.floor(hrs / 24)
+    if (days === 1) return 'ayer'
+    return `hace ${days} días`
+  }
+
   const today = new Date()
   const todayKey = today.toISOString().split('T')[0]
 
@@ -104,7 +117,7 @@ export default function Familia() {
     if (ids.length) {
       const { data: profiles } = await supabase
         .from('user_profiles')
-        .select('id, full_name, avatar_url')
+        .select('id, full_name, avatar_url, last_seen')
         .in('id', ids)
       const map = {}
       ;(profiles ?? []).forEach(p => { map[p.id] = p })
@@ -459,8 +472,13 @@ export default function Familia() {
                         {adminName.split(' ')[0]}
                         {isAdmin && <span style={{ marginLeft: 6, fontSize: 10, fontWeight: 700, color: '#4A7C59', background: '#EBF3EE', padding: '2px 7px', borderRadius: 6 }}>Tú</span>}
                       </p>
-                      <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>
-                        {adminOnline ? '🟢 En línea' : '⚫ Desconectado'}
+                      <p style={{ fontSize: 11, color: adminOnline ? '#16A34A' : '#9CA3AF', margin: 0 }}>
+                        {adminOnline
+                          ? '🟢 En línea ahora'
+                          : (() => {
+                              const ago = fmtLastSeen(adminMp?.last_seen)
+                              return ago ? `⚪ Última vez ${ago}` : '⚪ Ausente'
+                            })()}
                       </p>
                     </div>
                     <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
@@ -518,9 +536,14 @@ export default function Familia() {
                       <p style={{ fontSize: 14, fontWeight: 600, color: '#1A1A1A', margin: '0 0 2px' }}>
                         {name.split(' ')[0]}
                       </p>
-                      <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>
-                        {online ? '🟢 En línea' : '⚫ Desconectado'}
-                        {joined ? ` · Desde ${joined}` : ''}
+                      <p style={{ fontSize: 11, color: online ? '#16A34A' : '#9CA3AF', margin: 0 }}>
+                        {online
+                          ? '🟢 En línea ahora'
+                          : (() => {
+                              const ago = fmtLastSeen(mp?.last_seen)
+                              return ago ? `⚪ Última vez ${ago}` : '⚪ Ausente'
+                            })()}
+                        {!online && joined ? ` · Desde ${joined}` : ''}
                       </p>
                     </div>
                     <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8 }}>

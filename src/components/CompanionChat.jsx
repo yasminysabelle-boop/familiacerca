@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
 import { geminiChat } from '../lib/gemini'
 import { FAMILIACERCA_KNOWLEDGE } from '../lib/companionKnowledge'
+import { supabase } from '../lib/supabase'
+import { useFamily } from '../contexts/FamilyContext'
 import miloLunaImg  from '../assets/companions/milo-luna.png'
 import miloAvatarImg from '../assets/companions/milo-avatar.png'
 import lunaAvatarImg from '../assets/companions/luna-avatar.png'
@@ -60,9 +62,68 @@ const FALLBACKS = {
   luna: 'Te escucho 🌙',
 }
 
+// Queries Supabase for contextual anomalies and returns the best proactive message.
+// Priority: A (low stock) > B (no activity) > C (upcoming appointment) > D (default)
+async function buildProactiveMessage(chosen, ownerId, patientName) {
+  if (!ownerId) return PROACTIVE_GREETINGS[chosen]
+  try {
+    const today = new Date().toISOString().split('T')[0]
+
+    // A) Low stock medications (≤7 pills remaining)
+    const { data: stocks } = await supabase
+      .from('medication_stock')
+      .select('medication_id, pills_remaining')
+      .eq('user_id', ownerId)
+      .lte('pills_remaining', 7)
+      .gt('pills_remaining', 0)
+      .limit(1)
+
+    if (stocks?.length) {
+      const { data: med } = await supabase
+        .from('medications').select('name').eq('id', stocks[0].medication_id).maybeSingle()
+      const name = med?.name ?? 'un medicamento'
+      return `Hola 👋 Noté que ${name} tiene pocas dosis (${stocks[0].pills_remaining} restantes). ¿Quieres programar la renovación?`
+    }
+
+    // B) No activity registered today
+    const { data: activity } = await supabase
+      .from('activity_log')
+      .select('id')
+      .eq('owner_id', ownerId)
+      .gte('created_at', `${today}T00:00:00`)
+      .limit(1)
+
+    if (!activity?.length) {
+      const name = patientName || 'el paciente'
+      return `Hola 👋 Aún no se ha registrado actividad hoy. ¿Cómo estuvo ${name}?`
+    }
+
+    // C) Upcoming appointment (next 2 days)
+    const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1)
+    const dayAfter  = new Date(); dayAfter.setDate(dayAfter.getDate() + 2)
+    const { data: upcoming } = await supabase
+      .from('events')
+      .select('title, date')
+      .eq('user_id', ownerId)
+      .gte('date', tomorrow.toISOString().split('T')[0])
+      .lte('date', dayAfter.toISOString().split('T')[0])
+      .order('date', { ascending: true })
+      .limit(1)
+
+    if (upcoming?.length) {
+      const title = upcoming[0].title ? ` (${upcoming[0].title})` : ''
+      return `Hola 👋 Tienen una cita médica pronto${title}. ¿Necesitan ayuda para prepararse?`
+    }
+  } catch { }
+
+  // D) No anomalies — friendly default
+  return `Hola 👋 Estoy aquí para ayudarte. ¿En qué puedo apoyarte hoy?`
+}
+
 // bottomOffset: px from bottom of viewport for the floating button.
 // Pass 24 on Landing (no nav bar), use default 140 inside Layout (above FAB).
 export default function CompanionChat({ bottomOffset = 140 }) {
+  const { ownerId, profile } = useFamily()
   const [companion,  setCompanion]  = useState(() => {
     // migrate from old key
     const old = localStorage.getItem('fc_companion')
@@ -88,12 +149,13 @@ export default function CompanionChat({ bottomOffset = 140 }) {
   useEffect(() => { setOpen(false) }, [pathname])
 
   // Proactive trigger: open after 6 s on dashboard, once per session
+  // Detects anomalies (low stock, no activity, upcoming appointment) before showing message
   useEffect(() => {
     if (pathname !== '/dashboard') return
     if (sessionStorage.getItem(SS_PROACTIVE)) return
     if (proactiveRef.current) return
 
-    const timer = setTimeout(() => {
+    const timer = setTimeout(async () => {
       if (proactiveRef.current) return
       proactiveRef.current = true
       sessionStorage.setItem(SS_PROACTIVE, '1')
@@ -102,13 +164,15 @@ export default function CompanionChat({ bottomOffset = 140 }) {
       if (!chosen) {
         setSelecting(true)
       } else {
-        setMessages([{ role: 'companion', text: PROACTIVE_GREETINGS[chosen] }])
+        const patientName = profile?.name?.split(' ')[0] ?? null
+        const msg = await buildProactiveMessage(chosen, ownerId, patientName)
+        setMessages([{ role: 'companion', text: msg }])
         setOpen(true)
       }
     }, 6000)
 
     return () => clearTimeout(timer)
-  }, [pathname])
+  }, [pathname, ownerId])
 
   // Scroll to latest message
   useEffect(() => {

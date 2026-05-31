@@ -228,6 +228,16 @@ export default function Expenses() {
     .sort((a, b) => b.subtotal - a.subtotal)
   const maxCat = categoryTotals[0]?.subtotal ?? 1
 
+  // Who contributed most this month
+  const memberMap = {}
+  for (const e of expenses) {
+    const name = (e.paid_by || 'Sin nombre').trim()
+    memberMap[name] = (memberMap[name] ?? 0) + parseFloat(e.amount)
+  }
+  const memberContributions = Object.entries(memberMap)
+    .map(([name, amount]) => ({ name, amount, pct: total > 0 ? Math.round((amount / total) * 100) : 0 }))
+    .sort((a, b) => b.amount - a.amount)
+
   const fieldStyle = {
     width: '100%', padding: '11px 14px',
     border: '1.5px solid #EDE5D8', borderRadius: 12,
@@ -457,6 +467,35 @@ export default function Expenses() {
             </>
           )}
         </div>
+
+        {/* ¿Quién aportó más? */}
+        {!loading && memberContributions.length > 0 && (
+          <div style={{ margin: '16px 20px 0', background: 'white', borderRadius: 18, padding: '16px 18px', border: '1px solid #EDE5D8', boxShadow: '0 2px 12px rgba(0,0,0,0.05)' }}>
+            <p style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 14 }}>
+              ¿Quién aportó más este mes?
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {memberContributions.map((m, i) => (
+                <div key={m.name} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: i === 0 ? '#EBF3EE' : '#F3F4F6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, flexShrink: 0, fontWeight: 700, color: i === 0 ? '#4A7C59' : '#9CA3AF' }}>
+                    {i === 0 ? '🥇' : i === 1 ? '🥈' : '🥉'}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.name}</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: '#1A1A1A', flexShrink: 0, marginLeft: 8 }}>
+                        {formatCurrency(m.amount)} · <span style={{ color: '#4A7C59' }}>{m.pct}%</span>
+                      </span>
+                    </div>
+                    <div style={{ height: 4, background: '#F3F4F6', borderRadius: 2, overflow: 'hidden' }}>
+                      <div style={{ height: '100%', borderRadius: 2, background: i === 0 ? '#4A7C59' : '#9CA3AF', width: `${m.pct}%`, transition: 'width 0.4s ease' }} />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* FAB — hidden for familiar (view only) */}
