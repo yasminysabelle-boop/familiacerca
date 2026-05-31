@@ -13,39 +13,35 @@ function calcAge(dateStr) {
   return age >= 0 ? age : null
 }
 
+const CARE_RELATIONS = [
+  { value: 'mama',   emoji: '👩', label: 'Mamá' },
+  { value: 'papa',   emoji: '👨', label: 'Papá' },
+  { value: 'abuelo', emoji: '👴', label: 'Abuelo' },
+  { value: 'abuela', emoji: '👵', label: 'Abuela' },
+  { value: 'otro',   emoji: '💛', label: 'Otro familiar' },
+]
+
+const CONCERNS = [
+  { value: 'medicamentos', emoji: '💊', label: 'Medicamentos' },
+  { value: 'alzheimer',    emoji: '🧠', label: 'Alzheimer o demencia' },
+  { value: 'hospital',     emoji: '🏥', label: 'Hospitalizaciones' },
+  { value: 'rutinas',      emoji: '📋', label: 'Rutinas diarias' },
+  { value: 'todo',         emoji: '✅', label: 'Todo lo anterior' },
+]
+
 const FREQ_OPTIONS = [
-  { value: 'once_daily',  label: 'Una vez al día',    times: 1, interval: null },
-  { value: 'twice_daily', label: 'Dos veces al día',  times: 2, interval: null },
-  { value: 'three_daily', label: 'Tres veces al día', times: 3, interval: null },
-  { value: 'every_4h',    label: 'Cada 4 horas',      times: 1, interval: 4 },
-  { value: 'every_6h',    label: 'Cada 6 horas',      times: 1, interval: 6 },
-  { value: 'every_8h',    label: 'Cada 8 horas',      times: 1, interval: 8 },
-  { value: 'every_12h',   label: 'Cada 12 horas',     times: 1, interval: 12 },
-  { value: 'as_needed',   label: 'Según necesidad',   times: 0, interval: null },
-  { value: 'weekly',      label: 'Semanal',           times: 1, interval: null },
+  { value: 'once_daily',  label: 'Una vez al día' },
+  { value: 'twice_daily', label: 'Dos veces al día' },
+  { value: 'three_daily', label: 'Tres veces al día' },
+  { value: 'every_8h',    label: 'Cada 8 horas' },
+  { value: 'every_12h',   label: 'Cada 12 horas' },
+  { value: 'as_needed',   label: 'Según necesidad' },
 ]
 
-function computeScheduledTimes(frequency, startTimes) {
-  const opt = FREQ_OPTIONS.find(o => o.value === frequency)
-  if (!opt || opt.times === 0) return []
-  if (opt.interval) {
-    const start = startTimes[0]
-    if (!start) return []
-    const [h, m] = start.split(':').map(Number)
-    const dosesPerDay = 24 / opt.interval
-    return Array.from({ length: dosesPerDay }, (_, i) => {
-      const total = (h * 60 + m + i * opt.interval * 60) % (24 * 60)
-      return `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`
-    })
-  }
-  return startTimes.filter(Boolean)
+const RELATION_PRONOUN = {
+  mama: 'tu mamá', papa: 'tu papá',
+  abuelo: 'tu abuelo', abuela: 'tu abuela', otro: 'el paciente',
 }
-
-const TIME_PRESETS = [
-  { label: '🌅 Mañana', time: '08:00' },
-  { label: '☀️ Tarde',  time: '14:00' },
-  { label: '🌙 Noche',  time: '20:00' },
-]
 
 const INPUT = {
   width: '100%', padding: '14px 16px', borderRadius: 14,
@@ -84,37 +80,76 @@ function PrimaryBtn({ children, onClick, disabled, pressed, onPD, onPU, onPL }) 
   )
 }
 
+function SkipBtn({ onClick, label = 'Hacer esto después' }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        background: 'none', border: 'none', color: '#9CA3AF',
+        fontSize: 13, cursor: 'pointer', padding: '10px',
+        fontFamily: 'inherit', width: '100%',
+      }}
+    >
+      {label}
+    </button>
+  )
+}
+
 export default function OnboardingFlow() {
   const { user } = useAuth()
   const { refresh } = useFamily()
+  const TOTAL = 7
 
-  const [step, setStep] = useState(1)
+  const [step, setStep]     = useState(1)
   const [pressed, setPressed] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [error, setError]   = useState('')
 
-  // Step 1
-  const [patientName, setPatientName] = useState('')
-  const [birthDate, setBirthDate]     = useState('')
-  const [photoFile, setPhotoFile]     = useState(null)
+  // Paso 2 — relación
+  const [careRelation, setCareRelation] = useState('')
+
+  // Paso 3 — perfil básico
+  const [patientName, setPatientName]   = useState('')
+  const [birthDate, setBirthDate]       = useState('')
+  const [photoFile, setPhotoFile]       = useState(null)
   const [photoPreview, setPhotoPreview] = useState(null)
   const [photoMenuOpen, setPhotoMenuOpen] = useState(false)
   const cameraRef  = useRef(null)
   const galleryRef = useRef(null)
 
-  // Step 2
-  const [medName, setMedName]           = useState('')
-  const [medDose, setMedDose]           = useState('')
-  const [medFrequency, setMedFrequency] = useState('')
-  const [medTimes, setMedTimes]         = useState([''])
+  // Paso 4 — preocupaciones
+  const [concerns, setConcerns] = useState([])
 
-  // Step 3
+  // Paso 5 — invitar equipo
   const [inviteLink, setInviteLink] = useState('')
   const [copied, setCopied]         = useState(false)
 
-  const [saving, setSaving] = useState(false)
-  const [error, setError]   = useState('')
+  // Paso 6 — primera acción guiada
+  const [a6Med, setA6Med]           = useState('')
+  const [a6MedFreq, setA6MedFreq]   = useState('')
+  const [a6MedTime, setA6MedTime]   = useState('')
+  const [a6Task, setA6Task]         = useState('')
+  const [a6TaskTime, setA6TaskTime] = useState('')
+  const [a6Note, setA6Note]         = useState('')
 
-  const displayName = user?.user_metadata?.full_name ?? user?.email ?? 'Yo'
-  const progress    = (step / 3) * 100
+  const displayName  = user?.user_metadata?.full_name ?? user?.email ?? 'Yo'
+  const progress     = (step / TOTAL) * 100
+  const patientFirst = patientName.trim().split(' ')[0] || 'tu familiar'
+
+  // Placeholder dinámico del campo nombre en paso 3
+  const namePlaceholder = {
+    mama: 'Nombre de tu mamá', papa: 'Nombre de tu papá',
+    abuelo: 'Nombre de tu abuelo', abuela: 'Nombre de tu abuela',
+    otro: 'Nombre del familiar',
+  }[careRelation] ?? 'Ej: María González'
+
+  // Qué mostrar en paso 6 según preocupaciones
+  const wantsMeds  = concerns.includes('medicamentos') || concerns.includes('todo')
+  const wantsNote  = !wantsMeds && (concerns.includes('alzheimer') || concerns.includes('hospital'))
+  const step6Type  = wantsMeds ? 'meds' : wantsNote ? 'note' : 'task'
+
+  const pd = () => setPressed(true)
+  const pu = () => setPressed(false)
 
   function pickPhoto(e) {
     const f = e.target.files?.[0]
@@ -123,25 +158,32 @@ export default function OnboardingFlow() {
     setPhotoPreview(URL.createObjectURL(f))
   }
 
-  function handleFreqChange(val) {
-    setMedFrequency(val)
-    const opt = FREQ_OPTIONS.find(o => o.value === val)
-    if (!opt || opt.times === 0) {
-      setMedTimes([])
+  function toggleConcern(value) {
+    if (value === 'todo') {
+      const others = CONCERNS.filter(c => c.value !== 'todo').map(c => c.value)
+      const hasAll = others.every(v => concerns.includes(v)) && concerns.includes('todo')
+      setConcerns(hasAll ? [] : [...others, 'todo'])
     } else {
-      const count = opt.interval ? 1 : opt.times
-      setMedTimes(prev => {
-        const next = [...prev]
-        while (next.length < count) next.push('')
-        return next.slice(0, count)
-      })
+      setConcerns(prev => prev.includes(value) ? prev.filter(v => v !== value) : [...prev, value])
     }
   }
 
-  async function handleStep1() {
+  async function generateInviteLink() {
+    if (inviteLink) return // ya generado
+    try {
+      const { data: token } = await supabase.rpc('create_family_invitation', {
+        p_invited_email: '', p_invited_by: displayName,
+      })
+      setInviteLink(token ? `${window.location.origin}/join?token=${token}` : window.location.origin)
+    } catch {
+      setInviteLink(window.location.origin)
+    }
+  }
+
+  // ── Guardar perfil (Paso 3) ──────────────────────────────────────────
+  async function handleSaveProfile() {
     if (!patientName.trim() || !birthDate) return
-    setSaving(true)
-    setError('')
+    setSaving(true); setError('')
     try {
       let photoUrl = null
       if (photoFile) {
@@ -152,19 +194,16 @@ export default function OnboardingFlow() {
           photoUrl = publicUrl
         }
       }
-
       const { error: e1 } = await supabase.from('care_profiles').upsert(
         { user_id: user.id, name: patientName.trim(), age: calcAge(birthDate), photo_url: photoUrl },
         { onConflict: 'user_id' }
       )
       if (e1) throw e1
-
       await supabase.from('patient_profiles').upsert(
         { owner_id: user.id, nombre_completo: patientName.trim(), fecha_nacimiento: birthDate },
         { onConflict: 'owner_id' }
       )
-
-      setStep(2)
+      setStep(4)
     } catch {
       setError('No se pudo guardar. Intenta de nuevo.')
     } finally {
@@ -172,50 +211,63 @@ export default function OnboardingFlow() {
     }
   }
 
-  async function generateLink() {
-    try {
-      const { data: token } = await supabase.rpc('create_family_invitation', {
-        p_invited_email: '',
-        p_invited_by: displayName,
-      })
-      if (token) { setInviteLink(`${window.location.origin}/join?token=${token}`); return }
-    } catch { }
-    setInviteLink(window.location.origin)
+  // ── Avanzar de Paso 4 a Paso 5 (genera link de fondo) ───────────────
+  function goToStep5() {
+    generateInviteLink()
+    setStep(5)
   }
 
-  async function handleStep2() {
-    if (!medName.trim()) return
+  // ── Guardar primera acción (Paso 6) ──────────────────────────────────
+  async function saveFirstAction() {
     setSaving(true)
-    const scheduled_times = computeScheduledTimes(medFrequency, medTimes)
-    const firstTime = scheduled_times[0] ?? null
     try {
-      const { error: medErr } = await supabase.from('medications').insert({
-        user_id: user.id,
-        name: medName.trim(),
-        dosage: medDose.trim() || null,
-        frequency: medFrequency || null,
-        time: firstTime,
-        scheduled_times: scheduled_times.length ? scheduled_times : null,
-      })
-      if (medErr) console.warn('[OnboardingFlow] medication insert failed:', medErr)
+      if (step6Type === 'meds' && a6Med.trim()) {
+        const times = a6MedTime ? [a6MedTime] : []
+        await supabase.from('medications').insert({
+          user_id: user.id, created_by_user_id: user.id,
+          name: a6Med.trim(),
+          frequency: a6MedFreq || null,
+          time: a6MedTime || null,
+          scheduled_times: times.length ? times : null,
+        })
+      } else if (step6Type === 'task' && a6Task.trim()) {
+        await supabase.from('notes').insert({
+          user_id: user.id, created_by_user_id: user.id,
+          title: a6Task.trim(),
+          content: a6TaskTime ? `Horario: ${a6TaskTime}` : '',
+          tags: ['rutina'],
+        })
+      } else if (step6Type === 'note' && a6Note.trim()) {
+        await supabase.from('notes').insert({
+          user_id: user.id, created_by_user_id: user.id,
+          title: 'Nota inicial',
+          content: a6Note.trim(),
+          tags: ['médico'],
+        })
+      }
     } catch (err) {
-      console.warn('[OnboardingFlow] medication insert error:', err)
+      console.warn('[OnboardingFlow] step6 save failed:', err)
+    } finally {
+      setSaving(false)
+      setStep(7)
     }
-    await generateLink()
-    setSaving(false)
-    setStep(3)
   }
 
-  async function skipToStep3() {
-    await generateLink()
-    setStep(3)
-  }
+  // ── Funciones de compartir (Paso 5) ───────────────────────────────────
+  const inviteMsg = () =>
+    `Te invito a FamiliaCerca para coordinar el cuidado de ${patientName || 'nuestro familiar'}. Descárgala en familiacerca.com${inviteLink ? ` o entra aquí: ${inviteLink}` : ''}`
 
   function shareWhatsApp() {
-    const msg = `¡Hola! Te invito a cuidar juntos en FamiliaCerca. Entra aquí: ${inviteLink}`
-    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank')
+    window.open(`https://wa.me/?text=${encodeURIComponent(inviteMsg())}`, '_blank')
   }
-
+  function shareSMS() {
+    window.open(`sms:?body=${encodeURIComponent(inviteMsg())}`, '_blank')
+  }
+  function shareEmail() {
+    const subject = `Únete al equipo de cuidado en FamiliaCerca`
+    const body = `Hola,\n\nTe invito a coordinar el cuidado de ${patientName || 'nuestro familiar'} en FamiliaCerca.\n\n${inviteLink ? `Entra aquí: ${inviteLink}\n\n` : ''}Descárgala en familiacerca.com`
+    window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`)
+  }
   async function copyLink() {
     try { await navigator.clipboard.writeText(inviteLink); setCopied(true); setTimeout(() => setCopied(false), 2500) } catch { }
   }
@@ -226,20 +278,11 @@ export default function OnboardingFlow() {
     window.location.href = '/dashboard'
   }
 
-  const pd = () => setPressed(true)
-  const pu = () => setPressed(false)
-
-  const freqOpt = FREQ_OPTIONS.find(o => o.value === medFrequency)
-  const showTimePickers = freqOpt && freqOpt.times > 0
-  const isInterval = freqOpt?.interval != null
-  const previewTimes = isInterval && medTimes[0]
-    ? computeScheduledTimes(medFrequency, medTimes)
-    : []
-
+  // ── RENDER ─────────────────────────────────────────────────────────────
   return (
     <div style={{ minHeight: '100dvh', background: '#F0EDE6', display: 'flex', flexDirection: 'column' }}>
 
-      {/* Header */}
+      {/* ── Header con barra de progreso ── */}
       <div style={{ background: '#2D4A1E', padding: '0 20px', paddingTop: 'calc(env(safe-area-inset-top) + 14px)' }}>
         <Logo showWordmark size={28} />
         <div style={{ marginTop: 16, height: 4, background: 'rgba(255,255,255,0.15)', borderRadius: 4 }}>
@@ -249,43 +292,98 @@ export default function OnboardingFlow() {
           }} />
         </div>
         <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', textAlign: 'right', margin: '6px 0 14px', fontWeight: 600 }}>
-          {step} / 3
+          {step} / {TOTAL}
         </p>
       </div>
 
-      {/* Body */}
+      {/* ── Body ── */}
       <div style={{ flex: 1, padding: '32px 20px 48px', overflowY: 'auto', maxWidth: 480, width: '100%', margin: '0 auto', boxSizing: 'border-box' }}>
 
-        {/* ── PASO 1 ── */}
+        {/* ════ PASO 1 — BIENVENIDA ════ */}
         {step === 1 && (
           <>
-            <p style={{ fontSize: 26, fontWeight: 800, color: '#1A1A1A', fontFamily: 'Georgia, serif', lineHeight: 1.25, margin: '0 0 6px' }}>
+            <div style={{ textAlign: 'center', marginBottom: 32 }}>
+              <div style={{ fontSize: 56, marginBottom: 16, lineHeight: 1 }}>🏠</div>
+              <p style={{ fontSize: 28, fontWeight: 800, color: '#1A1A1A', fontFamily: 'Georgia, serif', lineHeight: 1.2, margin: '0 0 12px' }}>
+                Bienvenido a FamiliaCerca
+              </p>
+              <p style={{ fontSize: 16, color: '#718096', margin: 0, lineHeight: 1.6 }}>
+                Organiza el cuidado de tu familiar en un solo lugar.
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 32 }}>
+              {[
+                { emoji: '💊', text: 'Medicamentos con recordatorios automáticos' },
+                { emoji: '👨‍👩‍👧', text: 'Todo el equipo coordinado en tiempo real' },
+                { emoji: '📋', text: 'Historial médico accesible desde cualquier lugar' },
+              ].map(({ emoji, text }) => (
+                <div key={text} style={{
+                  display: 'flex', alignItems: 'center', gap: 14,
+                  padding: '14px 16px', background: 'white',
+                  borderRadius: 16, border: '1.5px solid #E8E4DC',
+                }}>
+                  <span style={{ fontSize: 24, flexShrink: 0 }}>{emoji}</span>
+                  <p style={{ fontSize: 14, color: '#374151', margin: 0, lineHeight: 1.4 }}>{text}</p>
+                </div>
+              ))}
+            </div>
+
+            <PrimaryBtn onClick={() => setStep(2)} pressed={pressed} onPD={pd} onPU={pu} onPL={pu}>
+              Comenzar →
+            </PrimaryBtn>
+          </>
+        )}
+
+        {/* ════ PASO 2 — ¿A QUIÉN VAS A CUIDAR? ════ */}
+        {step === 2 && (
+          <>
+            <p style={{ fontSize: 26, fontWeight: 800, color: '#1A1A1A', fontFamily: 'Georgia, serif', lineHeight: 1.25, margin: '0 0 8px' }}>
               ¿A quién vas a cuidar?
             </p>
             <p style={{ fontSize: 14, color: '#718096', margin: '0 0 28px' }}>
-              Crea el perfil del paciente para comenzar.
+              Selecciona para personalizar tu experiencia.
             </p>
 
-            {/* Photo */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 28 }}>
-              {/* Hidden inputs */}
-              <input
-                ref={cameraRef}
-                type="file"
-                accept="image/*"
-                capture="environment"
-                onChange={pickPhoto}
-                style={{ display: 'none' }}
-              />
-              <input
-                ref={galleryRef}
-                type="file"
-                accept="image/*"
-                onChange={pickPhoto}
-                style={{ display: 'none' }}
-              />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {CARE_RELATIONS.map(({ value, emoji, label }) => (
+                <button
+                  key={value}
+                  onClick={() => { setCareRelation(value); setStep(3) }}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 16,
+                    padding: '18px 20px', borderRadius: 16,
+                    border: '1.5px solid #E8E4DC', background: 'white',
+                    cursor: 'pointer', textAlign: 'left',
+                    boxShadow: '0 2px 0px #E0DBD2', fontFamily: 'inherit',
+                    WebkitTapHighlightColor: 'transparent',
+                    transition: 'all 0.12s',
+                  }}
+                >
+                  <span style={{ fontSize: 32, flexShrink: 0 }}>{emoji}</span>
+                  <span style={{ fontSize: 18, fontWeight: 700, color: '#1A1A1A' }}>{label}</span>
+                  <span style={{ marginLeft: 'auto', color: '#D1D5DB', fontSize: 18 }}>›</span>
+                </button>
+              ))}
+            </div>
+          </>
+        )}
 
-              {/* Circle */}
+        {/* ════ PASO 3 — PERFIL BÁSICO ════ */}
+        {step === 3 && (
+          <>
+            <p style={{ fontSize: 26, fontWeight: 800, color: '#1A1A1A', fontFamily: 'Georgia, serif', lineHeight: 1.25, margin: '0 0 6px' }}>
+              Cuéntanos sobre {RELATION_PRONOUN[careRelation] ?? 'el paciente'}
+            </p>
+            <p style={{ fontSize: 14, color: '#718096', margin: '0 0 28px' }}>
+              Solo lo básico — puedes agregar detalles médicos después.
+            </p>
+
+            {/* Foto */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 28 }}>
+              <input ref={cameraRef} type="file" accept="image/*" capture="environment" onChange={pickPhoto} style={{ display: 'none' }} />
+              <input ref={galleryRef} type="file" accept="image/*" onChange={pickPhoto} style={{ display: 'none' }} />
+
               <div
                 onClick={() => setPhotoMenuOpen(o => !o)}
                 style={{
@@ -304,31 +402,14 @@ export default function OnboardingFlow() {
                 {photoPreview ? 'Cambiar foto' : 'Foto (opcional)'}
               </p>
 
-              {/* Source picker */}
               {photoMenuOpen && (
                 <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
-                  <button
-                    onClick={() => { cameraRef.current.click(); setPhotoMenuOpen(false) }}
-                    style={{
-                      padding: '10px 18px', borderRadius: 12,
-                      border: '1.5px solid #4A7C59', background: 'white',
-                      color: '#2D4A1E', fontWeight: 700, fontSize: 13,
-                      cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
-                      fontFamily: 'inherit',
-                    }}
-                  >
+                  <button onClick={() => { cameraRef.current.click(); setPhotoMenuOpen(false) }}
+                    style={{ padding: '10px 18px', borderRadius: 12, border: '1.5px solid #4A7C59', background: 'white', color: '#2D4A1E', fontWeight: 700, fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'inherit' }}>
                     📷 Cámara
                   </button>
-                  <button
-                    onClick={() => { galleryRef.current.click(); setPhotoMenuOpen(false) }}
-                    style={{
-                      padding: '10px 18px', borderRadius: 12,
-                      border: '1.5px solid #4A7C59', background: 'white',
-                      color: '#2D4A1E', fontWeight: 700, fontSize: 13,
-                      cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
-                      fontFamily: 'inherit',
-                    }}
-                  >
+                  <button onClick={() => { galleryRef.current.click(); setPhotoMenuOpen(false) }}
+                    style={{ padding: '10px 18px', borderRadius: 12, border: '1.5px solid #4A7C59', background: 'white', color: '#2D4A1E', fontWeight: 700, fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'inherit' }}>
                     🖼️ Galería
                   </button>
                 </div>
@@ -341,7 +422,7 @@ export default function OnboardingFlow() {
                 <input
                   style={INPUT} value={patientName} autoFocus
                   onChange={e => setPatientName(e.target.value)}
-                  placeholder="Ej: María González"
+                  placeholder={namePlaceholder}
                 />
               </div>
               <div>
@@ -357,219 +438,275 @@ export default function OnboardingFlow() {
             {error && <p style={{ color: '#DC2626', fontSize: 13, marginTop: 12 }}>{error}</p>}
 
             <div style={{ marginTop: 32 }}>
-              <PrimaryBtn onClick={handleStep1} disabled={!patientName.trim() || !birthDate || saving} pressed={pressed} onPD={pd} onPU={pu} onPL={pu}>
+              <PrimaryBtn onClick={handleSaveProfile} disabled={!patientName.trim() || !birthDate || saving} pressed={pressed} onPD={pd} onPU={pu} onPL={pu}>
                 {saving ? 'Guardando...' : 'Continuar →'}
               </PrimaryBtn>
             </div>
           </>
         )}
 
-        {/* ── PASO 2 ── */}
-        {step === 2 && (
+        {/* ════ PASO 4 — ¿QUÉ TE PREOCUPA MÁS? ════ */}
+        {step === 4 && (
           <>
-            <p style={{ fontSize: 26, fontWeight: 800, color: '#1A1A1A', fontFamily: 'Georgia, serif', lineHeight: 1.25, margin: '0 0 6px' }}>
-              Agrega su primer medicamento
+            <p style={{ fontSize: 26, fontWeight: 800, color: '#1A1A1A', fontFamily: 'Georgia, serif', lineHeight: 1.25, margin: '0 0 8px' }}>
+              ¿Qué te preocupa más?
             </p>
             <p style={{ fontSize: 14, color: '#718096', margin: '0 0 28px' }}>
-              Puedes agregar más desde la app cuando quieras.
+              Te ayudamos a organizarlo. Puedes elegir más de una.
             </p>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              <div>
-                <label style={LABEL}>Nombre del medicamento *</label>
-                <input
-                  style={INPUT} value={medName} autoFocus
-                  onChange={e => setMedName(e.target.value)}
-                  placeholder="Ej: Metformina"
-                />
-              </div>
-              <div>
-                <label style={LABEL}>Dosis (opcional)</label>
-                <input
-                  style={INPUT} value={medDose}
-                  onChange={e => setMedDose(e.target.value)}
-                  placeholder="Ej: 500mg"
-                />
-              </div>
-
-              {/* Frecuencia */}
-              <div>
-                <label style={LABEL}>Frecuencia</label>
-                <div style={{ position: 'relative' }}>
-                  <select
-                    value={medFrequency}
-                    onChange={e => handleFreqChange(e.target.value)}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {CONCERNS.map(({ value, emoji, label }) => {
+                const selected = concerns.includes(value)
+                return (
+                  <button
+                    key={value}
+                    onClick={() => toggleConcern(value)}
                     style={{
-                      ...INPUT,
-                      paddingRight: 36,
-                      appearance: 'none', WebkitAppearance: 'none',
+                      display: 'flex', alignItems: 'center', gap: 16,
+                      padding: '16px 18px', borderRadius: 16,
+                      border: `2px solid ${selected ? '#2D4A1E' : '#E8E4DC'}`,
+                      background: selected ? '#EAF0E6' : 'white',
+                      cursor: 'pointer', textAlign: 'left',
+                      fontFamily: 'inherit', transition: 'all 0.12s',
+                      WebkitTapHighlightColor: 'transparent',
                     }}
                   >
-                    <option value="">Seleccionar frecuencia...</option>
-                    {FREQ_OPTIONS.map(o => (
-                      <option key={o.value} value={o.value}>{o.label}</option>
-                    ))}
-                  </select>
-                  <span style={{
-                    position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)',
-                    pointerEvents: 'none', color: '#9CA3AF', fontSize: 12,
-                  }}>▼</span>
+                    <span style={{ fontSize: 24, flexShrink: 0 }}>{emoji}</span>
+                    <span style={{ fontSize: 15, fontWeight: 600, color: selected ? '#2D4A1E' : '#374151', flex: 1 }}>
+                      {label}
+                    </span>
+                    {selected && <span style={{ fontSize: 16, color: '#2D4A1E', flexShrink: 0 }}>✓</span>}
+                  </button>
+                )
+              })}
+            </div>
+
+            <div style={{ marginTop: 28, display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <PrimaryBtn onClick={goToStep5} pressed={pressed} onPD={pd} onPU={pu} onPL={pu}>
+                Continuar →
+              </PrimaryBtn>
+              <SkipBtn onClick={goToStep5} />
+            </div>
+          </>
+        )}
+
+        {/* ════ PASO 5 — INVITA AL EQUIPO ════ */}
+        {step === 5 && (
+          <>
+            <p style={{ fontSize: 26, fontWeight: 800, color: '#1A1A1A', fontFamily: 'Georgia, serif', lineHeight: 1.25, margin: '0 0 8px' }}>
+              Invita a alguien del equipo
+            </p>
+            <p style={{ fontSize: 14, color: '#718096', margin: '0 0 28px', lineHeight: 1.5 }}>
+              El cuidado es más fácil cuando toda la familia está conectada.
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {/* WhatsApp */}
+              <button
+                onClick={shareWhatsApp}
+                onPointerDown={pd} onPointerUp={pu} onPointerLeave={pu}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 14,
+                  padding: '16px 18px', borderRadius: 16, border: 'none',
+                  background: '#25D366', color: 'white', cursor: 'pointer',
+                  boxShadow: pressed ? 'none' : '0 3px 0px #1da653',
+                  transform: pressed ? 'translateY(3px)' : 'none',
+                  transition: 'transform 0.08s ease, box-shadow 0.08s ease',
+                  fontFamily: 'inherit', WebkitTapHighlightColor: 'transparent',
+                }}
+              >
+                <span style={{ fontSize: 26, flexShrink: 0 }}>📱</span>
+                <div style={{ textAlign: 'left' }}>
+                  <p style={{ margin: 0, fontSize: 15, fontWeight: 700 }}>Invitar por WhatsApp</p>
+                  <p style={{ margin: '2px 0 0', fontSize: 12, opacity: 0.85 }}>Mensaje con el nombre del paciente</p>
                 </div>
-              </div>
+              </button>
 
-              {/* Hora(s) */}
-              {showTimePickers && (
-                <div>
-                  <label style={LABEL}>
-                    {isInterval ? 'Hora de inicio' : medTimes.length > 1 ? 'Horarios' : 'Hora'}
-                  </label>
-
-                  {/* Quick presets */}
-                  <div style={{ display: 'flex', gap: 6, marginBottom: 10 }}>
-                    {TIME_PRESETS.map(({ label, time }) => (
-                      <button
-                        key={time}
-                        type="button"
-                        onClick={() => {
-                          if (isInterval || medTimes.length === 1) {
-                            setMedTimes([time])
-                          } else {
-                            // for multi-dose, fill slots in order
-                            setMedTimes(prev => {
-                              const next = [...prev]
-                              const emptyIdx = next.findIndex(t => !t)
-                              if (emptyIdx !== -1) next[emptyIdx] = time
-                              else next[next.length - 1] = time
-                              return next
-                            })
-                          }
-                        }}
-                        style={{
-                          flex: 1, padding: '8px 4px', borderRadius: 10,
-                          border: '1.5px solid #E8E4DC', background: 'white',
-                          cursor: 'pointer', fontSize: 11, fontWeight: 700,
-                          color: '#4A7C59', fontFamily: 'inherit',
-                        }}
-                      >
-                        {label}
-                      </button>
-                    ))}
-                  </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    {medTimes.map((t, i) => (
-                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        {medTimes.length > 1 && (
-                          <span style={{ fontSize: 12, color: '#9CA3AF', width: 18, flexShrink: 0 }}>{i + 1}.</span>
-                        )}
-                        <input
-                          type="time"
-                          value={t}
-                          onChange={e => {
-                            const next = [...medTimes]
-                            next[i] = e.target.value
-                            setMedTimes(next)
-                          }}
-                          style={{ ...INPUT, flex: 1 }}
-                        />
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Preview for interval-based */}
-                  {previewTimes.length > 0 && (
-                    <div style={{ marginTop: 8, padding: '10px 12px', background: '#EAF0E6', borderRadius: 10 }}>
-                      <p style={{ fontSize: 11, color: '#2D4A1E', fontWeight: 600, marginBottom: 6 }}>
-                        Horarios automáticos ({previewTimes.length} dosis al día):
-                      </p>
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-                        {previewTimes.map((t, i) => (
-                          <span key={i} style={{
-                            background: 'white', color: '#2D4A1E',
-                            padding: '2px 8px', borderRadius: 6,
-                            fontSize: 11, fontWeight: 600, border: '1px solid #C9DFC4',
-                          }}>
-                            {t}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+              {/* SMS */}
+              <button
+                onClick={shareSMS}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 14,
+                  padding: '16px 18px', borderRadius: 16,
+                  border: '1.5px solid #E8E4DC', background: 'white', cursor: 'pointer',
+                  boxShadow: '0 2px 0px #E0DBD2', fontFamily: 'inherit',
+                  WebkitTapHighlightColor: 'transparent',
+                }}
+              >
+                <span style={{ fontSize: 26, flexShrink: 0 }}>💬</span>
+                <div style={{ textAlign: 'left' }}>
+                  <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#1A1A1A' }}>Invitar por SMS</p>
+                  <p style={{ margin: '2px 0 0', fontSize: 12, color: '#718096' }}>Mensaje de texto directo</p>
                 </div>
+              </button>
+
+              {/* Email */}
+              <button
+                onClick={shareEmail}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 14,
+                  padding: '16px 18px', borderRadius: 16,
+                  border: '1.5px solid #E8E4DC', background: 'white', cursor: 'pointer',
+                  boxShadow: '0 2px 0px #E0DBD2', fontFamily: 'inherit',
+                  WebkitTapHighlightColor: 'transparent',
+                }}
+              >
+                <span style={{ fontSize: 26, flexShrink: 0 }}>📧</span>
+                <div style={{ textAlign: 'left' }}>
+                  <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#1A1A1A' }}>Invitar por correo</p>
+                  <p style={{ margin: '2px 0 0', fontSize: 12, color: '#718096' }}>Asunto y mensaje prellenado</p>
+                </div>
+              </button>
+
+              {/* Copiar enlace */}
+              {inviteLink && (
+                <button
+                  onClick={copyLink}
+                  style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                    padding: '13px', borderRadius: 14,
+                    border: '1.5px solid #E8E4DC', background: 'white', cursor: 'pointer',
+                    color: '#2D4A1E', fontSize: 14, fontWeight: 700, fontFamily: 'inherit',
+                  }}
+                >
+                  {copied ? '✓ ¡Enlace copiado!' : '🔗 Copiar enlace de invitación'}
+                </button>
               )}
             </div>
 
-            <div style={{ marginTop: 32, display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <PrimaryBtn onClick={handleStep2} disabled={!medName.trim() || saving} pressed={pressed} onPD={pd} onPU={pu} onPL={pu}>
-                {saving ? 'Guardando...' : 'Continuar →'}
+            <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <PrimaryBtn onClick={() => setStep(6)} pressed={pressed} onPD={pd} onPU={pu} onPL={pu}>
+                Continuar →
               </PrimaryBtn>
-              <button
-                onClick={skipToStep3}
-                style={{ background: 'none', border: 'none', color: '#9CA3AF', fontSize: 13, cursor: 'pointer', padding: '10px', fontFamily: 'inherit' }}
-              >
-                Saltar este paso
-              </button>
+              <SkipBtn onClick={() => setStep(6)} />
             </div>
           </>
         )}
 
-        {/* ── PASO 3 — Celebración ── */}
-        {step === 3 && (
+        {/* ════ PASO 6 — PRIMERA ACCIÓN GUIADA ════ */}
+        {step === 6 && (
           <>
-            {/* Encabezado de celebración con nombre del paciente */}
-            <div style={{ textAlign: 'center', marginBottom: 28 }}>
-              <div style={{ fontSize: 52, marginBottom: 12, lineHeight: 1 }}>🎉</div>
-              <p style={{ fontSize: 26, fontWeight: 800, color: '#1A1A1A', fontFamily: 'Georgia, serif', lineHeight: 1.25, margin: '0 0 8px' }}>
+            <p style={{ fontSize: 26, fontWeight: 800, color: '#1A1A1A', fontFamily: 'Georgia, serif', lineHeight: 1.25, margin: '0 0 8px' }}>
+              Hagamos algo juntos
+            </p>
+            <p style={{ fontSize: 14, color: '#718096', margin: '0 0 20px', lineHeight: 1.5 }}>
+              Tu primera acción en menos de 1 minuto.
+            </p>
+
+            {/* ── Meds ── */}
+            {step6Type === 'meds' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <div style={{ padding: '12px 14px', background: '#EAF0E6', borderRadius: 12 }}>
+                  <p style={{ margin: 0, fontSize: 13, color: '#2D4A1E', fontWeight: 600 }}>
+                    💊 Primer medicamento de {patientFirst}
+                  </p>
+                </div>
+                <div>
+                  <label style={LABEL}>Nombre del medicamento *</label>
+                  <input style={INPUT} value={a6Med} autoFocus
+                    onChange={e => setA6Med(e.target.value)}
+                    placeholder="Ej: Metformina, Losartán, Aspirina..." />
+                </div>
+                <div>
+                  <label style={LABEL}>Frecuencia</label>
+                  <div style={{ position: 'relative' }}>
+                    <select value={a6MedFreq} onChange={e => setA6MedFreq(e.target.value)}
+                      style={{ ...INPUT, paddingRight: 36, appearance: 'none', WebkitAppearance: 'none' }}>
+                      <option value="">Seleccionar...</option>
+                      {FREQ_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                    </select>
+                    <span style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#9CA3AF', fontSize: 12 }}>▼</span>
+                  </div>
+                </div>
+                <div>
+                  <label style={LABEL}>Hora de toma</label>
+                  <input type="time" style={INPUT} value={a6MedTime} onChange={e => setA6MedTime(e.target.value)} />
+                </div>
+              </div>
+            )}
+
+            {/* ── Task / Rutina ── */}
+            {step6Type === 'task' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <div style={{ padding: '12px 14px', background: '#EAF0E6', borderRadius: 12 }}>
+                  <p style={{ margin: 0, fontSize: 13, color: '#2D4A1E', fontWeight: 600 }}>
+                    📋 Primera rutina diaria de {patientFirst}
+                  </p>
+                </div>
+                <div>
+                  <label style={LABEL}>Nombre de la rutina *</label>
+                  <input style={INPUT} value={a6Task} autoFocus
+                    onChange={e => setA6Task(e.target.value)}
+                    placeholder="Ej: Baño, Ejercicio, Fisioterapia..." />
+                </div>
+                <div>
+                  <label style={LABEL}>Hora</label>
+                  <input type="time" style={INPUT} value={a6TaskTime} onChange={e => setA6TaskTime(e.target.value)} />
+                </div>
+              </div>
+            )}
+
+            {/* ── Nota médica ── */}
+            {step6Type === 'note' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <div style={{ padding: '12px 14px', background: '#EAF0E6', borderRadius: 12 }}>
+                  <p style={{ margin: 0, fontSize: 13, color: '#2D4A1E', fontWeight: 600 }}>
+                    📝 Primera nota médica de {patientFirst}
+                  </p>
+                </div>
+                <div>
+                  <label style={LABEL}>Nota médica</label>
+                  <textarea
+                    style={{ ...INPUT, resize: 'none', minHeight: 110, lineHeight: 1.55 }}
+                    value={a6Note} autoFocus rows={4}
+                    onChange={e => setA6Note(e.target.value)}
+                    placeholder="Diagnóstico, medicamentos actuales, indicaciones del médico..."
+                  />
+                </div>
+              </div>
+            )}
+
+            <div style={{ marginTop: 28, display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <PrimaryBtn
+                onClick={saveFirstAction}
+                disabled={
+                  saving ||
+                  (step6Type === 'meds' && !a6Med.trim()) ||
+                  (step6Type === 'task' && !a6Task.trim()) ||
+                  (step6Type === 'note' && !a6Note.trim())
+                }
+                pressed={pressed} onPD={pd} onPU={pu} onPL={pu}
+              >
+                {saving
+                  ? 'Guardando...'
+                  : step6Type === 'meds' ? 'Agregar medicamento →'
+                  : step6Type === 'task' ? 'Agregar rutina →'
+                  : 'Guardar nota →'}
+              </PrimaryBtn>
+              <SkipBtn onClick={() => setStep(7)} />
+            </div>
+          </>
+        )}
+
+        {/* ════ PASO 7 — CELEBRACIÓN ════ */}
+        {step === 7 && (
+          <>
+            <div style={{ textAlign: 'center', marginBottom: 32 }}>
+              <div style={{ fontSize: 56, marginBottom: 14, lineHeight: 1 }}>🎉</div>
+              <p style={{ fontSize: 26, fontWeight: 800, color: '#1A1A1A', fontFamily: 'Georgia, serif', lineHeight: 1.25, margin: '0 0 10px' }}>
                 {patientName.trim()
                   ? `${patientName.trim().split(' ')[0]} ya está protegido.`
                   : '¡Todo listo!'}
               </p>
-              <p style={{ fontSize: 14, color: '#718096', margin: 0, lineHeight: 1.5 }}>
+              <p style={{ fontSize: 15, color: '#718096', margin: 0, lineHeight: 1.6 }}>
                 Tu equipo de cuidado está listo para comenzar.
               </p>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {/* WhatsApp */}
-              <button
-                onPointerDown={pd} onPointerUp={pu} onPointerLeave={pu}
-                onClick={shareWhatsApp}
-                style={{
-                  width: '100%', padding: '16px', borderRadius: 16, border: 'none',
-                  background: '#25D366', color: 'white', fontSize: 16, fontWeight: 700,
-                  cursor: 'pointer',
-                  boxShadow: pressed ? 'none' : '0 3px 0px #1da653',
-                  transform: pressed ? 'translateY(3px)' : 'none',
-                  transition: 'transform 0.08s ease, box-shadow 0.08s ease',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-                  fontFamily: 'inherit',
-                }}
-              >
-                <span style={{ fontSize: 20 }}>💬</span> Invitar al equipo por WhatsApp
-              </button>
-
-              {/* Copy link */}
-              <button
-                onClick={copyLink}
-                style={{
-                  width: '100%', padding: '14px', borderRadius: 14,
-                  border: '1.5px solid #E8E4DC', background: 'white',
-                  color: '#2D4A1E', fontSize: 14, fontWeight: 700, cursor: 'pointer',
-                  boxShadow: '0 2px 0px #E0DBD2',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                  fontFamily: 'inherit',
-                }}
-              >
-                {copied ? '✓ ¡Copiado!' : '🔗 Copiar enlace de invitación'}
-              </button>
-
-              {/* Finish */}
-              <div style={{ marginTop: 8 }}>
-                <PrimaryBtn onClick={finish} pressed={pressed} onPD={pd} onPU={pu} onPL={pu}>
-                  Ir al panel principal →
-                </PrimaryBtn>
-              </div>
-            </div>
+            <PrimaryBtn onClick={finish} pressed={pressed} onPD={pd} onPU={pu} onPL={pu}>
+              Ir al panel principal →
+            </PrimaryBtn>
           </>
         )}
 
