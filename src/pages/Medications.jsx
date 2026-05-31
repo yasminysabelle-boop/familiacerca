@@ -501,17 +501,16 @@ Return ONLY valid JSON.`
                 >
                   <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 15, fontWeight: 700, color: '#1A1A1A', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 7 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 4 }}>
                         {stockDot !== null && (
-                          <span style={{
-                            display: 'block', width: 12, height: 12, borderRadius: '50%',
-                            background: stockDot, flexShrink: 0,
-                            boxShadow: `0 0 0 2px ${stockDot}33`,
-                          }}
-                            title={pills <= 3 ? 'Stock crítico' : pills <= 7 ? 'Stock bajo' : 'Stock suficiente'}
-                          />
+                          <div style={{
+                            width: 12, height: 12, borderRadius: '50%',
+                            backgroundColor: stockDot, flexShrink: 0,
+                          }} />
                         )}
-                        <span>💊 {med.name}</span>
+                        <span style={{ fontSize: 15, fontWeight: 700, color: '#1A1A1A' }}>
+                          💊 {med.name}
+                        </span>
                       </div>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
                         {med.dosage && <span style={{ fontSize: 12, color: '#6B7280' }}>{med.dosage}</span>}
