@@ -553,9 +553,9 @@ Return ONLY valid JSON.`
                             ? days == null ? 'Ver stock' : days <= 0 ? 'Agotado' : `${days} día${days !== 1 ? 's' : ''}`
                             : 'Configurar stock'}
                         </span>
-                        {stock && (
-                          <span style={{ fontSize: 10, color: '#9CA3AF' }}>
-                            · {stock.pills_remaining}/{stock.total_pills} 💊
+                        {med.pills_remaining != null && (
+                          <span style={{ fontSize: 11, fontWeight: 700, color: med.pills_remaining <= 3 ? '#ef4444' : med.pills_remaining <= 7 ? '#eab308' : '#16a34a' }}>
+                            {med.pills_remaining <= 3 ? '🔴' : med.pills_remaining <= 7 ? '🟡' : '🟢'} {med.pills_remaining} dosis
                           </span>
                         )}
                       </button>
