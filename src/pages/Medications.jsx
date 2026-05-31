@@ -486,14 +486,22 @@ Return ONLY valid JSON.`
               const stockBg = days == null ? '#F3F4F6'
                 : days <= 1 ? '#FEF2F2' : days <= 3 ? '#FEF3C7' : days <= 7 ? '#FFFBEB' : '#F0FDF4'
 
+              // Stock dot color based on pills remaining
+              const pills = stock?.pills_remaining
+              const stockDot = pills == null ? null : pills <= 3 ? '#DC2626' : pills <= 15 ? '#EAB308' : '#22C55E'
+
               return (
                 <div
                   key={med.id}
-                  style={{ background: 'white', borderRadius: 16, border: '1px solid #EDE5D8', borderLeft: '4px solid #4A7C59', padding: '14px 16px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
+                  style={{ background: 'white', borderRadius: 16, border: '1px solid #EDE5D8', borderLeft: `4px solid ${stockDot ?? '#4A7C59'}`, padding: '14px 16px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
                 >
                   <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ fontSize: 15, fontWeight: 700, color: '#1A1A1A', marginBottom: 4 }}>
+                      <p style={{ fontSize: 15, fontWeight: 700, color: '#1A1A1A', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
+                        {stockDot && (
+                          <span style={{ width: 9, height: 9, borderRadius: '50%', background: stockDot, flexShrink: 0, display: 'inline-block' }}
+                            title={pills <= 3 ? 'Stock crítico' : pills <= 15 ? 'Stock bajo' : 'Stock suficiente'} />
+                        )}
                         💊 {med.name}
                       </p>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>

@@ -135,7 +135,7 @@ export default function PatientProfile() {
   const canEdit = memberRole === null || memberRole === 'cuidador'
 
   const [form, setForm]         = useState(EMPTY)
-  const [open, setOpen]         = useState({ s1:true, s2:false, s3:false, s4:false })
+  const [open, setOpen]         = useState({ s1:true, s2:false, s3:false, s4:false, s5:false })
   const [saving, setSaving]     = useState(false)
   const [error, setError]       = useState('')
   const [success, setSuccess]   = useState(false)
@@ -266,10 +266,11 @@ export default function PatientProfile() {
 
   // ── Badge counts ──────────────────────────────────────────────────────────
   const b = keys => keys.filter(k => { const v=form[k]; return Array.isArray(v)?v.length>0:!!v }).length
-  const b1 = b(['nombre_completo','fecha_nacimiento','sexo','tipo_sangre','diagnostico_principal','alergias_detalle','contacto_emergencia_nombre'])
-  const b2 = b(['medico_tratante','hospital_preferencia','condiciones_secundarias','seguro_compania','indicaciones_medico'])
-  const b3 = b(['movilidad','estado_cognitivo','usa_dispositivos','peso','rutinas_importantes','cosas_que_calman'])
-  const b4 = b(['historia_personal','gustos_hobbies','frases_famosas','miedos'])
+  const b1 = b(['nombre_completo','fecha_nacimiento','sexo','tipo_sangre'])
+  const b2 = b(['diagnostico_principal','alergias_detalle','condiciones_secundarias','seguro_compania','indicaciones_medico','antecedentes_familiares'])
+  const b3 = b(['movilidad','estado_cognitivo','usa_dispositivos','peso','alimentos_acepta','rutinas_importantes','cosas_que_calman'])
+  const b4 = b(['contacto_emergencia_nombre','medico_tratante','especialistas','hospital_preferencia'])
+  const b5 = b(['historia_personal','gustos_hobbies','frases_famosas','miedos'])
 
   const initials = form.nombre_completo.trim().split(' ').filter(Boolean)
     .slice(0,2).map(w=>w[0].toUpperCase()).join('') || '?'
@@ -311,7 +312,7 @@ export default function PatientProfile() {
             <div style={{ flex:1 }}>
               <p style={{ color:'rgba(255,255,255,0.65)', fontSize:12, margin:0 }}>Información clínica</p>
               <h1 style={{ color:'white', fontFamily:'Georgia,serif', fontSize:20, fontWeight:700, margin:'2px 0 0' }}>
-                Perfil del Paciente
+                {form.nombre_completo ? `Perfil de ${form.nombre_completo.split(' ')[0]}` : 'Perfil del Paciente'}
               </h1>
             </div>
           </div>
@@ -370,8 +371,8 @@ export default function PatientProfile() {
         ) : (
           <form onSubmit={handleSave} style={{ padding:'16px 16px 0' }}>
 
-            {/* ══ S1: Lo esencial ══════════════════════════════════════════ */}
-            <Section color="#4A7C59" icon="⭐" title="Lo esencial" badge={b1}
+            {/* ══ S1: Información básica ═══════════════════════════════════ */}
+            <Section color="#4A7C59" icon="📋" title="Información básica" badge={b1}
               open={open.s1} onToggle={() => setOpen(p=>({...p,s1:!p.s1}))}>
 
               <Fld label="Nombre completo">
@@ -419,6 +420,11 @@ export default function PatientProfile() {
                   })}
                 </div>
               </Fld>
+            </Section>
+
+            {/* ══ S2: Información médica ════════════════════════════════════ */}
+            <Section color="#2563EB" icon="🏥" title="Información médica" badge={b2}
+              open={open.s2} onToggle={() => setOpen(p=>({...p,s2:!p.s2}))}>
 
               <Fld label="Diagnóstico principal">
                 <VoiceArea id="diagnostico_principal" value={form.diagnostico_principal}
@@ -473,83 +479,6 @@ export default function PatientProfile() {
                 </div>
               </Fld>
 
-              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
-                <Fld label="Contacto emergencia">
-                  <input value={form.contacto_emergencia_nombre}
-                    onChange={e=>set('contacto_emergencia_nombre',e.target.value)}
-                    placeholder="Nombre" style={F} onFocus={fo} onBlur={fb} />
-                </Fld>
-                <Fld label="Teléfono emergencia">
-                  <input type="tel" value={form.contacto_emergencia_telefono}
-                    onChange={e=>set('contacto_emergencia_telefono',e.target.value)}
-                    placeholder="Teléfono" style={F} onFocus={fo} onBlur={fb} />
-                </Fld>
-              </div>
-            </Section>
-
-            {/* ══ S2: Información médica ═══════════════════════════════════ */}
-            <Section color="#2563EB" icon="🏥" title="Información médica" badge={b2}
-              open={open.s2} onToggle={() => setOpen(p=>({...p,s2:!p.s2}))}>
-
-              <p style={{ fontSize:11, fontWeight:700, color:'#9CA3AF', textTransform:'uppercase', letterSpacing:'0.07em', margin:'0 0 10px' }}>
-                Médico tratante principal
-              </p>
-              <div style={{ background:'#F5F8FF', borderRadius:14, padding:14, marginBottom:16, border:'1px solid #DBEAFE' }}>
-                <Fld label="Nombre">
-                  <input value={form.medico_tratante} onChange={e=>set('medico_tratante',e.target.value)}
-                    placeholder="Dr. / Dra." style={F} onFocus={fo} onBlur={fb} />
-                </Fld>
-                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
-                  <Fld label="Especialidad" mb={0}>
-                    <input value={form.especialidad_medico} onChange={e=>set('especialidad_medico',e.target.value)}
-                      placeholder="Geriatría" style={F} onFocus={fo} onBlur={fb} />
-                  </Fld>
-                  <Fld label="Teléfono" mb={0}>
-                    <input type="tel" value={form.telefono_medico} onChange={e=>set('telefono_medico',e.target.value)}
-                      placeholder="55 1234 5678" style={F} onFocus={fo} onBlur={fb} />
-                  </Fld>
-                </div>
-              </div>
-
-              <p style={{ fontSize:11, fontWeight:700, color:'#9CA3AF', textTransform:'uppercase', letterSpacing:'0.07em', margin:'0 0 10px' }}>
-                Especialistas adicionales
-              </p>
-              {form.especialistas.map((esp,i) => (
-                <div key={i} style={{
-                  background:'#F5F8FF', borderRadius:14, padding:'12px 14px', marginBottom:10,
-                  border:'1px solid #DBEAFE', position:'relative',
-                }}>
-                  <button type="button" onClick={() => delEsp(i)} style={{
-                    position:'absolute', top:10, right:12, background:'none',
-                    border:'none', cursor:'pointer', color:'#9CA3AF', fontSize:16,
-                  }}>✕</button>
-                  <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
-                    <Fld label="Nombre">
-                      <input value={esp.nombre} onChange={e=>setEsp(i,'nombre',e.target.value)}
-                        placeholder="Dr. X" style={F} onFocus={fo} onBlur={fb} />
-                    </Fld>
-                    <Fld label="Especialidad">
-                      <input value={esp.especialidad} onChange={e=>setEsp(i,'especialidad',e.target.value)}
-                        placeholder="Cardiología" style={F} onFocus={fo} onBlur={fb} />
-                    </Fld>
-                  </div>
-                  <Fld label="Teléfono" mb={0}>
-                    <input type="tel" value={esp.telefono} onChange={e=>setEsp(i,'telefono',e.target.value)}
-                      placeholder="55 1234 5678" style={F} onFocus={fo} onBlur={fb} />
-                  </Fld>
-                </div>
-              ))}
-              <button type="button" onClick={addEsp} style={{
-                width:'100%', padding:'10px', borderRadius:12,
-                border:'1.5px dashed #BFDBFE', background:'transparent',
-                color:'#2563EB', fontWeight:600, fontSize:13, cursor:'pointer', marginBottom:16,
-              }}>+ Agregar especialista</button>
-
-              <Fld label="Hospital / Clínica de preferencia">
-                <input value={form.hospital_preferencia} onChange={e=>set('hospital_preferencia',e.target.value)}
-                  placeholder="Ej. Hospital General de México" style={F} onFocus={fo} onBlur={fb} />
-              </Fld>
-
               <Fld label="Condiciones secundarias">
                 <CheckChips opts={CONDICION} value={form.condiciones_secundarias}
                   onChange={v=>set('condiciones_secundarias',v)} />
@@ -579,8 +508,8 @@ export default function PatientProfile() {
               </Fld>
             </Section>
 
-            {/* ══ S3: Cuidado diario ════════════════════════════════════════ */}
-            <Section color="#EA8C00" icon="🏠" title="Cuidado diario" badge={b3}
+            {/* ══ S3: Preferencias ═══════════════════════════════════════════ */}
+            <Section color="#EA8C00" icon="⭐" title="Preferencias" badge={b3}
               open={open.s3} onToggle={() => setOpen(p=>({...p,s3:!p.s3}))}>
 
               <Fld label="Movilidad">
@@ -664,9 +593,68 @@ export default function PatientProfile() {
               </Fld>
             </Section>
 
-            {/* ══ S4: Historia personal ═════════════════════════════════════ */}
-            <Section color="#7C3AED" icon="💜" title="Historia personal" badge={b4}
+            {/* ══ S4: Contactos ════════════════════════════════════════════ */}
+            <Section color="#0891B2" icon="📞" title="Contactos" badge={b4}
               open={open.s4} onToggle={() => setOpen(p=>({...p,s4:!p.s4}))}>
+
+              <p style={{ fontSize:11, fontWeight:700, color:'#9CA3AF', textTransform:'uppercase', letterSpacing:'0.07em', margin:'0 0 10px' }}>
+                Médico de cabecera
+              </p>
+              <div style={{ background:'#F0F9FF', borderRadius:14, padding:14, marginBottom:16, border:'1px solid #BAE6FD' }}>
+                <Fld label="Nombre">
+                  <input value={form.medico_tratante} onChange={e=>set('medico_tratante',e.target.value)}
+                    placeholder="Dr. / Dra." style={F} onFocus={fo} onBlur={fb} />
+                </Fld>
+                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
+                  <Fld label="Especialidad" mb={0}>
+                    <input value={form.especialidad_medico} onChange={e=>set('especialidad_medico',e.target.value)}
+                      placeholder="Geriatría" style={F} onFocus={fo} onBlur={fb} />
+                  </Fld>
+                  <Fld label="Teléfono" mb={0}>
+                    <input type="tel" value={form.telefono_medico} onChange={e=>set('telefono_medico',e.target.value)}
+                      placeholder="55 1234 5678" style={F} onFocus={fo} onBlur={fb} />
+                  </Fld>
+                </div>
+              </div>
+
+              <p style={{ fontSize:11, fontWeight:700, color:'#9CA3AF', textTransform:'uppercase', letterSpacing:'0.07em', margin:'0 0 10px' }}>
+                Especialistas
+              </p>
+              {form.especialistas.map((esp,i) => (
+                <div key={i} style={{ background:'#F0F9FF', borderRadius:14, padding:'12px 14px', marginBottom:10, border:'1px solid #BAE6FD', position:'relative' }}>
+                  <button type="button" onClick={() => delEsp(i)} style={{ position:'absolute', top:10, right:12, background:'none', border:'none', cursor:'pointer', color:'#9CA3AF', fontSize:16 }}>✕</button>
+                  <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
+                    <Fld label="Nombre"><input value={esp.nombre} onChange={e=>setEsp(i,'nombre',e.target.value)} placeholder="Dr. X" style={F} onFocus={fo} onBlur={fb} /></Fld>
+                    <Fld label="Especialidad"><input value={esp.especialidad} onChange={e=>setEsp(i,'especialidad',e.target.value)} placeholder="Cardiología" style={F} onFocus={fo} onBlur={fb} /></Fld>
+                  </div>
+                  <Fld label="Teléfono" mb={0}><input type="tel" value={esp.telefono} onChange={e=>setEsp(i,'telefono',e.target.value)} placeholder="55 1234 5678" style={F} onFocus={fo} onBlur={fb} /></Fld>
+                </div>
+              ))}
+              <button type="button" onClick={addEsp} style={{ width:'100%', padding:'10px', borderRadius:12, border:'1.5px dashed #BAE6FD', background:'transparent', color:'#0891B2', fontWeight:600, fontSize:13, cursor:'pointer', marginBottom:16 }}>
+                + Agregar especialista
+              </button>
+
+              <Fld label="Hospital / Clínica de preferencia">
+                <input value={form.hospital_preferencia} onChange={e=>set('hospital_preferencia',e.target.value)}
+                  placeholder="Ej. Hospital General de México" style={F} onFocus={fo} onBlur={fb} />
+              </Fld>
+
+              <p style={{ fontSize:11, fontWeight:700, color:'#9CA3AF', textTransform:'uppercase', letterSpacing:'0.07em', margin:'0 0 10px' }}>
+                Contacto de emergencia
+              </p>
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+                <Fld label="Nombre" mb={0}>
+                  <input value={form.contacto_emergencia_nombre} onChange={e=>set('contacto_emergencia_nombre',e.target.value)} placeholder="Nombre" style={F} onFocus={fo} onBlur={fb} />
+                </Fld>
+                <Fld label="Teléfono" mb={0}>
+                  <input type="tel" value={form.contacto_emergencia_telefono} onChange={e=>set('contacto_emergencia_telefono',e.target.value)} placeholder="Teléfono" style={F} onFocus={fo} onBlur={fb} />
+                </Fld>
+              </div>
+            </Section>
+
+            {/* ══ S5: Historia personal ════════════════════════════════════ */}
+            <Section color="#7C3AED" icon="📖" title="Historia personal" badge={b5}
+              open={open.s5} onToggle={() => setOpen(p=>({...p,s5:!p.s5}))}>
 
               <p style={{ fontSize:13, color:'#9CA3AF', margin:'0 0 16px', lineHeight:1.5 }}>
                 Ayuda a los cuidadores a conocer a la persona más allá de su condición médica.

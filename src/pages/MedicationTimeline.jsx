@@ -31,10 +31,11 @@ const FILTER_OPTIONS = [
   { id: 'caregiver_assigned',label: 'Turnos',        icon: '👤' },
 ]
 
-const RANGE_OPTIONS = [
-  { id: 7,  label: '7 días' },
-  { id: 30, label: '30 días' },
-  { id: 90, label: '3 meses' },
+const PERIOD_OPTIONS = [
+  { id: 'today',     label: 'Hoy' },
+  { id: 'yesterday', label: 'Ayer' },
+  { id: '7',         label: '7 días' },
+  { id: '30',        label: '30 días' },
 ]
 
 function careItemLabel(key) {
@@ -277,18 +278,29 @@ export default function MedicationTimeline() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [filterType, setFilterType] = useState('all')
-  const [daysRange, setDaysRange] = useState(30)
+  const [period, setPeriod] = useState('today')
 
   useEffect(() => {
     if (ownerId) fetchLog()
-  }, [ownerId, filterType, daysRange])
+  }, [ownerId, filterType, period])
 
   async function fetchLog() {
     setLoading(true)
     setError('')
     try {
-      const since = new Date()
-      since.setDate(since.getDate() - daysRange)
+      const now = new Date()
+      let since, until = null
+
+      if (period === 'today') {
+        since = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+      } else if (period === 'yesterday') {
+        const y = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1)
+        since = y
+        until = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+      } else {
+        since = new Date()
+        since.setDate(since.getDate() - parseInt(period))
+      }
 
       let q = supabase
         .from('activity_log')
@@ -299,6 +311,7 @@ export default function MedicationTimeline() {
         .limit(300)
 
       if (filterType !== 'all') q = q.eq('type', filterType)
+      if (until) q = q.lt('created_at', until.toISOString())
 
       const { data, error: err } = await q
       if (err) throw err
@@ -354,24 +367,21 @@ export default function MedicationTimeline() {
           ))}
         </div>
 
-        {/* Date range picker */}
-        <div style={{
-          display: 'flex', gap: 6, marginBottom: 20,
-          background: '#F3F4F6', borderRadius: 12, padding: 4,
-        }}>
-          {RANGE_OPTIONS.map(opt => (
+        {/* Filtros de período */}
+        <div style={{ display: 'flex', gap: 6, marginBottom: 20 }}>
+          {PERIOD_OPTIONS.map(opt => (
             <button
               key={opt.id}
-              onClick={() => setDaysRange(opt.id)}
+              onClick={() => setPeriod(opt.id)}
               style={{
-                flex: 1, padding: '8px 0',
-                borderRadius: 9, border: 'none',
+                flex: 1, padding: '9px 0',
+                borderRadius: 20, border: 'none',
                 fontSize: 12, fontWeight: 700,
                 cursor: 'pointer',
                 transition: 'all 0.15s',
-                background: daysRange === opt.id ? 'white' : 'transparent',
-                color: daysRange === opt.id ? '#1A1A1A' : '#9CA3AF',
-                boxShadow: daysRange === opt.id ? '0 1px 4px rgba(0,0,0,0.1)' : 'none',
+                background: period === opt.id ? '#2D4A1E' : '#F3F4F6',
+                color: period === opt.id ? 'white' : '#6B7280',
+                boxShadow: period === opt.id ? '0 2px 8px rgba(45,74,30,0.25)' : 'none',
               }}
             >
               {opt.label}

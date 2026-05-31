@@ -76,10 +76,14 @@ export default function Chat() {
   const [aiInput, setAiInput] = useState('')
   const [aiResponse, setAiResponse] = useState('')
   const [aiLoading, setAiLoading] = useState(false)
+  const [contextMsg, setContextMsg] = useState(null)   // mensaje con menú abierto
+  const [pinError, setPinError] = useState('')
   const bottomRef = useRef(null)
   const inputRef = useRef(null)
+  const longPressTimer = useRef(null)
 
   const displayName = user?.user_metadata?.full_name ?? user?.email ?? 'Familiar'
+  const isOwner = user?.id === ownerId
 
   const { recording, interim, error: speechError, start, stop, clearError } =
     useSpeechToText(text => setInput(prev => prev ? prev + ' ' + text : text))
@@ -206,6 +210,32 @@ export default function Chat() {
     setAiLoading(false)
   }
 
+  function startLongPress(msg) {
+    longPressTimer.current = setTimeout(() => setContextMsg(msg), 500)
+  }
+  function cancelLongPress() {
+    clearTimeout(longPressTimer.current)
+  }
+
+  async function togglePin(msg) {
+    setPinError('')
+    const alreadyPinned = msg.is_pinned
+    if (!alreadyPinned) {
+      const pinnedCount = messages.filter(m => m.is_pinned).length
+      if (pinnedCount >= 3) { setPinError('Máximo 3 mensajes fijados.'); setContextMsg(null); return }
+    }
+    const { error } = await supabase.from('chat_messages').update({
+      is_pinned: !alreadyPinned,
+      pinned_at: alreadyPinned ? null : new Date().toISOString(),
+    }).eq('id', msg.id)
+    if (!error) {
+      setMessages(prev => prev.map(m =>
+        m.id === msg.id ? { ...m, is_pinned: !alreadyPinned, pinned_at: alreadyPinned ? null : new Date().toISOString() } : m
+      ))
+    }
+    setContextMsg(null)
+  }
+
   function handleKeyDown(e) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
@@ -222,6 +252,7 @@ export default function Chat() {
   }, {})
 
   const isMe = id => id === user?.id
+  const pinnedMsgs = messages.filter(m => m.is_pinned).sort((a, b) => (a.pinned_at ?? '').localeCompare(b.pinned_at ?? ''))
 
   return (
     <Layout>
@@ -230,6 +261,73 @@ export default function Chat() {
         height: '100%', overflow: 'hidden',
         background: '#F7F3ED',
       }}>
+
+        {/* Barra de mensajes fijados */}
+        {pinnedMsgs.length > 0 && (
+          <div style={{
+            background: 'white', borderBottom: '1px solid #EDE5D8',
+            padding: '8px 14px', flexShrink: 0,
+          }}>
+            {pinError && (
+              <p style={{ fontSize: 11, color: '#D63031', marginBottom: 4 }}>⚠ {pinError}</p>
+            )}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+              {pinnedMsgs.map(msg => {
+                const msgText = msg.content ?? msg.message ?? ''
+                const canUnpin = isOwner || msg.user_id === user?.id
+                return (
+                  <div key={msg.id} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 14, flexShrink: 0 }}>📌</span>
+                    <p style={{ flex: 1, fontSize: 12, color: '#374151', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {msgText}
+                    </p>
+                    {canUnpin && (
+                      <button onClick={() => togglePin(msg)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9CA3AF', fontSize: 14, flexShrink: 0, padding: 0 }}>
+                        ✕
+                      </button>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Overlay de menú contextual (long press) */}
+        {contextMsg && (
+          <div
+            style={{ position: 'fixed', inset: 0, zIndex: 300, background: 'rgba(0,0,0,0.45)' }}
+            onClick={() => setContextMsg(null)}
+          >
+            <div
+              style={{
+                position: 'absolute', bottom: 96, left: '50%', transform: 'translateX(-50%)',
+                background: 'white', borderRadius: 18, overflow: 'hidden',
+                boxShadow: '0 16px 48px rgba(0,0,0,0.2)', minWidth: 240,
+              }}
+              onClick={e => e.stopPropagation()}
+            >
+              <div style={{ padding: '12px 16px', borderBottom: '1px solid #F3F4F6' }}>
+                <p style={{ fontSize: 12, color: '#9CA3AF', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  "{(contextMsg.content ?? contextMsg.message ?? '').slice(0, 50)}"
+                </p>
+              </div>
+              <button
+                onClick={() => togglePin(contextMsg)}
+                style={{ width: '100%', padding: '14px 16px', border: 'none', background: 'none', cursor: 'pointer', textAlign: 'left', fontSize: 14, fontWeight: 600, color: contextMsg.is_pinned ? '#D63031' : '#2D4A1E', display: 'flex', alignItems: 'center', gap: 10 }}
+              >
+                <span style={{ fontSize: 18 }}>{contextMsg.is_pinned ? '📍' : '📌'}</span>
+                {contextMsg.is_pinned ? 'Desfijar mensaje' : 'Fijar mensaje'}
+              </button>
+              <button
+                onClick={() => setContextMsg(null)}
+                style={{ width: '100%', padding: '12px 16px', border: 'none', background: '#F9F5F1', cursor: 'pointer', textAlign: 'center', fontSize: 13, fontWeight: 600, color: '#9CA3AF' }}
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Messages area */}
         <div style={{
@@ -286,12 +384,17 @@ export default function Chat() {
                   return (
                     <div
                       key={msg.id}
+                      onPointerDown={() => startLongPress(msg)}
+                      onPointerUp={cancelLongPress}
+                      onPointerLeave={cancelLongPress}
+                      onContextMenu={e => { e.preventDefault(); setContextMsg(msg) }}
                       style={{
                         display: 'flex',
                         justifyContent: mine ? 'flex-end' : 'flex-start',
                         alignItems: 'flex-end',
                         gap: 8,
                         marginBottom: (!nextMsg || nextMsg.user_id !== msg.user_id) ? 8 : 2,
+                        userSelect: 'none',
                       }}
                     >
                       {/* Avatar placeholder for alignment on "mine" side */}
@@ -344,13 +447,15 @@ export default function Chat() {
                           {msgText}
                         </div>
 
-                        {/* Timestamp */}
+                        {/* Timestamp + pin indicator */}
                         <span style={{
                           fontSize: 10, color: '#BBBBBB',
                           marginTop: 3,
                           marginLeft: mine ? 0 : 4,
                           marginRight: mine ? 4 : 0,
+                          display: 'flex', alignItems: 'center', gap: 3,
                         }}>
+                          {msg.is_pinned && <span style={{ fontSize: 10 }}>📌</span>}
                           {formatTime(msg.created_at)}
                         </span>
                       </div>

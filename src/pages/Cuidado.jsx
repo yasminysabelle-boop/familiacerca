@@ -208,6 +208,32 @@ export default function Cuidado() {
               </span>
             </div>
 
+            {/* Barra de progreso */}
+            {!loading && requiredItems.length > 0 && (
+              <div style={{ marginBottom: 14, background: 'white', borderRadius: 16, border: '1px solid #EDE5D8', padding: '14px 16px', boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: completedRequired === requiredItems.length ? '#16A34A' : '#374151', margin: 0 }}>
+                    {completedRequired === requiredItems.length
+                      ? '¡Todo listo por hoy! 🎉'
+                      : `${completedRequired} de ${requiredItems.length} completadas`}
+                  </p>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: completedRequired === requiredItems.length ? '#16A34A' : '#4A7C59' }}>
+                    {Math.round((completedRequired / requiredItems.length) * 100)}%
+                  </span>
+                </div>
+                <div style={{ height: 8, borderRadius: 4, background: '#F3F4F6', overflow: 'hidden' }}>
+                  <div style={{
+                    height: '100%', borderRadius: 4,
+                    width: `${(completedRequired / requiredItems.length) * 100}%`,
+                    background: completedRequired === requiredItems.length
+                      ? 'linear-gradient(90deg, #22C55E, #16A34A)'
+                      : 'linear-gradient(90deg, #2D4A1E, #4A7C59)',
+                    transition: 'width 0.4s ease',
+                  }} />
+                </div>
+              </div>
+            )}
+
             {isFamiliar && (
               <div style={{
                 display: 'flex', alignItems: 'center', gap: 10,
