@@ -90,8 +90,9 @@ export default function Onboarding() {
   useEffect(() => {
     if (familyLoading || !user) return
     if (ownerId && ownerId !== user.id) {
-      // Fire-and-forget is intentional here — member redirect must not block on metadata update
-      supabase.auth.updateUser({ data: { onboarding_completed: true } }).catch(() => {})
+      // Fire-and-forget — member redirect must not block on metadata update
+      supabase.auth.updateUser({ data: { onboarding_completed: true } })
+        .catch(err => console.warn('[Onboarding] member metadata update failed:', err))
       navigate('/hoy', { replace: true })
     }
   }, [user, ownerId, familyLoading, navigate])

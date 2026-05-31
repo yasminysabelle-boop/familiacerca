@@ -257,6 +257,11 @@ export default function Medications() {
   async function processPhoto(file, type) {
     setAddStep('ai-processing')
     setAddAiError('')
+    if (!AI_KEY) {
+      setAddAiError('Función no disponible. Ingresa los datos manualmente.')
+      setAddStep('form')
+      return
+    }
     try {
       const b64  = await toBase64(file)
       const mime = file.type || 'image/jpeg'

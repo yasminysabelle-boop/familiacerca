@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
+import { useSubscription } from '../contexts/SubscriptionContext'
 import { supabase } from '../lib/supabase'
 import { XIcon } from './Icons'
 
@@ -25,6 +26,7 @@ function fmtDate(dateStr) {
 
 export default function MedicationStockTab({ med, ownerId, isFamiliar, onClose }) {
   const { user } = useAuth()
+  const { canEdit } = useSubscription()
   const [stock, setStock] = useState(null)
   const [renewals, setRenewals] = useState([])
   const [loading, setLoading] = useState(true)
@@ -52,10 +54,11 @@ export default function MedicationStockTab({ med, ownerId, isFamiliar, onClose }
   }
 
   async function handleRenew() {
+    if (isFamiliar || !canEdit) return
     const count = parseInt(newPillCount)
     if (!count || count <= 0) return
     setRenewing(true)
-    const dosesPerDay = stock?.doses_per_day ?? 1
+    const dosesPerDay = Math.max(1, stock?.doses_per_day ?? 1)
     const days = Math.floor(count / dosesPerDay)
     const end = new Date()
     end.setDate(end.getDate() + days)
@@ -219,7 +222,7 @@ export default function MedicationStockTab({ med, ownerId, isFamiliar, onClose }
             )}
 
             {/* Renew button */}
-            {!isFamiliar && (
+            {!isFamiliar && canEdit && (
               <button
                 onClick={() => setShowRenewModal(true)}
                 style={{

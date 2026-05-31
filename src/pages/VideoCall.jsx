@@ -44,8 +44,11 @@ export default function VideoCall() {
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
         body: JSON.stringify({ ownerId, title: 'Llamada ahora', scheduledAt: new Date().toISOString(), participants: 'all' }),
       })
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        throw new Error(body.error ?? `Error ${res.status}`)
+      }
       const body = await res.json()
-      if (!res.ok) throw new Error(body.error ?? 'Error al iniciar')
       navigate(`/videollamada?id=${body.callId}`, { replace: true })
     } catch (err) {
       setInstantError(err.message)
@@ -62,6 +65,8 @@ export default function VideoCall() {
       .maybeSingle()
     if (err || !data) {
       setError('No se encontró la videollamada.')
+    } else if (ownerId && data.owner_id !== ownerId) {
+      setError('No tienes acceso a esta videollamada.')
     } else {
       setCall(data)
     }
@@ -308,9 +313,15 @@ export default function VideoCall() {
                   <p style={{ color: '#FCA5A5', fontSize: 13, fontWeight: 600, margin: '0 0 4px' }}>
                     Permisos denegados
                   </p>
-                  <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 12, margin: 0, lineHeight: 1.5 }}>
-                    Activa cámara y micrófono desde los ajustes de tu navegador para unirte.
+                  <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 12, margin: '0 0 10px', lineHeight: 1.5 }}>
+                    Activa cámara y micrófono desde los ajustes de tu navegador.
                   </p>
+                  <button
+                    onClick={requestPermissionsAndJoin}
+                    style={{ padding: '8px 18px', borderRadius: 10, border: 'none', background: 'rgba(255,255,255,0.2)', color: 'white', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}
+                  >
+                    Intentar de nuevo
+                  </button>
                 </div>
               )}
 

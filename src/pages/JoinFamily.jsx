@@ -46,9 +46,9 @@ export default function JoinFamily() {
   }, [token])
 
   // If user just logged in and we have a valid invitation, accept automatically.
-  // Guard: skip if the logged-in user is the admin who created this invitation.
+  // Guard: skip if the logged-in user is the admin, or if acceptance is already in flight.
   useEffect(() => {
-    if (user && invitation && invitation.status === 'pending' && !isExpired(invitation) && !accepted) {
+    if (user && invitation && invitation.status === 'pending' && !isExpired(invitation) && !accepted && !accepting) {
       if (user.id === invitation.user_id) return
       acceptInvitation()
     }

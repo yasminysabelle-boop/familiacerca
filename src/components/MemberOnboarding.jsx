@@ -64,7 +64,9 @@ export default function MemberOnboarding({ onDone }) {
         const { error: upErr } = await supabase.storage
           .from('avatars')
           .upload(path, photoFile, { upsert: true, contentType: photoFile.type })
-        if (!upErr) {
+        if (upErr) {
+          setError('No se pudo subir la foto. Tu perfil se guardará sin imagen.')
+        } else {
           const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(path)
           avatarUrl = publicUrl
         }

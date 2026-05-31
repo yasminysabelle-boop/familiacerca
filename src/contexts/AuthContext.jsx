@@ -26,6 +26,9 @@ export function AuthProvider({ children }) {
     supabase.auth.getSession().then(({ data: { session } }) => {
       clearTimeout(timer)
       resolve(session)
+    }).catch(() => {
+      clearTimeout(timer)
+      resolve(null)
     })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {

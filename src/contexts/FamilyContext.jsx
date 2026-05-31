@@ -98,7 +98,9 @@ export function FamilyProvider({ children }) {
                     .eq('member_user_id', user.id)
                     .neq('user_id', user.id)
                   if (recheck?.length) loadFamilies()
-                } catch { }
+                } catch (err) {
+                  console.warn('[FamilyContext] membership recheck failed:', err)
+                }
               }, 3000)
             }
           }

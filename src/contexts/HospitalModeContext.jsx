@@ -62,7 +62,11 @@ export function HospitalModeProvider({ children }) {
           }
         }
       )
-      .subscribe()
+      .subscribe(status => {
+        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+          console.warn('[HospitalModeContext] subscription failed:', status)
+        }
+      })
     channelRef.current = channel
   }
 
@@ -130,7 +134,7 @@ export function HospitalModeProvider({ children }) {
     try {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) return
-      await fetch(
+      const res = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-hospital-notification`,
         {
           method: 'POST',
@@ -141,8 +145,12 @@ export function HospitalModeProvider({ children }) {
           body: JSON.stringify({ ownerId, action, activatedByName, hospitalName }),
         }
       )
+      if (!res.ok) {
+        const body = await res.text().catch(() => '')
+        console.warn('[HospitalModeContext] notification failed:', res.status, body)
+      }
     } catch (err) {
-      console.warn('[HospitalModeContext] notification failed:', err)
+      console.warn('[HospitalModeContext] notification error:', err)
     }
   }
 

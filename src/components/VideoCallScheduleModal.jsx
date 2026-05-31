@@ -96,10 +96,14 @@ export default function VideoCallScheduleModal({ open, onClose }) {
 
   async function handleSchedule() {
     if (!date || !time) return
+    const scheduledAt = new Date(`${date}T${time}`).toISOString()
+    if (new Date(scheduledAt) <= new Date()) {
+      setScheduleError('La fecha y hora deben ser en el futuro.')
+      return
+    }
     setScheduling(true)
     setScheduleError('')
     try {
-      const scheduledAt = new Date(`${date}T${time}`).toISOString()
       const participants = participantMode === 'all'
         ? 'all'
         : selectedIds.length > 0 ? selectedIds : 'all'
@@ -117,8 +121,10 @@ export default function VideoCallScheduleModal({ open, onClose }) {
           participants,
         }),
       })
-      const body = await res.json()
-      if (!res.ok) throw new Error(body.error ?? 'Error al programar')
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        throw new Error(body.error ?? `Error ${res.status}`)
+      }
       setView('list')
       loadUpcoming()
       setTitle('')
@@ -145,8 +151,11 @@ export default function VideoCallScheduleModal({ open, onClose }) {
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
         body: JSON.stringify({ ownerId, title: 'Llamada ahora', scheduledAt: new Date().toISOString(), participants: 'all' }),
       })
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        throw new Error(body.error ?? `Error ${res.status}`)
+      }
       const body = await res.json()
-      if (!res.ok) throw new Error(body.error ?? 'Error al iniciar')
       onClose()
       navigate(`/videollamada?id=${body.callId}`)
     } catch (err) {

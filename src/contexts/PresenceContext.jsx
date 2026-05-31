@@ -24,12 +24,13 @@ export function PresenceProvider({ children }) {
       .subscribe(async status => {
         if (status === 'SUBSCRIBED') {
           await channel.track({ userId: user.id })
+        } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+          console.warn('[PresenceContext] subscription failed:', status)
         }
       })
 
     return () => {
-      channel.unsubscribe()
-      supabase.removeChannel(channel)
+      channel.unsubscribe().then(() => supabase.removeChannel(channel)).catch(() => supabase.removeChannel(channel))
     }
   }, [user?.id, ownerId])
 

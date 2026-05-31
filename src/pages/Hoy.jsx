@@ -177,9 +177,10 @@ export default function Hoy() {
   }
 
   async function confirmMed(med) {
+    if (isFamiliar) return
     setConfirming(med.id)
     try {
-      const loc = await getLocation({ force: true })
+      const loc = await getLocation({ force: true }).catch(() => null)
       const confirmedAt = new Date().toISOString()
       await supabase.from('medication_logs').upsert({
         medication_id: med.id,
@@ -264,14 +265,19 @@ export default function Hoy() {
     if (!f) return
     setUploadError('')
     setProofStamping(true)
-    const [stamped, loc] = await Promise.all([
-      stampProof(f, displayName),
-      getLocation({ force: true }),
-    ])
-    setProofBlob(stamped)
-    setProofPreview(URL.createObjectURL(stamped))
-    setProofGps(loc)
-    setProofStamping(false)
+    try {
+      const [stamped, loc] = await Promise.all([
+        stampProof(f, displayName),
+        getLocation({ force: true }).catch(() => null),
+      ])
+      setProofBlob(stamped)
+      setProofPreview(URL.createObjectURL(stamped))
+      setProofGps(loc)
+    } catch (err) {
+      setUploadError('No se pudo procesar la foto. Intenta de nuevo.')
+    } finally {
+      setProofStamping(false)
+    }
   }
 
   async function submitProofPhoto() {

@@ -189,7 +189,7 @@ export default function OnboardingFlow() {
     const scheduled_times = computeScheduledTimes(medFrequency, medTimes)
     const firstTime = scheduled_times[0] ?? null
     try {
-      await supabase.from('medications').insert({
+      const { error: medErr } = await supabase.from('medications').insert({
         user_id: user.id,
         name: medName.trim(),
         dosage: medDose.trim() || null,
@@ -197,7 +197,10 @@ export default function OnboardingFlow() {
         time: firstTime,
         scheduled_times: scheduled_times.length ? scheduled_times : null,
       })
-    } catch { }
+      if (medErr) console.warn('[OnboardingFlow] medication insert failed:', medErr)
+    } catch (err) {
+      console.warn('[OnboardingFlow] medication insert error:', err)
+    }
     await generateLink()
     setSaving(false)
     setStep(3)
