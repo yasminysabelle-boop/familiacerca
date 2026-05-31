@@ -1692,6 +1692,7 @@ export default function Dashboard() {
   const [showVideoCallModal, setShowVideoCallModal] = useState(false)
   const [startingInstantCall, setStartingInstantCall] = useState(false)
   const [instantCallError, setInstantCallError] = useState('')
+  const [renewalAlerts, setRenewalAlerts] = useState([])
   const { refresh: refreshSub } = useSubscription()
   const [searchParams, setSearchParams] = useSearchParams()
 
@@ -2360,6 +2361,25 @@ export default function Dashboard() {
     setConfirming(null)
   }
 
+  useEffect(() => {
+    if (!ownerId) return
+    async function checkRenewalAlerts() {
+      const in7 = new Date(); in7.setDate(in7.getDate() + 7)
+      const { data: stocks } = await supabase
+        .from('medication_stock')
+        .select('medication_id, estimated_end_date, pills_remaining')
+        .eq('user_id', ownerId)
+        .lte('estimated_end_date', in7.toISOString().split('T')[0])
+      if (!stocks?.length) { setRenewalAlerts([]); return }
+      const { data: meds } = await supabase
+        .from('medications').select('id, name, dosage').in('id', stocks.map(s => s.medication_id))
+      setRenewalAlerts((meds ?? []).map(m => ({
+        ...m, stock: stocks.find(s => s.medication_id === m.id),
+      })))
+    }
+    checkRenewalAlerts()
+  }, [ownerId])
+
   async function handleInstantCall() {
     if (!ownerId || startingInstantCall) return
     setStartingInstantCall(true)
@@ -2598,6 +2618,46 @@ export default function Dashboard() {
         </div>
       )}
       <TrialBanner />
+
+      {/* Sticky renewal alerts */}
+      {renewalAlerts.map(med => {
+        const days = med.stock?.estimated_end_date
+          ? Math.ceil((new Date(med.stock.estimated_end_date + 'T12:00:00') - new Date()) / (1000 * 60 * 60 * 24))
+          : null
+        const urgent = days != null && days <= 3
+        return (
+          <div
+            key={med.id}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 12,
+              margin: '0 16px 10px', padding: '12px 14px',
+              borderRadius: 14, border: `1.5px solid ${urgent ? '#FCA5A5' : '#FDE68A'}`,
+              background: urgent ? '#FEF2F2' : '#FFFBEB',
+            }}
+          >
+            <span style={{ fontSize: 20, flexShrink: 0 }}>{urgent ? '🚨' : '🔔'}</span>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ fontSize: 13, fontWeight: 700, color: urgent ? '#DC2626' : '#7A5A18', margin: 0, lineHeight: 1.3 }}>
+                {days <= 0 ? `${med.name} se agotó` : `${med.name} — ${days === 1 ? 'mañana se acaba' : `${days} días restantes`}`}
+              </p>
+              <p style={{ fontSize: 11, color: '#9CA3AF', margin: '2px 0 0' }}>
+                {med.stock?.pills_remaining} pastillas · toca para renovar
+              </p>
+            </div>
+            <button
+              onClick={() => navigate('/medications')}
+              style={{
+                padding: '6px 12px', borderRadius: 10, border: 'none', flexShrink: 0,
+                background: urgent ? '#DC2626' : '#C9882A',
+                color: 'white', fontWeight: 700, fontSize: 12, cursor: 'pointer',
+              }}
+            >
+              Renovar
+            </button>
+          </div>
+        )
+      })}
+
       {confirmError && (
         <div style={{
           position: 'fixed', top: 64, left: '50%', transform: 'translateX(-50%)',
