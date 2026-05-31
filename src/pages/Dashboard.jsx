@@ -1604,7 +1604,7 @@ function AlertDetailRow({ evt, onTap }) {
       <span style={{ fontSize: 18, flexShrink: 0 }}>{evt.resolved ? '✅' : '🚨'}</span>
       <div style={{ flex: 1, minWidth: 0 }}>
         <p style={{ fontSize: 13, fontWeight: 700, color: evt.resolved ? '#374151' : '#D63031', margin: 0 }}>
-          {evt.resolved ? 'Emergencia resuelta' : 'Emergencia SOS'}
+          {evt.resolved ? 'Emergencia resuelta' : 'SOS Emergencia'}
         </p>
         <div style={{ display: 'flex', gap: 8, marginTop: 2 }}>
           {evt.triggeredBy && <span style={{ fontSize: 11, color: '#6B7280' }}>{evt.triggeredBy.split(' ')[0]}</span>}
@@ -2800,7 +2800,7 @@ export default function Dashboard() {
               <AlertTriangle size={22} color="white" strokeWidth={2} />
             </div>
             <div style={{ flex: 1, textAlign: 'left' }}>
-              <p style={{ fontSize: 15, fontWeight: 800, color: 'white', margin: 0 }}>Emergencia SOS</p>
+              <p style={{ fontSize: 15, fontWeight: 800, color: 'white', margin: 0 }}>SOS Emergencia</p>
               <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)', margin: '3px 0 0' }}>
                 {sosSent ? 'Alerta enviada — familia notificada' : 'Toca para alertar a toda la familia'}
               </p>
@@ -2817,13 +2817,13 @@ export default function Dashboard() {
             </div>
           </button>
 
-          {/* Fila 1: Medicamentos | Cuidado de hoy */}
+          {/* Fila 1: Medicamentos | Rutinas de hoy */}
           <DashCard Icon={Pill}           title="Medicamentos"       subtitle={medCardSubtitle}                                                                                         status={medCardStatus}  statusType={medCardStatusType}  to="/hoy" />
-          <DashCard Icon={ClipboardCheck} title="Cuidado de hoy"     subtitle={medTotal > 0 ? `${medTotal} med${medTotal !== 1 ? 's' : ''} programados` : 'Rutina diaria'}              status={careStatus}     statusType={careStatusType}     to="/cuidado" />
+          <DashCard Icon={ClipboardCheck} title="Rutinas de hoy"     subtitle={medTotal > 0 ? `${medTotal} med${medTotal !== 1 ? 's' : ''} programados` : 'Rutina diaria'}              status={careStatus}     statusType={careStatusType}     to="/cuidado" />
 
-          {/* Fila 2: Historial | Chat familiar */}
+          {/* Fila 2: Historial | Mensajes */}
           <DashCard Icon={Clock}          title="Historial"           subtitle="Registro completo de cuidado"                                                            status="Ver historial"  statusType="info"               to="/historial" />
-          <DashCard Icon={Chat}           title="Chat familiar"       subtitle="Mensajes del equipo"                                                                                     status="Ver chat"       statusType="info"                to="/chat" />
+          <DashCard Icon={Chat}           title="Mensajes"            subtitle="Chat con el equipo familiar"                                                                            status="Ver mensajes"   statusType="info"                to="/chat" />
 
           {/* Fila 3: Citas médicas | Cuentas Claras */}
           <DashCard
@@ -2836,9 +2836,9 @@ export default function Dashboard() {
           />
           <DashCard Icon={Receipt}        title="Cuentas Claras"      subtitle="Control de gastos"                                                                                       status="Ver gastos"     statusType="info"                to="/gastos" />
 
-          {/* Fila 4: Perfil del paciente | Mi equipo */}
-          <DashCard Icon={User}           title="Perfil del paciente" subtitle="Diagnósticos y alergias"                                                                                 status="Ver perfil"     statusType="info"                to="/paciente/perfil" />
-          <DashCard Icon={Users}          title="Mi equipo"           subtitle="Cuidadores y familiares"                                                                                 status="Ver equipo"     statusType="info"                to="/familia" />
+          {/* Fila 4: Perfil del paciente | Equipo de cuidado */}
+          <DashCard Icon={User}           title={`Perfil de ${profile?.name?.split(' ')[0] ?? 'paciente'}`} subtitle="Diagnósticos y alergias"                                          status="Ver perfil"     statusType="info"                to="/paciente/perfil" />
+          <DashCard Icon={Users}          title="Equipo de cuidado"   subtitle="Cuidadores y familiares"                                                                                 status="Ver equipo"     statusType="info"                to="/familia" />
 
           {/* Fila 5: Diario Médico | Videollamada */}
           <DashCard Icon={BookOpen} title="Diario Médico"  subtitle="Historia clínica con IA"    status="Ver diario"  statusType="info" to="/diario-medico" />

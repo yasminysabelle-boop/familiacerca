@@ -93,7 +93,7 @@ export default function MemoryAlbum() {
     <Layout>
       <div className="p-4 md:p-8 max-w-4xl">
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900">Álbum familiar</h2>
+          <h2 className="text-2xl font-bold text-gray-900">Fotos y videos</h2>
           <p className="text-gray-500 mt-1">Fotos y videos de momentos especiales en familia</p>
         </div>
 

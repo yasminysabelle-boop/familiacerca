@@ -196,7 +196,7 @@ export default function Cuidado() {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
               <p style={{ fontSize: 16, fontWeight: 700, color: '#1A1A1A', fontFamily: 'Georgia, serif', margin: 0 }}>
-                Cuidado de hoy
+                Rutinas de hoy
               </p>
               <span style={{
                 fontSize: 11, fontWeight: 700,

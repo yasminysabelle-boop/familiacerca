@@ -589,9 +589,9 @@ export default function Familia() {
           boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
         }}>
           {[
-            { to: '/album',    icon: '📸', label: 'Álbum familiar',  desc: 'Fotos y videos de momentos especiales' },
-            { to: '/memorias', icon: '🎙️', label: 'Memorias',        desc: 'Diario de voz familiar' },
-            { to: '/reportes', icon: '📊', label: 'Reportes',        desc: 'Análisis semanal y PDF médico' },
+            { to: '/album',    icon: '📸', label: 'Fotos y videos',    desc: 'Fotos y videos de momentos especiales' },
+            { to: '/memorias', icon: '🎙️', label: 'Memorias de voz',  desc: 'Diario de voz familiar' },
+            { to: '/reportes', icon: '📊', label: 'Reportes médicos', desc: 'Análisis semanal y PDF médico' },
           ].map(({ to, icon, label, desc }, i, arr) => (
             <Link
               key={to}

@@ -245,7 +245,7 @@ export default function Chat() {
             }}>
               <div style={{ fontSize: 44, marginBottom: 12 }}>💬</div>
               <p style={{ fontSize: 14, fontWeight: 600, color: '#1A1A1A', marginBottom: 6 }}>
-                Chat familiar
+                Mensajes familiares
               </p>
               <p style={{ fontSize: 12, color: '#9CA3AF', lineHeight: 1.6 }}>
                 Todos los miembros de la familia pueden ver estos mensajes.

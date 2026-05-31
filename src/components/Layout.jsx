@@ -15,23 +15,23 @@ import { useHospitalMode } from '../contexts/HospitalModeContext'
 const PAGE_TITLES = {
   '/dashboard':      'Inicio',
   '/hoy':            'Medicamentos',
-  '/cuidado':        'Cuidado de hoy',
-  '/memorias':       'Memorias',
-  '/diario-voz':     'Memorias',
+  '/cuidado':        'Rutinas de hoy',
+  '/memorias':       'Memorias de voz',
+  '/diario-voz':     'Memorias de voz',
   '/familia':        'Mi Familia',
   '/medications':    'Medicamentos',
   '/historial':      'Historial de cuidado',
   '/diario-medico':  'Diario Médico',
   '/calendar':       'Citas médicas',
   '/notes':          'Notas',
-  '/chat':           'Chat familiar',
-  '/album':          'Álbum familiar',
-  '/reportes':       'Reportes',
+  '/chat':           'Mensajes',
+  '/album':          'Fotos y videos',
+  '/reportes':       'Reportes médicos',
   '/mas':            'Más opciones',
   '/gastos':         'Cuentas Claras',
   '/directorio':     'Directorio',
   '/permisos':       'Permisos',
-  '/ajustes':        'Mi cuenta',
+  '/ajustes':        'Mi Cuenta',
   '/pricing':        'Planes',
   '/paciente/perfil':'Perfil del paciente',
   '/videollamada':   'Videollamada',
@@ -41,8 +41,8 @@ const PRIMARY_PAGES = new Set(['/dashboard', '/familia', '/ajustes'])
 
 const BOTTOM_TABS = [
   { to: '/dashboard', Icon: Home,     label: 'Inicio' },
-  { to: '/familia',   Icon: Users,    label: 'Familia' },
-  { to: '/ajustes',   Icon: Settings, label: 'Ajustes' },
+  { to: '/familia',   Icon: Users,    label: 'Mi Familia' },
+  { to: '/ajustes',   Icon: Settings, label: 'Mi Cuenta' },
 ]
 
 export default function Layout({ children }) {
