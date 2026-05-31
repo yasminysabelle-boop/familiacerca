@@ -486,9 +486,13 @@ Return ONLY valid JSON.`
               const stockBg = days == null ? '#F3F4F6'
                 : days <= 1 ? '#FEF2F2' : days <= 3 ? '#FEF3C7' : days <= 7 ? '#FFFBEB' : '#F0FDF4'
 
-              // Stock dot color based on pills remaining
-              const pills = stock?.pills_remaining
-              const stockDot = pills == null ? null : pills <= 3 ? '#DC2626' : pills <= 15 ? '#EAB308' : '#22C55E'
+              // Stock dot: red ≤3, yellow ≤7, green >7 (null = no stock data → no dot)
+              const pills = stock?.pills_remaining ?? null
+              const stockDot = pills === null
+                ? null
+                : pills <= 3 ? '#EF4444'
+                : pills <= 7 ? '#EAB308'
+                : '#22C55E'
 
               return (
                 <div
@@ -497,13 +501,18 @@ Return ONLY valid JSON.`
                 >
                   <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ fontSize: 15, fontWeight: 700, color: '#1A1A1A', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
-                        {stockDot && (
-                          <span style={{ width: 9, height: 9, borderRadius: '50%', background: stockDot, flexShrink: 0, display: 'inline-block' }}
-                            title={pills <= 3 ? 'Stock crítico' : pills <= 15 ? 'Stock bajo' : 'Stock suficiente'} />
+                      <div style={{ fontSize: 15, fontWeight: 700, color: '#1A1A1A', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 7 }}>
+                        {stockDot !== null && (
+                          <span style={{
+                            display: 'block', width: 12, height: 12, borderRadius: '50%',
+                            background: stockDot, flexShrink: 0,
+                            boxShadow: `0 0 0 2px ${stockDot}33`,
+                          }}
+                            title={pills <= 3 ? 'Stock crítico' : pills <= 7 ? 'Stock bajo' : 'Stock suficiente'}
+                          />
                         )}
-                        💊 {med.name}
-                      </p>
+                        <span>💊 {med.name}</span>
+                      </div>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
                         {med.dosage && <span style={{ fontSize: 12, color: '#6B7280' }}>{med.dosage}</span>}
                         {(opt?.label ?? med.frequency) && (

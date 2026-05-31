@@ -152,9 +152,11 @@ export default function PatientProfile() {
 
   async function fetchProfile() {
     setLoading(true)
-    const { data:row } = await supabase
-      .from('patient_profiles').select('*')
-      .eq('owner_id', ownerId).maybeSingle()
+    const [{ data: row }, { data: cp }] = await Promise.all([
+      supabase.from('patient_profiles').select('*').eq('owner_id', ownerId).maybeSingle(),
+      supabase.from('care_profiles').select('name, photo_url').eq('user_id', ownerId).maybeSingle(),
+    ])
+
     if (row) {
       setForm({
         ...EMPTY,
@@ -165,7 +167,17 @@ export default function PatientProfile() {
           : (row.alergias ?? []).map(n => ({ nombre:n, reaccion:'' })),
         peso:  row.peso?.toString()  ?? '',
         talla: row.talla?.toString() ?? '',
+        // Fill in name/photo from care_profiles if patient_profiles is missing them
+        nombre_completo: row.nombre_completo || cp?.name || '',
+        foto_url: row.foto_url || cp?.photo_url || '',
       })
+    } else if (cp) {
+      // patient_profiles doesn't exist yet — bootstrap from care_profiles
+      setForm(prev => ({
+        ...prev,
+        nombre_completo: cp.name ?? '',
+        foto_url: cp.photo_url ?? '',
+      }))
     }
     setLoading(false)
   }
