@@ -164,13 +164,24 @@ export default function Medications() {
   // ── Data fetching ──────────────────────────────────────────────────────────
   async function fetchAll() {
     setLoading(true)
-    const { data } = await supabase
+    const { data: medsData } = await supabase
       .from('medications').select('*').eq('user_id', ownerId)
       .order('created_at', { ascending: false })
-    const meds = data ?? []
-    setMedications(meds)
+    const meds = medsData ?? []
+
+    // Fetch stock in the same call so pills_remaining is available on first render
+    let stockMap = {}
+    if (meds.length) {
+      const { data: stockData } = await supabase
+        .from('medication_stock').select('*').eq('user_id', ownerId)
+        .in('medication_id', meds.map(m => m.id))
+      ;(stockData ?? []).forEach(s => { stockMap[s.medication_id] = s })
+    }
+
+    setStockByMedId(stockMap)
+    // Merge pills_remaining directly onto each med so the dot never flickers
+    setMedications(meds.map(m => ({ ...m, pills_remaining: stockMap[m.id]?.pills_remaining ?? null })))
     setLoading(false)
-    if (meds.length) fetchStockData(meds)
   }
 
   async function fetchStockData(meds) {
@@ -181,6 +192,7 @@ export default function Medications() {
     const map = {}
     ;(data ?? []).forEach(s => { map[s.medication_id] = s })
     setStockByMedId(map)
+    setMedications(prev => prev.map(m => ({ ...m, pills_remaining: map[m.id]?.pills_remaining ?? null })))
   }
 
   // ── Form helpers ───────────────────────────────────────────────────────────
@@ -486,28 +498,22 @@ Return ONLY valid JSON.`
               const stockBg = days == null ? '#F3F4F6'
                 : days <= 1 ? '#FEF2F2' : days <= 3 ? '#FEF3C7' : days <= 7 ? '#FFFBEB' : '#F0FDF4'
 
-              // Stock dot: red ≤3, yellow ≤7, green >7 (null = no stock data → no dot)
-              const pills = stock?.pills_remaining ?? null
-              const stockDot = pills === null
-                ? null
-                : pills <= 3 ? '#EF4444'
-                : pills <= 7 ? '#EAB308'
-                : '#22C55E'
-
               return (
                 <div
                   key={med.id}
-                  style={{ background: 'white', borderRadius: 16, border: '1px solid #EDE5D8', borderLeft: `4px solid ${stockDot ?? '#4A7C59'}`, padding: '14px 16px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
+                  style={{ background: 'white', borderRadius: 16, border: '1px solid #EDE5D8', borderLeft: `4px solid ${stock ? (stock.pills_remaining <= 3 ? '#ef4444' : stock.pills_remaining <= 7 ? '#eab308' : '#22c55e') : '#4A7C59'}`, padding: '14px 16px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
                 >
                   <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 4 }}>
-                        {stockDot !== null && (
-                          <div style={{
-                            width: 12, height: 12, borderRadius: '50%',
-                            backgroundColor: stockDot, flexShrink: 0,
-                          }} />
-                        )}
+                        {(() => {
+                          const pills = med.pills_remaining ?? stock?.pills_remaining ?? null
+                          if (pills === null) return null
+                          const color = pills <= 3 ? '#ef4444' : pills <= 7 ? '#eab308' : '#22c55e'
+                          return (
+                            <div style={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: color, flexShrink: 0, display: 'inline-block' }} />
+                          )
+                        })()}
                         <span style={{ fontSize: 15, fontWeight: 700, color: '#1A1A1A' }}>
                           💊 {med.name}
                         </span>
