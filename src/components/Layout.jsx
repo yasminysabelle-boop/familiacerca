@@ -1,8 +1,8 @@
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import Logo from './Logo'
-import { Home, Users, User, Menu, Settings } from './Icons'
+import { Home, Users, User, Menu, Settings, ChevronLeft } from './Icons'
 import Paywall from './Paywall'
 import InstallBanner from './InstallBanner'
 import OfflineBanner from './OfflineBanner'
@@ -13,28 +13,31 @@ import CompanionChat from './CompanionChat'
 import { useHospitalMode } from '../contexts/HospitalModeContext'
 
 const PAGE_TITLES = {
-  '/dashboard':   'Inicio',
-  '/hoy':         'Medicamentos de hoy',
-  '/memorias':    'Memorias',
-  '/diario-voz':  'Memorias',
-  '/familia':     'Mi Familia',
-  '/medications': 'Medicamentos',
-  '/historial':   'Historial de cuidado',
-  '/diario-medico': 'Diario Médico',
-  '/calendar':    'Calendario',
-  '/notes':       'Notas',
-  '/chat':        'Chat familiar',
-  '/album':       'Álbum familiar',
-  '/reportes':    'Reportes',
-  '/perfil':      'Perfil familiar',
-  '/mas':         'Más opciones',
-  '/gastos':      'Cuentas Claras',
-  '/directorio':  'Directorio',
-  '/permisos':    'Permisos',
-  '/ajustes':     'Mi cuenta',
-  '/pricing':     'Planes',
-  '/mas':         'Más opciones',
+  '/dashboard':      'Inicio',
+  '/hoy':            'Medicamentos',
+  '/cuidado':        'Cuidado de hoy',
+  '/memorias':       'Memorias',
+  '/diario-voz':     'Memorias',
+  '/familia':        'Mi Familia',
+  '/medications':    'Medicamentos',
+  '/historial':      'Historial de cuidado',
+  '/diario-medico':  'Diario Médico',
+  '/calendar':       'Citas médicas',
+  '/notes':          'Notas',
+  '/chat':           'Chat familiar',
+  '/album':          'Álbum familiar',
+  '/reportes':       'Reportes',
+  '/mas':            'Más opciones',
+  '/gastos':         'Cuentas Claras',
+  '/directorio':     'Directorio',
+  '/permisos':       'Permisos',
+  '/ajustes':        'Mi cuenta',
+  '/pricing':        'Planes',
+  '/paciente/perfil':'Perfil del paciente',
+  '/videollamada':   'Videollamada',
 }
+
+const PRIMARY_PAGES = new Set(['/dashboard', '/familia', '/mas', '/ajustes'])
 
 const BOTTOM_TABS = [
   { to: '/dashboard', Icon: Home,     label: 'Inicio' },
@@ -49,8 +52,10 @@ export default function Layout({ children }) {
   const { dark } = useDarkMode()
   const { isHospitalMode, hospitalMode } = useHospitalMode() ?? {}
   const location = useLocation()
+  const navigate = useNavigate()
   const isHome      = location.pathname === '/dashboard'
   const isVideoCall = location.pathname === '/videollamada'
+  const isSecondary = !PRIMARY_PAGES.has(location.pathname) && !isVideoCall
 
   const bg      = dark ? '#0F1A12' : '#F0EDE6'
   const navBg   = dark ? 'rgba(28,18,8,0.97)' : '#2D4A1E'
@@ -102,6 +107,32 @@ export default function Layout({ children }) {
       >
         {isHome ? (
           <Logo showWordmark size={32} />
+        ) : isSecondary ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+            <button
+              onClick={() => navigate('/dashboard')}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 2,
+                background: 'rgba(255,255,255,0.12)',
+                border: '1px solid rgba(255,255,255,0.18)',
+                borderRadius: 20, cursor: 'pointer',
+                color: 'white', fontSize: 12, fontWeight: 700,
+                padding: '5px 10px 5px 6px', flexShrink: 0,
+                WebkitTapHighlightColor: 'transparent',
+              }}
+              aria-label="Volver al inicio"
+            >
+              <ChevronLeft size={15} color="white" strokeWidth={2.5} />
+              Regresar
+            </button>
+            <h1 style={{
+              fontSize: 14, fontWeight: 700, color: 'rgba(255,255,255,0.85)',
+              fontFamily: 'Georgia, serif', margin: 0,
+              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+            }}>
+              {PAGE_TITLES[location.pathname] ?? ''}
+            </h1>
+          </div>
         ) : (
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <Logo size={28} />
@@ -137,11 +168,11 @@ export default function Layout({ children }) {
         </div>
       </header>
 
-      {/* Scrollable main — no top/bottom offset on the video call route */}
+      {/* Scrollable main — no offsets on video call; no bottom offset on secondary pages */}
       <main style={{
         position: 'fixed', inset: 0, overflowY: 'auto',
         top:    isVideoCall ? 0 : `calc(${hospitalBarHeight}px + 56px + env(safe-area-inset-top))`,
-        bottom: isVideoCall ? 0 : 'calc(68px + env(safe-area-inset-bottom))',
+        bottom: isVideoCall ? 0 : isSecondary ? 'env(safe-area-inset-bottom)' : 'calc(68px + env(safe-area-inset-bottom))',
       }}>
         <InstallBanner />
         <OfflineBanner />
@@ -195,8 +226,8 @@ export default function Layout({ children }) {
         @keyframes hbPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
       `}</style>
 
-      {/* Bottom navigation — hidden on full-screen video call route */}
-      {isVideoCall ? null : <nav
+      {/* Bottom navigation — hidden on video call and secondary pages */}
+      {isVideoCall || isSecondary ? null : <nav
         style={{
           position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 40,
           height: 'calc(68px + env(safe-area-inset-bottom))',

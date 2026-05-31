@@ -33,6 +33,7 @@ import Directory from './pages/Directory'
 import Pricing from './pages/Pricing'
 import Settings from './pages/Settings'
 import CareSchedule from './pages/CareSchedule'
+import Cuidado from './pages/Cuidado'
 import PatientProfile from './pages/PatientProfile'
 import Landing from './pages/Landing'
 import VideoCall from './pages/VideoCall'
@@ -105,6 +106,7 @@ function AppShell() {
         <Route path="/diario-voz"  element={<P><Memorias /></P>} />
         <Route path="/memorias"    element={<P><Memorias /></P>} />
         <Route path="/hoy"         element={<P><Hoy /></P>} />
+        <Route path="/cuidado"     element={<P><Cuidado /></P>} />
         <Route path="/familia"     element={<P><Familia /></P>} />
         <Route path="/reportes"    element={<P><Reports /></P>} />
         <Route path="/mas"         element={<P><More /></P>} />
@@ -114,7 +116,7 @@ function AppShell() {
         <Route path="/permisos"    element={<P><Permissions /></P>} />
         <Route path="/pricing"     element={<Pricing />} />
         <Route path="/ajustes"            element={<P><Settings /></P>} />
-        <Route path="/cuidado/horarios"   element={<P><CareSchedule /></P>} />
+        <Route path="/cuidado/horarios"   element={<Navigate to="/cuidado?tab=horarios" replace />} />
         <Route path="/paciente/perfil"    element={<P><PatientProfile /></P>} />
         <Route path="/videollamada"       element={<P><VideoCall /></P>} />
         <Route path="/admin"              element={<P><Admin /></P>} />

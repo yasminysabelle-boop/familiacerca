@@ -6,7 +6,7 @@ import { useSubscription } from '../contexts/SubscriptionContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import {
-  Clock, BookOpen,
+  BookOpen,
   Image, Mic,
   BarChart, User,
   Shield, Star,
@@ -17,8 +17,7 @@ const MORE_SECTIONS = [
   {
     label: 'Gestión del cuidado',
     items: [
-      { to: '/diario-medico',    Icon: BookOpen, label: 'Diario Médico',       desc: 'Historia clínica con IA — voz y foto', color: '#2D4A1E' },
-      { to: '/cuidado/horarios', Icon: Clock,    label: 'Horarios de cuidado', desc: 'Turnos y rutinas del cuidado',          color: '#4A7C59' },
+      { to: '/diario-medico', Icon: BookOpen, label: 'Diario Médico', desc: 'Historia clínica con IA — voz y foto', color: '#2D4A1E' },
     ],
   },
   {

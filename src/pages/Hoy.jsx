@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
-import { CheckIcon, MoreVertical, Pencil, Plus, Settings, Trash, XIcon } from '../components/Icons'
+import { CheckIcon, MoreVertical, Pencil, Plus, Trash, XIcon } from '../components/Icons'
 import { getLocation, mapsUrl } from '../lib/gps'
 import { track } from '../lib/analytics'
-import { CARE_CATEGORIES, CARE_ITEMS } from '../lib/careItems'
 
 const TIME_GROUPS = [
   { id: 0, label: 'Mañana',      icon: '🌅', range: [0, 12] },
@@ -61,18 +60,6 @@ async function stampProof(file, confirmerName) {
   })
 }
 
-function calcularEstadoCuidado(item, isChecked = false, customTime = null) {
-  if (isChecked) return 'completado'
-  const time = customTime ?? item.scheduledTime
-  if (item.category !== 'daily' || !time) return 'pendiente'
-  const [h, m] = time.split(':').map(Number)
-  const now = new Date()
-  const diff = (now.getHours() * 60 + now.getMinutes()) - (h * 60 + m)
-  if (diff < 0)   return 'programado'
-  if (diff <= 30) return 'pendiente'
-  return 'tarde'
-}
-
 function calcularEstadoMedicamento(scheduledTime, isConfirmed = false) {
   if (isConfirmed) return 'completado'
   if (!scheduledTime) return 'pendiente'
@@ -90,10 +77,6 @@ export default function Hoy() {
   const { user } = useAuth()
   const { ownerId, profile, memberRole } = useFamily()
   const navigate = useNavigate()
-  const [searchParams] = useSearchParams()
-  const [activeTab, setActiveTab] = useState(() =>
-    searchParams.get('view') === 'cuidado' ? 'cuidado' : 'medicamentos'
-  )
   const [medications, setMedications] = useState([])
   const [logs, setLogs] = useState({})
   const [loading, setLoading] = useState(true)
@@ -112,11 +95,6 @@ export default function Hoy() {
     return false
   }
   const [adminWarningMed, setAdminWarningMed] = useState(null)
-
-  // Care checklist state
-  const [careLogs, setCareLogs] = useState({})
-  const [careSchedules, setCareSchedules] = useState({})
-  const [careToggling, setCareToggling] = useState(null)
   const [weekHistory, setWeekHistory] = useState([])
 
   // Bottom sheet for proof photo
@@ -158,55 +136,19 @@ export default function Hoy() {
       }).reverse()
 
       const [
-        { data: meds,          error: e1 },
-        { data: todayLogs,     error: e2 },
-        { data: careRows },
+        { data: meds,      error: e1 },
+        { data: todayLogs, error: e2 },
         { data: histMedLogs },
-        { data: histCareLogs },
-        { data: scheduleRows },
       ] = await Promise.all([
         supabase.from('medications').select('*').eq('user_id', ownerId),
         supabase.from('medication_logs').select('*').eq('user_id', ownerId).eq('log_date', today),
-        supabase.from('daily_care_logs').select('*').eq('user_id', ownerId).eq('log_date', today),
         supabase.from('medication_logs').select('medication_id,log_date,status').eq('user_id', ownerId).in('log_date', histDays),
-        supabase.from('daily_care_logs').select('item_key,log_date,status').eq('user_id', ownerId).in('log_date', histDays),
-        supabase.from('care_item_schedules').select('item_key,scheduled_time').eq('user_id', ownerId),
       ])
       if (e1 || e2) throw e1 ?? e2
       setMedications(meds ?? [])
       const map = {}
       ;(todayLogs ?? []).forEach(l => { map[l.medication_id] = l })
       setLogs(map)
-
-      const cmap = {}
-      for (const row of (careRows ?? [])) cmap[row.item_key] = row
-      setCareLogs(cmap)
-
-      const smap = {}
-      for (const row of (scheduleRows ?? [])) smap[row.item_key] = row.scheduled_time
-      setCareSchedules(smap)
-
-      const dailyCareKeys = CARE_ITEMS
-        .filter(i => i.category === 'daily')
-        .map(i => i.key)
-      const usedCareKeys = new Set((histCareLogs ?? []).map(l => l.item_key))
-      const activeDailyCareKeys = dailyCareKeys.filter(k => usedCareKeys.has(k))
-
-      // Auto-register no_completado for past days where care items were never logged
-      const missingInserts = []
-      for (const date of histDays) {
-        const existingKeys = new Set(
-          (histCareLogs ?? []).filter(l => l.log_date === date).map(l => l.item_key)
-        )
-        for (const key of activeDailyCareKeys) {
-          if (!existingKeys.has(key)) {
-            missingInserts.push({ user_id: ownerId, item_key: key, log_date: date, status: 'no_completado' })
-          }
-        }
-      }
-      if (missingInserts.length > 0) {
-        supabase.from('daily_care_logs').insert(missingInserts) // fire-and-forget
-      }
 
       const DAY_LABELS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
       setWeekHistory(histDays.map(date => {
@@ -219,21 +161,11 @@ export default function Hoy() {
         const medFail = (meds ?? []).length > 0
           ? (meds ?? []).filter(m => !confirmedIds.has(m.id)).length
           : 0
-        const completedCareKeys = new Set(
-          (histCareLogs ?? [])
-            .filter(l => l.log_date === date && (l.status === 'completed' || !l.status))
-            .map(l => l.item_key)
-        )
-        const failedCareItems = activeDailyCareKeys
-          .filter(k => !completedCareKeys.has(k))
-          .map(k => CARE_ITEMS.find(i => i.key === k))
-          .filter(Boolean)
         return {
           date,
           dayLabel: DAY_LABELS[d.getDay()],
           dayNum: d.getDate(),
-          failures: medFail + failedCareItems.length,
-          failedItems: failedCareItems,
+          failures: medFail,
         }
       }))
     } catch (err) {
@@ -291,38 +223,6 @@ export default function Hoy() {
     await supabase.from('medications').delete().eq('id', id).eq('user_id', ownerId)
     setMedications(prev => prev.filter(m => m.id !== id))
     setLogs(prev => { const n = { ...prev }; delete n[id]; return n })
-  }
-
-  async function toggleCareItem(item) {
-    if (isFamiliar || careToggling) return
-    const existing = careLogs[item.key]
-    setCareToggling(item.key)
-    try {
-      if (existing) {
-        await supabase.from('daily_care_logs').delete().eq('id', existing.id)
-        setCareLogs(prev => { const n = { ...prev }; delete n[item.key]; return n })
-      } else {
-        const { data, error } = await supabase
-          .from('daily_care_logs')
-          .upsert({
-            user_id: ownerId,
-            item_key: item.key,
-            log_date: today,
-            checked_at: new Date().toISOString(),
-            checked_by: displayName,
-          }, { onConflict: 'user_id,item_key,log_date' })
-          .select()
-          .single()
-        if (!error && data) setCareLogs(prev => ({ ...prev, [item.key]: data }))
-      }
-    } finally {
-      setCareToggling(null)
-    }
-  }
-
-  function isCareItemOverdue(item) {
-    if (careLogs[item.key] || item.category !== 'daily') return false
-    return calcularEstadoCuidado(item, false, careSchedules[item.key]) === 'tarde'
   }
 
   function openProofSheet(med) {
@@ -435,13 +335,6 @@ export default function Hoy() {
     return (Date.now() - new Date(log.confirmed_at).getTime()) < 30 * 60 * 1000
   })
 
-  // Care checklist derived values
-  const requiredItems = CARE_ITEMS.filter(i => i.category === 'daily')
-  const completedRequired = requiredItems.filter(i => !!careLogs[i.key]).length
-  const todayTimeline = Object.values(careLogs)
-    .filter(l => l.log_date === today)
-    .sort((a, b) => a.checked_at.localeCompare(b.checked_at))
-
   function fmtMedTime(t) {
     if (!t) return ''
     const [h, m] = t.split(':').map(Number)
@@ -456,48 +349,12 @@ export default function Hoy() {
       })
     : []
 
-  const overdueCareItems = !loading
-    ? CARE_ITEMS.filter(i => calcularEstadoCuidado(i, !!careLogs[i.key], careSchedules[i.key]) === 'tarde')
-    : []
-
-  const showMedOverdue  = !isFamiliar && !loading && overdueMeds.length > 0
-  const showCareOverdue = !isFamiliar && !loading && overdueCareItems.length > 0
+  const showMedOverdue = !isFamiliar && !loading && overdueMeds.length > 0
 
   return (
     <Layout>
 
       <div style={{ padding: '16px 16px 96px', maxWidth: 600 }}>
-
-        {/* Tab switcher */}
-        <div style={{
-          display: 'flex', gap: 4, marginBottom: 16,
-          background: '#F3F4F6', borderRadius: 14, padding: 4,
-        }}>
-          {[
-            { id: 'medicamentos', label: '💊 Medicamentos' },
-            { id: 'cuidado',      label: '📋 Cuidado' },
-          ].map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              style={{
-                flex: 1, padding: '10px 8px',
-                borderRadius: 10, border: 'none',
-                fontSize: 13, fontWeight: 700,
-                cursor: 'pointer',
-                background: activeTab === tab.id ? 'white' : 'transparent',
-                color: activeTab === tab.id ? '#1A1A1A' : '#9CA3AF',
-                boxShadow: activeTab === tab.id ? '0 1px 4px rgba(0,0,0,0.1)' : 'none',
-                transition: 'all 0.15s',
-              }}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
-        {/* ── MEDICAMENTOS TAB ─────────────────────────────── */}
-        {activeTab === 'medicamentos' && <>
 
         {/* Overdue meds alert */}
         {showMedOverdue && (
@@ -527,9 +384,9 @@ export default function Hoy() {
               Últimos 7 días
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              {weekHistory.map(({ date, dayLabel, dayNum, failures, failedItems }) => (
+              {weekHistory.map(({ date, dayLabel, dayNum, failures }) => (
                 <div key={date} style={{
-                  padding: failures === 0 ? '6px 10px' : '8px 10px',
+                  padding: '6px 10px',
                   borderRadius: 10,
                   background: failures === 0 ? '#F0FDF4' : '#FEF2F2',
                 }}>
@@ -542,25 +399,9 @@ export default function Hoy() {
                       fontSize: 12, fontWeight: 600,
                       color: failures === 0 ? '#16A34A' : '#DC2626',
                     }}>
-                      {failures === 0 ? 'Todo completado' : `${failures} sin completar`}
+                      {failures === 0 ? 'Todo completado' : `${failures} med${failures !== 1 ? 's' : ''} sin dar`}
                     </span>
                   </div>
-                  {failures > 0 && failedItems?.length > 0 && (
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px 6px', marginTop: 5, paddingLeft: 60 }}>
-                      {failedItems.slice(0, 4).map(item => (
-                        <span key={item.key} style={{
-                          fontSize: 11, color: '#DC2626',
-                          background: 'rgba(220,38,38,0.08)',
-                          borderRadius: 4, padding: '1px 5px',
-                        }}>
-                          {item.icon} {item.label}
-                        </span>
-                      ))}
-                      {failedItems.length > 4 && (
-                        <span style={{ fontSize: 11, color: '#B91C1C' }}>+{failedItems.length - 4} más</span>
-                      )}
-                    </div>
-                  )}
                 </div>
               ))}
             </div>
@@ -938,259 +779,6 @@ export default function Hoy() {
             )}
           </>
         )}
-        </> /* end medicamentos tab */}
-
-        {/* ── CUIDADO TAB ──────────────────────────────────── */}
-        {activeTab === 'cuidado' && <>
-
-        {/* Overdue care alert */}
-        {showCareOverdue && (
-          <div style={{
-            background: '#FEF2F2', border: '1px solid #FCA5A5',
-            borderRadius: 14, padding: '10px 16px', marginBottom: 14,
-            display: 'flex', alignItems: 'flex-start', gap: 8,
-          }}>
-            <span style={{ fontSize: 16, flexShrink: 0, marginTop: 1 }}>⚠️</span>
-            <p style={{ fontSize: 13, fontWeight: 700, color: '#DC2626', margin: 0, lineHeight: 1.5 }}>
-              {overdueCareItems.slice(0, 3).map(i => `${i.icon} ${i.label}`).join(' · ')}
-              {overdueCareItems.length > 3 ? ` · +${overdueCareItems.length - 3} más` : ''}
-            </p>
-          </div>
-        )}
-
-            {/* ── Cuidado de hoy ──────────────────────────────────── */}
-            <div style={{ marginTop: 0 }}>
-
-              {/* Section header */}
-              <div style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                marginBottom: 14,
-              }}>
-                <p style={{
-                  fontSize: 16, fontWeight: 700, color: '#1A1A1A',
-                  fontFamily: 'Georgia, serif', margin: 0,
-                }}>
-                  Cuidado de hoy
-                </p>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{
-                    fontSize: 11, fontWeight: 700,
-                    color: completedRequired === requiredItems.length ? '#16A34A' : '#4A7C59',
-                    background: completedRequired === requiredItems.length ? '#DCFCE7' : '#EBF3EE',
-                    padding: '3px 10px', borderRadius: 20,
-                  }}>
-                    {completedRequired}/{requiredItems.length}
-                  </span>
-                  {!isFamiliar && (
-                    <button
-                      onClick={() => navigate('/cuidado/horarios')}
-                      style={{
-                        width: 30, height: 30, borderRadius: 8,
-                        border: '1px solid #EDE5D8', background: 'white',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        cursor: 'pointer',
-                      }}
-                      aria-label="Configurar horarios"
-                    >
-                      <Settings size={14} color="#9CA3AF" strokeWidth={1.75} />
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {isFamiliar && (
-                <div style={{
-                  display: 'flex', alignItems: 'center', gap: 10,
-                  background: '#F9FAFB', border: '1px solid #E5E7EB',
-                  borderRadius: 12, padding: '10px 14px', marginBottom: 14,
-                }}>
-                  <span style={{ fontSize: 16 }}>👁️</span>
-                  <p style={{ fontSize: 12, color: '#6B7280', margin: 0 }}>
-                    Solo puedes ver el cuidado registrado por el cuidador.
-                  </p>
-                </div>
-              )}
-
-              {/* Checklist grouped by category */}
-              {CARE_CATEGORIES.map(cat => {
-                const items = CARE_ITEMS.filter(i => i.category === cat.id)
-                return (
-                  <div key={cat.id} style={{ marginBottom: 14 }}>
-                    <p style={{
-                      fontSize: 11, fontWeight: 700, letterSpacing: '0.08em',
-                      textTransform: 'uppercase', color: '#9CA3AF',
-                      marginBottom: 6, paddingLeft: 2,
-                    }}>
-                      {cat.icon} {cat.label}
-                    </p>
-                    <div style={{
-                      background: 'white', borderRadius: 16,
-                      border: '1px solid #EDE5D8', overflow: 'hidden',
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
-                    }}>
-                      {items.map((item, idx) => {
-                        const isChecked  = !!careLogs[item.key]
-                        const status     = calcularEstadoCuidado(item, isChecked, careSchedules[item.key])
-                        const isOverdue  = status === 'tarde'
-                        const isEarly    = status === 'programado'
-                        const isToggling = careToggling === item.key
-                        const log        = careLogs[item.key]
-                        const checkedTime = log?.checked_at
-                          ? new Date(log.checked_at).toLocaleTimeString('es-US', { hour: '2-digit', minute: '2-digit' })
-                          : null
-
-                        return (
-                          <div
-                            key={item.key}
-                            style={{
-                              display: 'flex', alignItems: 'center', gap: 12,
-                              padding: '13px 14px',
-                              background: isChecked ? cat.bg : 'white',
-                              borderBottom: idx < items.length - 1
-                                ? `1px solid ${isChecked ? cat.color + '25' : '#F5EEE6'}`
-                                : 'none',
-                              transition: 'background 0.2s',
-                              opacity: isToggling ? 0.55 : 1,
-                            }}
-                          >
-                            <button
-                              onClick={() => toggleCareItem(item)}
-                              disabled={isFamiliar || !!careToggling}
-                              style={{
-                                width: 26, height: 26, borderRadius: 8, flexShrink: 0,
-                                border: `2px solid ${isChecked ? cat.color : isOverdue ? '#FCA5A5' : '#D1D5DB'}`,
-                                background: isChecked ? cat.color : 'white',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                cursor: isFamiliar ? 'default' : 'pointer',
-                                padding: 0, transition: 'all 0.2s',
-                              }}
-                              aria-label={isChecked ? 'Desmarcar' : 'Marcar'}
-                            >
-                              {isChecked && !isToggling && (
-                                <CheckIcon size={13} color="white" strokeWidth={2.5} />
-                              )}
-                              {isToggling && (
-                                <div style={{
-                                  width: 10, height: 10, borderRadius: '50%',
-                                  border: `2px solid ${isChecked ? 'rgba(255,255,255,0.4)' : '#D1D5DB'}`,
-                                  borderTopColor: isChecked ? 'white' : cat.color,
-                                  animation: 'spin 0.6s linear infinite',
-                                }} />
-                              )}
-                            </button>
-
-                            <span style={{ fontSize: 20, flexShrink: 0, lineHeight: 1 }}>{item.icon}</span>
-                            <div style={{ flex: 1, minWidth: 0 }}>
-                              <p style={{
-                                fontSize: 13, fontWeight: 600, margin: 0, lineHeight: 1.3,
-                                color: isChecked ? '#9CA3AF' : isOverdue ? '#DC2626' : '#1A1A1A',
-                                textDecoration: isChecked ? 'line-through' : 'none',
-                              }}>
-                                {item.label}
-                              </p>
-                              {isChecked && checkedTime && (
-                                <p style={{ fontSize: 10, color: cat.color, margin: '2px 0 0', fontWeight: 600 }}>
-                                  ✓ {checkedTime}
-                                  {log?.checked_by ? ` · ${log.checked_by.split(' ')[0]}` : ''}
-                                </p>
-                              )}
-                              {!isChecked && (careSchedules[item.key] ?? item.scheduledTime) && !isOverdue && (
-                                <p style={{ fontSize: 10, color: '#9CA3AF', margin: '2px 0 0' }}>
-                                  ⏰ {fmtMedTime(careSchedules[item.key] ?? item.scheduledTime)}
-                                </p>
-                              )}
-                            </div>
-
-                            {isChecked && (
-                              <span style={{
-                                fontSize: 10, fontWeight: 700,
-                                color: '#16A34A', background: '#DCFCE7',
-                                padding: '2px 8px', borderRadius: 6, flexShrink: 0,
-                              }}>
-                                ✓ Listo
-                              </span>
-                            )}
-                            {isOverdue && !isChecked && (
-                              <span style={{
-                                fontSize: 10, fontWeight: 700,
-                                color: '#7A5A18', background: '#FEF3C7',
-                                padding: '2px 8px', borderRadius: 6, flexShrink: 0,
-                              }}>
-                                ⚠ Tarde
-                              </span>
-                            )}
-                            {!isChecked && isEarly && (careSchedules[item.key] ?? item.scheduledTime) && (
-                              <span style={{
-                                fontSize: 10, fontWeight: 700,
-                                color: '#6B7280', background: '#F3F4F6',
-                                padding: '2px 8px', borderRadius: 6, flexShrink: 0,
-                                whiteSpace: 'nowrap',
-                              }}>
-                                🕐 {fmtMedTime(careSchedules[item.key] ?? item.scheduledTime)}
-                              </span>
-                            )}
-                          </div>
-                        )
-                      })}
-                    </div>
-                  </div>
-                )
-              })}
-
-              {/* Timeline of today's completed care items */}
-              {todayTimeline.length > 0 && (
-                <div style={{ marginTop: 8, marginBottom: 8 }}>
-                  <p style={{
-                    fontSize: 11, fontWeight: 700, letterSpacing: '0.08em',
-                    textTransform: 'uppercase', color: '#9CA3AF',
-                    marginBottom: 6, paddingLeft: 2,
-                  }}>
-                    Línea de tiempo del día
-                  </p>
-                  <div style={{
-                    background: 'white', borderRadius: 16,
-                    border: '1px solid #EDE5D8', overflow: 'hidden',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
-                  }}>
-                    {todayTimeline.map((log, i) => {
-                      const ci  = CARE_ITEMS.find(x => x.key === log.item_key)
-                      const cat = CARE_CATEGORIES.find(c => c.id === ci?.category)
-                      return (
-                        <div
-                          key={log.id}
-                          style={{
-                            display: 'flex', alignItems: 'center', gap: 10,
-                            padding: '11px 14px',
-                            borderBottom: i < todayTimeline.length - 1 ? '1px solid #F5EEE6' : 'none',
-                          }}
-                        >
-                          <span style={{ fontSize: 18, flexShrink: 0 }}>{ci?.icon ?? '✓'}</span>
-                          <p style={{ flex: 1, fontSize: 13, color: '#1A1A1A', margin: 0, fontWeight: 500 }}>
-                            {ci?.label ?? log.item_key}
-                          </p>
-                          <span style={{ fontSize: 11, color: '#9CA3AF', flexShrink: 0 }}>
-                            {new Date(log.checked_at).toLocaleTimeString('es-US', { hour: '2-digit', minute: '2-digit' })}
-                          </span>
-                          {log.checked_by && (
-                            <span style={{
-                              fontSize: 10, fontWeight: 700, flexShrink: 0,
-                              color: cat?.color ?? '#4A7C59',
-                              background: cat ? `${cat.color}18` : '#EBF3EE',
-                              padding: '2px 7px', borderRadius: 6,
-                            }}>
-                              {log.checked_by.split(' ')[0]}
-                            </span>
-                          )}
-                        </div>
-                      )
-                    })}
-                  </div>
-                </div>
-              )}
-            </div>
-
-        </> /* end cuidado tab */}
-
       </div>
 
       {/* Delete confirmation dialog */}
