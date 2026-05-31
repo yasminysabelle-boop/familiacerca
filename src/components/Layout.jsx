@@ -49,7 +49,8 @@ export default function Layout({ children }) {
   const { dark } = useDarkMode()
   const { isHospitalMode, hospitalMode } = useHospitalMode() ?? {}
   const location = useLocation()
-  const isHome = location.pathname === '/dashboard'
+  const isHome      = location.pathname === '/dashboard'
+  const isVideoCall = location.pathname === '/videollamada'
 
   const bg      = dark ? '#0F1A12' : '#F0EDE6'
   const navBg   = dark ? 'rgba(28,18,8,0.97)' : '#2D4A1E'
@@ -136,8 +137,12 @@ export default function Layout({ children }) {
         </div>
       </header>
 
-      {/* Scrollable main */}
-      <main style={{ position: 'fixed', inset: 0, overflowY: 'auto', top: `calc(${hospitalBarHeight}px + 56px + env(safe-area-inset-top))`, bottom: 'calc(68px + env(safe-area-inset-bottom))' }}>
+      {/* Scrollable main — no top/bottom offset on the video call route */}
+      <main style={{
+        position: 'fixed', inset: 0, overflowY: 'auto',
+        top:    isVideoCall ? 0 : `calc(${hospitalBarHeight}px + 56px + env(safe-area-inset-top))`,
+        bottom: isVideoCall ? 0 : 'calc(68px + env(safe-area-inset-bottom))',
+      }}>
         <InstallBanner />
         <OfflineBanner />
 
@@ -190,8 +195,8 @@ export default function Layout({ children }) {
         @keyframes hbPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
       `}</style>
 
-      {/* Bottom navigation — 4 tabs */}
-      <nav
+      {/* Bottom navigation — hidden on full-screen video call route */}
+      {isVideoCall ? null : <nav
         style={{
           position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 40,
           height: 'calc(68px + env(safe-area-inset-bottom))',
@@ -236,7 +241,7 @@ export default function Layout({ children }) {
             </Link>
           )
         })}
-      </nav>
+      </nav>}
     </div>
   )
 }

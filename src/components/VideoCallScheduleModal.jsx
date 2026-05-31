@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
@@ -135,10 +136,12 @@ export default function VideoCallScheduleModal({ open, onClose }) {
   const minDate = new Date().toISOString().slice(0, 10)
   const canJoin = call => minutesUntil(call.scheduled_at) <= 15
 
-  return (
+  // Portal to document.body — escapes Layout's stacking context so z-index
+  // is resolved in the root context, above the bottom nav (z-index: 40).
+  return createPortal(
     <div
       style={{
-        position: 'fixed', inset: 0, zIndex: 300,
+        position: 'fixed', inset: 0, zIndex: 9000,
         background: 'rgba(0,0,0,0.55)',
         display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
       }}
@@ -147,7 +150,7 @@ export default function VideoCallScheduleModal({ open, onClose }) {
       <div style={{
         width: '100%', maxWidth: 480,
         background: 'white', borderRadius: '24px 24px 0 0',
-        padding: '24px 20px 48px',
+        padding: '24px 20px calc(env(safe-area-inset-bottom) + 96px)',
         boxShadow: '0 -8px 48px rgba(0,0,0,0.2)',
         maxHeight: '90vh', overflowY: 'auto',
       }}>
@@ -370,6 +373,7 @@ export default function VideoCallScheduleModal({ open, onClose }) {
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
