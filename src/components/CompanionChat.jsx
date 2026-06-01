@@ -63,7 +63,7 @@ const FALLBACKS = {
 }
 
 // Queries Supabase for contextual anomalies and returns the best proactive message.
-// Priority: A (low stock) > B (no activity) > C (upcoming appointment) > D (default)
+// Priority: A (low stock) > B (no activity) > C (upcoming appointment) > E (high expenses) > D (default)
 async function buildProactiveMessage(chosen, ownerId, patientName) {
   if (!ownerId) return PROACTIVE_GREETINGS[chosen]
   try {
@@ -113,6 +113,36 @@ async function buildProactiveMessage(chosen, ownerId, patientName) {
     if (upcoming?.length) {
       const title = upcoming[0].title ? ` (${upcoming[0].title})` : ''
       return `Hola 👋 Tienen una cita médica pronto${title}. ¿Necesitan ayuda para prepararse?`
+    }
+
+    // E) Monthly expenses above 3-month average (needs ≥2 months of history)
+    const now2 = new Date()
+    const currentMonth = `${now2.getFullYear()}-${String(now2.getMonth() + 1).padStart(2, '0')}`
+    const threeMonthsAgo = new Date(now2.getFullYear(), now2.getMonth() - 3, 1)
+    const threeMonthsAgoDate = `${threeMonthsAgo.getFullYear()}-${String(threeMonthsAgo.getMonth() + 1).padStart(2, '0')}-01`
+
+    const { data: expenses } = await supabase
+      .from('care_expenses')
+      .select('amount, date')
+      .eq('user_id', ownerId)
+      .gte('date', threeMonthsAgoDate)
+
+    if (expenses?.length) {
+      const byMonth = {}
+      for (const exp of expenses) {
+        const m = exp.date.slice(0, 7)
+        byMonth[m] = (byMonth[m] ?? 0) + parseFloat(exp.amount)
+      }
+      const currentTotal = byMonth[currentMonth] ?? 0
+      const prevTotals = Object.entries(byMonth)
+        .filter(([m]) => m < currentMonth)
+        .map(([, v]) => v)
+      if (prevTotals.length >= 2 && currentTotal > 0) {
+        const avg = prevTotals.reduce((s, v) => s + v, 0) / prevTotals.length
+        if (currentTotal > avg) {
+          return `Hola 👋 Este mes los gastos de cuidado están por encima del promedio. ¿Quieres revisar Cuentas Claras?`
+        }
+      }
     }
   } catch { }
 
