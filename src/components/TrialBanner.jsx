@@ -2,8 +2,28 @@ import { useNavigate } from 'react-router-dom'
 import { useSubscription } from '../contexts/SubscriptionContext'
 
 export default function TrialBanner() {
-  const { isTrialing, daysLeft } = useSubscription()
+  const { isTrialing, trialExpired, daysLeft } = useSubscription()
   const navigate = useNavigate()
+
+  // Expired trial — yellow persistent banner
+  if (trialExpired) {
+    return (
+      <div
+        onClick={() => navigate('/planes')}
+        style={{
+          margin: '0 16px 16px', borderRadius: 14, padding: '11px 16px',
+          background: 'linear-gradient(135deg, #FFFBEB, #FEF3C7)',
+          border: '1.5px solid #FDE68A',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10,
+          cursor: 'pointer',
+        }}
+      >
+        <p style={{ fontSize: 13, fontWeight: 700, color: '#92400E', margin: 0 }}>
+          ⚠ Tu prueba gratuita venció. Actualiza para continuar →
+        </p>
+      </div>
+    )
+  }
 
   if (!isTrialing) return null
 
@@ -12,9 +32,7 @@ export default function TrialBanner() {
   return (
     <div
       style={{
-        margin: '0 16px 16px',
-        borderRadius: 16,
-        padding: '14px 16px',
+        margin: '0 16px 16px', borderRadius: 16, padding: '14px 16px',
         background: urgent
           ? 'linear-gradient(135deg, #FEF2F2, #FEE2E2)'
           : 'linear-gradient(135deg, #F7F3ED, #EBF3EE)',

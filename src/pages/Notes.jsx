@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import PaywallModal from '../components/PaywallModal'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
@@ -25,10 +26,11 @@ const onBlur  = e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.bo
 
 export default function Notes() {
   const { user } = useAuth()
-  const { ownerId } = useFamily()
-  const { canEdit } = useSubscription()
+  const { ownerId, profile } = useFamily()
+  const { canEdit, trialExpired } = useSubscription()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
+  const [showPaywall, setShowPaywall] = useState(false)
   const [notes, setNotes] = useState([])
   const [form, setForm] = useState(emptyForm)
   const [editId, setEditId] = useState(null)
@@ -100,6 +102,7 @@ export default function Notes() {
   }
 
   function openAdd() {
+    if (trialExpired) { setShowPaywall(true); return }
     setEditId(null)
     setForm(emptyForm)
     setShowForm(true)
@@ -159,6 +162,7 @@ export default function Notes() {
 
   return (
     <Layout>
+      {showPaywall && <PaywallModal onClose={() => setShowPaywall(false)} patientName={profile?.name?.split(' ')[0]} />}
       {/* Transparent overlay to close menu */}
       {menuOpen && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 99 }} onClick={() => setMenuOpen(null)} />

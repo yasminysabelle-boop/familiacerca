@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import PaywallModal from '../components/PaywallModal'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
@@ -94,9 +95,10 @@ const labelStyle = {
 
 export default function Medications() {
   const { user } = useAuth()
-  const { ownerId, memberRole } = useFamily()
-  const { canEdit } = useSubscription()
+  const { ownerId, memberRole, profile } = useFamily()
+  const { canEdit, trialExpired } = useSubscription()
   const navigate = useNavigate()
+  const [showPaywall, setShowPaywall] = useState(false)
   const [searchParams, setSearchParams] = useSearchParams()
   const { permission, supported, requestAndSubscribe } = usePushNotifications()
 
@@ -212,6 +214,7 @@ export default function Medications() {
   }
 
   function openAdd() {
+    if (trialExpired) { setShowPaywall(true); return }
     setForm(emptyForm); setScheduledTimes(['']); setEditId(null)
     setStockForm(emptyStock); setAddPhotoFile(null); setAddPhotoPreview(null)
     setAddAiExtracted(null); setAddAiError(''); setAddPhotoType(null)
@@ -428,6 +431,7 @@ Return ONLY valid JSON.`
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <Layout>
+      {showPaywall && <PaywallModal onClose={() => setShowPaywall(false)} patientName={profile?.name?.split(' ')[0]} />}
       <div style={{ padding: '16px 16px 0', maxWidth: 600 }}>
 
         {/* Header */}

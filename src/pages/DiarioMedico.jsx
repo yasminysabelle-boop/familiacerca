@@ -2,8 +2,10 @@ import { useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
+import { useSubscription } from '../contexts/SubscriptionContext'
 import Layout from '../components/Layout'
 import DiarioMedicoEntryModal from '../components/DiarioMedicoEntryModal'
+import PaywallModal from '../components/PaywallModal'
 
 const LOCATION_META = {
   hospital: { label: 'Hospital',  emoji: '🏥', bg: '#FFF0F0', color: '#B91C1C' },
@@ -170,14 +172,20 @@ function EntryCard({ entry }) {
 
 export default function DiarioMedico() {
   const { user }                     = useAuth()
-  const { ownerId, memberRole }      = useFamily()
+  const { ownerId, memberRole, profile } = useFamily()
+  const { trialExpired }             = useSubscription()
   const [entries, setEntries]        = useState([])
   const [loading, setLoading]        = useState(true)
   const [showModal, setShowModal]    = useState(false)
+  const [showPaywall, setShowPaywall] = useState(false)
   const channelRef                   = useRef(null)
 
   // Admin or cuidador can add entries
   const canAdd = memberRole === null || memberRole === 'cuidador'
+  function openEntry() {
+    if (trialExpired) { setShowPaywall(true); return }
+    setShowModal(true)
+  }
 
   useEffect(() => {
     if (!ownerId) return
@@ -248,7 +256,7 @@ export default function DiarioMedico() {
           </div>
           {canAdd && (
             <button
-              onClick={() => setShowModal(true)}
+              onClick={openEntry}
               style={{
                 padding: '10px 16px', borderRadius: 12, border: 'none',
                 background: 'rgba(255,255,255,0.15)', color: 'white',
@@ -282,7 +290,7 @@ export default function DiarioMedico() {
             </p>
             {canAdd && (
               <button
-                onClick={() => setShowModal(true)}
+                onClick={openEntry}
                 style={{
                   padding: '12px 24px', borderRadius: 12, border: 'none',
                   background: '#4A7C59', color: 'white', fontWeight: 700,
@@ -331,6 +339,12 @@ export default function DiarioMedico() {
         onClose={() => setShowModal(false)}
         onSaved={load}
       />
+      {showPaywall && (
+        <PaywallModal
+          onClose={() => setShowPaywall(false)}
+          patientName={profile?.name?.split(' ')[0]}
+        />
+      )}
     </Layout>
   )
 }

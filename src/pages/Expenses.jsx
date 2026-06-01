@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import PaywallModal from '../components/PaywallModal'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
@@ -37,9 +38,10 @@ const catFor = id => CATEGORIES.find(c => c.id === id) ?? CATEGORIES[5]
 
 export default function Expenses() {
   const { user } = useAuth()
-  const { ownerId, memberRole } = useFamily()
+  const { ownerId, memberRole, profile } = useFamily()
   const isFamiliar = memberRole === 'familiar'
-  const { canEdit } = useSubscription()
+  const { canEdit, trialExpired } = useSubscription()
+  const [showPaywall, setShowPaywall] = useState(false)
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
   const fileRef = useRef(null)
@@ -501,7 +503,7 @@ export default function Expenses() {
       {/* FAB — hidden for familiar (view only) */}
       {!isFamiliar && (
         <button
-          onClick={() => openModal()}
+          onClick={() => trialExpired ? setShowPaywall(true) : openModal()}
           style={{
             position: 'fixed', bottom: 84, right: 20, zIndex: 30,
             width: 54, height: 54, borderRadius: '50%',
@@ -834,6 +836,12 @@ export default function Expenses() {
             </form>
           </div>
         </div>
+      )}
+      {showPaywall && (
+        <PaywallModal
+          onClose={() => setShowPaywall(false)}
+          patientName={profile?.name?.split(' ')[0]}
+        />
       )}
     </Layout>
   )

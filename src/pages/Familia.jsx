@@ -9,6 +9,7 @@ import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import { UserPlus, Phone, Mail, MapPin, XIcon, BookOpen, Users, LogOut } from '../components/Icons'
 import { track } from '../lib/analytics'
+import PaywallModal from '../components/PaywallModal'
 
 const PLAN_LABELS = { free: 'Prueba gratuita', familiar: 'Plan Familiar', care_plus: 'Care+' }
 const PLAN_COLORS = { free: '#9CA3AF', familiar: '#4A7C59', care_plus: '#7C3AED' }
@@ -17,7 +18,7 @@ export default function Familia() {
   const { user, signOut } = useAuth()
   const { profile, ownerId } = useFamily()
   const onlineIds = usePresence()
-  const { sub, isPaid, isTrialing, daysLeft } = useSubscription()
+  const { sub, isPaid, isTrialing, daysLeft, trialExpired } = useSubscription()
   const navigate = useNavigate()
   const [members, setMembers] = useState([])
   const [memberProfiles, setMemberProfiles] = useState({})
@@ -38,6 +39,7 @@ export default function Familia() {
   const [savingShift, setSavingShift] = useState(false)
   const [savingRole, setSavingRole] = useState(false)
   const [confirmRemoveDialog, setConfirmRemoveDialog] = useState(null) // { member, name }
+  const [showPaywall, setShowPaywall] = useState(false)
 
   const displayName = user?.user_metadata?.full_name?.trim() || user?.email?.trim() || 'Familiar'
   const isAdmin = user?.id === ownerId
@@ -169,6 +171,7 @@ export default function Familia() {
   }
 
   function openInvite() {
+    if (trialExpired) { setShowPaywall(true); return }
     setInviteEmail(''); setInviteStatus('idle'); setInviteLink(''); setCopied(false)
     setShowInvite(true)
   }
@@ -997,6 +1000,12 @@ export default function Familia() {
             </div>
           </div>
         </div>
+      )}
+      {showPaywall && (
+        <PaywallModal
+          onClose={() => setShowPaywall(false)}
+          patientName={profile?.name?.split(' ')[0]}
+        />
       )}
     </Layout>
   )
