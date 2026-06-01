@@ -290,14 +290,20 @@ function EventCard({ event, onClick }) {
   )
 }
 
+function toLocalDateKey(d = new Date()) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
 export default function MedicationTimeline() {
   const { ownerId } = useFamily()
   const navigate = useNavigate()
+  const todayKey = toLocalDateKey()
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [filterType, setFilterType] = useState('all')
   const [period, setPeriod] = useState('today')
+  const [expandedDays, setExpandedDays] = useState(new Set([toLocalDateKey()]))
 
   useEffect(() => {
     if (ownerId) fetchLog()
@@ -454,40 +460,92 @@ export default function MedicationTimeline() {
             </p>
           </div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-            {days.map(([dateKey, dayEvents]) => (
-              <div key={dateKey}>
-                {/* Day header */}
-                <div style={{
-                  display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10,
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {days.map(([dateKey, dayEvents]) => {
+              const isExpanded = expandedDays.has(dateKey)
+              const isToday = dateKey === todayKey
+              function toggleDay() {
+                setExpandedDays(prev => {
+                  const next = new Set(prev)
+                  next.has(dateKey) ? next.delete(dateKey) : next.add(dateKey)
+                  return next
+                })
+              }
+              return (
+                <div key={dateKey} style={{
+                  background: 'white', borderRadius: 16,
+                  border: `1px solid ${isToday ? '#C8DFC8' : '#EDE5D8'}`,
+                  overflow: 'hidden',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
                 }}>
-                  <p style={{
-                    fontSize: 12, fontWeight: 700, color: '#6B7280',
-                    textTransform: 'uppercase', letterSpacing: '0.07em', margin: 0,
-                  }}>
-                    {dayLabel(dateKey)}
-                  </p>
-                  <div style={{ flex: 1, height: 1, background: '#EDE5D8' }} />
-                  <span style={{
-                    fontSize: 10, fontWeight: 700, color: '#9CA3AF',
-                    background: '#F3F4F6', padding: '2px 8px', borderRadius: 10,
-                  }}>
-                    {dayEvents.length}
-                  </span>
-                </div>
+                  {/* Day header — tocable */}
+                  <button
+                    onClick={toggleDay}
+                    style={{
+                      width: '100%', display: 'flex', alignItems: 'center', gap: 10,
+                      padding: '12px 16px',
+                      background: isToday ? '#F0FDF4' : '#FDFAF7',
+                      border: 'none', cursor: 'pointer',
+                      borderBottom: isExpanded ? `1px solid ${isToday ? '#C8DFC8' : '#EDE5D8'}` : 'none',
+                      WebkitTapHighlightColor: 'transparent',
+                    }}
+                  >
+                    <div style={{ flex: 1, textAlign: 'left' }}>
+                      <p style={{
+                        fontSize: 13, fontWeight: 700,
+                        color: isToday ? '#2D4A1E' : '#374151',
+                        margin: 0,
+                      }}>
+                        {dayLabel(dateKey)}
+                        {isToday && (
+                          <span style={{ marginLeft: 7, fontSize: 10, fontWeight: 700, color: '#4A7C59', background: '#C6EDD0', padding: '2px 7px', borderRadius: 6 }}>
+                            Hoy
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                    <span style={{
+                      fontSize: 10, fontWeight: 700, color: '#9CA3AF',
+                      background: '#F3F4F6', padding: '2px 8px', borderRadius: 10, flexShrink: 0,
+                    }}>
+                      {dayEvents.length} evento{dayEvents.length !== 1 ? 's' : ''}
+                    </span>
+                    <span style={{
+                      fontSize: 16, color: '#9CA3AF', flexShrink: 0,
+                      transform: isExpanded ? 'rotate(90deg)' : 'none',
+                      transition: 'transform 0.22s ease',
+                      display: 'inline-block',
+                    }}>›</span>
+                  </button>
 
-                {/* Events for this day */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  {dayEvents.map(evt => (
-                    <EventCard
-                      key={evt.id}
-                      event={evt}
-                      onClick={EVENT_ROUTES[evt.type] ? () => navigate(EVENT_ROUTES[evt.type]) : undefined}
-                    />
-                  ))}
+                  {/* Events — colapsables */}
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateRows: isExpanded ? '1fr' : '0fr',
+                    transition: 'grid-template-rows 0.28s cubic-bezier(0.4,0,0.2,1)',
+                  }}>
+                    <div style={{ overflow: 'hidden' }}>
+                      <div style={{
+                        padding: isExpanded ? '12px 12px 12px' : '0 12px',
+                        display: 'flex', flexDirection: 'column', gap: 8,
+                        opacity: isExpanded ? 1 : 0,
+                        transition: isExpanded
+                          ? 'opacity 0.2s ease 0.08s'
+                          : 'opacity 0.1s ease',
+                      }}>
+                        {dayEvents.map(evt => (
+                          <EventCard
+                            key={evt.id}
+                            event={evt}
+                            onClick={EVENT_ROUTES[evt.type] ? () => navigate(EVENT_ROUTES[evt.type]) : undefined}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
       </div>
