@@ -173,7 +173,7 @@ export default function Layout({ children }) {
       <main style={{
         position: 'fixed', inset: 0, overflowY: 'auto',
         top:    isVideoCall ? 0 : `calc(${hospitalBarHeight}px + 56px + env(safe-area-inset-top))`,
-        bottom: isVideoCall ? 0 : isSecondary ? 'env(safe-area-inset-bottom)' : 'calc(68px + env(safe-area-inset-bottom))',
+        bottom: isVideoCall ? 0 : (isSecondary || isHospitalMode) ? 'env(safe-area-inset-bottom)' : 'calc(68px + env(safe-area-inset-bottom))',
       }}>
         <InstallBanner />
         <OfflineBanner />
@@ -227,8 +227,8 @@ export default function Layout({ children }) {
         @keyframes hbPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
       `}</style>
 
-      {/* Bottom navigation — hidden on video call and secondary pages */}
-      {isVideoCall || isSecondary ? null : <nav
+      {/* Bottom navigation — hidden on video call, secondary pages, and hospital mode */}
+      {isVideoCall || isSecondary || isHospitalMode ? null : <nav
         style={{
           position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 40,
           height: 'calc(68px + env(safe-area-inset-bottom))',
