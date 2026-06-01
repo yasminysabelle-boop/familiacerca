@@ -84,6 +84,12 @@ function dateLabelFor(dateKey, todayKey, yesterdayKey) {
   return raw.charAt(0).toUpperCase() + raw.slice(1)
 }
 
+// Returns YYYY-MM-DD in the browser's local timezone — avoids UTC midnight
+// rollover where toISOString() can return the wrong date for UTC-offset locales.
+function toLocalDateKey(d = new Date()) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
 function sortSection(events) {
   return [...events].sort((a, b) => {
     if (a.type === 'MED_PENDING' && b.type !== 'MED_PENDING') return -1
@@ -1734,17 +1740,20 @@ export default function Dashboard() {
   }, [])
 
   const now = new Date()
-  const todayKey = now.toISOString().split('T')[0]
-  const yesterday = new Date(now); yesterday.setDate(yesterday.getDate() - 1)
-  const yesterdayKey = yesterday.toISOString().split('T')[0]
-  const tomorrow = new Date(now); tomorrow.setDate(tomorrow.getDate() + 1)
-  const tomorrowKey = tomorrow.toISOString().split('T')[0]
-  const sevenAgo = new Date(now); sevenAgo.setDate(sevenAgo.getDate() - 6)
-  const sevenAgoKey = sevenAgo.toISOString().split('T')[0]
+  const todayKey     = toLocalDateKey(now)
+  const yesterday    = new Date(now); yesterday.setDate(yesterday.getDate() - 1)
+  const yesterdayKey = toLocalDateKey(yesterday)
+  const tomorrow     = new Date(now); tomorrow.setDate(tomorrow.getDate() + 1)
+  const tomorrowKey  = toLocalDateKey(tomorrow)
+  const sevenAgo     = new Date(now); sevenAgo.setDate(sevenAgo.getDate() - 6)
+  const sevenAgoKey  = toLocalDateKey(sevenAgo)
   const tabDays = Array.from({ length: 7 }, (_, i) => {
     const d = new Date(now); d.setDate(d.getDate() - i)
-    return d.toISOString().split('T')[0]
+    return toLocalDateKey(d)
   })
+  // UTC ISO strings for DB queries: midnight in local timezone → correct UTC boundary
+  const todayStartISO   = new Date(now.getFullYear(),     now.getMonth(),     now.getDate()).toISOString()
+  const sevenAgoStartISO = new Date(sevenAgo.getFullYear(), sevenAgo.getMonth(), sevenAgo.getDate()).toISOString()
 
   const fullName = user?.user_metadata?.full_name ?? user?.email ?? 'Cuidador'
   const firstName = fullName.split(' ')[0]
@@ -1769,7 +1778,7 @@ export default function Dashboard() {
       .from('chat_messages')
       .select('id', { count: 'exact', head: true })
       .eq('owner_id', ownerId)
-      .gte('created_at', todayKey + 'T00:00:00Z')
+      .gte('created_at', todayStartISO)
       .then(({ count }) => setChatCount(count ?? 0))
   }, [ownerId, todayKey])
 
@@ -1990,21 +1999,21 @@ export default function Dashboard() {
       supabase.from('voice_diary')
         .select('*, user_profiles(full_name)')
         .in('user_id', allFamilyIds)
-        .gte('created_at', sevenAgoKey + 'T00:00:00Z')
+        .gte('created_at', sevenAgoStartISO)
         .order('created_at', { ascending: false })
         .limit(20),
 
       supabase.from('memories')
         .select('*')
         .in('user_id', allFamilyIds)
-        .gte('created_at', sevenAgoKey + 'T00:00:00Z')
+        .gte('created_at', sevenAgoStartISO)
         .order('created_at', { ascending: false })
         .limit(10),
 
       supabase.from('care_expenses')
         .select('*')
         .eq('user_id', ownerId)
-        .gte('created_at', sevenAgoKey + 'T00:00:00Z')
+        .gte('created_at', sevenAgoStartISO)
         .order('created_at', { ascending: false })
         .limit(20),
 
@@ -2018,7 +2027,7 @@ export default function Dashboard() {
       supabase.from('emergency_alerts')
         .select('*')
         .in('user_id', allFamilyIds)
-        .gte('created_at', sevenAgoKey + 'T00:00:00Z')
+        .gte('created_at', sevenAgoStartISO)
         .order('created_at', { ascending: false })
         .limit(10),
     ])
@@ -2063,7 +2072,7 @@ export default function Dashboard() {
     for (let i = 1; i <= 6; i++) {
       const d = new Date(now)
       d.setDate(d.getDate() - i)
-      pastDays.push(d.toISOString().split("T")[0])
+      pastDays.push(toLocalDateKey(d))
     }
     const confirmedByDay = {}
     for (const log of (confirmedLogs ?? [])) {
@@ -2121,7 +2130,7 @@ export default function Dashboard() {
     const sevenAgoTs = new Date(sevenAgoKey + 'T12:00:00').getTime()
     const yesterdayTs = new Date(yesterdayKey + 'T12:00:00').getTime()
     for (let ts = sevenAgoTs; ts <= yesterdayTs; ts += dayMs) {
-      const dk = new Date(ts).toISOString().split('T')[0]
+      const dk = toLocalDateKey(new Date(ts))
       const confirmedOnDay = confirmedByDate[dk] ?? new Set()
       for (const med of (meds ?? [])) {
         if (confirmedOnDay.has(med.id)) continue
@@ -2146,7 +2155,7 @@ export default function Dashboard() {
 
     // ── Voice memories ──
     for (const mem of (voiceMemories ?? [])) {
-      const dateKey = mem.created_at.split('T')[0]
+      const dateKey = toLocalDateKey(new Date(mem.created_at))
       allEvents.push({
         id: `mem-${mem.id}`,
         type: 'VOICE_MEMORY',
@@ -2161,7 +2170,7 @@ export default function Dashboard() {
 
     // ── Photo memories ──
     for (const photo of (photoMemories ?? [])) {
-      const dateKey = photo.created_at.split('T')[0]
+      const dateKey = toLocalDateKey(new Date(photo.created_at))
       allEvents.push({
         id: `photo-${photo.id}`,
         type: 'PHOTO',
@@ -2177,7 +2186,7 @@ export default function Dashboard() {
     // ── Expenses ──
     for (const exp of (expenses ?? [])) {
       const ts = exp.created_at ?? (exp.date ? exp.date + 'T12:00:00' : todayKey)
-      const dateKey = ts.split('T')[0]
+      const dateKey = toLocalDateKey(new Date(ts))
       allEvents.push({
         id: `exp-${exp.id}`,
         type: 'EXPENSE',
@@ -2223,7 +2232,7 @@ export default function Dashboard() {
 
     // ── SOS alerts ──
     for (const alert of (sosAlerts ?? [])) {
-      const dateKey = alert.created_at.split('T')[0]
+      const dateKey = toLocalDateKey(new Date(alert.created_at))
       allEvents.push({
         id: `sos-${alert.id}`,
         type: 'SOS_ALERT',
@@ -2258,7 +2267,7 @@ export default function Dashboard() {
 
     // Ensure all 7 days appear even when they have no events
     for (let ts = sevenAgoTs; ts <= new Date(todayKey + 'T12:00:00').getTime(); ts += dayMs) {
-      const dk = new Date(ts).toISOString().split('T')[0]
+      const dk = toLocalDateKey(new Date(ts))
       if (!dateMap[dk]) dateMap[dk] = []
     }
 
