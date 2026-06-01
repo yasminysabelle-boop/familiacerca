@@ -67,7 +67,7 @@ const FALLBACKS = {
 async function buildProactiveMessage(chosen, ownerId, patientName) {
   if (!ownerId) return PROACTIVE_GREETINGS[chosen]
   try {
-    const today = new Date().toISOString().split('T')[0]
+    const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' })
 
     // A) Low stock medications (≤7 pills remaining)
     const { data: stocks } = await supabase
@@ -105,8 +105,8 @@ async function buildProactiveMessage(chosen, ownerId, patientName) {
       .from('events')
       .select('title, date')
       .eq('user_id', ownerId)
-      .gte('date', tomorrow.toISOString().split('T')[0])
-      .lte('date', dayAfter.toISOString().split('T')[0])
+      .gte('date', tomorrow.toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' }))
+      .lte('date', dayAfter.toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' }))
       .order('date', { ascending: true })
       .limit(1)
 

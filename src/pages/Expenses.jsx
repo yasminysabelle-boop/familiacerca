@@ -64,7 +64,7 @@ export default function Expenses() {
   const [confirmDialog, setConfirmDialog] = useState(null)
   const [form, setForm] = useState({
     amount: '', category: 'Medicamentos', description: '',
-    paid_by: displayName, date: now.toISOString().slice(0, 10),
+    paid_by: displayName, date: now.toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' }),
   })
   const [photoFile,    setPhotoFile]    = useState(null)
   const [photoPreview, setPhotoPreview] = useState(null)
@@ -132,7 +132,7 @@ export default function Expenses() {
         category:    expense.category ?? 'Medicamentos',
         description: expense.description ?? '',
         paid_by:     expense.paid_by ?? displayName,
-        date:        expense.date ?? new Date().toISOString().slice(0, 10),
+        date:        expense.date ?? new Date().toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' }),
       })
       setPhotoFile(null)
       setPhotoPreview(expense.receipt_photo_url ?? null)
@@ -140,7 +140,7 @@ export default function Expenses() {
       setEditExpense(null)
       setForm({
         amount: '', category: 'Medicamentos', description: '',
-        paid_by: displayName, date: new Date().toISOString().slice(0, 10),
+        paid_by: displayName, date: new Date().toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' }),
       })
       setPhotoFile(null)
       setPhotoPreview(null)

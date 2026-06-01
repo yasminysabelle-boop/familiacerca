@@ -1727,8 +1727,8 @@ export default function Dashboard() {
   const [pressedSOS, setPressedSOS] = useState(false)
   const [weekShifts, setWeekShifts] = useState([])
   // Initialized to today's key so today is expanded; past days start collapsed
-  const [expandedDays, setExpandedDays] = useState(() => new Set([new Date().toISOString().split('T')[0]]))
-  const [selectedDayTab, setSelectedDayTab] = useState(() => new Date().toISOString().split('T')[0])
+  const [expandedDays, setExpandedDays] = useState(() => new Set([new Date().toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' })]))
+  const [selectedDayTab, setSelectedDayTab] = useState(() => new Date().toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' }))
 
   useEffect(() => {
     if (searchParams.get('checkout') === 'success') {
@@ -1810,7 +1810,7 @@ export default function Dashboard() {
     if (!ownerId) return
     const days = Array.from({ length: 7 }, (_, i) => {
       const d = new Date(); d.setDate(d.getDate() + i)
-      return d.toISOString().split('T')[0]
+      return d.toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' })
     })
     supabase
       .from('care_shifts')
@@ -2477,7 +2477,7 @@ export default function Dashboard() {
   const todayShift = weekShifts.find(s => s.shift_date === todayKey) ?? null
   const weekDays = Array.from({ length: 7 }, (_, i) => {
     const d = new Date(); d.setDate(d.getDate() + i)
-    return d.toISOString().split('T')[0]
+    return d.toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' })
   })
 
   const todaySection = sections.find(s => s.dateKey === todayKey)

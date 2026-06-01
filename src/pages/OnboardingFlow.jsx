@@ -80,6 +80,20 @@ function PrimaryBtn({ children, onClick, disabled, pressed, onPD, onPU, onPL }) 
   )
 }
 
+function matchCareItemKey(text) {
+  const t = (text ?? '').toLowerCase()
+  if (/baño|bañar|ducha/.test(t))               return 'bath'
+  if (/cepill|diente|dental/.test(t))            return 'dental_morning'
+  if (/ropa|vestir|cambio.*ropa/.test(t))        return 'clothes'
+  if (/desayuno|breakfast/.test(t))              return 'breakfast'
+  if (/almuerzo|lunch|comida/.test(t))           return 'lunch'
+  if (/cena|dinner|merienda/.test(t))            return 'dinner'
+  if (/ejercicio|camina|walk|paseo|físic/.test(t)) return 'exercise'
+  if (/terapia|fisio|rehabilit/.test(t))         return 'home_therapy'
+  if (/uña|nail/.test(t))                        return 'nail_trim'
+  return null
+}
+
 function SkipBtn({ onClick, label = 'Hacer esto después' }) {
   return (
     <button
@@ -171,12 +185,18 @@ export default function OnboardingFlow() {
   async function generateInviteLink() {
     if (inviteLink) return // ya generado
     try {
-      const { data: token } = await supabase.rpc('create_family_invitation', {
-        p_invited_email: '', p_invited_by: displayName,
+      // Use a placeholder email so the RPC does not reject an empty string.
+      // The token is what matters — the invited person sets their own email on join.
+      const { data: token, error } = await supabase.rpc('create_family_invitation', {
+        p_invited_email: 'invitado@familiacerca.app', p_invited_by: displayName,
       })
-      setInviteLink(token ? `${window.location.origin}/join?token=${token}` : window.location.origin)
+      if (!error && token) {
+        setInviteLink(`${window.location.origin}/join?token=${token}`)
+      } else {
+        setInviteLink(`${window.location.origin}/join`)
+      }
     } catch {
-      setInviteLink(window.location.origin)
+      setInviteLink(`${window.location.origin}/join`)
     }
   }
 
@@ -231,12 +251,23 @@ export default function OnboardingFlow() {
           scheduled_times: times.length ? times : null,
         })
       } else if (step6Type === 'task' && a6Task.trim()) {
-        await supabase.from('notes').insert({
-          user_id: user.id, created_by_user_id: user.id,
-          title: a6Task.trim(),
-          content: a6TaskTime ? `Horario: ${a6TaskTime}` : '',
-          tags: ['rutina'],
-        })
+        // Try to match the task to a predefined care item so it appears in Cuidado.jsx
+        const careKey = matchCareItemKey(a6Task)
+        if (careKey) {
+          await supabase.from('care_item_schedules').upsert({
+            user_id: user.id,
+            item_key: careKey,
+            scheduled_time: a6TaskTime || null,
+            updated_at: new Date().toISOString(),
+          }, { onConflict: 'user_id,item_key' })
+        } else {
+          await supabase.from('notes').insert({
+            user_id: user.id, created_by_user_id: user.id,
+            title: a6Task.trim(),
+            content: a6TaskTime ? `Horario: ${a6TaskTime}` : '',
+            tags: ['rutina'],
+          })
+        }
       } else if (step6Type === 'note' && a6Note.trim()) {
         await supabase.from('notes').insert({
           user_id: user.id, created_by_user_id: user.id,

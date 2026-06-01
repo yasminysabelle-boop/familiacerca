@@ -14,13 +14,21 @@ export default function HospitalDashboard({ onManageMode, onSOS, onVideoCall }) 
   const { user } = useAuth()
   const [deactivating, setDeactivating] = useState(false)
   const [confirmDeactivate, setConfirmDeactivate] = useState(false)
+  const [deactivateError, setDeactivateError] = useState('')
 
   async function handleDeactivate() {
     setDeactivating(true)
-    const name = user?.user_metadata?.full_name ?? user?.email ?? 'Familiar'
-    await deactivateHospitalMode(name)
-    setDeactivating(false)
-    setConfirmDeactivate(false)
+    setDeactivateError('')
+    try {
+      const name = user?.user_metadata?.full_name ?? user?.email ?? 'Familiar'
+      const { error } = await deactivateHospitalMode(name)
+      if (error) throw error
+      setConfirmDeactivate(false)
+    } catch {
+      setDeactivateError('No se pudo desactivar. Verifica tu conexión.')
+    } finally {
+      setDeactivating(false)
+    }
   }
 
   return (
@@ -120,6 +128,11 @@ export default function HospitalDashboard({ onManageMode, onSOS, onVideoCall }) 
           <p style={{ margin: 0, fontSize: 13, color: '#6B7280', textAlign: 'center', lineHeight: 1.5 }}>
             Los medicamentos y rutinas se reanudan. El equipo será notificado.
           </p>
+          {deactivateError && (
+            <p style={{ margin: 0, fontSize: 12, color: '#DC2626', textAlign: 'center', fontWeight: 600 }}>
+              ⚠ {deactivateError}
+            </p>
+          )}
           <div style={{ display: 'flex', gap: 10 }}>
             <button
               onClick={() => setConfirmDeactivate(false)}

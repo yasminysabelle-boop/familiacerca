@@ -97,25 +97,31 @@ export default function Chat() {
       .channel(`familia-chat:${ownerId}`)
       .on(
         'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'chat_messages', filter: `owner_id=eq.${ownerId}` },
+        { event: '*', schema: 'public', table: 'chat_messages', filter: `owner_id=eq.${ownerId}` },
         payload => {
-          setMessages(prev => {
-            if (prev.some(m => m.id === payload.new.id)) return prev
-            return [...prev, payload.new]
-          })
-          const senderId = payload.new.user_id
-          setProfiles(prev => {
-            if (prev[senderId]) return prev
-            supabase
-              .from('user_profiles')
-              .select('id, full_name, avatar_url')
-              .eq('id', senderId)
-              .maybeSingle()
-              .then(({ data }) => {
-                if (data) setProfiles(p => ({ ...p, [data.id]: data }))
-              })
-            return prev
-          })
+          if (payload.eventType === 'INSERT') {
+            setMessages(prev => {
+              if (prev.some(m => m.id === payload.new.id)) return prev
+              return [...prev, payload.new]
+            })
+            const senderId = payload.new.user_id
+            setProfiles(prev => {
+              if (prev[senderId]) return prev
+              supabase
+                .from('user_profiles')
+                .select('id, full_name, avatar_url')
+                .eq('id', senderId)
+                .maybeSingle()
+                .then(({ data }) => {
+                  if (data) setProfiles(p => ({ ...p, [data.id]: data }))
+                })
+              return prev
+            })
+          } else if (payload.eventType === 'UPDATE') {
+            setMessages(prev => prev.map(m => m.id === payload.new.id ? { ...m, ...payload.new } : m))
+          } else if (payload.eventType === 'DELETE') {
+            setMessages(prev => prev.filter(m => m.id !== payload.old?.id))
+          }
         }
       )
       .subscribe()
@@ -192,7 +198,7 @@ export default function Chat() {
       supabase.from('medication_logs').select('*, medications(name)').eq('user_id', uid).eq('log_date', today),
       supabase.from('voice_diary').select('transcription, mood').eq('user_id', uid).order('created_at', { ascending: false }).limit(5),
       supabase.from('events').select('title, date, time').gte('date', today).order('date', { ascending: true }).limit(3),
-      supabase.from('care_expenses').select('description, amount').order('created_at', { ascending: false }).limit(5),
+      supabase.from('care_expenses').select('description, amount').eq('user_id', uid).order('created_at', { ascending: false }).limit(5),
     ])
     const medStatus = (todayLogs ?? []).map(l => `${l.medications?.name}: ${l.status === 'confirmed' ? 'dado' : 'pendiente'}`).join(', ')
     const memoriesText = (recentMemories ?? []).filter(m => m.transcription).map(m => `"${m.transcription.slice(0, 80)}"`).join('; ')
