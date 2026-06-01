@@ -32,7 +32,11 @@ export default function HospitalDashboard({ onManageMode, onSOS, onVideoCall }) 
   }
 
   return (
-    <div style={{ padding: '12px 16px 96px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+    <div style={{
+      position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999,
+      backgroundColor: '#F0EDE6', overflowY: 'auto',
+      padding: '12px 16px 32px', display: 'flex', flexDirection: 'column', gap: 14,
+    }}>
 
       {/* 1. Banner rojo con estado global */}
       <HospitalBanner onManage={onManageMode} />
