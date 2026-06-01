@@ -2847,8 +2847,11 @@ export default function Dashboard() {
           <p style={{ fontFamily: 'Georgia, serif', fontSize: 14, fontWeight: 700, color: '#1A1A1A', margin: '0 0 12px' }}>
             Resumen del día
           </p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <div
+              onClick={() => navigate('/medications')}
+              style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0', cursor: 'pointer', borderBottom: '1px solid #F5EEE6' }}
+            >
               <span style={{ fontSize: 18, flexShrink: 0 }}>💊</span>
               <p style={{ flex: 1, fontSize: 13, color: '#374151', margin: 0 }}>
                 {medTotal === 0
@@ -2857,20 +2860,39 @@ export default function Dashboard() {
                     ? `${confirmedTodayCount} de ${medTotal} medicamentos dados ✅`
                     : `${pendingCount} medicamento${pendingCount !== 1 ? 's' : ''} pendiente${pendingCount !== 1 ? 's' : ''}`}
               </p>
+              <span style={{ fontSize: 14, color: '#D4C0B0', flexShrink: 0 }}>›</span>
+            </div>
+            <div
+              onClick={() => navigate('/cuidado')}
+              style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0', cursor: 'pointer', borderBottom: '1px solid #F5EEE6' }}
+            >
+              <span style={{ fontSize: 18, flexShrink: 0 }}>✅</span>
+              <p style={{ flex: 1, fontSize: 13, color: '#374151', margin: 0 }}>
+                {loading ? 'Cargando tareas...' : careStatus}
+              </p>
+              <span style={{ fontSize: 14, color: '#D4C0B0', flexShrink: 0 }}>›</span>
             </div>
             {nextAppointment && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div
+                onClick={() => navigate('/calendar')}
+                style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0', cursor: 'pointer', borderBottom: '1px solid #F5EEE6' }}
+              >
                 <span style={{ fontSize: 18, flexShrink: 0 }}>📅</span>
                 <p style={{ flex: 1, fontSize: 13, color: '#374151', margin: 0 }}>
-                  {nextAppointment.appointmentTitle ?? 'Próxima cita médica'}
+                  Próxima cita: {nextAppointment.appointmentTitle ?? 'Cita médica'}
                 </p>
+                <span style={{ fontSize: 14, color: '#D4C0B0', flexShrink: 0 }}>›</span>
               </div>
             )}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div
+              onClick={() => navigate('/familia')}
+              style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0', cursor: 'pointer' }}
+            >
               <span style={{ fontSize: 18, flexShrink: 0 }}>👤</span>
               <p style={{ flex: 1, fontSize: 13, color: '#374151', margin: 0 }}>
                 Cuida hoy: <strong>{todayShift?.caregiver_name ?? firstName}</strong>
               </p>
+              <span style={{ fontSize: 14, color: '#D4C0B0', flexShrink: 0 }}>›</span>
             </div>
           </div>
         </div>
@@ -2898,14 +2920,34 @@ export default function Dashboard() {
                   SOS_ALERT: 'Alerta SOS',
                   APPOINTMENT_PROOF: 'Comprobante de cita',
                 }[evt.type] ?? evt.type
+                const actRoute = {
+                  MED_CONFIRMED: '/medications',
+                  VOICE_MEMORY: '/memorias',
+                  PHOTO: '/album',
+                  NOTE: '/notas',
+                  EXPENSE: '/gastos',
+                  SOS_ALERT: '/historial',
+                  APPOINTMENT: '/calendar',
+                  APPOINTMENT_PROOF: '/calendar',
+                }[evt.type]
                 const evtTime = evt.timestamp ? fmtTimestamp(evt.timestamp) : null
                 return (
-                  <div key={evt.id ?? i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 0', borderBottom: i < recentEvents5.length - 1 ? '1px solid #F5EEE6' : 'none' }}>
+                  <div
+                    key={evt.id ?? i}
+                    onClick={actRoute ? () => navigate(actRoute) : undefined}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 10,
+                      padding: '8px 0',
+                      borderBottom: i < recentEvents5.length - 1 ? '1px solid #F5EEE6' : 'none',
+                      cursor: actRoute ? 'pointer' : 'default',
+                    }}
+                  >
                     <span style={{ fontSize: 16, flexShrink: 0 }}>{actIcon}</span>
                     <p style={{ flex: 1, fontSize: 13, color: '#374151', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {actLabel}
                     </p>
                     {evtTime && <span style={{ fontSize: 11, color: '#9CA3AF', flexShrink: 0 }}>{evtTime}</span>}
+                    {actRoute && <span style={{ fontSize: 14, color: '#D4C0B0', flexShrink: 0 }}>›</span>}
                   </div>
                 )
               })}

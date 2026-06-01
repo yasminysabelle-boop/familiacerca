@@ -117,6 +117,9 @@ export default function Medications() {
   const [stockByMedId, setStockByMedId] = useState({})
   const [loading,      setLoading]      = useState(true)
   const [stockTabMed,  setStockTabMed]  = useState(null) // open stock sheet
+  const [logsByMedId,  setLogsByMedId]  = useState({})
+  const [expandedMedHistorial, setExpandedMedHistorial] = useState(new Set())
+  const [expandedHistorialDays, setExpandedHistorialDays] = useState(new Set())
 
   // ── Form / add-flow state ──────────────────────────────────────────────────
   const [showForm,    setShowForm]    = useState(false)
@@ -183,6 +186,26 @@ export default function Medications() {
     setStockByMedId(stockMap)
     // Merge pills_remaining directly onto each med so the dot never flickers
     setMedications(meds.map(m => ({ ...m, pills_remaining: stockMap[m.id]?.pills_remaining ?? null })))
+
+    // Fetch last 7 days of confirmed logs for historial
+    if (meds.length) {
+      const sevenAgo = new Date(); sevenAgo.setDate(sevenAgo.getDate() - 6)
+      const sevenAgoKey = sevenAgo.toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' })
+      const { data: logsData } = await supabase
+        .from('medication_logs')
+        .select('medication_id, log_date, status, confirmed_by_name, confirmed_at, photo_url')
+        .eq('user_id', ownerId)
+        .gte('log_date', sevenAgoKey)
+        .in('medication_id', meds.map(m => m.id))
+      const logsMap = {}
+      ;(logsData ?? []).forEach(log => {
+        if (!logsMap[log.medication_id]) logsMap[log.medication_id] = {}
+        if (!logsMap[log.medication_id][log.log_date]) logsMap[log.medication_id][log.log_date] = []
+        logsMap[log.medication_id][log.log_date].push(log)
+      })
+      setLogsByMedId(logsMap)
+    }
+
     setLoading(false)
   }
 
@@ -563,6 +586,98 @@ Return ONLY valid JSON.`
                           </span>
                         )}
                       </button>
+
+                      {/* Historial — últimos 7 días expandible */}
+                      <div style={{ marginTop: 10 }}>
+                        <button
+                          onClick={() => setExpandedMedHistorial(prev => {
+                            const next = new Set(prev)
+                            next.has(med.id) ? next.delete(med.id) : next.add(med.id)
+                            return next
+                          })}
+                          style={{
+                            background: 'none', border: 'none', cursor: 'pointer',
+                            fontSize: 11, color: '#4A7C59', fontWeight: 700, padding: 0,
+                            display: 'flex', alignItems: 'center', gap: 4,
+                          }}
+                        >
+                          <span style={{
+                            display: 'inline-block',
+                            transform: expandedMedHistorial.has(med.id) ? 'rotate(90deg)' : 'none',
+                            transition: 'transform 0.2s',
+                          }}>›</span>
+                          Historial 7 días
+                        </button>
+                        {expandedMedHistorial.has(med.id) && (() => {
+                          const todayD = new Date()
+                          const last7 = Array.from({ length: 7 }, (_, i) => {
+                            const d = new Date(todayD); d.setDate(d.getDate() - i)
+                            return d.toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' })
+                          })
+                          const medLogs = logsByMedId[med.id] ?? {}
+                          return (
+                            <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                              {last7.map(dayKey => {
+                                const dayLogs = (medLogs[dayKey] ?? []).filter(l => l.status === 'confirmed')
+                                const confirmed = dayLogs.length > 0
+                                const expandKey = `${med.id}-${dayKey}`
+                                const isExpanded = expandedHistorialDays.has(expandKey)
+                                const d = new Date(dayKey + 'T12:00:00')
+                                const label = d.toLocaleDateString('es-US', { weekday: 'short', day: 'numeric', month: 'short' })
+                                return (
+                                  <div key={dayKey}>
+                                    <button
+                                      onClick={() => {
+                                        if (!confirmed) return
+                                        setExpandedHistorialDays(prev => {
+                                          const next = new Set(prev)
+                                          next.has(expandKey) ? next.delete(expandKey) : next.add(expandKey)
+                                          return next
+                                        })
+                                      }}
+                                      style={{
+                                        width: '100%', display: 'flex', alignItems: 'center', gap: 8,
+                                        padding: '6px 10px', borderRadius: 8, border: 'none',
+                                        background: confirmed ? '#F0FDF4' : '#FFF5F5',
+                                        cursor: confirmed ? 'pointer' : 'default',
+                                        textAlign: 'left',
+                                      }}
+                                    >
+                                      <span style={{ fontSize: 12, flexShrink: 0 }}>{confirmed ? '✅' : '⚠️'}</span>
+                                      <span style={{ flex: 1, fontSize: 12, fontWeight: 600, color: '#374151' }}>{label}</span>
+                                      <span style={{ fontSize: 11, fontWeight: 700, color: confirmed ? '#15803D' : '#D63031' }}>
+                                        {confirmed ? `${dayLogs.length} dosis` : 'Sin dar'}
+                                      </span>
+                                      {confirmed && (
+                                        <span style={{ fontSize: 12, color: '#9CA3AF', transform: isExpanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s', flexShrink: 0 }}>›</span>
+                                      )}
+                                    </button>
+                                    {isExpanded && (
+                                      <div style={{ paddingLeft: 10, marginTop: 3, display: 'flex', flexDirection: 'column', gap: 3 }}>
+                                        {dayLogs.map((log, li) => (
+                                          <div key={li} style={{ background: '#F9FAFB', borderRadius: 8, padding: '6px 10px', display: 'flex', alignItems: 'center', gap: 8 }}>
+                                            <span style={{ fontSize: 11, color: '#9CA3AF', flexShrink: 0 }}>
+                                              {log.confirmed_at
+                                                ? new Date(log.confirmed_at).toLocaleTimeString('es-US', { hour: 'numeric', minute: '2-digit', hour12: true })
+                                                : '—'}
+                                            </span>
+                                            <span style={{ fontSize: 12, color: '#374151', flex: 1 }}>
+                                              {log.confirmed_by_name?.split(' ')[0] ?? 'Confirmado'}
+                                            </span>
+                                            {log.photo_url && (
+                                              <img src={log.photo_url} alt="Prueba" style={{ width: 32, height: 32, borderRadius: 6, objectFit: 'cover', border: '1px solid #BBF7D0', flexShrink: 0 }} />
+                                            )}
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                )
+                              })}
+                            </div>
+                          )
+                        })()}
+                      </div>
                     </div>
 
                     {canActOn(med) && (

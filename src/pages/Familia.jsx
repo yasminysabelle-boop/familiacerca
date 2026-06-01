@@ -40,6 +40,7 @@ export default function Familia() {
   const [savingRole, setSavingRole] = useState(false)
   const [confirmRemoveDialog, setConfirmRemoveDialog] = useState(null) // { member, name }
   const [showPaywall, setShowPaywall] = useState(false)
+  const [memberLastActivity, setMemberLastActivity] = useState(null)
 
   const displayName = user?.user_metadata?.full_name?.trim() || user?.email?.trim() || 'Familiar'
   const isAdmin = user?.id === ownerId
@@ -131,6 +132,7 @@ export default function Familia() {
   function openModal(member, mp) {
     setMemberModal({ member, profile: mp })
     setMemberContact(undefined)
+    setMemberLastActivity(null)
     supabase
       .from('contacts')
       .select('*')
@@ -138,6 +140,18 @@ export default function Familia() {
       .ilike('email', member.member_email ?? '')
       .maybeSingle()
       .then(({ data }) => setMemberContact(data ?? null))
+    if (member.member_user_id) {
+      setMemberLastActivity(undefined)
+      supabase
+        .from('activity_log')
+        .select('type, description, created_at')
+        .eq('owner_id', ownerId)
+        .eq('actor_id', member.member_user_id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+        .then(({ data }) => setMemberLastActivity(data ?? null))
+    }
   }
 
   async function handleInvite(e) {
@@ -508,7 +522,7 @@ export default function Familia() {
                 return (
                   <div
                     key={member.member_user_id ?? member.member_email}
-                    onClick={() => navigate(`/directorio?member=${encodeURIComponent(member.member_email ?? '')}`)}
+                    onClick={() => openModal(member, mp)}
                     style={{
                       display: 'flex', alignItems: 'center', gap: 12,
                       padding: '12px 14px', borderRadius: 14,
@@ -734,6 +748,42 @@ export default function Familia() {
                   </div>
                 </div>
               )}
+
+              {/* Última actividad */}
+              <div style={{ borderRadius: 14, background: '#F9F5F1', border: '1px solid #EDE5D8', padding: '12px 14px', marginBottom: 12 }}>
+                <p style={{ fontSize: 10, fontWeight: 700, color: '#9CA3AF', letterSpacing: '0.08em', textTransform: 'uppercase', margin: '0 0 8px' }}>
+                  Última actividad
+                </p>
+                {memberLastActivity === undefined ? (
+                  <p style={{ fontSize: 12, color: '#9CA3AF', margin: 0 }}>Cargando...</p>
+                ) : memberLastActivity === null ? (
+                  <p style={{ fontSize: 12, color: '#9CA3AF', margin: 0 }}>Sin actividad registrada</p>
+                ) : (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <p style={{ fontSize: 13, color: '#374151', margin: 0, flex: 1, lineHeight: 1.4 }}>
+                      {memberLastActivity.description}
+                    </p>
+                    <span style={{ fontSize: 11, color: '#9CA3AF', flexShrink: 0 }}>
+                      {new Date(memberLastActivity.created_at).toLocaleDateString('es-US', { day: 'numeric', month: 'short' })}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Botón mensaje al chat */}
+              <button
+                onClick={() => { setMemberModal(null); navigate('/chat') }}
+                style={{
+                  width: '100%', padding: '13px', borderRadius: 14, border: 'none',
+                  background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
+                  color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                  marginBottom: 10,
+                  boxShadow: '0 4px 16px rgba(74,124,89,0.25)',
+                }}
+              >
+                💬 Enviar mensaje
+              </button>
 
               <div style={{ borderRadius: 16, background: '#F9F5F1', border: '1px solid #EDE5D8', padding: '4px 16px', marginBottom: 16 }}>
                 {member.member_email && (

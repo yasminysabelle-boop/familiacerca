@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useFamily } from '../contexts/FamilyContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
@@ -37,6 +38,16 @@ const PERIOD_OPTIONS = [
   { id: '7',         label: '7 días' },
   { id: '30',        label: '30 días' },
 ]
+
+const EVENT_ROUTES = {
+  med_confirmed:      '/medications',
+  care_routine:       '/cuidado',
+  doctor_note:        '/notas',
+  appointment:        '/calendar',
+  expense:            '/gastos',
+  sos:                '/historial',
+  care_photo:         '/album',
+}
 
 function careItemLabel(key) {
   return CARE_ITEMS.find(i => i.key === key)?.label ?? key
@@ -205,19 +216,23 @@ function EventMetadata({ type, meta }) {
   return null
 }
 
-function EventCard({ event }) {
+function EventCard({ event, onClick }) {
   const cfg = EVENT_CONFIG[event.type] ?? { icon: '📌', label: event.type, color: '#6B7280', bg: 'white', border: '#EDE5D8' }
   const time = fmtTime(event.created_at)
 
   return (
-    <div style={{
-      background: cfg.bg,
-      border: `1px solid ${cfg.border}`,
-      borderRadius: 16,
-      padding: '13px 15px',
-      display: 'flex',
-      gap: 12,
-    }}>
+    <div
+      onClick={onClick}
+      style={{
+        background: cfg.bg,
+        border: `1px solid ${cfg.border}`,
+        borderRadius: 16,
+        padding: '13px 15px',
+        display: 'flex',
+        gap: 12,
+        cursor: onClick ? 'pointer' : 'default',
+      }}
+    >
       {/* Icon */}
       <div style={{
         width: 38, height: 38, borderRadius: 10, flexShrink: 0,
@@ -268,12 +283,16 @@ function EventCard({ event }) {
         {/* Type-specific metadata */}
         <EventMetadata type={event.type} meta={event.metadata} />
       </div>
+      {onClick && (
+        <span style={{ fontSize: 16, color: '#D4C0B0', flexShrink: 0, alignSelf: 'center' }}>›</span>
+      )}
     </div>
   )
 }
 
 export default function MedicationTimeline() {
   const { ownerId } = useFamily()
+  const navigate = useNavigate()
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -460,7 +479,11 @@ export default function MedicationTimeline() {
                 {/* Events for this day */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   {dayEvents.map(evt => (
-                    <EventCard key={evt.id} event={evt} />
+                    <EventCard
+                      key={evt.id}
+                      event={evt}
+                      onClick={EVENT_ROUTES[evt.type] ? () => navigate(EVENT_ROUTES[evt.type]) : undefined}
+                    />
                   ))}
                 </div>
               </div>
