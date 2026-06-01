@@ -5,6 +5,9 @@ import { useFamily } from '../contexts/FamilyContext'
 import { useSubscription } from '../contexts/SubscriptionContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
+import { SkeletonDashSummary, SkeletonCard } from '../components/SkeletonLoader'
+import SuccessAnimation, { useSuccessAnimation } from '../components/SuccessAnimation'
+import { usePullToRefresh } from '../hooks/usePullToRefresh'
 import { AlertTriangle, CheckIcon, User, XIcon, Pill, ClipboardCheck, Chat, Calendar, Receipt, Users, Camera, Heart, Clock, BookOpen } from '../components/Icons'
 import { geminiGenerate } from '../lib/gemini'
 import TrialBanner from '../components/TrialBanner'
@@ -1707,6 +1710,8 @@ export default function Dashboard() {
   const [timelineError, setTimelineError] = useState('')
   const [confirmError, setConfirmError] = useState('')
   const [confirming, setConfirming] = useState(null)
+  const { trigger: medSuccessTrigger, fire: fireMedSuccess } = useSuccessAnimation()
+  const { containerRef: pullRef, onTouchStart: pullStart, onTouchMove: pullMove, onTouchEnd: pullEnd, PullIndicator } = usePullToRefresh(fetchTimeline)
   const [expandedAudio, setExpandedAudio] = useState(null)
   const [medTotal, setMedTotal] = useState(0)
   const [showSOS, setShowSOS] = useState(false)
@@ -2366,6 +2371,7 @@ export default function Dashboard() {
           return { ...section, events: sortSection([...filtered, confirmedEvt]) }
         })
       )
+      fireMedSuccess()
     }
     setConfirming(null)
   }
@@ -2679,7 +2685,14 @@ export default function Dashboard() {
           ⚠️ {confirmError}
         </div>
       )}
-      <div style={{ padding: '12px 16px 96px', maxWidth: 600 }}>
+      <div
+        ref={pullRef}
+        onTouchStart={pullStart}
+        onTouchMove={pullMove}
+        onTouchEnd={pullEnd}
+        style={{ padding: '12px 16px 96px', maxWidth: 600, overflowY: 'auto' }}
+      >
+        <PullIndicator />
 
         {/* ════ ZONA 1 — Paciente + Estado del día (fondo verde) ══════════ */}
         <div style={{
@@ -2839,7 +2852,7 @@ export default function Dashboard() {
         )}
 
         {/* ── 2 ─ Resumen del día ─────────────────────────────────────── */}
-        <div style={{
+        {loading ? <SkeletonDashSummary /> : <div style={{
           background: 'white', borderRadius: 20, border: '1px solid #EDE5D8',
           padding: '16px 18px', marginBottom: 12,
           boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
@@ -2895,7 +2908,7 @@ export default function Dashboard() {
               <span style={{ fontSize: 14, color: '#D4C0B0', flexShrink: 0 }}>›</span>
             </div>
           </div>
-        </div>
+        </div>}
 
         {/* ── 3 ─ Actividad reciente (máx. 5) ────────────────────────── */}
         {recentEvents5.length > 0 && (
@@ -3001,7 +3014,12 @@ export default function Dashboard() {
         </button>
 
         {/* ════ Atajos rápidos ════════════════════════════════════════════ */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', padding: '0 16px', marginBottom: 24 }}>
+        {loading && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', padding: '0 16px', marginBottom: 24 }}>
+            {[...Array(6)].map((_, i) => <SkeletonCard key={i} height={130} borderRadius={16} />)}
+          </div>
+        )}
+        <div style={{ display: loading ? 'none' : 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', padding: '0 16px', marginBottom: 24 }}>
 
           {/* Fila 1: Medicamentos | Rutinas de hoy */}
           <DashCard Icon={Pill}           title="Medicamentos"       subtitle={medCardSubtitle}                                                                                         status={medCardStatus}  statusType={medCardStatusType}  to="/hoy" />
@@ -3185,6 +3203,7 @@ export default function Dashboard() {
         <EventDetailSheet evt={selectedEvent} onClose={() => setSelectedEvent(null)} />
       )}
       <VideoCallScheduleModal open={showVideoCallModal} onClose={() => setShowVideoCallModal(false)} />
+      <SuccessAnimation visible={medSuccessTrigger > 0} key={medSuccessTrigger} />
     </Layout>
   )
 }

@@ -8,6 +8,11 @@ import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import { ChevronLeft, ChevronRight, Plus, XIcon, Camera } from '../components/Icons'
 import { track } from '../lib/analytics'
+import { SkeletonExpenseCard } from '../components/SkeletonLoader'
+import EmptyState from '../components/EmptyState'
+import SuccessAnimation, { useSuccessAnimation } from '../components/SuccessAnimation'
+import LoadingButton from '../components/LoadingButton'
+import { usePullToRefresh } from '../hooks/usePullToRefresh'
 import EvidencePhoto from '../components/EvidencePhoto'
 
 const CATEGORIES = [
@@ -70,6 +75,8 @@ export default function Expenses() {
   const [photoFile,    setPhotoFile]    = useState(null)
   const [photoPreview, setPhotoPreview] = useState(null)
   const [saving,    setSaving]    = useState(false)
+  const { trigger: expSuccessTrigger, fire: fireExpSuccess } = useSuccessAnimation()
+  const { containerRef: pullRef, onTouchStart: pullStart, onTouchMove: pullMove, onTouchEnd: pullEnd, PullIndicator } = usePullToRefresh(loadExpenses)
   const [saveError, setSaveError] = useState('')
 
   useEffect(() => { if (ownerId) loadExpenses() }, [year, month, ownerId])
@@ -212,6 +219,7 @@ export default function Expenses() {
     }
 
     track(editExpense ? 'expense_edited' : 'expense_added', { category: form.category, amount: parseFloat(form.amount) })
+    fireExpSuccess()
     setShowModal(false)
     loadExpenses()
   }
@@ -254,7 +262,14 @@ export default function Expenses() {
 
   return (
     <Layout>
-      <div style={{ paddingBottom: 96 }}>
+      <div
+        ref={pullRef}
+        onTouchStart={pullStart}
+        onTouchMove={pullMove}
+        onTouchEnd={pullEnd}
+        style={{ paddingBottom: 96, overflowY: 'auto' }}
+      >
+        <PullIndicator />
 
         {/* Month navigator */}
         <div style={{
@@ -341,9 +356,9 @@ export default function Expenses() {
         {/* Expense list */}
         <div style={{ padding: '0 20px' }}>
           {loading ? (
-            <p style={{ textAlign: 'center', padding: '40px 0', color: '#9CA3AF', fontSize: 13 }}>
-              Cargando...
-            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, paddingTop: 8 }}>
+              {[...Array(4)].map((_, i) => <SkeletonExpenseCard key={i} />)}
+            </div>
           ) : loadError ? (
             <div style={{ textAlign: 'center', padding: '40px 24px' }}>
               <p style={{ fontSize: 14, color: '#D63031', marginBottom: 12 }}>{loadError}</p>
@@ -353,18 +368,13 @@ export default function Expenses() {
               }}>Reintentar</button>
             </div>
           ) : expenses.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '48px 24px' }}>
-              <div style={{ fontSize: 48, marginBottom: 12 }}>💰</div>
-              <p style={{
-                fontFamily: 'Georgia, serif', fontSize: 16, fontWeight: 700,
-                color: '#1A1A1A', marginBottom: 6,
-              }}>
-                Sin gastos este mes
-              </p>
-              <p style={{ fontSize: 13, color: '#9CA3AF', lineHeight: 1.6 }}>
-                Toca el botón + para registrar el primer gasto del mes.
-              </p>
-            </div>
+            <EmptyState
+              icon="💰"
+              title="Sin gastos este mes"
+              description="Registra los gastos médicos y de cuidado del familiar."
+              actionLabel="+ Registrar gasto"
+              onAction={() => openModal()}
+            />
           ) : (
             <>
             {menuOpen !== null && (
@@ -821,24 +831,15 @@ export default function Expenses() {
                 </div>
               )}
 
-              <button
+              <LoadingButton
                 type="submit"
+                loading={saving}
                 disabled={!canSave || !canEdit}
-                onClick={!canEdit ? (e) => { e.preventDefault(); navigate('/pricing') } : undefined}
-                style={{
-                  marginTop: 4, width: '100%', padding: '14px',
-                  background: (canSave && canEdit)
-                    ? 'linear-gradient(135deg, #4A7C59, #3A6347)'
-                    : '#C0CCC5',
-                  color: 'white', fontWeight: 700, fontSize: 14,
-                  borderRadius: 14, border: 'none',
-                  cursor: (canSave && canEdit) ? 'pointer' : 'not-allowed',
-                  boxShadow: canSave ? '0 6px 20px rgba(74,124,89,0.3)' : 'none',
-                  transition: 'all 0.2s',
-                }}
+                loadingText="Guardando..."
+                style={{ marginTop: 4, width: '100%', padding: '14px' }}
               >
-                {saving ? 'Guardando...' : editExpense ? 'Guardar cambios' : 'Guardar gasto'}
-              </button>
+                {editExpense ? 'Guardar cambios' : 'Guardar gasto'}
+              </LoadingButton>
             </form>
           </div>
         </div>
@@ -849,6 +850,7 @@ export default function Expenses() {
           patientName={profile?.name?.split(' ')[0]}
         />
       )}
+      <SuccessAnimation visible={expSuccessTrigger > 0} key={expSuccessTrigger} />
     </Layout>
   )
 }

@@ -11,6 +11,7 @@ import FamilySelector from './FamilySelector'
 import FamilySwitcher from './FamilySwitcher'
 import CompanionChat from './CompanionChat'
 import { useHospitalMode } from '../contexts/HospitalModeContext'
+import { useBadgeCounts } from '../hooks/useBadgeCounts'
 
 const PAGE_TITLES = {
   '/dashboard':      'Inicio',
@@ -50,6 +51,7 @@ export default function Layout({ children }) {
   const { profile } = useFamily()
   const { dark } = useDarkMode()
   const { isHospitalMode, hospitalMode } = useHospitalMode() ?? {}
+  const { homeBadge, familyBadge } = useBadgeCounts()
   const location = useLocation()
   const navigate = useNavigate()
   const isHome      = location.pathname === '/dashboard'
@@ -241,6 +243,8 @@ export default function Layout({ children }) {
       >
         {BOTTOM_TABS.map(({ to, Icon, label }) => {
           const isActive = location.pathname === to
+          const badge = to === '/dashboard' ? homeBadge : to === '/familia' ? familyBadge : 0
+          const badgeText = badge > 9 ? '9+' : badge > 0 ? String(badge) : null
           return (
             <Link
               key={to}
@@ -250,13 +254,30 @@ export default function Layout({ children }) {
                 flex: 1, display: 'flex', flexDirection: 'column',
                 alignItems: 'center', justifyContent: 'center',
                 gap: 2, paddingTop: 4, textDecoration: 'none',
+                position: 'relative',
               }}
             >
-              <Icon
-                size={22}
-                color={isActive ? 'white' : 'rgba(255,255,255,0.4)'}
-                strokeWidth={isActive ? 2 : 1.5}
-              />
+              <div style={{ position: 'relative', display: 'inline-flex' }}>
+                <Icon
+                  size={22}
+                  color={isActive ? 'white' : 'rgba(255,255,255,0.4)'}
+                  strokeWidth={isActive ? 2 : 1.5}
+                />
+                {badgeText && (
+                  <span style={{
+                    position: 'absolute', top: -6, right: -8,
+                    minWidth: 18, height: 18, borderRadius: 9,
+                    background: '#DC2626', color: 'white',
+                    fontSize: 9, fontWeight: 800,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    padding: '0 4px', boxSizing: 'border-box',
+                    border: '1.5px solid rgba(0,0,0,0.3)',
+                    lineHeight: 1,
+                  }}>
+                    {badgeText}
+                  </span>
+                )}
+              </div>
               <span style={{
                 fontSize: 9, fontWeight: 700, letterSpacing: '0.02em',
                 color: isActive ? 'white' : 'rgba(255,255,255,0.4)', lineHeight: 1,

@@ -5,6 +5,7 @@ import { useFamily } from '../contexts/FamilyContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import { ChevronLeft, CheckIcon, XIcon, AlertTriangle } from '../components/Icons'
+import LoadingButton from '../components/LoadingButton'
 
 // ── Constants ────────────────────────────────────────────────────────────────
 const SANGRE     = ['A+','A-','B+','B-','O+','O-','AB+','AB-']
@@ -713,23 +714,15 @@ export default function PatientProfile() {
             )}
 
             {canEdit && (
-              <button type="submit" disabled={saving} style={{
-                width:'100%', padding:'15px', borderRadius:16, border:'none',
-                background: saving ? '#C0CCC5' : 'linear-gradient(135deg, #4A7C59, #3A6347)',
-                color:'white', fontWeight:700, fontSize:15,
-                cursor: saving?'not-allowed':'pointer',
-                boxShadow: saving ? 'none' : '0 6px 24px rgba(74,124,89,0.35)',
-                transition:'all 0.2s',
-                display:'flex', alignItems:'center', justifyContent:'center', gap:8,
-                marginBottom:16,
-              }}>
-                {saving ? '⏳ Guardando...' : (
-                  <>
-                    <CheckIcon size={17} color="white" strokeWidth={2.5} />
-                    Guardar perfil del paciente
-                  </>
-                )}
-              </button>
+              <LoadingButton
+                type="submit"
+                loading={saving}
+                loadingText="Guardando..."
+                style={{ width: '100%', padding: '15px', fontSize: 15, marginBottom: 16 }}
+              >
+                <CheckIcon size={17} color="white" strokeWidth={2.5} />
+                Guardar perfil del paciente
+              </LoadingButton>
             )}
           </form>
         )}

@@ -5,6 +5,9 @@ import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import { mapsUrl } from '../lib/gps'
 import { CARE_ITEMS } from '../lib/careItems'
+import { SkeletonEventCard } from '../components/SkeletonLoader'
+import EmptyState from '../components/EmptyState'
+import { usePullToRefresh } from '../hooks/usePullToRefresh'
 
 const EVENT_CONFIG = {
   med_confirmed:      { icon: '💊', label: 'Medicamento',        color: '#4A7C59', bg: '#F0FDF4', border: '#BBF7D0' },
@@ -298,6 +301,7 @@ export default function MedicationTimeline() {
   const { ownerId } = useFamily()
   const navigate = useNavigate()
   const todayKey = toLocalDateKey()
+  const { containerRef: pullRef, onTouchStart: pullStart, onTouchMove: pullMove, onTouchEnd: pullEnd, PullIndicator } = usePullToRefresh(fetchLog)
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -361,7 +365,14 @@ export default function MedicationTimeline() {
 
   return (
     <Layout>
-      <div style={{ padding: '16px 16px 96px', maxWidth: 600 }}>
+      <div
+        ref={pullRef}
+        onTouchStart={pullStart}
+        onTouchMove={pullMove}
+        onTouchEnd={pullEnd}
+        style={{ padding: '16px 16px 96px', maxWidth: 600, overflowY: 'auto' }}
+      >
+        <PullIndicator />
 
         {/* Type filter — horizontal scroll */}
         <div style={{
@@ -416,12 +427,19 @@ export default function MedicationTimeline() {
 
         {/* Content */}
         {loading ? (
-          <div style={{ display: 'flex', justifyContent: 'center', padding: 56 }}>
-            <div style={{
-              width: 28, height: 28, borderRadius: '50%',
-              border: '3px solid #EDE5D8', borderTopColor: '#4A7C59',
-              animation: 'spin 0.8s linear infinite',
-            }} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {[...Array(4)].map((_, i) => (
+              <div key={i} style={{ background: 'white', borderRadius: 16, border: '1px solid #EDE5D8', overflow: 'hidden' }}>
+                <div style={{ padding: '12px 16px', background: '#FDFAF7', borderBottom: '1px solid #EDE5D8', display: 'flex', gap: 10, alignItems: 'center' }}>
+                  <div style={{ width: 80, height: 13, borderRadius: 6, background: '#E5E0D8', animation: 'skeletonShimmer 1.4s ease-in-out infinite' }} />
+                  <div style={{ flex: 1 }} />
+                  <div style={{ width: 50, height: 11, borderRadius: 10, background: '#E5E0D8', animation: 'skeletonShimmer 1.4s ease-in-out infinite' }} />
+                </div>
+                <div style={{ padding: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {[...Array(2)].map((_, j) => <SkeletonEventCard key={j} />)}
+                </div>
+              </div>
+            ))}
           </div>
         ) : error ? (
           <div style={{
@@ -441,24 +459,13 @@ export default function MedicationTimeline() {
             </button>
           </div>
         ) : days.length === 0 ? (
-          <div style={{
-            background: 'white', borderRadius: 20, border: '1px solid #EDE5D8',
-            padding: '56px 24px', textAlign: 'center',
-            boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
-          }}>
-            <div style={{ fontSize: 48, marginBottom: 14 }}>📖</div>
-            <p style={{
-              fontFamily: 'Georgia, serif', fontSize: 17, fontWeight: 700,
-              color: '#1A1A1A', marginBottom: 8,
-            }}>
-              Sin actividad registrada
-            </p>
-            <p style={{ fontSize: 13, color: '#9CA3AF', lineHeight: 1.6 }}>
-              {filterType !== 'all'
-                ? 'No hay eventos de este tipo en el período seleccionado.'
-                : 'Los eventos aparecerán aquí a medida que el equipo registre actividad.'}
-            </p>
-          </div>
+          <EmptyState
+            icon="📋"
+            title="Sin actividad registrada"
+            description={filterType !== 'all'
+              ? 'No hay eventos de este tipo en el período seleccionado.'
+              : 'Las acciones del equipo aparecerán aquí a medida que registren actividad.'}
+          />
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {days.map(([dateKey, dayEvents]) => {

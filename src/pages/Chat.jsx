@@ -6,6 +6,8 @@ import { useSubscription } from '../contexts/SubscriptionContext'
 import { supabase } from '../lib/supabase'
 import { geminiGenerate } from '../lib/gemini'
 import Layout from '../components/Layout'
+import EmptyState from '../components/EmptyState'
+import LoadingButton from '../components/LoadingButton'
 import MicButton from '../components/MicButton'
 import { useSpeechToText } from '../hooks/useSpeechToText'
 
@@ -352,20 +354,11 @@ export default function Chat() {
           display: 'flex', flexDirection: 'column', gap: 0,
         }}>
           {messages.length === 0 && (
-            <div style={{
-              display: 'flex', flexDirection: 'column',
-              alignItems: 'center', justifyContent: 'center',
-              flex: 1, textAlign: 'center', padding: '48px 24px',
-            }}>
-              <div style={{ fontSize: 44, marginBottom: 12 }}>💬</div>
-              <p style={{ fontSize: 14, fontWeight: 600, color: '#1A1A1A', marginBottom: 6 }}>
-                Mensajes familiares
-              </p>
-              <p style={{ fontSize: 12, color: '#9CA3AF', lineHeight: 1.6 }}>
-                Todos los miembros de la familia pueden ver estos mensajes.
-                ¡Sé el primero en escribir!
-              </p>
-            </div>
+            <EmptyState
+              icon="💬"
+              title="Sin mensajes aún"
+              description="Todos los miembros de la familia pueden ver estos mensajes. ¡Sé el primero en escribir!"
+            />
           )}
 
           {Object.entries(grouped).map(([date, msgs]) => (
@@ -601,23 +594,15 @@ export default function Chat() {
             >
               ✨
             </button>
-            <button
+            <LoadingButton
               type="submit"
-              disabled={sending || !input.trim() || !canEdit}
-              onClick={!canEdit ? (e) => { e.preventDefault(); navigate('/pricing') } : undefined}
-              style={{
-                padding: '10px 18px', borderRadius: 20, border: 'none',
-                background: (sending || !input.trim() || !canEdit)
-                  ? '#C0CCC5'
-                  : 'linear-gradient(135deg, #4A7C59, #3A6347)',
-                color: 'white', fontWeight: 700, fontSize: 13,
-                cursor: (sending || !input.trim() || !canEdit) ? 'not-allowed' : 'pointer',
-                flexShrink: 0, transition: 'all 0.15s',
-                boxShadow: (!sending && input.trim() && canEdit) ? '0 3px 12px rgba(74,124,89,0.3)' : 'none',
-              }}
+              loading={sending}
+              disabled={!input.trim() || !canEdit}
+              loadingText="..."
+              style={{ padding: '10px 18px', borderRadius: 20, fontSize: 13, flexShrink: 0 }}
             >
               Enviar
-            </button>
+            </LoadingButton>
           </form>
         </div>
       </div>

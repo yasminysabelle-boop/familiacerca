@@ -10,6 +10,10 @@ import { Plus, XIcon, Pencil, Trash, Bell, CheckIcon } from '../components/Icons
 import { usePushNotifications } from '../hooks/usePushNotifications'
 import { track } from '../lib/analytics'
 import MedicationStockTab from '../components/MedicationStockTab'
+import { SkeletonMedCard } from '../components/SkeletonLoader'
+import EmptyState from '../components/EmptyState'
+import LoadingButton from '../components/LoadingButton'
+import { usePullToRefresh } from '../hooks/usePullToRefresh'
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -99,6 +103,7 @@ export default function Medications() {
   const { canEdit, trialExpired } = useSubscription()
   const navigate = useNavigate()
   const [showPaywall, setShowPaywall] = useState(false)
+  const { containerRef: pullRef, onTouchStart: pullStart, onTouchMove: pullMove, onTouchEnd: pullEnd, PullIndicator } = usePullToRefresh(fetchAll)
   const [searchParams, setSearchParams] = useSearchParams()
   const { permission, supported, requestAndSubscribe } = usePushNotifications()
 
@@ -455,7 +460,14 @@ Return ONLY valid JSON.`
   return (
     <Layout>
       {showPaywall && <PaywallModal onClose={() => setShowPaywall(false)} patientName={profile?.name?.split(' ')[0]} />}
-      <div style={{ padding: '16px 16px 0', maxWidth: 600 }}>
+      <div
+        ref={pullRef}
+        onTouchStart={pullStart}
+        onTouchMove={pullMove}
+        onTouchEnd={pullEnd}
+        style={{ padding: '16px 16px 0', maxWidth: 600, overflowY: 'auto' }}
+      >
+        <PullIndicator />
 
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
@@ -499,20 +511,17 @@ Return ONLY valid JSON.`
 
         {/* Medication list */}
         {loading ? (
-          <div style={{ display: 'flex', justifyContent: 'center', padding: '48px 0' }}>
-            <div style={{ width: 28, height: 28, borderRadius: '50%', border: '3px solid #EDE5D8', borderTopColor: '#4A7C59', animation: 'spin 0.8s linear infinite' }} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {[...Array(3)].map((_, i) => <SkeletonMedCard key={i} />)}
           </div>
         ) : medications.length === 0 ? (
-          <div style={{ background: 'white', borderRadius: 20, border: '1px solid #EDE5D8', padding: '48px 24px', textAlign: 'center', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
-            <div style={{ fontSize: 44, marginBottom: 12 }}>💊</div>
-            <p style={{ fontSize: 14, fontWeight: 600, color: '#1A1A1A', marginBottom: 6 }}>Sin medicamentos</p>
-            <p style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 20 }}>Agrega los medicamentos del familiar para mantener un control preciso.</p>
-            {!isFamiliar && (
-              <button onClick={openAdd} style={{ padding: '10px 24px', borderRadius: 12, background: 'linear-gradient(135deg, #4A7C59, #3A6347)', color: 'white', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>
-                + Agregar medicamento
-              </button>
-            )}
-          </div>
+          <EmptyState
+            icon="💊"
+            title="Sin medicamentos aún"
+            description="Agrega los medicamentos del familiar para mantener un control preciso."
+            actionLabel={!isFamiliar ? '+ Agregar medicamento' : undefined}
+            onAction={!isFamiliar ? openAdd : undefined}
+          />
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {medications.map(med => {
@@ -988,25 +997,15 @@ Return ONLY valid JSON.`
                   <button type="button" onClick={closeForm} style={{ flex: 1, padding: '13px', border: '1.5px solid #EDE5D8', borderRadius: 14, background: 'white', color: '#6B7280', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
                     Cancelar
                   </button>
-                  <button
-                    type="submit" disabled={saving || !canEdit}
-                    onClick={!canEdit ? (e) => { e.preventDefault(); navigate('/pricing') } : undefined}
-                    style={{
-                      flex: 2, padding: '13px', borderRadius: 14, border: 'none',
-                      background: (saving || !canEdit) ? '#C0CCC5' : 'linear-gradient(135deg, #4A7C59, #3A6347)',
-                      color: 'white', fontWeight: 700, fontSize: 14,
-                      cursor: saving ? 'not-allowed' : 'pointer',
-                      boxShadow: saving ? 'none' : '0 6px 20px rgba(74,124,89,0.3)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                    }}
+                  <LoadingButton
+                    type="submit"
+                    loading={saving}
+                    disabled={!canEdit}
+                    loadingText="Guardando..."
+                    style={{ flex: 2, padding: '13px' }}
                   >
-                    {saving ? (
-                      <>
-                        <div style={{ width: 16, height: 16, borderRadius: '50%', border: '2.5px solid rgba(255,255,255,0.4)', borderTopColor: 'white', animation: 'spin 0.7s linear infinite', flexShrink: 0 }} />
-                        Guardando...
-                      </>
-                    ) : editId ? 'Guardar cambios' : 'Guardar medicamento'}
-                  </button>
+                    {editId ? 'Guardar cambios' : 'Guardar medicamento'}
+                  </LoadingButton>
                 </div>
               </form>
             )}

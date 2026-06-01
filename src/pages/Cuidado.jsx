@@ -7,6 +7,8 @@ import Layout from '../components/Layout'
 import { CheckIcon, Clock } from '../components/Icons'
 import { CARE_CATEGORIES, CARE_ITEMS } from '../lib/careItems'
 import EvidencePhoto from '../components/EvidencePhoto'
+import EmptyState from '../components/EmptyState'
+import SuccessAnimation from '../components/SuccessAnimation'
 
 const DAILY_ITEMS = CARE_ITEMS.filter(i => i.category === 'daily')
 
@@ -389,6 +391,15 @@ export default function Cuidado() {
                   )
                 })}
 
+                {todayTimeline.length === 0 && completedRequired === 0 && (
+                  <div style={{ marginTop: 8 }}>
+                    <EmptyState
+                      icon="✅"
+                      title="Sin rutinas completadas aún"
+                      description="Las rutinas completadas hoy aparecerán aquí."
+                    />
+                  </div>
+                )}
                 {todayTimeline.length > 0 && (
                   <div style={{ marginTop: 8, marginBottom: 8 }}>
                     <p style={{
@@ -571,6 +582,7 @@ export default function Cuidado() {
         )}
 
       </div>
+      <SuccessAnimation visible={!!justCompletedKey} key={justCompletedKey ?? 'none'} />
     </Layout>
   )
 }

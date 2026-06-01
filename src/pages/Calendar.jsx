@@ -5,6 +5,7 @@ import { useFamily } from '../contexts/FamilyContext'
 import { useSubscription } from '../contexts/SubscriptionContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
+import EmptyState from '../components/EmptyState'
 
 const DAYS   = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
 const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
@@ -267,7 +268,13 @@ export default function Calendar() {
                 <button onClick={fetchEvents} className="text-sm font-semibold text-primary underline">Reintentar</button>
               </div>
             ) : (selected ? selectedEvents : events.slice(0, 5)).length === 0 ? (
-              <p className="text-sm text-gray-400 text-center py-6">Sin eventos</p>
+              <EmptyState
+                icon="📅"
+                title="Sin citas programadas"
+                description="Agrega una cita médica para hacer seguimiento."
+                actionLabel="+ Agregar cita"
+                onAction={() => { setEditEvent(null); setForm(emptyForm ?? {}); setShowForm(true) }}
+              />
             ) : (
               <ul className="space-y-4">
                 {(selected ? selectedEvents : events.slice(0, 5)).map(ev => {
