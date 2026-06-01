@@ -1,13 +1,16 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useSubscription } from '../contexts/SubscriptionContext'
+import { useFamily } from '../contexts/FamilyContext'
 
 export default function Paywall() {
   const { trialExpired, isPaid, paywallDismissed, dismissPaywall } = useSubscription()
+  const { memberRole } = useFamily()
   const navigate = useNavigate()
   const [dismissed, setDismissed] = useState(false)
 
-  if (!trialExpired || isPaid || paywallDismissed || dismissed) return null
+  const isAdmin = memberRole === null
+  if (!trialExpired || !isAdmin || isPaid || paywallDismissed || dismissed) return null
 
   function handleDismiss() {
     dismissPaywall()

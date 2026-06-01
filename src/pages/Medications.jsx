@@ -214,7 +214,7 @@ export default function Medications() {
   }
 
   function openAdd() {
-    if (trialExpired) { setShowPaywall(true); return }
+    if (trialExpired && isAdmin) { setShowPaywall(true); return }
     setForm(emptyForm); setScheduledTimes(['']); setEditId(null)
     setStockForm(emptyStock); setAddPhotoFile(null); setAddPhotoPreview(null)
     setAddAiExtracted(null); setAddAiError(''); setAddPhotoType(null)

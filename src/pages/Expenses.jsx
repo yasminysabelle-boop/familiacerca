@@ -503,7 +503,7 @@ export default function Expenses() {
       {/* FAB — hidden for familiar (view only) */}
       {!isFamiliar && (
         <button
-          onClick={() => trialExpired ? setShowPaywall(true) : openModal()}
+          onClick={() => (trialExpired && isAdmin) ? setShowPaywall(true) : openModal()}
           style={{
             position: 'fixed', bottom: 84, right: 20, zIndex: 30,
             width: 54, height: 54, borderRadius: '50%',

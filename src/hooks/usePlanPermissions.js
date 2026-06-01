@@ -10,23 +10,23 @@ export function usePlanPermissions() {
   const isCuidador = memberRole === 'cuidador'
   const isFamiliar = memberRole === 'familiar'
   const canWrite = isAdmin || isCuidador
-  const hasPlanAccess = isPaid || isTrialing
-  const hasPaidFeatures = isPaid || (isTrialing && !trialExpired)
+  // Paywall only blocks the admin — invited members are not responsible for payment
+  const adminBlocked = trialExpired && isAdmin
 
   return {
-    // Core write actions — blocked when trial expired
-    canAddMedication:  !trialExpired && canWrite,
-    canAddNote:        !trialExpired && canWrite,
-    canAddExpense:     !trialExpired && canWrite,
-    canAddDiaryEntry:  !trialExpired && canWrite,
-    canInviteMember:   !trialExpired && isAdmin,
+    // Core write actions — only admin is blocked when trial expired
+    canAddMedication:  !adminBlocked && canWrite,
+    canAddNote:        !adminBlocked && canWrite,
+    canAddExpense:     !adminBlocked && canWrite,
+    canAddDiaryEntry:  !adminBlocked && canWrite,
+    canInviteMember:   !adminBlocked && isAdmin,
 
-    // Feature access by plan
-    canViewExpenses:   !trialExpired,
-    canViewAlbum:      !trialExpired,
-    canExportReport:   !trialExpired && (plan === 'familiar' || plan === 'care_plus'),
-    canViewDirectory:  !trialExpired && (plan === 'familiar' || plan === 'care_plus'),
-    canViewTimeline:   !trialExpired && (plan === 'familiar' || plan === 'care_plus'),
+    // Feature access by plan — only admin sees paywall gates
+    canViewExpenses:   !adminBlocked,
+    canViewAlbum:      !adminBlocked,
+    canExportReport:   !adminBlocked && (plan === 'familiar' || plan === 'care_plus'),
+    canViewDirectory:  !adminBlocked && (plan === 'familiar' || plan === 'care_plus'),
+    canViewTimeline:   !adminBlocked && (plan === 'familiar' || plan === 'care_plus'),
 
     // Member limits
     maxMembers: plan === 'care_plus' ? Infinity : plan === 'familiar' ? 6 : 2,

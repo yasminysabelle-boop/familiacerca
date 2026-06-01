@@ -183,7 +183,7 @@ export default function DiarioMedico() {
   // Admin or cuidador can add entries
   const canAdd = memberRole === null || memberRole === 'cuidador'
   function openEntry() {
-    if (trialExpired) { setShowPaywall(true); return }
+    if (trialExpired && memberRole === null) { setShowPaywall(true); return }
     setShowModal(true)
   }
 

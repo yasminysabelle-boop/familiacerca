@@ -102,7 +102,7 @@ export default function Notes() {
   }
 
   function openAdd() {
-    if (trialExpired) { setShowPaywall(true); return }
+    if (trialExpired && isAdmin) { setShowPaywall(true); return }
     setEditId(null)
     setForm(emptyForm)
     setShowForm(true)

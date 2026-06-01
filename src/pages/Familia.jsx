@@ -171,7 +171,7 @@ export default function Familia() {
   }
 
   function openInvite() {
-    if (trialExpired) { setShowPaywall(true); return }
+    if (trialExpired && isAdmin) { setShowPaywall(true); return }
     setInviteEmail(''); setInviteStatus('idle'); setInviteLink(''); setCopied(false)
     setShowInvite(true)
   }

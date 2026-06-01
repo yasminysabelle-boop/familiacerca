@@ -1,12 +1,15 @@
 import { useNavigate } from 'react-router-dom'
 import { useSubscription } from '../contexts/SubscriptionContext'
+import { useFamily } from '../contexts/FamilyContext'
 
 export default function TrialBanner() {
   const { isTrialing, trialExpired, daysLeft } = useSubscription()
+  const { memberRole } = useFamily()
   const navigate = useNavigate()
 
-  // Expired trial — yellow persistent banner
-  if (trialExpired) {
+  const isAdmin = memberRole === null
+  // Expired trial — yellow persistent banner (admin only)
+  if (trialExpired && isAdmin) {
     return (
       <div
         onClick={() => navigate('/planes')}
@@ -25,7 +28,7 @@ export default function TrialBanner() {
     )
   }
 
-  if (!isTrialing) return null
+  if (!isTrialing || !isAdmin) return null
 
   const urgent = daysLeft <= 3
 
