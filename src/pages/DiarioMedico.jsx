@@ -250,7 +250,7 @@ export default function DiarioMedico() {
                 Notas Médicas IA
               </p>
               <p style={{ margin: '3px 0 0', fontSize: 12, color: 'rgba(255,255,255,0.55)' }}>
-                Historia clínica del cuidado familiar
+                Habla o toma una foto y Milo organiza todo.
               </p>
             </div>
           </div>
