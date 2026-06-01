@@ -8,6 +8,7 @@ import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import { ChevronLeft, ChevronRight, Plus, XIcon, Camera } from '../components/Icons'
 import { track } from '../lib/analytics'
+import EvidencePhoto from '../components/EvidencePhoto'
 
 const CATEGORIES = [
   { id: 'Medicamentos',    emoji: '💊', color: '#4A7C59' },
@@ -412,6 +413,11 @@ export default function Expenses() {
                     <p style={{ fontSize: 15, fontWeight: 800, color: '#1A1A1A', flexShrink: 0 }}>
                       {formatCurrency(expense.amount)}
                     </p>
+
+                    {/* Receipt photo thumbnail */}
+                    {expense.receipt_photo_url && (
+                      <EvidencePhoto photoUrl={expense.receipt_photo_url} />
+                    )}
 
                     {/* ⋮ menu — hidden for familiar */}
                     {!isFamiliar && <div style={{ position: 'relative', flexShrink: 0 }}>

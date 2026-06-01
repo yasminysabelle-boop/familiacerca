@@ -7,6 +7,7 @@ import Layout from '../components/Layout'
 import { CheckIcon, MoreVertical, Pencil, Plus, Trash, XIcon } from '../components/Icons'
 import { getLocation, mapsUrl } from '../lib/gps'
 import { track } from '../lib/analytics'
+import EvidencePhoto from '../components/EvidencePhoto'
 
 const TIME_GROUPS = [
   { id: 0, label: 'Mañana',      icon: '🌅', range: [0, 12] },
@@ -642,15 +643,18 @@ export default function Hoy() {
 
                             <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
                             {isConfirmed && (
-                              <div style={{ textAlign: 'right' }}>
+                              <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
                                 {hasPhoto ? (
-                                  <span style={{
-                                    fontSize: 10, fontWeight: 700, color: '#16A34A',
-                                    background: '#DCFCE7', padding: '3px 8px', borderRadius: 6,
-                                    display: 'block',
-                                  }}>
-                                    ✅ Con prueba
-                                  </span>
+                                  <>
+                                    <EvidencePhoto photoUrl={log.photo_url} />
+                                    <span style={{
+                                      fontSize: 10, fontWeight: 700, color: '#16A34A',
+                                      background: '#DCFCE7', padding: '3px 8px', borderRadius: 6,
+                                      display: 'block',
+                                    }}>
+                                      ✅ Con prueba
+                                    </span>
+                                  </>
                                 ) : proofExpired ? (
                                   <span style={{
                                     fontSize: 10, fontWeight: 700, color: '#7A5A18',

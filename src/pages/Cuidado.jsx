@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import { CheckIcon, Clock } from '../components/Icons'
 import { CARE_CATEGORIES, CARE_ITEMS } from '../lib/careItems'
+import EvidencePhoto from '../components/EvidencePhoto'
 
 const DAILY_ITEMS = CARE_ITEMS.filter(i => i.category === 'daily')
 
@@ -56,6 +57,7 @@ export default function Cuidado() {
   const [careLogs, setCareLogs] = useState({})
   const [careSchedules, setCareSchedules] = useState({})
   const [careToggling, setCareToggling] = useState(null)
+  const [justCompletedKey, setJustCompletedKey] = useState(null)
   const [loading, setLoading] = useState(true)
 
   const [times, setTimes] = useState(() =>
@@ -105,6 +107,7 @@ export default function Cuidado() {
       if (existing) {
         await supabase.from('daily_care_logs').delete().eq('id', existing.id)
         setCareLogs(prev => { const n = { ...prev }; delete n[item.key]; return n })
+        if (justCompletedKey === item.key) setJustCompletedKey(null)
       } else {
         const { data, error } = await supabase
           .from('daily_care_logs')
@@ -117,11 +120,22 @@ export default function Cuidado() {
           }, { onConflict: 'user_id,item_key,log_date' })
           .select()
           .single()
-        if (!error && data) setCareLogs(prev => ({ ...prev, [item.key]: data }))
+        if (!error && data) {
+          setCareLogs(prev => ({ ...prev, [item.key]: data }))
+          setJustCompletedKey(item.key)
+        }
       }
     } finally {
       setCareToggling(null)
     }
+  }
+
+  async function handleRoutinePhoto(itemKey, photoUrl) {
+    const log = careLogs[itemKey]
+    if (!log) return
+    await supabase.from('daily_care_logs').update({ photo_url: photoUrl }).eq('id', log.id)
+    setCareLogs(prev => ({ ...prev, [itemKey]: { ...prev[itemKey], photo_url: photoUrl } }))
+    setJustCompletedKey(null)
   }
 
   async function saveSchedules() {
@@ -333,6 +347,19 @@ export default function Cuidado() {
                                     ✓ {checkedTime}{log?.checked_by ? ` · ${log.checked_by.split(' ')[0]}` : ''}
                                   </p>
                                 )}
+                                {isChecked && justCompletedKey === item.key && !log?.photo_url && (
+                                  <EvidencePhoto
+                                    onPhotoCapture={url => handleRoutinePhoto(item.key, url)}
+                                    label="Agregar foto"
+                                    bucket="care-photos"
+                                    pathPrefix={`routines/${ownerId}`}
+                                  />
+                                )}
+                                {isChecked && log?.photo_url && (
+                                  <div style={{ marginTop: 4 }}>
+                                    <EvidencePhoto photoUrl={log.photo_url} />
+                                  </div>
+                                )}
                                 {!isChecked && (careSchedules[item.key] ?? item.scheduledTime) && !isOverdue && (
                                   <p style={{ fontSize: 10, color: '#9CA3AF', margin: '2px 0 0' }}>
                                     ⏰ {fmtTime(careSchedules[item.key] ?? item.scheduledTime)}
@@ -404,6 +431,9 @@ export default function Cuidado() {
                               }}>
                                 {log.checked_by.split(' ')[0]}
                               </span>
+                            )}
+                            {log.photo_url && (
+                              <EvidencePhoto photoUrl={log.photo_url} />
                             )}
                           </div>
                         )
