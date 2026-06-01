@@ -52,9 +52,10 @@ export default function HospitalModeModal({ open, onClose }) {
         position: 'fixed', bottom: 0, left: 0, right: 0,
         zIndex: 100000,
         maxWidth: 480, margin: '0 auto',
-        maxHeight: '90vh', overflowY: 'auto',
+        maxHeight: 'calc(90vh - env(safe-area-inset-bottom))',
+        overflowY: 'auto',
         background: 'white', borderRadius: '24px 24px 0 0',
-        padding: '28px 24px 48px',
+        padding: '28px 24px calc(80px + env(safe-area-inset-bottom))',
         boxShadow: '0 -8px 48px rgba(0,0,0,0.2)',
       }}>
         {/* Header */}
