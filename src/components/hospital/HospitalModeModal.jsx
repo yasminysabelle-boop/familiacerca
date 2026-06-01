@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useHospitalMode } from '../../contexts/HospitalModeContext'
 import { useAuth } from '../../contexts/AuthContext'
 import VoiceInput from '../VoiceInput'
@@ -37,17 +38,21 @@ export default function HospitalModeModal({ open, onClose }) {
     onClose()
   }
 
-  return (
+  return createPortal(
     <div
       style={{
-        position: 'fixed', inset: 0, zIndex: 300,
-        background: 'rgba(0,0,0,0.55)',
+        position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+        zIndex: 99999,
+        backgroundColor: 'rgba(0,0,0,0.55)',
         display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
       }}
       onClick={e => { if (e.target === e.currentTarget) onClose() }}
     >
       <div style={{
-        width: '100%', maxWidth: 480,
+        position: 'fixed', bottom: 0, left: 0, right: 0,
+        zIndex: 100000,
+        maxWidth: 480, margin: '0 auto',
+        maxHeight: '90vh', overflowY: 'auto',
         background: 'white', borderRadius: '24px 24px 0 0',
         padding: '28px 24px 48px',
         boxShadow: '0 -8px 48px rgba(0,0,0,0.2)',
@@ -236,6 +241,7 @@ export default function HospitalModeModal({ open, onClose }) {
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
