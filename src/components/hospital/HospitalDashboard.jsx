@@ -1,38 +1,51 @@
 import { Link } from 'react-router-dom'
+import { useState } from 'react'
 import { useHospitalMode } from '../../contexts/HospitalModeContext'
+import { useAuth } from '../../contexts/AuthContext'
 import HospitalBanner from './HospitalBanner'
+import HospitalInfoCard from './HospitalInfoCard'
 import PatientStatusCard from './PatientStatusCard'
 import DoctorNotesCard from './DoctorNotesCard'
-import HospitalVisitsCard from './HospitalVisitsCard'
-import HospitalDocumentsCard from './HospitalDocumentsCard'
 import DischargeDateCard from './DischargeDateCard'
 import MedicationsPausedCard from './MedicationsPausedCard'
 
 export default function HospitalDashboard({ onManageMode, onSOS, onVideoCall }) {
-  const { hospitalMode } = useHospitalMode()
+  const { deactivateHospitalMode } = useHospitalMode()
+  const { user } = useAuth()
+  const [deactivating, setDeactivating] = useState(false)
+  const [confirmDeactivate, setConfirmDeactivate] = useState(false)
+
+  async function handleDeactivate() {
+    setDeactivating(true)
+    const name = user?.user_metadata?.full_name ?? user?.email ?? 'Familiar'
+    await deactivateHospitalMode(name)
+    setDeactivating(false)
+    setConfirmDeactivate(false)
+  }
 
   return (
-    <div style={{ padding: '12px 16px 24px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+    <div style={{ padding: '12px 16px 96px', display: 'flex', flexDirection: 'column', gap: 14 }}>
 
-      {/* 1. Banner rojo */}
+      {/* 1. Banner rojo con estado global */}
       <HospitalBanner onManage={onManageMode} />
 
-      {/* 2. Estado del paciente */}
-      <PatientStatusCard />
+      {/* 2. Tarjeta principal — info hospitalaria editable */}
+      <HospitalInfoCard />
 
-      {/* 3. Notas del médico */}
+      {/* ── Tarjeta secundaria ─────────────────────────────── */}
+
+      {/* 3. Medicamentos activos (pausados) */}
+      <MedicationsPausedCard />
+
+      {/* 4. Notas médicas */}
       <DoctorNotesCard />
 
-      {/* 4. Quién visita hoy */}
-      <HospitalVisitsCard />
-
-      {/* 5. Documentos */}
-      <HospitalDocumentsCard />
-
-      {/* 6. Fecha de alta */}
+      {/* 5. Próxima evaluación / fecha de alta */}
       <DischargeDateCard />
 
-      {/* 7. Chat familiar */}
+      {/* ── Comunicación ──────────────────────────────────── */}
+
+      {/* 6. Chat familiar */}
       <QuickLink
         to="/chat"
         emoji="💬"
@@ -43,25 +56,98 @@ export default function HospitalDashboard({ onManageMode, onSOS, onVideoCall }) 
         border="#BBF7D0"
       />
 
-      {/* 8. Videollamadas */}
-      <VideoCallCard onOpen={onVideoCall} />
+      {/* 7. Videollamada */}
+      <button
+        onClick={onVideoCall}
+        style={{
+          width: '100%', background: 'white', borderRadius: 16, padding: '16px 18px',
+          boxShadow: '0 2px 12px rgba(0,0,0,0.06)', border: '1px solid #F0EDE6',
+          cursor: 'pointer', textAlign: 'left', display: 'flex', alignItems: 'center', gap: 12,
+        }}
+      >
+        <span style={{ fontSize: 28, flexShrink: 0 }}>📹</span>
+        <div style={{ flex: 1 }}>
+          <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#1A1A1A' }}>Videollamadas</p>
+          <p style={{ margin: '2px 0 0', fontSize: 12, color: '#6B7280' }}>Programar o unirse a la sala familiar</p>
+        </div>
+        <span style={{ color: '#4A7C59', fontSize: 18, flexShrink: 0 }}>›</span>
+      </button>
 
-      {/* 9. Cuentas claras */}
-      <QuickLink
-        to="/gastos"
-        emoji="💰"
-        title="Cuentas claras"
-        subtitle="Gastos del hospital y medicamentos"
-        color="#C9882A"
-        bg="#FFFBEB"
-        border="#FDE68A"
-      />
+      {/* ── Emergencia ────────────────────────────────────── */}
 
-      {/* 10. SOS */}
-      <SOSCard onSOS={onSOS} />
+      {/* 8. SOS */}
+      <button
+        onClick={onSOS}
+        style={{
+          width: '100%', padding: '18px', borderRadius: 16,
+          border: 'none', cursor: 'pointer',
+          background: 'linear-gradient(135deg, #B91C1C, #EF4444)',
+          boxShadow: '0 4px 20px rgba(185,28,28,0.35)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12,
+        }}
+      >
+        <span style={{ fontSize: 28 }}>🚨</span>
+        <div style={{ textAlign: 'left' }}>
+          <p style={{ margin: 0, fontSize: 17, fontWeight: 800, color: 'white' }}>SOS — Emergencia</p>
+          <p style={{ margin: '2px 0 0', fontSize: 12, color: 'rgba(255,255,255,0.8)' }}>
+            Notifica a todo el equipo de inmediato
+          </p>
+        </div>
+      </button>
 
-      {/* 11. Medicamentos pausados */}
-      <MedicationsPausedCard />
+      {/* 9. Desactivar Modo Hospital */}
+      {!confirmDeactivate ? (
+        <button
+          onClick={() => setConfirmDeactivate(true)}
+          style={{
+            width: '100%', padding: '14px', borderRadius: 14,
+            border: '2px solid #DC2626', background: 'white',
+            color: '#DC2626', fontWeight: 700, fontSize: 14,
+            cursor: 'pointer', transition: 'all 0.15s',
+          }}
+        >
+          Desactivar Modo Hospital
+        </button>
+      ) : (
+        <div style={{
+          borderRadius: 16, border: '2px solid #B91C1C',
+          background: '#FFF5F5', padding: '18px',
+          display: 'flex', flexDirection: 'column', gap: 12,
+        }}>
+          <p style={{ margin: 0, fontSize: 14, color: '#B91C1C', fontWeight: 700, textAlign: 'center' }}>
+            ¿Confirmar alta hospitalaria?
+          </p>
+          <p style={{ margin: 0, fontSize: 13, color: '#6B7280', textAlign: 'center', lineHeight: 1.5 }}>
+            Los medicamentos y rutinas se reanudan. El equipo será notificado.
+          </p>
+          <div style={{ display: 'flex', gap: 10 }}>
+            <button
+              onClick={() => setConfirmDeactivate(false)}
+              style={{
+                flex: 1, padding: '12px', borderRadius: 12,
+                border: '1.5px solid #EDE5D8', background: 'white',
+                color: '#6B7280', fontWeight: 700, fontSize: 14, cursor: 'pointer',
+              }}
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={handleDeactivate}
+              disabled={deactivating}
+              style={{
+                flex: 1, padding: '12px', borderRadius: 12,
+                border: 'none',
+                background: deactivating ? '#9CA3AF' : 'linear-gradient(135deg, #4A7C59, #3A6347)',
+                color: 'white', fontWeight: 700, fontSize: 14,
+                cursor: deactivating ? 'default' : 'pointer',
+                boxShadow: deactivating ? 'none' : '0 4px 14px rgba(74,124,89,0.3)',
+              }}
+            >
+              {deactivating ? 'Desactivando...' : '✅ Confirmar alta'}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -84,50 +170,5 @@ function QuickLink({ to, emoji, title, subtitle, color, bg, border }) {
       </div>
       <span style={{ color: color, fontSize: 18, flexShrink: 0 }}>›</span>
     </Link>
-  )
-}
-
-function VideoCallCard({ onOpen }) {
-  return (
-    <button
-      onClick={onOpen}
-      style={{
-        width: '100%', background: 'white', borderRadius: 16, padding: '16px 18px',
-        boxShadow: '0 2px 12px rgba(0,0,0,0.06)', border: '1px solid #F0EDE6',
-        cursor: 'pointer', textAlign: 'left', display: 'flex', alignItems: 'center', gap: 12,
-      }}
-    >
-      <span style={{ fontSize: 28, flexShrink: 0 }}>📹</span>
-      <div style={{ flex: 1 }}>
-        <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#1A1A1A' }}>Videollamadas</p>
-        <p style={{ margin: '2px 0 0', fontSize: 12, color: '#6B7280' }}>Programar o unirse a la sala familiar</p>
-      </div>
-      <span style={{ color: '#4A7C59', fontSize: 18, flexShrink: 0 }}>›</span>
-    </button>
-  )
-}
-
-function SOSCard({ onSOS }) {
-  return (
-    <button
-      onClick={onSOS}
-      style={{
-        width: '100%', padding: '18px', borderRadius: 16,
-        border: 'none', cursor: 'pointer',
-        background: 'linear-gradient(135deg, #B91C1C, #EF4444)',
-        boxShadow: '0 4px 20px rgba(185,28,28,0.35)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12,
-      }}
-    >
-      <span style={{ fontSize: 28 }}>🚨</span>
-      <div style={{ textAlign: 'left' }}>
-        <p style={{ margin: 0, fontSize: 17, fontWeight: 800, color: 'white' }}>
-          SOS — Emergencia
-        </p>
-        <p style={{ margin: '2px 0 0', fontSize: 12, color: 'rgba(255,255,255,0.8)' }}>
-          Notifica a todo el equipo de inmediato
-        </p>
-      </div>
-    </button>
   )
 }

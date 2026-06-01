@@ -14,6 +14,7 @@ export default function HospitalModeModal({ open, onClose }) {
   const { user } = useAuth()
   const [hospitalName, setHospitalName] = useState(hospitalMode?.hospital_name ?? '')
   const [roomNumber, setRoomNumber] = useState(hospitalMode?.room_number ?? '')
+  const [treatingDoctor, setTreatingDoctor] = useState(hospitalMode?.treating_doctor ?? '')
   const [saving, setSaving] = useState(false)
   const [step, setStep] = useState('main') // 'main' | 'confirmDeactivate'
 
@@ -23,7 +24,7 @@ export default function HospitalModeModal({ open, onClose }) {
 
   async function handleActivate() {
     setSaving(true)
-    await activateHospitalMode({ hospitalName, roomNumber, activatedByName })
+    await activateHospitalMode({ hospitalName, roomNumber, treatingDoctor, activatedByName })
     setSaving(false)
     onClose()
   }
@@ -138,6 +139,13 @@ export default function HospitalModeModal({ open, onClose }) {
               rows={1}
               label="Habitación"
             />
+            <VoiceInput
+              value={treatingDoctor}
+              onChange={setTreatingDoctor}
+              placeholder="Médico tratante (opcional)"
+              rows={1}
+              label="Médico tratante"
+            />
 
             <button
               onClick={handleActivate}
@@ -190,11 +198,18 @@ export default function HospitalModeModal({ open, onClose }) {
               rows={1}
               label="Habitación"
             />
+            <VoiceInput
+              value={treatingDoctor}
+              onChange={setTreatingDoctor}
+              placeholder="Médico tratante"
+              rows={1}
+              label="Médico tratante"
+            />
 
             <button
               onClick={async () => {
                 setSaving(true)
-                await updateHospitalMode({ hospital_name: hospitalName, room_number: roomNumber })
+                await updateHospitalMode({ hospital_name: hospitalName, room_number: roomNumber, treating_doctor: treatingDoctor })
                 setSaving(false)
                 onClose()
               }}

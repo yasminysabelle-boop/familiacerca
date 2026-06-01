@@ -70,7 +70,7 @@ export function HospitalModeProvider({ children }) {
     channelRef.current = channel
   }
 
-  async function activateHospitalMode({ hospitalName, roomNumber, activatedByName }) {
+  async function activateHospitalMode({ hospitalName, roomNumber, treatingDoctor, activatedByName }) {
     if (!ownerId) return
 
     const { data, error } = await supabase
@@ -84,6 +84,7 @@ export function HospitalModeProvider({ children }) {
           activated_by_name: activatedByName,
           hospital_name: hospitalName ?? null,
           room_number: roomNumber ?? null,
+          treating_doctor: treatingDoctor ?? null,
         },
         { onConflict: 'owner_id' }
       )
