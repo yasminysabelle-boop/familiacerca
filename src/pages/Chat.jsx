@@ -81,6 +81,7 @@ export default function Chat() {
   const bottomRef = useRef(null)
   const inputRef = useRef(null)
   const longPressTimer = useRef(null)
+  const longPressStartY = useRef(null)
 
   const displayName = user?.user_metadata?.full_name ?? user?.email ?? 'Familiar'
   const isOwner = user?.id === ownerId
@@ -187,7 +188,7 @@ export default function Chat() {
     if (!question.trim()) return
     setAiLoading(true)
     setAiResponse('')
-    const today = new Date().toISOString().split('T')[0]
+    const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' })
     const uid = ownerId ?? user?.id
     const [
       { data: todayLogs },
@@ -216,11 +217,20 @@ export default function Chat() {
     setAiLoading(false)
   }
 
-  function startLongPress(msg) {
-    longPressTimer.current = setTimeout(() => setContextMsg(msg), 500)
+  function startLongPress(msg, e) {
+    longPressStartY.current = e.clientY
+    longPressTimer.current = setTimeout(() => {
+      longPressStartY.current = null
+      setContextMsg(msg)
+    }, 500)
   }
   function cancelLongPress() {
     clearTimeout(longPressTimer.current)
+    longPressStartY.current = null
+  }
+  function checkScrollCancel(e) {
+    if (longPressStartY.current === null) return
+    if (Math.abs(e.clientY - longPressStartY.current) > 10) cancelLongPress()
   }
 
   async function togglePin(msg) {
@@ -390,7 +400,8 @@ export default function Chat() {
                   return (
                     <div
                       key={msg.id}
-                      onPointerDown={() => startLongPress(msg)}
+                      onPointerDown={e => startLongPress(msg, e)}
+                      onPointerMove={checkScrollCancel}
                       onPointerUp={cancelLongPress}
                       onPointerLeave={cancelLongPress}
                       onContextMenu={e => { e.preventDefault(); setContextMsg(msg) }}

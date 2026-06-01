@@ -10,7 +10,7 @@ import lunaAvatarImg from '../assets/companions/luna-avatar.png'
 
 const LS_KEY         = 'fc_pet_preference'
 const LS_HISTORY_KEY = 'fc_companion_history'
-const SS_PROACTIVE   = 'fc_proactive_shown'
+const SS_PROACTIVE_PREFIX = 'fc_proactive_shown_'
 
 const BASE_KNOWLEDGE = `
 Cuando el usuario pregunte sobre la app, sus funciones, precios, instalación o soporte, usa ÚNICAMENTE la información del siguiente bloque de conocimiento. Si algo no está ahí, dilo honestamente. Para preguntas emocionales o de apoyo, responde con calidez priorizando el acompañamiento humano.
@@ -178,17 +178,18 @@ export default function CompanionChat({ bottomOffset = 140 }) {
   // Close chat on navigation
   useEffect(() => { setOpen(false) }, [pathname])
 
-  // Proactive trigger: open after 6 s on dashboard, once per session
+  // Proactive trigger: open after 6 s on dashboard, once per session per user
   // Detects anomalies (low stock, no activity, upcoming appointment) before showing message
   useEffect(() => {
     if (pathname !== '/dashboard') return
-    if (sessionStorage.getItem(SS_PROACTIVE)) return
+    const proactiveKey = SS_PROACTIVE_PREFIX + (ownerId ?? 'anon')
+    if (sessionStorage.getItem(proactiveKey)) return
     if (proactiveRef.current) return
 
     const timer = setTimeout(async () => {
       if (proactiveRef.current) return
       proactiveRef.current = true
-      sessionStorage.setItem(SS_PROACTIVE, '1')
+      sessionStorage.setItem(proactiveKey, '1')
 
       const chosen = localStorage.getItem(LS_KEY)
       if (!chosen) {

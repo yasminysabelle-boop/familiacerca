@@ -37,7 +37,7 @@ const PAGE_TITLES = {
   '/videollamada':   'Videollamada',
 }
 
-const PRIMARY_PAGES = new Set(['/dashboard', '/familia', '/ajustes'])
+const PRIMARY_PAGES = new Set(['/dashboard', '/familia', '/ajustes', '/planes', '/pricing'])
 
 const BOTTOM_TABS = [
   { to: '/dashboard', Icon: Home,     label: 'Inicio' },
@@ -61,7 +61,7 @@ export default function Layout({ children }) {
   const hdrBg   = dark ? 'rgba(28,18,8,0.95)' : '#2D4A1E'
   const border  = dark ? '#1E3A28' : 'rgba(255,255,255,0.08)'
 
-  const hospitalBarHeight = isHospitalMode ? 28 : 0
+  const hospitalBarHeight = isHospitalMode ? 40 : 0
 
   return (
     <div style={{ background: bg }}>

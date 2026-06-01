@@ -2378,7 +2378,7 @@ export default function Dashboard() {
         .from('medication_stock')
         .select('medication_id, estimated_end_date, pills_remaining')
         .eq('user_id', ownerId)
-        .lte('estimated_end_date', in7.toISOString().split('T')[0])
+        .lte('estimated_end_date', in7.toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' }))
       if (!stocks?.length) { setRenewalAlerts([]); return }
       const { data: meds } = await supabase
         .from('medications').select('id, name, dosage').in('id', stocks.map(s => s.medication_id))

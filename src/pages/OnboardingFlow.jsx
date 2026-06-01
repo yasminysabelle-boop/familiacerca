@@ -215,7 +215,7 @@ export default function OnboardingFlow() {
         }
       }
       const { error: e1 } = await supabase.from('care_profiles').upsert(
-        { user_id: user.id, name: patientName.trim(), age: calcAge(birthDate), photo_url: photoUrl },
+        { user_id: user.id, name: patientName.trim(), photo_url: photoUrl },
         { onConflict: 'user_id' }
       )
       if (e1) throw e1
@@ -461,7 +461,7 @@ export default function OnboardingFlow() {
                 <input
                   type="date" style={INPUT} value={birthDate}
                   onChange={e => setBirthDate(e.target.value)}
-                  max={new Date().toISOString().split('T')[0]}
+                  max={new Date().toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' })}
                 />
               </div>
             </div>
