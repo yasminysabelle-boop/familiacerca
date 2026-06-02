@@ -7,6 +7,7 @@ import Layout from '../components/Layout'
 import { ChevronLeft, CheckIcon, XIcon, AlertTriangle } from '../components/Icons'
 import LoadingButton from '../components/LoadingButton'
 import PatientProfileContacts from '../components/PatientProfileContacts'
+import { generateMedicalReport, fetchReportData } from '../utils/generateMedicalReport'
 
 // ── Constants ────────────────────────────────────────────────────────────────
 const SANGRE     = ['A+','A-','B+','B-','O+','O-','AB+','AB-']
@@ -138,11 +139,12 @@ export default function PatientProfile() {
 
   const [form, setForm]         = useState(EMPTY)
   const [open, setOpen]         = useState({ s1:true, s2:false, s3:false, s4:false, s5:false })
-  const [saving, setSaving]     = useState(false)
-  const [error, setError]       = useState('')
-  const [success, setSuccess]   = useState(false)
-  const [loading, setLoading]   = useState(true)
+  const [saving, setSaving]         = useState(false)
+  const [error, setError]           = useState('')
+  const [success, setSuccess]       = useState(false)
+  const [loading, setLoading]       = useState(true)
   const [contactBadge, setContactBadge] = useState(0)
+  const [generatingPDF, setGeneratingPDF] = useState(false)
   const [lf, setLf]             = useState(null)   // listening field
   const [otraAlergia, setOtraAlergia] = useState('')
   const [uploading, setUploading] = useState(false)
@@ -233,6 +235,19 @@ export default function PatientProfile() {
     if (!n || form.alergias_detalle.find(a => a.nombre===n)) return
     set('alergias_detalle', [...form.alergias_detalle, { nombre:n, reaccion:'' }])
     setOtraAlergia('')
+  }
+
+  // ── PDF ───────────────────────────────────────────────────────────────────
+  async function handleGeneratePDF() {
+    setGeneratingPDF(true)
+    try {
+      const data = await fetchReportData(ownerId)
+      await generateMedicalReport(data, profile?.name)
+    } catch (err) {
+      console.error('[PDF]', err)
+    } finally {
+      setGeneratingPDF(false)
+    }
   }
 
   // ── Save ──────────────────────────────────────────────────────────────────
@@ -517,6 +532,32 @@ export default function PatientProfile() {
                   lf={lf} onVoice={startVoice} />
               </Fld>
             </Section>
+
+            {/* ── Botón Reporte PDF ───────────────────────────────────────── */}
+            <button
+              type="button"
+              onClick={handleGeneratePDF}
+              disabled={generatingPDF}
+              style={{
+                width: '100%', marginBottom: 12, padding: '13px 16px',
+                borderRadius: 16, border: '1.5px solid #2D4A1E',
+                background: generatingPDF ? '#F0F9F4' : 'white',
+                display: 'flex', alignItems: 'center', gap: 10,
+                cursor: generatingPDF ? 'not-allowed' : 'pointer',
+                boxShadow: '0 2px 8px rgba(45,74,30,0.08)',
+              }}
+            >
+              <span style={{ fontSize: 20 }}>{generatingPDF ? '⏳' : '📄'}</span>
+              <div style={{ flex: 1, textAlign: 'left' }}>
+                <p style={{ fontSize: 13, fontWeight: 700, color: '#2D4A1E', margin: 0 }}>
+                  {generatingPDF ? 'Generando reporte...' : 'Generar reporte PDF'}
+                </p>
+                <p style={{ fontSize: 11, color: '#9CA3AF', margin: '1px 0 0' }}>
+                  Medicamentos, directorio, notas y citas
+                </p>
+              </div>
+              {!generatingPDF && <span style={{ color: '#4A7C59', fontSize: 16 }}>↓</span>}
+            </button>
 
             {/* ══ S3: Preferencias ═══════════════════════════════════════════ */}
             <Section color="#EA8C00" icon="⭐" title="Preferencias" badge={b3}

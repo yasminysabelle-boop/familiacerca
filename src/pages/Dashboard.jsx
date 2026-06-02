@@ -13,6 +13,7 @@ import { geminiGenerate } from '../lib/gemini'
 import TrialBanner from '../components/TrialBanner'
 import { useHospitalMode } from '../contexts/HospitalModeContext'
 import HospitalDashboard from '../components/hospital/HospitalDashboard'
+import { generateMedicalReport, fetchReportData } from '../utils/generateMedicalReport'
 import HospitalModeModal from '../components/hospital/HospitalModeModal'
 import VideoCallScheduleModal from '../components/VideoCallScheduleModal'
 import { getLocation, mapsUrl } from '../lib/gps'
@@ -1726,6 +1727,7 @@ export default function Dashboard() {
   const [chatCount, setChatCount] = useState(0)
   const [patientProfileIncomplete, setPatientProfileIncomplete] = useState(false)
   const [patientProfile, setPatientProfile] = useState(null)
+  const [pdfLoading, setPdfLoading] = useState(false)
   const [dailyMood, setDailyMood] = useState(null)
   const [savingMood, setSavingMood] = useState(false)
   const [pressedMood, setPressedMood] = useState(null)
@@ -2458,6 +2460,19 @@ export default function Dashboard() {
     setTimeout(() => setSosSent(false), 15000)
   }
 
+  async function handlePDF() {
+    if (pdfLoading || !ownerId) return
+    setPdfLoading(true)
+    try {
+      const data = await fetchReportData(ownerId)
+      await generateMedicalReport(data, profile?.name)
+    } catch (err) {
+      console.error('[PDF]', err)
+    } finally {
+      setPdfLoading(false)
+    }
+  }
+
   function toggleDay(dateKey) {
     setExpandedDays(prev => {
       const next = new Set(prev)
@@ -2786,6 +2801,28 @@ export default function Dashboard() {
               </div>
             )}
           </Link>
+
+          {/* Botón reporte PDF — solo si hay perfil cargado */}
+          {patientProfile && (
+            <button
+              onClick={handlePDF}
+              disabled={pdfLoading}
+              style={{
+                marginTop: 10, width: '100%', padding: '9px 14px',
+                borderRadius: 12, border: '1px solid rgba(255,255,255,0.22)',
+                background: 'rgba(255,255,255,0.1)',
+                display: 'flex', alignItems: 'center', gap: 8,
+                cursor: pdfLoading ? 'not-allowed' : 'pointer',
+                WebkitTapHighlightColor: 'transparent',
+              }}
+            >
+              <span style={{ fontSize: 16 }}>{pdfLoading ? '⏳' : '📄'}</span>
+              <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.85)' }}>
+                {pdfLoading ? 'Generando...' : 'Reporte PDF'}
+              </span>
+              {!pdfLoading && <span style={{ marginLeft: 'auto', fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>↓ Descargar</span>}
+            </button>
+          )}
 
           {/* Separador */}
           <div style={{ height: 1, background: 'rgba(255,255,255,0.1)', margin: '16px 0' }} />
