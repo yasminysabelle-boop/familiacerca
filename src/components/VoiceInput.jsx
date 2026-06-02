@@ -91,9 +91,7 @@ export default function VoiceInput({
         {supported && !disabled && (
           <button
             type="button"
-            onPointerDown={e => { e.preventDefault(); if (!recording) start() }}
-            onPointerUp={e => { e.preventDefault(); if (recording) stop() }}
-            onPointerLeave={() => { if (recording) stop() }}
+            onClick={() => recording ? stop() : start()}
             aria-label={recording ? 'Detener grabación' : 'Grabar voz'}
             style={{
               position: 'absolute',

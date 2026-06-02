@@ -1,10 +1,10 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import { track } from '../lib/analytics'
-import { useSpeechToText } from '../hooks/useSpeechToText'
+import VoiceRecorder from '../components/VoiceRecorder'
 
 const MOODS = [
   { value: 'good',    emoji: '😊', label: 'Buen día',   color: '#22C55E' },
@@ -50,31 +50,16 @@ export default function Memorias() {
   const isFamiliar = memberRole === 'familiar'
   const [recordings, setRecordings] = useState([])
   const [loading, setLoading] = useState(true)
-  const [step, setStep] = useState('idle') // 'idle' | 'recording' | 'saving'
-  const [elapsed, setElapsed] = useState(0)
+  const [step, setStep] = useState('idle') // 'idle' | 'saving'
   const [saveError, setSaveError] = useState('')
-  const [micError, setMicError] = useState('')
   const [playing, setPlaying] = useState(null)
   const [yearAgoMemory, setYearAgoMemory] = useState(null)
-  const recorderRef = useRef(null)
-  const streamRef   = useRef(null)
-  const mimeTypeRef = useRef('')
-  const chunksRef = useRef([])
-  const timerRef = useRef(null)
-  const transcriptRef = useRef('')
-
-  const { start: startSpeech, stop: stopSpeech } = useSpeechToText(text => {
-    transcriptRef.current = transcriptRef.current
-      ? transcriptRef.current + ' ' + text
-      : text
-  })
 
   const patientName = profile?.name ?? 'el familiar'
   const myDisplayName = user?.user_metadata?.full_name ?? user?.email ?? 'Familiar'
 
   useEffect(() => {
     if (user && ownerId) fetchRecordings()
-    return () => clearInterval(timerRef.current)
   }, [user, ownerId])
 
   async function fetchRecordings() {
@@ -99,109 +84,25 @@ export default function Memorias() {
     setLoading(false)
   }
 
-  function pickMimeType() {
-    const candidates = [
-      'audio/webm;codecs=opus',
-      'audio/webm',
-      'audio/ogg;codecs=opus',
-      'audio/mp4',
-    ]
-    return (typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported)
-      ? (candidates.find(t => MediaRecorder.isTypeSupported(t)) ?? '')
-      : ''
-  }
-
-  async function startRecording() {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      setMicError('')
-      setSaveError('')
-      chunksRef.current = []
-      transcriptRef.current = ''
-
-      const mimeType = pickMimeType()
-      console.log('[startRecording] mimeType:', mimeType || '(navegador default)', '— MediaRecorder disponible:', typeof MediaRecorder !== 'undefined')
-      mimeTypeRef.current = mimeType
-      streamRef.current = stream
-
-      try { startSpeech() } catch (e) { console.warn('[startRecording] SpeechRecognition no disponible:', e) }
-
-      const recOpts = mimeType ? { mimeType } : {}
-      const recorder = new MediaRecorder(stream, recOpts)
-      recorder.ondataavailable = e => {
-        console.log('[ondataavailable] chunk size:', e.data.size)
-        if (e.data.size > 0) chunksRef.current.push(e.data)
-      }
-      recorder.start(250)
-      recorderRef.current = recorder
-      setStep('recording'); setElapsed(0)
-      timerRef.current = setInterval(() => setElapsed(n => n + 1), 1000)
-    } catch (err) {
-      console.error('[startRecording] error:', err)
-      setMicError('No se pudo acceder al micrófono. Verifica los permisos del navegador.')
-    }
-  }
-
-  async function stopAndSave() {
-    console.log('[stopAndSave] inicio — elapsed:', elapsed, 'chunks:', chunksRef.current.length)
-    clearInterval(timerRef.current)
-
-    const recorder = recorderRef.current
-    const stream   = streamRef.current
-
-    if (!recorder || recorder.state === 'inactive') {
-      console.warn('[stopAndSave] recorder inactivo o nulo — state:', recorder?.state)
-      stopSpeech()
-      stream?.getTracks().forEach(t => t.stop())
-      setSaveError('La grabación se interrumpió. Intenta de nuevo.')
-      setStep('idle')
-      return
-    }
-
+  async function handleAudioBlob(blob, duration) {
     setStep('saving')
     setSaveError('')
-    const duration = elapsed
 
-    await new Promise(resolve => {
-      recorder.onstop = () => {
-        try { stopSpeech() } catch (e) { console.warn('[stopAndSave] stopSpeech error:', e) }
-        stream?.getTracks().forEach(t => t.stop())
-        resolve()
-      }
-      recorder.stop()
-    })
-
-    recorderRef.current = null
-    streamRef.current = null
-
-    const mimeType = mimeTypeRef.current || 'audio/webm'
-    const blob = new Blob(chunksRef.current, { type: mimeType })
-    console.log('[stopAndSave] chunks:', chunksRef.current.length, '— blob size:', blob.size, 'bytes — mimeType:', mimeType)
-
-    if (blob.size === 0) {
-      console.error('[stopAndSave] blob vacío, abortando')
-      setSaveError('No se capturó audio. Intenta grabar de nuevo.')
-      setStep('idle')
-      return
-    }
-
+    const mimeType = blob.type || 'audio/webm'
     const ext  = mimeType.includes('mp4') ? 'mp4' : mimeType.includes('ogg') ? 'ogg' : 'webm'
     const path = `${user.id}/${Date.now()}.${ext}`
-    console.log('[stopAndSave] subiendo a storage — path:', path, 'contentType:', mimeType.split(';')[0])
 
     const { error: uploadError } = await supabase.storage
       .from('voice-diary')
       .upload(path, blob, { contentType: mimeType.split(';')[0] })
 
     if (uploadError) {
-      console.error('[stopAndSave] error upload:', uploadError)
-      // Detect common causes for a clearer user message
       const errMsg = uploadError.message ?? ''
       let friendlyMsg = 'Error al subir el audio.'
       if (errMsg.toLowerCase().includes('bucket') || uploadError.statusCode === '404') {
-        friendlyMsg = 'El bucket de almacenamiento no existe. Pide al administrador que ejecute create_storage_buckets.sql en Supabase.'
+        friendlyMsg = 'El bucket de almacenamiento no existe. Pide al administrador que lo cree en Supabase.'
       } else if (uploadError.statusCode === '403' || errMsg.toLowerCase().includes('policy') || errMsg.toLowerCase().includes('permission')) {
-        friendlyMsg = 'Sin permiso para subir archivos. Verifica las políticas RLS del bucket voice-diary en Supabase.'
+        friendlyMsg = 'Sin permiso para subir archivos. Verifica las políticas RLS del bucket voice-diary.'
       } else if (errMsg) {
         friendlyMsg = `Error al subir el audio: ${errMsg}`
       }
@@ -211,49 +112,27 @@ export default function Memorias() {
     }
 
     const { data: { publicUrl } } = supabase.storage.from('voice-diary').getPublicUrl(path)
-    console.log('[stopAndSave] upload OK — publicUrl:', publicUrl)
 
     const defaultTitle = new Date().toLocaleDateString('es-US', { weekday: 'long', day: 'numeric', month: 'long' })
 
-    console.log('[stopAndSave] insertando en voice_diary — duration:', duration)
     const { error: insertError } = await supabase.from('voice_diary').insert({
       user_id: user.id,
       audio_url: publicUrl,
       title: defaultTitle,
       duration_seconds: duration,
-      transcription: transcriptRef.current || null,
+      transcription: null,
     })
 
     if (insertError) {
-      console.error('[stopAndSave] error insert:', insertError)
-      setSaveError('El audio se subió pero no se pudo guardar en la base de datos: ' + insertError.message)
+      setSaveError('El audio se subió pero no se pudo guardar: ' + insertError.message)
       setStep('idle')
       return
     }
 
-    console.log('[stopAndSave] guardado correctamente')
-    track('memory_recorded', { duration_seconds: elapsed })
+    track('memory_recorded', { duration_seconds: duration })
     setSaveError('')
-    setElapsed(0)
     setStep('idle')
     fetchRecordings()
-  }
-
-  function cancelRecording() {
-    clearInterval(timerRef.current)
-    stopSpeech()
-    transcriptRef.current = ''
-    const recorder = recorderRef.current
-    const stream   = streamRef.current
-    if (recorder && recorder.state !== 'inactive') {
-      recorder.onstop = () => stream?.getTracks().forEach(t => t.stop())
-      recorder.stop()
-    } else {
-      stream?.getTracks().forEach(t => t.stop())
-    }
-    recorderRef.current = null
-    streamRef.current = null
-    setStep('idle'); setElapsed(0)
   }
 
   async function deleteRecording(id) {
@@ -271,18 +150,7 @@ export default function Memorias() {
   return (
     <Layout>
       <style>{`
-        @keyframes wave-out {
-          0%   { transform: scale(1);   opacity: 0.55; }
-          100% { transform: scale(2.1); opacity: 0; }
-        }
-        @keyframes wave-bar {
-          0%, 100% { transform: scaleY(0.25); }
-          50%       { transform: scaleY(1);    }
-        }
-        @keyframes rec-ring {
-          0%   { transform: scale(1);   opacity: 0.5; }
-          100% { transform: scale(2.4); opacity: 0; }
-        }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
       `}</style>
       <div style={{ padding: '16px 16px 0', maxWidth: 600 }}>
 
@@ -323,7 +191,7 @@ export default function Memorias() {
           boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
         }}>
 
-          {/* Idle state — animated record button */}
+          {/* Idle + recording state (VoiceRecorder manages recording UI internally) */}
           {step === 'idle' && (
             <div style={{ textAlign: 'center', padding: '12px 0 8px' }}>
               <p style={{
@@ -333,14 +201,6 @@ export default function Memorias() {
                 Memoria de {patientName}
               </p>
 
-              {micError && (
-                <div style={{
-                  marginBottom: 20, padding: '10px 14px', borderRadius: 12,
-                  background: '#FFF0F0', border: '1px solid #FFBABA', color: '#D63031', fontSize: 13,
-                }}>
-                  🎤 {micError}
-                </div>
-              )}
               {saveError && (
                 <div style={{
                   marginBottom: 20, padding: '12px 16px', borderRadius: 14,
@@ -354,124 +214,11 @@ export default function Memorias() {
                 </div>
               )}
 
-              {/* Wave button */}
-              <div style={{ position: 'relative', width: 88, height: 88, margin: '0 auto 18px' }}>
-                {/* 3 ripple rings */}
-                {[0, 0.7, 1.4].map((delay, i) => (
-                  <div key={i} style={{
-                    position: 'absolute', inset: 0, borderRadius: '50%',
-                    background: 'rgba(124,92,191,0.18)',
-                    animation: `wave-out 2.1s ease-out infinite ${delay}s`,
-                    pointerEvents: 'none',
-                  }} />
-                ))}
-                {/* Mic circle */}
-                <button
-                  onClick={startRecording}
-                  style={{
-                    position: 'absolute', inset: 0, borderRadius: '50%', border: 'none',
-                    background: 'linear-gradient(145deg, #8B6CC9, #5E3FA3)',
-                    boxShadow: '0 10px 32px rgba(94,63,163,0.45)',
-                    cursor: 'pointer',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 34, transition: 'transform 0.12s, box-shadow 0.12s',
-                  }}
-                  onMouseDown={e => { e.currentTarget.style.transform = 'scale(0.94)'; e.currentTarget.style.boxShadow = '0 4px 16px rgba(94,63,163,0.35)' }}
-                  onMouseUp={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 10px 32px rgba(94,63,163,0.45)' }}
-                  onTouchStart={e => { e.currentTarget.style.transform = 'scale(0.94)' }}
-                  onTouchEnd={e => { e.currentTarget.style.transform = 'scale(1)' }}
-                >
-                  🎙️
-                </button>
-              </div>
-
-              <p style={{ fontSize: 13, fontWeight: 700, color: '#7C5CBF', letterSpacing: '0.03em' }}>
-                Toca para grabar
-              </p>
-            </div>
-          )}
-
-          {/* Recording */}
-          {step === 'recording' && (
-            <div style={{ textAlign: 'center', padding: '8px 0' }}>
-
-              {/* Red radiating rings + mic */}
-              <div style={{ position: 'relative', width: 88, height: 88, margin: '0 auto 20px' }}>
-                {[0, 0.55, 1.1].map((delay, i) => (
-                  <div key={i} style={{
-                    position: 'absolute', inset: 0, borderRadius: '50%',
-                    background: 'rgba(214,48,49,0.18)',
-                    animation: `rec-ring 1.6s ease-out infinite ${delay}s`,
-                    pointerEvents: 'none',
-                  }} />
-                ))}
-                <div style={{
-                  position: 'absolute', inset: 0, borderRadius: '50%',
-                  background: 'linear-gradient(145deg, #EF4444, #B91C1C)',
-                  boxShadow: '0 10px 32px rgba(185,28,28,0.45)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 34,
-                }}>
-                  🎙️
-                </div>
-              </div>
-
-              {/* Equalizer bars */}
-              <div style={{
-                display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
-                gap: 4, height: 32, marginBottom: 16,
-              }}>
-                {[
-                  { h: 28, delay: '0s'    },
-                  { h: 20, delay: '0.15s' },
-                  { h: 32, delay: '0.3s'  },
-                  { h: 16, delay: '0.08s' },
-                  { h: 26, delay: '0.45s' },
-                  { h: 22, delay: '0.22s' },
-                  { h: 30, delay: '0.38s' },
-                ].map(({ h, delay }, i) => (
-                  <div key={i} style={{
-                    width: 4, borderRadius: 3,
-                    height: h,
-                    background: 'linear-gradient(to top, #D63031, #FF6B6B)',
-                    transformOrigin: 'bottom',
-                    animation: `wave-bar ${0.55 + (i % 3) * 0.12}s ease-in-out infinite ${delay}`,
-                  }} />
-                ))}
-              </div>
-
-              {/* Timer */}
-              <p style={{ fontSize: 34, fontWeight: 700, fontFamily: 'monospace', color: '#1A1A1A', marginBottom: 4 }}>
-                {fmt(elapsed)}
-              </p>
-              <p style={{ fontSize: 11, color: '#D63031', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 22 }}>
-                ● Grabando
-              </p>
-
-              <div style={{ display: 'flex', gap: 10 }}>
-                <button
-                  onClick={stopAndSave}
-                  style={{
-                    flex: 2, padding: '13px',
-                    background: 'linear-gradient(135deg, #7C5CBF, #5E3FA3)',
-                    color: 'white', fontWeight: 700, fontSize: 14,
-                    borderRadius: 14, border: 'none', cursor: 'pointer',
-                    boxShadow: '0 4px 16px rgba(124,92,191,0.3)',
-                  }}
-                >
-                  ✓ Guardar memoria
-                </button>
-                <button
-                  onClick={cancelRecording}
-                  style={{
-                    flex: 1, padding: '13px',
-                    border: '1.5px solid #EDE5D8', background: 'white',
-                    color: '#6B7280', fontWeight: 600, fontSize: 14,
-                    borderRadius: 14, cursor: 'pointer',
-                  }}
-                >
-                  Cancelar
-                </button>
-              </div>
+              <VoiceRecorder
+                mode="record"
+                onAudioBlob={handleAudioBlob}
+                placeholder="Toca para grabar"
+              />
             </div>
           )}
 

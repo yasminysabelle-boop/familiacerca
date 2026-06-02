@@ -2,8 +2,8 @@ import { useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
-import { useSpeechToText } from '../hooks/useSpeechToText'
 import VoiceInput from './VoiceInput'
+import VoiceRecorder from './VoiceRecorder'
 
 const CLAUDE_PROXY = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/claude-proxy`
 const MODEL        = 'claude-sonnet-4-6'
@@ -206,10 +206,7 @@ export default function DiarioMedicoEntryModal({ open, onClose, onSaved }) {
   const [saving, setSaving] = useState(false)
   const fileRef = useRef()
 
-  // Voice recording
-  const { recording, interim, error: voiceError, supported, start, stop } = useSpeechToText(
-    text => setTranscript(prev => (prev + ' ' + text).trimStart())
-  )
+  const supported = !!(window.SpeechRecognition || window.webkitSpeechRecognition)
 
   function reset() {
     setStep('input'); setInputType('voice'); setTranscript(''); setPhotoFile(null)
@@ -392,41 +389,13 @@ export default function DiarioMedicoEntryModal({ open, onClose, onSaved }) {
                   Habla libremente sobre la consulta — qué dijo el médico, medicamentos recetados, próximos estudios...
                 </p>
 
-                {/* Big mic button */}
                 <div style={{ display: 'flex', justifyContent: 'center' }}>
-                  <button
-                    onPointerDown={e => { e.preventDefault(); if (!recording) start() }}
-                    onPointerUp={e => { e.preventDefault(); if (recording) stop() }}
-                    onPointerLeave={() => { if (recording) stop() }}
-                    style={{
-                      width: 88, height: 88, borderRadius: '50%', border: 'none',
-                      background: recording
-                        ? 'linear-gradient(135deg, #DC2626, #EF4444)'
-                        : 'linear-gradient(135deg, #4A7C59, #3A6347)',
-                      cursor: 'pointer', display: 'flex', flexDirection: 'column',
-                      alignItems: 'center', justifyContent: 'center', gap: 2,
-                      boxShadow: recording
-                        ? '0 0 0 8px rgba(239,68,68,0.2)'
-                        : '0 6px 20px rgba(74,124,89,0.4)',
-                      transition: 'all 0.2s',
-                    }}
-                  >
-                    <span style={{ fontSize: 30 }}>{recording ? '⏹' : '🎙️'}</span>
-                    <span style={{ fontSize: 10, color: 'white', fontWeight: 700 }}>
-                      {recording ? 'Soltar' : 'Mantén'}
-                    </span>
-                  </button>
+                  <VoiceRecorder
+                    mode="transcribe"
+                    onTranscript={text => setTranscript(prev => (prev + ' ' + text).trimStart())}
+                    placeholder="Toca para grabar la consulta"
+                  />
                 </div>
-
-                {recording && interim && (
-                  <p style={{ fontSize: 12, color: '#9CA3AF', textAlign: 'center', fontStyle: 'italic' }}>
-                    {interim}...
-                  </p>
-                )}
-
-                {voiceError && (
-                  <p style={{ fontSize: 12, color: '#DC2626', textAlign: 'center' }}>{voiceError}</p>
-                )}
 
                 {transcript && (
                   <div style={{
