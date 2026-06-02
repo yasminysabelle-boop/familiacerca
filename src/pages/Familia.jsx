@@ -4,21 +4,17 @@ import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { usePresence } from '../contexts/PresenceContext'
 import { useSubscription } from '../contexts/SubscriptionContext'
-import { createPortalSession } from '../lib/stripe'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
-import { UserPlus, Phone, Mail, MapPin, XIcon, BookOpen, Users, LogOut } from '../components/Icons'
+import { UserPlus, Phone, Mail, MapPin, XIcon } from '../components/Icons'
 import { track } from '../lib/analytics'
 import PaywallModal from '../components/PaywallModal'
 
-const PLAN_LABELS = { free: 'Prueba gratuita', familiar: 'Plan Familiar', care_plus: 'Care+' }
-const PLAN_COLORS = { free: '#9CA3AF', familiar: '#4A7C59', care_plus: '#7C3AED' }
-
 export default function Familia() {
-  const { user, signOut } = useAuth()
+  const { user } = useAuth()
   const { profile, ownerId } = useFamily()
   const onlineIds = usePresence()
-  const { sub, isPaid, isTrialing, daysLeft, trialExpired } = useSubscription()
+  const { trialExpired } = useSubscription()
   const navigate = useNavigate()
   const [members, setMembers] = useState([])
   const [memberProfiles, setMemberProfiles] = useState({})
@@ -31,8 +27,6 @@ export default function Familia() {
   const [inviteLink, setInviteLink] = useState('')
   const [emailSent, setEmailSent] = useState(false)
   const [copied, setCopied] = useState(false)
-  const [portalLoading, setPortalLoading] = useState(false)
-  const [portalError, setPortalError] = useState('')
   const [shifts, setShifts] = useState({})
   const [shiftModal, setShiftModal] = useState(null)
   const [shiftName, setShiftName] = useState('')
@@ -190,20 +184,6 @@ export default function Familia() {
     setShowInvite(true)
   }
 
-  async function handlePortal() {
-    if (!isPaid) { navigate('/pricing'); return }
-    setPortalLoading(true)
-    setPortalError('')
-    try {
-      const url = await createPortalSession()
-      window.location.href = url
-    } catch (err) {
-      console.error(err)
-      setPortalLoading(false)
-      setPortalError('No se pudo abrir el portal. Intenta de nuevo.')
-    }
-  }
-
   async function handleAssignRole(memberUserId, newRole) {
     setSavingRole(true)
     const { error } = await supabase.rpc('assign_member_role', {
@@ -227,15 +207,6 @@ export default function Familia() {
     setConfirmRemoveDialog(null)
     setMemberModal(null)
     track('family_member_removed', {})
-  }
-
-  async function handleSignOut() {
-    try { await signOut() } catch { }
-    finally {
-      localStorage.removeItem('fc_active_context')
-      localStorage.removeItem('fc_member_owner_id')
-      window.location.href = '/login'
-    }
   }
 
   const fieldStyle = {
@@ -363,52 +334,6 @@ export default function Familia() {
             </div>
           )
         })()}
-
-        {/* Subscription badge */}
-        {sub && (
-          <div style={{
-            background: 'white', borderRadius: 16, border: '1px solid #EDE5D8',
-            padding: '14px 16px', marginBottom: 12,
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{
-                width: 36, height: 36, borderRadius: 10, flexShrink: 0,
-                background: `${PLAN_COLORS[sub.plan] ?? '#9CA3AF'}18`,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 18,
-              }}>
-                {sub.plan === 'care_plus' ? '✨' : sub.plan === 'familiar' ? '❤️' : '🌱'}
-
-              </div>
-              <div>
-                <p style={{ fontSize: 13, fontWeight: 700, color: '#1A1A1A', margin: '0 0 2px' }}>
-                  {PLAN_LABELS[sub.plan] ?? sub.plan}
-                </p>
-                <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>
-                  {isTrialing ? `${daysLeft} días restantes` : isPaid ? 'Activo' : 'Período de prueba terminado'}
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={handlePortal}
-              disabled={portalLoading}
-              style={{
-                padding: '7px 14px', borderRadius: 10, fontSize: 12, fontWeight: 700,
-                border: '1.5px solid #EDE5D8', background: 'white',
-                color: '#6B7280', cursor: 'pointer',
-              }}
-            >
-              {portalLoading ? '...' : isPaid ? 'Gestionar' : 'Ver planes'}
-            </button>
-          </div>
-        )}
-        {portalError && (
-          <p style={{ fontSize: 12, color: '#D63031', margin: '-4px 0 12px', padding: '8px 12px', background: '#FFF0F0', border: '1px solid #FFBABA', borderRadius: 10 }}>
-            ⚠ {portalError}
-          </p>
-        )}
 
         {/* Members section */}
         <div style={{
@@ -596,79 +521,6 @@ export default function Familia() {
           )}
         </div>
 
-        {/* Directory shortcut */}
-        <Link
-          to="/directorio"
-          style={{
-            display: 'flex', alignItems: 'center', gap: 14,
-            background: 'white', borderRadius: 16, border: '1px solid #EDE5D8',
-            padding: '14px 16px', marginBottom: 12, textDecoration: 'none',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-          }}
-        >
-          <div style={{
-            width: 40, height: 40, borderRadius: 12, flexShrink: 0,
-            background: '#F0F8F4', display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            <BookOpen size={20} color="#4A7C59" strokeWidth={1.5} />
-          </div>
-          <div style={{ flex: 1 }}>
-            <p style={{ fontSize: 14, fontWeight: 600, color: '#1A1A1A', margin: '0 0 2px' }}>Directorio</p>
-            <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>Médicos, contactos y emergencias</p>
-          </div>
-          <span style={{ color: '#D1D5DB', fontSize: 18 }}>›</span>
-        </Link>
-
-        {/* Memorias y reportes */}
-        <div style={{
-          background: 'white', borderRadius: 16, border: '1px solid #EDE5D8',
-          overflow: 'hidden', marginBottom: 12,
-          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-        }}>
-          {[
-            { to: '/album',    icon: '📸', label: 'Fotos y videos',    desc: 'Fotos y videos de momentos especiales' },
-            { to: '/memorias', icon: '🎙️', label: 'Memorias de voz',  desc: 'Diario de voz familiar' },
-            { to: '/reportes', icon: '📊', label: 'Reportes médicos', desc: 'Análisis semanal y PDF médico' },
-          ].map(({ to, icon, label, desc }, i, arr) => (
-            <Link
-              key={to}
-              to={to}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 12,
-                padding: '14px 16px', textDecoration: 'none',
-                borderBottom: i < arr.length - 1 ? '1px solid #F5EEE6' : 'none',
-              }}
-            >
-              <div style={{
-                width: 38, height: 38, borderRadius: 10, flexShrink: 0,
-                background: '#F0F8F4', display: 'flex', alignItems: 'center',
-                justifyContent: 'center', fontSize: 18,
-              }}>
-                {icon}
-              </div>
-              <div style={{ flex: 1 }}>
-                <p style={{ fontSize: 14, fontWeight: 600, color: '#1A1A1A', margin: '0 0 1px' }}>{label}</p>
-                <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>{desc}</p>
-              </div>
-              <span style={{ color: '#D1D5DB', fontSize: 18 }}>›</span>
-            </Link>
-          ))}
-        </div>
-
-        {/* Sign out */}
-        <button
-          onClick={handleSignOut}
-          style={{
-            width: '100%', padding: '14px', marginBottom: 24,
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-            border: '1.5px solid #FFBABA', borderRadius: 16,
-            background: '#FFF8F8', color: '#D63031',
-            fontWeight: 700, fontSize: 14, cursor: 'pointer',
-          }}
-        >
-          <LogOut size={17} color="#D63031" strokeWidth={1.75} />
-          Cerrar sesión
-        </button>
       </div>
 
       {/* Member contact modal */}
