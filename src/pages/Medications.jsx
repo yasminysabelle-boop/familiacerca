@@ -113,9 +113,7 @@ export default function Medications() {
   const isFamiliar = memberRole === 'familiar'
 
   function canActOn(med) {
-    if (isAdmin) return true
-    if (memberRole === 'cuidador' && med.created_by_user_id === user?.id) return true
-    return false
+    return isAdmin || memberRole === 'cuidador'
   }
 
   // ── Medication list state ──────────────────────────────────────────────────
