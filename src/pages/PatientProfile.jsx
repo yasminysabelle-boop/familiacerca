@@ -604,7 +604,7 @@ export default function PatientProfile() {
             </Section>
 
             {/* ══ S4: Contactos ════════════════════════════════════════════ */}
-            <Section color="#0891B2" icon="📞" title="Contactos" badge={b4}
+            <Section color="#0891B2" icon="📒" title="Directorio" badge={b4}
               open={open.s4} onToggle={() => setOpen(p=>({...p,s4:!p.s4}))}>
               <PatientProfileContacts
                 ownerId={ownerId}
