@@ -102,8 +102,7 @@ export default function Hoy() {
   const isAdmin = memberRole === null || ownerId === user?.id
   const isCuidador = memberRole === 'cuidador'
   function canActOn(med) {
-    if (isFamiliar) return false
-    return isAdmin || isCuidador
+    return isAdmin
   }
   const [adminWarningMed, setAdminWarningMed] = useState(null)
   const [weekHistory, setWeekHistory] = useState([])

@@ -53,6 +53,7 @@ export default function Cuidado() {
   )
 
   const isFamiliar = memberRole === 'familiar'
+  const isAdmin    = memberRole === null
   const today = toLocalDate()
   const displayName = user?.user_metadata?.full_name ?? user?.email ?? 'Familiar'
 
@@ -467,15 +468,15 @@ export default function Cuidado() {
               Se avisa si no se marca 30 min después
             </p>
 
-            {isFamiliar && (
+            {!isAdmin && (
               <div style={{
                 background: '#F9FAFB', border: '1px solid #E5E7EB',
                 borderRadius: 12, padding: '10px 14px', marginBottom: 18,
                 display: 'flex', alignItems: 'center', gap: 8,
               }}>
-                <span style={{ fontSize: 15 }}>👁️</span>
+                <span style={{ fontSize: 15 }}>🔒</span>
                 <p style={{ fontSize: 12, color: '#6B7280', margin: 0 }}>
-                  Solo el administrador o el cuidador pueden cambiar los horarios.
+                  Solo el administrador puede cambiar los horarios.
                 </p>
               </div>
             )}
@@ -513,15 +514,15 @@ export default function Cuidado() {
                         type="time"
                         value={times[item.key] ?? item.scheduledTime}
                         onChange={e => setTimes(prev => ({ ...prev, [item.key]: e.target.value }))}
-                        disabled={isFamiliar}
+                        disabled={!isAdmin}
                         style={{
                           ...fieldStyle,
                           width: 112,
-                          opacity: isFamiliar ? 0.5 : 1,
-                          cursor: isFamiliar ? 'default' : 'auto',
+                          opacity: !isAdmin ? 0.5 : 1,
+                          cursor: !isAdmin ? 'default' : 'auto',
                         }}
-                        onFocus={isFamiliar ? undefined : onFocusStyle}
-                        onBlur={isFamiliar ? undefined : onBlurStyle}
+                        onFocus={!isAdmin ? undefined : onFocusStyle}
+                        onBlur={!isAdmin ? undefined : onBlurStyle}
                       />
                     </div>
                   ))}
@@ -545,7 +546,7 @@ export default function Cuidado() {
                   </p>
                 )}
 
-                {!isFamiliar && (
+                {isAdmin && (
                   <button
                     onClick={saveSchedules}
                     disabled={saving}
