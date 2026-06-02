@@ -8,6 +8,7 @@ import { CheckIcon, MoreVertical, Pencil, Plus, Trash, XIcon } from '../componen
 import { getLocation, mapsUrl } from '../lib/gps'
 import { track } from '../lib/analytics'
 import EvidencePhoto from '../components/EvidencePhoto'
+import { detectMedicationWindow } from '../utils/medicationDatabase'
 
 const TIME_GROUPS = [
   { id: 0, label: 'Mañana',      icon: '🌅', range: [0, 12] },
@@ -61,17 +62,28 @@ async function stampProof(file, confirmerName) {
   })
 }
 
-function calcularEstadoMedicamento(scheduledTime, isConfirmed = false) {
-  if (isConfirmed) return 'completado'
+// Returns: 'programado' | 'pendiente' | 'dar_pronto' | 'tarde' | 'completado' | 'dado_tarde'
+function calcularEstadoMedicamento(scheduledTime, isConfirmed = false, windowMinutes = 60, givenOnTime = null) {
+  if (isConfirmed) return givenOnTime === false ? 'dado_tarde' : 'completado'
   if (!scheduledTime) return 'pendiente'
-  const parts = scheduledTime.split(':')
-  const h = Math.min(Math.max(parseInt(parts[0], 10) || 0, 0), 23)
-  const m = Math.min(Math.max(parseInt(parts[1], 10) || 0, 0), 59)
+  const [hStr, mStr] = scheduledTime.split(':')
+  const h = Math.min(Math.max(parseInt(hStr, 10) || 0, 0), 23)
+  const m = Math.min(Math.max(parseInt(mStr, 10) || 0, 0), 59)
   const now = new Date()
-  const diff = (now.getHours() * 60 + now.getMinutes()) - (h * 60 + m)
-  if (diff < 0)   return 'programado'
-  if (diff <= 30) return 'pendiente'
-  return 'tarde'
+  const diffMins = (now.getHours() * 60 + now.getMinutes()) - (h * 60 + m)
+  if (diffMins < 0) return 'programado'
+  if (diffMins > windowMinutes) return 'tarde'
+  if (diffMins >= windowMinutes - 15) return 'dar_pronto'
+  return 'pendiente'
+}
+
+const STATUS_CONFIG = {
+  programado: { dot: '⚪', label: 'Programado',  color: '#9CA3AF', bg: '#F3F4F6', border: '#E5E7EB' },
+  pendiente:  { dot: '🟢', label: 'Pendiente',   color: '#15803D', bg: '#F0FDF4', border: '#86EFAC' },
+  dar_pronto: { dot: '🟡', label: 'Dar pronto',  color: '#92400E', bg: '#FFFBEB', border: '#FDE68A' },
+  tarde:      { dot: '🔴', label: 'Tarde',       color: '#DC2626', bg: '#FEF2F2', border: '#FCA5A5' },
+  completado: { dot: '✅', label: 'Dado',        color: '#15803D', bg: '#F0FDF4', border: '#BBF7D0' },
+  dado_tarde: { dot: '⚠️', label: 'Dado tarde',  color: '#7A5A18', bg: '#FFFBEB', border: '#FDE68A' },
 }
 
 export default function Hoy() {
@@ -98,7 +110,16 @@ export default function Hoy() {
   const [adminWarningMed, setAdminWarningMed] = useState(null)
   const [weekHistory, setWeekHistory] = useState([])
 
-  // Bottom sheet for proof photo
+  // New confirmation panel (PARTE 4): shown before confirming
+  const [confirmPanel, setConfirmPanel] = useState(null) // { med }
+  const [panelUploading, setPanelUploading] = useState(false)
+  const [panelStamping, setPanelStamping] = useState(false)
+  const [panelPreview, setPanelPreview] = useState(null)
+  const [panelBlob, setPanelBlob] = useState(null)
+  const [panelGps, setPanelGps] = useState(null)
+  const [panelError, setPanelError] = useState('')
+
+  // Legacy proof sheet (post-confirm photo for existing logs without photo)
   const [proofSheet, setProofSheet] = useState(null)
   const [proofUploading, setProofUploading] = useState(false)
   const [proofStamping, setProofStamping] = useState(false)
@@ -107,10 +128,10 @@ export default function Hoy() {
   const [proofGps, setProofGps] = useState(null)
   const [uploadError, setUploadError] = useState('')
 
-  // Tick every 30 s so countdown displays stay current
+  // Tick every minute so status badges update automatically (PARTE 6)
   const [, setTick] = useState(0)
   useEffect(() => {
-    const id = setInterval(() => setTick(t => t + 1), 30_000)
+    const id = setInterval(() => setTick(t => t + 1), 60_000)
     return () => clearInterval(id)
   }, [])
 
@@ -177,40 +198,139 @@ export default function Hoy() {
     }
   }
 
-  async function confirmMed(med) {
+  // Opens the full confirmation panel (PARTE 4)
+  function openConfirmPanel(med) {
     if (isFamiliar) return
-    setConfirming(med.id)
+    setConfirmPanel({ med })
+    setPanelPreview(null)
+    setPanelBlob(null)
+    setPanelGps(null)
+    setPanelStamping(false)
+    setPanelError('')
+  }
+
+  function closeConfirmPanel() {
+    setConfirmPanel(null)
+    setPanelPreview(null)
+    setPanelBlob(null)
+    setPanelGps(null)
+    setPanelError('')
+  }
+
+  async function panelHandleFile(e) {
+    const f = e.target.files?.[0]
+    e.target.value = ''
+    if (!f) return
+    setPanelError('')
+    setPanelStamping(true)
     try {
-      const loc = await getLocation({ force: true }).catch(() => null)
+      const [stamped, loc] = await Promise.all([
+        stampProof(f, displayName),
+        getLocation({ force: true }).catch(() => null),
+      ])
+      setPanelBlob(stamped)
+      setPanelPreview(URL.createObjectURL(stamped))
+      setPanelGps(loc)
+    } catch {
+      setPanelError('No se pudo procesar la foto. Intenta de nuevo.')
+    } finally {
+      setPanelStamping(false)
+    }
+  }
+
+  function panelOpenCamera() {
+    if (panelStamping || panelUploading) return
+    const el = document.createElement('input')
+    el.type = 'file'; el.accept = 'image/*'; el.capture = 'environment'
+    el.addEventListener('change', panelHandleFile, { once: true })
+    el.click()
+  }
+
+  function panelOpenGallery() {
+    if (panelStamping || panelUploading) return
+    const el = document.createElement('input')
+    el.type = 'file'; el.accept = 'image/*'
+    el.addEventListener('change', panelHandleFile, { once: true })
+    el.click()
+  }
+
+  // Main confirm action from panel (PARTE 5)
+  async function doConfirmFromPanel() {
+    if (!confirmPanel) return
+    const med = confirmPanel.med
+    setPanelUploading(true)
+    setPanelError('')
+    try {
+      const loc = panelGps ?? await getLocation({ force: true }).catch(() => null)
       const confirmedAt = new Date().toISOString()
-      await supabase.from('medication_logs').upsert({
+
+      // Calculate timing fields (PARTE 5)
+      const scheduledTime = firstTime(med)
+      const windowMinutes = med.time_window_minutes ?? detectMedicationWindow(med.name)
+      let minutesLate = null
+      let givenOnTime = true
+      let scheduledAt = null
+
+      if (scheduledTime) {
+        const [hh, mm] = scheduledTime.split(':').map(Number)
+        const scheduledDate = new Date()
+        scheduledDate.setHours(hh, mm, 0, 0)
+        scheduledAt = scheduledDate.toISOString()
+        minutesLate = Math.round((new Date(confirmedAt) - scheduledDate) / 60000)
+        givenOnTime = minutesLate <= windowMinutes
+      }
+
+      // Upload photo if taken
+      let photoUrl = null
+      if (panelBlob) {
+        const path = `${ownerId}/${today}/${med.id}.jpg`
+        const { error: storageErr } = await supabase.storage
+          .from('confirmations')
+          .upload(path, panelBlob, { upsert: true, contentType: 'image/jpeg' })
+        if (!storageErr) {
+          const { data: { publicUrl } } = supabase.storage.from('confirmations').getPublicUrl(path)
+          photoUrl = publicUrl
+        }
+      }
+
+      // Save log (PARTE 5)
+      const logPayload = {
         medication_id: med.id,
         user_id: ownerId,
         status: 'confirmed',
         log_date: today,
         confirmed_by_name: displayName,
+        given_by_name: displayName,
         confirmed_at: confirmedAt,
+        scheduled_at: scheduledAt,
+        photo_url: photoUrl,
+        given_on_time: givenOnTime,
+        minutes_late: minutesLate,
         latitude: loc?.latitude ?? null,
         longitude: loc?.longitude ?? null,
         address: loc?.address ?? null,
-      }, { onConflict: 'medication_id,log_date,user_id' })
-      track('medication_marked_given', { medication_name: med.name, has_location: !!loc })
-      setLogs(prev => ({
-        ...prev,
-        [med.id]: {
-          status: 'confirmed',
-          confirmed_by_name: displayName,
-          confirmed_at: confirmedAt,
-          latitude: loc?.latitude ?? null,
-          longitude: loc?.longitude ?? null,
-          address: loc?.address ?? null,
-          photo_url: null,
-        },
-      }))
-      openProofSheet(med)
+      }
+
+      await supabase.from('medication_logs').upsert(logPayload, { onConflict: 'medication_id,log_date,user_id' })
+      track('medication_marked_given', { medication_name: med.name, given_on_time: givenOnTime, has_photo: !!photoUrl })
+
+      setLogs(prev => ({ ...prev, [med.id]: { ...logPayload } }))
+      closeConfirmPanel()
+
+      // Offer legacy proof sheet only if no photo was taken and within 30-min window
+      if (!photoUrl) openProofSheet(med)
+    } catch (err) {
+      console.error(err)
+      setPanelError('No se pudo registrar. Verifica tu conexión e intenta de nuevo.')
     } finally {
-      setConfirming(null)
+      setPanelUploading(false)
     }
+  }
+
+  // Legacy direct confirm (kept for unconfirm flow)
+  async function confirmMed(med) {
+    if (isFamiliar) return
+    openConfirmPanel(med)
   }
 
   async function unconfirmMed(med) {
@@ -352,7 +472,8 @@ export default function Hoy() {
   const overdueMeds = !loading
     ? medications.filter(m => {
         if (logs[m.id]?.status === 'confirmed') return false
-        return calcularEstadoMedicamento(firstTime(m)) === 'tarde'
+        const win = m.time_window_minutes ?? detectMedicationWindow(m.name)
+        return calcularEstadoMedicamento(firstTime(m), false, win) === 'tarde'
       })
     : []
 
@@ -366,17 +487,40 @@ export default function Hoy() {
         {/* Overdue meds alert */}
         {showMedOverdue && (
           <div style={{
-            background: '#FEF2F2', border: '1px solid #FCA5A5',
-            borderRadius: 14, padding: '10px 16px', marginBottom: 14,
-            display: 'flex', alignItems: 'flex-start', gap: 8,
+            background: '#FEF2F2', border: '1.5px solid #FCA5A5',
+            borderRadius: 14, padding: '12px 16px', marginBottom: 14,
           }}>
-            <span style={{ fontSize: 16, flexShrink: 0, marginTop: 1 }}>⚠️</span>
-            <p style={{ fontSize: 13, fontWeight: 700, color: '#DC2626', margin: 0, lineHeight: 1.5 }}>
-              {overdueMeds.length} sin dar · {overdueMeds.slice(0, 2).map(m => {
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 8 }}>
+              <span style={{ fontSize: 16, flexShrink: 0, marginTop: 1 }}>⚠️</span>
+              <p style={{ fontSize: 13, fontWeight: 700, color: '#DC2626', margin: 0, lineHeight: 1.5 }}>
+                {overdueMeds.length} medicamento{overdueMeds.length !== 1 ? 's' : ''} — venció la ventana
+              </p>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {overdueMeds.map(m => {
                 const t = firstTime(m)
-                return t ? `${m.name} ${fmtMedTime(t)}` : m.name
-              }).join(' · ')}{overdueMeds.length > 2 ? ` · +${overdueMeds.length - 2} más` : ''}
-            </p>
+                const win = m.time_window_minutes ?? detectMedicationWindow(m.name)
+                return (
+                  <button
+                    key={m.id}
+                    onClick={() => openConfirmPanel(m)}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 10,
+                      background: '#FFF5F5', border: '1px solid #FCA5A5',
+                      borderRadius: 10, padding: '8px 12px',
+                      cursor: 'pointer', width: '100%', textAlign: 'left',
+                    }}
+                  >
+                    <span style={{ fontSize: 13, fontWeight: 700, color: '#DC2626', flex: 1 }}>
+                      💊 {m.name}{t ? ` · ${fmtMedTime(t)}` : ''} · ventana {win} min
+                    </span>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: '#DC2626', background: '#FEE2E2', padding: '2px 8px', borderRadius: 6, flexShrink: 0 }}>
+                      Dar ahora →
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
           </div>
         )}
 
@@ -568,7 +712,12 @@ export default function Hoy() {
                         const proofExpired = isConfirmed && !hasPhoto && log?.confirmed_at &&
                           (Date.now() - new Date(log.confirmed_at).getTime()) >= 30 * 60 * 1000
 
-                        const timingStatus = calcularEstadoMedicamento(med._firstTime, isConfirmed)
+                        // Use the medication's own window (PARTE 6)
+                        const windowMinutes = med.time_window_minutes ?? detectMedicationWindow(med.name)
+                        const timingStatus = calcularEstadoMedicamento(
+                          med._firstTime, isConfirmed, windowMinutes, log?.given_on_time
+                        )
+                        const statusCfg = STATUS_CONFIG[timingStatus] ?? STATUS_CONFIG.pendiente
                         const isEarly = timingStatus === 'programado'
                         const earlyLabel = (() => {
                           if (!isEarly || !med._firstTime) return null
@@ -593,15 +742,16 @@ export default function Hoy() {
                             <button
                               onClick={() => {
                                 if (isFamiliar) return
-                                if (isEarly) return
-                                if (!isConfirmed && isAdmin) { setAdminWarningMed(med); return }
-                                isConfirmed ? unconfirmMed(med) : confirmMed(med)
+                                if (isConfirmed) { unconfirmMed(med); return }
+                                // REGLA DE ORO: SIEMPRE abre el panel, nunca deshabilitar
+                                if (isAdmin) { setAdminWarningMed(med); return }
+                                openConfirmPanel(med)
                               }}
-                              disabled={isWorking || isEarly || isFamiliar}
+                              disabled={isWorking || isFamiliar}
                               style={{
-                                width: 28, height: 28, borderRadius: 8, flexShrink: 0,
-                                border: `2px solid ${isConfirmed ? '#22C55E' : isFamiliar ? '#E5E7EB' : '#D1D5DB'}`,
-                                background: isConfirmed ? '#22C55E' : isFamiliar ? '#F9FAFB' : 'white',
+                                width: 32, height: 32, borderRadius: 10, flexShrink: 0,
+                                border: `2px solid ${isConfirmed ? '#22C55E' : statusCfg.border}`,
+                                background: isConfirmed ? '#22C55E' : statusCfg.bg,
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                                 cursor: isWorking || isFamiliar ? 'not-allowed' : 'pointer',
                                 transition: 'all 0.2s',
@@ -615,6 +765,9 @@ export default function Hoy() {
                                   border: '2px solid #D1D5DB', borderTopColor: '#4A7C59',
                                   animation: 'spin 0.6s linear infinite',
                                 }} />
+                              )}
+                              {!isConfirmed && !isWorking && (
+                                <span style={{ fontSize: 12, lineHeight: 1 }}>{statusCfg.dot}</span>
                               )}
                             </button>
 
@@ -690,22 +843,16 @@ export default function Hoy() {
                               </div>
                             )}
 
-                            {!isConfirmed && isEarly && earlyLabel && (
+                            {!isConfirmed && (
                               <span style={{
-                                fontSize: 10, fontWeight: 700, color: '#6B7280',
-                                background: '#F3F4F6', padding: '3px 8px', borderRadius: 6,
+                                fontSize: 10, fontWeight: 700,
+                                color: statusCfg.color,
+                                background: statusCfg.bg,
+                                border: `1px solid ${statusCfg.border}`,
+                                padding: '3px 8px', borderRadius: 6,
                                 whiteSpace: 'nowrap',
                               }}>
-                                🕐 {earlyLabel}
-                              </span>
-                            )}
-                            {!isConfirmed && timingStatus === 'tarde' && (
-                              <span style={{
-                                fontSize: 10, fontWeight: 700, color: '#A07020',
-                                background: '#FFFBEB', padding: '3px 8px', borderRadius: 6,
-                                whiteSpace: 'nowrap',
-                              }}>
-                                ⚠ Tarde
+                                {isEarly && earlyLabel ? `🕐 ${earlyLabel}` : `${statusCfg.dot} ${statusCfg.label}`}
                               </span>
                             )}
 
@@ -823,6 +970,142 @@ export default function Hoy() {
         </div>
       )}
 
+      {/* ── Confirmation Panel (PARTE 4) ──────────────────────────── */}
+      {confirmPanel && (() => {
+        const med = confirmPanel.med
+        const windowMinutes = med.time_window_minutes ?? detectMedicationWindow(med.name)
+        const schedTime = firstTime(med)
+        const status = calcularEstadoMedicamento(schedTime, false, windowMinutes)
+        const statusCfg = STATUS_CONFIG[status] ?? STATUS_CONFIG.pendiente
+        const now = new Date()
+        const nowStr = now.toLocaleTimeString('es-US', { hour: 'numeric', minute: '2-digit', hour12: true })
+        const patientFirstName = profile?.name?.split(' ')[0] ?? 'el paciente'
+
+        return (
+          <div
+            style={{ position: 'fixed', inset: 0, zIndex: 250, background: 'rgba(0,0,0,0.65)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
+            onClick={e => { if (e.target === e.currentTarget && !panelUploading) closeConfirmPanel() }}
+          >
+            <div style={{ width: '100%', maxWidth: 480, background: 'white', borderRadius: '24px 24px 0 0', padding: '24px 20px 96px', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 -8px 48px rgba(0,0,0,0.25)' }}>
+
+              {/* Header */}
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 16 }}>
+                <div>
+                  <p style={{ fontFamily: 'Georgia, serif', fontSize: 20, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>
+                    💊 {med.name}
+                  </p>
+                  {med.dosage && <p style={{ fontSize: 13, color: '#6B7280', margin: '3px 0 0' }}>{med.dosage}</p>}
+                </div>
+                <button onClick={closeConfirmPanel} disabled={panelUploading} style={{ padding: 8, borderRadius: 10, background: '#F3F4F6', border: 'none', cursor: 'pointer', flexShrink: 0 }}>
+                  <XIcon size={16} color="#6B7280" strokeWidth={2} />
+                </button>
+              </div>
+
+              {/* Status pill */}
+              <div style={{
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                padding: '8px 16px', borderRadius: 20,
+                background: statusCfg.bg, border: `1.5px solid ${statusCfg.border}`,
+                marginBottom: 16,
+              }}>
+                <span style={{ fontSize: 16 }}>{statusCfg.dot}</span>
+                <span style={{ fontSize: 14, fontWeight: 700, color: statusCfg.color }}>{statusCfg.label}</span>
+                {schedTime && (
+                  <span style={{ fontSize: 12, color: statusCfg.color, opacity: 0.75 }}>
+                    · programado {fmtMedTime(schedTime)} · ventana {windowMinutes} min
+                  </span>
+                )}
+              </div>
+
+              {/* Time info */}
+              <div style={{ background: '#F9F5F1', borderRadius: 14, padding: '12px 14px', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span style={{ fontSize: 20 }}>🕐</span>
+                <div>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', margin: 0 }}>Hora actual: {nowStr}</p>
+                  <p style={{ fontSize: 12, color: '#6B7280', margin: '2px 0 0' }}>
+                    ¿Ya le diste {med.name} a {patientFirstName}?
+                  </p>
+                </div>
+              </div>
+
+              {/* Photo section */}
+              <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#6B7280', margin: '0 0 10px' }}>
+                📷 Foto de evidencia
+              </p>
+              <div style={{ border: '2px dashed #EDE5D8', borderRadius: 16, overflow: 'hidden', marginBottom: 12, background: panelPreview ? 'transparent' : '#FDFAF7' }}>
+                {panelStamping ? (
+                  <div style={{ padding: '32px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+                    <div style={{ width: 24, height: 24, borderRadius: '50%', border: '3px solid #EDE5D8', borderTopColor: '#4A7C59', animation: 'spin 0.8s linear infinite' }} />
+                    <p style={{ fontSize: 12, color: '#9CA3AF', margin: 0 }}>Aplicando sello...</p>
+                  </div>
+                ) : panelPreview ? (
+                  <>
+                    <img src={panelPreview} alt="Evidencia" style={{ width: '100%', maxHeight: 200, objectFit: 'cover' }} />
+                    <div style={{ padding: '8px 12px', background: '#F0FDF4', display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <span style={{ fontSize: 12 }}>🔒</span>
+                      <p style={{ fontSize: 11, fontWeight: 700, color: '#15803D', margin: 0, flex: 1 }}>Sello aplicado</p>
+                      <div style={{ display: 'flex', gap: 6 }}>
+                        <button type="button" onClick={panelOpenCamera} disabled={panelUploading} style={{ padding: '5px 10px', borderRadius: 8, border: '1px solid #4A7C59', background: '#EBF3EE', color: '#4A7C59', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>📷</button>
+                        <button type="button" onClick={panelOpenGallery} disabled={panelUploading} style={{ padding: '5px 10px', borderRadius: 8, border: '1px solid #C0CCC5', background: '#FDFAF7', color: '#6B7280', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}>🖼</button>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div style={{ padding: '20px 16px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+                    <span style={{ fontSize: 32 }}>📷</span>
+                    <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0, textAlign: 'center' }}>
+                      Se recomienda foto como evidencia · sellado automático con hora y nombre
+                    </p>
+                    <div style={{ display: 'flex', gap: 8, width: '100%' }}>
+                      <button type="button" onClick={panelOpenCamera} style={{ flex: 1, padding: '10px 0', borderRadius: 12, border: '1.5px solid #4A7C59', background: '#EBF3EE', color: '#4A7C59', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>📷 Tomar foto</button>
+                      <button type="button" onClick={panelOpenGallery} style={{ flex: 1, padding: '10px 0', borderRadius: 12, border: '1.5px solid #C0CCC5', background: '#FDFAF7', color: '#6B7280', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>🖼 Galería</button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {!panelBlob && (
+                <p style={{ fontSize: 11, color: '#9CA3AF', textAlign: 'center', marginBottom: 12 }}>
+                  La foto no es obligatoria — puedes confirmar sin ella
+                </p>
+              )}
+
+              {panelError && (
+                <div style={{ background: '#FFF0F0', border: '1px solid #FFBABA', borderRadius: 10, padding: '10px 12px', marginBottom: 12, display: 'flex', gap: 8 }}>
+                  <span>⚠️</span>
+                  <p style={{ fontSize: 12, color: '#D63031', margin: 0 }}>{panelError}</p>
+                </div>
+              )}
+
+              {/* Confirm button — SIEMPRE habilitado (REGLA DE ORO) */}
+              <button
+                onClick={doConfirmFromPanel}
+                disabled={panelUploading || panelStamping}
+                style={{
+                  width: '100%', padding: '16px', borderRadius: 16, border: 'none',
+                  background: 'linear-gradient(135deg, #22C55E, #16A34A)',
+                  color: 'white', fontWeight: 800, fontSize: 16,
+                  cursor: (panelUploading || panelStamping) ? 'not-allowed' : 'pointer',
+                  opacity: (panelUploading || panelStamping) ? 0.75 : 1,
+                  boxShadow: '0 6px 20px rgba(34,197,94,0.4)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                  marginBottom: 10,
+                }}
+              >
+                {panelUploading ? (
+                  <><div style={{ width: 18, height: 18, borderRadius: '50%', border: '2.5px solid rgba(255,255,255,0.4)', borderTopColor: 'white', animation: 'spin 0.7s linear infinite' }} /> Guardando...</>
+                ) : (
+                  <>✅ Confirmar que se dio</>
+                )}
+              </button>
+              <button onClick={closeConfirmPanel} style={{ width: '100%', padding: '12px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: '#9CA3AF' }}>
+                Cancelar
+              </button>
+            </div>
+          </div>
+        )
+      })()}
+
       {/* Admin emergency confirmation dialog */}
       {adminWarningMed && (
         <div
@@ -848,7 +1131,7 @@ export default function Hoy() {
                 Cancelar
               </button>
               <button
-                onClick={() => { const m = adminWarningMed; setAdminWarningMed(null); confirmMed(m) }}
+                onClick={() => { const m = adminWarningMed; setAdminWarningMed(null); openConfirmPanel(m) }}
                 style={{ flex: 1, padding: '12px', borderRadius: 12, border: 'none', background: '#C9882A', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer', boxShadow: '0 4px 16px rgba(201,136,42,0.3)' }}
               >
                 Confirmar

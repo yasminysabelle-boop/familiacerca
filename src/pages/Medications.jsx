@@ -14,6 +14,7 @@ import { SkeletonMedCard } from '../components/SkeletonLoader'
 import EmptyState from '../components/EmptyState'
 import LoadingButton from '../components/LoadingButton'
 import { usePullToRefresh } from '../hooks/usePullToRefresh'
+import { detectMedicationWindow, getMiloSuggestion, WINDOW_OPTIONS } from '../utils/medicationDatabase'
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -79,7 +80,7 @@ function daysFromNow(dateStr) {
 
 // ── Styles ────────────────────────────────────────────────────────────────────
 
-const emptyForm  = { name: '', dosage: '', frequency: '', notes: '' }
+const emptyForm  = { name: '', dosage: '', frequency: '', notes: '', timeWindowMinutes: 60 }
 const emptyStock = { totalPills: '', renewalMethod: '', pharmacyName: '', refillsRemaining: '', lastMailDate: '' }
 
 const fieldStyle = {
@@ -125,6 +126,7 @@ export default function Medications() {
   const [logsByMedId,  setLogsByMedId]  = useState({})
   const [expandedMedHistorial, setExpandedMedHistorial] = useState(new Set())
   const [expandedHistorialDays, setExpandedHistorialDays] = useState(new Set())
+  const [miloSuggestion, setMiloSuggestion] = useState(null)
 
   // ── Form / add-flow state ──────────────────────────────────────────────────
   const [showForm,    setShowForm]    = useState(false)
@@ -251,7 +253,7 @@ export default function Medications() {
   }
 
   function openEdit(med) {
-    setForm({ name: med.name, dosage: med.dosage ?? '', frequency: med.frequency ?? '', notes: med.notes ?? '' })
+    setForm({ name: med.name, dosage: med.dosage ?? '', frequency: med.frequency ?? '', notes: med.notes ?? '', timeWindowMinutes: med.time_window_minutes ?? 60 })
     const opt = FREQ_OPTIONS.find(o => o.value === med.frequency)
     if (med.scheduled_times?.length) {
       setScheduledTimes(opt?.interval ? [med.scheduled_times[0]] : med.scheduled_times)
@@ -371,6 +373,7 @@ Return ONLY valid JSON.`
       name: form.name, dosage: form.dosage || null,
       frequency: form.frequency || null, notes: form.notes || null,
       scheduled_times, user_id: ownerId,
+      time_window_minutes: form.timeWindowMinutes ?? 60,
     }
     let savedId = editId, error
     if (editId) {
@@ -866,7 +869,74 @@ Return ONLY valid JSON.`
                 {/* Medication fields */}
                 <div>
                   <label style={labelStyle}>Nombre del medicamento *</label>
-                  <input name="med_name" required value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} placeholder="ej. Metformina" autoComplete="off" style={fieldStyle} onFocus={onFocus} onBlur={onBlur} />
+                  <input
+                    name="med_name" required value={form.name}
+                    onChange={e => {
+                      const name = e.target.value
+                      setForm(p => ({ ...p, name }))
+                      const detected = detectMedicationWindow(name)
+                      setForm(p => ({ ...p, name, timeWindowMinutes: detected }))
+                      setMiloSuggestion(getMiloSuggestion(name, detected))
+                    }}
+                    placeholder="ej. Metformina" autoComplete="off"
+                    style={fieldStyle} onFocus={onFocus} onBlur={onBlur}
+                  />
+                </div>
+
+                {/* Milo suggestion */}
+                {miloSuggestion && (
+                  <div style={{
+                    background: '#FFFBEB', border: '1.5px solid #F59E0B',
+                    borderRadius: 14, padding: '12px 14px',
+                    display: 'flex', flexDirection: 'column', gap: 10,
+                  }}>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <span style={{ fontSize: 20, flexShrink: 0 }}>💊</span>
+                      <p style={{ fontSize: 13, color: '#7A5A18', margin: 0, lineHeight: 1.5 }}>
+                        {miloSuggestion}
+                      </p>
+                    </div>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <button type="button"
+                        onClick={() => { setForm(p => ({ ...p, timeWindowMinutes: 30 })); setMiloSuggestion(null) }}
+                        style={{ flex: 1, padding: '8px', borderRadius: 10, border: 'none', background: '#F59E0B', color: 'white', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}
+                      >
+                        Sí, usar 30 min
+                      </button>
+                      <button type="button"
+                        onClick={() => setMiloSuggestion(null)}
+                        style={{ flex: 1, padding: '8px', borderRadius: 10, border: '1px solid #EDE5D8', background: 'white', color: '#6B7280', fontWeight: 600, fontSize: 12, cursor: 'pointer' }}
+                      >
+                        No, mantener 1 hora
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Ventana de tiempo */}
+                <div>
+                  <label style={labelStyle}>Ventana de tiempo para dar</label>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    {WINDOW_OPTIONS.map(opt => (
+                      <button
+                        key={opt.minutes}
+                        type="button"
+                        onClick={() => setForm(p => ({ ...p, timeWindowMinutes: opt.minutes }))}
+                        style={{
+                          flex: 1, padding: '10px 6px', borderRadius: 12,
+                          border: `1.5px solid ${form.timeWindowMinutes === opt.minutes ? '#4A7C59' : '#EDE5D8'}`,
+                          background: form.timeWindowMinutes === opt.minutes ? '#EBF3EE' : 'white',
+                          color: form.timeWindowMinutes === opt.minutes ? '#2D4A1E' : '#6B7280',
+                          fontWeight: form.timeWindowMinutes === opt.minutes ? 700 : 400,
+                          fontSize: 12, cursor: 'pointer', transition: 'all 0.15s',
+                          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
+                        }}
+                      >
+                        <span style={{ fontSize: 13, fontWeight: 700 }}>{opt.label}</span>
+                        <span style={{ fontSize: 10, opacity: 0.7 }}>{opt.desc}</span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 <div>
