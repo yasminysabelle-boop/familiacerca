@@ -3,7 +3,7 @@
 // Replaced at build time by vite.config.js → stampSwVersion plugin.
 // Every deploy gets a unique hash → browser detects change → installs new SW
 // → clears old caches → sends SW_UPDATED → main.jsx reloads the page.
-const CACHE_VER = 'familiacerca-BUILD'
+const CACHE_VER = 'familiacerca-v2-BUILD'
 
 // Static assets whose URLs are stable (not content-hashed by Vite)
 const PRECACHE = [
