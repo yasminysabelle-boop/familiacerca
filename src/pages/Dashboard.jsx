@@ -3153,8 +3153,11 @@ export default function Dashboard() {
           <DashCard Icon={User}           title={`Perfil de ${profile?.name?.split(' ')[0] ?? 'paciente'}`} subtitle="Diagnósticos y alergias"                                          status="Ver perfil"     statusType="info"                to="/paciente/perfil" />
           <DashCard Icon={Users}          title="Equipo de cuidado"   subtitle="Cuidadores y familiares"                                                                                 status="Ver equipo"     statusType="info"                to="/familia" />
 
-          {/* Fila 5: Notas Médicas IA | Videollamada */}
-          <DashCard Icon={BookOpen} title="Notas Médicas IA"  subtitle="Historia clínica con IA"    status="Ver notas"  statusType="info" to="/diario-medico" />
+          {/* Fila 5: Notas Médicas IA | Incidentes */}
+          <DashCard Icon={BookOpen}       title="Notas Médicas IA"  subtitle="Historia clínica con IA"    status="Ver notas"       statusType="info"   to="/diario-medico" />
+          <DashCard Icon={AlertTriangle}  title="Incidentes"        subtitle="Caídas y eventos importantes" status="Ver incidentes" statusType="urgent" to="/incidentes" />
+
+          {/* Fila 6: Videollamada */}
           <VideoCallDashCard
             onInstant={handleInstantCall}
             onSchedule={() => setShowVideoCallModal(true)}

@@ -37,6 +37,7 @@ const PAGE_TITLES = {
   '/paciente/perfil': 'Perfil del paciente',
   '/videollamada':   'Videollamada',
   '/registros':      'Registro diario',
+  '/incidentes':     'Incidentes',
 }
 
 const PRIMARY_PAGES = new Set(['/dashboard', '/familia', '/ajustes', '/planes', '/pricing'])

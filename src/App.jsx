@@ -40,6 +40,7 @@ import VideoCall from './pages/VideoCall'
 import Admin from './pages/Admin'
 import DiarioMedico from './pages/DiarioMedico'
 import CareRecord from './pages/CareRecord'
+import Incidents from './pages/Incidents'
 
 const P = ({ children }) => <ProtectedRoute>{children}</ProtectedRoute>
 
@@ -128,6 +129,7 @@ function AppShell() {
         <Route path="/admin"              element={<P><Admin /></P>} />
         <Route path="/diario-medico"      element={<P><DiarioMedico /></P>} />
         <Route path="/registros"          element={<P><CareRecord /></P>} />
+        <Route path="/incidentes"         element={<P><Incidents /></P>} />
         <Route path="/terminos"    element={<TermsOfService />} />
         <Route path="/privacidad"  element={<PrivacyPolicy />} />
         <Route path="*"            element={<Navigate to="/login" replace />} />

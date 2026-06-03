@@ -6,7 +6,7 @@ import { useSubscription } from '../contexts/SubscriptionContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import {
-  BookOpen, ClipboardCheck,
+  BookOpen, ClipboardCheck, AlertTriangle,
   Image, Mic,
   BarChart, User,
   Shield, Star,
@@ -18,7 +18,8 @@ const MORE_SECTIONS = [
     label: 'Gestión del cuidado',
     items: [
       { to: '/diario-medico', Icon: BookOpen,       label: 'Notas Médicas IA',   desc: 'Historia clínica con IA — voz y foto',         color: '#2D4A1E' },
-      { to: '/registros',    Icon: ClipboardCheck, label: 'Registro diario',    desc: 'Ánimo, comida, sueño, hidratación y evacuación', color: '#4A7C59' },
+      { to: '/registros',    Icon: ClipboardCheck,  label: 'Registro diario',    desc: 'Ánimo, comida, sueño, hidratación y evacuación', color: '#4A7C59' },
+      { to: '/incidentes',   Icon: AlertTriangle,   label: 'Incidentes',          desc: 'Caídas, fiebre y eventos importantes',            color: '#DC2626' },
     ],
   },
   {
