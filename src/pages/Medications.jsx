@@ -654,17 +654,10 @@ Return ONLY valid JSON.`
   return (
     <Layout>
       {showPaywall && <PaywallModal onClose={() => setShowPaywall(false)} patientName={profile?.name?.split(' ')[0]} />}
-      <div
-        ref={pullRef}
-        onTouchStart={pullStart}
-        onTouchMove={pullMove}
-        onTouchEnd={pullEnd}
-        style={{ padding: '16px 16px 0', maxWidth: 600, overflowY: 'auto' }}
-      >
-        <PullIndicator />
 
-        {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+      {/* Header — fuera del scroll */}
+      <div style={{ padding: '16px 16px 0', maxWidth: 600 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
           <div>
             <h2 style={{ fontFamily: 'Georgia, serif', fontSize: 20, fontWeight: 700, color: '#1A1A1A', marginBottom: 2 }}>
               Medicamentos
@@ -686,9 +679,11 @@ Return ONLY valid JSON.`
             </button>
           )}
         </div>
+      </div>
 
-        {/* ── Tab bar ─────────────────────────────────────────────────────── */}
-        <div style={{ display: 'flex', background: '#f5f5f5', borderRadius: '8px 8px 0 0', marginBottom: 0, overflow: 'hidden' }}>
+      {/* Tab bar — fuera del scroll, siempre visible */}
+      <div style={{ padding: '0 16px', maxWidth: 600 }}>
+        <div style={{ display: 'flex', background: '#f5f5f5', borderRadius: '8px 8px 0 0', overflow: 'hidden' }}>
           {['hoy', 'todos', 'stock'].map(tab => (
             <button key={tab} onClick={() => setActiveTab(tab)}
               style={{
@@ -706,6 +701,17 @@ Return ONLY valid JSON.`
             </button>
           ))}
         </div>
+      </div>
+
+      {/* Contenido scrolleable */}
+      <div
+        ref={pullRef}
+        onTouchStart={pullStart}
+        onTouchMove={pullMove}
+        onTouchEnd={pullEnd}
+        style={{ padding: '0 16px', maxWidth: 600 }}
+      >
+        <PullIndicator />
 
         {activeTab === 'hoy' && (<>
 
