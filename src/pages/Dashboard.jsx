@@ -3088,7 +3088,7 @@ export default function Dashboard() {
         <div style={{ display: loading ? 'none' : 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', padding: '0 16px', marginBottom: 24 }}>
 
           {/* Fila 1: Medicamentos | Rutinas de hoy */}
-          <DashCard Icon={Pill}           title="Medicamentos"       subtitle={medCardSubtitle}                                                                                         status={medCardStatus}  statusType={medCardStatusType}  to="/hoy" />
+          <DashCard Icon={Pill}           title="Medicamentos"       subtitle={medCardSubtitle}                                                                                         status={medCardStatus}  statusType={medCardStatusType}  to="/medications" />
           <DashCard Icon={ClipboardCheck} title="Rutinas de hoy"     subtitle={medTotal > 0 ? `${medTotal} med${medTotal !== 1 ? 's' : ''} programados` : 'Rutina diaria'}              status={careStatus}     statusType={careStatusType}     to="/cuidado" />
 
           {/* Fila 2: Registros de cuidado | Mensajes */}
