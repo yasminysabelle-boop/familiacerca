@@ -2863,15 +2863,21 @@ export default function Dashboard() {
               : isYellow && nextPendingMed
                 ? `${pendingCount} dosis por dar${nextPendingMed.medTime ? ` · Próxima: ${fmtTime(nextPendingMed.medTime)}` : ''}`
                 : null
+            const dest = isRed ? '/medications' : isYellow ? '/cuidado' : null
             return (
-              <div style={{
-                marginTop: 12,
-                background: 'rgba(255,255,255,0.95)',
-                borderRadius: 12,
-                borderLeft: `4px solid ${color}`,
-                padding: '10px 14px',
-                display: 'flex', alignItems: 'center', gap: 10,
-              }}>
+              <div
+                onClick={dest ? () => navigate(dest) : undefined}
+                style={{
+                  marginTop: 12,
+                  background: 'rgba(255,255,255,0.95)',
+                  borderRadius: 12,
+                  borderLeft: `4px solid ${color}`,
+                  padding: '10px 14px',
+                  display: 'flex', alignItems: 'center', gap: 10,
+                  cursor: dest ? 'pointer' : 'default',
+                  WebkitTapHighlightColor: 'transparent',
+                }}
+              >
                 <span style={{ fontSize: 16, flexShrink: 0 }}>{emoji}</span>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <p style={{ fontSize: 13, fontWeight: 700, color, margin: 0, lineHeight: 1.3 }}>{text}</p>
@@ -2881,6 +2887,9 @@ export default function Dashboard() {
                     </p>
                   )}
                 </div>
+                {dest && (
+                  <span style={{ fontSize: 11, fontWeight: 700, color, flexShrink: 0, opacity: 0.8 }}>Ver detalle →</span>
+                )}
               </div>
             )
           })()}
