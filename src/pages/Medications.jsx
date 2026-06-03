@@ -169,6 +169,20 @@ export default function Medications() {
     return () => clearInterval(id)
   }, [])
 
+  // Auto-reset at midnight PR: detect date change while PWA is open
+  useEffect(() => {
+    if (!ownerId) return
+    const lastDate = { current: new Date().toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' }) }
+    const id = setInterval(() => {
+      const nowDate = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' })
+      if (nowDate !== lastDate.current) {
+        lastDate.current = nowDate
+        fetchAll()
+      }
+    }, 60_000)
+    return () => clearInterval(id)
+  }, [ownerId])
+
   // ── Form / add-flow state ──────────────────────────────────────────────────
   const [showForm,    setShowForm]    = useState(false)
   const [addStep,     setAddStep]     = useState(null)

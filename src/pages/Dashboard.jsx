@@ -1715,6 +1715,7 @@ export default function Dashboard() {
   const { containerRef: pullRef, onTouchStart: pullStart, onTouchMove: pullMove, onTouchEnd: pullEnd, PullIndicator } = usePullToRefresh(fetchTimeline)
   const [expandedAudio, setExpandedAudio] = useState(null)
   const [medTotal, setMedTotal] = useState(0)
+  const [medsList, setMedsList]  = useState([])
   const [showSOS, setShowSOS] = useState(false)
   const [sosSent, setSosSent] = useState(false)
   const [sosConfirming, setSosConfirming] = useState(false)
@@ -2040,6 +2041,7 @@ export default function Dashboard() {
     ])
 
     setMedTotal((meds ?? []).length)
+    setMedsList(meds ?? [])
 
     const todayLogMap = {}
     ;(todayLogs ?? []).forEach(l => { todayLogMap[l.medication_id] = l })
@@ -2535,22 +2537,47 @@ export default function Dashboard() {
   }
 
   // Medicamentos card status
+  const _isRetrasado = nextPendingMed?.medStatus === 'tarde'
+  const _retrasadoMins = _isRetrasado && nextPendingMed.medTime ? (() => {
+    const [h, m] = nextPendingMed.medTime.split(':').map(Number)
+    const now = new Date()
+    return Math.round((now.getHours() * 60 + now.getMinutes()) - (h * 60 + m))
+  })() : null
+  const _retrasadoLabel = _retrasadoMins != null
+    ? (_retrasadoMins >= 60 ? `${Math.floor(_retrasadoMins/60)}h ${_retrasadoMins % 60}min` : `${_retrasadoMins} min`)
+    : null
+  const _tomorrowFirst = (() => {
+    const times = (medsList ?? [])
+      .filter(m => m.frequency !== 'as_needed')
+      .flatMap(m => m.scheduled_times?.length ? m.scheduled_times : m.time ? [m.time] : [])
+      .sort()
+    return times[0] ?? null
+  })()
+
   let medCardStatus, medCardStatusType, medCardSubtitle
   if (nextPendingMed) {
-    medCardStatus = nextPendingMed.medTime ? `A las ${fmtTime(nextPendingMed.medTime)}` : 'Pendiente hoy'
-    medCardStatusType = 'warning'
-    medCardSubtitle = `${pendingCount} medicamento${pendingCount !== 1 ? 's' : ''} por dar`
+    if (_isRetrasado) {
+      medCardStatus = '⚠️ Retrasado'
+      medCardStatusType = 'urgent'
+      medCardSubtitle = `${nextPendingMed.medName}${_retrasadoLabel ? ` · hace ${_retrasadoLabel}` : ''}`
+    } else {
+      medCardStatus = `${pendingCount} pendiente${pendingCount !== 1 ? 's' : ''}`
+      medCardStatusType = 'warning'
+      medCardSubtitle = nextPendingMed.medTime
+        ? `Próxima: ${nextPendingMed.medName} · ${fmtTime(nextPendingMed.medTime)}`
+        : `${pendingCount} dosis por dar hoy`
+    }
   } else if (confirmedTodayCount > 0) {
-    medCardStatus = 'Todo dado hoy'
+    medCardStatus = 'Todo dado ✅'
     medCardStatusType = 'ok'
-    medCardSubtitle = `${confirmedTodayCount} dosis confirmada${confirmedTodayCount !== 1 ? 's' : ''}`
+    medCardSubtitle = `${confirmedTodayCount} de ${medTotal} dosis completadas${_tomorrowFirst ? ` · Mañana: ${fmtTime(_tomorrowFirst)}` : ''}`
   } else {
-    medCardStatus = 'Sin pendientes'
+    medCardStatus = medTotal > 0 ? 'Sin dosis aún' : 'Sin meds'
     medCardStatusType = 'info'
-    medCardSubtitle = medTotal > 0 ? 'Aún no hay dosis' : 'Sin meds configurados'
+    medCardSubtitle = medTotal > 0 ? 'Aún es temprano' : 'Sin medicamentos'
   }
 
-  const medsPulsing = !loading && nextPendingMed?.medStatus === 'tarde'
+  const medsPulsing = !loading && _isRetrasado
   const carePulsing = !loading && careStatusType === 'urgent'
 
   const detailSubtitle = loading
@@ -2903,12 +2930,14 @@ export default function Dashboard() {
               style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0', cursor: 'pointer', borderBottom: '1px solid #F5EEE6' }}
             >
               <span style={{ fontSize: 18, flexShrink: 0 }}>💊</span>
-              <p style={{ flex: 1, fontSize: 13, color: '#374151', margin: 0 }}>
+              <p style={{ flex: 1, fontSize: 13, color: _isRetrasado ? '#DC2626' : '#374151', margin: 0, fontWeight: _isRetrasado ? 600 : 400 }}>
                 {medTotal === 0
                   ? 'Sin medicamentos configurados'
-                  : pendingCount === 0 && confirmedTodayCount >= medTotal
-                    ? `${confirmedTodayCount} de ${medTotal} medicamentos dados ✅`
-                    : `${pendingCount} medicamento${pendingCount !== 1 ? 's' : ''} pendiente${pendingCount !== 1 ? 's' : ''}`}
+                  : _isRetrasado && nextPendingMed
+                    ? `⚠️ ${nextPendingMed.medName} debía darse hace ${_retrasadoLabel ?? '?'}`
+                    : pendingCount === 0 && confirmedTodayCount >= medTotal
+                      ? `💊 ${confirmedTodayCount} de ${medTotal} dosis completadas hoy ✅`
+                      : `💊 ${pendingCount} dosis pendientes${nextPendingMed?.medTime ? ` · Próxima: ${nextPendingMed.medName} ${fmtTime(nextPendingMed.medTime)}` : ''}`}
               </p>
               <span style={{ fontSize: 14, color: '#D4C0B0', flexShrink: 0 }}>›</span>
             </div>
