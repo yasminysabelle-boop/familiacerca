@@ -3,7 +3,7 @@
 // Replaced at build time by vite.config.js → stampSwVersion plugin.
 // Every deploy gets a unique hash → browser detects change → installs new SW
 // → clears old caches → sends SW_UPDATED → main.jsx reloads the page.
-const CACHE_VER = 'familiacerca-v3-BUILD'
+const CACHE_VER = 'familiacerca-v4-BUILD'
 
 // Static assets whose URLs are stable (not content-hashed by Vite)
 const PRECACHE = [
@@ -114,6 +114,11 @@ self.addEventListener('fetch', event => {
       })
     )
   )
+})
+
+// ── Message handler (allows page to trigger skipWaiting) ─────────
+self.addEventListener('message', event => {
+  if (event.data?.type === 'SKIP_WAITING') self.skipWaiting()
 })
 
 // ── Push notifications ────────────────────────────────────────────

@@ -20,13 +20,15 @@ if ('serviceWorker' in navigator) {
       // Without this the browser only checks once every 24 h.
       reg.update().catch(() => {})
 
-      // Primary path: listen for the new SW moving through install → activate
+      // Primary path: new SW found → tell it to skip waiting immediately
       reg.addEventListener('updatefound', () => {
         const sw = reg.installing
         if (!sw) return
         sw.addEventListener('statechange', () => {
-          // Only reload after full activation AND when a previous SW was in
-          // control (skip on first-ever install to avoid spurious reloads)
+          if (sw.state === 'installed') {
+            // Tell the waiting SW to activate immediately
+            sw.postMessage({ type: 'SKIP_WAITING' })
+          }
           if (sw.state === 'activated' && navigator.serviceWorker.controller) {
             reloadOnce()
           }
