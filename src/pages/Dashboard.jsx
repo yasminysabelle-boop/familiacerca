@@ -2851,6 +2851,40 @@ export default function Dashboard() {
             </button>
           )}
 
+          {/* Global status indicator */}
+          {(() => {
+            const isRed    = pendingCount > 0 && _isRetrasado
+            const isYellow = pendingCount > 0 && !_isRetrasado
+            const color  = isRed ? '#DC2626' : isYellow ? '#D97706' : '#2D4A1E'
+            const emoji  = isRed ? '🔴' : isYellow ? '🟡' : '🟢'
+            const text   = isRed ? 'Atención requerida' : isYellow ? 'Pendientes' : 'Todo al día'
+            const detail = isRed && nextPendingMed
+              ? `${nextPendingMed.medName}${_retrasadoLabel ? ` · hace ${_retrasadoLabel}` : ''}`
+              : isYellow && nextPendingMed
+                ? `${pendingCount} dosis por dar${nextPendingMed.medTime ? ` · Próxima: ${fmtTime(nextPendingMed.medTime)}` : ''}`
+                : null
+            return (
+              <div style={{
+                marginTop: 12,
+                background: 'rgba(255,255,255,0.95)',
+                borderRadius: 12,
+                borderLeft: `4px solid ${color}`,
+                padding: '10px 14px',
+                display: 'flex', alignItems: 'center', gap: 10,
+              }}>
+                <span style={{ fontSize: 16, flexShrink: 0 }}>{emoji}</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: 13, fontWeight: 700, color, margin: 0, lineHeight: 1.3 }}>{text}</p>
+                  {detail && (
+                    <p style={{ fontSize: 11, color: '#6B7280', margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {detail}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )
+          })()}
+
           {/* Separador */}
           <div style={{ height: 1, background: 'rgba(255,255,255,0.1)', margin: '16px 0' }} />
 
