@@ -9,6 +9,7 @@ import { Plus, XIcon, Pencil, Trash, Bell, CheckIcon } from '../components/Icons
 import { usePushNotifications } from '../hooks/usePushNotifications'
 import { track } from '../lib/analytics'
 import MedicationStockTab from '../components/MedicationStockTab'
+import EvidencePhoto from '../components/EvidencePhoto'
 import { SkeletonMedCard } from '../components/SkeletonLoader'
 import EmptyState from '../components/EmptyState'
 import LoadingButton from '../components/LoadingButton'
@@ -47,6 +48,26 @@ const RENEWAL_METHODS = [
 
 const CLAUDE_PROXY = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/claude-proxy`
 const AI_MODEL     = 'claude-sonnet-4-6'
+
+// ── Hoy-tab helpers ───────────────────────────────────────────────────────────
+
+function calcMedStatus(scheduledTime, windowMinutes = 60) {
+  if (!scheduledTime) return 'pendiente'
+  const [h, m] = scheduledTime.split(':').map(Number)
+  const now = new Date()
+  const diffMins = (now.getHours() * 60 + now.getMinutes()) - (h * 60 + m)
+  if (diffMins < 0)               return 'programado'
+  if (diffMins > windowMinutes)   return 'tarde'
+  if (diffMins >= windowMinutes - 15) return 'dar_pronto'
+  return 'pendiente'
+}
+
+const MED_STATUS = {
+  programado: { dot: '⚪', label: 'Programado', color: '#9CA3AF', bg: '#F9FAFB', border: '#E5E7EB' },
+  pendiente:  { dot: '🟢', label: 'A tiempo',   color: '#15803D', bg: '#F0FDF4', border: '#86EFAC' },
+  dar_pronto: { dot: '🟡', label: 'Dar pronto', color: '#92400E', bg: '#FFFBEB', border: '#FDE68A' },
+  tarde:      { dot: '🔴', label: 'Tarde',      color: '#DC2626', bg: '#FEF2F2', border: '#FCA5A5' },
+}
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -128,6 +149,24 @@ export default function Medications() {
   const [expandedHistorialDays, setExpandedHistorialDays] = useState(new Set())
   const [miloSuggestion, setMiloSuggestion] = useState(null)
   const [activeTab,      setActiveTab]      = useState('hoy')
+  const [dadosExpandido,     setDadosExpandido]     = useState(false)
+  const [adminModal,         setAdminModal]         = useState(null)
+  const [adminSaving,        setAdminSaving]        = useState(false)
+  const [adminPhotoBlob,     setAdminPhotoBlob]     = useState(null)
+  const [adminPhotoPreview,  setAdminPhotoPreview]  = useState(null)
+  const [adminError,         setAdminError]         = useState('')
+  const [omisionModal,       setOmisionModal]       = useState(null)
+  const [omisionReason,      setOmisionReason]      = useState('')
+  const [omisionSaving,      setOmisionSaving]      = useState(false)
+  const [omisionError,       setOmisionError]       = useState('')
+  const [toastMsg,           setToastMsg]           = useState('')
+  const [, setTick] = useState(0)
+
+  // Tick each minute so pending-status badges stay accurate
+  useEffect(() => {
+    const id = setInterval(() => setTick(t => t + 1), 60_000)
+    return () => clearInterval(id)
+  }, [])
 
   // ── Form / add-flow state ──────────────────────────────────────────────────
   const [showForm,    setShowForm]    = useState(false)
@@ -201,7 +240,7 @@ export default function Medications() {
       const sevenAgoKey = sevenAgo.toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' })
       const { data: logsData } = await supabase
         .from('medication_logs')
-        .select('medication_id, log_date, status, confirmed_by_name, confirmed_at, photo_url')
+        .select('medication_id, log_date, status, confirmed_by_name, confirmed_at, photo_url, given_on_time, minutes_late')
         .eq('user_id', ownerId)
         .gte('log_date', sevenAgoKey)
         .in('medication_id', meds.map(m => m.id))
@@ -443,6 +482,113 @@ Return ONLY valid JSON.`
     setStockByMedId(prev => { const n = { ...prev }; delete n[id]; return n })
   }
 
+  // ── Hoy-tab handlers ───────────────────────────────────────────────────────
+  function firstTimeMed(med) {
+    if (med.scheduled_times?.length) return [...med.scheduled_times].sort()[0]
+    return med.time ?? null
+  }
+
+  function showToast(msg) {
+    setToastMsg(msg)
+    setTimeout(() => setToastMsg(''), 3000)
+  }
+
+  function adminOpenCamera() {
+    const el = document.createElement('input')
+    el.type = 'file'; el.accept = 'image/*'; el.capture = 'environment'
+    el.addEventListener('change', e => { const f = e.target.files?.[0]; if (!f) return; setAdminPhotoBlob(f); const r = new FileReader(); r.onload = ev => setAdminPhotoPreview(ev.target.result); r.readAsDataURL(f) }, { once: true })
+    el.click()
+  }
+  function adminOpenGallery() {
+    const el = document.createElement('input')
+    el.type = 'file'; el.accept = 'image/*'
+    el.addEventListener('change', e => { const f = e.target.files?.[0]; if (!f) return; setAdminPhotoBlob(f); const r = new FileReader(); r.onload = ev => setAdminPhotoPreview(ev.target.result); r.readAsDataURL(f) }, { once: true })
+    el.click()
+  }
+
+  async function handleAdministrar() {
+    if (!adminModal || adminSaving) return
+    setAdminSaving(true); setAdminError('')
+    const med = adminModal
+    const confirmedAt = new Date().toISOString()
+    const scheduledTime = firstTimeMed(med)
+    const windowMinutes = med.time_window_minutes ?? 60
+    let minutesLate = null, givenOnTime = true, scheduledAt = null
+    if (scheduledTime) {
+      const [hh, mm] = scheduledTime.split(':').map(Number)
+      const d = new Date(); d.setHours(hh, mm, 0, 0)
+      scheduledAt = d.toISOString()
+      minutesLate = Math.round((new Date() - d) / 60000)
+      givenOnTime = minutesLate <= windowMinutes
+    }
+    let photoUrl = null
+    if (adminPhotoBlob) {
+      const path = `${ownerId}/${today}/${med.id}.jpg`
+      const { error: sErr } = await supabase.storage.from('confirmations')
+        .upload(path, adminPhotoBlob, { upsert: true, contentType: adminPhotoBlob.type || 'image/jpeg' })
+      if (!sErr) {
+        const { data: { publicUrl } } = supabase.storage.from('confirmations').getPublicUrl(path)
+        photoUrl = publicUrl
+      }
+    }
+    const { error: logErr } = await supabase.from('medication_logs').upsert({
+      medication_id: med.id, user_id: ownerId, status: 'confirmed',
+      log_date: today, confirmed_by_name: displayName, given_by_name: displayName,
+      confirmed_at: confirmedAt, scheduled_at: scheduledAt,
+      photo_url: photoUrl, given_on_time: givenOnTime, minutes_late: minutesLate,
+    }, { onConflict: 'medication_id,log_date,user_id' })
+    if (logErr) { setAdminSaving(false); setAdminError('No se pudo registrar. Intenta de nuevo.'); return }
+    const stock = stockByMedId[med.id]
+    if (stock) {
+      const qty = Number(med.quantity_per_dose ?? 1)
+      await supabase.from('medication_stock')
+        .update({ pills_remaining: Math.max(0, stock.pills_remaining - qty), updated_at: new Date().toISOString() })
+        .eq('medication_id', med.id).eq('user_id', ownerId)
+      setStockByMedId(prev => ({ ...prev, [med.id]: { ...prev[med.id], pills_remaining: Math.max(0, stock.pills_remaining - qty) } }))
+    }
+    setLogsByMedId(prev => {
+      const next = { ...prev }
+      if (!next[med.id]) next[med.id] = {}
+      if (!next[med.id][today]) next[med.id][today] = []
+      next[med.id][today] = next[med.id][today].filter(l => l.status !== 'confirmed')
+      next[med.id][today].push({ medication_id: med.id, log_date: today, status: 'confirmed', confirmed_by_name: displayName, confirmed_at: confirmedAt, photo_url: photoUrl, given_on_time: givenOnTime, minutes_late: minutesLate })
+      return next
+    })
+    track('medication_administered', { medication_name: med.name })
+    setAdminSaving(false); setAdminModal(null); setAdminPhotoBlob(null); setAdminPhotoPreview(null)
+    showToast('Medicamento registrado correctamente ✅')
+  }
+
+  async function handleOmitir() {
+    if (!omisionModal || !omisionReason || omisionSaving) return
+    setOmisionSaving(true); setOmisionError('')
+    const med = omisionModal
+    const scheduledTime = firstTimeMed(med)
+    let scheduledAt = null
+    if (scheduledTime) {
+      const [hh, mm] = scheduledTime.split(':').map(Number)
+      const d = new Date(); d.setHours(hh, mm, 0, 0); scheduledAt = d.toISOString()
+    }
+    await supabase.from('medication_omissions').insert({
+      medication_id: med.id, owner_id: ownerId, scheduled_at: scheduledAt,
+      reason: omisionReason, omitted_by: user.id, omitted_by_name: displayName,
+    })
+    await supabase.from('medication_logs').upsert({
+      medication_id: med.id, user_id: ownerId, status: 'missed',
+      log_date: today, confirmed_by_name: displayName, confirmed_at: new Date().toISOString(),
+    }, { onConflict: 'medication_id,log_date,user_id' })
+    setLogsByMedId(prev => {
+      const next = { ...prev }
+      if (!next[med.id]) next[med.id] = {}
+      if (!next[med.id][today]) next[med.id][today] = []
+      next[med.id][today] = next[med.id][today].filter(l => l.status !== 'missed')
+      next[med.id][today].push({ medication_id: med.id, log_date: today, status: 'missed', confirmed_by_name: displayName, confirmed_at: new Date().toISOString() })
+      return next
+    })
+    setOmisionSaving(false); setOmisionModal(null); setOmisionReason('')
+    showToast('Omisión registrada ✓')
+  }
+
   // ── Derived ────────────────────────────────────────────────────────────────
   const freqOpt     = FREQ_OPTIONS.find(o => o.value === form.frequency)
   const showTimePickers = freqOpt && freqOpt.times > 0
@@ -459,6 +605,32 @@ Return ONLY valid JSON.`
     const end = new Date(); end.setDate(end.getDate() + d)
     return { days: d, date: end.toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' }) }
   })()
+
+  // ── Hoy-tab derived values ────────────────────────────────────────────────
+  const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' })
+
+  const _noLogMeds = medications.filter(med =>
+    !(logsByMedId[med.id]?.[today] ?? []).some(l => l.status === 'confirmed' || l.status === 'missed')
+  )
+  const pendientesMeds = _noLogMeds
+    .filter(med => {
+      const times = med.scheduled_times?.length ? med.scheduled_times : med.time ? [med.time] : []
+      const firstT = times.length ? [...times].sort()[0] : null
+      return calcMedStatus(firstT, med.time_window_minutes ?? 60) !== 'tarde'
+    })
+    .sort((a, b) => {
+      const at = a.scheduled_times?.[0] ?? a.time ?? '99:99'
+      const bt = b.scheduled_times?.[0] ?? b.time ?? '99:99'
+      return at.localeCompare(bt)
+    })
+  const retrasadosMeds = _noLogMeds.filter(med => {
+    const times = med.scheduled_times?.length ? med.scheduled_times : med.time ? [med.time] : []
+    const firstT = times.length ? [...times].sort()[0] : null
+    return calcMedStatus(firstT, med.time_window_minutes ?? 60) === 'tarde'
+  })
+  const administradosMeds = medications.filter(med =>
+    (logsByMedId[med.id]?.[today] ?? []).some(l => l.status === 'confirmed' || l.status === 'missed')
+  )
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
@@ -512,7 +684,7 @@ Return ONLY valid JSON.`
                 WebkitTapHighlightColor: 'transparent',
               }}
             >
-              {tab === 'hoy' ? '💊 Hoy' : tab === 'todos' ? '📋 Todos' : '📦 Stock'}
+              {tab === 'hoy' ? '💊 Hoy' : tab === 'todos' ? '📋 Historial' : '📦 Inventario'}
             </button>
           ))}
         </div>
@@ -521,7 +693,7 @@ Return ONLY valid JSON.`
 
         {/* Push banner */}
         {supported && permission !== 'granted' && permission !== 'denied' && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'white', borderRadius: 14, border: '1px solid #EDE5D8', padding: '12px 14px', marginBottom: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'white', borderRadius: 14, border: '1px solid #EDE5D8', padding: '12px 14px', marginBottom: 14, boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
             <div style={{ width: 36, height: 36, borderRadius: 10, flexShrink: 0, background: '#EBF3EE', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Bell size={18} color="#4A7C59" strokeWidth={1.5} />
             </div>
@@ -535,7 +707,7 @@ Return ONLY valid JSON.`
           </div>
         )}
 
-        {/* Medication list */}
+        {/* ── Hoy: 3 secciones ─────────────────────────────────────────────── */}
         {loading ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {[...Array(3)].map((_, i) => <SkeletonMedCard key={i} />)}
@@ -544,191 +716,137 @@ Return ONLY valid JSON.`
           <EmptyState
             icon="💊"
             title="Sin medicamentos aún"
-            description="Agrega los medicamentos del familiar para mantener un control preciso."
+            description="Agrega los medicamentos del familiar."
             actionLabel={isAdmin ? '+ Agregar medicamento' : undefined}
             onAction={isAdmin ? openAdd : undefined}
           />
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {medications.map(med => {
-              const opt    = FREQ_OPTIONS.find(o => o.value === med.frequency)
-              const times  = med.scheduled_times?.length ? med.scheduled_times : med.time ? [med.time] : []
-              const stock  = stockByMedId[med.id]
-              const days   = stock ? daysFromNow(stock.estimated_end_date) : null
-              const stockColor = days == null ? '#9CA3AF'
-                : days <= 1 ? '#DC2626' : days <= 3 ? '#D97706' : days <= 7 ? '#C9882A' : '#16A34A'
-              const stockBg = days == null ? '#F3F4F6'
-                : days <= 1 ? '#FEF2F2' : days <= 3 ? '#FEF3C7' : days <= 7 ? '#FFFBEB' : '#F0FDF4'
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16, paddingBottom: 16 }}>
 
-              return (
-                <div
-                  key={med.id}
-                  style={{ background: 'white', borderRadius: 16, border: '1px solid #EDE5D8', borderLeft: `4px solid ${stock ? (stock.pills_remaining <= 3 ? '#ef4444' : stock.pills_remaining <= 7 ? '#eab308' : '#22c55e') : '#4A7C59'}`, padding: '14px 16px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 4 }}>
-                        {(() => {
-                          const pills = med.pills_remaining ?? stock?.pills_remaining ?? null
-                          if (pills === null) return null
-                          const color = pills <= 3 ? '#ef4444' : pills <= 7 ? '#eab308' : '#22c55e'
-                          return (
-                            <div style={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: color, flexShrink: 0, display: 'inline-block' }} />
-                          )
-                        })()}
-                        <span style={{ fontSize: 15, fontWeight: 700, color: '#1A1A1A' }}>
-                          💊 {med.name}
-                        </span>
-                      </div>
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
-                        {med.dosage && <span style={{ fontSize: 12, color: '#6B7280' }}>{med.dosage}</span>}
-                        {(opt?.label ?? med.frequency) && (
-                          <span style={{ background: '#EBF3EE', color: '#4A7C59', padding: '2px 8px', borderRadius: 6, fontSize: 11, fontWeight: 600 }}>
-                            {opt?.label ?? med.frequency}
+            {/* ── Sección 1: PENDIENTES ──────────────────────────────────── */}
+            {pendientesMeds.length > 0 && (
+              <div>
+                <p style={{ fontSize: 12, fontWeight: 700, color: '#15803D', letterSpacing: '0.06em', textTransform: 'uppercase', margin: '0 0 8px 2px' }}>
+                  🟢 Pendientes ({pendientesMeds.length})
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {pendientesMeds.map(med => {
+                    const times = med.scheduled_times?.length ? med.scheduled_times : med.time ? [med.time] : []
+                    const firstT = times.length ? [...times].sort()[0] : null
+                    const sCfg = MED_STATUS[calcMedStatus(firstT, med.time_window_minutes ?? 60)]
+                    return (
+                      <div key={med.id} style={{ background: 'white', borderRadius: 16, border: '1px solid #EDE5D8', borderLeft: '4px solid #4A7C59', padding: '14px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: times.length ? 8 : 0 }}>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <p style={{ fontSize: 15, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>
+                              💊 {med.name}{med.dosage ? <span style={{ fontWeight: 400, color: '#6B7280', fontSize: 13 }}> · {med.dosage}</span> : null}
+                            </p>
+                          </div>
+                          <span style={{ fontSize: 11, fontWeight: 700, color: sCfg.color, background: sCfg.bg, border: `1px solid ${sCfg.border}`, padding: '3px 8px', borderRadius: 6, flexShrink: 0 }}>
+                            {sCfg.dot} {sCfg.label}
                           </span>
-                        )}
-                      </div>
-                      {times.length > 0 && (
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 8 }}>
-                          {times.map((t, i) => (
-                            <span key={i} style={{ background: '#F0F8F4', color: '#2D6A4F', padding: '3px 8px', borderRadius: 6, fontSize: 11, fontWeight: 600 }}>
-                              ⏰ {t}
-                            </span>
-                          ))}
                         </div>
-                      )}
-                      {med.notes && (
-                        <p style={{ fontSize: 11, color: '#9CA3AF', marginTop: 6, lineHeight: 1.4 }}>{med.notes}</p>
-                      )}
-                      {/* Stock chip */}
-                      <button
-                        onClick={() => setStockTabMed(med)}
-                        style={{
-                          marginTop: 10, display: 'inline-flex', alignItems: 'center', gap: 5,
-                          padding: '4px 10px', borderRadius: 20, border: `1px solid ${stockColor}40`,
-                          background: stockBg, cursor: 'pointer', transition: 'all 0.15s',
-                        }}
-                      >
-                        <span style={{ fontSize: 11 }}>📦</span>
-                        <span style={{ fontSize: 11, fontWeight: 700, color: stockColor }}>
-                          {stock
-                            ? days == null ? 'Ver stock' : days <= 0 ? 'Agotado' : `${days} día${days !== 1 ? 's' : ''}`
-                            : 'Configurar stock'}
-                        </span>
-                        {med.pills_remaining != null && (
-                          <span style={{ fontSize: 11, fontWeight: 700, color: med.pills_remaining <= 3 ? '#ef4444' : med.pills_remaining <= 7 ? '#eab308' : '#16a34a' }}>
-                            {med.pills_remaining <= 3 ? '🔴' : med.pills_remaining <= 7 ? '🟡' : '🟢'} {med.pills_remaining} dosis
-                          </span>
+                        {times.length > 0 && (
+                          <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 10 }}>
+                            {times.map((t, i) => <span key={i} style={{ background: '#F0F8F4', color: '#2D6A4F', padding: '2px 8px', borderRadius: 6, fontSize: 11, fontWeight: 600 }}>⏰ {t}</span>)}
+                            {med.time_window_minutes && <span style={{ fontSize: 11, color: '#9CA3AF' }}>ventana {med.time_window_minutes} min</span>}
+                          </div>
                         )}
-                      </button>
-
-                      {/* Historial — últimos 7 días expandible */}
-                      <div style={{ marginTop: 10 }}>
-                        <button
-                          onClick={() => setExpandedMedHistorial(prev => {
-                            const next = new Set(prev)
-                            next.has(med.id) ? next.delete(med.id) : next.add(med.id)
-                            return next
-                          })}
-                          style={{
-                            background: 'none', border: 'none', cursor: 'pointer',
-                            fontSize: 11, color: '#4A7C59', fontWeight: 700, padding: 0,
-                            display: 'flex', alignItems: 'center', gap: 4,
-                          }}
-                        >
-                          <span style={{
-                            display: 'inline-block',
-                            transform: expandedMedHistorial.has(med.id) ? 'rotate(90deg)' : 'none',
-                            transition: 'transform 0.2s',
-                          }}>›</span>
-                          Historial 7 días
-                        </button>
-                        {expandedMedHistorial.has(med.id) && (() => {
-                          const todayD = new Date()
-                          const last7 = Array.from({ length: 7 }, (_, i) => {
-                            const d = new Date(todayD); d.setDate(d.getDate() - i)
-                            return d.toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' })
-                          })
-                          const medLogs = logsByMedId[med.id] ?? {}
-                          return (
-                            <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 4 }}>
-                              {last7.map(dayKey => {
-                                const dayLogs = (medLogs[dayKey] ?? []).filter(l => l.status === 'confirmed')
-                                const confirmed = dayLogs.length > 0
-                                const expandKey = `${med.id}-${dayKey}`
-                                const isExpanded = expandedHistorialDays.has(expandKey)
-                                const d = new Date(dayKey + 'T12:00:00')
-                                const label = d.toLocaleDateString('es-US', { weekday: 'short', day: 'numeric', month: 'short' })
-                                return (
-                                  <div key={dayKey}>
-                                    <button
-                                      onClick={() => {
-                                        if (!confirmed) return
-                                        setExpandedHistorialDays(prev => {
-                                          const next = new Set(prev)
-                                          next.has(expandKey) ? next.delete(expandKey) : next.add(expandKey)
-                                          return next
-                                        })
-                                      }}
-                                      style={{
-                                        width: '100%', display: 'flex', alignItems: 'center', gap: 8,
-                                        padding: '6px 10px', borderRadius: 8, border: 'none',
-                                        background: confirmed ? '#F0FDF4' : '#FFF5F5',
-                                        cursor: confirmed ? 'pointer' : 'default',
-                                        textAlign: 'left',
-                                      }}
-                                    >
-                                      <span style={{ fontSize: 12, flexShrink: 0 }}>{confirmed ? '✅' : '⚠️'}</span>
-                                      <span style={{ flex: 1, fontSize: 12, fontWeight: 600, color: '#374151' }}>{label}</span>
-                                      <span style={{ fontSize: 11, fontWeight: 700, color: confirmed ? '#15803D' : '#D63031' }}>
-                                        {confirmed ? `${dayLogs.length} dosis` : 'Sin dar'}
-                                      </span>
-                                      {confirmed && (
-                                        <span style={{ fontSize: 12, color: '#9CA3AF', transform: isExpanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s', flexShrink: 0 }}>›</span>
-                                      )}
-                                    </button>
-                                    {isExpanded && (
-                                      <div style={{ paddingLeft: 10, marginTop: 3, display: 'flex', flexDirection: 'column', gap: 3 }}>
-                                        {dayLogs.map((log, li) => (
-                                          <div key={li} style={{ background: '#F9FAFB', borderRadius: 8, padding: '6px 10px', display: 'flex', alignItems: 'center', gap: 8 }}>
-                                            <span style={{ fontSize: 11, color: '#9CA3AF', flexShrink: 0 }}>
-                                              {log.confirmed_at
-                                                ? new Date(log.confirmed_at).toLocaleTimeString('es-US', { hour: 'numeric', minute: '2-digit', hour12: true })
-                                                : '—'}
-                                            </span>
-                                            <span style={{ fontSize: 12, color: '#374151', flex: 1 }}>
-                                              {log.confirmed_by_name?.split(' ')[0] ?? 'Confirmado'}
-                                            </span>
-                                            {log.photo_url && (
-                                              <img src={log.photo_url} alt="Prueba" style={{ width: 32, height: 32, borderRadius: 6, objectFit: 'cover', border: '1px solid #BBF7D0', flexShrink: 0 }} />
-                                            )}
-                                          </div>
-                                        ))}
-                                      </div>
-                                    )}
-                                  </div>
-                                )
-                              })}
-                            </div>
-                          )
-                        })()}
+                        {!isFamiliar && (
+                          <button onClick={() => { setAdminModal(med); setAdminPhotoBlob(null); setAdminPhotoPreview(null); setAdminError('') }} style={{ width: '100%', padding: '10px', borderRadius: 12, border: 'none', background: 'linear-gradient(135deg, #4A7C59, #3A6347)', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer', boxShadow: '0 4px 12px rgba(74,124,89,0.25)' }}>
+                            ✅ Administrar
+                          </button>
+                        )}
                       </div>
-                    </div>
-
-                    {canActOn(med) && (
-                      <div style={{ display: 'flex', gap: 4, marginLeft: 12, flexShrink: 0 }}>
-                        <button onClick={() => openEdit(med)} style={{ padding: '6px 8px', borderRadius: 8, border: '1px solid #EDE5D8', background: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center' }} title="Editar">
-                          <Pencil size={14} color="#6B7280" strokeWidth={1.5} />
-                        </button>
-                        <button onClick={() => setConfirmDialog({ onConfirm: () => handleDelete(med.id) })} style={{ padding: '6px 8px', borderRadius: 8, border: '1px solid #EDE5D8', background: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center' }} title="Eliminar">
-                          <Trash size={14} color="#D63031" strokeWidth={1.5} />
-                        </button>
-                      </div>
-                    )}
-                  </div>
+                    )
+                  })}
                 </div>
-              )
-            })}
+              </div>
+            )}
+
+            {/* ── Sección 2: RETRASADOS ──────────────────────────────────── */}
+            {retrasadosMeds.length > 0 && (
+              <div>
+                <p style={{ fontSize: 12, fontWeight: 700, color: '#DC2626', letterSpacing: '0.06em', textTransform: 'uppercase', margin: '0 0 8px 2px' }}>
+                  🔴 Retrasados ({retrasadosMeds.length})
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {retrasadosMeds.map(med => {
+                    const times = med.scheduled_times?.length ? med.scheduled_times : med.time ? [med.time] : []
+                    const firstT = times.length ? [...times].sort()[0] : null
+                    const delayMins = firstT ? (() => { const [h, m] = firstT.split(':').map(Number); const now = new Date(); return Math.round((now.getHours() * 60 + now.getMinutes()) - (h * 60 + m)) })() : null
+                    const delayLabel = delayMins == null ? '' : delayMins >= 60 ? `${Math.floor(delayMins/60)}h ${delayMins%60}min` : `${delayMins} min`
+                    return (
+                      <div key={med.id} style={{ background: '#FEF2F2', borderRadius: 16, border: '1px solid #FCA5A5', borderLeft: '4px solid #DC2626', padding: '14px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <p style={{ fontSize: 15, fontWeight: 700, color: '#1A1A1A', margin: '0 0 2px' }}>
+                              💊 {med.name}{med.dosage ? <span style={{ fontWeight: 400, color: '#6B7280', fontSize: 13 }}> · {med.dosage}</span> : null}
+                            </p>
+                            {delayLabel && <p style={{ fontSize: 12, color: '#DC2626', fontWeight: 600, margin: 0 }}>⏱ Retraso: {delayLabel}</p>}
+                          </div>
+                          <span style={{ fontSize: 11, fontWeight: 700, color: '#DC2626', background: 'white', border: '1px solid #FCA5A5', padding: '3px 8px', borderRadius: 6, flexShrink: 0 }}>🔴 Tarde</span>
+                        </div>
+                        {!isFamiliar && (
+                          <div style={{ display: 'flex', gap: 8 }}>
+                            <button onClick={() => { setAdminModal(med); setAdminPhotoBlob(null); setAdminPhotoPreview(null); setAdminError('') }} style={{ flex: 2, padding: '10px', borderRadius: 12, border: 'none', background: 'linear-gradient(135deg, #4A7C59, #3A6347)', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>✅ Administrar</button>
+                            <button onClick={() => { setOmisionModal(med); setOmisionReason(''); setOmisionError('') }} style={{ flex: 1, padding: '10px', borderRadius: 12, border: '1px solid #FCA5A5', background: 'white', color: '#DC2626', fontWeight: 600, fontSize: 13, cursor: 'pointer' }}>Omitir</button>
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Todo listo */}
+            {pendientesMeds.length === 0 && retrasadosMeds.length === 0 && administradosMeds.length > 0 && (
+              <div style={{ textAlign: 'center', padding: '20px 16px', background: '#F0FDF4', borderRadius: 16, border: '1px solid #BBF7D0' }}>
+                <p style={{ fontSize: 16, fontWeight: 700, color: '#15803D', margin: 0 }}>✅ ¡Todo administrado hoy!</p>
+                {profile?.name && <p style={{ fontSize: 13, color: '#4A7C59', margin: '4px 0 0' }}>{profile.name.split(' ')[0]} tomó todos sus medicamentos 💙</p>}
+              </div>
+            )}
+
+            {/* ── Sección 3: ADMINISTRADOS (colapsada) ──────────────────── */}
+            {administradosMeds.length > 0 && (
+              <div>
+                <button onClick={() => setDadosExpandido(v => !v)} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 8, padding: '11px 14px', borderRadius: 12, background: 'white', border: '1px solid #BBF7D0', cursor: 'pointer', marginBottom: dadosExpandido ? 8 : 0, WebkitTapHighlightColor: 'transparent' }}>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: '#15803D', flex: 1, textAlign: 'left' }}>✅ Administrados hoy ({administradosMeds.length})</span>
+                  <span style={{ fontSize: 16, color: '#9CA3AF', display: 'inline-block', transform: dadosExpandido ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s' }}>›</span>
+                </button>
+                {dadosExpandido && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {administradosMeds.map(med => {
+                      const todayLog = (logsByMedId[med.id]?.[today] ?? []).find(l => l.status === 'confirmed' || l.status === 'missed')
+                      const isOmitted = todayLog?.status === 'missed'
+                      const confTime = todayLog?.confirmed_at ? new Date(todayLog.confirmed_at).toLocaleTimeString('es-US', { hour: 'numeric', minute: '2-digit', hour12: true }) : null
+                      const byName = todayLog?.confirmed_by_name?.split(' ')[0]
+                      return (
+                        <div key={med.id} style={{ background: isOmitted ? '#FFFBEB' : '#F0FDF4', borderRadius: 14, border: isOmitted ? '1px solid #FDE68A' : '1px solid #BBF7D0', borderLeft: isOmitted ? '4px solid #D97706' : '4px solid #22C55E', padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
+                          <span style={{ fontSize: 18, flexShrink: 0 }}>{isOmitted ? '❌' : '✅'}</span>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <p style={{ fontSize: 14, fontWeight: 700, color: isOmitted ? '#92400E' : '#15803D', margin: '0 0 3px' }}>{med.name}</p>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                              {confTime && <span style={{ fontSize: 11, color: '#4A7C59', fontWeight: 600 }}>🕐 {confTime}</span>}
+                              {byName && <span style={{ fontSize: 11, color: '#6B7280' }}>por {byName}</span>}
+                              {isOmitted ? (
+                                <span style={{ fontSize: 11, fontWeight: 700, color: '#D97706' }}>Omitido</span>
+                              ) : (
+                                <span style={{ fontSize: 11, fontWeight: 700, color: todayLog?.given_on_time === false ? '#D97706' : '#15803D' }}>
+                                  {todayLog?.given_on_time === false && todayLog?.minutes_late ? `⚠️ Dado tarde ${todayLog.minutes_late} min` : '✓ A tiempo'}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          {todayLog?.photo_url && <EvidencePhoto photoUrl={todayLog.photo_url} />}
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
 
@@ -1122,6 +1240,111 @@ Return ONLY valid JSON.`
           </div>
         </div>
       )}
+
+      {/* ── Modal: Administrar ─────────────────────────────────────────────── */}
+      {adminModal && (
+        <div
+          style={{ position: 'fixed', inset: 0, zIndex: 250, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'flex-end' }}
+          onClick={e => { if (e.target === e.currentTarget && !adminSaving) { setAdminModal(null); setAdminPhotoBlob(null); setAdminPhotoPreview(null) } }}
+        >
+          <div style={{ width: '100%', maxHeight: '90vh', background: 'white', borderRadius: '24px 24px 0 0', padding: '24px 20px 80px', overflowY: 'auto', boxShadow: '0 -8px 48px rgba(0,0,0,0.2)' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 16 }}>
+              <div>
+                <p style={{ fontFamily: 'Georgia, serif', fontSize: 20, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>💊 {adminModal.name}</p>
+                {adminModal.dosage && <p style={{ fontSize: 13, color: '#6B7280', margin: '2px 0 0' }}>{adminModal.dosage}</p>}
+              </div>
+              <button onClick={() => { if (!adminSaving) { setAdminModal(null); setAdminPhotoBlob(null); setAdminPhotoPreview(null) } }} style={{ padding: 8, borderRadius: 10, background: '#F3F4F6', border: 'none', cursor: 'pointer' }}>
+                <XIcon size={16} color="#6B7280" strokeWidth={2} />
+              </button>
+            </div>
+
+            <div style={{ background: '#F9F5F1', borderRadius: 12, padding: '12px 14px', marginBottom: 16, display: 'flex', gap: 20 }}>
+              <div>
+                <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>Programado</p>
+                <p style={{ fontSize: 14, fontWeight: 700, color: '#1A1A1A', margin: '2px 0 0' }}>{firstTimeMed(adminModal) ?? '—'}</p>
+              </div>
+              <div>
+                <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>Hora actual</p>
+                <p style={{ fontSize: 14, fontWeight: 700, color: '#4A7C59', margin: '2px 0 0' }}>{new Date().toLocaleTimeString('es-US', { hour: 'numeric', minute: '2-digit', hour12: true })}</p>
+              </div>
+            </div>
+
+            <p style={{ fontSize: 12, fontWeight: 700, color: '#6B7280', letterSpacing: '0.06em', textTransform: 'uppercase', margin: '0 0 8px' }}>📷 Foto de evidencia (opcional)</p>
+            <div style={{ border: '2px dashed #EDE5D8', borderRadius: 14, overflow: 'hidden', marginBottom: 12, background: '#FDFAF7' }}>
+              {adminPhotoPreview ? (
+                <>
+                  <img src={adminPhotoPreview} alt="Evidencia" style={{ width: '100%', maxHeight: 180, objectFit: 'cover' }} />
+                  <div style={{ padding: '8px 12px', display: 'flex', gap: 8 }}>
+                    <button onClick={adminOpenCamera} style={{ flex: 1, padding: '7px', borderRadius: 8, border: '1px solid #4A7C59', background: '#EBF3EE', color: '#4A7C59', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>📷 Cambiar</button>
+                    <button onClick={() => { setAdminPhotoBlob(null); setAdminPhotoPreview(null) }} style={{ flex: 1, padding: '7px', borderRadius: 8, border: '1px solid #EDE5D8', background: 'white', color: '#6B7280', fontSize: 12, cursor: 'pointer' }}>Quitar</button>
+                  </div>
+                </>
+              ) : (
+                <div style={{ padding: '18px 16px', display: 'flex', gap: 8 }}>
+                  <button onClick={adminOpenCamera} style={{ flex: 1, padding: '10px', borderRadius: 12, border: '1.5px solid #4A7C59', background: '#EBF3EE', color: '#4A7C59', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>📷 Tomar foto</button>
+                  <button onClick={adminOpenGallery} style={{ flex: 1, padding: '10px', borderRadius: 12, border: '1.5px solid #C0CCC5', background: '#FDFAF7', color: '#6B7280', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>🖼 Galería</button>
+                </div>
+              )}
+            </div>
+
+            {adminError && <div style={{ background: '#FFF0F0', border: '1px solid #FFBABA', borderRadius: 10, padding: '10px 12px', marginBottom: 12 }}><p style={{ fontSize: 12, color: '#D63031', margin: 0 }}>⚠️ {adminError}</p></div>}
+
+            <button
+              onClick={handleAdministrar}
+              disabled={adminSaving}
+              style={{ width: '100%', padding: '16px', borderRadius: 16, border: 'none', background: adminSaving ? '#C0CCC5' : 'linear-gradient(135deg, #22C55E, #16A34A)', color: 'white', fontWeight: 800, fontSize: 16, cursor: adminSaving ? 'not-allowed' : 'pointer', boxShadow: adminSaving ? 'none' : '0 6px 20px rgba(34,197,94,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+            >
+              {adminSaving
+                ? <><div style={{ width: 18, height: 18, borderRadius: '50%', border: '2.5px solid rgba(255,255,255,0.4)', borderTopColor: 'white', animation: 'spin 0.7s linear infinite' }} /> Guardando...</>
+                : '✅ Confirmar administración'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Modal: Omisión ─────────────────────────────────────────────────── */}
+      {omisionModal && (
+        <div
+          style={{ position: 'fixed', inset: 0, zIndex: 250, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 24px' }}
+          onClick={e => { if (e.target === e.currentTarget && !omisionSaving) { setOmisionModal(null); setOmisionReason('') } }}
+        >
+          <div style={{ background: 'white', borderRadius: 20, padding: '28px 24px', maxWidth: 380, width: '100%', boxShadow: '0 24px 64px rgba(0,0,0,0.25)' }}>
+            <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#1A1A1A', margin: '0 0 4px' }}>Registrar omisión</p>
+            <p style={{ fontSize: 13, color: '#6B7280', margin: '0 0 20px' }}>💊 {omisionModal.name}</p>
+            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#6B7280', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8 }}>Motivo *</label>
+            <div style={{ position: 'relative', marginBottom: 20 }}>
+              <select
+                value={omisionReason}
+                onChange={e => setOmisionReason(e.target.value)}
+                style={{ width: '100%', padding: '11px 32px 11px 14px', borderRadius: 12, border: `1.5px solid ${omisionReason ? '#4A7C59' : '#EDE5D8'}`, background: '#FDFAF7', fontSize: 14, outline: 'none', appearance: 'none', cursor: 'pointer', boxSizing: 'border-box' }}
+              >
+                <option value="">Seleccionar motivo...</option>
+                <option value="Paciente rechazó el medicamento">Paciente rechazó el medicamento</option>
+                <option value="No había medicamento disponible">No había medicamento disponible</option>
+                <option value="Indicación médica">Indicación médica</option>
+                <option value="Olvido del cuidador">Olvido del cuidador</option>
+                <option value="Otro">Otro</option>
+              </select>
+              <span style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#9CA3AF', fontSize: 12 }}>▼</span>
+            </div>
+            {omisionError && <p style={{ fontSize: 12, color: '#DC2626', margin: '0 0 12px' }}>⚠️ {omisionError}</p>}
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button onClick={() => { setOmisionModal(null); setOmisionReason('') }} style={{ flex: 1, padding: '12px', borderRadius: 12, border: '1.5px solid #EDE5D8', background: 'white', color: '#6B7280', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>Cancelar</button>
+              <button onClick={handleOmitir} disabled={!omisionReason || omisionSaving} style={{ flex: 2, padding: '12px', borderRadius: 12, border: 'none', background: !omisionReason || omisionSaving ? '#C0CCC5' : '#DC2626', color: 'white', fontWeight: 700, fontSize: 14, cursor: !omisionReason || omisionSaving ? 'not-allowed' : 'pointer' }}>
+                {omisionSaving ? 'Guardando...' : 'Registrar omisión'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Toast ──────────────────────────────────────────────────────────── */}
+      {toastMsg && (
+        <div style={{ position: 'fixed', bottom: 'calc(80px + env(safe-area-inset-bottom))', left: '50%', transform: 'translateX(-50%)', zIndex: 400, background: '#1A1A1A', color: 'white', padding: '12px 20px', borderRadius: 12, fontSize: 13, fontWeight: 600, boxShadow: '0 8px 24px rgba(0,0,0,0.3)', pointerEvents: 'none', whiteSpace: 'nowrap' }}>
+          {toastMsg}
+        </div>
+      )}
+
     </Layout>
   )
 }
