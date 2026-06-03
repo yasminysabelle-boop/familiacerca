@@ -5,7 +5,6 @@ import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { useSubscription } from '../contexts/SubscriptionContext'
 import { supabase } from '../lib/supabase'
-import Layout from '../components/Layout'
 import { Plus, XIcon, Pencil, Trash, Bell, CheckIcon } from '../components/Icons'
 import { usePushNotifications } from '../hooks/usePushNotifications'
 import { track } from '../lib/analytics'
@@ -459,7 +458,7 @@ Return ONLY valid JSON.`
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
-    <Layout>
+    <>
       {showPaywall && <PaywallModal onClose={() => setShowPaywall(false)} patientName={profile?.name?.split(' ')[0]} />}
       <div
         ref={pullRef}
@@ -1080,6 +1079,6 @@ Return ONLY valid JSON.`
           </div>
         </div>
       )}
-    </Layout>
+    </>
   )
 }
