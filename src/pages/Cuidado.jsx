@@ -62,6 +62,7 @@ export default function Cuidado() {
   const [careToggling, setCareToggling] = useState(null)
   const [justCompletedKey, setJustCompletedKey] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [showCompleted, setShowCompleted] = useState(false)
 
   const [times, setTimes] = useState(() =>
     Object.fromEntries(DAILY_ITEMS.map(i => [i.key, i.scheduledTime]))
@@ -176,6 +177,11 @@ export default function Cuidado() {
     .filter(l => l.log_date === today)
     .sort((a, b) => a.checked_at.localeCompare(b.checked_at))
 
+  const retrasadas  = CARE_ITEMS.filter(i => !careLogs[i.key] && calcularEstadoCuidado(i, false, careSchedules[i.key]) === 'tarde')
+  const proximas    = CARE_ITEMS.filter(i => !careLogs[i.key] && ['programado', 'pendiente'].includes(calcularEstadoCuidado(i, false, careSchedules[i.key])) && !!(careSchedules[i.key] ?? i.scheduledTime))
+  const sinHorario  = CARE_ITEMS.filter(i => !careLogs[i.key] && !(careSchedules[i.key] ?? i.scheduledTime))
+  const completadas = CARE_ITEMS.filter(i => !!careLogs[i.key])
+
   return (
     <Layout>
       <div style={{ padding: '16px 16px 96px', maxWidth: 600 }}>
@@ -274,183 +280,160 @@ export default function Cuidado() {
               </div>
             ) : (
               <>
-                {CARE_CATEGORIES.map(cat => {
-                  const items = CARE_ITEMS.filter(i => i.category === cat.id)
-                  return (
-                    <div key={cat.id} style={{ marginBottom: 14 }}>
-                      <p style={{
-                        fontSize: 11, fontWeight: 700, letterSpacing: '0.08em',
-                        textTransform: 'uppercase', color: '#9CA3AF',
-                        marginBottom: 6, paddingLeft: 2,
-                      }}>
-                        {cat.icon} {cat.label}
-                      </p>
-                      <div style={{
-                        background: 'white', borderRadius: 16,
-                        border: '1px solid #EDE5D8', overflow: 'hidden',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
-                      }}>
-                        {items.map((item, idx) => {
-                          const isChecked  = !!careLogs[item.key]
-                          const status     = calcularEstadoCuidado(item, isChecked, careSchedules[item.key])
-                          const isOverdue  = status === 'tarde'
-                          const isEarly    = status === 'programado'
-                          const isToggling = careToggling === item.key
-                          const log        = careLogs[item.key]
-                          const checkedTime = log?.checked_at
-                            ? new Date(log.checked_at).toLocaleTimeString('es-US', { hour: '2-digit', minute: '2-digit' })
-                            : null
-                          return (
-                            <div
-                              key={item.key}
-                              style={{
-                                display: 'flex', alignItems: 'center', gap: 12,
-                                padding: '13px 14px',
-                                background: isChecked ? cat.bg : 'white',
-                                borderBottom: idx < items.length - 1
-                                  ? `1px solid ${isChecked ? cat.color + '25' : '#F5EEE6'}`
-                                  : 'none',
-                                transition: 'background 0.2s',
-                                opacity: isToggling ? 0.55 : 1,
-                              }}
-                            >
-                              <button
-                                onClick={() => toggleCareItem(item)}
-                                disabled={isFamiliar || !!careToggling}
-                                style={{
-                                  width: 26, height: 26, borderRadius: 8, flexShrink: 0,
-                                  border: `2px solid ${isChecked ? cat.color : isOverdue ? '#FCA5A5' : '#D1D5DB'}`,
-                                  background: isChecked ? cat.color : 'white',
-                                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                  cursor: isFamiliar ? 'default' : 'pointer',
-                                  padding: 0, transition: 'all 0.2s',
-                                }}
-                              >
-                                {isChecked && !isToggling && <CheckIcon size={13} color="white" strokeWidth={2.5} />}
-                                {isToggling && (
-                                  <div style={{
-                                    width: 10, height: 10, borderRadius: '50%',
-                                    border: `2px solid ${isChecked ? 'rgba(255,255,255,0.4)' : '#D1D5DB'}`,
-                                    borderTopColor: isChecked ? 'white' : cat.color,
-                                    animation: 'spin 0.6s linear infinite',
-                                  }} />
-                                )}
-                              </button>
-                              <span style={{ fontSize: 20, flexShrink: 0, lineHeight: 1 }}>{item.icon}</span>
-                              <div style={{ flex: 1, minWidth: 0 }}>
-                                <p style={{
-                                  fontSize: 13, fontWeight: 600, margin: 0, lineHeight: 1.3,
-                                  color: isChecked ? '#9CA3AF' : isOverdue ? '#DC2626' : '#1A1A1A',
-                                  textDecoration: isChecked ? 'line-through' : 'none',
-                                }}>
-                                  {item.label}
-                                </p>
-                                {isChecked && checkedTime && (
-                                  <p style={{ fontSize: 10, color: cat.color, margin: '2px 0 0', fontWeight: 600 }}>
-                                    ✓ {checkedTime}{log?.checked_by ? ` · ${log.checked_by.split(' ')[0]}` : ''}
-                                  </p>
-                                )}
-                                {isChecked && justCompletedKey === item.key && !log?.photo_url && (
-                                  <EvidencePhoto
-                                    onPhotoCapture={url => handleRoutinePhoto(item.key, url)}
-                                    label="Agregar foto"
-                                    bucket="care-photos"
-                                    pathPrefix={`routines/${ownerId}`}
-                                  />
-                                )}
-                                {isChecked && log?.photo_url && (
-                                  <div style={{ marginTop: 4 }}>
-                                    <EvidencePhoto photoUrl={log.photo_url} />
-                                  </div>
-                                )}
-                                {!isChecked && (careSchedules[item.key] ?? item.scheduledTime) && !isOverdue && (
-                                  <p style={{ fontSize: 10, color: '#9CA3AF', margin: '2px 0 0' }}>
-                                    ⏰ {fmtTime(careSchedules[item.key] ?? item.scheduledTime)}
-                                  </p>
-                                )}
-                              </div>
-                              {isChecked && (
-                                <span style={{ fontSize: 10, fontWeight: 700, color: '#16A34A', background: '#DCFCE7', padding: '2px 8px', borderRadius: 6, flexShrink: 0 }}>
-                                  ✓ Listo
-                                </span>
-                              )}
-                              {isOverdue && !isChecked && (
-                                <span style={{ fontSize: 10, fontWeight: 700, color: '#7A5A18', background: '#FEF3C7', padding: '2px 8px', borderRadius: 6, flexShrink: 0 }}>
-                                  ⚠ Tarde
-                                </span>
-                              )}
-                              {!isChecked && isEarly && (careSchedules[item.key] ?? item.scheduledTime) && (
-                                <span style={{ fontSize: 10, fontWeight: 700, color: '#6B7280', background: '#F3F4F6', padding: '2px 8px', borderRadius: 6, flexShrink: 0, whiteSpace: 'nowrap' }}>
-                                  🕐 {fmtTime(careSchedules[item.key] ?? item.scheduledTime)}
-                                </span>
-                              )}
-                            </div>
-                          )
-                        })}
-                      </div>
-                    </div>
-                  )
-                })}
-
-                {todayTimeline.length === 0 && completedRequired === 0 && (
+                {retrasadas.length === 0 && proximas.length === 0 && sinHorario.length === 0 && completadas.length === 0 && (
                   <div style={{ marginTop: 8 }}>
                     <EmptyState
                       icon="✅"
-                      title="Sin rutinas completadas aún"
-                      description="Las rutinas completadas hoy aparecerán aquí."
+                      title="Sin rutinas registradas aún"
+                      description="Las rutinas del día aparecerán aquí."
                     />
                   </div>
                 )}
-                {todayTimeline.length > 0 && (
-                  <div style={{ marginTop: 8, marginBottom: 8 }}>
+
+                {/* 🔴 Retrasadas */}
+                {retrasadas.length > 0 && (
+                  <div style={{ marginBottom: 14 }}>
                     <p style={{
                       fontSize: 11, fontWeight: 700, letterSpacing: '0.08em',
-                      textTransform: 'uppercase', color: '#9CA3AF',
-                      marginBottom: 6, paddingLeft: 2,
+                      textTransform: 'uppercase', color: '#DC2626',
+                      marginBottom: 6, paddingLeft: 10,
+                      borderLeft: '3px solid #DC2626', margin: '0 0 6px',
                     }}>
-                      Línea de tiempo del día
+                      🔴 Retrasadas
                     </p>
-                    <div style={{
-                      background: 'white', borderRadius: 16,
-                      border: '1px solid #EDE5D8', overflow: 'hidden',
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
-                    }}>
-                      {todayTimeline.map((log, i) => {
-                        const ci  = CARE_ITEMS.find(x => x.key === log.item_key)
-                        const cat = CARE_CATEGORIES.find(c => c.id === ci?.category)
+                    <div style={{ background: 'white', borderRadius: 16, border: '1px solid #FCA5A5', overflow: 'hidden', boxShadow: '0 2px 8px rgba(220,38,38,0.08)' }}>
+                      {retrasadas.map((item, idx) => {
+                        const cat = CARE_CATEGORIES.find(c => c.id === item.category) ?? { color: '#DC2626', bg: '#FEF2F2' }
+                        const isToggling = careToggling === item.key
+                        const log = careLogs[item.key]
                         return (
-                          <div
-                            key={log.id}
-                            style={{
-                              display: 'flex', alignItems: 'center', gap: 10,
-                              padding: '11px 14px',
-                              borderBottom: i < todayTimeline.length - 1 ? '1px solid #F5EEE6' : 'none',
-                            }}
-                          >
-                            <span style={{ fontSize: 18, flexShrink: 0 }}>{ci?.icon ?? '✓'}</span>
-                            <p style={{ flex: 1, fontSize: 13, color: '#1A1A1A', margin: 0, fontWeight: 500 }}>
-                              {ci?.label ?? log.item_key}
-                            </p>
-                            <span style={{ fontSize: 11, color: '#9CA3AF', flexShrink: 0 }}>
-                              {new Date(log.checked_at).toLocaleTimeString('es-US', { hour: '2-digit', minute: '2-digit' })}
-                            </span>
-                            {log.checked_by && (
-                              <span style={{
-                                fontSize: 10, fontWeight: 700, flexShrink: 0,
-                                color: cat?.color ?? '#4A7C59',
-                                background: cat ? `${cat.color}18` : '#EBF3EE',
-                                padding: '2px 7px', borderRadius: 6,
-                              }}>
-                                {log.checked_by.split(' ')[0]}
+                          <div key={item.key} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '13px 14px', background: 'white', borderBottom: idx < retrasadas.length - 1 ? '1px solid #FEE2E2' : 'none', transition: 'background 0.2s', opacity: isToggling ? 0.55 : 1 }}>
+                            <button onClick={() => toggleCareItem(item)} disabled={isFamiliar || !!careToggling} style={{ width: 26, height: 26, borderRadius: 8, flexShrink: 0, border: '2px solid #FCA5A5', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: isFamiliar ? 'default' : 'pointer', padding: 0, transition: 'all 0.2s' }}>
+                              {isToggling && <div style={{ width: 10, height: 10, borderRadius: '50%', border: '2px solid #FCA5A5', borderTopColor: '#DC2626', animation: 'spin 0.6s linear infinite' }} />}
+                            </button>
+                            <span style={{ fontSize: 20, flexShrink: 0, lineHeight: 1 }}>{item.icon}</span>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <p style={{ fontSize: 13, fontWeight: 600, margin: 0, lineHeight: 1.3, color: '#DC2626' }}>{item.label}</p>
+                              {(careSchedules[item.key] ?? item.scheduledTime) && (
+                                <p style={{ fontSize: 10, color: '#9CA3AF', margin: '2px 0 0' }}>⏰ {fmtTime(careSchedules[item.key] ?? item.scheduledTime)}</p>
+                              )}
+                            </div>
+                            <span style={{ fontSize: 10, fontWeight: 700, color: '#7A5A18', background: '#FEF3C7', padding: '2px 8px', borderRadius: 6, flexShrink: 0 }}>⚠ Tarde</span>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* ⏰ Próximas */}
+                {proximas.length > 0 && (
+                  <div style={{ marginBottom: 14 }}>
+                    <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#9CA3AF', marginBottom: 6, paddingLeft: 2 }}>
+                      ⏰ Próximas
+                    </p>
+                    <div style={{ background: 'white', borderRadius: 16, border: '1px solid #EDE5D8', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}>
+                      {proximas.map((item, idx) => {
+                        const cat = CARE_CATEGORIES.find(c => c.id === item.category) ?? { color: '#4A7C59', bg: '#EBF3EE' }
+                        const status = calcularEstadoCuidado(item, false, careSchedules[item.key])
+                        const isEarly = status === 'programado'
+                        const isToggling = careToggling === item.key
+                        return (
+                          <div key={item.key} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '13px 14px', background: 'white', borderBottom: idx < proximas.length - 1 ? '1px solid #F5EEE6' : 'none', transition: 'background 0.2s', opacity: isToggling ? 0.55 : 1 }}>
+                            <button onClick={() => toggleCareItem(item)} disabled={isFamiliar || !!careToggling} style={{ width: 26, height: 26, borderRadius: 8, flexShrink: 0, border: '2px solid #D1D5DB', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: isFamiliar ? 'default' : 'pointer', padding: 0, transition: 'all 0.2s' }}>
+                              {isToggling && <div style={{ width: 10, height: 10, borderRadius: '50%', border: '2px solid #D1D5DB', borderTopColor: cat.color, animation: 'spin 0.6s linear infinite' }} />}
+                            </button>
+                            <span style={{ fontSize: 20, flexShrink: 0, lineHeight: 1 }}>{item.icon}</span>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <p style={{ fontSize: 13, fontWeight: 600, margin: 0, lineHeight: 1.3, color: '#1A1A1A' }}>{item.label}</p>
+                              <p style={{ fontSize: 10, color: '#9CA3AF', margin: '2px 0 0' }}>⏰ {fmtTime(careSchedules[item.key] ?? item.scheduledTime)}</p>
+                            </div>
+                            {isEarly && (
+                              <span style={{ fontSize: 10, fontWeight: 700, color: '#6B7280', background: '#F3F4F6', padding: '2px 8px', borderRadius: 6, flexShrink: 0, whiteSpace: 'nowrap' }}>
+                                🕐 {fmtTime(careSchedules[item.key] ?? item.scheduledTime)}
                               </span>
-                            )}
-                            {log.photo_url && (
-                              <EvidencePhoto photoUrl={log.photo_url} />
                             )}
                           </div>
                         )
                       })}
                     </div>
+                  </div>
+                )}
+
+                {/* 📋 Sin horario */}
+                {sinHorario.length > 0 && (
+                  <div style={{ marginBottom: 14 }}>
+                    <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#9CA3AF', marginBottom: 6, paddingLeft: 2 }}>
+                      📋 Sin horario
+                    </p>
+                    <div style={{ background: 'white', borderRadius: 16, border: '1px solid #EDE5D8', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}>
+                      {sinHorario.map((item, idx) => {
+                        const cat = CARE_CATEGORIES.find(c => c.id === item.category) ?? { color: '#4A7C59', bg: '#EBF3EE' }
+                        const isToggling = careToggling === item.key
+                        return (
+                          <div key={item.key} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '13px 14px', background: 'white', borderBottom: idx < sinHorario.length - 1 ? '1px solid #F5EEE6' : 'none', transition: 'background 0.2s', opacity: isToggling ? 0.55 : 1 }}>
+                            <button onClick={() => toggleCareItem(item)} disabled={isFamiliar || !!careToggling} style={{ width: 26, height: 26, borderRadius: 8, flexShrink: 0, border: '2px solid #D1D5DB', background: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: isFamiliar ? 'default' : 'pointer', padding: 0, transition: 'all 0.2s' }}>
+                              {isToggling && <div style={{ width: 10, height: 10, borderRadius: '50%', border: '2px solid #D1D5DB', borderTopColor: cat.color, animation: 'spin 0.6s linear infinite' }} />}
+                            </button>
+                            <span style={{ fontSize: 20, flexShrink: 0, lineHeight: 1 }}>{item.icon}</span>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <p style={{ fontSize: 13, fontWeight: 600, margin: 0, lineHeight: 1.3, color: '#1A1A1A' }}>{item.label}</p>
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* ✅ Completadas — colapsado por defecto */}
+                {completadas.length > 0 && (
+                  <div style={{ marginBottom: 14 }}>
+                    <div
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6, paddingLeft: 2, cursor: 'pointer' }}
+                      onClick={() => setShowCompleted(s => !s)}
+                    >
+                      <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#16A34A', margin: 0, borderLeft: '3px solid #16A34A', paddingLeft: 8 }}>
+                        ✅ Completadas ({completadas.length})
+                      </p>
+                      <span style={{ fontSize: 13, color: '#9CA3AF' }}>{showCompleted ? '▾' : '▸'}</span>
+                    </div>
+                    {showCompleted && (
+                      <div style={{ background: 'white', borderRadius: 16, border: '1px solid #BBF7D0', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}>
+                        {completadas.map((item, idx) => {
+                          const cat = CARE_CATEGORIES.find(c => c.id === item.category) ?? { color: '#16A34A', bg: '#F0FDF4' }
+                          const isToggling = careToggling === item.key
+                          const log = careLogs[item.key]
+                          const checkedTime = log?.checked_at
+                            ? new Date(log.checked_at).toLocaleTimeString('es-US', { hour: '2-digit', minute: '2-digit' })
+                            : null
+                          return (
+                            <div key={item.key} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '13px 14px', background: cat.bg, borderBottom: idx < completadas.length - 1 ? `1px solid ${cat.color}25` : 'none', transition: 'background 0.2s', opacity: isToggling ? 0.55 : 1 }}>
+                              <button onClick={() => toggleCareItem(item)} disabled={isFamiliar || !!careToggling} style={{ width: 26, height: 26, borderRadius: 8, flexShrink: 0, border: `2px solid ${cat.color}`, background: cat.color, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: isFamiliar ? 'default' : 'pointer', padding: 0, transition: 'all 0.2s' }}>
+                                {!isToggling && <CheckIcon size={13} color="white" strokeWidth={2.5} />}
+                                {isToggling && <div style={{ width: 10, height: 10, borderRadius: '50%', border: '2px solid rgba(255,255,255,0.4)', borderTopColor: 'white', animation: 'spin 0.6s linear infinite' }} />}
+                              </button>
+                              <span style={{ fontSize: 20, flexShrink: 0, lineHeight: 1 }}>{item.icon}</span>
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <p style={{ fontSize: 13, fontWeight: 600, margin: 0, lineHeight: 1.3, color: '#9CA3AF', textDecoration: 'line-through' }}>{item.label}</p>
+                                {checkedTime && (
+                                  <p style={{ fontSize: 10, color: cat.color, margin: '2px 0 0', fontWeight: 600 }}>
+                                    ✓ {checkedTime}{log?.checked_by ? ` · ${log.checked_by.split(' ')[0]}` : ''}
+                                  </p>
+                                )}
+                                {justCompletedKey === item.key && !log?.photo_url && (
+                                  <EvidencePhoto onPhotoCapture={url => handleRoutinePhoto(item.key, url)} label="Agregar foto" bucket="care-photos" pathPrefix={`routines/${ownerId}`} />
+                                )}
+                                {log?.photo_url && (
+                                  <div style={{ marginTop: 4 }}><EvidencePhoto photoUrl={log.photo_url} /></div>
+                                )}
+                              </div>
+                              <span style={{ fontSize: 10, fontWeight: 700, color: '#16A34A', background: '#DCFCE7', padding: '2px 8px', borderRadius: 6, flexShrink: 0 }}>✓ Listo</span>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )}
                   </div>
                 )}
               </>
