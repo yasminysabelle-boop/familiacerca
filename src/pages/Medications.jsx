@@ -14,6 +14,9 @@ import EmptyState from '../components/EmptyState'
 import LoadingButton from '../components/LoadingButton'
 import { usePullToRefresh } from '../hooks/usePullToRefresh'
 import { detectMedicationWindow, getMiloSuggestion, WINDOW_OPTIONS } from '../utils/medicationDatabase'
+import Layout from '../components/Layout'
+import MedicationListTab from '../components/MedicationListTab'
+import MedicationStockList from './medications/MedicationStockList'
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -124,6 +127,7 @@ export default function Medications() {
   const [expandedMedHistorial, setExpandedMedHistorial] = useState(new Set())
   const [expandedHistorialDays, setExpandedHistorialDays] = useState(new Set())
   const [miloSuggestion, setMiloSuggestion] = useState(null)
+  const [activeTab,      setActiveTab]      = useState('hoy')
 
   // ── Form / add-flow state ──────────────────────────────────────────────────
   const [showForm,    setShowForm]    = useState(false)
@@ -458,7 +462,7 @@ Return ONLY valid JSON.`
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
-    <>
+    <Layout>
       {showPaywall && <PaywallModal onClose={() => setShowPaywall(false)} patientName={profile?.name?.split(' ')[0]} />}
       <div
         ref={pullRef}
@@ -492,6 +496,28 @@ Return ONLY valid JSON.`
             </button>
           )}
         </div>
+
+        {/* ── Tab bar ─────────────────────────────────────────────────────── */}
+        <div style={{ display: 'flex', background: '#f5f5f5', borderRadius: '8px 8px 0 0', marginBottom: 0, overflow: 'hidden' }}>
+          {['hoy', 'todos', 'stock'].map(tab => (
+            <button key={tab} onClick={() => setActiveTab(tab)}
+              style={{
+                flex: 1, padding: '10px 0', border: 'none', cursor: 'pointer',
+                background: activeTab === tab ? '#2D4A1E' : 'transparent',
+                color: activeTab === tab ? 'white' : '#666',
+                fontWeight: activeTab === tab ? 600 : 400,
+                fontSize: 14,
+                borderRadius: tab === 'hoy' ? '8px 0 0 0' : tab === 'stock' ? '0 8px 0 0' : 0,
+                transition: 'all 0.2s',
+                WebkitTapHighlightColor: 'transparent',
+              }}
+            >
+              {tab === 'hoy' ? '💊 Hoy' : tab === 'todos' ? '📋 Todos' : '📦 Stock'}
+            </button>
+          ))}
+        </div>
+
+        {activeTab === 'hoy' && (<>
 
         {/* Push banner */}
         {supported && permission !== 'granted' && permission !== 'denied' && (
@@ -705,6 +731,23 @@ Return ONLY valid JSON.`
             })}
           </div>
         )}
+
+        </>)}
+
+        {activeTab === 'todos' && (
+          <MedicationListTab
+            medications={medications}
+            stockByMedId={stockByMedId}
+            isAdmin={isAdmin}
+            onEditMed={openEdit}
+            onDeleteMed={handleDelete}
+          />
+        )}
+
+        {activeTab === 'stock' && (
+          <MedicationStockList />
+        )}
+
       </div>
 
       {/* ── Confirm delete dialog ─────────────────────────────────────────── */}
@@ -1079,6 +1122,6 @@ Return ONLY valid JSON.`
           </div>
         </div>
       )}
-    </>
+    </Layout>
   )
 }

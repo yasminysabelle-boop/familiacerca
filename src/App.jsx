@@ -13,7 +13,7 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import Onboarding from './pages/Onboarding'
 import Dashboard from './pages/Dashboard'
-import MedicationTabs from './pages/medications/MedicationTabs'
+import Medications from './pages/Medications'
 import MedicationTimeline from './pages/MedicationTimeline'
 import Calendar from './pages/Calendar'
 import Notes from './pages/Notes'
@@ -102,7 +102,7 @@ function AppShell() {
         <Route path="/register"    element={<Register />} />
         <Route path="/onboarding"  element={<P><Onboarding /></P>} />
         <Route path="/dashboard"   element={<P><Dashboard /></P>} />
-        <Route path="/medications" element={<P><MedicationTabs /></P>} />
+        <Route path="/medications" element={<P><Medications /></P>} />
         <Route path="/historial"   element={<P><MedicationTimeline /></P>} />
         <Route path="/calendar"    element={<P><Calendar /></P>} />
         <Route path="/notes"       element={<P><Notes /></P>} />
