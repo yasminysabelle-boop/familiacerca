@@ -162,13 +162,19 @@ export default function MedicationStockList() {
             const stock = stockMap[med.id]
             const days = stock ? daysFromNow(stock.estimated_end_date) : null
             const pills = stock?.pills_remaining ?? null
-            const sColor = stockColor(days)
-            const sBg = stockBg(days)
-            const sEmoji = stockEmoji(days, pills)
+            const minStock = med.min_stock ?? 7
+            const isBelowMin = pills != null && pills <= minStock
+            // Use min_stock-aware color: red if below min, yellow if close (2×min), green otherwise
+            const sColor = pills == null ? '#9CA3AF' : pills <= minStock ? '#DC2626' : pills <= minStock * 2 ? '#D97706' : '#16A34A'
+            const sBg    = pills == null ? '#F3F4F6' : pills <= minStock ? '#FEF2F2' : pills <= minStock * 2 ? '#FFFBEB' : '#F0FDF4'
+            const sEmoji = pills == null ? '⚪' : pills <= minStock ? '🔴' : pills <= minStock * 2 ? '🟡' : '🟢'
             const pct = stock?.total_pills > 0
               ? Math.max(0, Math.min(100, Math.round((stock.pills_remaining / stock.total_pills) * 100)))
               : 0
             const isEditing = inlineEditId === med.id
+            const qtyPerDose = Number(med.quantity_per_dose ?? 1)
+            const dailyDoses = DOSES_PER_DAY[med.frequency] ?? 1
+            const dailyConsumption = qtyPerDose * dailyDoses
 
             return (
               <div
@@ -176,7 +182,7 @@ export default function MedicationStockList() {
                 style={{
                   background: 'white',
                   borderRadius: 16,
-                  border: '1px solid #EDE5D8',
+                  border: isBelowMin ? '1.5px solid #FCA5A5' : '1px solid #EDE5D8',
                   borderLeft: `4px solid ${sColor}`,
                   padding: '14px 16px',
                   boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
@@ -185,14 +191,21 @@ export default function MedicationStockList() {
                 {/* Top row: name + badge */}
                 <div style={{
                   display: 'flex', alignItems: 'flex-start',
-                  justifyContent: 'space-between', gap: 10, marginBottom: stock ? 12 : 0,
+                  justifyContent: 'space-between', gap: 10, marginBottom: stock ? 10 : 0,
                 }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <span style={{ fontSize: 15, fontWeight: 700, color: '#1A1A1A' }}>
-                      💊 {med.name}
-                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: 15, fontWeight: 700, color: '#1A1A1A' }}>
+                        💊 {med.name}
+                      </span>
+                      {med.form && (
+                        <span style={{ fontSize: 10, fontWeight: 600, color: '#4A7C59', background: '#EBF3EE', padding: '2px 7px', borderRadius: 10 }}>
+                          {med.form}
+                        </span>
+                      )}
+                    </div>
                     {med.dosage && (
-                      <span style={{ fontSize: 12, color: '#9CA3AF', marginLeft: 8 }}>
+                      <span style={{ fontSize: 12, color: '#9CA3AF' }}>
                         {med.dosage}
                       </span>
                     )}
@@ -232,7 +245,7 @@ export default function MedicationStockList() {
                       gap: '6px 16px', marginBottom: 12,
                     }}>
                       <div>
-                        <p style={{ fontSize: 10, color: '#9CA3AF', margin: 0 }}>Pastillas restantes</p>
+                        <p style={{ fontSize: 10, color: '#9CA3AF', margin: 0 }}>Dosis restantes</p>
                         <p style={{ fontSize: 13, fontWeight: 700, color: sColor, margin: '1px 0 0' }}>
                           {stock.pills_remaining} / {stock.total_pills}
                         </p>
@@ -244,25 +257,28 @@ export default function MedicationStockList() {
                         </p>
                       </div>
                       <div>
+                        <p style={{ fontSize: 10, color: '#9CA3AF', margin: 0 }}>Consumo diario</p>
+                        <p style={{ fontSize: 12, fontWeight: 600, color: '#374151', margin: '1px 0 0' }}>
+                          {dailyConsumption % 1 === 0 ? dailyConsumption : dailyConsumption.toFixed(2)} dosis/día
+                        </p>
+                      </div>
+                      <div>
                         <p style={{ fontSize: 10, color: '#9CA3AF', margin: 0 }}>Se acaba aprox.</p>
                         <p style={{ fontSize: 12, fontWeight: 600, color: '#374151', margin: '1px 0 0' }}>
                           {fmtDate(stock.estimated_end_date)}
                         </p>
                       </div>
-                      {stock.renewal_method && (
-                        <div>
-                          <p style={{ fontSize: 10, color: '#9CA3AF', margin: 0 }}>Renovación</p>
-                          <p style={{ fontSize: 12, fontWeight: 600, color: '#374151', margin: '1px 0 0' }}>
-                            {{
-                              pharmacy: '🏪 Farmacia',
-                              mail: '📬 Envío',
-                              prescription: '📄 Receta',
-                              manual: '✍️ Manual',
-                            }[stock.renewal_method] ?? stock.renewal_method}
-                          </p>
-                        </div>
-                      )}
                     </div>
+
+                    {/* Min stock alert */}
+                    {isBelowMin && (
+                      <div style={{ background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 10, padding: '8px 12px', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span>🔴</span>
+                        <p style={{ fontSize: 12, fontWeight: 700, color: '#DC2626', margin: 0 }}>
+                          Stock bajo el mínimo ({minStock} dosis) — renovar pronto
+                        </p>
+                      </div>
+                    )}
 
                     {/* Urgency alert */}
                     {days != null && days <= 7 && (

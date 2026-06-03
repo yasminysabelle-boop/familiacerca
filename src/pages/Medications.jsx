@@ -17,6 +17,7 @@ import { usePullToRefresh } from '../hooks/usePullToRefresh'
 import { detectMedicationWindow, getMiloSuggestion, WINDOW_OPTIONS } from '../utils/medicationDatabase'
 import Layout from '../components/Layout'
 import MedicationListTab from '../components/MedicationListTab'
+import MedicationHistorialTab from '../components/MedicationHistorialTab'
 import MedicationStockList from './medications/MedicationStockList'
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -103,7 +104,7 @@ function daysFromNow(dateStr) {
 
 // ── Styles ────────────────────────────────────────────────────────────────────
 
-const emptyForm  = { name: '', dosage: '', frequency: '', notes: '', timeWindowMinutes: 60 }
+const emptyForm  = { name: '', dosage: '', frequency: '', notes: '', form: 'Tableta', quantityPerDose: 1, minStock: 7 }
 const emptyStock = { totalPills: '', renewalMethod: '', pharmacyName: '', refillsRemaining: '', lastMailDate: '' }
 
 const fieldStyle = {
@@ -293,7 +294,7 @@ export default function Medications() {
   }
 
   function openEdit(med) {
-    setForm({ name: med.name, dosage: med.dosage ?? '', frequency: med.frequency ?? '', notes: med.notes ?? '', timeWindowMinutes: med.time_window_minutes ?? 60 })
+    setForm({ name: med.name, dosage: med.dosage ?? '', frequency: med.frequency ?? '', notes: med.notes ?? '', form: med.form ?? 'Tableta', quantityPerDose: med.quantity_per_dose ?? 1, minStock: med.min_stock ?? 7 })
     const opt = FREQ_OPTIONS.find(o => o.value === med.frequency)
     if (med.scheduled_times?.length) {
       setScheduledTimes(opt?.interval ? [med.scheduled_times[0]] : med.scheduled_times)
@@ -413,7 +414,10 @@ Return ONLY valid JSON.`
       name: form.name, dosage: form.dosage || null,
       frequency: form.frequency || null, notes: form.notes || null,
       scheduled_times, user_id: ownerId,
-      time_window_minutes: form.timeWindowMinutes ?? 60,
+      form: form.form || 'Tableta',
+      quantity_per_dose: form.quantityPerDose || 1,
+      min_stock: form.minStock || 7,
+      time_window_minutes: 60,
     }
     let savedId = editId, error
     if (editId) {
@@ -853,13 +857,13 @@ Return ONLY valid JSON.`
         </>)}
 
         {activeTab === 'todos' && (
-          <MedicationListTab
-            medications={medications}
-            stockByMedId={stockByMedId}
-            isAdmin={isAdmin}
-            onEditMed={openEdit}
-            onDeleteMed={handleDelete}
-          />
+          <div style={{ padding: '0 0 96px' }}>
+            <MedicationHistorialTab
+              medications={medications}
+              logsByMedId={logsByMedId}
+              loading={loading}
+            />
+          </div>
         )}
 
         {activeTab === 'stock' && (
@@ -1024,82 +1028,40 @@ Return ONLY valid JSON.`
             {addStep === 'form' && (
               <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
-                {/* Medication fields */}
+                {/* Forma farmacéutica */}
+                <div>
+                  <label style={labelStyle}>Forma farmacéutica</label>
+                  <div style={{ position: 'relative' }}>
+                    <select value={form.form} onChange={e => setForm(p => ({ ...p, form: e.target.value }))} style={{ ...fieldStyle, paddingRight: 32 }} onFocus={onFocus} onBlur={onBlur}>
+                      {['Tableta','Cápsula','Jarabe','Gotas','Inyección','Crema','Inhalador','Parche','Supositorio','Otro'].map(f => (
+                        <option key={f} value={f}>{f}</option>
+                      ))}
+                    </select>
+                    <span style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#9CA3AF', fontSize: 12 }}>▼</span>
+                  </div>
+                </div>
+
+                {/* Nombre */}
                 <div>
                   <label style={labelStyle}>Nombre del medicamento *</label>
                   <input
                     name="med_name" required value={form.name}
-                    onChange={e => {
-                      const name = e.target.value
-                      setForm(p => ({ ...p, name }))
-                      const detected = detectMedicationWindow(name)
-                      setForm(p => ({ ...p, name, timeWindowMinutes: detected }))
-                      setMiloSuggestion(getMiloSuggestion(name, detected))
-                    }}
+                    onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
                     placeholder="ej. Metformina" autoComplete="off"
                     style={fieldStyle} onFocus={onFocus} onBlur={onBlur}
                   />
                 </div>
 
-                {/* Milo suggestion */}
-                {miloSuggestion && (
-                  <div style={{
-                    background: '#FFFBEB', border: '1.5px solid #F59E0B',
-                    borderRadius: 14, padding: '12px 14px',
-                    display: 'flex', flexDirection: 'column', gap: 10,
-                  }}>
-                    <div style={{ display: 'flex', gap: 8 }}>
-                      <span style={{ fontSize: 20, flexShrink: 0 }}>💊</span>
-                      <p style={{ fontSize: 13, color: '#7A5A18', margin: 0, lineHeight: 1.5 }}>
-                        {miloSuggestion}
-                      </p>
-                    </div>
-                    <div style={{ display: 'flex', gap: 8 }}>
-                      <button type="button"
-                        onClick={() => { setForm(p => ({ ...p, timeWindowMinutes: 30 })); setMiloSuggestion(null) }}
-                        style={{ flex: 1, padding: '8px', borderRadius: 10, border: 'none', background: '#F59E0B', color: 'white', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}
-                      >
-                        Sí, usar 30 min
-                      </button>
-                      <button type="button"
-                        onClick={() => setMiloSuggestion(null)}
-                        style={{ flex: 1, padding: '8px', borderRadius: 10, border: '1px solid #EDE5D8', background: 'white', color: '#6B7280', fontWeight: 600, fontSize: 12, cursor: 'pointer' }}
-                      >
-                        No, mantener 1 hora
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {/* Ventana de tiempo */}
+                {/* Concentración */}
                 <div>
-                  <label style={labelStyle}>Ventana de tiempo para dar</label>
-                  <div style={{ display: 'flex', gap: 8 }}>
-                    {WINDOW_OPTIONS.map(opt => (
-                      <button
-                        key={opt.minutes}
-                        type="button"
-                        onClick={() => setForm(p => ({ ...p, timeWindowMinutes: opt.minutes }))}
-                        style={{
-                          flex: 1, padding: '10px 6px', borderRadius: 12,
-                          border: `1.5px solid ${form.timeWindowMinutes === opt.minutes ? '#4A7C59' : '#EDE5D8'}`,
-                          background: form.timeWindowMinutes === opt.minutes ? '#EBF3EE' : 'white',
-                          color: form.timeWindowMinutes === opt.minutes ? '#2D4A1E' : '#6B7280',
-                          fontWeight: form.timeWindowMinutes === opt.minutes ? 700 : 400,
-                          fontSize: 12, cursor: 'pointer', transition: 'all 0.15s',
-                          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
-                        }}
-                      >
-                        <span style={{ fontSize: 13, fontWeight: 700 }}>{opt.label}</span>
-                        <span style={{ fontSize: 10, opacity: 0.7 }}>{opt.desc}</span>
-                      </button>
-                    ))}
-                  </div>
+                  <label style={labelStyle}>Concentración</label>
+                  <input name="dosage" value={form.dosage} onChange={e => setForm(p => ({ ...p, dosage: e.target.value }))} placeholder="ej. 500 mg, 10 mg/ml" style={fieldStyle} onFocus={onFocus} onBlur={onBlur} />
                 </div>
 
+                {/* Cantidad por toma */}
                 <div>
-                  <label style={labelStyle}>Dosis</label>
-                  <input name="dosage" value={form.dosage} onChange={e => setForm(p => ({ ...p, dosage: e.target.value }))} placeholder="ej. 500mg" style={fieldStyle} onFocus={onFocus} onBlur={onBlur} />
+                  <label style={labelStyle}>Cantidad por toma</label>
+                  <input type="number" inputMode="decimal" min="0.25" step="0.25" value={form.quantityPerDose} onChange={e => setForm(p => ({ ...p, quantityPerDose: e.target.value }))} placeholder="1" style={fieldStyle} onFocus={onFocus} onBlur={onBlur} />
                 </div>
 
                 <div>
@@ -1168,51 +1130,20 @@ Return ONLY valid JSON.`
                     </div>
                   )}
 
-                  {/* Renewal method */}
-                  <label style={{ ...labelStyle, marginTop: 16 }}>¿Cómo consigues este medicamento normalmente?</label>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                    {RENEWAL_METHODS.map(m => {
-                      const active = stockForm.renewalMethod === m.value
-                      return (
-                        <button
-                          key={m.value} type="button"
-                          onClick={() => setStockForm(p => ({ ...p, renewalMethod: active ? '' : m.value }))}
-                          style={{
-                            padding: '11px 8px', borderRadius: 12,
-                            border: `1.5px solid ${active ? '#4A7C59' : '#EDE5D8'}`,
-                            background: active ? '#EBF3EE' : 'white',
-                            color: active ? '#2D6A4F' : '#6B7280',
-                            fontWeight: 600, fontSize: 13, cursor: 'pointer',
-                            transition: 'all 0.15s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
-                          }}
-                        >
-                          {m.label}
-                        </button>
-                      )
-                    })}
+                  {/* Stock mínimo para alerta */}
+                  <div style={{ marginTop: 16 }}>
+                    <label style={labelStyle}>Stock mínimo para alerta</label>
+                    <input
+                      type="number" inputMode="numeric" min="1"
+                      value={form.minStock}
+                      onChange={e => setForm(p => ({ ...p, minStock: e.target.value }))}
+                      placeholder="7"
+                      style={fieldStyle} onFocus={onFocus} onBlur={onBlur}
+                    />
+                    <p style={{ fontSize: 11, color: '#9CA3AF', margin: '4px 0 0' }}>
+                      Se mostrará alerta 🔴 cuando queden menos de estas dosis
+                    </p>
                   </div>
-
-                  {/* Pharmacy fields */}
-                  {stockForm.renewalMethod === 'pharmacy' && (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 12 }}>
-                      <div>
-                        <label style={labelStyle}>Nombre de la farmacia</label>
-                        <input value={stockForm.pharmacyName} onChange={e => setStockForm(p => ({ ...p, pharmacyName: e.target.value }))} placeholder="Ej: Farmacia del Ahorro, CVS..." style={fieldStyle} onFocus={onFocus} onBlur={onBlur} />
-                      </div>
-                      <div>
-                        <label style={labelStyle}>¿Cuántos refills quedan?</label>
-                        <input type="number" inputMode="numeric" min="0" value={stockForm.refillsRemaining} onChange={e => setStockForm(p => ({ ...p, refillsRemaining: e.target.value }))} placeholder="Ej: 3 (0 = necesita cita)" style={fieldStyle} onFocus={onFocus} onBlur={onBlur} />
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Mail date */}
-                  {stockForm.renewalMethod === 'mail' && (
-                    <div style={{ marginTop: 12 }}>
-                      <label style={labelStyle}>Fecha del último envío</label>
-                      <input type="date" value={stockForm.lastMailDate} onChange={e => setStockForm(p => ({ ...p, lastMailDate: e.target.value }))} style={fieldStyle} onFocus={onFocus} onBlur={onBlur} />
-                    </div>
-                  )}
                 </div>
 
                 {saveError && (
