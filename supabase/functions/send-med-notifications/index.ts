@@ -157,15 +157,22 @@ Deno.serve(async (req: Request) => {
     .overlaps('scheduled_times', missedTimesToCheck)
 
   for (const med of overdueMeds ?? []) {
-    // Skip if already logged today
-    const { data: log } = await supabase
+    // Deduplication guard: atomically claim the missed slot by upserting a 'missed' log.
+    // ignoreDuplicates:true returns null data on conflict → means we already sent this alert.
+    const { data: claimed } = await supabase
       .from('medication_logs')
+      .upsert({
+        medication_id: med.id,
+        user_id: med.user_id,
+        status: 'missed',
+        log_date: todayPR,
+        confirmed_by_name: 'Sistema automático',
+        confirmed_at: new Date().toISOString(),
+      }, { onConflict: 'medication_id,log_date,user_id', ignoreDuplicates: true })
       .select('id')
-      .eq('medication_id', med.id)
-      .eq('user_id', med.user_id)
-      .eq('log_date', todayPR)
       .maybeSingle()
-    if (log) continue
+    // If row already existed (duplicate) or insert failed, skip notification
+    if (!claimed) continue
 
     const { data: members2 } = await supabase
       .from('family_members').select('member_user_id').eq('user_id', med.user_id)

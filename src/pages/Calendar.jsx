@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
@@ -9,8 +9,6 @@ import EmptyState from '../components/EmptyState'
 
 const DAYS   = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
 const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
-const YEAR_RANGE = Array.from({ length: 16 }, (_, i) => new Date().getFullYear() - 5 + i)
-
 const emptyForm = { title: '', date: '', time: '', description: '', type: 'appointment', status: 'programada' }
 
 const EVENT_TYPES = [
@@ -49,8 +47,15 @@ export default function Calendar() {
   const [saving, setSaving]     = useState(false)
   const [loadError, setLoadError] = useState('')
   const [showPicker, setShowPicker] = useState(false)
-  const pickerRef   = useRef(null)
-  const yearListRef = useRef(null)
+  const pickerRef        = useRef(null)
+  const yearListRef      = useRef(null)
+  const fetchEventsIdRef = useRef(0)  // stale-request guard
+
+  // Computed on component mount so it's fresh on every page load (not module load)
+  const yearRange = useMemo(
+    () => Array.from({ length: 16 }, (_, i) => new Date().getFullYear() - 5 + i),
+    []
+  )
 
   // Close picker on outside click
   useEffect(() => {
@@ -90,6 +95,7 @@ export default function Calendar() {
   useEffect(() => { if (user && ownerId) fetchEvents() }, [user, ownerId, year, month])
 
   async function fetchEvents() {
+    const myId = ++fetchEventsIdRef.current
     setLoadError('')
     try {
       const start = `${year}-${String(month + 1).padStart(2, '0')}-01`
@@ -99,16 +105,20 @@ export default function Calendar() {
         .from('events').select('*').eq('user_id', ownerId)
         .gte('date', start).lte('date', end).order('date')
       if (error) throw error
+      if (fetchEventsIdRef.current !== myId) return // family or month changed mid-flight
+
       setEvents(data ?? [])
 
       if (data?.length) {
         const ids = data.map(e => e.id)
         const { data: ps } = await supabase
           .from('appointment_proofs').select('*').in('event_id', ids)
+        if (fetchEventsIdRef.current !== myId) return
         const map = {}; ps?.forEach(p => { map[p.event_id] = p })
         setProofs(map)
       }
     } catch {
+      if (fetchEventsIdRef.current !== myId) return
       setLoadError('No se pudieron cargar los eventos. Verifica tu conexión.')
     }
   }
@@ -118,8 +128,9 @@ export default function Calendar() {
   function openEdit(ev) {
     setEditEvent(ev)
     const parts = (ev.date ?? '').split('-')
-    setDateDisplay(parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : '')
-    setDateError('')
+    const display = parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : ''
+    setDateDisplay(display)
+    setDateError(display ? '' : 'La cita no tiene fecha — ingresa una fecha válida (dd/mm/aaaa)')
     setExistingUrls(ev.attachments ?? [])
     setAttachFiles([])
     setAttachError('')
@@ -493,7 +504,7 @@ export default function Calendar() {
                     ref={yearListRef}
                     style={{ maxHeight: 150, overflowY: 'auto', scrollbarWidth: 'thin' }}
                   >
-                    {YEAR_RANGE.map(y => (
+                    {yearRange.map(y => (
                       <button
                         key={y}
                         data-year={y}

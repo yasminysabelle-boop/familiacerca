@@ -72,7 +72,7 @@ function calcularEstadoMedicamento(scheduledTime, isConfirmed = false, windowMin
   const now = new Date()
   const diffMins = (now.getHours() * 60 + now.getMinutes()) - (h * 60 + m)
   if (diffMins < 0) return 'programado'
-  if (diffMins > windowMinutes) return 'tarde'
+  if (diffMins >= windowMinutes) return 'tarde'
   if (diffMins >= windowMinutes - 15) return 'dar_pronto'
   return 'pendiente'
 }

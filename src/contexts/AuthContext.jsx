@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { requestFcmToken, onForegroundMessage } from '../lib/firebase'
 
@@ -11,6 +11,7 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
   const [inactivityWarning, setInactivityWarning] = useState(false)
+  const [fcmError, setFcmError] = useState(null)
 
   useEffect(() => {
     // On slow/offline mobile, getSession() can hang if it needs to refresh an
@@ -27,6 +28,9 @@ export function AuthProvider({ children }) {
     supabase.auth.getSession().then(({ data: { session } }) => {
       clearTimeout(timer)
       resolve(session)
+      // Refresh in the background so any server-side metadata changes
+      // (e.g. admin flag set while already logged in) apply without re-login.
+      if (session) supabase.auth.refreshSession().catch(() => {})
     }).catch(() => {
       clearTimeout(timer)
       resolve(null)
@@ -39,33 +43,35 @@ export function AuthProvider({ children }) {
     return () => { subscription.unsubscribe(); clearTimeout(timer) }
   }, [])
 
-  // Register FCM token on login and handle foreground push messages
+  // Register FCM token and expose a retry function for the UI
+  const registerFcmToken = useCallback(async (userId) => {
+    if (!userId) return
+    try {
+      const token = await requestFcmToken()
+      if (token) {
+        setFcmError(null)
+        await supabase.from('user_profiles').update({ fcm_token: token }).eq('id', userId)
+      } else {
+        setFcmError('unavailable')
+      }
+    } catch (err) {
+      console.warn('[FCM] Token registration failed:', err?.message ?? String(err))
+      setFcmError('registration_failed')
+    }
+  }, [])
+
+  // Foreground listener + initial token registration on login
   useEffect(() => {
     if (!user) return
     let unsubForeground = () => {}
 
-    async function setupFcm() {
-      try {
-        const token = await requestFcmToken()
-        if (token) {
-          await supabase
-            .from('user_profiles')
-            .update({ fcm_token: token })
-            .eq('id', user.id)
-        }
-      } catch {
-        // Non-critical — notifications simply won't arrive on this device
-      }
-
-      // Show system notifications for FCM messages received while app is open
+    try {
       unsubForeground = onForegroundMessage(payload => {
         const { title, body } = payload.notification ?? {}
         const data = payload.data ?? {}
         if (!title || Notification.permission !== 'granted') return
-
-        // SOS alerts are already shown via Supabase Realtime banner — skip duplicating them
+        // SOS alerts are already shown via Supabase Realtime banner
         if (data.type === 'SOS') return
-
         navigator.serviceWorker?.ready
           .then(reg => reg.showNotification(title, {
             body: body ?? '',
@@ -76,11 +82,13 @@ export function AuthProvider({ children }) {
           }))
           .catch(() => {})
       })
+    } catch (err) {
+      console.warn('[FCM] Foreground listener setup failed:', err)
     }
 
-    setupFcm()
+    registerFcmToken(user.id)
     return () => unsubForeground()
-  }, [user?.id])
+  }, [user?.id, registerFcmToken])
 
   // Update last_seen every 2 minutes while active
   useEffect(() => {
@@ -126,7 +134,11 @@ export function AuthProvider({ children }) {
   const signOut = () => supabase.auth.signOut()
 
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut, inactivityWarning }}>
+    <AuthContext.Provider value={{
+      user, loading, signIn, signUp, signOut, inactivityWarning,
+      fcmError,
+      retryFcm: () => registerFcmToken(user?.id),
+    }}>
       {children}
     </AuthContext.Provider>
   )

@@ -58,7 +58,7 @@ function calcMedStatus(scheduledTime, windowMinutes = 60) {
   const now = new Date()
   const diffMins = (now.getHours() * 60 + now.getMinutes()) - (h * 60 + m)
   if (diffMins < 0)               return 'programado'
-  if (diffMins > windowMinutes)   return 'tarde'
+  if (diffMins >= windowMinutes)  return 'tarde'
   if (diffMins >= windowMinutes - 15) return 'dar_pronto'
   return 'pendiente'
 }
@@ -162,13 +162,18 @@ export default function Medications() {
   const [omisionError,       setOmisionError]       = useState('')
   const [toastMsg,           setToastMsg]           = useState('')
   const [, setTick] = useState(0)
-  const autoMarkedRef = useRef(new Set())
+  const autoMarkedRef  = useRef(new Set())
+  const fetchAllIdRef  = useRef(0)   // stale-request guard for fetchAll
+  const mountedRef     = useRef(true) // unmount guard for async setState
 
   // Tick each minute so pending-status badges stay accurate
   useEffect(() => {
     const id = setInterval(() => setTick(t => t + 1), 60_000)
     return () => clearInterval(id)
   }, [])
+
+  // Unmount cleanup
+  useEffect(() => () => { mountedRef.current = false }, [])
 
   // Auto-reset at midnight PR: detect date change while PWA is open
   useEffect(() => {
@@ -231,10 +236,12 @@ export default function Medications() {
 
   // ── Data fetching ──────────────────────────────────────────────────────────
   async function fetchAll() {
+    const myId = ++fetchAllIdRef.current
     setLoading(true)
     const { data: medsData } = await supabase
       .from('medications').select('*').eq('user_id', ownerId)
       .order('created_at', { ascending: false })
+    if (fetchAllIdRef.current !== myId) return // ownerId changed mid-flight
     const meds = medsData ?? []
 
     // Fetch stock in the same call so pills_remaining is available on first render
@@ -243,6 +250,7 @@ export default function Medications() {
       const { data: stockData } = await supabase
         .from('medication_stock').select('*').eq('user_id', ownerId)
         .in('medication_id', meds.map(m => m.id))
+      if (fetchAllIdRef.current !== myId) return
       ;(stockData ?? []).forEach(s => { stockMap[s.medication_id] = s })
     }
 
@@ -260,6 +268,7 @@ export default function Medications() {
         .eq('user_id', ownerId)
         .gte('log_date', sevenAgoKey)
         .in('medication_id', meds.map(m => m.id))
+      if (fetchAllIdRef.current !== myId) return
       const logsMap = {}
       ;(logsData ?? []).forEach(log => {
         if (!logsMap[log.medication_id]) logsMap[log.medication_id] = {}
@@ -455,7 +464,7 @@ Return ONLY valid JSON.`
       const pillsRemaining = isRestocking ? totalPills : (editStockRecord.pills_remaining ?? totalPills)
       const days = Math.floor(pillsRemaining / dosesPerDay)
       const end  = new Date(); end.setDate(end.getDate() + days)
-      const today = new Date().toISOString().split('T')[0]
+      const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' })
 
       const stockOps = [
         supabase.from('medication_stock').upsert({
@@ -465,7 +474,7 @@ Return ONLY valid JSON.`
           pills_remaining: pillsRemaining,
           doses_per_day:  dosesPerDay,
           start_date:     editStockRecord?.start_date ?? today,
-          estimated_end_date: days > 0 ? end.toISOString().split('T')[0] : null,
+          estimated_end_date: days > 0 ? end.toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' }) : null,
           renewal_method: stockForm.renewalMethod || null,
           pharmacy_name:  stockForm.pharmacyName || null,
           refills_remaining: stockForm.refillsRemaining !== '' ? parseInt(stockForm.refillsRemaining) : null,
@@ -532,8 +541,15 @@ Return ONLY valid JSON.`
     if (_sched) {
       const [_hh, _mm] = _sched.split(':').map(Number)
       const _window = med.time_window_minutes ?? 60
-      const _late = Math.round((new Date().getHours() * 60 + new Date().getMinutes()) - (_hh * 60 + _mm))
-      if (_late > _window) {
+      const _now = new Date()
+      const _nowMins = _now.getHours() * 60 + _now.getMinutes()
+      const _schedMins = _hh * 60 + _mm
+      // Handle midnight wrap: if current time is before scheduled time on the clock,
+      // the dose was scheduled the previous day and elapsed time wraps around 24h.
+      const _late = _nowMins >= _schedMins
+        ? _nowMins - _schedMins
+        : 24 * 60 - _schedMins + _nowMins
+      if (_late >= _window) {
         setAdminError('La ventana clínica ha vencido. Esta dosis no puede administrarse. Continúa con la próxima dosis a su hora habitual.')
         return
       }
@@ -657,14 +673,18 @@ Return ONLY valid JSON.`
     const firstT = times.length ? [...times].sort()[0] : null
     return calcMedStatus(firstT, med.time_window_minutes ?? 60) === 'tarde'
   })
+  // Stable string key: changes whenever the SET of overdue meds changes, even if count stays the same
+  const retrasadosMedIds = retrasadosMeds.map(m => m.id).sort().join(',')
   const administradosMeds = medications.filter(med =>
     (logsByMedId[med.id]?.[today] ?? []).some(l => l.status === 'confirmed' || l.status === 'missed')
   )
 
-  // Auto-mark medications past their clinical window as missed (runs whenever retrasadosMeds changes)
+  // Auto-mark medications past their clinical window as missed.
+  // Dep key is the sorted ID string so the effect fires whenever the SET changes,
+  // even when count stays the same (e.g. med A confirmed → med C enters window).
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    if (loading || !ownerId || retrasadosMeds.length === 0) return
+    if (loading || !ownerId || !retrasadosMedIds) return
     const toMark = retrasadosMeds.filter(med => !autoMarkedRef.current.has(med.id))
     if (toMark.length === 0) return
     const todayLocal = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' })
@@ -679,7 +699,9 @@ Return ONLY valid JSON.`
       Promise.all([
         supabase.from('medication_omissions').insert({
           medication_id: med.id, owner_id: ownerId, scheduled_at: scheduledAt,
-          reason: 'Venció la ventana clínica (automático)', omitted_by_name: 'Sistema',
+          reason: 'Venció la ventana clínica (automático)',
+          omitted_by: user.id,         // D3: required field — was missing
+          omitted_by_name: 'Sistema automático',
         }),
         supabase.from('medication_logs').upsert({
           medication_id: med.id, user_id: ownerId, status: 'missed',
@@ -687,6 +709,7 @@ Return ONLY valid JSON.`
           confirmed_at: new Date().toISOString(), scheduled_at: scheduledAt,
         }, { onConflict: 'medication_id,log_date,user_id' }),
       ]).then(() => {
+        if (!mountedRef.current) return  // D2: component unmounted before promise resolved
         setLogsByMedId(prev => {
           const next = { ...prev }
           if (!next[med.id]) next[med.id] = {}
@@ -701,7 +724,7 @@ Return ONLY valid JSON.`
         })
       })
     }
-  }, [loading, ownerId, retrasadosMeds.length])
+  }, [loading, ownerId, retrasadosMedIds])
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
