@@ -115,6 +115,7 @@ export default function Landing() {
   const [showBar, setShowBar] = useState(false)
   const [dismissed, setDismissed] = useState(false)
   const statsRef = useRef(null)
+  const hasAnimatedStats = useRef(false)
 
   useEffect(() => {
     if (document.getElementById('landing-gfonts')) return
@@ -139,9 +140,11 @@ export default function Landing() {
     if (!el) return
     const targets = [500, 98, 3, 0]
     const io = new IntersectionObserver(entries => {
-      if (!entries[0].isIntersecting) return
+      if (!entries[0].isIntersecting || hasAnimatedStats.current) return
+      hasAnimatedStats.current = true
       io.disconnect()
-      const t0 = Date.now(); const dur = 1800
+      const t0 = Date.now()
+      const dur = 1800
       const tick = () => {
         const p = Math.min((Date.now() - t0) / dur, 1)
         const ease = 1 - Math.pow(1 - p, 3)
@@ -483,8 +486,8 @@ export default function Landing() {
 
             {/* WhatsApp: chaos panel */}
             <div className="reveal" style={{ borderRadius: 24, overflow: 'hidden', boxShadow: '0 12px 48px rgba(0,0,0,0.12)', border: '1px solid rgba(0,0,0,0.06)' }}>
-              <div style={{ background: '#128C7E', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div style={{ width: 38, height: 38, borderRadius: '50%', background: '#075E54', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>👨‍👩‍👧</div>
+              <div style={{ background: DARK, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ width: 38, height: 38, borderRadius: '50%', background: PRIMARY, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>👨‍👩‍👧</div>
                 <div>
                   <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: WHITE, fontFamily: SANS }}>Familia WhatsApp</p>
                   <p style={{ margin: 0, fontSize: 11, color: 'rgba(255,255,255,0.65)', fontFamily: SANS }}>8 participantes · 247 mensajes sin leer</p>
@@ -505,8 +508,8 @@ export default function Landing() {
                   { from: 'Mamá 📱', msg: 'ay dios mío qué hacemos', mine: false, time: '9:20' },
                 ].map((b, i) => (
                   <div key={i} style={{ display: 'flex', justifyContent: b.mine ? 'flex-end' : 'flex-start' }}>
-                    <div style={{ maxWidth: '78%', padding: '8px 12px', borderRadius: b.mine ? '14px 14px 4px 14px' : '14px 14px 14px 4px', background: b.mine ? '#DCF8C6' : WHITE, position: 'relative' }}>
-                      {!b.mine && <p style={{ margin: '0 0 2px', fontSize: 10, fontWeight: 600, color: '#128C7E', fontFamily: SANS }}>{b.from}</p>}
+                    <div style={{ maxWidth: '78%', padding: '8px 12px', borderRadius: b.mine ? '14px 14px 4px 14px' : '14px 14px 14px 4px', background: b.mine ? MINT_C : WHITE, position: 'relative' }}>
+                      {!b.mine && <p style={{ margin: '0 0 2px', fontSize: 10, fontWeight: 600, color: ACTION, fontFamily: SANS }}>{b.from}</p>}
                       <p style={{ margin: 0, fontSize: 12, color: '#303030', fontFamily: SANS, lineHeight: 1.4 }}>{b.msg}</p>
                       <p style={{ margin: '3px 0 0', fontSize: 9, color: '#9CA3AF', fontFamily: SANS, textAlign: 'right' }}>{b.time}</p>
                     </div>
