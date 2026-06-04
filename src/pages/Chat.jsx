@@ -567,7 +567,7 @@ export default function Chat() {
               color: interim ? '#9CA3AF' : '#D63031',
               fontWeight: interim ? 400 : 600,
             }}>
-              {interim ? `🎤 ${interim}` : '🔴 Escuchando... suelta para terminar'}
+              {interim ? `🎤 ${interim}` : '🔴 Grabando... toca el botón para detener'}
             </p>
           )}
 
