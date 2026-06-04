@@ -41,6 +41,7 @@ import Admin from './pages/Admin'
 import DiarioMedico from './pages/DiarioMedico'
 import CareRecord from './pages/CareRecord'
 import Incidents from './pages/Incidents'
+import InstallPrompt from './components/InstallPrompt'
 
 const P = ({ children }) => <ProtectedRoute>{children}</ProtectedRoute>
 
@@ -98,6 +99,7 @@ function AppShell() {
       {showSlides && !isLanding && <WelcomeSlides onDone={handleOnboardingDone} />}
       {!showSlides && !splashDone && !isLanding && <Splash fading={splashFading} />}
       {showMemberOnboarding && <MemberOnboarding onDone={handleMemberOnboardingDone} />}
+      <InstallPrompt />
       <Routes>
         <Route path="/"            element={<HomeRoute />} />
         <Route path="/login"       element={<Login />} />
