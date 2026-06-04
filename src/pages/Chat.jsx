@@ -64,6 +64,16 @@ function Avatar({ name, photoUrl, size = 32 }) {
   )
 }
 
+const CATEGORIES = [
+  { id: 'all',          emoji: '💬', label: 'Todos',        color: '#4A7C59' },
+  { id: 'aviso',        emoji: '📢', label: 'Aviso',        color: '#2563EB' },
+  { id: 'incidente',    emoji: '🚨', label: 'Incidente',    color: '#DC2626' },
+  { id: 'evidencia',    emoji: '📷', label: 'Evidencia',    color: '#7C3AED' },
+  { id: 'medicamentos', emoji: '💊', label: 'Medicamentos', color: '#16A34A' },
+  { id: 'cuidados',     emoji: '📋', label: 'Cuidados',     color: '#EA580C' },
+  { id: 'citas',        emoji: '📅', label: 'Citas',        color: '#0D9488' },
+]
+
 export default function Chat() {
   const { user } = useAuth()
   const { ownerId } = useFamily()
@@ -80,6 +90,8 @@ export default function Chat() {
   const [aiLoading, setAiLoading] = useState(false)
   const [contextMsg, setContextMsg] = useState(null)   // mensaje con menú abierto
   const [pinError, setPinError] = useState('')
+  const [activeCategory, setActiveCategory] = useState('all')
+  const [msgCategory, setMsgCategory] = useState('general')
   const bottomRef = useRef(null)
   const inputRef = useRef(null)
   const longPressTimer = useRef(null)
@@ -175,11 +187,14 @@ export default function Chat() {
       user_id: user.id,
       user_name: displayName,
       message: text,
+      category: msgCategory,
     })
 
     if (error) {
       setSendError('No se pudo enviar. Inténtalo de nuevo.')
       setInput(text)
+    } else {
+      setMsgCategory('general')
     }
 
     setSending(false)
@@ -261,8 +276,12 @@ export default function Chat() {
     }
   }
 
+  const filteredMessages = activeCategory === 'all'
+    ? messages
+    : messages.filter(m => (m.category ?? 'general') === activeCategory)
+
   // Group messages by date
-  const grouped = messages.reduce((acc, msg) => {
+  const grouped = filteredMessages.reduce((acc, msg) => {
     const date = formatDate(msg.created_at)
     if (!acc[date]) acc[date] = []
     acc[date].push(msg)
@@ -310,6 +329,31 @@ export default function Chat() {
             </div>
           </div>
         )}
+
+        {/* Category filter bar */}
+        <div style={{
+          background: 'white', borderBottom: '1px solid #EDE5D8',
+          padding: '8px 12px', flexShrink: 0,
+          display: 'flex', gap: 6, overflowX: 'auto',
+          scrollbarWidth: 'none',
+        }}>
+          {CATEGORIES.map(cat => (
+            <button
+              key={cat.id}
+              onClick={() => setActiveCategory(cat.id)}
+              style={{
+                padding: '5px 12px', borderRadius: 20, border: 'none',
+                background: activeCategory === cat.id ? cat.color : '#F3F4F6',
+                color: activeCategory === cat.id ? 'white' : '#374151',
+                fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                flexShrink: 0, whiteSpace: 'nowrap',
+                transition: 'background 0.15s, color 0.15s',
+              }}
+            >
+              {cat.emoji} {cat.label}
+            </button>
+          ))}
+        </div>
 
         {/* Overlay de menú contextual (long press) */}
         {contextMsg && (
@@ -389,6 +433,9 @@ export default function Chat() {
                   const senderProfile = profiles[msg.user_id]
                   const senderName = senderProfile?.full_name ?? msg.user_name ?? 'Familiar'
                   const msgText = msg.content ?? msg.message ?? ''
+                  const catInfo = msg.category && msg.category !== 'general'
+                    ? CATEGORIES.find(c => c.id === msg.category)
+                    : null
 
                   return (
                     <div
@@ -456,6 +503,19 @@ export default function Chat() {
                         }}>
                           {msgText}
                         </div>
+
+                        {/* Category badge */}
+                        {catInfo && (
+                          <span style={{
+                            fontSize: 10, fontWeight: 700,
+                            color: catInfo.color,
+                            marginTop: 2,
+                            marginLeft: mine ? 0 : 4,
+                            marginRight: mine ? 4 : 0,
+                          }}>
+                            {catInfo.emoji} {catInfo.label}
+                          </span>
+                        )}
 
                         {/* Timestamp + pin indicator */}
                         <span style={{
@@ -559,6 +619,28 @@ export default function Chat() {
               )}
             </div>
           )}
+
+          {/* Compact category picker */}
+          <div style={{ display: 'flex', gap: 5, marginBottom: 8, overflowX: 'auto', scrollbarWidth: 'none' }}>
+            {CATEGORIES.filter(c => c.id !== 'all').map(cat => (
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => setMsgCategory(cat.id)}
+                style={{
+                  padding: '3px 10px', borderRadius: 16, border: '1.5px solid',
+                  borderColor: msgCategory === cat.id ? cat.color : '#EDE5D8',
+                  background: msgCategory === cat.id ? cat.color : 'transparent',
+                  color: msgCategory === cat.id ? 'white' : '#9CA3AF',
+                  fontSize: 11, fontWeight: 600, cursor: 'pointer',
+                  flexShrink: 0, whiteSpace: 'nowrap',
+                  transition: 'all 0.15s',
+                }}
+              >
+                {cat.emoji} {cat.label}
+              </button>
+            ))}
+          </div>
 
           <form onSubmit={handleSend} style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
             <textarea

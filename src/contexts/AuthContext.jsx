@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
+import { requestFcmToken, onForegroundMessage } from '../lib/firebase'
 
 const AuthContext = createContext(null)
 
@@ -37,6 +38,49 @@ export function AuthProvider({ children }) {
 
     return () => { subscription.unsubscribe(); clearTimeout(timer) }
   }, [])
+
+  // Register FCM token on login and handle foreground push messages
+  useEffect(() => {
+    if (!user) return
+    let unsubForeground = () => {}
+
+    async function setupFcm() {
+      try {
+        const token = await requestFcmToken()
+        if (token) {
+          await supabase
+            .from('user_profiles')
+            .update({ fcm_token: token })
+            .eq('id', user.id)
+        }
+      } catch {
+        // Non-critical — notifications simply won't arrive on this device
+      }
+
+      // Show system notifications for FCM messages received while app is open
+      unsubForeground = onForegroundMessage(payload => {
+        const { title, body } = payload.notification ?? {}
+        const data = payload.data ?? {}
+        if (!title || Notification.permission !== 'granted') return
+
+        // SOS alerts are already shown via Supabase Realtime banner — skip duplicating them
+        if (data.type === 'SOS') return
+
+        navigator.serviceWorker?.ready
+          .then(reg => reg.showNotification(title, {
+            body: body ?? '',
+            icon: '/icon-192.png',
+            badge: '/icon-72.png',
+            tag: data.type ?? 'fcm-foreground',
+            data: { url: data.url ?? '/' },
+          }))
+          .catch(() => {})
+      })
+    }
+
+    setupFcm()
+    return () => unsubForeground()
+  }, [user?.id])
 
   // Update last_seen every 2 minutes while active
   useEffect(() => {

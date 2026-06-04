@@ -10,7 +10,8 @@ import EmptyState from '../components/EmptyState'
 const DAYS   = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
 const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
 
-const emptyForm = { title: '', date: '', time: '', description: '', type: 'appointment' }
+const emptyForm = { title: '', date: '', time: '', description: '', type: 'appointment', status: 'programada' }
+
 const EVENT_TYPES = [
   { value: 'appointment', label: 'Cita médica',  color: 'bg-blue-100 text-blue-800' },
   { value: 'medication',  label: 'Medicamento',  color: 'bg-primary-light text-primary' },
@@ -19,6 +20,13 @@ const EVENT_TYPES = [
 ]
 const typeStyle = t => EVENT_TYPES.find(x => x.value === t)?.color ?? 'bg-gray-100 text-gray-800'
 const typeLabel = t => EVENT_TYPES.find(x => x.value === t)?.label ?? t
+
+const STATUS_OPTIONS = [
+  { value: 'programada', label: 'Programada', color: '#2563EB', bg: '#EFF6FF' },
+  { value: 'realizada',  label: 'Realizada',  color: '#16A34A', bg: '#F0FDF4' },
+  { value: 'cancelada',  label: 'Cancelada',  color: '#DC2626', bg: '#FEF2F2' },
+]
+const statusInfo = s => STATUS_OPTIONS.find(o => o.value === s) ?? STATUS_OPTIONS[0]
 
 export default function Calendar() {
   const { user } = useAuth()
@@ -29,25 +37,34 @@ export default function Calendar() {
 
   const isAdmin = user?.id === ownerId
 
-  const [year, setYear]       = useState(today.getFullYear())
-  const [month, setMonth]     = useState(today.getMonth())
-  const [events, setEvents]   = useState([])
+  const [year, setYear]         = useState(today.getFullYear())
+  const [month, setMonth]       = useState(today.getMonth())
+  const [events, setEvents]     = useState([])
   const [selected, setSelected] = useState(null)
   const [showForm, setShowForm] = useState(false)
-  const [form, setForm]       = useState(emptyForm)
-  const [editEvent, setEditEvent] = useState(null)
+  const [form, setForm]         = useState(emptyForm)
+  const [editEvent, setEditEvent]   = useState(null)
   const [confirmDialog, setConfirmDialog] = useState(null)
-  const [saving, setSaving]   = useState(false)
+  const [saving, setSaving]     = useState(false)
   const [loadError, setLoadError] = useState('')
 
-  // Appointment proof modal state
-  const [proofEvent, setProofEvent]   = useState(null)
-  const [proofPhoto, setProofPhoto]   = useState(null)
-  const [proofPreview, setProofPreview] = useState(null)
-  const [proofNote, setProofNote]     = useState('')
-  const [proofSaving, setProofSaving] = useState(false)
+  // Date display (dd/mm/aaaa)
+  const [dateDisplay, setDateDisplay] = useState('')
+  const [dateError, setDateError]     = useState('')
+
+  // Attachment state
+  const [attachFiles, setAttachFiles]     = useState([])   // {file, preview, name, isImage}
+  const [existingUrls, setExistingUrls]   = useState([])   // already-saved URLs
+  const [attachError, setAttachError]     = useState('')
+
+  // Appointment proof modal
+  const [proofEvent, setProofEvent]       = useState(null)
+  const [proofPhoto, setProofPhoto]       = useState(null)
+  const [proofPreview, setProofPreview]   = useState(null)
+  const [proofNote, setProofNote]         = useState('')
+  const [proofSaving, setProofSaving]     = useState(false)
   const [proofUploadError, setProofUploadError] = useState('')
-  const [proofs, setProofs]           = useState({}) // eventId -> proof
+  const [proofs, setProofs]               = useState({})
 
   useEffect(() => { if (user && ownerId) fetchEvents() }, [user, ownerId, year, month])
 
@@ -63,7 +80,6 @@ export default function Calendar() {
       if (error) throw error
       setEvents(data ?? [])
 
-      // Fetch proofs for visible events
       if (data?.length) {
         const ids = data.map(e => e.id)
         const { data: ps } = await supabase
@@ -80,20 +96,93 @@ export default function Calendar() {
 
   function openEdit(ev) {
     setEditEvent(ev)
-    setForm({ title: ev.title, date: ev.date, time: ev.time ?? '', description: ev.description ?? '', type: ev.type })
+    const parts = (ev.date ?? '').split('-')
+    setDateDisplay(parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : '')
+    setDateError('')
+    setExistingUrls(ev.attachments ?? [])
+    setAttachFiles([])
+    setAttachError('')
+    setForm({ title: ev.title, date: ev.date, time: ev.time ?? '', description: ev.description ?? '', type: ev.type, status: ev.status ?? 'programada' })
     setShowForm(true)
+  }
+
+  function resetForm() {
+    setForm(emptyForm); setDateDisplay(''); setDateError('')
+    setAttachFiles([]); setExistingUrls([]); setAttachError('')
   }
 
   function handleChange(e) { setForm(prev => ({ ...prev, [e.target.name]: e.target.value })) }
 
-  async function handleSubmit(e) {
-    e.preventDefault(); setSaving(true)
-    if (editEvent) {
-      await supabase.from('events').update({ ...form, time: form.time || null }).eq('id', editEvent.id)
+  function handleDateInput(val) {
+    // Auto-insert slashes as user types
+    let digits = val.replace(/\D/g, '').slice(0, 8)
+    let formatted = digits
+    if (digits.length > 2) formatted = digits.slice(0, 2) + '/' + digits.slice(2)
+    if (digits.length > 4) formatted = digits.slice(0, 2) + '/' + digits.slice(2, 4) + '/' + digits.slice(4)
+    setDateDisplay(formatted)
+    setDateError('')
+
+    const parts = formatted.split('/')
+    if (parts.length === 3 && parts[0].length === 2 && parts[1].length === 2 && parts[2].length === 4) {
+      const iso = `${parts[2]}-${parts[1]}-${parts[0]}`
+      const d = new Date(iso)
+      if (isNaN(d.getTime())) {
+        setDateError('Fecha inválida')
+        setForm(prev => ({ ...prev, date: '' }))
+      } else {
+        setForm(prev => ({ ...prev, date: iso }))
+      }
     } else {
-      await supabase.from('events').insert({ ...form, time: form.time || null, user_id: ownerId, created_by_user_id: user.id })
+      setForm(prev => ({ ...prev, date: '' }))
     }
-    setForm(emptyForm); setShowForm(false); setEditEvent(null); setSaving(false); fetchEvents()
+  }
+
+  function pickAttachment() {
+    const el = document.createElement('input')
+    el.type = 'file'
+    el.accept = 'image/*,application/pdf,.doc,.docx'
+    el.multiple = true
+    el.addEventListener('change', e => {
+      const files = Array.from(e.target.files ?? [])
+      const items = files.map(f => ({
+        file: f,
+        preview: f.type.startsWith('image/') ? URL.createObjectURL(f) : null,
+        name: f.name,
+        isImage: f.type.startsWith('image/'),
+      }))
+      setAttachFiles(prev => [...prev, ...items])
+    }, { once: true })
+    el.click()
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault()
+    if (!form.date) { setDateError('Ingresa una fecha válida (dd/mm/aaaa)'); return }
+    setSaving(true); setAttachError('')
+
+    // Upload pending attachment files
+    const newUrls = []
+    for (const af of attachFiles) {
+      const safeName = af.name.replace(/[^a-zA-Z0-9._-]/g, '_')
+      const path = `${user.id}/${Date.now()}_${safeName}`
+      const { error: upErr } = await supabase.storage
+        .from('event-attachments').upload(path, af.file, { upsert: true, contentType: af.file.type })
+      if (upErr) {
+        setAttachError('Algunos archivos no se pudieron subir.')
+      } else {
+        const { data: { publicUrl } } = supabase.storage.from('event-attachments').getPublicUrl(path)
+        newUrls.push(publicUrl)
+      }
+    }
+    const allAttachments = [...existingUrls, ...newUrls]
+
+    if (editEvent) {
+      await supabase.from('events').update({ ...form, time: form.time || null, attachments: allAttachments }).eq('id', editEvent.id)
+    } else {
+      await supabase.from('events').insert({ ...form, time: form.time || null, user_id: ownerId, created_by_user_id: user.id, attachments: allAttachments })
+    }
+    resetForm(); setShowForm(false); setEditEvent(null); setSaving(false)
+    fetchEvents()
   }
 
   async function handleDelete(id) {
@@ -134,8 +223,7 @@ export default function Calendar() {
 
   async function submitProof() {
     if (!proofPhoto && !proofNote) return
-    setProofSaving(true)
-    setProofUploadError('')
+    setProofSaving(true); setProofUploadError('')
 
     let photo_url = null
     if (proofPhoto) {
@@ -152,7 +240,7 @@ export default function Calendar() {
 
     await supabase.from('appointment_proofs').upsert({
       event_id: proofEvent.id,
-      user_id: user.id, // proof uploader stays as the actual user (not owner)
+      user_id: user.id,
       photo_url,
       notes: proofNote || null,
       attended: true,
@@ -172,8 +260,10 @@ export default function Calendar() {
             <h2 className="text-2xl font-bold text-gray-900">Calendario</h2>
             <p className="text-gray-500 mt-1">Citas médicas y eventos importantes</p>
           </div>
-          <button onClick={() => { setEditEvent(null); setForm(emptyForm); setShowForm(!showForm) }}
-            className="px-4 py-2 bg-primary hover:bg-primary-dark text-white text-sm font-medium rounded-lg transition-colors">
+          <button
+            onClick={() => { setEditEvent(null); resetForm(); setShowForm(!showForm) }}
+            className="px-4 py-2 bg-primary hover:bg-primary-dark text-white text-sm font-medium rounded-lg transition-colors"
+          >
             + Agregar evento
           </button>
         </div>
@@ -190,8 +280,14 @@ export default function Calendar() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Fecha *</label>
-                <input type="date" name="date" required value={form.date} onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                <input
+                  value={dateDisplay}
+                  onChange={e => handleDateInput(e.target.value)}
+                  placeholder="dd/mm/aaaa"
+                  inputMode="numeric"
+                  className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary ${dateError ? 'border-red-400' : 'border-gray-200'}`}
+                />
+                {dateError && <p className="text-xs text-red-500 mt-1">{dateError}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Hora</label>
@@ -211,14 +307,91 @@ export default function Calendar() {
                   placeholder="Notas adicionales"
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
               </div>
+
+              {/* Status pills */}
+              <div className="col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  {STATUS_OPTIONS.map(opt => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => setForm(prev => ({ ...prev, status: opt.value }))}
+                      style={{
+                        padding: '6px 16px', borderRadius: 20,
+                        border: `1.5px solid ${form.status === opt.value ? opt.color : '#E5E7EB'}`,
+                        background: form.status === opt.value ? opt.bg : 'white',
+                        color: form.status === opt.value ? opt.color : '#6B7280',
+                        fontSize: 13, fontWeight: 600, cursor: 'pointer',
+                        transition: 'all 0.15s',
+                      }}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Document attachments */}
+              <div className="col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Documentos adjuntos</label>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
+                  {existingUrls.map((url, i) => {
+                    const isImg = /\.(jpg|jpeg|png|gif|webp)(\?|$)/i.test(url)
+                    return (
+                      <div key={url} style={{ position: 'relative' }}>
+                        {isImg ? (
+                          <img src={url} alt="adjunto" style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 8, border: '1px solid #EDE5D8' }} />
+                        ) : (
+                          <div style={{ width: 64, height: 64, borderRadius: 8, border: '1px solid #EDE5D8', background: '#F9FAFB', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
+                            <span style={{ fontSize: 22 }}>📄</span>
+                            <span style={{ fontSize: 9, color: '#6B7280', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 56, textAlign: 'center' }}>
+                              {url.split('/').pop()?.slice(0, 10)}
+                            </span>
+                          </div>
+                        )}
+                        <button type="button" onClick={() => setExistingUrls(prev => prev.filter((_, j) => j !== i))}
+                          style={{ position: 'absolute', top: -6, right: -6, width: 18, height: 18, borderRadius: '50%', background: '#DC2626', color: 'white', border: 'none', cursor: 'pointer', fontSize: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          ✕
+                        </button>
+                      </div>
+                    )
+                  })}
+                  {attachFiles.map((af, i) => (
+                    <div key={i} style={{ position: 'relative' }}>
+                      {af.isImage ? (
+                        <img src={af.preview} alt={af.name} style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 8, border: '1px solid #EDE5D8' }} />
+                      ) : (
+                        <div style={{ width: 64, height: 64, borderRadius: 8, border: '1px solid #EDE5D8', background: '#F9FAFB', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
+                          <span style={{ fontSize: 22 }}>📄</span>
+                          <span style={{ fontSize: 9, color: '#6B7280', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 56, textAlign: 'center' }}>
+                            {af.name.slice(0, 10)}
+                          </span>
+                        </div>
+                      )}
+                      <button type="button" onClick={() => setAttachFiles(prev => prev.filter((_, j) => j !== i))}
+                        style={{ position: 'absolute', top: -6, right: -6, width: 18, height: 18, borderRadius: '50%', background: '#DC2626', color: 'white', border: 'none', cursor: 'pointer', fontSize: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                  <button type="button" onClick={pickAttachment}
+                    style={{ width: 64, height: 64, borderRadius: 8, border: '2px dashed #D1D5DB', background: '#F9FAFB', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#9CA3AF', fontSize: 11, gap: 2 }}>
+                    <span style={{ fontSize: 20 }}>📎</span>
+                    Adjuntar
+                  </button>
+                </div>
+                {attachError && <p className="text-xs text-orange-600 mt-1">⚠ {attachError}</p>}
+              </div>
             </div>
+
             <div className="flex gap-3">
               <button type="submit" disabled={saving || !canEdit}
                 onClick={!canEdit ? (e) => { e.preventDefault(); navigate('/pricing') } : undefined}
                 className="px-4 py-2 bg-primary hover:bg-primary-dark disabled:opacity-60 text-white text-sm font-medium rounded-lg transition-colors">
                 {saving ? 'Guardando...' : editEvent ? 'Guardar cambios' : 'Guardar'}
               </button>
-              <button type="button" onClick={() => { setShowForm(false); setEditEvent(null) }}
+              <button type="button" onClick={() => { setShowForm(false); setEditEvent(null); resetForm() }}
                 className="px-4 py-2 border border-gray-200 text-gray-600 hover:bg-gray-50 text-sm font-medium rounded-lg transition-colors">
                 Cancelar
               </button>
@@ -273,19 +446,30 @@ export default function Calendar() {
                 title="Sin citas programadas"
                 description="Agrega una cita médica para hacer seguimiento."
                 actionLabel="+ Agregar cita"
-                onAction={() => { setEditEvent(null); setForm(emptyForm ?? {}); setShowForm(true) }}
+                onAction={() => { setEditEvent(null); resetForm(); setShowForm(true) }}
               />
             ) : (
               <ul className="space-y-4">
                 {(selected ? selectedEvents : events.slice(0, 5)).map(ev => {
                   const proof = proofs[ev.id]
+                  const si = statusInfo(ev.status ?? 'programada')
+                  const evAttachments = ev.attachments ?? []
                   return (
                     <li key={ev.id} className="border-b border-gray-50 last:border-0 pb-4 last:pb-0">
                       <div className="flex items-start justify-between gap-2 mb-2">
                         <div className="min-w-0">
-                          <span className={`inline-block text-xs px-2 py-0.5 rounded-full font-medium mb-1 ${typeStyle(ev.type)}`}>
-                            {typeLabel(ev.type)}
-                          </span>
+                          <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 4 }}>
+                            <span className={`inline-block text-xs px-2 py-0.5 rounded-full font-medium ${typeStyle(ev.type)}`}>
+                              {typeLabel(ev.type)}
+                            </span>
+                            <span style={{
+                              display: 'inline-block', fontSize: 11, padding: '2px 8px',
+                              borderRadius: 12, fontWeight: 600,
+                              background: si.bg, color: si.color,
+                            }}>
+                              {si.label}
+                            </span>
+                          </div>
                           <p className="text-sm font-semibold text-gray-800 leading-tight">{ev.title}</p>
                           {ev.time && <p className="text-xs text-gray-400 mt-0.5">⏰ {ev.time}</p>}
                           {ev.description && <p className="text-xs text-gray-400">{ev.description}</p>}
@@ -299,6 +483,25 @@ export default function Calendar() {
                           )}
                         </div>
                       </div>
+
+                      {/* Attachment thumbnails */}
+                      {evAttachments.length > 0 && (
+                        <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 6 }}>
+                          {evAttachments.map((url, i) => {
+                            const isImg = /\.(jpg|jpeg|png|gif|webp)(\?|$)/i.test(url)
+                            return isImg ? (
+                              <a key={i} href={url} target="_blank" rel="noreferrer">
+                                <img src={url} alt="adjunto" style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 6, border: '1px solid #EDE5D8' }} />
+                              </a>
+                            ) : (
+                              <a key={i} href={url} target="_blank" rel="noreferrer"
+                                style={{ width: 40, height: 40, borderRadius: 6, border: '1px solid #EDE5D8', background: '#F9FAFB', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }}>
+                                <span style={{ fontSize: 18 }}>📄</span>
+                              </a>
+                            )
+                          })}
+                        </div>
+                      )}
 
                       {/* Proof section */}
                       {proof ? (
@@ -348,21 +551,13 @@ export default function Calendar() {
             <div style={{ display: 'flex', gap: 10 }}>
               <button
                 onClick={() => setConfirmDialog(null)}
-                style={{
-                  flex: 1, padding: '12px', borderRadius: 12,
-                  border: '1.5px solid #EDE5D8', background: 'white',
-                  fontSize: 14, fontWeight: 600, color: '#374151', cursor: 'pointer',
-                }}
+                style={{ flex: 1, padding: '12px', borderRadius: 12, border: '1.5px solid #EDE5D8', background: 'white', fontSize: 14, fontWeight: 600, color: '#374151', cursor: 'pointer' }}
               >
                 Cancelar
               </button>
               <button
                 onClick={() => { confirmDialog.onConfirm(); setConfirmDialog(null) }}
-                style={{
-                  flex: 1, padding: '12px', borderRadius: 12,
-                  border: 'none', background: '#D63031',
-                  fontSize: 14, fontWeight: 700, color: 'white', cursor: 'pointer',
-                }}
+                style={{ flex: 1, padding: '12px', borderRadius: 12, border: 'none', background: '#D63031', fontSize: 14, fontWeight: 700, color: 'white', cursor: 'pointer' }}
               >
                 Eliminar
               </button>

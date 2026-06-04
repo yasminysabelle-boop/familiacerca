@@ -45,16 +45,20 @@ export function SubscriptionProvider({ children }) {
   const now = Date.now()
   const trialEndMs = sub?.trial_end_date ? new Date(sub.trial_end_date).getTime() : 0
 
-  const isPaid    = sub?.status === 'active' && (sub?.plan === 'familiar' || sub?.plan === 'care_plus')
-  const isTrialing = sub?.status === 'trial' && trialEndMs > now
-  const trialExpired = sub?.plan === 'free' && (sub?.status === 'expired' || (sub?.status === 'trial' && trialEndMs <= now))
+  // Users with app_metadata.role === 'admin' bypass all subscription and trial checks.
+  // This is set server-side via the Supabase service role key and cannot be spoofed by users.
+  const isAppAdmin = user?.app_metadata?.role === 'admin'
+
+  const isPaid    = isAppAdmin || (sub?.status === 'active' && (sub?.plan === 'familiar' || sub?.plan === 'care_plus'))
+  const isTrialing = !isAppAdmin && (sub?.status === 'trial' && trialEndMs > now)
+  const trialExpired = !isAppAdmin && (sub?.plan === 'free' && (sub?.status === 'expired' || (sub?.status === 'trial' && trialEndMs <= now)))
   const daysLeft  = isTrialing ? Math.max(0, Math.ceil((trialEndMs - now) / 86400000)) : 0
-  const hasAI     = isPaid && sub?.plan === 'care_plus'
-  const canEdit   = isPaid || isTrialing
+  const hasAI     = isAppAdmin || (isPaid && sub?.plan === 'care_plus')
+  const canEdit   = isAppAdmin || isPaid || isTrialing
 
   const value = {
     sub, loading,
-    isPaid, isTrialing, trialExpired, daysLeft, hasAI, canEdit,
+    isPaid, isTrialing, trialExpired, daysLeft, hasAI, canEdit, isAppAdmin,
     paywallDismissed,
     dismissPaywall: () => setPaywallDismissed(true),
     refresh: load,

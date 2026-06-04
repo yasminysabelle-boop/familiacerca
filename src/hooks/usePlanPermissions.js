@@ -2,7 +2,7 @@ import { useSubscription } from '../contexts/SubscriptionContext'
 import { useFamily } from '../contexts/FamilyContext'
 
 export function usePlanPermissions() {
-  const { sub, isPaid, isTrialing, trialExpired } = useSubscription()
+  const { sub, isPaid, isTrialing, trialExpired, isAppAdmin } = useSubscription()
   const { memberRole } = useFamily()
 
   const plan = sub?.plan ?? 'free'
@@ -10,51 +10,54 @@ export function usePlanPermissions() {
   const isCuidador = memberRole === 'cuidador'
   const isFamiliar = memberRole === 'familiar'
   const canWrite   = isAdmin || isCuidador
-  // Paywall only blocks the admin — invited members are not responsible for payment
-  const adminBlocked = trialExpired && isAdmin
+  // Paywall only blocks the admin — invited members are not responsible for payment.
+  // App-level admins (isAppAdmin) are never blocked regardless of plan or trial state.
+  const adminBlocked = !isAppAdmin && trialExpired && isAdmin
+  const planUnlocked = isAppAdmin || plan === 'familiar' || plan === 'care_plus'
 
   return {
     // ── Medication actions ───────────────────────────────────────────────────
-    canAddMedication:    !adminBlocked && isAdmin,    // admin only
-    canEditMedication:   !adminBlocked && isAdmin,    // admin only
-    canConfirmMedication: !adminBlocked && canWrite,  // cuidador + admin
+    canAddMedication:    !adminBlocked && isAdmin,
+    canEditMedication:   !adminBlocked && isAdmin,
+    canConfirmMedication: !adminBlocked && canWrite,
 
     // ── Routine (care) actions ───────────────────────────────────────────────
-    canCompleteRoutine:  !adminBlocked && canWrite,   // cuidador + admin
-    canConfigureRoutine: !adminBlocked && isAdmin,    // admin only (schedules/times)
+    canCompleteRoutine:  !adminBlocked && canWrite,
+    canConfigureRoutine: !adminBlocked && isAdmin,
 
     // ── Notes / diary ────────────────────────────────────────────────────────
-    canAddNote:          !adminBlocked && canWrite,   // cuidador + admin
-    canAddDiaryEntry:    !adminBlocked && canWrite,   // cuidador + admin
+    canAddNote:          !adminBlocked && canWrite,
+    canAddDiaryEntry:    !adminBlocked && canWrite,
 
     // ── Expenses ─────────────────────────────────────────────────────────────
-    canAddExpense:       !adminBlocked && canWrite,   // cuidador + admin (own records)
+    canAddExpense:       !adminBlocked && canWrite,
 
     // ── Team management ──────────────────────────────────────────────────────
-    canInviteMember:     !adminBlocked && isAdmin,    // admin only
+    canInviteMember:     !adminBlocked && isAdmin,
 
     // ── Patient profile & directory ──────────────────────────────────────────
-    canEditPatientProfile: isAdmin,                   // admin only
-    canEditDirectory:      isAdmin,                   // admin only
+    canEditPatientProfile: isAdmin,
+    canEditDirectory:      isAdmin,
 
     // ── Reports ──────────────────────────────────────────────────────────────
-    canGeneratePDF:      !adminBlocked,               // all roles
+    canGeneratePDF:      !adminBlocked,
 
-    // ── Feature access by plan (admin sees paywall gate, others pass through) ─
+    // ── Feature access by plan ───────────────────────────────────────────────
     canViewExpenses:   !adminBlocked,
     canViewAlbum:      !adminBlocked,
-    canExportReport:   !adminBlocked && (plan === 'familiar' || plan === 'care_plus'),
-    canViewDirectory:  !adminBlocked && (plan === 'familiar' || plan === 'care_plus'),
-    canViewTimeline:   !adminBlocked && (plan === 'familiar' || plan === 'care_plus'),
+    canExportReport:   !adminBlocked && planUnlocked,
+    canViewDirectory:  !adminBlocked && planUnlocked,
+    canViewTimeline:   !adminBlocked && planUnlocked,
 
     // ── Member limits ────────────────────────────────────────────────────────
-    maxMembers: plan === 'care_plus' ? Infinity : plan === 'familiar' ? 6 : 2,
+    maxMembers: isAppAdmin || plan === 'care_plus' ? Infinity : plan === 'familiar' ? 6 : 2,
 
     // ── Metadata ─────────────────────────────────────────────────────────────
     plan,
     trialExpired,
     isPaid,
     isTrialing,
+    isAppAdmin,
     isAdmin,
     isCuidador,
     isFamiliar,

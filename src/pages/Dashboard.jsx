@@ -10,6 +10,7 @@ import SuccessAnimation, { useSuccessAnimation } from '../components/SuccessAnim
 import { usePullToRefresh } from '../hooks/usePullToRefresh'
 import { AlertTriangle, CheckIcon, User, XIcon, Pill, ClipboardCheck, Chat, Calendar, Receipt, Users, Camera, Heart, Clock, BookOpen } from '../components/Icons'
 import { geminiGenerate } from '../lib/gemini'
+import { CARE_ITEMS } from '../lib/careItems'
 import TrialBanner from '../components/TrialBanner'
 import { useHospitalMode } from '../contexts/HospitalModeContext'
 import HospitalDashboard from '../components/hospital/HospitalDashboard'
@@ -1729,11 +1730,15 @@ export default function Dashboard() {
   const [patientProfileIncomplete, setPatientProfileIncomplete] = useState(false)
   const [patientProfile, setPatientProfile] = useState(null)
   const [pdfLoading, setPdfLoading] = useState(false)
+  const [careLogsToday, setCareLogsToday] = useState({})
   const [dailyMood, setDailyMood] = useState(null)
   const [savingMood, setSavingMood] = useState(false)
   const [pressedMood, setPressedMood] = useState(null)
   const [pressedSOS, setPressedSOS] = useState(false)
   const [weekShifts, setWeekShifts] = useState([])
+  // Tracks scheduled appointment reminder timeouts by event id to prevent duplicates
+  const apptReminderTimeouts = useRef(new Map())
+  const apptReminderScheduled = useRef(new Set())
   // Initialized to today's key so today is expanded; past days start collapsed
   const [expandedDays, setExpandedDays] = useState(() => new Set([new Date().toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' })]))
   const [selectedDayTab, setSelectedDayTab] = useState(() => new Date().toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' }))
@@ -1775,6 +1780,13 @@ export default function Dashboard() {
   useEffect(() => {
     if (user && ownerId) fetchTimeline()
   }, [user, ownerId])
+
+  // Clear all appointment reminder timeouts on unmount
+  useEffect(() => {
+    return () => {
+      for (const tid of apptReminderTimeouts.current.values()) clearTimeout(tid)
+    }
+  }, [])
 
   useEffect(() => {
     if (user) track('session_start', { user_id: user.id })
@@ -1990,6 +2002,7 @@ export default function Dashboard() {
       { data: expenses },
       { data: events },
       { data: sosAlerts },
+      { data: careLogsData },
     ] = await Promise.all([
       supabase.from('medications').select('*').eq('user_id', ownerId),
 
@@ -2038,10 +2051,19 @@ export default function Dashboard() {
         .gte('created_at', sevenAgoStartISO)
         .order('created_at', { ascending: false })
         .limit(10),
+
+      supabase.from('daily_care_logs')
+        .select('item_key')
+        .eq('user_id', ownerId)
+        .eq('log_date', todayKey),
     ])
 
     setMedTotal((meds ?? []).length)
     setMedsList(meds ?? [])
+
+    const careLogMap = {}
+    ;(careLogsData ?? []).forEach(r => { careLogMap[r.item_key] = true })
+    setCareLogsToday(careLogMap)
 
     const todayLogMap = {}
     ;(todayLogs ?? []).forEach(l => { todayLogMap[l.medication_id] = l })
@@ -2223,6 +2245,7 @@ export default function Dashboard() {
           dateKey: evDate,
           appointmentTitle: ev.title,
           appointmentTime: evTime ?? null,
+          status: ev.status ?? 'programada',
         })
       } else if (proof) {
         // Past appointment with a proof — surface it in the timeline
@@ -2290,6 +2313,40 @@ export default function Dashboard() {
     clearTimeout(timeoutTimer)
     setSections(newSections)
     setLoading(false)
+
+    // ── Appointment reminders: schedule a notification 1 hour before each upcoming event ──
+    if (Notification.permission === 'granted' && 'serviceWorker' in navigator) {
+      for (const ev of (events ?? [])) {
+        if (!ev.time || !ev.date) continue
+        const key = `appt-${ev.id}`
+        if (apptReminderScheduled.current.has(key)) continue
+
+        const [hh, mm] = ev.time.split(':').map(Number)
+        const apptTs = new Date(`${ev.date}T${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}:00`).getTime()
+        const reminderTs = apptTs - 60 * 60 * 1000          // 1 hour before
+        const msUntil = reminderTs - Date.now()
+
+        // Only schedule reminders that are in the future and within 8 hours
+        if (msUntil < 0 || msUntil > 8 * 60 * 60 * 1000) continue
+
+        apptReminderScheduled.current.add(key)
+        const tid = setTimeout(() => {
+          const timeLabel = `${hh % 12 || 12}:${String(mm).padStart(2, '0')}${hh >= 12 ? 'pm' : 'am'}`
+          navigator.serviceWorker.ready
+            .then(reg => reg.showNotification('📅 Cita médica en 1 hora', {
+              body: `${ev.title} · ${timeLabel}`,
+              icon: '/icon-192.png',
+              badge: '/icon-72.png',
+              tag: key,
+              data: { url: '/calendar' },
+              actions: [{ action: 'view', title: 'Ver en calendario' }],
+            }))
+            .catch(() => {})
+        }, msUntil)
+
+        apptReminderTimeouts.current.set(key, tid)
+      }
+    }
 
     // Load reactions for all visible event keys
     const eventKeys = allEvents.map(e => e.id)
@@ -2505,6 +2562,8 @@ export default function Dashboard() {
 
   const todaySection = sections.find(s => s.dateKey === todayKey)
   const pendingCount = todaySection?.events.filter(e => e.type === 'MED_PENDING').length ?? 0
+  const dailyItems = CARE_ITEMS.filter(i => i.category === 'daily')
+  const pendingRoutinesCount = dailyItems.filter(i => !careLogsToday[i.key]).length
   const confirmedTodayCount = todaySection?.events.filter(e => e.type === 'MED_CONFIRMED').length ?? 0
 
   // Next pending medication for the meds card
@@ -2989,23 +3048,47 @@ export default function Dashboard() {
               style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0', cursor: 'pointer', borderBottom: '1px solid #F5EEE6' }}
             >
               <span style={{ fontSize: 18, flexShrink: 0 }}>✅</span>
-              <p style={{ flex: 1, fontSize: 13, color: '#374151', margin: 0 }}>
-                {loading ? 'Cargando tareas...' : careStatus}
+              <p style={{
+                flex: 1, fontSize: 13, margin: 0,
+                color: loading ? '#9CA3AF' : pendingRoutinesCount > 0 ? '#D97706' : '#374151',
+                fontWeight: pendingRoutinesCount > 0 ? 600 : 400,
+              }}>
+                {loading
+                  ? 'Cargando rutinas...'
+                  : pendingRoutinesCount === 0
+                    ? `${dailyItems.length} rutinas completadas ✅`
+                    : `${pendingRoutinesCount} rutina${pendingRoutinesCount !== 1 ? 's' : ''} pendiente${pendingRoutinesCount !== 1 ? 's' : ''} hoy`}
               </p>
               <span style={{ fontSize: 14, color: '#D4C0B0', flexShrink: 0 }}>›</span>
             </div>
-            {nextAppointment && (
-              <div
-                onClick={() => navigate('/calendar')}
-                style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0', cursor: 'pointer', borderBottom: '1px solid #F5EEE6' }}
-              >
-                <span style={{ fontSize: 18, flexShrink: 0 }}>📅</span>
-                <p style={{ flex: 1, fontSize: 13, color: '#374151', margin: 0 }}>
-                  Próxima cita: {nextAppointment.appointmentTitle ?? 'Cita médica'}
-                </p>
-                <span style={{ fontSize: 14, color: '#D4C0B0', flexShrink: 0 }}>›</span>
-              </div>
-            )}
+            {nextAppointment && (() => {
+              const APPT_STATUS = {
+                programada: { color: '#2563EB', bg: '#EFF6FF', label: 'Programada' },
+                realizada:  { color: '#16A34A', bg: '#F0FDF4', label: 'Realizada' },
+                cancelada:  { color: '#DC2626', bg: '#FEF2F2', label: 'Cancelada' },
+              }
+              const si = APPT_STATUS[nextAppointment.status ?? 'programada'] ?? APPT_STATUS.programada
+              return (
+                <div
+                  onClick={() => navigate('/calendar')}
+                  style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0', cursor: 'pointer', borderBottom: '1px solid #F5EEE6' }}
+                >
+                  <span style={{ fontSize: 18, flexShrink: 0 }}>📅</span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ fontSize: 13, color: '#374151', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {nextAppointment.appointmentTitle ?? 'Cita médica'}
+                      {nextAppointment.appointmentTime
+                        ? <span style={{ color: '#9CA3AF' }}> · {fmtTime(nextAppointment.appointmentTime)}</span>
+                        : null}
+                    </p>
+                    <span style={{ display: 'inline-block', fontSize: 10, fontWeight: 700, padding: '1px 6px', borderRadius: 10, background: si.bg, color: si.color, marginTop: 2 }}>
+                      {si.label}
+                    </span>
+                  </div>
+                  <span style={{ fontSize: 14, color: '#D4C0B0', flexShrink: 0 }}>›</span>
+                </div>
+              )
+            })()}
             <div
               onClick={() => navigate('/familia')}
               style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0', cursor: 'pointer' }}
