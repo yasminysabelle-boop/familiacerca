@@ -337,9 +337,6 @@ export default function Notes() {
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
                   <p style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', letterSpacing: '0.08em', textTransform: 'uppercase', margin: 0 }}>Contenido *</p>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    {recording && (
-                      <span style={{ fontSize: 11, fontWeight: 700, color: '#D63031' }}>🔴 Escuchando...</span>
-                    )}
                     <MicButton recording={recording} onStart={start} onStop={stop} size="sm" />
                   </div>
                 </div>
