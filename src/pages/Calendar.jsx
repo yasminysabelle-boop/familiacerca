@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
@@ -9,6 +9,7 @@ import EmptyState from '../components/EmptyState'
 
 const DAYS   = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
 const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
+const YEAR_RANGE = Array.from({ length: 16 }, (_, i) => new Date().getFullYear() - 5 + i)
 
 const emptyForm = { title: '', date: '', time: '', description: '', type: 'appointment', status: 'programada' }
 
@@ -47,6 +48,26 @@ export default function Calendar() {
   const [confirmDialog, setConfirmDialog] = useState(null)
   const [saving, setSaving]     = useState(false)
   const [loadError, setLoadError] = useState('')
+  const [showPicker, setShowPicker] = useState(false)
+  const pickerRef   = useRef(null)
+  const yearListRef = useRef(null)
+
+  // Close picker on outside click
+  useEffect(() => {
+    if (!showPicker) return
+    function onDown(e) {
+      if (pickerRef.current && !pickerRef.current.contains(e.target)) setShowPicker(false)
+    }
+    document.addEventListener('mousedown', onDown)
+    return () => document.removeEventListener('mousedown', onDown)
+  }, [showPicker])
+
+  // Scroll selected year into view when picker opens
+  useEffect(() => {
+    if (!showPicker || !yearListRef.current) return
+    const el = yearListRef.current.querySelector(`[data-year="${year}"]`)
+    el?.scrollIntoView({ block: 'center', behavior: 'instant' })
+  }, [showPicker])
 
   // Date display (dd/mm/aaaa)
   const [dateDisplay, setDateDisplay] = useState('')
@@ -402,9 +423,99 @@ export default function Calendar() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Calendar grid */}
           <div className="lg:col-span-2 bg-white rounded-xl border border-green-100 p-5">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-4" style={{ position: 'relative' }}>
               <button onClick={prevMonth} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-600">←</button>
-              <h3 className="font-semibold text-gray-900">{MONTHS[month]} {year}</h3>
+
+              {/* Clickable month+year — opens grid+year picker */}
+              <button
+                onClick={() => setShowPicker(v => !v)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 5,
+                  background: showPicker ? '#F3F4F6' : 'transparent',
+                  border: 'none', cursor: 'pointer',
+                  padding: '5px 12px', borderRadius: 10,
+                  fontWeight: 700, fontSize: 15, color: '#1A1A1A',
+                  transition: 'background 0.15s',
+                }}
+              >
+                {MONTHS[month]} {year}
+                <span style={{
+                  fontSize: 9, color: '#9CA3AF',
+                  display: 'inline-block',
+                  transform: showPicker ? 'rotate(180deg)' : 'none',
+                  transition: 'transform 0.2s',
+                }}>▼</span>
+              </button>
+
+              {showPicker && (
+                <div
+                  ref={pickerRef}
+                  style={{
+                    position: 'absolute', top: 'calc(100% + 8px)', left: '50%',
+                    transform: 'translateX(-50%)',
+                    zIndex: 50,
+                    background: 'white', borderRadius: 16,
+                    border: '1px solid #EDE5D8',
+                    boxShadow: '0 8px 32px rgba(0,0,0,0.14)',
+                    padding: 14, width: 272,
+                  }}
+                >
+                  {/* Month grid 3×4 */}
+                  <p style={{ fontSize: 10, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 8px 2px' }}>
+                    Mes
+                  </p>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4, marginBottom: 14 }}>
+                    {MONTHS.map((m, i) => (
+                      <button
+                        key={m}
+                        onClick={() => { setMonth(i); setShowPicker(false) }}
+                        style={{
+                          padding: '7px 4px', borderRadius: 8, border: 'none',
+                          background: i === month ? '#4A7C59' : 'transparent',
+                          color: i === month ? 'white' : '#374151',
+                          fontWeight: i === month ? 700 : 400,
+                          fontSize: 12, cursor: 'pointer',
+                          transition: 'background 0.12s',
+                        }}
+                      >
+                        {m.slice(0, 3)}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div style={{ height: 1, background: '#F3F4F6', margin: '0 0 12px' }} />
+
+                  {/* Year list scrollable */}
+                  <p style={{ fontSize: 10, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 8px 2px' }}>
+                    Año
+                  </p>
+                  <div
+                    ref={yearListRef}
+                    style={{ maxHeight: 150, overflowY: 'auto', scrollbarWidth: 'thin' }}
+                  >
+                    {YEAR_RANGE.map(y => (
+                      <button
+                        key={y}
+                        data-year={y}
+                        onClick={() => { setYear(y); setShowPicker(false) }}
+                        style={{
+                          display: 'block', width: '100%',
+                          padding: '7px 12px', border: 'none',
+                          background: y === year ? '#EBF3EE' : 'transparent',
+                          color: y === year ? '#4A7C59' : '#374151',
+                          fontWeight: y === year ? 700 : 400,
+                          fontSize: 13, textAlign: 'center',
+                          cursor: 'pointer', borderRadius: 8,
+                          transition: 'background 0.12s',
+                        }}
+                      >
+                        {y}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <button onClick={nextMonth} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-600">→</button>
             </div>
             <div className="grid grid-cols-7 gap-1 mb-2">
