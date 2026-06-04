@@ -2565,6 +2565,7 @@ export default function Dashboard() {
   const dailyItems = CARE_ITEMS.filter(i => i.category === 'daily')
   const pendingRoutinesCount = dailyItems.filter(i => !careLogsToday[i.key]).length
   const confirmedTodayCount = todaySection?.events.filter(e => e.type === 'MED_CONFIRMED').length ?? 0
+  const missedTodayCount = todaySection?.events.filter(e => e.type === 'MED_MISSED').length ?? 0
 
   // Next pending medication for the meds card
   const nextPendingMed = todaySection?.events.find(e => e.type === 'MED_PENDING') ?? null
@@ -3032,14 +3033,20 @@ export default function Dashboard() {
               style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0', cursor: 'pointer', borderBottom: '1px solid #F5EEE6' }}
             >
               <span style={{ fontSize: 18, flexShrink: 0 }}>💊</span>
-              <p style={{ flex: 1, fontSize: 13, color: _isRetrasado ? '#DC2626' : '#374151', margin: 0, fontWeight: _isRetrasado ? 600 : 400 }}>
+              <p style={{
+                flex: 1, fontSize: 13, margin: 0,
+                color: missedTodayCount > 0 ? '#DC2626' : _isRetrasado ? '#DC2626' : '#374151',
+                fontWeight: missedTodayCount > 0 || _isRetrasado ? 600 : 400,
+              }}>
                 {medTotal === 0
                   ? 'Sin medicamentos configurados'
-                  : _isRetrasado && nextPendingMed
-                    ? `⚠️ ${nextPendingMed.medName} debía darse hace ${_retrasadoLabel ?? '?'}`
-                    : pendingCount === 0 && confirmedTodayCount >= medTotal
-                      ? `💊 ${confirmedTodayCount} de ${medTotal} dosis completadas hoy ✅`
-                      : `💊 ${pendingCount} dosis pendientes${nextPendingMed?.medTime ? ` · Próxima: ${nextPendingMed.medName} ${fmtTime(nextPendingMed.medTime)}` : ''}`}
+                  : missedTodayCount > 0
+                    ? `❌ ${missedTodayCount} dosis olvidada${missedTodayCount !== 1 ? 's' : ''} hoy${pendingCount > 0 ? ` · ${pendingCount} pendiente${pendingCount !== 1 ? 's' : ''}` : confirmedTodayCount > 0 ? ` · ${confirmedTodayCount} dada${confirmedTodayCount !== 1 ? 's' : ''}` : ''}`
+                    : _isRetrasado && nextPendingMed
+                      ? `⚠️ ${nextPendingMed.medName} debía darse hace ${_retrasadoLabel ?? '?'}`
+                      : pendingCount === 0 && confirmedTodayCount >= medTotal
+                        ? `💊 ${confirmedTodayCount} de ${medTotal} dosis completadas hoy ✅`
+                        : `💊 ${pendingCount} dosis pendientes${nextPendingMed?.medTime ? ` · Próxima: ${nextPendingMed.medName} ${fmtTime(nextPendingMed.medTime)}` : ''}`}
               </p>
               <span style={{ fontSize: 14, color: '#D4C0B0', flexShrink: 0 }}>›</span>
             </div>

@@ -35,18 +35,38 @@ Deno.serve(async (req: Request) => {
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
   )
 
-  // Current time in both UTC and common Latin American offsets for debugging
   const now = new Date()
-  const utcTime = `${String(now.getUTCHours()).padStart(2, '0')}:${String(now.getUTCMinutes()).padStart(2, '0')}`
-  // UTC-5 (e.g. Bogotá/Lima) and UTC-6 (e.g. Mexico City/Guatemala)
-  const utcMinus5 = new Date(now.getTime() - 5 * 60 * 60 * 1000)
-  const utcMinus6 = new Date(now.getTime() - 6 * 60 * 60 * 1000)
-  const localTime5 = `${String(utcMinus5.getUTCHours()).padStart(2, '0')}:${String(utcMinus5.getUTCMinutes()).padStart(2, '0')}`
-  const localTime6 = `${String(utcMinus6.getUTCHours()).padStart(2, '0')}:${String(utcMinus6.getUTCMinutes()).padStart(2, '0')}`
+  function toHHMM(d: Date) {
+    return `${String(d.getUTCHours()).padStart(2, '0')}:${String(d.getUTCMinutes()).padStart(2, '0')}`
+  }
+  function shiftTZ(base: Date, offsetHours: number) {
+    return new Date(base.getTime() + offsetHours * 60 * 60 * 1000)
+  }
 
-  // Check all common local times against scheduled_times
-  const timesToCheck = Array.from(new Set([utcTime, localTime5, localTime6]))
-  console.log(`[send-med-notifications] Checking times: UTC=${utcTime}, UTC-5=${localTime5}, UTC-6=${localTime6}`)
+  // Reminder fires 10 minutes BEFORE the scheduled dose time
+  const in10 = new Date(now.getTime() + 10 * 60 * 1000)
+  const timesToCheck = Array.from(new Set([
+    toHHMM(in10),
+    toHHMM(shiftTZ(in10, -4)),  // UTC-4 Puerto Rico / Atlantic
+    toHHMM(shiftTZ(in10, -5)),  // UTC-5 Colombia / Peru
+    toHHMM(shiftTZ(in10, -6)),  // UTC-6 Mexico / Central
+  ]))
+  console.log(`[send-med-notifications] 10-min-before check: ${timesToCheck.join(', ')}`)
+
+  // Missed-dose check: fire once, 61 minutes AFTER scheduled time (window just closed)
+  const was61 = new Date(now.getTime() - 61 * 60 * 1000)
+  const missedTimesToCheck = Array.from(new Set([
+    toHHMM(was61),
+    toHHMM(shiftTZ(was61, -4)),
+    toHHMM(shiftTZ(was61, -5)),
+    toHHMM(shiftTZ(was61, -6)),
+  ]))
+
+  // Today in PR timezone (UTC-4) for log existence checks
+  const todayPR = (() => {
+    const d = shiftTZ(now, -4)
+    return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`
+  })()
 
   // Find all medications scheduled for any of the current minute variants
   const { data: meds, error: medsError } = await supabase
@@ -108,10 +128,10 @@ Deno.serve(async (req: Request) => {
         await webpush.sendNotification(
           { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
           JSON.stringify({
-            title: `💊 Hora de ${med.name}`,
-            body: med.dosage ? `${med.dosage} · ${utcTime}` : utcTime,
+            title: `💊 ${med.name} en 10 minutos`,
+            body: med.dosage ? `Dosis: ${med.dosage} — prepara la dosis ahora` : 'Prepara la dosis ahora',
             url: '/hoy',
-            tag: `med-${med.id}-${utcTime}`,
+            tag: `med-reminder-${med.id}`,
           })
         )
         sentCount++
@@ -129,10 +149,105 @@ Deno.serve(async (req: Request) => {
     }
   }
 
+  // ── Missed-dose alerts ───────────────────────────────────────────────────────
+  // Fire 61 minutes after scheduled time if no confirmed/missed log exists for today
+  const { data: overdueMeds } = await supabase
+    .from('medications')
+    .select('id, name, dosage, user_id, scheduled_times')
+    .overlaps('scheduled_times', missedTimesToCheck)
+
+  for (const med of overdueMeds ?? []) {
+    // Skip if already logged today
+    const { data: log } = await supabase
+      .from('medication_logs')
+      .select('id')
+      .eq('medication_id', med.id)
+      .eq('user_id', med.user_id)
+      .eq('log_date', todayPR)
+      .maybeSingle()
+    if (log) continue
+
+    const { data: members2 } = await supabase
+      .from('family_members').select('member_user_id').eq('user_id', med.user_id)
+    const userIds2 = [med.user_id, ...(members2?.map((m: { member_user_id: string }) => m.member_user_id).filter(Boolean) ?? [])]
+
+    const { data: subs2 } = await supabase
+      .from('push_subscriptions').select('id, endpoint, p256dh, auth, user_id').in('user_id', userIds2)
+
+    const missedBody = med.dosage
+      ? `${med.dosage} — la dosis no fue administrada en el horario establecido`
+      : 'La dosis no fue administrada en el horario establecido'
+
+    for (const sub of subs2 ?? []) {
+      try {
+        await webpush.sendNotification(
+          { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
+          JSON.stringify({
+            title: `❌ Dosis olvidada — ${med.name}`,
+            body: missedBody,
+            url: '/hoy',
+            tag: `missed-${med.id}-${todayPR}`,
+            requireInteraction: true,
+          })
+        )
+        sentCount++
+      } catch (err: unknown) {
+        failCount++
+        const statusCode = (err as { statusCode?: number }).statusCode
+        if (statusCode === 410) await supabase.from('push_subscriptions').delete().eq('id', sub.id)
+      }
+    }
+
+    // FCM missed-dose alert
+    const firebaseServerKey = Deno.env.get('FIREBASE_SERVER_KEY')
+    if (firebaseServerKey) {
+      const { data: fcmProfiles } = await supabase
+        .from('user_profiles').select('fcm_token').in('id', userIds2).not('fcm_token', 'is', null)
+      const fcmTokens: string[] = (fcmProfiles ?? []).map((p: { fcm_token: string | null }) => p.fcm_token).filter(Boolean)
+      if (fcmTokens.length > 0) {
+        await fetch('https://fcm.googleapis.com/fcm/send', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `key=${firebaseServerKey}` },
+          body: JSON.stringify({
+            registration_ids: fcmTokens,
+            notification: { title: `❌ Dosis olvidada — ${med.name}`, body: missedBody, icon: '/icon-192.png', tag: `missed-${med.id}` },
+            data: { type: 'MISSED_DOSE', url: '/hoy', medicationName: med.name },
+            priority: 'high',
+          }),
+        }).catch(() => {})
+      }
+    }
+  }
+
+  // ── FCM 10-min reminders ─────────────────────────────────────────────────────
+  const firebaseServerKey = Deno.env.get('FIREBASE_SERVER_KEY')
+  if (firebaseServerKey && meds && meds.length > 0) {
+    const allOwnerIds = [...new Set(meds.map((m: { user_id: string }) => m.user_id))]
+    const { data: fcmProfiles } = await supabase
+      .from('user_profiles').select('id, fcm_token').in('id', allOwnerIds).not('fcm_token', 'is', null)
+    const fcmByOwner: Record<string, string> = {}
+    ;(fcmProfiles ?? []).forEach((p: { id: string, fcm_token: string }) => { fcmByOwner[p.id] = p.fcm_token })
+
+    for (const med of meds) {
+      const token = fcmByOwner[med.user_id]
+      if (!token) continue
+      await fetch('https://fcm.googleapis.com/fcm/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `key=${firebaseServerKey}` },
+        body: JSON.stringify({
+          to: token,
+          notification: { title: `💊 ${med.name} en 10 minutos`, body: med.dosage ? `Dosis: ${med.dosage}` : 'Prepara la dosis', icon: '/icon-192.png', tag: `med-reminder-${med.id}` },
+          data: { type: 'MED_REMINDER', url: '/hoy' },
+          priority: 'high',
+        }),
+      }).catch(() => {})
+    }
+  }
+
   console.log(`[send-med-notifications] Done. sent=${sentCount}, failed=${failCount}`)
 
   return new Response(
-    JSON.stringify({ sent: sentCount, failed: failCount, time: utcTime, checked: timesToCheck, medications: meds.length }),
+    JSON.stringify({ sent: sentCount, failed: failCount, checked: timesToCheck, medications: meds?.length ?? 0 }),
     { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
   )
 })

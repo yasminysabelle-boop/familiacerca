@@ -162,6 +162,7 @@ export default function Medications() {
   const [omisionError,       setOmisionError]       = useState('')
   const [toastMsg,           setToastMsg]           = useState('')
   const [, setTick] = useState(0)
+  const autoMarkedRef = useRef(new Set())
 
   // Tick each minute so pending-status badges stay accurate
   useEffect(() => {
@@ -526,8 +527,18 @@ Return ONLY valid JSON.`
 
   async function handleAdministrar() {
     if (!adminModal || adminSaving) return
-    setAdminSaving(true); setAdminError('')
     const med = adminModal
+    const _sched = firstTimeMed(med)
+    if (_sched) {
+      const [_hh, _mm] = _sched.split(':').map(Number)
+      const _window = med.time_window_minutes ?? 60
+      const _late = Math.round((new Date().getHours() * 60 + new Date().getMinutes()) - (_hh * 60 + _mm))
+      if (_late > _window) {
+        setAdminError('La ventana clínica ha vencido. Esta dosis no puede administrarse. Continúa con la próxima dosis a su hora habitual.')
+        return
+      }
+    }
+    setAdminSaving(true); setAdminError('')
     const confirmedAt = new Date().toISOString()
     const scheduledTime = firstTimeMed(med)
     const windowMinutes = med.time_window_minutes ?? 60
@@ -649,6 +660,48 @@ Return ONLY valid JSON.`
   const administradosMeds = medications.filter(med =>
     (logsByMedId[med.id]?.[today] ?? []).some(l => l.status === 'confirmed' || l.status === 'missed')
   )
+
+  // Auto-mark medications past their clinical window as missed (runs whenever retrasadosMeds changes)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (loading || !ownerId || retrasadosMeds.length === 0) return
+    const toMark = retrasadosMeds.filter(med => !autoMarkedRef.current.has(med.id))
+    if (toMark.length === 0) return
+    const todayLocal = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' })
+    for (const med of toMark) {
+      autoMarkedRef.current.add(med.id)
+      const scheduledTime = firstTimeMed(med)
+      let scheduledAt = null
+      if (scheduledTime) {
+        const [hh, mm] = scheduledTime.split(':').map(Number)
+        const d = new Date(); d.setHours(hh, mm, 0, 0); scheduledAt = d.toISOString()
+      }
+      Promise.all([
+        supabase.from('medication_omissions').insert({
+          medication_id: med.id, owner_id: ownerId, scheduled_at: scheduledAt,
+          reason: 'Venció la ventana clínica (automático)', omitted_by_name: 'Sistema',
+        }),
+        supabase.from('medication_logs').upsert({
+          medication_id: med.id, user_id: ownerId, status: 'missed',
+          log_date: todayLocal, confirmed_by_name: 'Sistema automático',
+          confirmed_at: new Date().toISOString(), scheduled_at: scheduledAt,
+        }, { onConflict: 'medication_id,log_date,user_id' }),
+      ]).then(() => {
+        setLogsByMedId(prev => {
+          const next = { ...prev }
+          if (!next[med.id]) next[med.id] = {}
+          if (!next[med.id][todayLocal]) next[med.id][todayLocal] = []
+          if (!next[med.id][todayLocal].some(l => l.status === 'missed' || l.status === 'confirmed')) {
+            next[med.id][todayLocal].push({
+              medication_id: med.id, log_date: todayLocal, status: 'missed',
+              confirmed_at: new Date().toISOString(), confirmed_by_name: 'Sistema automático',
+            })
+          }
+          return next
+        })
+      })
+    }
+  }, [loading, ownerId, retrasadosMeds.length])
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
@@ -788,35 +841,52 @@ Return ONLY valid JSON.`
               </div>
             )}
 
-            {/* ── Sección 2: RETRASADOS ──────────────────────────────────── */}
+            {/* ── Sección 2: DOSIS OLVIDADAS ─────────────────────────────── */}
             {retrasadosMeds.length > 0 && (
               <div>
                 <p style={{ fontSize: 12, fontWeight: 700, color: '#DC2626', letterSpacing: '0.06em', textTransform: 'uppercase', margin: '0 0 8px 2px' }}>
-                  🔴 Retrasados ({retrasadosMeds.length})
+                  ❌ Dosis olvidadas ({retrasadosMeds.length})
                 </p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   {retrasadosMeds.map(med => {
                     const times = med.scheduled_times?.length ? med.scheduled_times : med.time ? [med.time] : []
                     const firstT = times.length ? [...times].sort()[0] : null
-                    const delayMins = firstT ? (() => { const [h, m] = firstT.split(':').map(Number); const now = new Date(); return Math.round((now.getHours() * 60 + now.getMinutes()) - (h * 60 + m)) })() : null
-                    const delayLabel = delayMins == null ? '' : delayMins >= 60 ? `${Math.floor(delayMins/60)}h ${delayMins%60}min` : `${delayMins} min`
+                    const timeLabel = firstT ? (() => {
+                      const [h, m] = firstT.split(':').map(Number)
+                      return `${h % 12 || 12}:${String(m).padStart(2, '0')}${h >= 12 ? 'pm' : 'am'}`
+                    })() : null
+                    const medLabel = [med.name, med.dosage].filter(Boolean).join(' ')
+                    const waText = encodeURIComponent(
+                      `⚠️ Dosis olvidada: ${medLabel}${timeLabel ? `. Hora programada: ${timeLabel}` : ''}. La dosis no fue administrada en el horario establecido. Por favor indique el procedimiento a seguir.`
+                    )
                     return (
-                      <div key={med.id} style={{ background: '#FEF2F2', borderRadius: 16, border: '1px solid #FCA5A5', borderLeft: '4px solid #DC2626', padding: '14px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+                      <div key={med.id} style={{ background: '#FEF2F2', borderRadius: 16, border: '1.5px solid #FCA5A5', borderLeft: '4px solid #DC2626', padding: '14px', boxShadow: '0 2px 8px rgba(214,48,49,0.08)' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
                           <div style={{ flex: 1, minWidth: 0 }}>
-                            <p style={{ fontSize: 15, fontWeight: 700, color: '#1A1A1A', margin: '0 0 2px' }}>
-                              💊 {med.name}{med.dosage ? <span style={{ fontWeight: 400, color: '#6B7280', fontSize: 13 }}> · {med.dosage}</span> : null}
+                            <p style={{ fontSize: 15, fontWeight: 700, color: '#DC2626', margin: '0 0 2px' }}>
+                              ❌ {med.name}{med.dosage ? <span style={{ fontWeight: 400, color: '#6B7280', fontSize: 13 }}> · {med.dosage}</span> : null}
                             </p>
-                            {delayLabel && <p style={{ fontSize: 12, color: '#DC2626', fontWeight: 600, margin: 0 }}>⏱ Retraso: {delayLabel}</p>}
+                            {timeLabel && (
+                              <p style={{ fontSize: 12, color: '#DC2626', fontWeight: 600, margin: 0 }}>
+                                ⏰ Programado: {timeLabel} — ventana clínica vencida
+                              </p>
+                            )}
                           </div>
-                          <span style={{ fontSize: 11, fontWeight: 700, color: '#DC2626', background: 'white', border: '1px solid #FCA5A5', padding: '3px 8px', borderRadius: 6, flexShrink: 0 }}>🔴 Tarde</span>
+                          <span style={{ fontSize: 10, fontWeight: 700, color: 'white', background: '#DC2626', padding: '3px 8px', borderRadius: 6, flexShrink: 0 }}>Olvidada</span>
                         </div>
-                        {!isFamiliar && (
-                          <div style={{ display: 'flex', gap: 8 }}>
-                            <button onClick={() => { setAdminModal(med); setAdminPhotoBlob(null); setAdminPhotoPreview(null); setAdminError('') }} style={{ flex: 2, padding: '10px', borderRadius: 12, border: 'none', background: 'linear-gradient(135deg, #4A7C59, #3A6347)', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>✅ Administrar</button>
-                            <button onClick={() => { setOmisionModal(med); setOmisionReason(''); setOmisionError('') }} style={{ flex: 1, padding: '10px', borderRadius: 12, border: '1px solid #FCA5A5', background: 'white', color: '#DC2626', fontWeight: 600, fontSize: 13, cursor: 'pointer' }}>Omitir</button>
-                          </div>
-                        )}
+                        <div style={{ background: '#FFF5F5', border: '1px solid #FECACA', borderRadius: 10, padding: '10px 12px', marginBottom: 10 }}>
+                          <p style={{ fontSize: 12, color: '#7F1D1D', lineHeight: 1.6, margin: 0, fontWeight: 500 }}>
+                            ⚠️ <strong>Dosis olvidada</strong> — No administres esta dosis. Continúa con la próxima dosis a su hora habitual. Si es un medicamento crítico o el paciente presenta síntomas, notifica al médico de inmediato.
+                          </p>
+                        </div>
+                        <a
+                          href={`https://wa.me/?text=${waText}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, width: '100%', padding: '10px', borderRadius: 10, background: '#25D366', color: 'white', fontWeight: 700, fontSize: 13, textDecoration: 'none', boxShadow: '0 2px 8px rgba(37,211,102,0.25)' }}
+                        >
+                          📱 Notificar al médico por WhatsApp
+                        </a>
                       </div>
                     )
                   })}
@@ -855,10 +925,12 @@ Return ONLY valid JSON.`
                               {confTime && <span style={{ fontSize: 11, color: '#4A7C59', fontWeight: 600 }}>🕐 {confTime}</span>}
                               {byName && <span style={{ fontSize: 11, color: '#6B7280' }}>por {byName}</span>}
                               {isOmitted ? (
-                                <span style={{ fontSize: 11, fontWeight: 700, color: '#D97706' }}>Omitido</span>
+                                <span style={{ fontSize: 11, fontWeight: 700, color: '#DC2626' }}>❌ Dosis olvidada</span>
                               ) : (
                                 <span style={{ fontSize: 11, fontWeight: 700, color: todayLog?.given_on_time === false ? '#D97706' : '#15803D' }}>
-                                  {todayLog?.given_on_time === false && todayLog?.minutes_late ? `⚠️ Dado tarde ${todayLog.minutes_late} min` : '✓ A tiempo'}
+                                  {todayLog?.given_on_time === false && todayLog?.minutes_late
+                                    ? `⚠️ Fuera de ventana (${todayLog.minutes_late} min)`
+                                    : '✅ Administrado a tiempo'}
                                 </span>
                               )}
                             </div>

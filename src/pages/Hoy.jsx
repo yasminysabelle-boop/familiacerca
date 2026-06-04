@@ -487,34 +487,43 @@ export default function Hoy() {
             background: '#FEF2F2', border: '1.5px solid #FCA5A5',
             borderRadius: 14, padding: '12px 16px', marginBottom: 14,
           }}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 8 }}>
-              <span style={{ fontSize: 16, flexShrink: 0, marginTop: 1 }}>⚠️</span>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 10 }}>
+              <span style={{ fontSize: 16, flexShrink: 0, marginTop: 1 }}>❌</span>
               <p style={{ fontSize: 13, fontWeight: 700, color: '#DC2626', margin: 0, lineHeight: 1.5 }}>
-                {overdueMeds.length} medicamento{overdueMeds.length !== 1 ? 's' : ''} — venció la ventana
+                {overdueMeds.length} dosis olvidada{overdueMeds.length !== 1 ? 's' : ''} — ventana clínica vencida
               </p>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {overdueMeds.map(m => {
                 const t = firstTime(m)
-                const win = m.time_window_minutes ?? detectMedicationWindow(m.name)
+                const timeLabel = t ? fmtMedTime(t) : null
+                const medLabel = [m.name, m.dosage].filter(Boolean).join(' ')
+                const waText = encodeURIComponent(
+                  `⚠️ Dosis olvidada: ${medLabel}${timeLabel ? `. Hora programada: ${timeLabel}` : ''}. La dosis no fue administrada en el horario establecido. Por favor indique el procedimiento a seguir.`
+                )
                 return (
-                  <button
+                  <div
                     key={m.id}
-                    onClick={() => openConfirmPanel(m)}
                     style={{
-                      display: 'flex', alignItems: 'center', gap: 10,
                       background: '#FFF5F5', border: '1px solid #FCA5A5',
-                      borderRadius: 10, padding: '8px 12px',
-                      cursor: 'pointer', width: '100%', textAlign: 'left',
+                      borderRadius: 12, padding: '10px 12px',
                     }}
                   >
-                    <span style={{ fontSize: 13, fontWeight: 700, color: '#DC2626', flex: 1 }}>
-                      💊 {m.name}{t ? ` · ${fmtMedTime(t)}` : ''} · ventana {win} min
-                    </span>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: '#DC2626', background: '#FEE2E2', padding: '2px 8px', borderRadius: 6, flexShrink: 0 }}>
-                      Dar ahora →
-                    </span>
-                  </button>
+                    <p style={{ fontSize: 13, fontWeight: 700, color: '#DC2626', margin: '0 0 6px' }}>
+                      💊 {m.name}{timeLabel ? ` · ${timeLabel}` : ''}
+                    </p>
+                    <p style={{ fontSize: 11, color: '#7F1D1D', lineHeight: 1.5, margin: '0 0 8px', fontWeight: 500 }}>
+                      ⚠️ No administres esta dosis. Continúa con la próxima a su hora habitual. Si es un medicamento crítico o hay síntomas, notifica al médico.
+                    </p>
+                    <a
+                      href={`https://wa.me/?text=${waText}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, width: '100%', padding: '8px', borderRadius: 8, background: '#25D366', color: 'white', fontWeight: 700, fontSize: 12, textDecoration: 'none' }}
+                    >
+                      📱 Notificar al médico
+                    </a>
+                  </div>
                 )
               })}
             </div>
