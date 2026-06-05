@@ -17,22 +17,27 @@ export default function EmergencyAlert() {
   const displayName = user?.user_metadata?.full_name ?? user?.email ?? 'Familiar'
 
   useEffect(() => {
-    checkActiveAlerts()
+    if (!ownerId) return
+    checkActiveAlerts(ownerId)
     const channel = supabase
-      .channel('emergency-alerts')
+      .channel(`emergency-alerts-${ownerId}`)
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'emergency_alerts' }, payload => {
-        if (!payload.new.resolved) setActiveAlert(payload.new)
+        if (!payload.new.resolved && payload.new.owner_id === ownerId) setActiveAlert(payload.new)
       })
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'emergency_alerts' }, payload => {
-        if (payload.new.resolved) setActiveAlert(prev => prev?.id === payload.new.id ? null : prev)
+        if (payload.new.resolved && payload.new.owner_id === ownerId) {
+          setActiveAlert(prev => prev?.id === payload.new.id ? null : prev)
+        }
       })
       .subscribe()
     return () => supabase.removeChannel(channel)
-  }, [])
+  }, [ownerId])
 
-  async function checkActiveAlerts() {
+  async function checkActiveAlerts(scopedOwnerId) {
+    if (!scopedOwnerId) return
     const { data } = await supabase
-      .from('emergency_alerts').select('*').eq('resolved', false)
+      .from('emergency_alerts').select('*')
+      .eq('resolved', false).eq('owner_id', scopedOwnerId)
       .order('created_at', { ascending: false }).limit(1)
     if (data?.length) setActiveAlert(data[0])
   }
@@ -55,6 +60,7 @@ export default function EmergencyAlert() {
     // Insert into DB — triggers realtime banner for all family members
     const { error: insertError } = await supabase.from('emergency_alerts').insert({
       user_id: user.id,
+      owner_id: ownerId,
       triggered_by_name: displayName,
       relative_name: profile?.name ?? null,
       latitude: loc?.latitude ?? null,

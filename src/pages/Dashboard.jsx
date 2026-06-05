@@ -2338,6 +2338,7 @@ export default function Dashboard() {
       const dateKey = toLocalDateKey(new Date(alert.created_at))
       allEvents.push({
         id: `sos-${alert.id}`,
+        sosAlertId: alert.id,
         type: 'SOS_ALERT',
         timestamp: new Date(alert.created_at),
         dateKey,
@@ -2562,6 +2563,7 @@ export default function Dashboard() {
     // Log in DB (triggers realtime banner for all family members)
     const { error: insertError } = await supabase.from('emergency_alerts').insert({
       user_id: user.id,
+      owner_id: ownerId,
       triggered_by_name: fullName,
       relative_name: profile?.name ?? null,
       latitude: sosLocation?.latitude ?? null,
@@ -2588,6 +2590,16 @@ export default function Dashboard() {
     setSosSent(true)
     setShowSOS(false)
     setTimeout(() => setSosSent(false), 15000)
+  }
+
+  async function dismissSOS() {
+    if (!activeSosEvent?.sosAlertId) return
+    await supabase.from('emergency_alerts').update({ resolved: true }).eq('id', activeSosEvent.sosAlertId)
+    setSections(prev => prev.map(s => ({
+      ...s,
+      events: s.events.map(e => e.id === activeSosEvent.id ? { ...e, resolved: true } : e),
+    })))
+    setSosSent(false)
   }
 
   async function handlePDF() {
@@ -2641,7 +2653,8 @@ export default function Dashboard() {
   // Next pending medication for the meds card
   const nextPendingMed = todaySection?.events.find(e => e.type === 'MED_PENDING') ?? null
 
-  const hasActiveSOS = sections.flatMap(s => s.events).some(e => e.type === 'SOS_ALERT' && !e.resolved)
+  const activeSosEvent = sections.flatMap(s => s.events).find(e => e.type === 'SOS_ALERT' && !e.resolved) ?? null
+  const hasActiveSOS = !!activeSosEvent
   const lastActivity = sections.flatMap(s => s.events)
     .filter(e => ['MED_CONFIRMED', 'VOICE_MEMORY', 'PHOTO', 'NOTE', 'EXPENSE'].includes(e.type))
     .sort((a, b) => b.timestamp - a.timestamp)[0] ?? null
@@ -3154,13 +3167,13 @@ export default function Dashboard() {
             })
           }
 
-          const activeSOS = sections.flatMap(s => s.events).find(e => e.type === 'SOS_ALERT' && !e.resolved)
-          if (activeSOS) {
+          if (activeSosEvent) {
             alerts.push({
               key: 'sos', type: 'urgent', icon: '🚨',
               title: 'Alerta SOS activa',
-              subtitle: activeSOS.triggeredBy ? `Activada por ${activeSOS.triggeredBy.split(' ')[0]}` : 'Emergencia familiar',
+              subtitle: activeSosEvent.triggeredBy ? `Activada por ${activeSosEvent.triggeredBy.split(' ')[0]}` : 'Emergencia familiar',
               to: null,
+              onDismiss: dismissSOS,
             })
           }
 
@@ -3226,6 +3239,18 @@ export default function Dashboard() {
                         {alert.subtitle}
                       </p>
                     </div>
+                    {alert.onDismiss && (
+                      <button
+                        onClick={e => { e.stopPropagation(); alert.onDismiss() }}
+                        style={{
+                          flexShrink: 0, padding: '5px 10px', borderRadius: 8, border: 'none',
+                          background: '#FEE2E2', color: '#DC2626', fontSize: 11, fontWeight: 700,
+                          cursor: 'pointer', WebkitTapHighlightColor: 'transparent',
+                        }}
+                      >
+                        Resolver
+                      </button>
+                    )}
                     {alert.to && <span style={{ fontSize: 14, color: '#D4C0B0', flexShrink: 0 }}>›</span>}
                   </div>
                 )
