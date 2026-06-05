@@ -2,7 +2,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import Logo from './Logo'
-import { Home, Users, User, Settings, ChevronLeft } from './Icons'
+import { Home, Chat, Plus, User, ChevronLeft } from './Icons'
 import Paywall from './Paywall'
 import InstallBanner from './InstallBanner'
 import OfflineBanner from './OfflineBanner'
@@ -42,11 +42,6 @@ const PAGE_TITLES = {
 
 const PRIMARY_PAGES = new Set(['/dashboard', '/familia', '/ajustes', '/planes', '/pricing'])
 
-const BOTTOM_TABS = [
-  { to: '/dashboard', Icon: Home,     label: 'Inicio' },
-  { to: '/familia',   Icon: Users,    label: 'Mi Familia' },
-  { to: '/ajustes',   Icon: Settings, label: 'Mi Cuenta' },
-]
 
 export default function Layout({ children }) {
   const { inactivityWarning } = useAuth()
@@ -177,7 +172,7 @@ export default function Layout({ children }) {
       <main style={{
         position: 'fixed', inset: 0, overflowY: 'auto',
         top:    isVideoCall ? 0 : `calc(${hospitalBarHeight}px + 56px + env(safe-area-inset-top))`,
-        bottom: isVideoCall ? 0 : (isSecondary || isHospitalMode) ? 'env(safe-area-inset-bottom)' : 'calc(68px + env(safe-area-inset-bottom))',
+        bottom: isVideoCall ? 0 : (isSecondary || isHospitalMode) ? 'env(safe-area-inset-bottom)' : 'calc(64px + env(safe-area-inset-bottom))',
       }}>
         <InstallBanner />
         <OfflineBanner />
@@ -205,7 +200,7 @@ export default function Layout({ children }) {
       {/* Inactivity warning banner */}
       {inactivityWarning && (
         <div style={{
-          position: 'fixed', bottom: 'calc(68px + env(safe-area-inset-bottom))', left: 0, right: 0, zIndex: 50,
+          position: 'fixed', bottom: 'calc(64px + env(safe-area-inset-bottom))', left: 0, right: 0, zIndex: 50,
           background: '#1F2937',
           padding: '14px 20px 16px',
           boxShadow: '0 -4px 24px rgba(0,0,0,0.3)',
@@ -231,71 +226,61 @@ export default function Layout({ children }) {
         @keyframes hbPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
       `}</style>
 
-      {/* Bottom navigation — hidden on video call, secondary pages, and hospital mode */}
-      {isVideoCall || isSecondary || isHospitalMode ? null : <nav
-        style={{
+      {/* Bottom navigation — 5-item white nav */}
+      {isVideoCall || isSecondary || isHospitalMode ? null : (
+        <nav style={{
           position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 40,
-          height: 'calc(68px + env(safe-area-inset-bottom))',
+          height: 'calc(64px + env(safe-area-inset-bottom))',
           paddingBottom: 'env(safe-area-inset-bottom)',
-          background: navBg,
-          borderTop: `1px solid ${border}`,
-          boxShadow: '0 -2px 16px rgba(0,0,0,0.25)',
-          display: 'flex',
-        }}
-      >
-        {BOTTOM_TABS.map(({ to, Icon, label }) => {
-          const isActive = location.pathname === to
-          const badge = to === '/dashboard' ? homeBadge : to === '/familia' ? familyBadge : 0
-          const badgeText = badge > 9 ? '9+' : badge > 0 ? String(badge) : null
-          return (
-            <Link
-              key={to}
-              to={to}
-              aria-current={isActive ? 'page' : undefined}
-              style={{
-                flex: 1, display: 'flex', flexDirection: 'column',
-                alignItems: 'center', justifyContent: 'center',
-                gap: 2, paddingTop: 4, textDecoration: 'none',
-                position: 'relative',
-              }}
-            >
-              <div style={{ position: 'relative', display: 'inline-flex' }}>
-                <Icon
-                  size={22}
-                  color={isActive ? 'white' : 'rgba(255,255,255,0.4)'}
-                  strokeWidth={isActive ? 2 : 1.5}
-                />
-                {badgeText && (
-                  <span style={{
-                    position: 'absolute', top: -6, right: -8,
-                    minWidth: 18, height: 18, borderRadius: 9,
-                    background: '#DC2626', color: 'white',
-                    fontSize: 9, fontWeight: 800,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    padding: '0 4px', boxSizing: 'border-box',
-                    border: '1.5px solid rgba(0,0,0,0.3)',
-                    lineHeight: 1,
-                  }}>
-                    {badgeText}
-                  </span>
-                )}
-              </div>
-              <span style={{
-                fontSize: 9, fontWeight: 700, letterSpacing: '0.02em',
-                color: isActive ? 'white' : 'rgba(255,255,255,0.4)', lineHeight: 1,
-              }}>
-                {label}
-              </span>
-              {isActive && (
-                <span style={{
-                  width: 4, height: 4, borderRadius: '50%',
-                  background: '#C9894A', marginTop: 2,
-                }} />
+          background: dark ? '#1C1205' : 'white',
+          borderTop: `1px solid ${dark ? '#2A1A08' : '#F0EDE6'}`,
+          boxShadow: '0 -2px 16px rgba(0,0,0,0.06)',
+          display: 'flex', alignItems: 'center',
+        }}>
+          {/* Inicio */}
+          <Link to="/dashboard" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, textDecoration: 'none', paddingTop: 4 }}>
+            <div style={{ position: 'relative' }}>
+              <Home size={22} color={location.pathname === '/dashboard' ? (dark ? '#A3D4B5' : '#3D6B54') : (dark ? 'rgba(255,255,255,0.35)' : '#9FAF9A')} strokeWidth={location.pathname === '/dashboard' ? 2 : 1.5} />
+              {homeBadge > 0 && (
+                <span style={{ position: 'absolute', top: -5, right: -7, minWidth: 16, height: 16, borderRadius: 8, background: '#DC2626', color: 'white', fontSize: 8, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 3px', boxSizing: 'border-box' }}>
+                  {homeBadge > 9 ? '9+' : homeBadge}
+                </span>
               )}
+            </div>
+            <span style={{ fontSize: 9, fontWeight: 700, color: location.pathname === '/dashboard' ? (dark ? '#A3D4B5' : '#3D6B54') : (dark ? 'rgba(255,255,255,0.35)' : '#9FAF9A') }}>Inicio</span>
+          </Link>
+
+          {/* Chat */}
+          <Link to="/chat" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, textDecoration: 'none', paddingTop: 4 }}>
+            <div style={{ position: 'relative' }}>
+              <Chat size={22} color={location.pathname === '/chat' ? (dark ? '#A3D4B5' : '#3D6B54') : (dark ? 'rgba(255,255,255,0.35)' : '#9FAF9A')} strokeWidth={location.pathname === '/chat' ? 2 : 1.5} />
+              {familyBadge > 0 && (
+                <span style={{ position: 'absolute', top: -3, right: -3, width: 7, height: 7, borderRadius: '50%', background: '#D6A13B' }} />
+              )}
+            </div>
+            <span style={{ fontSize: 9, fontWeight: 700, color: location.pathname === '/chat' ? (dark ? '#A3D4B5' : '#3D6B54') : (dark ? 'rgba(255,255,255,0.35)' : '#9FAF9A') }}>Chat</span>
+          </Link>
+
+          {/* Center + button */}
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Link to="/cuidado" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 52, height: 52, borderRadius: '50%', background: '#2D4A1E', boxShadow: '0 2px 12px rgba(45,74,30,0.35)', marginTop: -18, textDecoration: 'none' }}>
+              <Plus size={22} color="white" strokeWidth={2} />
             </Link>
-          )
-        })}
-      </nav>}
+          </div>
+
+          {/* Milo IA */}
+          <Link to="/memorias" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, textDecoration: 'none', paddingTop: 4 }}>
+            <span style={{ fontSize: 22, lineHeight: 1 }}>🤖</span>
+            <span style={{ fontSize: 9, fontWeight: 700, color: location.pathname === '/memorias' ? (dark ? '#A3D4B5' : '#3D6B54') : (dark ? 'rgba(255,255,255,0.35)' : '#9FAF9A') }}>Milo IA</span>
+          </Link>
+
+          {/* Mi cuenta */}
+          <Link to="/ajustes" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, textDecoration: 'none', paddingTop: 4 }}>
+            <User size={22} color={location.pathname === '/ajustes' ? (dark ? '#A3D4B5' : '#3D6B54') : (dark ? 'rgba(255,255,255,0.35)' : '#9FAF9A')} strokeWidth={location.pathname === '/ajustes' ? 2 : 1.5} />
+            <span style={{ fontSize: 9, fontWeight: 700, color: location.pathname === '/ajustes' ? (dark ? '#A3D4B5' : '#3D6B54') : (dark ? 'rgba(255,255,255,0.35)' : '#9FAF9A') }}>Mi cuenta</span>
+          </Link>
+        </nav>
+      )}
     </div>
   )
 }
