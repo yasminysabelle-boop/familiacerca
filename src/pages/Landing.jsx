@@ -1007,7 +1007,7 @@ export default function Landing() {
                   <text x="20" y="19.5" textAnchor="middle" dominantBaseline="middle" fill="white" fontSize="13" fontWeight="800" fontFamily="Georgia,serif" letterSpacing="-0.5">FC</text>
                   <text x="20" y="31" textAnchor="middle" dominantBaseline="middle" fill="white" fillOpacity="0.75" fontSize="9">♥</text>
                 </svg>
-                <span style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 700, color: WHITE }}>Familia<span style={{ color: GOLD }}>Cerca</span></span>
+                <span style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 700, color: WHITE }}>Familia<span style={{ color: '#D6A13B' }}>Cerca</span></span>
               </div>
               <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.32)', lineHeight: 1.7, fontFamily: SANS, fontWeight: 300, margin: '0 0 24px' }}>
                 Cuidado familiar coordinado para la comunidad hispana. Medicamentos, rutinas y amor — todo en un solo lugar.
