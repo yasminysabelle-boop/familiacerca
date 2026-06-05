@@ -95,6 +95,23 @@ function toLocalDateKey(d = new Date()) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
+function timeAgo(date) {
+  if (!date) return null
+  const diff = Math.floor((Date.now() - date.getTime()) / 60000)
+  if (diff < 1) return 'ahora mismo'
+  if (diff < 60) return `hace ${diff} min`
+  const hrs = Math.floor(diff / 60)
+  if (hrs < 24) return `hace ${hrs}h`
+  if (hrs < 48) return 'ayer'
+  return `hace ${Math.floor(hrs / 24)} días`
+}
+
+function formatNotified(names) {
+  if (!names.length) return 'Tu equipo fue notificado'
+  if (names.length === 1) return `Notificado: ${names[0]}`
+  return `Notificados: ${names.slice(0, -1).join(', ')} y ${names[names.length - 1]}`
+}
+
 function sortSection(events) {
   return [...events].sort((a, b) => {
     if (a.type === 'MED_PENDING' && b.type !== 'MED_PENDING') return -1
@@ -1690,8 +1707,10 @@ function CareDayDetail({ section, todayKey, confirming, onConfirm, isFamiliar, o
   )
 }
 
-function QuickCard({ emoji, label, subtitle, statusColor, onClick, index }) {
+function QuickCard({ emoji, label, subtitle, statusColor, onClick, index, size = 'standard' }) {
   const [pressed, setPressed] = useState(false)
+  const isLarge = size === 'large'
+  const isSmall = size === 'small'
   return (
     <button
       onClick={onClick}
@@ -1699,23 +1718,24 @@ function QuickCard({ emoji, label, subtitle, statusColor, onClick, index }) {
       onPointerUp={() => setPressed(false)}
       onPointerLeave={() => setPressed(false)}
       style={{
-        borderRadius: 16, border: '0.5px solid #E8E4DC',
-        background: 'white',
-        boxShadow: pressed ? 'none' : '0 2px 0px #E0DBD2',
+        borderRadius: isSmall ? 12 : 16,
+        border: isLarge ? '1px solid #C8E6D0' : '0.5px solid #E8E4DC',
+        background: isLarge ? 'linear-gradient(135deg, #F0FDF4, #fff)' : 'white',
+        boxShadow: pressed ? 'none' : isLarge ? '0 3px 0px #BFD9C8' : '0 2px 0px #E0DBD2',
         transform: pressed ? 'translateY(2px)' : 'none',
-        padding: '16px 14px',
+        padding: isLarge ? '20px 16px' : isSmall ? '11px 12px' : '16px 14px',
         cursor: 'pointer', textAlign: 'left',
-        display: 'flex', flexDirection: 'column', gap: 8,
+        display: 'flex', flexDirection: 'column', gap: isSmall ? 5 : 8,
         WebkitTapHighlightColor: 'transparent',
         transition: 'transform 0.08s ease, box-shadow 0.08s ease',
         animation: `fadeInUp 0.4s ease ${index * 0.08}s both`,
       }}
     >
-      <span style={{ fontSize: 26 }}>{emoji}</span>
+      <span style={{ fontSize: isLarge ? 32 : isSmall ? 20 : 26 }}>{emoji}</span>
       <div>
-        <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#1E2D26', lineHeight: 1.2 }}>{label}</p>
+        <p style={{ margin: 0, fontSize: isLarge ? 16 : isSmall ? 12 : 14, fontWeight: isLarge ? 800 : 700, color: '#1E2D26', lineHeight: 1.2 }}>{label}</p>
         {subtitle && (
-          <p style={{ margin: '3px 0 0', fontSize: 11, color: statusColor ?? '#9CA3AF', fontWeight: statusColor ? 600 : 400 }}>
+          <p style={{ margin: isSmall ? '2px 0 0' : '3px 0 0', fontSize: isSmall ? 10 : 11, color: statusColor ?? '#9CA3AF', fontWeight: statusColor ? 600 : 400 }}>
             {subtitle}
           </p>
         )}
@@ -1770,6 +1790,8 @@ export default function Dashboard() {
   const [pressedMood, setPressedMood] = useState(null)
   const [pressedSOS, setPressedSOS] = useState(false)
   const [weekShifts, setWeekShifts] = useState([])
+  const [familyCount, setFamilyCount] = useState(1)
+  const [familyNames, setFamilyNames] = useState([])
   // Tracks scheduled appointment reminder timeouts by event id to prevent duplicates
   const apptReminderTimeouts = useRef(new Map())
   const apptReminderScheduled = useRef(new Set())
@@ -1859,6 +1881,21 @@ export default function Dashboard() {
       .maybeSingle()
       .then(({ data }) => setDailyMood(data?.mood ?? null))
   }, [ownerId, todayKey])
+
+  useEffect(() => {
+    if (!ownerId) return
+    supabase
+      .from('family_members')
+      .select('member_user_id, user_profiles(full_name)')
+      .eq('user_id', ownerId)
+      .then(({ data }) => {
+        setFamilyCount((data?.length ?? 0) + 1)
+        const names = (data ?? [])
+          .map(m => m.user_profiles?.full_name?.split(' ')[0])
+          .filter(Boolean)
+        setFamilyNames([firstName, ...names])
+      })
+  }, [ownerId])
 
   useEffect(() => {
     if (!ownerId) return
@@ -2604,6 +2641,13 @@ export default function Dashboard() {
   // Next pending medication for the meds card
   const nextPendingMed = todaySection?.events.find(e => e.type === 'MED_PENDING') ?? null
 
+  const hasActiveSOS = sections.flatMap(s => s.events).some(e => e.type === 'SOS_ALERT' && !e.resolved)
+  const lastActivity = sections.flatMap(s => s.events)
+    .filter(e => ['MED_CONFIRMED', 'VOICE_MEMORY', 'PHOTO', 'NOTE', 'EXPENSE'].includes(e.type))
+    .sort((a, b) => b.timestamp - a.timestamp)[0] ?? null
+  const lastUpdatedBy = lastActivity?.confirmedBy?.split(' ')[0] || lastActivity?.recorderName?.split(' ')[0] || lastActivity?.uploaderName?.split(' ')[0] || null
+  const lastUpdatedAgo = timeAgo(lastActivity?.timestamp ?? null)
+
   // Last voice/photo memory across any day
   const lastMemory = sections.flatMap(s => s.events).find(e => e.type === 'VOICE_MEMORY' || e.type === 'PHOTO') ?? null
 
@@ -2949,6 +2993,29 @@ export default function Dashboard() {
               <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: 18, flexShrink: 0 }}>›</span>
             </div>
 
+            {/* Prominent status + coordination */}
+            {(patientProfile?.nombre_completo || profile?.name) && (
+              <div style={{ marginTop: 14, textAlign: 'center' }}>
+                <p style={{
+                  color: _isRetrasado ? '#F87171' : pendingCount > 0 ? '#FCD34D' : '#86EFAC',
+                  fontSize: 17, fontWeight: 700, margin: '0 0 4px',
+                  fontFamily: "'Cormorant Garamond', Georgia, serif",
+                }}>
+                  {_isRetrasado ? '🔴' : pendingCount > 0 ? '🟡' : '🟢'}{' '}
+                  {(patientProfile?.nombre_completo || profile?.name)?.split(' ')[0]}{' '}
+                  {_isRetrasado ? 'necesita atención' : pendingCount > 0 ? 'tiene pendientes' : 'está estable'}
+                </p>
+                {lastUpdatedBy && lastUpdatedAgo && (
+                  <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: 11, margin: '0 0 5px' }}>
+                    Últ. actualización: {lastUpdatedBy} · {lastUpdatedAgo}
+                  </p>
+                )}
+                <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11, margin: 0, fontStyle: 'italic' }}>
+                  {familyCount === 1 ? 'Tú cuidando solo' : `${familyCount} personas cuidando juntos`}
+                </p>
+              </div>
+            )}
+
             {/* Wellbeing badges */}
             {(patientProfile?.nombre_completo || profile?.name) && (
               <div style={{ display: 'flex', gap: 6, marginTop: 14, flexWrap: 'wrap' }}>
@@ -3063,8 +3130,8 @@ export default function Dashboard() {
           if (_isRetrasado && nextPendingMed) {
             alerts.push({
               key: 'med-overdue', type: 'urgent', icon: '💊',
-              title: `${nextPendingMed.medName} — retrasado`,
-              subtitle: _retrasadoLabel ? `Debía darse hace ${_retrasadoLabel}` : 'Medicamento pendiente',
+              title: `⚠️ ${nextPendingMed.medName} pendiente${_retrasadoLabel ? ` desde hace ${_retrasadoLabel}` : ''}`,
+              subtitle: formatNotified(familyNames),
               to: '/medications',
             })
           } else if (pendingCount > 0) {
@@ -3179,19 +3246,20 @@ export default function Dashboard() {
               fontFamily: "'Cormorant Garamond', Georgia, serif",
               fontSize: 14, fontWeight: 700, color: '#1E2D26', margin: '0 0 10px',
             }}>
-              Últimas novedades
+              Actividad reciente
             </p>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
-              {recentEvents5.slice(0, 4).map((evt, i) => {
+              {recentEvents5.slice(0, 3).map((evt, i) => {
                 const actIcon = { MED_CONFIRMED: '💊', APPOINTMENT: '📅', VOICE_MEMORY: '🎙️', PHOTO: '📸', NOTE: '📝', EXPENSE: '💰', SOS_ALERT: '🚨', APPOINTMENT_PROOF: '📋' }[evt.type] ?? '📋'
-                const actLabel = {
-                  MED_CONFIRMED: evt.medName ?? 'Medicamento dado',
+                const actorName = evt.confirmedBy?.split(' ')[0] || evt.recorderName?.split(' ')[0] || evt.uploaderName?.split(' ')[0] || firstName
+                const actAction = {
+                  MED_CONFIRMED: `${actorName} confirmó ${evt.medName ?? 'medicamento'}`,
                   APPOINTMENT: evt.appointmentTitle ?? 'Cita médica',
-                  VOICE_MEMORY: 'Memoria de voz',
-                  PHOTO: evt.caption ?? 'Foto familiar',
-                  NOTE: evt.noteText?.slice(0, 40) ?? 'Nota',
-                  EXPENSE: `$${evt.amount ?? ''} ${evt.description ?? ''}`.trim(),
-                  SOS_ALERT: 'Alerta SOS',
+                  VOICE_MEMORY: `${actorName} grabó una memoria`,
+                  PHOTO: `${actorName} subió una foto`,
+                  NOTE: `${actorName} escribió una nota`,
+                  EXPENSE: (`${actorName} registró $${evt.amount ?? ''} ${evt.description ?? ''}`).trim(),
+                  SOS_ALERT: 'Alerta SOS enviada',
                   APPOINTMENT_PROOF: 'Comprobante de cita',
                 }[evt.type] ?? evt.type
                 const actRoute = {
@@ -3204,8 +3272,8 @@ export default function Dashboard() {
                   APPOINTMENT: '/calendar',
                   APPOINTMENT_PROOF: '/calendar',
                 }[evt.type]
-                const evtTime = evt.timestamp ? fmtTimestamp(evt.timestamp) : null
-                const limit = Math.min(recentEvents5.length, 4)
+                const evtAgo = timeAgo(evt.timestamp ?? null)
+                const limit = Math.min(recentEvents5.length, 3)
                 return (
                   <div
                     key={evt.id ?? i}
@@ -3220,9 +3288,9 @@ export default function Dashboard() {
                   >
                     <span style={{ fontSize: 16, flexShrink: 0 }}>{actIcon}</span>
                     <p style={{ flex: 1, fontSize: 13, color: '#374151', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {actLabel}
+                      {actAction}
                     </p>
-                    {evtTime && <span style={{ fontSize: 11, color: '#9CA3AF', flexShrink: 0 }}>{evtTime}</span>}
+                    {evtAgo && <span style={{ fontSize: 11, color: '#9CA3AF', flexShrink: 0, whiteSpace: 'nowrap' }}>{evtAgo}</span>}
                     {actRoute && <span style={{ fontSize: 14, color: '#D4C0B0', flexShrink: 0 }}>›</span>}
                   </div>
                 )
@@ -3231,84 +3299,72 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* ════ BLOCK 4 — Quick access grid ═══════════════════════════════ */}
-        <div style={{
-          display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)',
-          gap: 12, marginBottom: 16,
-        }}>
-          <QuickCard emoji="💊" label="Medicamentos"
+        {/* ════ BLOCK 4 — Quick access grid (3-level hierarchy) ══════════ */}
+        {/* Level 1 — Primary daily actions */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, marginBottom: 10 }}>
+          <QuickCard size="large" emoji="💊" label="Medicamentos"
             subtitle={_isRetrasado ? `⚠️ ${pendingCount} retrasado${pendingCount !== 1 ? 's' : ''}` : pendingCount > 0 ? `${pendingCount} pendiente${pendingCount !== 1 ? 's' : ''}` : confirmedTodayCount > 0 ? `${confirmedTodayCount} dado${confirmedTodayCount !== 1 ? 's' : ''}` : 'Sin meds hoy'}
             statusColor={_isRetrasado ? '#E45B4C' : pendingCount > 0 ? '#D6A13B' : confirmedTodayCount > 0 ? '#22C55E' : undefined}
             onClick={() => navigate('/medications')} index={0} />
-          <QuickCard emoji="✅" label="Rutinas"
+          <QuickCard size="large" emoji="✅" label="Rutinas"
             subtitle={pendingRoutinesCount > 0 ? `${pendingRoutinesCount} pendiente${pendingRoutinesCount !== 1 ? 's' : ''}` : 'Todas completadas'}
             statusColor={pendingRoutinesCount > 0 ? '#D6A13B' : '#22C55E'}
             onClick={() => navigate('/cuidado')} index={1} />
-          <QuickCard emoji="📋" label="Historial"
-            subtitle="Registro completo"
-            onClick={() => navigate('/registros')} index={2} />
-          <QuickCard emoji="📹" label="Videollamada"
-            subtitle={startingInstantCall ? 'Iniciando...' : 'Conectar familia'}
-            onClick={handleInstantCall} index={3} />
-          <QuickCard emoji="👨‍👩‍👧" label="Equipo"
-            subtitle="Cuidadores y familia"
-            onClick={() => navigate('/familia')} index={4} />
-          <QuickCard emoji="💰" label="Gastos"
-            subtitle="Control de cuentas"
-            onClick={() => navigate('/gastos')} index={5} />
-          <QuickCard emoji="📝" label="Notas"
-            subtitle="Historia clínica"
-            onClick={() => navigate('/diario-medico')} index={6} />
-          {/* SOS — coral, prominent */}
-          <button
-            onClick={prepareSOS}
-            onPointerDown={() => setPressedSOS(true)}
-            onPointerUp={() => setPressedSOS(false)}
-            onPointerLeave={() => setPressedSOS(false)}
-            style={{
-              borderRadius: 16, border: 'none',
-              background: sosSent
-                ? 'linear-gradient(135deg, #B91C1C, #7F1D1D)'
-                : 'linear-gradient(135deg, #E45B4C, #C0392B)',
-              padding: '16px 14px',
-              cursor: 'pointer', textAlign: 'left',
-              display: 'flex', flexDirection: 'column', gap: 8,
-              WebkitTapHighlightColor: 'transparent',
-              boxShadow: pressedSOS ? 'none' : '0 4px 16px rgba(228,91,76,0.4)',
-              transform: pressedSOS ? 'translateY(2px)' : 'none',
-              transition: 'transform 0.08s ease, box-shadow 0.08s ease',
-              animation: 'fadeInUp 0.4s ease 0.56s both',
-            }}
-          >
-            <span style={{ fontSize: 26 }}>🆘</span>
-            <div>
-              <p style={{ margin: 0, fontSize: 14, fontWeight: 800, color: 'white', lineHeight: 1.2 }}>SOS Familiar</p>
-              <p style={{ margin: '3px 0 0', fontSize: 11, color: 'rgba(255,255,255,0.8)' }}>
-                {sosSent ? 'Alerta enviada' : 'Alertar a la familia'}
-              </p>
-            </div>
-          </button>
         </div>
 
-        {/* Modo Hospital */}
+        {/* Level 2 — Connection actions */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, marginBottom: 10 }}>
+          <QuickCard emoji="📹" label="Videollamada"
+            subtitle={startingInstantCall ? 'Iniciando...' : 'Conectar familia'}
+            onClick={handleInstantCall} index={2} />
+          <QuickCard emoji="👨‍👩‍👧" label="Equipo"
+            subtitle="Cuidadores y familia"
+            onClick={() => navigate('/familia')} index={3} />
+        </div>
+
+        {/* Level 3 — Utility actions */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginBottom: 12 }}>
+          <QuickCard size="small" emoji="📋" label="Historial"
+            onClick={() => navigate('/registros')} index={4} />
+          <QuickCard size="small" emoji="📝" label="Notas"
+            onClick={() => navigate('/diario-medico')} index={5} />
+          <QuickCard size="small" emoji="💰" label="Gastos"
+            onClick={() => navigate('/gastos')} index={6} />
+          <QuickCard size="small" emoji="🏥" label="Hospital"
+            onClick={() => setShowHospitalModal(true)} index={7} />
+        </div>
+
+        {/* SOS — neutral dark green normally; coral only when emergency active */}
         <button
-          onClick={() => setShowHospitalModal(true)}
+          onClick={prepareSOS}
+          onPointerDown={() => setPressedSOS(true)}
+          onPointerUp={() => setPressedSOS(false)}
+          onPointerLeave={() => setPressedSOS(false)}
           style={{
-            width: '100%', marginBottom: 16,
-            border: '1px solid #FCA5A5', borderRadius: 14,
-            background: '#FEF2F2',
-            padding: '12px 16px',
+            width: '100%', borderRadius: 16, border: 'none',
+            background: sosSent
+              ? 'linear-gradient(135deg, #B91C1C, #7F1D1D)'
+              : hasActiveSOS
+                ? 'linear-gradient(135deg, #E45B4C, #C0392B)'
+                : 'linear-gradient(135deg, #1E2D26, #0F1A14)',
+            padding: '14px 18px', marginBottom: 16,
             cursor: 'pointer', textAlign: 'left',
             display: 'flex', alignItems: 'center', gap: 12,
             WebkitTapHighlightColor: 'transparent',
+            boxShadow: pressedSOS ? 'none' : hasActiveSOS || sosSent ? '0 4px 16px rgba(228,91,76,0.4)' : '0 3px 0px rgba(0,0,0,0.35)',
+            transform: pressedSOS ? 'translateY(2px)' : 'none',
+            transition: 'transform 0.08s ease, box-shadow 0.08s ease',
+            animation: 'fadeInUp 0.4s ease 0.56s both',
           }}
         >
-          <span style={{ fontSize: 20 }}>🏥</span>
+          <span style={{ fontSize: 24 }}>🆘</span>
           <div style={{ flex: 1 }}>
-            <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#DC2626' }}>Modo Hospital</p>
-            <p style={{ margin: '2px 0 0', fontSize: 11, color: '#EF4444' }}>Activar gestión hospitalaria</p>
+            <p style={{ margin: 0, fontSize: 14, fontWeight: 800, color: 'white', lineHeight: 1.2 }}>SOS Familiar</p>
+            <p style={{ margin: '2px 0 0', fontSize: 11, color: 'rgba(255,255,255,0.7)' }}>
+              {sosSent ? 'Alerta enviada · La familia fue notificada' : hasActiveSOS ? '⚡ Emergencia activa' : 'Alertar a toda la familia'}
+            </p>
           </div>
-          <span style={{ fontSize: 14, color: '#FCA5A5' }}>›</span>
+          <span style={{ fontSize: 18, color: 'rgba(255,255,255,0.45)', flexShrink: 0 }}>›</span>
         </button>
         <HospitalModeModal open={showHospitalModal} onClose={() => setShowHospitalModal(false)} />
 
