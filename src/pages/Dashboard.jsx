@@ -2946,24 +2946,29 @@ export default function Dashboard() {
                 minHeight: 'max(270px, 35vh)', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
                 background: 'linear-gradient(160deg,#063324,#1E2D26)',
               }}>
-                {/* Blurred photo fill */}
+                {/* Blurred photo fill — CSS background-image */}
                 {heroPhoto && (
-                  <img src={heroPhoto} alt="" aria-hidden style={{
-                    position: 'absolute', inset: 0, width: '100%', height: '100%',
-                    objectFit: 'cover', filter: 'blur(22px)', transform: 'scale(1.15)',
-                    pointerEvents: 'none', userSelect: 'none',
+                  <div style={{
+                    position: 'absolute', inset: 0,
+                    backgroundImage: `url(${heroPhoto})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center top',
+                    filter: 'blur(20px)',
+                    transform: 'scale(1.1)',
+                    zIndex: 0,
                   }} />
                 )}
                 {/* Overlay: dark green tint + bottom gradient */}
                 <div style={{
                   position: 'absolute', inset: 0,
                   background: heroPhoto
-                    ? 'linear-gradient(180deg,rgba(6,51,36,0.60) 0%,rgba(6,51,36,0.88) 100%)'
+                    ? 'linear-gradient(to bottom,rgba(6,51,36,0.72) 0%,rgba(6,51,36,0.88) 100%)'
                     : 'linear-gradient(160deg,#063324,#1a3825)',
                   pointerEvents: 'none',
+                  zIndex: 1,
                 }} />
                 {/* Content */}
-                <div style={{ position: 'relative', zIndex: 1, padding: '28px 24px 26px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+                <div style={{ position: 'relative', zIndex: 2, padding: '28px 24px 26px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
                   {/* Circular photo */}
                   <div style={{ position: 'relative' }}>
                     {heroPhoto ? (
@@ -2973,7 +2978,7 @@ export default function Dashboard() {
                         {(patientProfile?.nombre_completo || profile?.name)?.charAt(0) ?? '👤'}
                       </div>
                     )}
-                    <div style={{ position: 'absolute', bottom: 4, right: 4, width: 10, height: 10, borderRadius: '50%', background: '#22C55E', border: '2px solid rgba(255,255,255,0.9)' }} />
+                    <div style={{ position: 'absolute', bottom: 4, right: 4, width: 8, height: 8, borderRadius: '50%', background: '#22C55E', border: '2px solid rgba(255,255,255,0.9)' }} />
                   </div>
 
                   {/* Patient name */}
