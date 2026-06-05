@@ -2891,495 +2891,214 @@ export default function Dashboard() {
         onTouchStart={pullStart}
         onTouchMove={pullMove}
         onTouchEnd={pullEnd}
-        style={{ padding: '12px 16px 96px', maxWidth: 600, overflowY: 'auto' }}
+        style={{ background: '#F5F0E8', minHeight: '100vh', paddingBottom: 100, overflowY: 'auto', maxWidth: 480, margin: '0 auto' }}
       >
         <PullIndicator />
+        <style>{`
+          @keyframes fadeInUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+          @keyframes sos-ring  { 0%,100%{box-shadow:0 0 0 3px rgba(228,91,76,0.35)} 50%{box-shadow:0 0 0 9px rgba(228,91,76,0)} }
+        `}</style>
 
-        {/* ════ BLOCK 1 — Patient Status Card ═══════════════════════════ */}
-        <div style={{
-          background: 'linear-gradient(135deg, #063324, #1E2D26)',
-          borderRadius: 20, padding: '20px',
-          boxShadow: '0 8px 32px rgba(6,51,36,0.55)',
-          marginBottom: 12,
-        }}>
-          <style>{`
-            @keyframes status-pulse {
-              0%,100%{box-shadow:0 0 0 3px rgba(34,197,94,0.35)}
-              50%{box-shadow:0 0 0 7px rgba(34,197,94,0)}
-            }
-            @keyframes status-pulse-warn {
-              0%,100%{box-shadow:0 0 0 3px rgba(214,161,59,0.4)}
-              50%{box-shadow:0 0 0 7px rgba(214,161,59,0)}
-            }
-            @keyframes status-pulse-urgent {
-              0%,100%{box-shadow:0 0 0 3px rgba(228,91,76,0.45)}
-              50%{box-shadow:0 0 0 8px rgba(228,91,76,0)}
-            }
-            @keyframes fadeInUp {
-              from{opacity:0;transform:translateY(10px)}
-              to{opacity:1;transform:translateY(0)}
-            }
-          `}</style>
-
+        {/* ═══════════════════════════════════════════════════════════════
+            HEADER
+        ═══════════════════════════════════════════════════════════════ */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 20px 12px' }}>
+          {/* Logo */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ fontSize: 20 }}>🌿</span>
+            <span style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 18, fontWeight: 700, color: '#1E2D26' }}>FamiliaCerca</span>
+          </div>
           {/* Greeting */}
-          <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11, margin: '0 0 16px', letterSpacing: '0.07em', textTransform: 'uppercase' }}>
-            {timeIcon} {timeGreeting}, {firstName}
-          </p>
+          <div style={{ flex: 1, textAlign: 'center', padding: '0 10px' }}>
+            <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#1E2D26' }}>{timeGreeting}, {firstName}</p>
+            <p style={{ margin: 0, fontSize: 10, color: '#7A8F80' }}>Hoy es un buen día para cuidar juntos</p>
+          </div>
+          {/* Bell + avatar */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <button onClick={() => navigate('/chat')} style={{ position: 'relative', background: 'none', border: 'none', cursor: 'pointer', padding: 4 }}>
+              <span style={{ fontSize: 20 }}>🔔</span>
+              {chatCount > 0 && (
+                <span style={{ position: 'absolute', top: 0, right: 0, background: '#E45B4C', color: 'white', fontSize: 9, fontWeight: 800, borderRadius: '50%', width: 16, height: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {chatCount > 9 ? '9+' : chatCount}
+                </span>
+              )}
+            </button>
+            <button onClick={() => navigate('/ajustes')} style={{ width: 34, height: 34, borderRadius: '50%', background: '#3D6B54', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: 14 }}>
+              {firstName.charAt(0).toUpperCase()}
+            </button>
+          </div>
+        </div>
 
-          {/* Patient identity */}
-          <Link to="/paciente/perfil" style={{ textDecoration: 'none', display: 'block' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-              {/* Circular photo */}
+        {/* ═══════════════════════════════════════════════════════════════
+            PATIENT HERO
+        ═══════════════════════════════════════════════════════════════ */}
+        <div style={{ margin: '0 16px 14px', background: 'white', borderRadius: 24, padding: '20px 20px 16px', boxShadow: '0 2px 16px rgba(30,45,38,0.07)', position: 'relative', overflow: 'hidden' }}>
+          {/* Leaf decoration */}
+          <div style={{ position: 'absolute', top: -14, right: -14, fontSize: 90, opacity: 0.05, transform: 'rotate(20deg)', pointerEvents: 'none', lineHeight: 1 }}>🌿</div>
+
+          {/* Identity row */}
+          <Link to="/paciente/perfil" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 16, marginBottom: 14 }}>
+            {/* Photo 90px */}
+            <div style={{ position: 'relative', flexShrink: 0 }}>
               {profile?.photo_url ? (
-                <img
-                  src={profile.photo_url}
-                  alt={profile.name}
-                  style={{
-                    width: 72, height: 72, borderRadius: '50%', objectFit: 'cover',
-                    border: '2.5px solid rgba(255,255,255,0.18)', flexShrink: 0,
-                  }}
-                />
+                <img src={profile.photo_url} alt="" style={{ width: 90, height: 90, borderRadius: '50%', objectFit: 'cover', border: '3px solid #F0F7F3' }} />
               ) : (
-                <div style={{
-                  width: 72, height: 72, borderRadius: '50%', flexShrink: 0,
-                  background: 'rgba(255,255,255,0.12)',
-                  border: '2.5px solid rgba(255,255,255,0.18)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 28, color: 'rgba(255,255,255,0.85)',
-                }}>
+                <div style={{ width: 90, height: 90, borderRadius: '50%', background: 'linear-gradient(135deg,#3D6B54,#1E2D26)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 34, color: 'white' }}>
                   {(patientProfile?.nombre_completo || profile?.name)?.charAt(0) ?? '👴'}
                 </div>
               )}
-
-              {/* Name + status dot + meta */}
-              <div style={{ flex: 1, minWidth: 0 }}>
-                {(patientProfile?.nombre_completo || profile?.name) ? (
-                  <>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                      <p style={{
-                        color: 'white', fontSize: 21, fontWeight: 800,
-                        fontFamily: "'Cormorant Garamond', Georgia, serif",
-                        margin: 0, lineHeight: 1.1,
-                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                        maxWidth: 175,
-                      }}>
-                        {patientProfile?.nombre_completo || profile?.name}
-                      </p>
-                      <span style={{
-                        width: 10, height: 10, borderRadius: '50%', flexShrink: 0,
-                        background: _isRetrasado ? '#E45B4C' : pendingCount > 0 ? '#D6A13B' : '#22C55E',
-                        animation: _isRetrasado
-                          ? 'status-pulse-urgent 1.6s ease-in-out infinite'
-                          : pendingCount > 0
-                            ? 'status-pulse-warn 2s ease-in-out infinite'
-                            : 'status-pulse 2.5s ease-in-out infinite',
-                      }} />
-                    </div>
-                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 4 }}>
-                      {calcAge(patientProfile?.fecha_nacimiento) !== null && (
-                        <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11 }}>
-                          {calcAge(patientProfile?.fecha_nacimiento)} años
-                        </span>
-                      )}
-                      {patientProfile?.diagnostico_principal && (
-                        <span style={{
-                          color: 'rgba(255,255,255,0.4)', fontSize: 11,
-                          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                          maxWidth: 155,
-                        }}>
-                          · {patientProfile.diagnostico_principal}
-                        </span>
-                      )}
-                    </div>
-                    <p style={{ color: 'rgba(255,255,255,0.28)', fontSize: 10, margin: '0 0 3px' }}>
-                      {familyCount > 1
-                        ? `👨‍👩‍👧 ${familyCount} familiares coordinados`
-                        : '🤝 Tú cuidando solo · Invita a tu familia'}
-                    </p>
-                    <p style={{
-                      color: _isRetrasado ? '#E45B4C' : pendingCount > 0 ? '#D6A13B' : 'rgba(255,255,255,0.4)',
-                      fontSize: 11, margin: 0,
-                      fontWeight: pendingCount > 0 ? 600 : 400,
-                    }}>
-                      {_isRetrasado
-                        ? `⚠️ ${pendingCount} med${pendingCount !== 1 ? 's' : ''} retrasado${pendingCount !== 1 ? 's' : ''}`
-                        : pendingCount > 0
-                          ? `${pendingCount} medicamento${pendingCount !== 1 ? 's' : ''} pendiente${pendingCount !== 1 ? 's' : ''}`
-                          : confirmedTodayCount > 0
-                            ? '✓ Todo al día hoy'
-                            : `Cuida hoy: ${todayShift?.caregiver_name ?? firstName}`}
-                    </p>
-                  </>
-                ) : (
-                  <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: 14, fontWeight: 600, margin: 0, textDecoration: 'underline' }}>
-                    + Agregar perfil del paciente →
-                  </p>
-                )}
-              </div>
-              <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: 18, flexShrink: 0 }}>›</span>
+              <div style={{ position: 'absolute', bottom: 2, right: 2, width: 26, height: 26, borderRadius: '50%', background: '#E45B4C', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, border: '2.5px solid white' }}>❤️</div>
             </div>
-
-            {/* Prominent status — calibrated 3 levels */}
-            {(patientProfile?.nombre_completo || profile?.name) && (() => {
-              const patientFirst = (patientProfile?.nombre_completo || profile?.name)?.split(' ')[0]
-              const isCritical = hasActiveSOS || (_isRetrasado && _retrasadoMins != null && _retrasadoMins >= 720)
-              const isPending   = !isCritical && (pendingCount > 0 || _isRetrasado)
-              const pendingLabel = pendingCount + (_isRetrasado && pendingCount === 0 ? 1 : 0)
-              return (
-                <div style={{ marginTop: 14, textAlign: 'center' }}>
-                  <p style={{
-                    color: isCritical ? '#F87171' : isPending ? '#FCD34D' : '#86EFAC',
-                    fontSize: 17, fontWeight: 700, margin: '0 0 5px',
-                    fontFamily: "'Cormorant Garamond', Georgia, serif",
-                  }}>
-                    {isCritical
-                      ? '🔴 Atención requerida'
-                      : isPending
-                        ? `🟡 Hay ${pendingLabel} tarea${pendingLabel !== 1 ? 's' : ''} pendiente${pendingLabel !== 1 ? 's' : ''}`
-                        : `🟢 ${patientFirst} está estable`}
-                  </p>
-                  {isCritical ? (
-                    <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, margin: 0, lineHeight: 1.6 }}>
-                      {hasActiveSOS
-                        ? 'Alerta de emergencia activa'
-                        : `${nextPendingMed?.medName ?? 'Medicamento'} pendiente desde hace ${_retrasadoLabel}`}
-                      {familyNames.length > 1 && ` · Notificados: ${familyNames.slice(0, 2).join(' y ')}`}
-                    </p>
-                  ) : (
-                    <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: 11, margin: 0, lineHeight: 1.6 }}>
-                      {lastUpdatedBy && lastUpdatedAgo
-                        ? `Actualizado por ${lastUpdatedBy} · ${lastUpdatedAgo}`
-                        : 'Sin actividad reciente registrada'}
-                      {familyCount > 1 ? ` · ${familyCount} familiares coordinados` : ''}
-                    </p>
-                  )}
-                </div>
-              )
-            })()}
-
-            {/* Wellbeing badges */}
-            {(patientProfile?.nombre_completo || profile?.name) && (
-              <div style={{ display: 'flex', gap: 6, marginTop: 14, flexWrap: 'wrap' }}>
-                {[
-                  { key: 'mood', emoji: getMoodEmoji(dailyMood) || '😶', label: 'Estado', active: !!dailyMood },
-                  { key: 'sleep', emoji: '😴', label: 'Sueño', active: !!careLogsToday['sleep'] },
-                  { key: 'nutrition', emoji: '🥗', label: 'Comida', active: !!careLogsToday['nutrition'] },
-                  { key: 'hygiene', emoji: '🛁', label: 'Higiene', active: !!careLogsToday['hygiene'] },
-                ].map(b => (
-                  <span key={b.key} style={{
-                    fontSize: 11, padding: '4px 10px', borderRadius: 20,
-                    background: b.active ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.07)',
-                    color: b.active ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.35)',
-                    border: `1px solid ${b.active ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.08)'}`,
-                  }}>
-                    {b.emoji} {b.label}
-                  </span>
-                ))}
-              </div>
-            )}
-
-            {patientProfileIncomplete && (
-              <div style={{
-                marginTop: 12, padding: '9px 13px',
-                background: 'rgba(255,255,255,0.1)',
-                border: '1px solid rgba(255,255,255,0.15)',
-                borderRadius: 11,
-                display: 'flex', alignItems: 'center', gap: 8,
-              }}>
-                <span style={{ fontSize: 15, flexShrink: 0 }}>📋</span>
-                <div style={{ flex: 1 }}>
-                  <p style={{ color: 'white', fontSize: 12, fontWeight: 700, margin: 0 }}>
-                    Completa el perfil del paciente
-                  </p>
-                  <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 11, margin: '1px 0 0' }}>
-                    Diagnóstico, alergias y médico tratante
-                  </p>
-                </div>
-                <span style={{ color: 'rgba(255,255,255,0.45)', fontSize: 13 }}>›</span>
-              </div>
-            )}
+            {/* Info */}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ margin: '0 0 2px', fontSize: 22, fontWeight: 800, fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#1E2D26', lineHeight: 1.1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {patientProfile?.nombre_completo || profile?.name || <span style={{ color: '#9CA3AF', fontSize: 15, fontWeight: 600 }}>+ Agregar paciente</span>}
+              </p>
+              {calcAge(patientProfile?.fecha_nacimiento) !== null && (
+                <p style={{ margin: '0 0 4px', fontSize: 12, color: '#6B7280' }}>
+                  {calcAge(patientProfile?.fecha_nacimiento)} años{patientProfile?.diagnostico_principal ? ` · ${patientProfile.diagnostico_principal}` : ''}
+                </p>
+              )}
+              <p style={{ margin: 0, fontSize: 11, color: '#3D6B54', fontWeight: 600 }}>Tu cuidado, junto a tu familia</p>
+            </div>
           </Link>
 
-          {/* Separator */}
-          <div style={{ height: 1, background: 'rgba(255,255,255,0.08)', margin: '16px 0' }} />
-
-          {/* Mood selector */}
-          <p style={{
-            fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.55)',
-            margin: '0 0 10px',
-          }}>
-            ¿Cómo estuvo {(patientProfile?.nombre_completo || profile?.name)?.split(' ')[0] || 'el paciente'} hoy?
-          </p>
-          <div style={{ display: 'flex', gap: 8 }}>
-            {MOOD_OPTIONS.map(({ mood, emoji, label, bg, border: btnBorder, shadow }) => {
-              const isSelected = !!dailyMood && (dailyMood === mood || dailyMood === emoji)
-              const isPressed  = pressedMood === mood
-              return (
-                <button
-                  key={mood}
-                  onClick={() => !isFamiliar && saveMood(mood)}
-                  onPointerDown={() => !isFamiliar && setPressedMood(mood)}
-                  onPointerUp={() => setPressedMood(null)}
-                  onPointerLeave={() => setPressedMood(null)}
-                  disabled={savingMood || isFamiliar}
-                  style={{
-                    flex: 1, padding: '11px 4px', borderRadius: 14,
-                    border: `1.5px solid ${isSelected ? btnBorder : 'rgba(255,255,255,0.12)'}`,
-                    background: isSelected ? bg : 'rgba(255,255,255,0.07)',
-                    cursor: savingMood || isFamiliar ? 'default' : 'pointer',
-                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-                    boxShadow: isPressed ? 'none' : isSelected ? shadow : '0 3px 0px rgba(0,0,0,0.25)',
-                    transform: isPressed ? 'translateY(3px)' : isSelected ? 'scale(1.04)' : 'none',
-                    transition: 'transform 0.1s ease, box-shadow 0.1s ease',
-                    opacity: savingMood ? 0.6 : 1,
-                  }}
-                >
-                  <span style={{ fontSize: 22 }}>{emoji}</span>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: isSelected && mood === 'good' ? '#92400E' : 'rgba(255,255,255,0.9)' }}>
-                    {label}
-                  </span>
-                </button>
-              )
-            })}
-          </div>
-          {dailyMood && (
-            <p style={{ fontSize: 12, color: '#D6A13B', fontWeight: 600, textAlign: 'center', margin: '10px 0 0' }}>
-              {MOOD_FEEDBACK[dailyMood] ?? ''}
+          {/* Family avatars */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+            <div style={{ display: 'flex' }}>
+              {familyNames.slice(0, 4).map((name, i) => (
+                <div key={i} style={{ width: 28, height: 28, borderRadius: '50%', background: `hsl(${(i * 73 + 120) % 360},40%,48%)`, border: '2px solid white', marginLeft: i > 0 ? -8 : 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 11, fontWeight: 700, zIndex: 4 - i, position: 'relative' }}>
+                  {name.charAt(0)}
+                </div>
+              ))}
+              {familyNames.length === 0 && (
+                <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#3D6B54', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 11, fontWeight: 700 }}>
+                  {firstName.charAt(0)}
+                </div>
+              )}
+            </div>
+            <p style={{ margin: 0, fontSize: 11, color: '#6B7280' }}>
+              {familyCount > 1 ? `${familyCount} familiares cuidando juntos` : '🤝 Invita a tu familia'}
             </p>
-          )}
-          {isFamiliar && !dailyMood && (
-            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', margin: '8px 0 0', textAlign: 'center' }}>
-              El administrador registra el estado del día
-            </p>
-          )}
-        </div>
-
-        {/* AI motivational cards */}
-        {Object.keys(aiCards).length > 0 && (
-          <div style={{ marginBottom: 12 }}>
-            {aiCards.morning && <AiCard type="morning" text={aiCards.morning} />}
-            {aiCards.evening && <AiCard type="evening" text={aiCards.evening} />}
-            {aiCards.burnout && <AiCard type="burnout" text={aiCards.burnout} />}
-            {aiCards.weekly  && <AiCard type="weekly"  text={aiCards.weekly} />}
           </div>
-        )}
 
-        {/* ════ BLOCK 2 — Conditional alerts ══════════════════════════════ */}
-        {!loading && (() => {
-          const alerts = []
-
-          if (_isRetrasado && nextPendingMed) {
-            alerts.push({
-              key: 'med-overdue', type: 'urgent', icon: '💊',
-              title: `⚠️ ${nextPendingMed.medName} pendiente${_retrasadoLabel ? ` desde hace ${_retrasadoLabel}` : ''}`,
-              subtitle: formatNotified(familyNames),
-              subtitle2: _retrasadoMins != null && _retrasadoMins >= 120 ? 'Ventana clínica activa' : null,
-              to: '/medications',
-            })
-          } else if (pendingCount > 0) {
-            alerts.push({
-              key: 'med-pending', type: 'warning', icon: '⏳',
-              title: `${pendingCount} medicamento${pendingCount !== 1 ? 's' : ''} pendiente${pendingCount !== 1 ? 's' : ''}`,
-              subtitle: nextPendingMed?.medTime ? `Próxima dosis: ${fmtTime(nextPendingMed.medTime)}` : 'Por confirmar hoy',
-              to: '/medications',
-            })
-          }
-
-          if (nextAppointment && (nextAppointment.dateKey === todayKey || nextAppointment.dateKey === tomorrowKey)) {
-            alerts.push({
-              key: 'appointment', type: 'info', icon: '📅',
-              title: nextAppointment.appointmentTitle ?? 'Cita médica',
-              subtitle: nextAppointment.dateKey === todayKey
-                ? `Hoy${nextAppointment.appointmentTime ? ' · ' + fmtTime(nextAppointment.appointmentTime) : ''}`
-                : `Mañana${nextAppointment.appointmentTime ? ' · ' + fmtTime(nextAppointment.appointmentTime) : ''}`,
-              to: '/calendar',
-            })
-          }
-
-          // SOS is shown as a dedicated banner below — not duplicated here
-
-          if (alerts.length === 0) {
+          {/* Status card */}
+          {(() => {
+            const patientFirst = (patientProfile?.nombre_completo || profile?.name)?.split(' ')[0]
+            const isCritical = hasActiveSOS || (_isRetrasado && _retrasadoMins != null && _retrasadoMins >= 720)
+            const isPending = !isCritical && (pendingCount > 0 || _isRetrasado)
             return (
-              <div style={{
-                background: 'linear-gradient(135deg, #F0FDF4, #DCFCE7)',
-                borderRadius: 16, border: '1px solid #86EFAC',
-                padding: '14px 16px', marginBottom: 12,
-                display: 'flex', alignItems: 'center', gap: 12,
-              }}>
-                <div style={{
-                  width: 42, height: 42, borderRadius: 12, flexShrink: 0,
-                  background: '#22C55E',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 18, color: 'white', fontWeight: 800,
-                }}>✓</div>
-                <div>
-                  <p style={{ fontSize: 14, fontWeight: 700, color: '#15803D', margin: 0 }}>Todo al día</p>
-                  <p style={{ fontSize: 12, color: '#16A34A', margin: '2px 0 0' }}>
-                    {confirmedTodayCount > 0 ? `${confirmedTodayCount} dosis confirmadas hoy` : 'Sin alertas pendientes'}
+              <div style={{ background: isCritical ? '#FEF2F2' : isPending ? '#FFFBEB' : '#F0FDF4', border: `1.5px solid ${isCritical ? '#FCA5A5' : isPending ? '#FDE68A' : '#86EFAC'}`, borderRadius: 16, padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ width: 36, height: 36, borderRadius: 10, flexShrink: 0, background: isCritical ? '#FEE2E2' : isPending ? '#FEF3C7' : '#DCFCE7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>
+                  {isCritical ? '🔴' : isPending ? '🟡' : '✅'}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: isCritical ? '#DC2626' : isPending ? '#92400E' : '#15803D', lineHeight: 1.2 }}>
+                    {isCritical ? 'Atención requerida' : isPending ? `${patientFirst ?? 'Paciente'} tiene pendientes` : `${patientFirst ?? 'Paciente'} está estable`}
+                  </p>
+                  <p style={{ margin: '2px 0 0', fontSize: 11, color: isCritical ? '#EF4444' : isPending ? '#B45309' : '#16A34A' }}>
+                    {lastUpdatedBy && lastUpdatedAgo ? `Actualizado por ${lastUpdatedBy} · ${lastUpdatedAgo}` : 'Sin actividad reciente'}
                   </p>
                 </div>
               </div>
             )
-          }
+          })()}
+        </div>
 
-          const ALERT_STYLES = {
-            urgent: { bg: '#FEF2F2', border: '#FCA5A5', titleColor: '#DC2626', subColor: '#EF4444', iconBg: '#FEE2E2' },
-            warning: { bg: '#FFFBEB', border: '#FDE68A', titleColor: '#92400E', subColor: '#B45309', iconBg: '#FEF3C7' },
-            info: { bg: 'white', border: '#BFDBFE', titleColor: '#1E40AF', subColor: '#3B82F6', iconBg: '#EFF6FF' },
-          }
-
-          return (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 12 }}>
-              {alerts.map((alert, i) => {
-                const s = ALERT_STYLES[alert.type]
-                return (
-                  <div
-                    key={alert.key}
-                    onClick={alert.to ? () => navigate(alert.to) : undefined}
-                    style={{
-                      background: s.bg, borderRadius: 16, border: `1.5px solid ${s.border}`,
-                      padding: '13px 16px',
-                      display: 'flex', alignItems: 'center', gap: 12,
-                      cursor: alert.to ? 'pointer' : 'default',
-                      animation: `fadeInUp 0.4s ease ${i * 0.1}s both`,
-                    }}
-                  >
-                    <div style={{
-                      width: 40, height: 40, borderRadius: 12, flexShrink: 0,
-                      background: s.iconBg,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 18,
-                    }}>
-                      {alert.icon}
-                    </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ fontSize: 13, fontWeight: 700, color: s.titleColor, margin: 0, lineHeight: 1.3 }}>
-                        {alert.title}
-                      </p>
-                      <p style={{ fontSize: 11, color: s.subColor, margin: '2px 0 0' }}>
-                        {alert.subtitle}
-                      </p>
-                      {alert.subtitle2 && (
-                        <p style={{ fontSize: 10, color: s.subColor, margin: '2px 0 0', opacity: 0.7, fontStyle: 'italic' }}>
-                          {alert.subtitle2}
-                        </p>
-                      )}
-                    </div>
-                    {alert.onDismiss && (
-                      <button
-                        onClick={e => { e.stopPropagation(); alert.onDismiss() }}
-                        style={{
-                          flexShrink: 0, padding: '5px 10px', borderRadius: 8, border: 'none',
-                          background: '#FEE2E2', color: '#DC2626', fontSize: 11, fontWeight: 700,
-                          cursor: 'pointer', WebkitTapHighlightColor: 'transparent',
-                        }}
-                      >
-                        Resolver
-                      </button>
-                    )}
-                    {alert.to && <span style={{ fontSize: 14, color: '#D4C0B0', flexShrink: 0 }}>›</span>}
-                  </div>
-                )
-              })}
+        {/* ═══════════════════════════════════════════════════════════════
+            WELLBEING PILLS
+        ═══════════════════════════════════════════════════════════════ */}
+        <div style={{ display: 'flex', gap: 8, padding: '0 16px 14px', overflowX: 'auto', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none' }}>
+          {[
+            { icon: getMoodEmoji(dailyMood) || '😶', label: 'Estado', value: dailyMood === 'good' ? 'Bueno' : dailyMood === 'regular' ? 'Regular' : dailyMood === 'hard' ? 'Difícil' : '—', bg: '#F0FDF4', color: '#15803D' },
+            { icon: '🌙', label: 'Descanso', value: careLogsToday['sleep'] ? 'Bien' : '—', bg: '#F5F3FF', color: '#7C3AED' },
+            { icon: '🍽️', label: 'Alimentación', value: careLogsToday['nutrition'] ? 'Completa' : '—', bg: '#FFFBEB', color: '#92400E' },
+            { icon: '💧', label: 'Hidratación', value: careLogsToday['hydration'] ? 'Adecuada' : '—', bg: '#EFF6FF', color: '#1D4ED8' },
+          ].map((pill, i) => (
+            <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, background: pill.bg, borderRadius: 14, padding: '10px 14px', flexShrink: 0, minWidth: 76, animation: `fadeInUp 0.35s ease ${i * 0.06}s both` }}>
+              <span style={{ fontSize: 18 }}>{pill.icon}</span>
+              <p style={{ margin: 0, fontSize: 9, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{pill.label}</p>
+              <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: pill.color }}>{pill.value}</p>
             </div>
-          )
-        })()}
+          ))}
+          {!dailyMood && !isFamiliar && (
+            <button onClick={() => navigate('/cuidado')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, background: 'rgba(61,107,84,0.08)', border: '1.5px dashed #3D6B54', borderRadius: 14, padding: '10px 14px', flexShrink: 0, cursor: 'pointer', WebkitTapHighlightColor: 'transparent', minWidth: 76 }}>
+              <span style={{ fontSize: 18 }}>➕</span>
+              <p style={{ margin: 0, fontSize: 10, fontWeight: 700, color: '#3D6B54' }}>Registrar</p>
+            </button>
+          )}
+        </div>
 
-        {/* ── Single SOS banner (C5) — only when emergency active ─────── */}
+        {/* ═══════════════════════════════════════════════════════════════
+            SOS BANNER — only when active
+        ═══════════════════════════════════════════════════════════════ */}
         {hasActiveSOS && (
-          <div style={{
-            background: 'linear-gradient(135deg, #7F1D1D, #991B1B)',
-            borderRadius: 16, padding: '16px 18px', marginBottom: 12,
-            boxShadow: '0 4px 24px rgba(185,28,28,0.4)',
-            display: 'flex', alignItems: 'center', gap: 14,
-            animation: 'fadeInUp 0.3s ease both',
-          }}>
-            <span style={{ fontSize: 26, flexShrink: 0 }}>🚨</span>
+          <div style={{ margin: '0 16px 14px', background: 'linear-gradient(135deg,#7F1D1D,#991B1B)', borderRadius: 16, padding: '16px 18px', boxShadow: '0 4px 24px rgba(185,28,28,0.4)', display: 'flex', alignItems: 'center', gap: 14, animation: 'fadeInUp 0.3s ease both' }}>
+            <span style={{ fontSize: 26, flexShrink: 0, animation: 'sos-ring 1.4s ease-in-out infinite' }}>🚨</span>
             <div style={{ flex: 1 }}>
-              <p style={{ margin: 0, fontSize: 15, fontWeight: 800, color: 'white', lineHeight: 1.2 }}>
-                Alerta SOS activa
-              </p>
+              <p style={{ margin: 0, fontSize: 15, fontWeight: 800, color: 'white' }}>Alerta SOS activa</p>
               <p style={{ margin: '3px 0 0', fontSize: 11, color: 'rgba(255,255,255,0.75)' }}>
-                {activeSosEvent?.triggeredBy
-                  ? `Activada por ${activeSosEvent.triggeredBy.split(' ')[0]}`
-                  : 'Emergencia familiar'}
+                {activeSosEvent?.triggeredBy ? `Activada por ${activeSosEvent.triggeredBy.split(' ')[0]}` : 'Emergencia familiar'}
               </p>
             </div>
-            <button
-              onClick={dismissSOS}
-              style={{
-                flexShrink: 0, padding: '7px 13px', borderRadius: 10, border: 'none',
-                background: 'rgba(255,255,255,0.18)', color: 'white', fontSize: 12, fontWeight: 700,
-                cursor: 'pointer', WebkitTapHighlightColor: 'transparent',
-              }}
-            >
+            <button onClick={dismissSOS} style={{ flexShrink: 0, padding: '7px 14px', borderRadius: 10, border: 'none', background: 'rgba(255,255,255,0.18)', color: 'white', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
               Resolver
             </button>
           </div>
         )}
 
-        {/* ── BLOCK 3 — Actividad reciente (C2) ───────────────────────── */}
-        <div style={{
-          background: 'white', borderRadius: 16, border: '1px solid #EDE5D8',
-          padding: '14px 16px', marginBottom: 12,
-          boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
-          animation: 'fadeInUp 0.4s ease 0.1s both',
-        }}>
-          <p style={{
-            fontFamily: "'Cormorant Garamond', Georgia, serif",
-            fontSize: 14, fontWeight: 700, color: '#1E2D26', margin: '0 0 10px',
-          }}>
-            Actividad reciente
-          </p>
+        {/* ═══════════════════════════════════════════════════════════════
+            ALERT CARD — only if overdue/pending
+        ═══════════════════════════════════════════════════════════════ */}
+        {!loading && (_isRetrasado || pendingCount > 0) && nextPendingMed && (
+          <div style={{ margin: '0 16px 14px', background: 'white', borderRadius: 16, borderLeft: `4px solid ${_isRetrasado ? '#E45B4C' : '#D6A13B'}`, padding: '14px 16px', boxShadow: '0 2px 12px rgba(0,0,0,0.05)', animation: 'fadeInUp 0.4s ease both' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+              <div style={{ width: 38, height: 38, borderRadius: 10, flexShrink: 0, background: _isRetrasado ? '#FEE2E2' : '#FEF3C7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>💊</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ margin: '0 0 5px', fontSize: 13, fontWeight: 700, color: _isRetrasado ? '#DC2626' : '#92400E', lineHeight: 1.3 }}>
+                  {_isRetrasado
+                    ? `⚠️ ${nextPendingMed.medName} pendiente desde hace ${_retrasadoLabel}`
+                    : `${nextPendingMed.medName} pendiente${nextPendingMed.medTime ? ` · ${fmtTime(nextPendingMed.medTime)}` : ''}`}
+                </p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                  {_isRetrasado && _retrasadoMins >= 120 && (
+                    <span style={{ fontSize: 10, fontWeight: 700, color: '#15803D', background: '#DCFCE7', borderRadius: 20, padding: '2px 8px' }}>Ventana clínica activa</span>
+                  )}
+                  <span style={{ fontSize: 11, color: '#9CA3AF' }}>{formatNotified(familyNames)}</span>
+                </div>
+              </div>
+              <button onClick={() => navigate('/medications')} style={{ flexShrink: 0, background: 'none', border: 'none', cursor: 'pointer', color: '#3D6B54', fontSize: 12, fontWeight: 700, padding: '4px 0', whiteSpace: 'nowrap' }}>
+                Ver detalle ›
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ═══════════════════════════════════════════════════════════════
+            RECENT ACTIVITY
+        ═══════════════════════════════════════════════════════════════ */}
+        <div style={{ margin: '0 16px 14px', background: 'white', borderRadius: 20, padding: '16px 16px 10px', boxShadow: '0 2px 12px rgba(0,0,0,0.05)', animation: 'fadeInUp 0.4s ease 0.1s both' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+            <p style={{ margin: 0, fontSize: 14, fontWeight: 700, fontFamily: "'Cormorant Garamond', Georgia, serif", color: '#1E2D26' }}>Actividad reciente</p>
+            <button onClick={() => navigate('/registros')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: '#3D6B54', fontWeight: 600 }}>Ver todas ›</button>
+          </div>
           {recentActivityItems.length === 0 ? (
-            <p style={{ fontSize: 12, color: '#9CA3AF', margin: 0, textAlign: 'center', padding: '8px 0' }}>
-              Sin actividad reciente registrada
-            </p>
+            <p style={{ margin: '0 0 8px', fontSize: 12, color: '#9CA3AF', textAlign: 'center', padding: '10px 0' }}>Sin actividad reciente registrada</p>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <div style={{ position: 'relative' }}>
+              <div style={{ position: 'absolute', left: 12, top: 4, bottom: 4, width: 1, borderLeft: '2px dotted #E8E4DC' }} />
               {recentActivityItems.map((evt, i) => {
-                const CARE_LOG_MAP = { sleep: { icon: '😴', label: 'Sueño registrado' }, nutrition: { icon: '🍽️', label: 'Alimentación registrada' }, hygiene: { icon: '🛁', label: 'Higiene registrada' } }
-                const actIcon = evt.type === 'CARE_LOG'
-                  ? (CARE_LOG_MAP[evt.careLogKey]?.icon ?? '✅')
-                  : ({ MED_CONFIRMED: '💊', APPOINTMENT: '📅', VOICE_MEMORY: '🎙️', PHOTO: '📸', NOTE: '📝', EXPENSE: '💰', APPOINTMENT_PROOF: '📋' }[evt.type] ?? '📋')
+                const CLM = { sleep: { icon: '😴', color: '#7C3AED', bg: '#F5F3FF', label: 'Sueño registrado' }, nutrition: { icon: '🍽️', color: '#92400E', bg: '#FFFBEB', label: 'Alimentación registrada' }, hygiene: { icon: '🛁', color: '#1D4ED8', bg: '#EFF6FF', label: 'Higiene registrada' } }
+                const TM = { MED_CONFIRMED: { icon: '💊', color: '#15803D', bg: '#DCFCE7' }, APPOINTMENT: { icon: '📅', color: '#1D4ED8', bg: '#EFF6FF' }, VOICE_MEMORY: { icon: '🎙️', color: '#7C3AED', bg: '#F5F3FF' }, PHOTO: { icon: '📸', color: '#92400E', bg: '#FFFBEB' }, NOTE: { icon: '📝', color: '#1E2D26', bg: '#F5F0E8' }, EXPENSE: { icon: '💰', color: '#C9882A', bg: '#FFFBEB' }, APPOINTMENT_PROOF: { icon: '📋', color: '#1D4ED8', bg: '#EFF6FF' } }
+                const meta = evt.type === 'CARE_LOG' ? CLM[evt.careLogKey] : TM[evt.type]
                 const actorName = evt.confirmedBy?.split(' ')[0] || evt.recorderName?.split(' ')[0] || evt.uploaderName?.split(' ')[0] || firstName
-                const actAction = evt.type === 'CARE_LOG'
-                  ? (CARE_LOG_MAP[evt.careLogKey]?.label ?? 'Cuidado registrado')
-                  : ({
-                      MED_CONFIRMED: `${actorName} confirmó ${evt.medName ?? 'medicamento'}`,
-                      APPOINTMENT: evt.appointmentTitle ?? 'Cita médica registrada',
-                      VOICE_MEMORY: `${actorName} grabó una memoria`,
-                      PHOTO: `${actorName} subió una foto`,
-                      NOTE: `${actorName} escribió una nota`,
-                      EXPENSE: (`${actorName} registró $${evt.amount ?? ''} ${evt.description ?? ''}`).trim(),
-                      APPOINTMENT_PROOF: 'Comprobante de cita subido',
-                    }[evt.type] ?? evt.type)
-                const actRoute = evt.type === 'CARE_LOG' ? '/cuidado' : ({
-                  MED_CONFIRMED: '/medications',
-                  VOICE_MEMORY: '/memorias',
-                  PHOTO: '/album',
-                  NOTE: '/notas',
-                  EXPENSE: '/gastos',
-                  APPOINTMENT: '/calendar',
-                  APPOINTMENT_PROOF: '/calendar',
-                }[evt.type])
+                const actAction = evt.type === 'CARE_LOG' ? (meta?.label ?? 'Cuidado registrado') : ({ MED_CONFIRMED: `${actorName} confirmó ${evt.medName ?? 'medicamento'}`, APPOINTMENT: evt.appointmentTitle ?? 'Cita médica registrada', VOICE_MEMORY: `${actorName} grabó una memoria`, PHOTO: `${actorName} subió una foto`, NOTE: `${actorName} escribió una nota`, EXPENSE: (`${actorName} registró $${evt.amount ?? ''} ${evt.description ?? ''}`).trim(), APPOINTMENT_PROOF: 'Comprobante de cita subido' }[evt.type] ?? evt.type)
+                const actRoute = evt.type === 'CARE_LOG' ? '/cuidado' : ({ MED_CONFIRMED: '/medications', VOICE_MEMORY: '/memorias', PHOTO: '/album', NOTE: '/notas', EXPENSE: '/gastos', APPOINTMENT: '/calendar', APPOINTMENT_PROOF: '/calendar' }[evt.type])
                 const evtAgo = timeAgo(evt.timestamp ?? null)
                 return (
-                  <div
-                    key={evt.id ?? i}
-                    onClick={actRoute ? () => navigate(actRoute) : undefined}
-                    style={{
-                      display: 'flex', alignItems: 'center', gap: 10,
-                      padding: '9px 0',
-                      borderBottom: i < recentActivityItems.length - 1 ? '1px solid #F5EEE6' : 'none',
-                      cursor: actRoute ? 'pointer' : 'default',
-                      animation: `fadeInUp 0.4s ease ${0.15 + i * 0.07}s both`,
-                    }}
-                  >
-                    <span style={{ fontSize: 16, flexShrink: 0 }}>{actIcon}</span>
-                    <p style={{ flex: 1, fontSize: 13, color: '#374151', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {actAction}
-                    </p>
+                  <div key={evt.id ?? i} onClick={actRoute ? () => navigate(actRoute) : undefined} style={{ display: 'flex', alignItems: 'center', gap: 10, paddingLeft: 4, paddingBottom: 12, cursor: actRoute ? 'pointer' : 'default', animation: `fadeInUp 0.4s ease ${0.12 + i * 0.07}s both` }}>
+                    <div style={{ width: 24, height: 24, borderRadius: '50%', background: meta?.bg ?? '#F5F0E8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, flexShrink: 0, border: `1.5px solid ${(meta?.color ?? '#9CA3AF') + '33'}` }}>{meta?.icon ?? '📋'}</div>
+                    <p style={{ flex: 1, margin: 0, fontSize: 12, color: '#374151', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{actAction}</p>
                     {evtAgo && <span style={{ fontSize: 11, color: '#9CA3AF', flexShrink: 0, whiteSpace: 'nowrap' }}>{evtAgo}</span>}
                     {actRoute && <span style={{ fontSize: 14, color: '#D4C0B0', flexShrink: 0 }}>›</span>}
                   </div>
@@ -3389,75 +3108,100 @@ export default function Dashboard() {
           )}
         </div>
 
-        {/* ════ BLOCK 4 — Quick access grid (3-level hierarchy) ══════════ */}
-        {/* Level 1 — Primary daily actions */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, marginBottom: 10 }}>
-          <QuickCard size="large" emoji="💊" label="Medicamentos"
-            subtitle={_isRetrasado ? `⚠️ ${pendingCount} retrasado${pendingCount !== 1 ? 's' : ''}` : pendingCount > 0 ? `${pendingCount} pendiente${pendingCount !== 1 ? 's' : ''}` : confirmedTodayCount > 0 ? `${confirmedTodayCount} dado${confirmedTodayCount !== 1 ? 's' : ''}` : 'Sin meds hoy'}
-            statusColor={_isRetrasado ? '#E45B4C' : pendingCount > 0 ? '#D6A13B' : confirmedTodayCount > 0 ? '#22C55E' : undefined}
-            onClick={() => navigate('/medications')} index={0} />
-          <QuickCard size="large" emoji="✅" label="Rutinas"
-            subtitle={pendingRoutinesCount > 0 ? `${pendingRoutinesCount} pendiente${pendingRoutinesCount !== 1 ? 's' : ''}` : 'Todas completadas'}
-            statusColor={pendingRoutinesCount > 0 ? '#D6A13B' : '#22C55E'}
-            onClick={() => navigate('/cuidado')} index={1} />
-        </div>
+        {/* ═══════════════════════════════════════════════════════════════
+            MODULES GRID
+        ═══════════════════════════════════════════════════════════════ */}
+        <div style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
 
-        {/* Level 2 — Connection actions */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, marginBottom: 10 }}>
-          <QuickCard emoji="📹" label="Videollamada"
-            subtitle={startingInstantCall ? 'Iniciando...' : 'Conectar familia'}
-            onClick={handleInstantCall} index={2} />
-          <QuickCard emoji="👨‍👩‍👧" label="Equipo"
-            subtitle="Cuidadores y familia"
-            onClick={() => navigate('/familia')} index={3} />
-        </div>
-
-        {/* Level 3 — Utility actions */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginBottom: 12 }}>
-          <QuickCard size="small" emoji="📋" label="Historial"
-            onClick={() => navigate('/registros')} index={4} />
-          <QuickCard size="small" emoji="📝" label="Notas"
-            onClick={() => navigate('/diario-medico')} index={5} />
-          <QuickCard size="small" emoji="💰" label="Gastos"
-            onClick={() => navigate('/gastos')} index={6} />
-          <QuickCard size="small" emoji="🏥" label="Hospital"
-            onClick={() => setShowHospitalModal(true)} index={7} />
-        </div>
-
-        {/* SOS — neutral dark green normally; coral only when emergency active */}
-        <button
-          onClick={prepareSOS}
-          onPointerDown={() => setPressedSOS(true)}
-          onPointerUp={() => setPressedSOS(false)}
-          onPointerLeave={() => setPressedSOS(false)}
-          style={{
-            width: '100%', borderRadius: 16, border: 'none',
-            background: sosSent
-              ? 'linear-gradient(135deg, #B91C1C, #7F1D1D)'
-              : 'linear-gradient(135deg, #1E2D26, #0F1A14)',
-            padding: '14px 18px', marginBottom: 16,
-            cursor: 'pointer', textAlign: 'left',
-            display: 'flex', alignItems: 'center', gap: 12,
-            WebkitTapHighlightColor: 'transparent',
-            boxShadow: pressedSOS ? 'none' : sosSent ? '0 4px 16px rgba(228,91,76,0.4)' : '0 3px 0px rgba(0,0,0,0.35)',
-            transform: pressedSOS ? 'translateY(2px)' : 'none',
-            transition: 'transform 0.08s ease, box-shadow 0.08s ease',
-            animation: 'fadeInUp 0.4s ease 0.56s both',
-          }}
-        >
-          <span style={{ fontSize: 24 }}>🆘</span>
-          <div style={{ flex: 1 }}>
-            <p style={{ margin: 0, fontSize: 14, fontWeight: 800, color: 'white', lineHeight: 1.2 }}>SOS Familiar</p>
-            <p style={{ margin: '2px 0 0', fontSize: 11, color: 'rgba(255,255,255,0.7)' }}>
-              {sosSent ? 'Alerta enviada · La familia fue notificada' : 'Alertar a toda la familia'}
-            </p>
+          {/* Level 1 — Primary */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <button onClick={() => navigate('/medications')} style={{ borderRadius: 18, border: 'none', background: '#3D6B54', padding: '18px 16px', cursor: 'pointer', textAlign: 'left', WebkitTapHighlightColor: 'transparent', animation: 'fadeInUp 0.4s ease 0.08s both' }}>
+              <span style={{ fontSize: 24 }}>💊</span>
+              <p style={{ margin: '8px 0 2px', fontSize: 14, fontWeight: 800, color: 'white' }}>Medicamentos</p>
+              <p style={{ margin: 0, fontSize: 11, color: 'rgba(255,255,255,0.75)' }}>
+                {_isRetrasado ? `⚠️ ${pendingCount} retrasado${pendingCount !== 1 ? 's' : ''}` : pendingCount > 0 ? `${pendingCount} pendiente${pendingCount !== 1 ? 's' : ''}` : confirmedTodayCount > 0 ? `${confirmedTodayCount} dado${confirmedTodayCount !== 1 ? 's' : ''}` : 'Sin meds hoy'}
+              </p>
+            </button>
+            <button onClick={() => navigate('/cuidado')} style={{ borderRadius: 18, border: '1.5px solid #3D6B54', background: 'white', padding: '18px 16px', cursor: 'pointer', textAlign: 'left', WebkitTapHighlightColor: 'transparent', animation: 'fadeInUp 0.4s ease 0.12s both' }}>
+              <span style={{ fontSize: 24 }}>✅</span>
+              <p style={{ margin: '8px 0 2px', fontSize: 14, fontWeight: 800, color: '#1E2D26' }}>Rutinas</p>
+              <p style={{ margin: 0, fontSize: 11, color: pendingRoutinesCount > 0 ? '#D6A13B' : '#22C55E', fontWeight: 600 }}>
+                {pendingRoutinesCount > 0 ? `${pendingRoutinesCount} pendiente${pendingRoutinesCount !== 1 ? 's' : ''}` : 'Todas completadas'}
+              </p>
+            </button>
           </div>
-          <span style={{ fontSize: 18, color: 'rgba(255,255,255,0.45)', flexShrink: 0 }}>›</span>
-        </button>
-        <HospitalModeModal open={showHospitalModal} onClose={() => setShowHospitalModal(false)} />
+
+          {/* Level 2 — Secondary */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <button onClick={handleInstantCall} style={{ borderRadius: 16, border: 'none', background: '#F5F3FF', padding: '14px', cursor: 'pointer', textAlign: 'left', WebkitTapHighlightColor: 'transparent', animation: 'fadeInUp 0.4s ease 0.16s both' }}>
+              <span style={{ fontSize: 22 }}>🎥</span>
+              <p style={{ margin: '6px 0 2px', fontSize: 13, fontWeight: 700, color: '#5B21B6' }}>Videollamada</p>
+              <p style={{ margin: 0, fontSize: 11, color: '#7C3AED' }}>{startingInstantCall ? 'Iniciando...' : 'Conectar ahora'}</p>
+            </button>
+            <button onClick={() => navigate('/familia')} style={{ borderRadius: 16, border: 'none', background: '#EFF6FF', padding: '14px', cursor: 'pointer', textAlign: 'left', WebkitTapHighlightColor: 'transparent', animation: 'fadeInUp 0.4s ease 0.2s both' }}>
+              <span style={{ fontSize: 22 }}>👥</span>
+              <p style={{ margin: '6px 0 2px', fontSize: 13, fontWeight: 700, color: '#1E40AF' }}>Equipo</p>
+              <p style={{ margin: 0, fontSize: 11, color: '#3B82F6' }}>{familyCount > 1 ? `${familyCount} cuidadores` : 'Tu equipo'}</p>
+            </button>
+          </div>
+
+          {/* Level 3 — Compact 4-col */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 8 }}>
+            {[
+              { emoji: '📋', label: 'Historial', sub: 'Registros', route: '/registros' },
+              { emoji: '📝', label: 'Notas', sub: 'Mis notas', route: '/diario-medico' },
+              { emoji: '💰', label: 'Gastos', sub: 'Cuentas', route: '/gastos' },
+              { emoji: '🏥', label: 'Hospital', sub: 'Modo hospital', onClick: () => setShowHospitalModal(true) },
+            ].map((c, i) => (
+              <button key={i} onClick={c.onClick ?? (() => navigate(c.route))} style={{ borderRadius: 14, border: '0.5px solid #E8E4DC', background: 'white', padding: '11px 8px', cursor: 'pointer', textAlign: 'left', WebkitTapHighlightColor: 'transparent', display: 'flex', flexDirection: 'column', gap: 4, animation: `fadeInUp 0.4s ease ${0.24 + i * 0.04}s both` }}>
+                <span style={{ fontSize: 20 }}>{c.emoji}</span>
+                <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: '#1E2D26', lineHeight: 1.2 }}>{c.label}</p>
+                <p style={{ margin: 0, fontSize: 10, color: '#9CA3AF' }}>{c.sub}</p>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* ═══════════════════════════════════════════════════════════════
+            SOS SECTION
+        ═══════════════════════════════════════════════════════════════ */}
+        <div style={{ padding: '14px 16px 0' }}>
+          <button
+            onClick={prepareSOS}
+            onPointerDown={() => setPressedSOS(true)}
+            onPointerUp={() => setPressedSOS(false)}
+            onPointerLeave={() => setPressedSOS(false)}
+            style={{
+              width: '100%', borderRadius: 20, border: 'none',
+              background: sosSent
+                ? 'linear-gradient(135deg,#B91C1C,#7F1D1D)'
+                : hasActiveSOS
+                  ? 'linear-gradient(135deg,#E45B4C,#C0392B)'
+                  : 'linear-gradient(135deg,#1E2D26,#0F1A14)',
+              padding: '16px 18px', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', gap: 14,
+              WebkitTapHighlightColor: 'transparent',
+              boxShadow: pressedSOS ? 'none' : sosSent || hasActiveSOS ? '0 4px 20px rgba(228,91,76,0.4)' : '0 4px 16px rgba(30,45,38,0.3)',
+              transform: pressedSOS ? 'translateY(2px)' : 'none',
+              transition: 'transform 0.08s, box-shadow 0.08s',
+              animation: 'fadeInUp 0.4s ease 0.32s both',
+            }}
+          >
+            <div style={{ width: 44, height: 44, borderRadius: 14, background: 'rgba(255,255,255,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, flexShrink: 0 }}>🆘</div>
+            <div style={{ flex: 1 }}>
+              <p style={{ margin: 0, fontSize: 15, fontWeight: 800, color: 'white', lineHeight: 1.2 }}>SOS y Emergencias</p>
+              <p style={{ margin: '3px 0 0', fontSize: 11, color: 'rgba(255,255,255,0.7)' }}>
+                {sosSent ? 'Alerta enviada · La familia fue notificada' : hasActiveSOS ? '⚡ Emergencia activa' : 'Alerta a toda la familia'}
+              </p>
+            </div>
+            <div style={{ flexShrink: 0, background: 'rgba(255,255,255,0.12)', borderRadius: 12, padding: '8px 14px' }}>
+              <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: 'white' }}>{sosSent ? 'Enviado' : 'Activar'}</p>
+            </div>
+          </button>
+        </div>
 
         {/* Sign out */}
-        <div style={{ marginTop: 8, paddingBottom: 8, display: 'flex', justifyContent: 'center' }}>
+        <div style={{ marginTop: 16, paddingBottom: 8, display: 'flex', justifyContent: 'center' }}>
           <button
             onClick={async () => {
               localStorage.removeItem('fc_active_context')
@@ -3465,15 +3209,12 @@ export default function Dashboard() {
               try { await signOut() } catch { }
               window.location.href = '/login'
             }}
-            style={{
-              background: 'none', border: '1px solid #EDE5D8',
-              color: '#9CA3AF', fontSize: 13, fontWeight: 600,
-              borderRadius: 12, padding: '10px 24px', cursor: 'pointer',
-            }}
+            style={{ background: 'none', border: '1px solid #EDE5D8', color: '#9CA3AF', fontSize: 13, fontWeight: 600, borderRadius: 12, padding: '10px 24px', cursor: 'pointer' }}
           >
             Cerrar sesión
           </button>
         </div>
+        <HospitalModeModal open={showHospitalModal} onClose={() => setShowHospitalModal(false)} />
       </div>
 
       {/* ── SOS confirm dialog ────────────────────────────────────────────── */}
