@@ -1798,6 +1798,7 @@ export default function Dashboard() {
   // Initialized to today's key so today is expanded; past days start collapsed
   const [expandedDays, setExpandedDays] = useState(() => new Set([new Date().toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' })]))
   const [selectedDayTab, setSelectedDayTab] = useState(() => new Date().toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' }))
+  const [showMoreTools, setShowMoreTools] = useState(false)
 
   useEffect(() => {
     if (searchParams.get('checkout') === 'success') {
@@ -2930,81 +2931,100 @@ export default function Dashboard() {
         </div>
 
         {/* ═══════════════════════════════════════════════════════════════
-            PATIENT HERO — full-bleed blurred photo background
+            PATIENT HERO — light premium card
         ═══════════════════════════════════════════════════════════════ */}
         {(() => {
-          const patientFirst = (patientProfile?.nombre_completo || profile?.name)?.split(' ')[0]
           const isCritical = hasActiveSOS || (_isRetrasado && _retrasadoMins != null && _retrasadoMins >= 720)
           const isPending = !isCritical && (pendingCount > 0 || _isRetrasado)
-          const statusDot = isCritical ? '🔴' : isPending ? '🟡' : '🟢'
-          const statusText = isCritical ? 'Atención requerida' : isPending ? 'Requiere atención' : 'Todo bajo control'
           const heroPhoto = patientProfile?.foto_url || profile?.photo_url || null
           console.log('[HeroCard] heroPhoto:', heroPhoto, '| foto_url:', patientProfile?.foto_url, '| photo_url:', profile?.photo_url)
+          const age = calcAge(patientProfile?.fecha_nacimiento)
           return (
-            <Link to="/paciente/perfil" style={{ textDecoration: 'none', display: 'block', margin: '0 16px 18px' }}>
+            <Link to="/paciente/perfil" style={{ textDecoration: 'none', display: 'block', margin: '0 16px 16px' }}>
               <div style={{
-                position: 'relative', borderRadius: 28, overflow: 'hidden',
-                minHeight: 'max(270px, 35vh)', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
-                background: 'linear-gradient(160deg,#063324,#1E2D26)',
+                background: 'white', borderRadius: 20, overflow: 'hidden',
+                boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+                display: 'flex', minHeight: 220,
               }}>
-                {/* Blurred photo fill — CSS background-image */}
-                {heroPhoto && (
+                {/* Photo — left 45% */}
+                <div style={{ position: 'relative', width: '45%', flexShrink: 0 }}>
+                  {heroPhoto ? (
+                    <img src={heroPhoto} alt="" style={{
+                      width: '100%', height: '100%', objectFit: 'cover',
+                      borderRadius: '16px 0 0 16px', display: 'block',
+                    }} />
+                  ) : (
+                    <div style={{
+                      width: '100%', height: '100%', minHeight: 220,
+                      background: 'linear-gradient(160deg,#3D6B54,#1E2D26)',
+                      borderRadius: '16px 0 0 16px',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 44, color: 'white',
+                    }}>
+                      {(patientProfile?.nombre_completo || profile?.name)?.charAt(0) ?? '👤'}
+                    </div>
+                  )}
+                  {/* ❤️ badge top-right */}
                   <div style={{
-                    position: 'absolute', inset: 0,
-                    backgroundImage: `url(${heroPhoto})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center top',
-                    filter: 'blur(20px)',
-                    transform: 'scale(1.1)',
-                    zIndex: 0,
-                  }} />
-                )}
-                {/* Overlay: dark green tint + bottom gradient */}
-                <div style={{
-                  position: 'absolute', inset: 0,
-                  background: heroPhoto
-                    ? 'linear-gradient(to bottom,rgba(6,51,36,0.55) 0%,rgba(6,51,36,0.72) 100%)'
-                    : 'linear-gradient(160deg,#063324,#1a3825)',
-                  pointerEvents: 'none',
-                  zIndex: 1,
-                }} />
-                {/* Content */}
-                <div style={{ position: 'relative', zIndex: 2, padding: '28px 24px 26px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
-                  {/* Circular photo */}
-                  <div style={{ position: 'relative' }}>
-                    {heroPhoto ? (
-                      <img src={heroPhoto} alt="" style={{ width: 108, height: 108, borderRadius: '50%', objectFit: 'cover', border: '2.5px solid rgba(255,255,255,0.6)', display: 'block', boxShadow: '0 4px 20px rgba(0,0,0,0.3)' }} />
-                    ) : (
-                      <div style={{ width: 108, height: 108, borderRadius: '50%', background: 'rgba(255,255,255,0.12)', border: '2.5px solid rgba(255,255,255,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 38, color: 'white', boxShadow: '0 4px 20px rgba(0,0,0,0.3)' }}>
-                        {(patientProfile?.nombre_completo || profile?.name)?.charAt(0) ?? '👤'}
-                      </div>
+                    position: 'absolute', top: 10, right: 10,
+                    width: 28, height: 28, borderRadius: '50%', background: '#E45B4C',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 14, boxShadow: '0 2px 8px rgba(228,91,76,0.35)',
+                  }}>🤍</div>
+                </div>
+                {/* Right side info */}
+                <div style={{ flex: 1, padding: '16px 14px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minWidth: 0 }}>
+                  <div>
+                    <p style={{ margin: 0, fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 26, fontWeight: 700, color: '#1E2D26', lineHeight: 1.15, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {patientProfile?.nombre_completo || profile?.name || 'Agregar paciente'}
+                    </p>
+                    {age && (
+                      <p style={{ margin: '3px 0 0', fontSize: 13, color: '#6F7A72' }}>{age} años</p>
                     )}
-                    <div style={{ position: 'absolute', bottom: 4, right: 4, width: 8, height: 8, borderRadius: '50%', background: '#22C55E', border: '2px solid rgba(255,255,255,0.9)' }} />
+                    <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                      <p style={{ margin: 0, fontSize: 12, color: '#6F7A72', display: 'flex', alignItems: 'center', gap: 5 }}>
+                        <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#22C55E', display: 'inline-block', flexShrink: 0 }} />
+                        Tu cuidado, junto a tu familia
+                      </p>
+                      <p style={{ margin: 0, fontSize: 12, color: '#6F7A72', paddingLeft: 12 }}>
+                        {familyCount > 1 ? `${familyCount} familiares colaborando` : 'Invita a tu familia'}
+                      </p>
+                    </div>
                   </div>
-
-                  {/* Patient name */}
-                  <p style={{ margin: 0, fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 28, fontWeight: 700, color: 'white', letterSpacing: '0.02em', textAlign: 'center', lineHeight: 1.1 }}>
-                    {patientProfile?.nombre_completo || profile?.name || 'Agregar paciente'}
-                  </p>
-
-                  {/* Status row */}
-                  <p style={{ margin: 0, fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 22, fontWeight: 600, color: 'white', textAlign: 'center', lineHeight: 1.2 }}>
-                    {statusDot} {statusText}
-                  </p>
-
-                  {/* Status detail */}
-                  <p style={{ margin: 0, fontSize: 13, color: 'rgba(245,240,232,0.70)', textAlign: 'center', lineHeight: 1.4 }}>
-                    {isCritical
-                      ? (hasActiveSOS ? 'Alerta SOS activa' : `Medicamento retrasado${_retrasadoLabel ? ` ${_retrasadoLabel}` : ''}`)
-                      : isPending
-                        ? (pendingCount > 0 ? `${pendingCount} medicamento${pendingCount !== 1 ? 's' : ''} pendiente${pendingCount !== 1 ? 's' : ''}` : 'Rutinas sin completar')
-                        : (lastUpdatedAgo ? `Última actualización ${lastUpdatedAgo}` : 'Todo al día hoy')}
-                  </p>
-
-                  {/* Family row */}
-                  <p style={{ margin: '2px 0 0', fontSize: 12, color: 'rgba(214,161,59,0.85)', fontWeight: 500 }}>
-                    👨‍👩‍👧 {familyCount > 1 ? `${familyCount} familiares colaborando` : 'Invita a tu familia'}
-                  </p>
+                  {/* Status card */}
+                  <div style={{
+                    background: isCritical ? '#FFF5F5' : isPending ? '#FFFBF0' : '#F0FDF4',
+                    borderRadius: 12, padding: '10px 12px',
+                    border: `1px solid ${isCritical ? '#FECACA' : isPending ? '#FDE68A' : '#BBF7D0'}`,
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 3 }}>
+                      <div style={{
+                        width: 22, height: 22, borderRadius: '50%', flexShrink: 0,
+                        background: isCritical ? '#FEE2E2' : isPending ? '#FEF3C7' : '#DCFCE7',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12,
+                      }}>
+                        {isCritical ? '⚠️' : isPending ? '⚠️' : '✓'}
+                      </div>
+                      <p style={{ margin: 0, fontSize: 16, fontWeight: 600, color: '#1E2D26', lineHeight: 1.2 }}>
+                        {isCritical ? 'Atención requerida' : isPending ? 'Requiere atención' : 'Todo bajo control'}
+                      </p>
+                    </div>
+                    <p style={{ margin: '0 0 5px', fontSize: 13, color: '#6F7A72', lineHeight: 1.4 }}>
+                      {isCritical
+                        ? (hasActiveSOS ? 'Alerta SOS activa' : `Retrasado${_retrasadoLabel ? ` ${_retrasadoLabel}` : ''}`)
+                        : isPending
+                          ? (pendingCount > 0 ? `${pendingCount} med${pendingCount !== 1 ? 's' : ''} pendiente${pendingCount !== 1 ? 's' : ''}` : 'Rutinas pendientes')
+                          : (lastUpdatedAgo ? `Actualizado ${lastUpdatedAgo}` : 'Todo al día hoy')}
+                    </p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                      <div style={{ width: 18, height: 18, borderRadius: '50%', background: '#EAF0E6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 700, color: '#4A7C59', flexShrink: 0 }}>
+                        {(lastUpdatedBy ?? firstName).charAt(0).toUpperCase()}
+                      </div>
+                      <p style={{ margin: 0, fontSize: 10, color: '#9CA3AF', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        Actualizado por {lastUpdatedBy ?? firstName} · {lastUpdatedAgo ?? 'ahora'}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </Link>
@@ -3014,21 +3034,33 @@ export default function Dashboard() {
         {/* ═══════════════════════════════════════════════════════════════
             WELLBEING PILLS
         ═══════════════════════════════════════════════════════════════ */}
-        <div style={{ display: 'flex', gap: 6, padding: '0 16px 20px', overflowX: 'auto', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none' }}>
+        <div style={{ display: 'flex', gap: 8, padding: '0 16px 16px', overflowX: 'auto', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none' }}>
           {[
-            { icon: getMoodEmoji(dailyMood) || '😶', label: 'Estado', value: dailyMood === 'good' ? 'Bueno' : dailyMood === 'regular' ? 'Regular' : dailyMood === 'hard' ? 'Difícil' : '—', rgba: 'rgba(34,197,94,0.18)', color: '#15803D' },
-            { icon: '🌙', label: 'Descanso', value: careLogsToday['sleep'] ? 'Bien' : '—', rgba: 'rgba(124,58,237,0.14)', color: '#7C3AED' },
-            { icon: '🍽️', label: 'Alimentación', value: careLogsToday['nutrition'] ? 'Completa' : '—', rgba: 'rgba(214,161,59,0.16)', color: '#92400E' },
-            { icon: '💧', label: 'Hidratación', value: careLogsToday['hydration'] ? 'Adecuada' : '—', rgba: 'rgba(59,130,246,0.15)', color: '#1D4ED8' },
+            { icon: dailyMood ? getMoodEmoji(dailyMood) : '✓', label: 'Estado', value: dailyMood === 'good' ? 'Bueno' : dailyMood === 'regular' ? 'Regular' : dailyMood === 'hard' ? 'Difícil' : '—', bg: '#F0FDF4', color: '#15803D', accent: '#22C55E' },
+            { icon: '🌙', label: 'Descanso', value: careLogsToday['sleep'] ? 'Bien' : '—', bg: '#F5F3FF', color: '#7C3AED', accent: '#7C3AED' },
+            { icon: '🍽️', label: 'Alimentación', value: careLogsToday['nutrition'] ? 'Completa' : '—', bg: '#FFF7ED', color: '#C2410C', accent: '#F97316' },
+            { icon: '💧', label: 'Hidratación', value: careLogsToday['hydration'] ? 'Adecuada' : '—', bg: '#EFF6FF', color: '#1D4ED8', accent: '#3B82F6' },
           ].map((pill, i) => (
-            <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, background: pill.rgba, borderRadius: 18, padding: '14px 18px', flexShrink: 0, minWidth: 86, animation: `fadeInUp 0.35s ease ${i * 0.06}s both` }}>
-              <span style={{ fontSize: 19 }}>{pill.icon}</span>
+            <div key={i} style={{
+              display: 'flex', flexDirection: 'column', gap: 3,
+              background: pill.bg, borderRadius: 12,
+              padding: '12px 14px 0', flexShrink: 0, minWidth: 82,
+              overflow: 'hidden',
+              animation: `fadeInUp 0.35s ease ${i * 0.06}s both`,
+            }}>
+              <span style={{ fontSize: 17, lineHeight: 1 }}>{pill.icon}</span>
               <p style={{ margin: 0, fontSize: 9, fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{pill.label}</p>
-              <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: pill.color }}>{pill.value}</p>
+              <p style={{ margin: '0 0 10px', fontSize: 12, fontWeight: 600, color: pill.color }}>{pill.value}</p>
+              <div style={{ height: 3, background: pill.accent, margin: '0 -14px' }} />
             </div>
           ))}
           {!dailyMood && !isFamiliar && (
-            <button onClick={() => navigate('/cuidado')} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, background: 'transparent', border: '1px dashed rgba(61,107,84,0.4)', borderRadius: 16, padding: '12px 16px', flexShrink: 0, cursor: 'pointer', WebkitTapHighlightColor: 'transparent', minWidth: 80 }}>
+            <button onClick={() => navigate('/cuidado')} style={{
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4,
+              background: 'white', border: '1px solid #E0DDD6', borderRadius: 12,
+              padding: '12px 14px', flexShrink: 0, cursor: 'pointer',
+              WebkitTapHighlightColor: 'transparent', minWidth: 76,
+            }}>
               <span style={{ fontSize: 18 }}>＋</span>
               <p style={{ margin: 0, fontSize: 10, fontWeight: 600, color: '#3D6B54' }}>Registrar</p>
             </button>
@@ -3057,13 +3089,13 @@ export default function Dashboard() {
             ALERT CARD — only if overdue/pending
         ═══════════════════════════════════════════════════════════════ */}
         {!loading && (_isRetrasado || pendingCount > 0) && nextPendingMed && (
-          <div style={{ margin: '0 16px 14px', background: 'white', borderRadius: 16, borderLeft: `3px solid ${_isRetrasado ? '#E45B4C' : '#D6A13B'}`, padding: '18px 20px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', animation: 'fadeInUp 0.4s ease both' }}>
+          <div style={{ margin: '0 16px 14px', background: 'white', borderRadius: 16, borderLeft: '3px solid #E45B4C', padding: '16px 18px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', animation: 'fadeInUp 0.4s ease both' }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-              <div style={{ width: 38, height: 38, borderRadius: 10, flexShrink: 0, background: _isRetrasado ? '#FEE2E2' : '#FEF3C7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>💊</div>
+              <div style={{ width: 40, height: 40, borderRadius: '50%', flexShrink: 0, background: '#FEE2E2', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>💊</div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ margin: '0 0 5px', fontSize: 13, fontWeight: 700, color: _isRetrasado ? '#DC2626' : '#92400E', lineHeight: 1.3 }}>
+                <p style={{ margin: '0 0 5px', fontSize: 15, fontWeight: 600, color: '#E45B4C', lineHeight: 1.3 }}>
                   {_isRetrasado
-                    ? `⚠️ ${nextPendingMed.medName} pendiente desde hace ${_retrasadoLabel}`
+                    ? `${nextPendingMed.medName} pendiente desde hace ${_retrasadoLabel}`
                     : `${nextPendingMed.medName} pendiente${nextPendingMed.medTime ? ` · ${fmtTime(nextPendingMed.medTime)}` : ''}`}
                 </p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
@@ -3073,7 +3105,7 @@ export default function Dashboard() {
                   <span style={{ fontSize: 11, color: '#9CA3AF' }}>{formatNotified(familyNames)}</span>
                 </div>
               </div>
-              <button onClick={() => navigate('/medications')} style={{ flexShrink: 0, background: 'none', border: 'none', cursor: 'pointer', color: '#3D6B54', fontSize: 12, fontWeight: 700, padding: '4px 0', whiteSpace: 'nowrap' }}>
+              <button onClick={() => navigate('/medications')} style={{ flexShrink: 0, background: 'none', border: 'none', cursor: 'pointer', color: '#3D6B54', fontSize: 13, fontWeight: 600, padding: '4px 0', whiteSpace: 'nowrap' }}>
                 Ver detalle ›
               </button>
             </div>
@@ -3086,13 +3118,12 @@ export default function Dashboard() {
         <div style={{ margin: '0 16px 24px', padding: '0', animation: 'fadeInUp 0.4s ease 0.1s both' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
             <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: '#6F7A72', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Actividad reciente</p>
-            <button onClick={() => navigate('/registros')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: '#3D6B54', fontWeight: 600 }}>Ver todas ›</button>
+            <button onClick={() => navigate('/registros')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: '#D6A13B', fontWeight: 600 }}>Ver todas ›</button>
           </div>
           {recentActivityItems.length === 0 ? (
             <p style={{ margin: '0 0 8px', fontSize: 12, color: '#9CA3AF', textAlign: 'center', padding: '10px 0' }}>Sin actividad reciente registrada</p>
           ) : (
-            <div style={{ position: 'relative' }}>
-              <div style={{ position: 'absolute', left: 15, top: 4, bottom: 4, width: 1, borderLeft: '1px dotted rgba(214,161,59,0.25)' }} />
+            <div>
               {recentActivityItems.map((evt, i) => {
                 const CLM = { sleep: { icon: '😴', color: '#7C3AED', bg: '#F5F3FF', label: 'Sueño registrado' }, nutrition: { icon: '🍽️', color: '#92400E', bg: '#FFFBEB', label: 'Alimentación registrada' }, hygiene: { icon: '🛁', color: '#1D4ED8', bg: '#EFF6FF', label: 'Higiene registrada' } }
                 const TM = { MED_CONFIRMED: { icon: '💊', color: '#15803D', bg: '#DCFCE7' }, APPOINTMENT: { icon: '📅', color: '#1D4ED8', bg: '#EFF6FF' }, VOICE_MEMORY: { icon: '🎙️', color: '#7C3AED', bg: '#F5F3FF' }, PHOTO: { icon: '📸', color: '#92400E', bg: '#FFFBEB' }, NOTE: { icon: '📝', color: '#1E2D26', bg: '#F5F0E8' }, EXPENSE: { icon: '💰', color: '#C9882A', bg: '#FFFBEB' }, APPOINTMENT_PROOF: { icon: '📋', color: '#1D4ED8', bg: '#EFF6FF' } }
@@ -3102,11 +3133,11 @@ export default function Dashboard() {
                 const actRoute = evt.type === 'CARE_LOG' ? '/cuidado' : ({ MED_CONFIRMED: '/medications', VOICE_MEMORY: '/memorias', PHOTO: '/album', NOTE: '/notas', EXPENSE: '/gastos', APPOINTMENT: '/calendar', APPOINTMENT_PROOF: '/calendar' }[evt.type])
                 const evtAgo = timeAgo(evt.timestamp ?? null)
                 return (
-                  <div key={evt.id ?? i} onClick={actRoute ? () => navigate(actRoute) : undefined} style={{ display: 'flex', alignItems: 'center', gap: 12, paddingLeft: 0, paddingBottom: 20, cursor: actRoute ? 'pointer' : 'default', animation: `fadeInUp 0.4s ease ${0.12 + i * 0.07}s both` }}>
+                  <div key={evt.id ?? i} onClick={actRoute ? () => navigate(actRoute) : undefined} style={{ display: 'flex', alignItems: 'center', gap: 12, paddingBottom: 16, cursor: actRoute ? 'pointer' : 'default', animation: `fadeInUp 0.4s ease ${0.12 + i * 0.07}s both` }}>
                     <div style={{ width: 32, height: 32, borderRadius: '50%', background: meta?.bg ?? '#F5F0E8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>{meta?.icon ?? '📋'}</div>
-                    <p style={{ flex: 1, margin: 0, fontSize: 12, color: '#374151', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{actAction}</p>
-                    {evtAgo && <span style={{ fontSize: 11, color: '#9CA3AF', flexShrink: 0, whiteSpace: 'nowrap' }}>{evtAgo}</span>}
-                    {actRoute && <span style={{ fontSize: 14, color: '#D4C0B0', flexShrink: 0 }}>›</span>}
+                    <p style={{ flex: 1, margin: 0, fontSize: 14, color: '#1E2D26', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{actAction}</p>
+                    {evtAgo && <span style={{ fontSize: 12, color: '#6F7A72', flexShrink: 0, whiteSpace: 'nowrap' }}>{evtAgo}</span>}
+                    {actRoute && <span style={{ fontSize: 14, color: '#9CA3AF', flexShrink: 0 }}>›</span>}
                   </div>
                 )
               })}
@@ -3117,19 +3148,19 @@ export default function Dashboard() {
         {/* ═══════════════════════════════════════════════════════════════
             MODULES GRID
         ═══════════════════════════════════════════════════════════════ */}
-        <div style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
 
-          {/* Level 1 — Primary */}
+          {/* Primary — Medicamentos + Rutinas */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-            <button onClick={() => navigate('/medications')} style={{ borderRadius: 18, border: 'none', background: '#3D6B54', padding: '20px', cursor: 'pointer', textAlign: 'left', WebkitTapHighlightColor: 'transparent', animation: 'fadeInUp 0.4s ease 0.08s both', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.12), 0 2px 12px rgba(0,0,0,0.06)' }}>
-              <span style={{ fontSize: 32 }}>💊</span>
+            <button onClick={() => navigate('/medications')} style={{ borderRadius: 20, border: 'none', background: '#2D4A1E', padding: '20px', cursor: 'pointer', textAlign: 'left', WebkitTapHighlightColor: 'transparent', animation: 'fadeInUp 0.4s ease 0.08s both', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
+              <span style={{ fontSize: 40 }}>💊</span>
               <p style={{ margin: '10px 0 3px', fontSize: 15, fontWeight: 600, color: 'white' }}>Medicamentos</p>
-              <p style={{ margin: 0, fontSize: 12, color: 'rgba(255,255,255,0.70)' }}>
+              <p style={{ margin: 0, fontSize: 12, color: _isRetrasado || pendingCount > 0 ? '#FCD34D' : 'rgba(255,255,255,0.70)', fontWeight: (_isRetrasado || pendingCount > 0) ? 600 : 400 }}>
                 {_isRetrasado ? `⚠️ ${pendingCount} retrasado${pendingCount !== 1 ? 's' : ''}` : pendingCount > 0 ? `${pendingCount} pendiente${pendingCount !== 1 ? 's' : ''}` : confirmedTodayCount > 0 ? `${confirmedTodayCount} dado${confirmedTodayCount !== 1 ? 's' : ''}` : 'Sin meds hoy'}
               </p>
             </button>
-            <button onClick={() => navigate('/cuidado')} style={{ borderRadius: 18, border: '1.5px solid #3D6B54', background: 'white', padding: '20px', cursor: 'pointer', textAlign: 'left', WebkitTapHighlightColor: 'transparent', animation: 'fadeInUp 0.4s ease 0.12s both', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
-              <span style={{ fontSize: 32 }}>✅</span>
+            <button onClick={() => navigate('/cuidado')} style={{ borderRadius: 20, border: '1px solid #E8E4DC', background: 'white', padding: '20px', cursor: 'pointer', textAlign: 'left', WebkitTapHighlightColor: 'transparent', animation: 'fadeInUp 0.4s ease 0.12s both', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
+              <span style={{ fontSize: 40 }}>✅</span>
               <p style={{ margin: '10px 0 3px', fontSize: 15, fontWeight: 600, color: '#1E2D26' }}>Rutinas</p>
               <p style={{ margin: 0, fontSize: 12, color: pendingRoutinesCount > 0 ? '#D6A13B' : '#22C55E', fontWeight: 600 }}>
                 {pendingRoutinesCount > 0 ? `${pendingRoutinesCount} pendiente${pendingRoutinesCount !== 1 ? 's' : ''}` : 'Todas completadas'}
@@ -3137,21 +3168,21 @@ export default function Dashboard() {
             </button>
           </div>
 
-          {/* Level 2 — Secondary */}
+          {/* Secondary — Videollamada + Equipo */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-            <button onClick={handleInstantCall} style={{ borderRadius: 16, border: 'none', background: '#F5F3FF', padding: '20px', cursor: 'pointer', textAlign: 'left', WebkitTapHighlightColor: 'transparent', animation: 'fadeInUp 0.4s ease 0.16s both', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
+            <button onClick={handleInstantCall} style={{ borderRadius: 20, border: 'none', background: '#F5F3FF', padding: '20px', cursor: 'pointer', textAlign: 'left', WebkitTapHighlightColor: 'transparent', animation: 'fadeInUp 0.4s ease 0.16s both', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
               <span style={{ fontSize: 32 }}>🎥</span>
-              <p style={{ margin: '10px 0 3px', fontSize: 15, fontWeight: 600, color: '#1E2D26' }}>Videollamada</p>
-              <p style={{ margin: 0, fontSize: 12, color: '#6F7A72' }}>{startingInstantCall ? 'Iniciando...' : 'Conectar ahora'}</p>
+              <p style={{ margin: '10px 0 3px', fontSize: 15, fontWeight: 600, color: '#5B21B6' }}>Videollamada</p>
+              <p style={{ margin: 0, fontSize: 12, color: '#7C3AED' }}>{startingInstantCall ? 'Iniciando...' : 'Conectar ahora'}</p>
             </button>
-            <button onClick={() => navigate('/familia')} style={{ borderRadius: 16, border: 'none', background: '#EFF6FF', padding: '20px', cursor: 'pointer', textAlign: 'left', WebkitTapHighlightColor: 'transparent', animation: 'fadeInUp 0.4s ease 0.2s both', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
+            <button onClick={() => navigate('/familia')} style={{ borderRadius: 20, border: 'none', background: '#EFF6FF', padding: '20px', cursor: 'pointer', textAlign: 'left', WebkitTapHighlightColor: 'transparent', animation: 'fadeInUp 0.4s ease 0.2s both', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
               <span style={{ fontSize: 32 }}>👥</span>
-              <p style={{ margin: '10px 0 3px', fontSize: 15, fontWeight: 600, color: '#1E2D26' }}>Equipo</p>
-              <p style={{ margin: 0, fontSize: 12, color: '#6F7A72' }}>{familyCount > 1 ? `${familyCount} cuidadores` : 'Tu equipo'}</p>
+              <p style={{ margin: '10px 0 3px', fontSize: 15, fontWeight: 600, color: '#1D4ED8' }}>Equipo</p>
+              <p style={{ margin: 0, fontSize: 12, color: '#3B82F6' }}>{familyCount > 1 ? `${familyCount} cuidadores` : 'Tu equipo'}</p>
             </button>
           </div>
 
-          {/* Level 3 — Compact 4-col */}
+          {/* Tertiary — 4-col small */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 8 }}>
             {[
               { emoji: '📋', label: 'Historial', sub: 'Registros', route: '/registros' },
@@ -3159,19 +3190,54 @@ export default function Dashboard() {
               { emoji: '💰', label: 'Gastos', sub: 'Cuentas', route: '/gastos' },
               { emoji: '🏥', label: 'Hospital', sub: 'Modo hospital', onClick: () => setShowHospitalModal(true) },
             ].map((c, i) => (
-              <button key={i} onClick={c.onClick ?? (() => navigate(c.route))} style={{ borderRadius: 14, border: 'none', background: 'white', padding: '13px 8px', cursor: 'pointer', textAlign: 'left', WebkitTapHighlightColor: 'transparent', display: 'flex', flexDirection: 'column', gap: 4, animation: `fadeInUp 0.4s ease ${0.24 + i * 0.04}s both`, boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
-                <span style={{ fontSize: 24 }}>{c.emoji}</span>
-                <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: '#1E2D26', lineHeight: 1.2 }}>{c.label}</p>
-                <p style={{ margin: 0, fontSize: 10, color: '#6F7A72' }}>{c.sub}</p>
+              <button key={i} onClick={c.onClick ?? (() => navigate(c.route))} style={{ borderRadius: 16, border: 'none', background: 'white', padding: '13px 8px', cursor: 'pointer', textAlign: 'left', WebkitTapHighlightColor: 'transparent', display: 'flex', flexDirection: 'column', gap: 4, animation: `fadeInUp 0.4s ease ${0.24 + i * 0.04}s both`, boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
+                <span style={{ fontSize: 28 }}>{c.emoji}</span>
+                <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: '#1E2D26', lineHeight: 1.2 }}>{c.label}</p>
+                <p style={{ margin: 0, fontSize: 11, color: '#6F7A72' }}>{c.sub}</p>
               </button>
             ))}
           </div>
+
+          {/* Más herramientas — accordion */}
+          <button
+            onClick={() => setShowMoreTools(t => !t)}
+            style={{
+              width: '100%', display: 'flex', alignItems: 'center', gap: 10,
+              background: 'white', border: 'none', borderRadius: 16,
+              padding: '14px 16px', cursor: 'pointer', textAlign: 'left',
+              boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+              WebkitTapHighlightColor: 'transparent',
+            }}
+          >
+            <span style={{ fontSize: 18, flexShrink: 0 }}>➕</span>
+            <p style={{ flex: 1, margin: 0, fontSize: 14, color: '#6F7A72', fontWeight: 500 }}>Más herramientas</p>
+            <span style={{ fontSize: 16, color: '#9CA3AF', display: 'inline-block', transform: showMoreTools ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s ease' }}>›</span>
+          </button>
+          {showMoreTools && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 8, animation: 'fadeInUp 0.25s ease both' }}>
+              {[
+                { emoji: '💬', label: 'Chat', sub: 'Familiar', route: '/chat' },
+                { emoji: '📅', label: 'Citas', sub: 'Médicas', route: '/calendar' },
+                { emoji: '📋', label: 'Registros', sub: 'Médicos', route: '/diario-medico' },
+                { emoji: '⚠️', label: 'Incidentes', sub: 'Alertas', route: '/registros' },
+                { emoji: '📸', label: 'Álbum', sub: 'Familiar', route: '/album' },
+                { emoji: '🤖', label: 'Milo IA', sub: 'Asistente', route: '/memorias' },
+                { emoji: '⚙️', label: 'Mi cuenta', sub: 'Ajustes', route: '/ajustes' },
+              ].map((c, i) => (
+                <button key={i} onClick={() => navigate(c.route)} style={{ borderRadius: 16, border: '1px solid #F0EDE6', background: 'white', padding: '13px 8px', cursor: 'pointer', textAlign: 'left', WebkitTapHighlightColor: 'transparent', display: 'flex', flexDirection: 'column', gap: 4, boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
+                  <span style={{ fontSize: 26 }}>{c.emoji}</span>
+                  <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: '#1E2D26', lineHeight: 1.2 }}>{c.label}</p>
+                  <p style={{ margin: 0, fontSize: 10, color: '#6F7A72' }}>{c.sub}</p>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* ═══════════════════════════════════════════════════════════════
-            SOS SECTION
+            SOS BAR
         ═══════════════════════════════════════════════════════════════ */}
-        <div style={{ padding: '24px 16px 0' }}>
+        <div style={{ padding: '20px 16px 0' }}>
           <button
             onClick={prepareSOS}
             onPointerDown={() => setPressedSOS(true)}
@@ -3179,30 +3245,36 @@ export default function Dashboard() {
             onPointerLeave={() => setPressedSOS(false)}
             style={{
               width: '100%', borderRadius: 20,
-              border: (sosSent || hasActiveSOS) ? 'none' : '1.5px solid rgba(228,91,76,0.45)',
-              background: sosSent
-                ? 'linear-gradient(135deg,#B91C1C,#7F1D1D)'
-                : hasActiveSOS
-                  ? 'linear-gradient(135deg,#E45B4C,#C0392B)'
-                  : 'rgba(228,91,76,0.04)',
-              padding: '16px 18px', cursor: 'pointer',
+              background: (sosSent || hasActiveSOS) ? 'linear-gradient(135deg,#E45B4C,#C0392B)' : 'white',
+              border: '1px solid #F0EDE6',
+              padding: '14px 18px', cursor: 'pointer',
               display: 'flex', alignItems: 'center', gap: 14,
               WebkitTapHighlightColor: 'transparent',
-              boxShadow: pressedSOS ? 'none' : (sosSent || hasActiveSOS) ? '0 4px 20px rgba(228,91,76,0.4)' : 'none',
+              boxShadow: pressedSOS ? 'none' : (sosSent || hasActiveSOS) ? '0 4px 20px rgba(228,91,76,0.35)' : '0 2px 12px rgba(0,0,0,0.06)',
               transform: pressedSOS ? 'translateY(2px)' : 'none',
               transition: 'transform 0.08s, box-shadow 0.08s',
               animation: 'fadeInUp 0.4s ease 0.32s both',
             }}
           >
-            <div style={{ width: 44, height: 44, borderRadius: 14, background: (sosSent || hasActiveSOS) ? 'rgba(255,255,255,0.12)' : 'rgba(228,91,76,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, flexShrink: 0 }}>🆘</div>
+            <div style={{
+              width: 40, height: 40, borderRadius: 10, flexShrink: 0,
+              background: (sosSent || hasActiveSOS) ? 'rgba(255,255,255,0.2)' : '#FEE2E2',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20,
+            }}>🆘</div>
             <div style={{ flex: 1 }}>
-              <p style={{ margin: 0, fontSize: 15, fontWeight: 800, color: (sosSent || hasActiveSOS) ? 'white' : '#E45B4C', lineHeight: 1.2 }}>SOS y Emergencias</p>
-              <p style={{ margin: '3px 0 0', fontSize: 11, color: (sosSent || hasActiveSOS) ? 'rgba(255,255,255,0.7)' : 'rgba(228,91,76,0.7)' }}>
+              <p style={{ margin: 0, fontSize: 15, fontWeight: 600, color: (sosSent || hasActiveSOS) ? 'white' : '#E45B4C', lineHeight: 1.2 }}>SOS y Emergencias</p>
+              <p style={{ margin: '2px 0 0', fontSize: 12, color: (sosSent || hasActiveSOS) ? 'rgba(255,255,255,0.8)' : '#6F7A72' }}>
                 {sosSent ? 'Alerta enviada · La familia fue notificada' : hasActiveSOS ? '⚡ Emergencia activa' : 'Alerta a toda la familia'}
               </p>
             </div>
-            <div style={{ flexShrink: 0, background: (sosSent || hasActiveSOS) ? 'rgba(255,255,255,0.12)' : 'rgba(228,91,76,0.12)', borderRadius: 12, padding: '8px 14px', border: (sosSent || hasActiveSOS) ? 'none' : '1px solid rgba(228,91,76,0.35)' }}>
-              <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: (sosSent || hasActiveSOS) ? 'white' : '#E45B4C' }}>{sosSent ? 'Enviado' : 'Activar'}</p>
+            <div style={{
+              flexShrink: 0, borderRadius: 20, padding: '8px 16px',
+              background: (sosSent || hasActiveSOS) ? 'rgba(255,255,255,0.2)' : 'transparent',
+              border: (sosSent || hasActiveSOS) ? 'none' : '1.5px solid #E45B4C',
+            }}>
+              <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: (sosSent || hasActiveSOS) ? 'white' : '#E45B4C' }}>
+                {sosSent ? 'Enviado' : 'Activar'}
+              </p>
             </div>
           </button>
         </div>
