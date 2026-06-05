@@ -232,7 +232,7 @@ export default function Layout({ children }) {
           position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100,
           height: 64,
           paddingBottom: 'env(safe-area-inset-bottom)',
-          backgroundColor: 'white',
+          backgroundColor: 'red',
           borderTop: '1px solid #F0EDE6',
           boxShadow: '0 -2px 12px rgba(0,0,0,0.05)',
           display: 'flex', alignItems: 'center',

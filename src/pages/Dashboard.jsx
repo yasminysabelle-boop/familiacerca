@@ -2951,6 +2951,7 @@ export default function Dashboard() {
             || null
           const age = calcAge(dobField)
           console.log('[PatientProfile]', patientProfile, '| heroPhoto:', heroPhoto, '| dob:', dobField, '| age:', age)
+          console.log('[AGE DEBUG] keys:', patientProfile ? Object.keys(patientProfile) : 'null', '| fecha_nacimiento:', patientProfile?.fecha_nacimiento, '| birth_date:', patientProfile?.birth_date, '| dob:', patientProfile?.dob)
           return (
             <Link to="/paciente/perfil" style={{ textDecoration: 'none', display: 'block', margin: '0 16px 16px' }}>
               <div style={{
