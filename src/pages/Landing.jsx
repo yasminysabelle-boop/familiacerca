@@ -330,19 +330,19 @@ export default function Landing() {
 
             <h1 className="hero-reveal hero-delay-2" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(40px, 5.5vw, 78px)', fontWeight: 700, color: WHITE, lineHeight: 1.08, margin: '0 0 28px', letterSpacing: '-1px', textAlign: 'center' }}>
               Cuida a quien amas,{' '}
-              <span style={{ color: GOLD }}>sin perder ningún detalle</span>
+              <span style={{ color: GOLD }}>sin perder ningún detalle.</span>
             </h1>
 
             <p className="hero-reveal hero-delay-3" style={{ fontSize: 'clamp(16px, 1.8vw, 19px)', color: 'rgba(255,255,255,0.60)', lineHeight: 1.80, margin: '0 0 48px', fontFamily: SANS, fontWeight: 300, textAlign: 'center' }}>
-              FamiliaCerca coordina medicamentos, rutinas y bienestar de tu familiar entre todos los cuidadores — en tiempo real, desde el celular.
+              Todos saben qué pasó, qué falta y cómo está tu familiar, sin depender de WhatsApp ni llamadas interminables.
             </p>
 
             <Link to="/register" className="hero-reveal hero-delay-4" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '18px 48px', borderRadius: 9999, marginBottom: 32, background: ACTION, color: WHITE, fontWeight: 600, fontSize: 18, fontFamily: SANS, textDecoration: 'none', letterSpacing: '0.02em', boxShadow: '0 12px 40px rgba(61,107,84,0.45)' }}>
-              Empezar gratis <span style={{ fontSize: 18, opacity: 0.85 }}>→</span>
+              Comenzar gratis <span style={{ fontSize: 18, opacity: 0.85 }}>→</span>
             </Link>
 
             <div className="hero-reveal hero-delay-5" style={{ display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap', justifyContent: 'center' }}>
-              {['Gratis para empezar', 'Sin App Store', 'iPhone y Android'].map(t => (
+              {['Gratis para empezar', 'Sin tarjeta de crédito', 'Funciona en iPhone y Android'].map(t => (
                 <div key={t} style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
                   <span style={{ fontSize: 12, color: MINT_C, fontWeight: 600 }}>✓</span>
                   <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.40)', fontWeight: 300, fontFamily: SANS }}>{t}</span>
@@ -433,16 +433,17 @@ export default function Landing() {
           <div style={{ background: PRIMARY, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 'clamp(56px,8vw,96px) clamp(36px,6vw,80px)' }}>
             <p style={{ fontSize: 11, fontWeight: 500, color: GOLD, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 20px', fontFamily: SANS }}>El problema</p>
             <h2 className="reveal" style={{ fontFamily: SERIF, fontSize: 'clamp(32px,3.5vw,52px)', fontWeight: 600, color: WHITE, lineHeight: 1.12, margin: '0 0 36px' }}>
-              Cuidar a un familiar mayor es un trabajo en equipo sin coordinación
+              El problema no es cuidar a tu familiar. El problema es que nadie sabe qué está pasando.
             </h2>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
               <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: '20px 18px' }}>
-                <p style={{ margin: '0 0 16px', fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.35)', fontFamily: SANS, letterSpacing: '0.10em', textTransform: 'uppercase' }}>Sin FamiliaCerca</p>
+                <p style={{ margin: '0 0 16px', fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.35)', fontFamily: SANS, letterSpacing: '0.10em', textTransform: 'uppercase' }}>Cuando el cuidado se coordina por WhatsApp:</p>
                 {[
-                  'WhatsApp caótico',
-                  'Dosis olvidadas',
-                  'Historial perdido',
-                  '¿Ya le diste la pastilla?',
+                  'Se olvidan medicamentos',
+                  'Nadie encuentra la información',
+                  'Se repiten tareas',
+                  'Hay discusiones entre familiares',
+                  'Nadie tiene una visión completa',
                 ].map(t => (
                   <div key={t} style={{ display: 'flex', alignItems: 'flex-start', gap: 9, marginBottom: 10 }}>
                     <span style={{ color: CORAL, fontWeight: 700, fontSize: 13, flexShrink: 0, marginTop: 1 }}>✕</span>
@@ -453,10 +454,11 @@ export default function Landing() {
               <div style={{ background: 'rgba(207,232,214,0.08)', border: `1px solid rgba(207,232,214,0.22)`, borderRadius: 16, padding: '20px 18px' }}>
                 <p style={{ margin: '0 0 16px', fontSize: 10, fontWeight: 600, color: MINT_C, fontFamily: SANS, letterSpacing: '0.10em', textTransform: 'uppercase' }}>Con FamiliaCerca</p>
                 {[
-                  'Alerta clínica ±1h',
-                  'Confirmación con foto',
-                  'Registros organizados',
-                  'Todos ven el historial',
+                  'Todos ven lo mismo',
+                  'Todo queda registrado',
+                  'Las alertas llegan a tiempo',
+                  'Cada cuidador sabe qué hacer',
+                  'El historial siempre está disponible',
                 ].map(t => (
                   <div key={t} style={{ display: 'flex', alignItems: 'flex-start', gap: 9, marginBottom: 10 }}>
                     <span style={{ color: MINT_C, fontWeight: 700, fontSize: 13, flexShrink: 0, marginTop: 1 }}>✓</span>
@@ -475,11 +477,10 @@ export default function Landing() {
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 72 }}>
             <p style={{ fontSize: 11, fontWeight: 500, color: ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>El caos conocido</p>
             <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(32px,4vw,56px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.1, margin: '0 0 18px' }}>
-              El cuidado de tu familia no debería perderse en un chat
+              WhatsApp es para conversar. FamiliaCerca es para cuidar.
             </h2>
             <p style={{ fontSize: 17, color: '#6B7E70', lineHeight: 1.75, maxWidth: 520, margin: '0 auto', fontFamily: SANS, fontWeight: 300 }}>
-              WhatsApp es para conversar. FamiliaCerca es para cuidar.
-
+              Cuando una persona depende de varios familiares o cuidadores, los mensajes se pierden, las tareas se duplican y la información desaparece. FamiliaCerca mantiene todo organizado en un solo lugar.
             </p>
           </div>
 
@@ -586,6 +587,31 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* ─────────────── BENEFITS ─────────────── */}
+      <section style={{ background: SAND, padding: '96px 32px' }}>
+        <div style={{ maxWidth: 1140, margin: '0 auto' }}>
+          <div className="reveal" style={{ textAlign: 'center', marginBottom: 64 }}>
+            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(32px,4vw,56px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.1, margin: 0 }}>
+              ¿Qué cambia para tu familia?
+            </h2>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 24 }}>
+            {[
+              { icon: '🧘', title: 'Tranquilidad', desc: 'Todos saben exactamente cómo está tu familiar.' },
+              { icon: '👨‍👩‍👧‍👦', title: 'Coordinación real', desc: 'Familiares y cuidadores trabajan como un solo equipo.' },
+              { icon: '📋', title: 'Historial completo', desc: 'Nada se pierde entre mensajes o llamadas.' },
+              { icon: '🚨', title: 'Respuesta rápida', desc: 'Alertas automáticas cuando algo requiere atención.' },
+            ].map((b, i) => (
+              <div key={b.title} className={`reveal reveal-delay-${i}`} style={{ background: WHITE, borderRadius: 20, border: `1px solid ${BORDER}`, padding: '36px 28px', boxShadow: '0 4px 20px rgba(61,107,84,0.06)' }}>
+                <div style={{ fontSize: 36, marginBottom: 16 }}>{b.icon}</div>
+                <h3 style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 600, color: PRIMARY, margin: '0 0 10px', lineHeight: 1.2 }}>{b.title}</h3>
+                <p style={{ fontSize: 16, color: '#6B7E70', lineHeight: 1.75, margin: 0, fontFamily: SANS, fontWeight: 300 }}>{b.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ─────────────── 7. FEATURES ─────────────── */}
       <section id="funciones" style={{ padding: '128px 32px', background: CREAM, position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: 800, height: 400, pointerEvents: 'none', background: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(61,107,84,0.05) 0%, transparent 70%)' }} />
@@ -605,13 +631,13 @@ export default function Landing() {
 
             {/* Card 1: Medicamentos */}
             <div className="feature-hero-card reveal" style={{ background: WHITE, borderRadius: 22, border: `1px solid rgba(61,107,84,0.18)`, padding: '36px 30px', boxShadow: '0 4px 24px rgba(61,107,84,0.07)', minHeight: 420, position: 'relative' }}>
-              <div style={{ width: 60, height: 60, borderRadius: 16, background: `rgba(6,51,36,0.07)`, border: '1px solid rgba(6,51,36,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, marginBottom: 18 }}>💊</div>
+              <div style={{ width: 60, height: 60, borderRadius: 16, background: `rgba(6,51,36,0.07)`, border: '1px solid rgba(6,51,36,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, marginBottom: 18 }}>📊</div>
               <div style={{ display: 'inline-flex', padding: '4px 12px', borderRadius: 9999, border: `1px solid rgba(214,161,59,0.30)`, marginBottom: 12, background: 'rgba(214,161,59,0.07)' }}>
                 <span style={{ fontSize: 10, fontWeight: 500, color: GOLD, letterSpacing: '0.08em', fontFamily: SANS }}>Lo más importante</span>
               </div>
-              <h3 style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 600, color: PRIMARY, margin: '0 0 10px', lineHeight: 1.2 }}>Control de medicamentos</h3>
+              <h3 style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 600, color: PRIMARY, margin: '0 0 10px', lineHeight: 1.2 }}>Estado del paciente en tiempo real</h3>
               <p style={{ fontSize: 17, color: '#6B7E70', lineHeight: 1.75, margin: '0 0 20px', fontFamily: SANS, fontWeight: 300 }}>
-                Ventana clínica ±1h para cada dosis. Alerta roja si se olvida. Confirmación con foto de prueba visible para todos.
+                Lo primero que todos quieren saber. Estado actual, medicamentos pendientes, última actualización y quién la realizó.
               </p>
               <div style={{ background: SAND, borderRadius: 12, padding: '12px 14px', border: `1px solid rgba(61,107,84,0.10)` }}>
                 {[
@@ -632,13 +658,13 @@ export default function Landing() {
 
             {/* Card 2: Chat categorizado */}
             <div className="feature-hero-card reveal reveal-delay-1" style={{ background: WHITE, borderRadius: 22, border: `1px solid rgba(61,107,84,0.18)`, padding: '36px 30px', boxShadow: '0 4px 24px rgba(61,107,84,0.07)', minHeight: 420, position: 'relative' }}>
-              <div style={{ width: 60, height: 60, borderRadius: 16, background: `rgba(6,51,36,0.07)`, border: '1px solid rgba(6,51,36,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, marginBottom: 18 }}>💬</div>
+              <div style={{ width: 60, height: 60, borderRadius: 16, background: `rgba(6,51,36,0.07)`, border: '1px solid rgba(6,51,36,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, marginBottom: 18 }}>💊</div>
               <div style={{ display: 'inline-flex', padding: '4px 12px', borderRadius: 9999, border: `1px solid rgba(214,161,59,0.30)`, marginBottom: 12, background: 'rgba(214,161,59,0.07)' }}>
-                <span style={{ fontSize: 10, fontWeight: 500, color: GOLD, letterSpacing: '0.08em', fontFamily: SANS }}>Organizado por categorías</span>
+                <span style={{ fontSize: 10, fontWeight: 500, color: GOLD, letterSpacing: '0.08em', fontFamily: SANS }}>Sin olvidos ni doble dosis</span>
               </div>
-              <h3 style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 600, color: PRIMARY, margin: '0 0 10px', lineHeight: 1.2 }}>Chat familiar categorizado</h3>
+              <h3 style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 600, color: PRIMARY, margin: '0 0 10px', lineHeight: 1.2 }}>Medicamentos coordinados</h3>
               <p style={{ fontSize: 17, color: '#6B7E70', lineHeight: 1.75, margin: '0 0 20px', fontFamily: SANS, fontWeight: 300 }}>
-                Mensajes organizados por tipo: 🏥 médico, 🚨 urgente, 💊 medicamentos. Sin perderse entre conversaciones.
+                Evita olvidos y dobles dosis con confirmación en tiempo real.
               </p>
               <div style={{ background: SAND, borderRadius: 12, padding: '12px', border: `1px solid rgba(61,107,84,0.10)`, display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {[
@@ -659,13 +685,13 @@ export default function Landing() {
 
             {/* Card 3: Registros médicos + PDF */}
             <div className="feature-hero-card reveal reveal-delay-2" style={{ background: WHITE, borderRadius: 22, border: `1px solid rgba(61,107,84,0.18)`, padding: '36px 30px', boxShadow: '0 4px 24px rgba(61,107,84,0.07)', minHeight: 420, position: 'relative' }}>
-              <div style={{ width: 60, height: 60, borderRadius: 16, background: `rgba(6,51,36,0.07)`, border: '1px solid rgba(6,51,36,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, marginBottom: 18 }}>📋</div>
+              <div style={{ width: 60, height: 60, borderRadius: 16, background: `rgba(6,51,36,0.07)`, border: '1px solid rgba(6,51,36,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, marginBottom: 18 }}>💬</div>
               <div style={{ display: 'inline-flex', padding: '4px 12px', borderRadius: 9999, border: `1px solid rgba(214,161,59,0.30)`, marginBottom: 12, background: 'rgba(214,161,59,0.07)' }}>
-                <span style={{ fontSize: 10, fontWeight: 500, color: GOLD, letterSpacing: '0.08em', fontFamily: SANS }}>Historial completo</span>
+                <span style={{ fontSize: 10, fontWeight: 500, color: GOLD, letterSpacing: '0.08em', fontFamily: SANS }}>Por categorías</span>
               </div>
-              <h3 style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 600, color: PRIMARY, margin: '0 0 10px', lineHeight: 1.2 }}>Registros médicos e incidentes</h3>
+              <h3 style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 600, color: PRIMARY, margin: '0 0 10px', lineHeight: 1.2 }}>Chat organizado por categorías</h3>
               <p style={{ fontSize: 17, color: '#6B7E70', lineHeight: 1.75, margin: '0 0 20px', fontFamily: SANS, fontWeight: 300 }}>
-                Historial médico, incidentes, visitas al doctor. Todo exportable a PDF para llevar al médico.
+                No más mensajes perdidos. Cada conversación en su lugar.
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {[
@@ -687,9 +713,9 @@ export default function Landing() {
           {/* 3 small secondary cards */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 18 }}>
             {[
-              { icon: '✅', title: 'Checklist diario', desc: 'Baño, comidas, ejercicio, cambios de posición — marcado en tiempo real por cualquier cuidador.' },
-              { icon: '🆘', title: 'Botón SOS', desc: 'Alerta instantánea a todos los cuidadores con un solo toque en caso de emergencia.' },
-              { icon: '🗓️', title: 'Citas médicas', desc: 'Agenda citas con recordatorios para todos. El historial de citas viaja junto al paciente.' },
+              { icon: '📋', title: 'Historial único del cuidado', desc: 'Todo registrado y exportable para el médico.' },
+              { icon: '🆘', title: 'Botón SOS', desc: 'Un toque y todos reciben la alerta al instante.' },
+              { icon: '🗓️', title: 'Citas médicas', desc: 'Estados, adjuntos y recordatorio automático.' },
             ].map((f, i) => (
               <div key={f.title} className={`reveal reveal-delay-${i}`} style={{ background: WHITE, borderRadius: 16, border: `1px solid rgba(61,107,84,0.16)`, padding: '26px 24px', display: 'flex', gap: 16, alignItems: 'flex-start', boxShadow: '0 2px 12px rgba(61,107,84,0.05)' }}>
                 <div style={{ width: 46, height: 46, borderRadius: 12, background: `rgba(6,51,36,0.07)`, border: `1px solid rgba(6,51,36,0.12)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>{f.icon}</div>
@@ -714,10 +740,10 @@ export default function Landing() {
             <div style={{ display: 'flex', flexDirection: 'column', position: 'relative' }}>
               <div className="como-line" style={{ position: 'absolute', left: 39, top: 64, bottom: 64, width: 2, background: `linear-gradient(to bottom, ${ACTION}, rgba(61,107,84,0.08))` }} />
               {[
-                { n: '1', title: 'Crea tu cuenta gratis', desc: 'Regístrate con tu correo en menos de un minuto. Sin tarjeta de crédito, sin descarga en tienda de apps.' },
-                { n: '2', title: 'Agrega a tu familiar y los cuidadores', desc: 'Invita a hermanos, pareja o cualquier cuidador. Cada uno tiene su propio acceso y ve todo en tiempo real.' },
-                { n: '3', title: 'Configura medicamentos y rutinas', desc: 'Carga los medicamentos con horarios. La ventana clínica ±1h evita dosis olvidadas y dobles dosis.' },
-                { n: '4', title: 'Coordínense sin confusión', desc: 'Cada confirmación, foto o alerta llega a todos al instante. Nunca más "¿ya le diste la pastilla?".' },
+                { n: '1', title: 'Crea tu cuenta gratis', desc: 'Sin tarjeta de crédito, sin descarga en tienda de apps.' },
+                { n: '2', title: 'Agrega a tu familiar y los cuidadores', desc: 'Cada uno con su propio acceso y rol.' },
+                { n: '3', title: 'Configura medicamentos y rutinas', desc: 'La app recuerda a cada cuidador qué toca y cuándo.' },
+                { n: '4', title: 'Coordínense en tiempo real', desc: 'Cada confirmación y alerta llega a todos al instante. Nunca más: ¿ya le diste la pastilla?' },
               ].map((s, i, arr) => (
                 <div key={s.n} className={`reveal reveal-delay-${i}`} style={{ display: 'flex', gap: 24, marginBottom: i < arr.length - 1 ? 32 : 0 }}>
                   <div style={{ flexShrink: 0, zIndex: 1 }}>
@@ -781,17 +807,18 @@ export default function Landing() {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }} className="testimonios-grid">
             {[
-              { name: 'María G.',    initial: 'M', role: 'Hija cuidadora',         location: 'Houston, Texas',          text: 'Antes mi hermano y yo nos peleábamos porque ninguno sabía si mamá ya había tomado su pastilla. Ahora con FamiliaCerca todos vemos lo mismo. ¡Nos salvó la convivencia familiar!' },
-              { name: 'Roberto S.',  initial: 'R', role: 'Hijo mayor',              location: 'Los Ángeles, California', text: 'La función de foto de prueba fue un cambio total. Ahora tenemos evidencia de cada medicamento y podemos mostrársela al cardiólogo. El doctor quedó impresionado con el registro.' },
-              { name: 'Carmen L.',   initial: 'C', role: 'Enfermera, uso personal', location: 'Miami, Florida',         text: 'Llevo 15 años como enfermera y nunca había visto una app tan práctica para el cuidado en casa. La recomiendo a todas las familias de mis pacientes.' },
-              { name: 'Patricia V.', initial: 'P', role: 'Coordinadora familiar',   location: 'San Juan, Puerto Rico',  text: 'Somos 4 hermanos en distintos estados cuidando a nuestro papá. FamiliaCerca nos unió. Cada uno sabe qué le toca y cuándo. Ya no hay excusas ni confusiones.' },
-              { name: 'Jorge M.',    initial: 'J', role: 'Esposo cuidador',         location: 'Nueva York, NY',         text: 'Mi esposa tiene Alzheimer y el checklist diario me salvó. Puedo registrar cada comida, cada baño, cada medicamento. Por fin duermo tranquilo sabiendo que nada se me escapa.' },
-              { name: 'Lucía R.',    initial: 'L', role: 'Hija única',              location: 'Chicago, Illinois',      text: 'Cuido sola a mis dos padres mayores desde hace 3 años. FamiliaCerca me ayuda a organizarme y el botón SOS me da tranquilidad cuando no estoy en casa. No sé cómo lo hacía antes.' },
+              { name: 'María G.',    initial: 'M', role: 'Hija cuidadora',         location: 'Houston, Texas',          headline: 'Se acabaron las discusiones familiares',                text: 'Antes mi hermano y yo nos peleábamos porque ninguno sabía si mamá ya había tomado su pastilla. Ahora con FamiliaCerca todos vemos lo mismo. ¡Nos salvó la convivencia familiar!' },
+              { name: 'Roberto S.',  initial: 'R', role: 'Hijo mayor',              location: 'Los Ángeles, California', headline: 'Por fin tenemos evidencia de todo',                      text: 'La función de foto de prueba fue un cambio total. Ahora tenemos evidencia de cada medicamento y podemos mostrársela al cardiólogo. El doctor quedó impresionado con el registro.' },
+              { name: 'Carmen L.',   initial: 'C', role: 'Enfermera, uso personal', location: 'Miami, Florida',         headline: 'La foto de confirmación cambió nuestra dinámica',        text: 'Llevo 15 años como enfermera y nunca había visto una app tan práctica para el cuidado en casa. La recomiendo a todas las familias de mis pacientes.' },
+              { name: 'Patricia V.', initial: 'P', role: 'Coordinadora familiar',   location: 'San Juan, Puerto Rico',  headline: 'Antes nadie sabía quién había dado la medicina',          text: 'Somos 4 hermanos en distintos estados cuidando a nuestro papá. FamiliaCerca nos unió. Cada uno sabe qué le toca y cuándo. Ya no hay excusas ni confusiones.' },
+              { name: 'Jorge M.',    initial: 'J', role: 'Esposo cuidador',         location: 'Nueva York, NY',         headline: 'Ahora todos estamos tranquilos',                          text: 'Mi esposa tiene Alzheimer y el checklist diario me salvó. Puedo registrar cada comida, cada baño, cada medicamento. Por fin duermo tranquilo sabiendo que nada se me escapa.' },
+              { name: 'Lucía R.',    initial: 'L', role: 'Hija única',              location: 'Chicago, Illinois',      headline: 'Mi mamá está mejor atendida y nosotros más organizados', text: 'Cuido sola a mis dos padres mayores desde hace 3 años. FamiliaCerca me ayuda a organizarme y el botón SOS me da tranquilidad cuando no estoy en casa. No sé cómo lo hacía antes.' },
             ].map((t, i) => (
               <div key={t.name} className={`reveal reveal-delay-${i % 3}`} style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 20, border: `1px solid rgba(61,107,84,0.28)`, padding: '32px 28px', boxShadow: '0 4px 24px rgba(0,0,0,0.18)', display: 'flex', flexDirection: 'column' }}>
-                <div style={{ display: 'flex', gap: 3, marginBottom: 18 }}>
+                <div style={{ display: 'flex', gap: 3, marginBottom: 14 }}>
                   {[1,2,3,4,5].map(s => <span key={s} style={{ color: GOLD, fontSize: 13 }}>★</span>)}
                 </div>
+                <p style={{ fontSize: 17, fontWeight: 600, color: WHITE, fontFamily: SERIF, margin: '0 0 12px', lineHeight: 1.3 }}>{t.headline}</p>
                 <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.72)', lineHeight: 1.85, margin: '0 0 24px', fontFamily: SANS, fontWeight: 300, fontStyle: 'italic', flex: 1 }}>"{t.text}"</p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   <div style={{ width: 46, height: 46, borderRadius: '50%', background: ACTION, border: `1px solid rgba(61,107,84,0.60)`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -809,6 +836,19 @@ export default function Landing() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ─────────────── EMOTIONAL QUOTE 2 ─────────────── */}
+      <section style={{ padding: '128px 32px', background: '#063324' }}>
+        <div style={{ maxWidth: 860, margin: '0 auto', textAlign: 'center' }}>
+          <div style={{ fontFamily: SERIF, fontSize: 110, color: GOLD, lineHeight: 0.7, marginBottom: 20, opacity: 0.22 }}>"</div>
+          <blockquote className="reveal" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(28px,3.8vw,54px)', fontWeight: 500, color: CREAM, lineHeight: 1.45, margin: '0 0 36px' }}>
+            Porque un día te vas a arrepentir de no haber registrado este momento.
+          </blockquote>
+          <p className="reveal reveal-delay-1" style={{ fontSize: 18, color: 'rgba(245,240,232,0.62)', lineHeight: 1.80, maxWidth: 640, margin: '0 auto', fontFamily: SANS, fontWeight: 300 }}>
+            Los medicamentos importan. Las citas importan. Las rutinas importan. Pero los recuerdos también. Cada actualización construye la historia de cuidado de la persona que amas.
+          </p>
         </div>
       </section>
 
@@ -938,10 +978,10 @@ export default function Landing() {
           <div style={{ maxWidth: 680 }}>
             <p style={{ fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 20px', fontFamily: SANS }}>Empieza hoy</p>
             <h2 className="reveal" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(44px,6vw,84px)', fontWeight: 700, color: WHITE, lineHeight: 1.02, margin: '0 0 24px' }}>
-              Cuida mejor,<br />juntos
+              Empieza a cuidar mejor, juntos.
             </h2>
             <p style={{ fontSize: 18, color: 'rgba(255,255,255,0.62)', lineHeight: 1.80, margin: '0 0 48px', fontFamily: SANS, fontWeight: 300 }}>
-              Únete a las familias que ya coordinan el cuidado de sus seres queridos con FamiliaCerca. Gratis para siempre en el plan básico.
+              Únete a las familias que ya dejaron atrás el caos de WhatsApp y ahora coordinan el cuidado de sus seres queridos desde un solo lugar.
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14 }}>
               <Link to="/register" style={{ padding: '20px 52px', borderRadius: 9999, background: WHITE, color: ACTION, fontWeight: 500, fontSize: 18, textDecoration: 'none', fontFamily: SANS, letterSpacing: '0.02em', boxShadow: '0 16px 56px rgba(0,0,0,0.28)', display: 'inline-flex', alignItems: 'center', gap: 10 }}>
