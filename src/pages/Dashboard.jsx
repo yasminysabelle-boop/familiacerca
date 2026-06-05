@@ -1690,6 +1690,40 @@ function CareDayDetail({ section, todayKey, confirming, onConfirm, isFamiliar, o
   )
 }
 
+function QuickCard({ emoji, label, subtitle, statusColor, onClick, index }) {
+  const [pressed, setPressed] = useState(false)
+  return (
+    <button
+      onClick={onClick}
+      onPointerDown={() => setPressed(true)}
+      onPointerUp={() => setPressed(false)}
+      onPointerLeave={() => setPressed(false)}
+      style={{
+        borderRadius: 16, border: '0.5px solid #E8E4DC',
+        background: 'white',
+        boxShadow: pressed ? 'none' : '0 2px 0px #E0DBD2',
+        transform: pressed ? 'translateY(2px)' : 'none',
+        padding: '16px 14px',
+        cursor: 'pointer', textAlign: 'left',
+        display: 'flex', flexDirection: 'column', gap: 8,
+        WebkitTapHighlightColor: 'transparent',
+        transition: 'transform 0.08s ease, box-shadow 0.08s ease',
+        animation: `fadeInUp 0.4s ease ${index * 0.08}s both`,
+      }}
+    >
+      <span style={{ fontSize: 26 }}>{emoji}</span>
+      <div>
+        <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#1E2D26', lineHeight: 1.2 }}>{label}</p>
+        {subtitle && (
+          <p style={{ margin: '3px 0 0', fontSize: 11, color: statusColor ?? '#9CA3AF', fontWeight: statusColor ? 600 : 400 }}>
+            {subtitle}
+          </p>
+        )}
+      </div>
+    </button>
+  )
+}
+
 // ── Main component ─────────────────────────────────────────────────────────────
 
 export default function Dashboard() {
@@ -2796,67 +2830,114 @@ export default function Dashboard() {
       >
         <PullIndicator />
 
-        {/* ════ ZONA 1 — Paciente + Estado del día (fondo verde) ══════════ */}
+        {/* ════ BLOCK 1 — Patient Status Card ═══════════════════════════ */}
         <div style={{
-          background: '#2D4A1E',
-          borderRadius: 20, padding: '16px 20px',
-          boxShadow: '0 4px 20px rgba(45,74,30,0.4)',
+          background: 'linear-gradient(135deg, #063324, #1E2D26)',
+          borderRadius: 20, padding: '20px',
+          boxShadow: '0 8px 32px rgba(6,51,36,0.55)',
           marginBottom: 12,
         }}>
-          {/* Info del paciente — tocable */}
+          <style>{`
+            @keyframes status-pulse {
+              0%,100%{box-shadow:0 0 0 3px rgba(34,197,94,0.35)}
+              50%{box-shadow:0 0 0 7px rgba(34,197,94,0)}
+            }
+            @keyframes status-pulse-warn {
+              0%,100%{box-shadow:0 0 0 3px rgba(214,161,59,0.4)}
+              50%{box-shadow:0 0 0 7px rgba(214,161,59,0)}
+            }
+            @keyframes status-pulse-urgent {
+              0%,100%{box-shadow:0 0 0 3px rgba(228,91,76,0.45)}
+              50%{box-shadow:0 0 0 8px rgba(228,91,76,0)}
+            }
+            @keyframes fadeInUp {
+              from{opacity:0;transform:translateY(10px)}
+              to{opacity:1;transform:translateY(0)}
+            }
+          `}</style>
+
+          {/* Greeting */}
+          <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 11, margin: '0 0 16px', letterSpacing: '0.07em', textTransform: 'uppercase' }}>
+            {timeIcon} {timeGreeting}, {firstName}
+          </p>
+
+          {/* Patient identity */}
           <Link to="/paciente/perfil" style={{ textDecoration: 'none', display: 'block' }}>
-            <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11, margin: '0 0 10px', letterSpacing: '0.03em' }}>
-              {timeIcon} {timeGreeting}, {firstName}
-            </p>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+              {/* Circular photo */}
               {profile?.photo_url ? (
                 <img
                   src={profile.photo_url}
                   alt={profile.name}
                   style={{
-                    width: 54, height: 54, borderRadius: '50%', objectFit: 'cover',
-                    border: '2px solid rgba(201,136,42,0.5)', flexShrink: 0,
+                    width: 72, height: 72, borderRadius: '50%', objectFit: 'cover',
+                    border: '2.5px solid rgba(255,255,255,0.18)', flexShrink: 0,
                   }}
                 />
               ) : (
                 <div style={{
-                  width: 54, height: 54, borderRadius: '50%', flexShrink: 0,
-                  background: 'rgba(255,255,255,0.15)',
-                  border: '2px solid rgba(255,255,255,0.2)',
+                  width: 72, height: 72, borderRadius: '50%', flexShrink: 0,
+                  background: 'rgba(255,255,255,0.12)',
+                  border: '2.5px solid rgba(255,255,255,0.18)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 22, color: 'rgba(255,255,255,0.85)',
+                  fontSize: 28, color: 'rgba(255,255,255,0.85)',
                 }}>
                   {(patientProfile?.nombre_completo || profile?.name)?.charAt(0) ?? '👴'}
                 </div>
               )}
+
+              {/* Name + status dot + meta */}
               <div style={{ flex: 1, minWidth: 0 }}>
                 {(patientProfile?.nombre_completo || profile?.name) ? (
                   <>
-                    <p style={{
-                      color: 'white', fontSize: 17, fontWeight: 800,
-                      fontFamily: 'Georgia, serif', margin: 0, lineHeight: 1.2,
-                      overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                    }}>
-                      {patientProfile?.nombre_completo || profile?.name}
-                    </p>
-                    <div style={{ display: 'flex', gap: 6, marginTop: 3, flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                      <p style={{
+                        color: 'white', fontSize: 21, fontWeight: 800,
+                        fontFamily: "'Cormorant Garamond', Georgia, serif",
+                        margin: 0, lineHeight: 1.1,
+                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                        maxWidth: 175,
+                      }}>
+                        {patientProfile?.nombre_completo || profile?.name}
+                      </p>
+                      <span style={{
+                        width: 10, height: 10, borderRadius: '50%', flexShrink: 0,
+                        background: _isRetrasado ? '#E45B4C' : pendingCount > 0 ? '#D6A13B' : '#22C55E',
+                        animation: _isRetrasado
+                          ? 'status-pulse-urgent 1.6s ease-in-out infinite'
+                          : pendingCount > 0
+                            ? 'status-pulse-warn 2s ease-in-out infinite'
+                            : 'status-pulse 2.5s ease-in-out infinite',
+                      }} />
+                    </div>
+                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 4 }}>
                       {calcAge(patientProfile?.fecha_nacimiento) !== null && (
-                        <span style={{ color: 'rgba(255,255,255,0.65)', fontSize: 12 }}>
+                        <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: 11 }}>
                           {calcAge(patientProfile?.fecha_nacimiento)} años
                         </span>
                       )}
                       {patientProfile?.diagnostico_principal && (
                         <span style={{
-                          color: 'rgba(255,255,255,0.55)', fontSize: 12,
+                          color: 'rgba(255,255,255,0.4)', fontSize: 11,
                           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                          maxWidth: 180,
+                          maxWidth: 155,
                         }}>
                           · {patientProfile.diagnostico_principal}
                         </span>
                       )}
                     </div>
-                    <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: 11, margin: '4px 0 0' }}>
-                      Cuida hoy: {todayShift?.caregiver_name ?? firstName}
+                    <p style={{
+                      color: _isRetrasado ? '#E45B4C' : pendingCount > 0 ? '#D6A13B' : 'rgba(255,255,255,0.4)',
+                      fontSize: 11, margin: 0,
+                      fontWeight: pendingCount > 0 ? 600 : 400,
+                    }}>
+                      {_isRetrasado
+                        ? `⚠️ ${pendingCount} med${pendingCount !== 1 ? 's' : ''} retrasado${pendingCount !== 1 ? 's' : ''}`
+                        : pendingCount > 0
+                          ? `${pendingCount} medicamento${pendingCount !== 1 ? 's' : ''} pendiente${pendingCount !== 1 ? 's' : ''}`
+                          : confirmedTodayCount > 0
+                            ? '✓ Todo al día hoy'
+                            : `Cuida hoy: ${todayShift?.caregiver_name ?? firstName}`}
                     </p>
                   </>
                 ) : (
@@ -2865,13 +2946,35 @@ export default function Dashboard() {
                   </p>
                 )}
               </div>
-              <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: 18, flexShrink: 0 }}>›</span>
+              <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: 18, flexShrink: 0 }}>›</span>
             </div>
+
+            {/* Wellbeing badges */}
+            {(patientProfile?.nombre_completo || profile?.name) && (
+              <div style={{ display: 'flex', gap: 6, marginTop: 14, flexWrap: 'wrap' }}>
+                {[
+                  { key: 'mood', emoji: getMoodEmoji(dailyMood) || '😶', label: 'Estado', active: !!dailyMood },
+                  { key: 'sleep', emoji: '😴', label: 'Sueño', active: !!careLogsToday['sleep'] },
+                  { key: 'nutrition', emoji: '🥗', label: 'Comida', active: !!careLogsToday['nutrition'] },
+                  { key: 'hygiene', emoji: '🛁', label: 'Higiene', active: !!careLogsToday['hygiene'] },
+                ].map(b => (
+                  <span key={b.key} style={{
+                    fontSize: 11, padding: '4px 10px', borderRadius: 20,
+                    background: b.active ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.07)',
+                    color: b.active ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.35)',
+                    border: `1px solid ${b.active ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.08)'}`,
+                  }}>
+                    {b.emoji} {b.label}
+                  </span>
+                ))}
+              </div>
+            )}
+
             {patientProfileIncomplete && (
               <div style={{
                 marginTop: 12, padding: '9px 13px',
-                background: 'rgba(255,255,255,0.12)',
-                border: '1px solid rgba(255,255,255,0.18)',
+                background: 'rgba(255,255,255,0.1)',
+                border: '1px solid rgba(255,255,255,0.15)',
                 borderRadius: 11,
                 display: 'flex', alignItems: 'center', gap: 8,
               }}>
@@ -2889,78 +2992,13 @@ export default function Dashboard() {
             )}
           </Link>
 
-          {/* Botón reporte PDF — solo si hay perfil cargado */}
-          {patientProfile && (
-            <button
-              onClick={handlePDF}
-              disabled={pdfLoading}
-              style={{
-                marginTop: 10, width: '100%', padding: '9px 14px',
-                borderRadius: 12, border: '1px solid rgba(255,255,255,0.22)',
-                background: 'rgba(255,255,255,0.1)',
-                display: 'flex', alignItems: 'center', gap: 8,
-                cursor: pdfLoading ? 'not-allowed' : 'pointer',
-                WebkitTapHighlightColor: 'transparent',
-              }}
-            >
-              <span style={{ fontSize: 16 }}>{pdfLoading ? '⏳' : '📄'}</span>
-              <span style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.85)' }}>
-                {pdfLoading ? 'Generando...' : 'Reporte PDF'}
-              </span>
-              {!pdfLoading && <span style={{ marginLeft: 'auto', fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>↓ Descargar</span>}
-            </button>
-          )}
+          {/* Separator */}
+          <div style={{ height: 1, background: 'rgba(255,255,255,0.08)', margin: '16px 0' }} />
 
-          {/* Global status indicator */}
-          {(() => {
-            const isRed    = pendingCount > 0 && _isRetrasado
-            const isYellow = pendingCount > 0 && !_isRetrasado
-            const color  = isRed ? '#DC2626' : isYellow ? '#D97706' : '#2D4A1E'
-            const emoji  = isRed ? '🔴' : isYellow ? '🟡' : '🟢'
-            const text   = isRed ? 'Atención requerida' : isYellow ? 'Pendientes' : 'Todo al día'
-            const detail = isRed && nextPendingMed
-              ? `${nextPendingMed.medName}${_retrasadoLabel ? ` · hace ${_retrasadoLabel}` : ''}`
-              : isYellow && nextPendingMed
-                ? `${pendingCount} dosis por dar${nextPendingMed.medTime ? ` · Próxima: ${fmtTime(nextPendingMed.medTime)}` : ''}`
-                : null
-            const dest = isRed ? '/medications' : isYellow ? '/cuidado' : null
-            return (
-              <div
-                onClick={dest ? () => navigate(dest) : undefined}
-                style={{
-                  marginTop: 12,
-                  background: 'rgba(255,255,255,0.95)',
-                  borderRadius: 12,
-                  borderLeft: `4px solid ${color}`,
-                  padding: '10px 14px',
-                  display: 'flex', alignItems: 'center', gap: 10,
-                  cursor: dest ? 'pointer' : 'default',
-                  WebkitTapHighlightColor: 'transparent',
-                }}
-              >
-                <span style={{ fontSize: 16, flexShrink: 0 }}>{emoji}</span>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontSize: 13, fontWeight: 700, color, margin: 0, lineHeight: 1.3 }}>{text}</p>
-                  {detail && (
-                    <p style={{ fontSize: 11, color: '#6B7280', margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {detail}
-                    </p>
-                  )}
-                </div>
-                {dest && (
-                  <span style={{ fontSize: 11, fontWeight: 700, color, flexShrink: 0, opacity: 0.8 }}>Ver detalle →</span>
-                )}
-              </div>
-            )
-          })()}
-
-          {/* Separador */}
-          <div style={{ height: 1, background: 'rgba(255,255,255,0.1)', margin: '16px 0' }} />
-
-          {/* ¿Cómo estuvo hoy? */}
+          {/* Mood selector */}
           <p style={{
-            fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.7)',
-            margin: '0 0 12px',
+            fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.55)',
+            margin: '0 0 10px',
           }}>
             ¿Cómo estuvo {(patientProfile?.nombre_completo || profile?.name)?.split(' ')[0] || 'el paciente'} hoy?
           </p>
@@ -2977,9 +3015,9 @@ export default function Dashboard() {
                   onPointerLeave={() => setPressedMood(null)}
                   disabled={savingMood || isFamiliar}
                   style={{
-                    flex: 1, padding: '12px 4px', borderRadius: 14,
-                    border: `1.5px solid ${isSelected ? btnBorder : 'rgba(255,255,255,0.15)'}`,
-                    background: isSelected ? bg : 'rgba(255,255,255,0.08)',
+                    flex: 1, padding: '11px 4px', borderRadius: 14,
+                    border: `1.5px solid ${isSelected ? btnBorder : 'rgba(255,255,255,0.12)'}`,
+                    background: isSelected ? bg : 'rgba(255,255,255,0.07)',
                     cursor: savingMood || isFamiliar ? 'default' : 'pointer',
                     display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
                     boxShadow: isPressed ? 'none' : isSelected ? shadow : '0 3px 0px rgba(0,0,0,0.25)',
@@ -2997,13 +3035,13 @@ export default function Dashboard() {
             })}
           </div>
           {dailyMood && (
-            <p style={{ fontSize: 12, color: '#C9894A', fontWeight: 600, textAlign: 'center', margin: '10px 0 0' }}>
+            <p style={{ fontSize: 12, color: '#D6A13B', fontWeight: 600, textAlign: 'center', margin: '10px 0 0' }}>
               {MOOD_FEEDBACK[dailyMood] ?? ''}
             </p>
           )}
           {isFamiliar && !dailyMood && (
-            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', margin: '8px 0 0', textAlign: 'center' }}>
-              El administrador o cuidador registra el estado del día
+            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', margin: '8px 0 0', textAlign: 'center' }}>
+              El administrador registra el estado del día
             </p>
           )}
         </div>
@@ -3018,116 +3056,140 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* ── 2 ─ Resumen del día ─────────────────────────────────────── */}
-        {loading ? <SkeletonDashSummary /> : <div style={{
-          background: 'white', borderRadius: 20, border: '1px solid #EDE5D8',
-          padding: '16px 18px', marginBottom: 12,
-          boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
-        }}>
-          <p style={{ fontFamily: 'Georgia, serif', fontSize: 14, fontWeight: 700, color: '#1A1A1A', margin: '0 0 12px' }}>
-            Resumen del día
-          </p>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div
-              onClick={() => navigate('/medications')}
-              style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0', cursor: 'pointer', borderBottom: '1px solid #F5EEE6' }}
-            >
-              <span style={{ fontSize: 18, flexShrink: 0 }}>💊</span>
-              <p style={{
-                flex: 1, fontSize: 13, margin: 0,
-                color: missedTodayCount > 0 ? '#DC2626' : _isRetrasado ? '#DC2626' : '#374151',
-                fontWeight: missedTodayCount > 0 || _isRetrasado ? 600 : 400,
-              }}>
-                {medTotal === 0
-                  ? 'Sin medicamentos configurados'
-                  : missedTodayCount > 0
-                    ? `❌ ${missedTodayCount} dosis olvidada${missedTodayCount !== 1 ? 's' : ''} hoy${pendingCount > 0 ? ` · ${pendingCount} pendiente${pendingCount !== 1 ? 's' : ''}` : confirmedTodayCount > 0 ? ` · ${confirmedTodayCount} dada${confirmedTodayCount !== 1 ? 's' : ''}` : ''}`
-                    : _isRetrasado && nextPendingMed
-                      ? `⚠️ ${nextPendingMed.medName} debía darse hace ${_retrasadoLabel ?? '?'}`
-                      : pendingCount === 0 && confirmedTodayCount >= medTotal
-                        ? `💊 ${confirmedTodayCount} de ${medTotal} dosis completadas hoy ✅`
-                        : `💊 ${pendingCount} dosis pendientes${nextPendingMed?.medTime ? ` · Próxima: ${nextPendingMed.medName} ${fmtTime(nextPendingMed.medTime)}` : ''}`}
-              </p>
-              <span style={{ fontSize: 14, color: '#D4C0B0', flexShrink: 0 }}>›</span>
-            </div>
-            <div
-              onClick={() => navigate('/cuidado')}
-              style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0', cursor: 'pointer', borderBottom: '1px solid #F5EEE6' }}
-            >
-              <span style={{ fontSize: 18, flexShrink: 0 }}>✅</span>
-              <p style={{
-                flex: 1, fontSize: 13, margin: 0,
-                color: loading ? '#9CA3AF' : pendingRoutinesCount > 0 ? '#D97706' : '#374151',
-                fontWeight: pendingRoutinesCount > 0 ? 600 : 400,
-              }}>
-                {loading
-                  ? 'Cargando rutinas...'
-                  : pendingRoutinesCount === 0
-                    ? `${dailyItems.length} rutinas completadas ✅`
-                    : `${pendingRoutinesCount} rutina${pendingRoutinesCount !== 1 ? 's' : ''} pendiente${pendingRoutinesCount !== 1 ? 's' : ''} hoy`}
-              </p>
-              <span style={{ fontSize: 14, color: '#D4C0B0', flexShrink: 0 }}>›</span>
-            </div>
-            {nextAppointment && (() => {
-              const APPT_STATUS = {
-                programada: { color: '#2563EB', bg: '#EFF6FF', label: 'Programada' },
-                realizada:  { color: '#16A34A', bg: '#F0FDF4', label: 'Realizada' },
-                cancelada:  { color: '#DC2626', bg: '#FEF2F2', label: 'Cancelada' },
-              }
-              const si = APPT_STATUS[nextAppointment.status ?? 'programada'] ?? APPT_STATUS.programada
-              return (
-                <div
-                  onClick={() => navigate('/calendar')}
-                  style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0', cursor: 'pointer', borderBottom: '1px solid #F5EEE6' }}
-                >
-                  <span style={{ fontSize: 18, flexShrink: 0 }}>📅</span>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ fontSize: 13, color: '#374151', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {nextAppointment.appointmentTitle ?? 'Cita médica'}
-                      {nextAppointment.appointmentTime
-                        ? <span style={{ color: '#9CA3AF' }}> · {fmtTime(nextAppointment.appointmentTime)}</span>
-                        : null}
-                    </p>
-                    <span style={{ display: 'inline-block', fontSize: 10, fontWeight: 700, padding: '1px 6px', borderRadius: 10, background: si.bg, color: si.color, marginTop: 2 }}>
-                      {si.label}
-                    </span>
-                  </div>
-                  <span style={{ fontSize: 14, color: '#D4C0B0', flexShrink: 0 }}>›</span>
-                </div>
-              )
-            })()}
-            <div
-              onClick={() => navigate('/familia')}
-              style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0', cursor: 'pointer' }}
-            >
-              <span style={{ fontSize: 18, flexShrink: 0 }}>👤</span>
-              <p style={{ flex: 1, fontSize: 13, color: '#374151', margin: 0 }}>
-                Cuida hoy: <strong>{todayShift?.caregiver_name ?? firstName}</strong>
-              </p>
-              <span style={{ fontSize: 14, color: '#D4C0B0', flexShrink: 0 }}>›</span>
-            </div>
-          </div>
-        </div>}
+        {/* ════ BLOCK 2 — Conditional alerts ══════════════════════════════ */}
+        {!loading && (() => {
+          const alerts = []
 
-        {/* ── 3 ─ Actividad reciente (máx. 5) ────────────────────────── */}
+          if (_isRetrasado && nextPendingMed) {
+            alerts.push({
+              key: 'med-overdue', type: 'urgent', icon: '💊',
+              title: `${nextPendingMed.medName} — retrasado`,
+              subtitle: _retrasadoLabel ? `Debía darse hace ${_retrasadoLabel}` : 'Medicamento pendiente',
+              to: '/medications',
+            })
+          } else if (pendingCount > 0) {
+            alerts.push({
+              key: 'med-pending', type: 'warning', icon: '⏳',
+              title: `${pendingCount} medicamento${pendingCount !== 1 ? 's' : ''} pendiente${pendingCount !== 1 ? 's' : ''}`,
+              subtitle: nextPendingMed?.medTime ? `Próxima dosis: ${fmtTime(nextPendingMed.medTime)}` : 'Por confirmar hoy',
+              to: '/medications',
+            })
+          }
+
+          if (nextAppointment && (nextAppointment.dateKey === todayKey || nextAppointment.dateKey === tomorrowKey)) {
+            alerts.push({
+              key: 'appointment', type: 'info', icon: '📅',
+              title: nextAppointment.appointmentTitle ?? 'Cita médica',
+              subtitle: nextAppointment.dateKey === todayKey
+                ? `Hoy${nextAppointment.appointmentTime ? ' · ' + fmtTime(nextAppointment.appointmentTime) : ''}`
+                : `Mañana${nextAppointment.appointmentTime ? ' · ' + fmtTime(nextAppointment.appointmentTime) : ''}`,
+              to: '/calendar',
+            })
+          }
+
+          const activeSOS = sections.flatMap(s => s.events).find(e => e.type === 'SOS_ALERT' && !e.resolved)
+          if (activeSOS) {
+            alerts.push({
+              key: 'sos', type: 'urgent', icon: '🚨',
+              title: 'Alerta SOS activa',
+              subtitle: activeSOS.triggeredBy ? `Activada por ${activeSOS.triggeredBy.split(' ')[0]}` : 'Emergencia familiar',
+              to: null,
+            })
+          }
+
+          if (alerts.length === 0) {
+            return (
+              <div style={{
+                background: 'linear-gradient(135deg, #F0FDF4, #DCFCE7)',
+                borderRadius: 16, border: '1px solid #86EFAC',
+                padding: '14px 16px', marginBottom: 12,
+                display: 'flex', alignItems: 'center', gap: 12,
+              }}>
+                <div style={{
+                  width: 42, height: 42, borderRadius: 12, flexShrink: 0,
+                  background: '#22C55E',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 18, color: 'white', fontWeight: 800,
+                }}>✓</div>
+                <div>
+                  <p style={{ fontSize: 14, fontWeight: 700, color: '#15803D', margin: 0 }}>Todo al día</p>
+                  <p style={{ fontSize: 12, color: '#16A34A', margin: '2px 0 0' }}>
+                    {confirmedTodayCount > 0 ? `${confirmedTodayCount} dosis confirmadas hoy` : 'Sin alertas pendientes'}
+                  </p>
+                </div>
+              </div>
+            )
+          }
+
+          const ALERT_STYLES = {
+            urgent: { bg: '#FEF2F2', border: '#FCA5A5', titleColor: '#DC2626', subColor: '#EF4444', iconBg: '#FEE2E2' },
+            warning: { bg: '#FFFBEB', border: '#FDE68A', titleColor: '#92400E', subColor: '#B45309', iconBg: '#FEF3C7' },
+            info: { bg: 'white', border: '#BFDBFE', titleColor: '#1E40AF', subColor: '#3B82F6', iconBg: '#EFF6FF' },
+          }
+
+          return (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 12 }}>
+              {alerts.map((alert, i) => {
+                const s = ALERT_STYLES[alert.type]
+                return (
+                  <div
+                    key={alert.key}
+                    onClick={alert.to ? () => navigate(alert.to) : undefined}
+                    style={{
+                      background: s.bg, borderRadius: 16, border: `1.5px solid ${s.border}`,
+                      padding: '13px 16px',
+                      display: 'flex', alignItems: 'center', gap: 12,
+                      cursor: alert.to ? 'pointer' : 'default',
+                      animation: `fadeInUp 0.4s ease ${i * 0.1}s both`,
+                    }}
+                  >
+                    <div style={{
+                      width: 40, height: 40, borderRadius: 12, flexShrink: 0,
+                      background: s.iconBg,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 18,
+                    }}>
+                      {alert.icon}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ fontSize: 13, fontWeight: 700, color: s.titleColor, margin: 0, lineHeight: 1.3 }}>
+                        {alert.title}
+                      </p>
+                      <p style={{ fontSize: 11, color: s.subColor, margin: '2px 0 0' }}>
+                        {alert.subtitle}
+                      </p>
+                    </div>
+                    {alert.to && <span style={{ fontSize: 14, color: '#D4C0B0', flexShrink: 0 }}>›</span>}
+                  </div>
+                )
+              })}
+            </div>
+          )
+        })()}
+
+        {/* ── BLOCK 3 — Recent activity ────────────────────────────────── */}
         {recentEvents5.length > 0 && (
           <div style={{
-            background: 'white', borderRadius: 20, border: '1px solid #EDE5D8',
-            padding: '16px 18px', marginBottom: 12,
-            boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
+            background: 'white', borderRadius: 16, border: '1px solid #EDE5D8',
+            padding: '14px 16px', marginBottom: 12,
+            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+            animation: 'fadeInUp 0.4s ease 0.1s both',
           }}>
-            <p style={{ fontFamily: 'Georgia, serif', fontSize: 14, fontWeight: 700, color: '#1A1A1A', margin: '0 0 12px' }}>
-              Actividad reciente
+            <p style={{
+              fontFamily: "'Cormorant Garamond', Georgia, serif",
+              fontSize: 14, fontWeight: 700, color: '#1E2D26', margin: '0 0 10px',
+            }}>
+              Últimas novedades
             </p>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
-              {recentEvents5.map((evt, i) => {
+              {recentEvents5.slice(0, 4).map((evt, i) => {
                 const actIcon = { MED_CONFIRMED: '💊', APPOINTMENT: '📅', VOICE_MEMORY: '🎙️', PHOTO: '📸', NOTE: '📝', EXPENSE: '💰', SOS_ALERT: '🚨', APPOINTMENT_PROOF: '📋' }[evt.type] ?? '📋'
                 const actLabel = {
-                  MED_CONFIRMED: evt.name ?? 'Medicamento dado',
+                  MED_CONFIRMED: evt.medName ?? 'Medicamento dado',
                   APPOINTMENT: evt.appointmentTitle ?? 'Cita médica',
                   VOICE_MEMORY: 'Memoria de voz',
                   PHOTO: evt.caption ?? 'Foto familiar',
-                  NOTE: evt.title ?? (evt.noteText?.slice(0, 40) ?? 'Nota'),
+                  NOTE: evt.noteText?.slice(0, 40) ?? 'Nota',
                   EXPENSE: `$${evt.amount ?? ''} ${evt.description ?? ''}`.trim(),
                   SOS_ALERT: 'Alerta SOS',
                   APPOINTMENT_PROOF: 'Comprobante de cita',
@@ -3143,15 +3205,17 @@ export default function Dashboard() {
                   APPOINTMENT_PROOF: '/calendar',
                 }[evt.type]
                 const evtTime = evt.timestamp ? fmtTimestamp(evt.timestamp) : null
+                const limit = Math.min(recentEvents5.length, 4)
                 return (
                   <div
                     key={evt.id ?? i}
                     onClick={actRoute ? () => navigate(actRoute) : undefined}
                     style={{
                       display: 'flex', alignItems: 'center', gap: 10,
-                      padding: '8px 0',
-                      borderBottom: i < recentEvents5.length - 1 ? '1px solid #F5EEE6' : 'none',
+                      padding: '9px 0',
+                      borderBottom: i < limit - 1 ? '1px solid #F5EEE6' : 'none',
                       cursor: actRoute ? 'pointer' : 'default',
+                      animation: `fadeInUp 0.4s ease ${0.15 + i * 0.07}s both`,
                     }}
                   >
                     <span style={{ fontSize: 16, flexShrink: 0 }}>{actIcon}</span>
@@ -3167,110 +3231,86 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* ── 4 ─ SOS Familiar — siempre visible ──────────────────────── */}
+        {/* ════ BLOCK 4 — Quick access grid ═══════════════════════════════ */}
+        <div style={{
+          display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)',
+          gap: 12, marginBottom: 16,
+        }}>
+          <QuickCard emoji="💊" label="Medicamentos"
+            subtitle={_isRetrasado ? `⚠️ ${pendingCount} retrasado${pendingCount !== 1 ? 's' : ''}` : pendingCount > 0 ? `${pendingCount} pendiente${pendingCount !== 1 ? 's' : ''}` : confirmedTodayCount > 0 ? `${confirmedTodayCount} dado${confirmedTodayCount !== 1 ? 's' : ''}` : 'Sin meds hoy'}
+            statusColor={_isRetrasado ? '#E45B4C' : pendingCount > 0 ? '#D6A13B' : confirmedTodayCount > 0 ? '#22C55E' : undefined}
+            onClick={() => navigate('/medications')} index={0} />
+          <QuickCard emoji="✅" label="Rutinas"
+            subtitle={pendingRoutinesCount > 0 ? `${pendingRoutinesCount} pendiente${pendingRoutinesCount !== 1 ? 's' : ''}` : 'Todas completadas'}
+            statusColor={pendingRoutinesCount > 0 ? '#D6A13B' : '#22C55E'}
+            onClick={() => navigate('/cuidado')} index={1} />
+          <QuickCard emoji="📋" label="Historial"
+            subtitle="Registro completo"
+            onClick={() => navigate('/registros')} index={2} />
+          <QuickCard emoji="📹" label="Videollamada"
+            subtitle={startingInstantCall ? 'Iniciando...' : 'Conectar familia'}
+            onClick={handleInstantCall} index={3} />
+          <QuickCard emoji="👨‍👩‍👧" label="Equipo"
+            subtitle="Cuidadores y familia"
+            onClick={() => navigate('/familia')} index={4} />
+          <QuickCard emoji="💰" label="Gastos"
+            subtitle="Control de cuentas"
+            onClick={() => navigate('/gastos')} index={5} />
+          <QuickCard emoji="📝" label="Notas"
+            subtitle="Historia clínica"
+            onClick={() => navigate('/diario-medico')} index={6} />
+          {/* SOS — coral, prominent */}
+          <button
+            onClick={prepareSOS}
+            onPointerDown={() => setPressedSOS(true)}
+            onPointerUp={() => setPressedSOS(false)}
+            onPointerLeave={() => setPressedSOS(false)}
+            style={{
+              borderRadius: 16, border: 'none',
+              background: sosSent
+                ? 'linear-gradient(135deg, #B91C1C, #7F1D1D)'
+                : 'linear-gradient(135deg, #E45B4C, #C0392B)',
+              padding: '16px 14px',
+              cursor: 'pointer', textAlign: 'left',
+              display: 'flex', flexDirection: 'column', gap: 8,
+              WebkitTapHighlightColor: 'transparent',
+              boxShadow: pressedSOS ? 'none' : '0 4px 16px rgba(228,91,76,0.4)',
+              transform: pressedSOS ? 'translateY(2px)' : 'none',
+              transition: 'transform 0.08s ease, box-shadow 0.08s ease',
+              animation: 'fadeInUp 0.4s ease 0.56s both',
+            }}
+          >
+            <span style={{ fontSize: 26 }}>🆘</span>
+            <div>
+              <p style={{ margin: 0, fontSize: 14, fontWeight: 800, color: 'white', lineHeight: 1.2 }}>SOS Familiar</p>
+              <p style={{ margin: '3px 0 0', fontSize: 11, color: 'rgba(255,255,255,0.8)' }}>
+                {sosSent ? 'Alerta enviada' : 'Alertar a la familia'}
+              </p>
+            </div>
+          </button>
+        </div>
+
+        {/* Modo Hospital */}
         <button
-          onClick={prepareSOS}
-          onPointerDown={() => setPressedSOS(true)}
-          onPointerUp={() => setPressedSOS(false)}
-          onPointerLeave={() => setPressedSOS(false)}
+          onClick={() => setShowHospitalModal(true)}
           style={{
-            width: '100%', marginBottom: 12,
-            border: 'none', cursor: 'pointer',
-            background: '#DC2626',
-            borderRadius: 16,
-            boxShadow: pressedSOS ? 'none' : '0 3px 0px #991B1B',
-            transform: pressedSOS ? 'translateY(3px)' : 'none',
-            transition: 'transform 0.08s ease, box-shadow 0.08s ease',
-            padding: '16px 18px',
-            display: 'flex', alignItems: 'center', gap: 14,
+            width: '100%', marginBottom: 16,
+            border: '1px solid #FCA5A5', borderRadius: 14,
+            background: '#FEF2F2',
+            padding: '12px 16px',
+            cursor: 'pointer', textAlign: 'left',
+            display: 'flex', alignItems: 'center', gap: 12,
             WebkitTapHighlightColor: 'transparent',
           }}
         >
-          <div style={{
-            width: 44, height: 44, borderRadius: 12,
-            background: 'rgba(255,255,255,0.15)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            flexShrink: 0,
-          }}>
-            <AlertTriangle size={22} color="white" strokeWidth={2} />
+          <span style={{ fontSize: 20 }}>🏥</span>
+          <div style={{ flex: 1 }}>
+            <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#DC2626' }}>Modo Hospital</p>
+            <p style={{ margin: '2px 0 0', fontSize: 11, color: '#EF4444' }}>Activar gestión hospitalaria</p>
           </div>
-          <div style={{ flex: 1, textAlign: 'left' }}>
-            <p style={{ fontSize: 15, fontWeight: 800, color: 'white', margin: 0 }}>SOS Familiar</p>
-            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.75)', margin: '3px 0 0' }}>
-              {sosSent ? 'Alerta enviada — familia notificada' : 'Toca para alertar a toda la familia'}
-            </p>
-          </div>
-          <div style={{
-            flexShrink: 0, display: 'inline-flex', alignItems: 'center', gap: 4,
-            padding: '4px 10px', borderRadius: 20,
-            background: sosSent ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.2)',
-          }}>
-            <span style={{ width: 4, height: 4, borderRadius: '50%', background: 'white', flexShrink: 0 }} />
-            <span style={{ fontSize: 10, fontWeight: 700, color: 'white', whiteSpace: 'nowrap' }}>
-              {sosSent ? 'Enviada' : 'Urgente'}
-            </span>
-          </div>
+          <span style={{ fontSize: 14, color: '#FCA5A5' }}>›</span>
         </button>
-
-        {/* ════ Atajos rápidos ════════════════════════════════════════════ */}
-        {loading && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', padding: '0 16px', marginBottom: 24 }}>
-            {[...Array(6)].map((_, i) => <SkeletonCard key={i} height={130} borderRadius={16} />)}
-          </div>
-        )}
-        <div style={{ display: loading ? 'none' : 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', padding: '0 16px', marginBottom: 24 }}>
-
-          {/* Fila 1: Medicamentos | Rutinas de hoy */}
-          <DashCard Icon={Pill}           title="Medicamentos"       subtitle={medCardSubtitle}                                                                                         status={medCardStatus}  statusType={medCardStatusType}  to="/medications" />
-          <DashCard Icon={ClipboardCheck} title="Rutinas de hoy"     subtitle={medTotal > 0 ? `${medTotal} med${medTotal !== 1 ? 's' : ''} programados` : 'Rutina diaria'}              status={careStatus}     statusType={careStatusType}     to="/cuidado" />
-
-          {/* Fila 2: Registros de cuidado | Mensajes */}
-          <DashCard Icon={Clock}          title="Registros de cuidado" subtitle="Historial completo de cuidado"                                                          status="Ver registros"  statusType="info"               to="/registros" />
-          <DashCard Icon={Chat}           title="Mensajes"            subtitle="Chat con el equipo familiar"                                                                            status="Ver mensajes"   statusType="info"                to="/chat" />
-
-          {/* Fila 3: Citas médicas | Cuentas Claras */}
-          <DashCard
-            Icon={Calendar}
-            title="Citas médicas"
-            subtitle={nextAppointment?.appointmentTitle ?? 'Sin citas próximas'}
-            status={nextAppointment ? (nextAppointment.dateKey === todayKey ? 'Hoy' : nextAppointment.dateKey === tomorrowKey ? 'Mañana' : 'Esta semana') : 'Ver calendario'}
-            statusType={nextAppointment ? 'warning' : 'info'}
-            to="/calendar"
-          />
-          <DashCard Icon={Receipt}        title="Cuentas Claras"      subtitle="Control de gastos"                                                                                       status="Ver gastos"     statusType="info"                to="/gastos" />
-
-          {/* Fila 4: Perfil del paciente | Equipo de cuidado */}
-          <DashCard Icon={User}           title={`Perfil de ${profile?.name?.split(' ')[0] ?? 'paciente'}`} subtitle="Diagnósticos y alergias"                                          status="Ver perfil"     statusType="info"                to="/paciente/perfil" />
-          <DashCard Icon={Users}          title="Equipo de cuidado"   subtitle="Cuidadores y familiares"                                                                                 status="Ver equipo"     statusType="info"                to="/familia" />
-
-          {/* Fila 5: Notas Médicas IA | Incidentes */}
-          <DashCard Icon={BookOpen}       title="Notas Médicas IA"  subtitle="Historia clínica con IA"    status="Ver notas"       statusType="info"   to="/diario-medico" />
-          <DashCard Icon={AlertTriangle}  title="Incidentes"        subtitle="Caídas y eventos importantes" status="Ver incidentes" statusType="urgent" to="/incidentes" />
-
-          {/* Fila 6: Videollamada */}
-          <VideoCallDashCard
-            onInstant={handleInstantCall}
-            onSchedule={() => setShowVideoCallModal(true)}
-            starting={startingInstantCall}
-            error={instantCallError}
-          />
-          <button
-            onClick={() => setShowHospitalModal(true)}
-            style={{
-              border: '1.5px solid #B91C1C', borderRadius: 16,
-              background: 'linear-gradient(135deg, #FFF5F5, #FFF0F0)',
-              padding: '14px', cursor: 'pointer', textAlign: 'left',
-              display: 'flex', flexDirection: 'column', gap: 4,
-              WebkitTapHighlightColor: 'transparent',
-            }}
-          >
-            <span style={{ fontSize: 22 }}>🏥</span>
-            <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#B91C1C' }}>Modo Hospital</p>
-            <p style={{ margin: 0, fontSize: 11, color: '#DC2626', opacity: 0.8 }}>Activar gestión hospitalaria</p>
-          </button>
-          <HospitalModeModal open={showHospitalModal} onClose={() => setShowHospitalModal(false)} />
-
-        </div>
+        <HospitalModeModal open={showHospitalModal} onClose={() => setShowHospitalModal(false)} />
 
         {/* Sign out */}
         <div style={{ marginTop: 8, paddingBottom: 8, display: 'flex', justifyContent: 'center' }}>
