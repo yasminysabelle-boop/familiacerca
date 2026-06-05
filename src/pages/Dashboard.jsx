@@ -1861,7 +1861,7 @@ export default function Dashboard() {
     if (!ownerId) return
     supabase
       .from('patient_profiles')
-      .select('nombre_completo, diagnostico_principal, fecha_nacimiento, foto_url')
+      .select('*')
       .eq('owner_id', ownerId)
       .maybeSingle()
       .then(({ data: pp }) => {
@@ -2943,20 +2943,28 @@ export default function Dashboard() {
           const isCritical = hasActiveSOS || (_isRetrasado && _retrasadoMins != null && _retrasadoMins >= 720)
           const isPending = !isCritical && (pendingCount > 0 || _isRetrasado)
           const heroPhoto = patientProfile?.foto_url || profile?.photo_url || null
-          const age = calcAge(patientProfile?.fecha_nacimiento)
+          const dobField = patientProfile?.fecha_nacimiento
+            || patientProfile?.birth_date
+            || patientProfile?.dob
+            || patientProfile?.date_of_birth
+            || patientProfile?.birthdate
+            || null
+          const age = calcAge(dobField)
+          console.log('[PatientProfile]', patientProfile, '| heroPhoto:', heroPhoto, '| dob:', dobField, '| age:', age)
           return (
             <Link to="/paciente/perfil" style={{ textDecoration: 'none', display: 'block', margin: '0 16px 16px' }}>
               <div style={{
                 background: 'white', borderRadius: 20, overflow: 'hidden',
                 boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-                display: 'flex', minHeight: 220,
+                display: 'flex', minHeight: 240,
               }}>
                 {/* Photo — left 50% */}
-                <div style={{ position: 'relative', width: '50%', flexShrink: 0, alignSelf: 'stretch', minHeight: 220 }}>
+                <div style={{ position: 'relative', width: '50%', flexShrink: 0, alignSelf: 'stretch', minHeight: 240 }}>
                   {heroPhoto ? (
                     <img src={heroPhoto} alt="" style={{
                       position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-                      width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top',
+                      width: '100%', height: '100%',
+                      objectFit: 'cover', objectPosition: 'center top',
                       display: 'block',
                     }} />
                   ) : (

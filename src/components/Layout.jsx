@@ -2,7 +2,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import Logo from './Logo'
-import { Home, Chat, Plus, User, ChevronLeft } from './Icons'
+import { User, ChevronLeft } from './Icons'
 import Paywall from './Paywall'
 import InstallBanner from './InstallBanner'
 import OfflineBanner from './OfflineBanner'
@@ -230,54 +230,52 @@ export default function Layout({ children }) {
       {isVideoCall || isSecondary || isHospitalMode ? null : (
         <nav style={{
           position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100,
-          height: 'calc(64px + env(safe-area-inset-bottom))',
+          height: 64,
           paddingBottom: 'env(safe-area-inset-bottom)',
-          background: dark ? '#1C1205' : 'white',
-          borderTop: `1px solid ${dark ? '#2A1A08' : '#F0EDE6'}`,
-          boxShadow: '0 -2px 16px rgba(0,0,0,0.06)',
+          backgroundColor: 'white',
+          borderTop: '1px solid #F0EDE6',
+          boxShadow: '0 -2px 12px rgba(0,0,0,0.05)',
           display: 'flex', alignItems: 'center',
         }}>
           {/* Inicio */}
-          <Link to="/dashboard" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, textDecoration: 'none', paddingTop: 4 }}>
-            <div style={{ position: 'relative' }}>
-              <Home size={22} color={location.pathname === '/dashboard' ? (dark ? '#A3D4B5' : '#3D6B54') : (dark ? 'rgba(255,255,255,0.35)' : '#9FAF9A')} strokeWidth={location.pathname === '/dashboard' ? 2 : 1.5} />
-              {homeBadge > 0 && (
-                <span style={{ position: 'absolute', top: -5, right: -7, minWidth: 16, height: 16, borderRadius: 8, background: '#DC2626', color: 'white', fontSize: 8, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 3px', boxSizing: 'border-box' }}>
-                  {homeBadge > 9 ? '9+' : homeBadge}
-                </span>
-              )}
-            </div>
-            <span style={{ fontSize: 9, fontWeight: 700, color: location.pathname === '/dashboard' ? (dark ? '#A3D4B5' : '#3D6B54') : (dark ? 'rgba(255,255,255,0.35)' : '#9FAF9A') }}>Inicio</span>
+          <Link to="/dashboard" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, textDecoration: 'none' }}>
+            <span style={{ fontSize: 22, lineHeight: 1 }}>🏠</span>
+            <span style={{ fontSize: 9, fontWeight: 700, color: location.pathname === '/dashboard' ? '#3D6B54' : '#9FAF9A' }}>Inicio</span>
           </Link>
 
           {/* Chat */}
-          <Link to="/chat" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, textDecoration: 'none', paddingTop: 4 }}>
-            <div style={{ position: 'relative' }}>
-              <Chat size={22} color={location.pathname === '/chat' ? (dark ? '#A3D4B5' : '#3D6B54') : (dark ? 'rgba(255,255,255,0.35)' : '#9FAF9A')} strokeWidth={location.pathname === '/chat' ? 2 : 1.5} />
+          <Link to="/chat" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, textDecoration: 'none' }}>
+            <div style={{ position: 'relative', lineHeight: 1 }}>
+              <span style={{ fontSize: 22 }}>💬</span>
               {familyBadge > 0 && (
-                <span style={{ position: 'absolute', top: -3, right: -3, width: 7, height: 7, borderRadius: '50%', background: '#D6A13B' }} />
+                <span style={{ position: 'absolute', top: 0, right: -2, width: 7, height: 7, borderRadius: '50%', background: '#D6A13B', display: 'block' }} />
               )}
             </div>
-            <span style={{ fontSize: 9, fontWeight: 700, color: location.pathname === '/chat' ? (dark ? '#A3D4B5' : '#3D6B54') : (dark ? 'rgba(255,255,255,0.35)' : '#9FAF9A') }}>Chat</span>
+            <span style={{ fontSize: 9, fontWeight: 700, color: location.pathname === '/chat' ? '#3D6B54' : '#9FAF9A' }}>Chat</span>
           </Link>
 
-          {/* Center + button */}
+          {/* Center + */}
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Link to="/cuidado" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 52, height: 52, borderRadius: '50%', background: '#2D4A1E', boxShadow: '0 2px 12px rgba(45,74,30,0.35)', marginTop: -18, textDecoration: 'none' }}>
-              <Plus size={22} color="white" strokeWidth={2} />
+            <Link to="/cuidado" style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              width: 52, height: 52, borderRadius: '50%',
+              background: '#2D4A1E', boxShadow: '0 2px 12px rgba(45,74,30,0.35)',
+              marginTop: -20, textDecoration: 'none', flexShrink: 0,
+            }}>
+              <span style={{ fontSize: 26, color: 'white', lineHeight: 1, fontWeight: 300 }}>+</span>
             </Link>
           </div>
 
           {/* Milo IA */}
-          <Link to="/memorias" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, textDecoration: 'none', paddingTop: 4 }}>
+          <Link to="/memorias" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, textDecoration: 'none' }}>
             <span style={{ fontSize: 22, lineHeight: 1 }}>🤖</span>
-            <span style={{ fontSize: 9, fontWeight: 700, color: location.pathname === '/memorias' ? (dark ? '#A3D4B5' : '#3D6B54') : (dark ? 'rgba(255,255,255,0.35)' : '#9FAF9A') }}>Milo IA</span>
+            <span style={{ fontSize: 9, fontWeight: 700, color: location.pathname === '/memorias' ? '#3D6B54' : '#9FAF9A' }}>Milo IA</span>
           </Link>
 
           {/* Mi cuenta */}
-          <Link to="/ajustes" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, textDecoration: 'none', paddingTop: 4 }}>
-            <User size={22} color={location.pathname === '/ajustes' ? (dark ? '#A3D4B5' : '#3D6B54') : (dark ? 'rgba(255,255,255,0.35)' : '#9FAF9A')} strokeWidth={location.pathname === '/ajustes' ? 2 : 1.5} />
-            <span style={{ fontSize: 9, fontWeight: 700, color: location.pathname === '/ajustes' ? (dark ? '#A3D4B5' : '#3D6B54') : (dark ? 'rgba(255,255,255,0.35)' : '#9FAF9A') }}>Mi cuenta</span>
+          <Link to="/ajustes" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, textDecoration: 'none' }}>
+            <span style={{ fontSize: 22, lineHeight: 1 }}>👤</span>
+            <span style={{ fontSize: 9, fontWeight: 700, color: location.pathname === '/ajustes' ? '#3D6B54' : '#9FAF9A' }}>Mi cuenta</span>
           </Link>
         </nav>
       )}
