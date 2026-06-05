@@ -1862,7 +1862,7 @@ export default function Dashboard() {
     if (!ownerId) return
     supabase
       .from('patient_profiles')
-      .select('nombre_completo, diagnostico_principal, fecha_nacimiento')
+      .select('nombre_completo, diagnostico_principal, fecha_nacimiento, foto_url')
       .eq('owner_id', ownerId)
       .maybeSingle()
       .then(({ data: pp }) => {
@@ -2938,7 +2938,8 @@ export default function Dashboard() {
           const isPending = !isCritical && (pendingCount > 0 || _isRetrasado)
           const statusDot = isCritical ? '🔴' : isPending ? '🟡' : '🟢'
           const statusText = isCritical ? 'Atención requerida' : isPending ? 'Requiere atención' : 'Todo bajo control'
-          const heroPhoto = profile?.photo_url ?? null
+          const heroPhoto = patientProfile?.foto_url || profile?.photo_url || null
+          console.log('[HeroCard] heroPhoto:', heroPhoto, '| foto_url:', patientProfile?.foto_url, '| photo_url:', profile?.photo_url)
           return (
             <Link to="/paciente/perfil" style={{ textDecoration: 'none', display: 'block', margin: '0 16px 18px' }}>
               <div style={{
@@ -2962,7 +2963,7 @@ export default function Dashboard() {
                 <div style={{
                   position: 'absolute', inset: 0,
                   background: heroPhoto
-                    ? 'linear-gradient(to bottom,rgba(6,51,36,0.72) 0%,rgba(6,51,36,0.88) 100%)'
+                    ? 'linear-gradient(to bottom,rgba(6,51,36,0.55) 0%,rgba(6,51,36,0.72) 100%)'
                     : 'linear-gradient(160deg,#063324,#1a3825)',
                   pointerEvents: 'none',
                   zIndex: 1,
