@@ -229,7 +229,7 @@ export default function Layout({ children }) {
       {/* Bottom navigation — 5-item white nav */}
       {isVideoCall || isSecondary || isHospitalMode ? null : (
         <nav style={{
-          position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 40,
+          position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100,
           height: 'calc(64px + env(safe-area-inset-bottom))',
           paddingBottom: 'env(safe-area-inset-bottom)',
           background: dark ? '#1C1205' : 'white',

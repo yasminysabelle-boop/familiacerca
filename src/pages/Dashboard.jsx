@@ -1343,10 +1343,8 @@ function RecentEventRow({ evt, onTap }) {
 
 function calcAge(dateStr) {
   if (!dateStr) return null
-  const birth = new Date(dateStr + 'T12:00:00')
-  const today = new Date()
-  let age = today.getFullYear() - birth.getFullYear()
-  if (today.getMonth() < birth.getMonth() || (today.getMonth() === birth.getMonth() && today.getDate() < birth.getDate())) age--
+  const age = Math.floor((Date.now() - new Date(dateStr)) / (365.25 * 24 * 60 * 60 * 1000))
+  if (age < 1 || age > 130) return null
   return age
 }
 
@@ -2908,10 +2906,10 @@ export default function Dashboard() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
             <img
               src="/logo.png" alt="FamiliaCerca"
-              style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', display: 'block' }}
+              style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover', display: 'block', flexShrink: 0 }}
               onError={e => { e.currentTarget.style.display = 'none'; e.currentTarget.nextSibling.style.display = 'flex' }}
             />
-            <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#2D4A1E', display: 'none', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 18 }}>🌿</div>
+            <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#2D4A1E', display: 'none', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 16 }}>🌿</div>
             <div>
               <p style={{ margin: 0, fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 18, fontWeight: 600, color: '#1E2D26', lineHeight: 1.2 }}>FamiliaCerca</p>
               <p style={{ margin: 0, fontSize: 11, color: '#6F7A72', lineHeight: 1.2 }}>Tu cuidado, junto a tu familia</p>
@@ -2953,18 +2951,18 @@ export default function Dashboard() {
                 boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
                 display: 'flex', minHeight: 220,
               }}>
-                {/* Photo — left 45% */}
-                <div style={{ position: 'relative', width: '45%', flexShrink: 0 }}>
+                {/* Photo — left 50% */}
+                <div style={{ position: 'relative', width: '50%', flexShrink: 0, alignSelf: 'stretch', minHeight: 220 }}>
                   {heroPhoto ? (
                     <img src={heroPhoto} alt="" style={{
-                      width: '100%', height: '100%', objectFit: 'cover',
-                      borderRadius: '16px 0 0 16px', display: 'block',
+                      position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+                      width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top',
+                      display: 'block',
                     }} />
                   ) : (
                     <div style={{
-                      width: '100%', height: '100%', minHeight: 220,
+                      position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
                       background: 'linear-gradient(160deg,#3D6B54,#1E2D26)',
-                      borderRadius: '16px 0 0 16px',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       fontSize: 44, color: 'white',
                     }}>
@@ -2997,7 +2995,7 @@ export default function Dashboard() {
                     </button>
                   </div>
                   <div style={{ position: 'relative', zIndex: 1 }}>
-                    <p style={{ margin: '28px 0 0', fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 30, fontWeight: 700, color: '#1E2D26', lineHeight: 1.1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <p style={{ margin: '28px 0 0', fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 24, fontWeight: 700, color: '#1E2D26', lineHeight: 1.2 }}>
                       {patientProfile?.nombre_completo || profile?.name || 'Agregar paciente'}
                     </p>
                     {age && (
@@ -3009,7 +3007,7 @@ export default function Dashboard() {
                         Tu cuidado, junto a tu familia
                       </p>
                       <p style={{ margin: 0, fontSize: 12, color: '#6F7A72', paddingLeft: 12 }}>
-                        {familyCount > 1 ? `${familyCount} familiares colaborando` : 'Invita a tu familia'}
+                        {familyCount >= 1 ? `👨‍👩‍👧‍👦 ${familyCount} familiares colaborando` : 'Invita a tu familia'}
                       </p>
                     </div>
                   </div>
@@ -3034,19 +3032,18 @@ export default function Dashboard() {
                     </div>
                     <p style={{ margin: '0 0 5px', fontSize: 13, color: '#6F7A72', lineHeight: 1.4 }}>
                       {isCritical
-                        ? (hasActiveSOS ? 'Alerta SOS activa' : `Retrasado${_retrasadoLabel ? ` ${_retrasadoLabel}` : ''}`)
+                        ? (hasActiveSOS
+                            ? 'Alerta SOS activa'
+                            : `${pendingCount} medicamento${pendingCount !== 1 ? 's' : ''} pendiente${pendingCount !== 1 ? 's' : ''}${_retrasadoMins != null ? ` · ${Math.floor(_retrasadoMins / 60)}h de retraso` : ''}`)
                         : isPending
-                          ? (pendingCount > 0 ? `${pendingCount} med${pendingCount !== 1 ? 's' : ''} pendiente${pendingCount !== 1 ? 's' : ''}` : 'Rutinas pendientes')
+                          ? (pendingCount > 0
+                              ? `${pendingCount} medicamento${pendingCount !== 1 ? 's' : ''} pendiente${pendingCount !== 1 ? 's' : ''}${_retrasadoMins != null ? ` · ${Math.floor(_retrasadoMins / 60)}h de retraso` : ''}`
+                              : 'Rutinas pendientes')
                           : (lastUpdatedAgo ? `Actualizado ${lastUpdatedAgo}` : 'Todo al día hoy')}
                     </p>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                      <div style={{ width: 18, height: 18, borderRadius: '50%', background: '#EAF0E6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 700, color: '#4A7C59', flexShrink: 0 }}>
-                        {(lastUpdatedBy ?? firstName).charAt(0).toUpperCase()}
-                      </div>
-                      <p style={{ margin: 0, fontSize: 10, color: '#9CA3AF', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        Actualizado por {lastUpdatedBy ?? firstName} · {lastUpdatedAgo ?? 'ahora'}
-                      </p>
-                    </div>
+                    <p style={{ margin: 0, fontSize: 10, color: '#9CA3AF', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {lastUpdatedBy ?? firstName} · {lastUpdatedAgo ?? 'ahora'}
+                    </p>
                   </div>
                 </div>
               </div>
