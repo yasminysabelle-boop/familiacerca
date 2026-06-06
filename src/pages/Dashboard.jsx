@@ -3014,21 +3014,21 @@ export default function Dashboard() {
                 boxShadow: '0 6px 32px rgba(0,0,0,0.18), 0 1px 4px rgba(0,0,0,0.06)',
                 display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
               }}>
+                {/* Fallback gradient — always rendered, covered by photo when available */}
+                <div style={{
+                  position: 'absolute', inset: 0,
+                  background: 'linear-gradient(160deg,#3D6B54 0%,#1E2D26 100%)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 56, color: 'rgba(255,255,255,0.22)',
+                }}>
+                  {(patientProfile?.nombre_completo || profile?.name)?.charAt(0) ?? '👤'}
+                </div>
                 {/* Full-bleed portrait photo */}
-                {heroPhoto ? (
+                {heroPhoto && (
                   <img src={heroPhoto} alt="" style={{
                     position: 'absolute', inset: 0, width: '100%', height: '100%',
                     objectFit: 'cover', objectPosition: 'center top', display: 'block',
-                  }} />
-                ) : (
-                  <div style={{
-                    position: 'absolute', inset: 0,
-                    background: 'linear-gradient(160deg,#3D6B54 0%,#1E2D26 100%)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 56, color: 'rgba(255,255,255,0.22)',
-                  }}>
-                    {(patientProfile?.nombre_completo || profile?.name)?.charAt(0) ?? '👤'}
-                  </div>
+                  }} onError={e => { e.currentTarget.style.display = 'none' }} />
                 )}
                 {/* Bottom gradient — text readability without over-darkening the photo */}
                 <div style={{

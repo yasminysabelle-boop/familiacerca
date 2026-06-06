@@ -284,6 +284,9 @@ export default function PatientProfile() {
     }
     const { error:err } = await supabase
       .from('patient_profiles').upsert(payload, { onConflict:'owner_id' })
+    if (!err && payload.foto_url !== undefined) {
+      await supabase.from('care_profiles').update({ photo_url: payload.foto_url }).eq('user_id', ownerId)
+    }
     if (err) setError('No se pudo guardar: '+err.message)
     else { setSuccess(true); setTimeout(()=>setSuccess(false), 3000) }
     setSaving(false)

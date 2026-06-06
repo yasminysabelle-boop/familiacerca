@@ -208,9 +208,9 @@ export default function OnboardingFlow() {
       let photoUrl = null
       if (photoFile) {
         const path = `${user.id}/profile.jpg`
-        const { error: upErr } = await supabase.storage.from('photos').upload(path, photoFile, { upsert: true })
+        const { error: upErr } = await supabase.storage.from('care-photos').upload(path, photoFile, { upsert: true })
         if (!upErr) {
-          const { data: { publicUrl } } = supabase.storage.from('photos').getPublicUrl(path)
+          const { data: { publicUrl } } = supabase.storage.from('care-photos').getPublicUrl(path)
           photoUrl = publicUrl
         }
       }
@@ -220,7 +220,7 @@ export default function OnboardingFlow() {
       )
       if (e1) throw e1
       await supabase.from('patient_profiles').upsert(
-        { owner_id: user.id, nombre_completo: patientName.trim(), fecha_nacimiento: birthDate },
+        { owner_id: user.id, nombre_completo: patientName.trim(), fecha_nacimiento: birthDate, ...(photoUrl ? { foto_url: photoUrl } : {}) },
         { onConflict: 'owner_id' }
       )
       setStep(4)
