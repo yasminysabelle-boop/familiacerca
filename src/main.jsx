@@ -13,6 +13,15 @@ if ('serviceWorker' in navigator) {
   }
 
   window.addEventListener('load', async () => {
+    // Register Firebase messaging SW immediately if permission already granted.
+    // This ensures the background handler is active on every app start, not just
+    // after requestFcmToken() runs at login time.
+    if ('Notification' in window && Notification.permission === 'granted') {
+      navigator.serviceWorker.register('/firebase-messaging-sw.js', {
+        scope: '/firebase-cloud-messaging-push-scope',
+      }).catch(() => {})
+    }
+
     try {
       const reg = await navigator.serviceWorker.register('/sw.js')
 

@@ -14,7 +14,7 @@ function urlBase64ToUint8Array(base64String) {
 }
 
 export function usePushNotifications() {
-  const { user } = useAuth()
+  const { user, retryFcm } = useAuth()
   const [permission, setPermission] = useState(() =>
     typeof Notification !== 'undefined' ? Notification.permission : 'default'
   )
@@ -108,7 +108,12 @@ export function usePushNotifications() {
     if (!supported) return
     const result = await Notification.requestPermission()
     setPermission(result)
-    if (result === 'granted') await subscribe()
+    if (result === 'granted') {
+      await subscribe()
+      // FCM token was likely not saved at login (permission was default/denied then).
+      // Save it now so background FCM push is available immediately after grant.
+      retryFcm?.()
+    }
   }
 
   useEffect(() => {

@@ -60,6 +60,35 @@ export function AuthProvider({ children }) {
     }
   }, [])
 
+  // Ensure a Web Push subscription exists for the user in push_subscriptions.
+  // This runs on every login so background push works even if the user never
+  // visits Settings or Medications (the only pages that mount usePushNotifications).
+  const ensurePushSubscription = useCallback(async (userId) => {
+    if (!userId) return
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return
+    const vapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY
+    if (!vapidKey || Notification.permission !== 'granted') return
+    try {
+      const reg = await navigator.serviceWorker.ready
+      let sub = await reg.pushManager.getSubscription()
+      if (!sub) {
+        const keyData = atob(
+          (vapidKey + '='.repeat((4 - vapidKey.length % 4) % 4))
+            .replace(/-/g, '+').replace(/_/g, '/')
+        )
+        const applicationServerKey = Uint8Array.from(keyData, c => c.charCodeAt(0))
+        sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey })
+      }
+      const j = sub.toJSON()
+      await supabase.from('push_subscriptions').upsert(
+        { user_id: userId, endpoint: j.endpoint, p256dh: j.keys.p256dh, auth: j.keys.auth },
+        { onConflict: 'user_id,endpoint' }
+      )
+    } catch (err) {
+      console.warn('[Push] ensurePushSubscription failed:', err?.message ?? String(err))
+    }
+  }, [])
+
   // Foreground listener + initial token registration on login
   useEffect(() => {
     if (!user) return
@@ -87,8 +116,9 @@ export function AuthProvider({ children }) {
     }
 
     registerFcmToken(user.id)
+    ensurePushSubscription(user.id)
     return () => unsubForeground()
-  }, [user?.id, registerFcmToken])
+  }, [user?.id, registerFcmToken, ensurePushSubscription])
 
   // Update last_seen every 2 minutes while active
   useEffect(() => {
