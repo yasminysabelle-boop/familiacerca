@@ -3160,7 +3160,7 @@ export default function Dashboard() {
                 {_isRetrasado
                   ? (nextPendingMed ? `⚠️ ${nextPendingMed.medName} pendiente` : '⚠️ Requiere atención')
                   : pendingCount > 0
-                    ? `${pendingCount} pendiente${pendingCount !== 1 ? 's' : ''}`
+                    ? (nextPendingMed ? `⚠️ ${nextPendingMed.medName} pendiente` : `${pendingCount} pendiente${pendingCount !== 1 ? 's' : ''}`)
                     : confirmedTodayCount > 0
                       ? `${confirmedTodayCount} dado${confirmedTodayCount !== 1 ? 's' : ''} hoy`
                       : 'Sin meds hoy'}
@@ -3172,7 +3172,7 @@ export default function Dashboard() {
                   </p>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexWrap: 'wrap' }}>
                     {_isRetrasado && _retrasadoMins >= 120 && (
-                      <span style={{ fontSize: 9, fontWeight: 700, color: '#15803D', background: '#DCFCE7', borderRadius: 20, padding: '2px 7px' }}>Ventana clínica</span>
+                      <span style={{ fontSize: 9, fontWeight: 700, color: '#15803D', background: '#DCFCE7', borderRadius: 20, padding: '2px 7px' }}>Ventana clínica activa</span>
                     )}
                     {nextPendingMed.medTime && (
                       <span style={{ fontSize: 11, color: '#D6A13B', fontWeight: 600 }}>{fmtTime(nextPendingMed.medTime)}</span>
@@ -3199,8 +3199,12 @@ export default function Dashboard() {
                 const pct = done / total
                 return (
                   <>
-                    <p style={{ margin: '0 0 4px', fontSize: 12, fontWeight: 600, color: pct === 1 ? '#22C55E' : done > 0 ? '#D6A13B' : '#9CA3AF' }}>
-                      {pct === 1 ? '✓ Todas completadas' : done > 0 ? `${done} de ${total} completadas` : 'Ninguna aún'}
+                    <p style={{ margin: '0 0 6px', lineHeight: 1.1, color: pct === 1 ? '#22C55E' : done > 0 ? '#D6A13B' : '#9CA3AF' }}>
+                      {pct === 1
+                        ? <span style={{ fontSize: 13, fontWeight: 700 }}>✓ Todas completadas</span>
+                        : done > 0
+                          ? <><span style={{ fontSize: 22, fontWeight: 800 }}>{done}</span><span style={{ fontSize: 11, fontWeight: 500 }}> de {total} completadas</span></>
+                          : <span style={{ fontSize: 12, fontWeight: 500 }}>Ninguna aún</span>}
                     </p>
                     <div style={{ marginTop: 'auto' }}>
                       <div style={{ display: 'flex', gap: 5, marginBottom: 7 }}>
@@ -3250,7 +3254,7 @@ export default function Dashboard() {
                     <div key={evt.id ?? i} onClick={actRoute ? () => navigate(actRoute) : undefined} style={{
                       display: 'flex', alignItems: 'flex-start', gap: 12,
                       cursor: actRoute ? 'pointer' : 'default',
-                      padding: '14px 0',
+                      padding: '16px 0',
                       borderBottom: isLast ? 'none' : '1px solid #F5F0E8',
                     }}>
                       <div style={{ width: 34, height: 34, borderRadius: '50%', background: meta?.bg ?? '#F5F0E8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, flexShrink: 0, marginTop: 1 }}>{meta?.icon ?? '📋'}</div>
