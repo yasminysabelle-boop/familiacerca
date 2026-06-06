@@ -2952,37 +2952,26 @@ export default function Dashboard() {
             />
             <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#2D4A1E', display: 'none', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 14 }}>🌿</div>
             <p style={{ margin: 0, fontFamily: 'Inter, system-ui, sans-serif', fontSize: 14, fontWeight: 600, color: '#1E2D26', lineHeight: 1 }}>FamiliaCerca</p>
-            {hasMultiple && (
-              <>
-                <span style={{ color: '#C5B9A8', fontSize: 12, flexShrink: 0 }}>|</span>
-                <button
-                  onClick={() => setShowFamilySwitcher(true)}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: 3,
-                    background: 'rgba(0,0,0,0.05)', border: 'none', borderRadius: 20,
-                    padding: '4px 10px', cursor: 'pointer', flexShrink: 0,
-                    maxWidth: 130, overflow: 'hidden', WebkitTapHighlightColor: 'transparent',
-                  }}
-                >
-                  <span style={{ fontSize: 13, fontWeight: 600, color: '#1E2D26', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {profile?.name || 'Mi familiar'}
-                  </span>
-                  <span style={{ fontSize: 10, color: '#6F7A72', flexShrink: 0 }}>▾</span>
-                </button>
-              </>
-            )}
-          </div>
-          {/* Center: patient name + status dot — hidden for multi-family (name shown in left pill) */}
-          {hasMultiple ? (
-            <div style={{ flex: 1 }} />
-          ) : (
-            <div style={{ flex: 1, padding: '0 8px', overflow: 'hidden', minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-              <span style={{ width: 7, height: 7, borderRadius: '50%', flexShrink: 0, background: hasActiveSOS ? '#E45B4C' : (pendingCount > 0 || _isRetrasado) ? '#D6A13B' : '#22C55E' }} />
+            <span style={{ color: '#C5B9A8', fontSize: 12, flexShrink: 0 }}>|</span>
+            <button
+              onClick={() => setShowFamilySwitcher(true)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 3,
+                background: 'rgba(0,0,0,0.05)', border: 'none', borderRadius: 20,
+                padding: '4px 10px', cursor: 'pointer', flexShrink: 0,
+                maxWidth: 140, overflow: 'hidden', WebkitTapHighlightColor: 'transparent',
+              }}
+            >
               <span style={{ fontSize: 13, fontWeight: 600, color: '#1E2D26', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {patientProfile?.nombre_completo || profile?.name || 'Mi familiar'}
+                {profile?.name || 'Mi familiar'}
               </span>
-            </div>
-          )}
+              <span style={{ fontSize: 10, color: '#6F7A72', flexShrink: 0 }}>▾</span>
+            </button>
+          </div>
+          {/* Center: status dot only */}
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <span style={{ width: 7, height: 7, borderRadius: '50%', background: hasActiveSOS ? '#E45B4C' : (pendingCount > 0 || _isRetrasado) ? '#D6A13B' : '#22C55E' }} />
+          </div>
           {/* Right: bell + avatar */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
             <button onClick={() => navigate('/chat')} style={{ position: 'relative', background: 'none', border: 'none', cursor: 'pointer', padding: 4 }}>
