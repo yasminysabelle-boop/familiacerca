@@ -42,7 +42,6 @@ import DiarioMedico from './pages/DiarioMedico'
 import CareRecord from './pages/CareRecord'
 import Incidents from './pages/Incidents'
 import FamilyRoles from './pages/FamilyRoles'
-import FamilySelector from './components/FamilySelector'
 import InstallPrompt from './components/InstallPrompt'
 
 const P = ({ children }) => <ProtectedRoute>{children}</ProtectedRoute>
@@ -136,7 +135,6 @@ function AppShell() {
         <Route path="/gastos"      element={<P><Expenses /></P>} />
         <Route path="/directorio"  element={<P><Directory /></P>} />
         <Route path="/join"          element={<JoinFamily />} />
-        <Route path="/family-select" element={<FamilySelector />} />
         <Route path="/permisos"    element={<P><Permissions /></P>} />
         <Route path="/roles"       element={<P><FamilyRoles /></P>} />
         <Route path="/pricing"     element={<Pricing />} />

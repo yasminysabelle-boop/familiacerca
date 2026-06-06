@@ -3552,19 +3552,17 @@ export default function Dashboard() {
                 })}
               </div>
 
-              {/* Join another family */}
+              {/* Close button */}
               <button
-                onClick={() => { setShowFamilySwitcher(false); navigate('/familia') }}
+                onClick={() => setShowFamilySwitcher(false)}
                 style={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                  width: '100%', padding: '14px', marginTop: 12,
-                  background: 'none', border: 'none', cursor: 'pointer',
-                  fontSize: 13, color: '#6F7A72', fontWeight: 500,
+                  width: '100%', padding: '13px', marginTop: 12,
+                  background: '#F5F0E8', border: 'none', borderRadius: 12,
+                  cursor: 'pointer', fontSize: 14, color: '#6F7A72', fontWeight: 600,
                   WebkitTapHighlightColor: 'transparent',
                 }}
               >
-                <span style={{ fontSize: 16, lineHeight: 1 }}>+</span>
-                Unirme a otra familia
+                Cerrar
               </button>
               <div style={{ height: 16 }} />
             </div>

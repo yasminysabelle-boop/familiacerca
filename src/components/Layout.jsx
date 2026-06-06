@@ -8,7 +8,6 @@ import Paywall from './Paywall'
 import InstallBanner from './InstallBanner'
 import OfflineBanner from './OfflineBanner'
 import { useDarkMode } from '../contexts/DarkModeContext'
-import FamilySelector from './FamilySelector'
 import FamilySwitcher from './FamilySwitcher'
 import CompanionChat from './CompanionChat'
 import { useHospitalMode } from '../contexts/HospitalModeContext'
@@ -208,7 +207,6 @@ export default function Layout({ children }) {
 
       <CompanionChat externalOpen={showCompanion} onExternalClose={() => setShowCompanion(false)} />
 
-      <FamilySelector />
       <Paywall />
 
       {/* Inactivity warning banner */}
