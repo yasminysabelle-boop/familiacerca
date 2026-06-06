@@ -43,6 +43,7 @@ import CareRecord from './pages/CareRecord'
 import Incidents from './pages/Incidents'
 import FamilyRoles from './pages/FamilyRoles'
 import InstallPrompt from './components/InstallPrompt'
+import { supabase } from './lib/supabase'
 
 const P = ({ children }) => <ProtectedRoute>{children}</ProtectedRoute>
 
@@ -90,14 +91,24 @@ function AppShell() {
     setShowMemberOnboarding(false)
   }
 
-  // After login, redirect to /join if there's a pending invite token from an email-confirmed signup
+  // After login, verify token is still pending before redirecting — clear if already used/expired
   useEffect(() => {
     if (!user) return
-    const pending = localStorage.getItem('pendingInviteToken')
-    if (pending && location.pathname !== '/join') {
-      navigate('/join?token=' + pending, { replace: true })
-      localStorage.removeItem('pendingInviteToken')
-    }
+    const token = localStorage.getItem('pendingInviteToken')
+    if (!token) return
+    supabase
+      .from('family_invitations')
+      .select('status')
+      .eq('token', token)
+      .single()
+      .then(({ data }) => {
+        if (!data || data.status !== 'pending') {
+          localStorage.removeItem('pendingInviteToken')
+        } else if (location.pathname !== '/join') {
+          navigate('/join?token=' + token, { replace: true })
+          localStorage.removeItem('pendingInviteToken')
+        }
+      })
   }, [user?.id])
 
   useEffect(() => {
