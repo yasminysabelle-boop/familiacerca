@@ -315,9 +315,8 @@ export default function Layout({ children }) {
               {[
                 { emoji: '💊', label: 'Registrar medicamento', path: '/medications' },
                 { emoji: '✅', label: 'Registrar rutina',       path: '/cuidado' },
-                { emoji: '📝', label: 'Nueva nota',             path: '/notas' },
+                { emoji: '📝', label: 'Nueva nota',             path: '/notas?add=1' },
                 { emoji: '📸', label: 'Subir foto',             path: '/album' },
-                { emoji: '🎤', label: 'Nota de voz',            path: '/chat' },
               ].map(({ emoji, label, path }) => (
                 <button
                   key={path}
