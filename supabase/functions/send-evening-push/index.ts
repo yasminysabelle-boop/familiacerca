@@ -134,6 +134,14 @@ Deno.serve(async (req: Request) => {
     })
   }
 
+  // Fetch patient names for all pending owners
+  const { data: careProfiles } = await supabase
+    .from('care_profiles')
+    .select('user_id, name')
+    .in('user_id', ownersWithPending)
+  const careNameMap = new Map<string, string>()
+  ;(careProfiles ?? []).forEach((p: { user_id: string; name: string }) => careNameMap.set(p.user_id, p.name))
+
   let sentCount = 0
   let failCount = 0
 
@@ -163,13 +171,15 @@ Deno.serve(async (req: Request) => {
 
     console.log(`[send-evening-push] Found ${subs?.length ?? 0} push subscriptions for ${userIds.length} users`)
 
+    const patientName = careNameMap.get(ownerId) ?? 'tu familiar'
+
     for (const sub of subs ?? []) {
       try {
         await webpush.sendNotification(
           { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
           JSON.stringify({
-            title: '⚠️ FamiliaCerca',
-            body: 'Hay tareas pendientes de hoy sin completar',
+            title: `⚠️ ${patientName} — tareas pendientes`,
+            body: 'Hay actividades de hoy sin completar',
             url: '/hoy',
             tag: `evening-push-${today}`,
           })

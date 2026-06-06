@@ -72,6 +72,11 @@ Deno.serve(async (req: Request) => {
     const medName = (log.medications as { name: string } | null)?.name ?? 'Medicamento'
     console.log(`[send-proof-reminders] Missing proof for: ${medName}`)
 
+    // Fetch patient name for this care group
+    const { data: careProfile } = await supabase
+      .from('care_profiles').select('name').eq('user_id', log.user_id).maybeSingle()
+    const patientName = careProfile?.name ?? 'tu familiar'
+
     // Collect owner + family members
     const { data: members } = await supabase
       .from('family_members')
@@ -93,7 +98,7 @@ Deno.serve(async (req: Request) => {
         await webpush.sendNotification(
           { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
           JSON.stringify({
-            title: '📷 Falta foto de prueba',
+            title: `📷 ${patientName} — falta foto de prueba`,
             body: `${medName} fue dado hace 30 min — agrega la foto de prueba`,
             url: '/hoy',
             tag: `proof-missing-${log.id}`,

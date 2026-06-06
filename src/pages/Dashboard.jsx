@@ -12,6 +12,7 @@ import { AlertTriangle, CheckIcon, User, XIcon, Pill, ClipboardCheck, Chat, Cale
 import { geminiGenerate } from '../lib/gemini'
 import { CARE_ITEMS } from '../lib/careItems'
 import TrialBanner from '../components/TrialBanner'
+import { usePushNotifications } from '../hooks/usePushNotifications'
 import { useHospitalMode } from '../contexts/HospitalModeContext'
 import HospitalDashboard from '../components/hospital/HospitalDashboard'
 import { generateMedicalReport, fetchReportData } from '../utils/generateMedicalReport'
@@ -1789,6 +1790,9 @@ export default function Dashboard() {
   const [pressedSOS, setPressedSOS] = useState(false)
   const [weekShifts, setWeekShifts] = useState([])
   const [familyCount, setFamilyCount] = useState(1)
+  const { permission, requestAndSubscribe } = usePushNotifications()
+  const [notifDismissed, setNotifDismissed] = useState(() => !!localStorage.getItem('notif_dismissed'))
+  function dismissNotifBanner() { localStorage.setItem('notif_dismissed', '1'); setNotifDismissed(true) }
   const [familyNames, setFamilyNames] = useState([])
   // Tracks scheduled appointment reminder timeouts by event id to prevent duplicates
   const apptReminderTimeouts = useRef(new Map())
@@ -2834,6 +2838,37 @@ export default function Dashboard() {
         </div>
       )}
       <TrialBanner />
+
+      {/* Notification permission banner — shown when permission not granted and not dismissed */}
+      {permission !== 'granted' && !notifDismissed && (
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 10,
+          margin: '0 16px 10px', padding: '10px 14px',
+          background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 14,
+        }}>
+          <span style={{ fontSize: 17, flexShrink: 0 }}>🔔</span>
+          <p style={{ flex: 1, fontSize: 13, color: '#1E40AF', margin: 0, fontWeight: 500, lineHeight: 1.3 }}>
+            Activa las notificaciones para estar al tanto
+          </p>
+          <button
+            onClick={requestAndSubscribe}
+            style={{
+              padding: '6px 13px', borderRadius: 9,
+              background: '#1D4ED8', color: 'white',
+              fontSize: 12, fontWeight: 700, border: 'none', cursor: 'pointer', flexShrink: 0,
+            }}
+          >
+            Activar
+          </button>
+          <button
+            onClick={dismissNotifBanner}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, flexShrink: 0, display: 'flex' }}
+            aria-label="Cerrar"
+          >
+            <XIcon size={14} color="#9CA3AF" strokeWidth={2} />
+          </button>
+        </div>
+      )}
 
       {/* Sticky renewal alerts */}
       {renewalAlerts.map(med => {
