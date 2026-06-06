@@ -86,7 +86,7 @@ Deno.serve(async (req: Request) => {
 
   if (!meds || meds.length === 0) {
     return new Response(
-      JSON.stringify({ sent: 0, time: utcTime, checked: timesToCheck }),
+      JSON.stringify({ sent: 0, time: toHHMM(now), checked: timesToCheck }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
@@ -230,19 +230,43 @@ Deno.serve(async (req: Request) => {
   const firebaseServerKey = Deno.env.get('FIREBASE_SERVER_KEY')
   if (firebaseServerKey && meds && meds.length > 0) {
     const allOwnerIds = [...new Set(meds.map((m: { user_id: string }) => m.user_id))]
+
+    // Fetch family members for all owners so FCM reaches the whole group, not just the owner
+    const { data: allFamilyRows } = await supabase
+      .from('family_members')
+      .select('user_id, member_user_id')
+      .in('user_id', allOwnerIds)
+
+    // Build ownerId → [ownerId, ...memberIds]
+    const recipientsByOwner = new Map<string, string[]>()
+    for (const ownerId of allOwnerIds) {
+      const members = (allFamilyRows ?? [])
+        .filter((r: { user_id: string }) => r.user_id === ownerId)
+        .map((r: { member_user_id: string }) => r.member_user_id)
+        .filter(Boolean)
+      recipientsByOwner.set(ownerId, [ownerId, ...members])
+    }
+
+    // Fetch FCM tokens for every recipient across all groups
+    const allRecipientIds = [...new Set([...recipientsByOwner.values()].flat())]
     const { data: fcmProfiles } = await supabase
-      .from('user_profiles').select('id, fcm_token').in('id', allOwnerIds).not('fcm_token', 'is', null)
-    const fcmByOwner: Record<string, string> = {}
-    ;(fcmProfiles ?? []).forEach((p: { id: string, fcm_token: string }) => { fcmByOwner[p.id] = p.fcm_token })
+      .from('user_profiles')
+      .select('id, fcm_token')
+      .in('id', allRecipientIds)
+      .not('fcm_token', 'is', null)
+
+    const tokenByUser = new Map<string, string>()
+    ;(fcmProfiles ?? []).forEach((p: { id: string; fcm_token: string }) => tokenByUser.set(p.id, p.fcm_token))
 
     for (const med of meds) {
-      const token = fcmByOwner[med.user_id]
-      if (!token) continue
+      const recipients = recipientsByOwner.get(med.user_id) ?? [med.user_id]
+      const fcmTokens = recipients.map(id => tokenByUser.get(id)).filter((t): t is string => !!t)
+      if (!fcmTokens.length) continue
       await fetch('https://fcm.googleapis.com/fcm/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `key=${firebaseServerKey}` },
         body: JSON.stringify({
-          to: token,
+          registration_ids: fcmTokens,
           notification: { title: `💊 ${med.name} en 10 minutos`, body: med.dosage ? `Dosis: ${med.dosage}` : 'Prepara la dosis', icon: '/icon-192.png', tag: `med-reminder-${med.id}` },
           data: { type: 'MED_REMINDER', url: '/hoy' },
           priority: 'high',
