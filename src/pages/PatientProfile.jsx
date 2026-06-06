@@ -288,7 +288,11 @@ export default function PatientProfile() {
       await supabase.from('care_profiles').update({ photo_url: payload.foto_url }).eq('user_id', ownerId)
     }
     if (err) setError('No se pudo guardar: '+err.message)
-    else { setSuccess(true); setTimeout(()=>setSuccess(false), 3000) }
+    else {
+      setSuccess(true)
+      setTimeout(() => setSuccess(false), 3000)
+      window.dispatchEvent(new Event('patientProfileUpdated'))
+    }
     setSaving(false)
   }
 

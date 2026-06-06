@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from './AuthContext'
 
@@ -10,11 +10,18 @@ export function FamilyProvider({ children }) {
   const [activeOwnerId, setActiveOwnerId] = useState(null)
   const [loading, setLoading] = useState(true)
   const [needsSelector, setNeedsSelector] = useState(false)
+  const loadFamiliesRef = useRef(null)
 
   useEffect(() => {
     if (user) loadFamilies()
     else reset()
   }, [user])
+
+  useEffect(() => {
+    function onPatientUpdated() { loadFamiliesRef.current?.() }
+    window.addEventListener('patientProfileUpdated', onPatientUpdated)
+    return () => window.removeEventListener('patientProfileUpdated', onPatientUpdated)
+  }, [])
 
   function reset() {
     setFamilies([])
@@ -134,6 +141,8 @@ export function FamilyProvider({ children }) {
       setLoading(false)
     }
   }
+
+  loadFamiliesRef.current = loadFamilies
 
   function switchFamily(ownerId) {
     localStorage.setItem('fc_active_context', ownerId)

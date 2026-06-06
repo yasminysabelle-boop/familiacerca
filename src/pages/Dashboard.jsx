@@ -1870,6 +1870,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (!ownerId) return
+    setPatientProfile(null)
     supabase
       .from('patient_profiles')
       .select('*')
@@ -1879,6 +1880,19 @@ export default function Dashboard() {
         setPatientProfile(pp ?? null)
         setPatientProfileIncomplete(!pp?.nombre_completo)
       })
+  }, [ownerId])
+
+  useEffect(() => {
+    function onPatientUpdated() {
+      if (!ownerId) return
+      supabase.from('patient_profiles').select('*').eq('owner_id', ownerId).maybeSingle()
+        .then(({ data: pp }) => {
+          setPatientProfile(pp ?? null)
+          setPatientProfileIncomplete(!pp?.nombre_completo)
+        })
+    }
+    window.addEventListener('patientProfileUpdated', onPatientUpdated)
+    return () => window.removeEventListener('patientProfileUpdated', onPatientUpdated)
   }, [ownerId])
 
   useEffect(() => {
@@ -3166,8 +3180,8 @@ export default function Dashboard() {
               </div>
               <p style={{ margin: '0 0 4px', fontSize: 15, fontWeight: 700, color: '#1E2D26', lineHeight: 1.2 }}>Rutinas</p>
               {(() => {
-                const done = Object.values(careLogsToday).filter(Boolean).length
                 const total = 4
+                const done = Math.min(Object.values(careLogsToday).filter(Boolean).length, total)
                 const pct = done / total
                 return (
                   <>
