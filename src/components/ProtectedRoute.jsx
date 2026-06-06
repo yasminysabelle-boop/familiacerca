@@ -86,10 +86,6 @@ export default function ProtectedRoute({ children }) {
   if (loading || (user && familyLoading)) return <PageSkeleton />
   if (!user) return <Navigate to="/login" replace />
 
-  if (needsSelector && pathname !== '/family-select') {
-    return <Navigate to="/family-select" replace />
-  }
-
   const onboardingDone = !!localStorage.getItem('fc_patient_onboarding_done')
   if (!profile && !onboardingDone) return <OnboardingFlow />
 

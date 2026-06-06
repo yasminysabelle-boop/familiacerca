@@ -1747,7 +1747,7 @@ function QuickCard({ emoji, label, subtitle, statusColor, onClick, index, size =
 
 export default function Dashboard() {
   const { user, signOut } = useAuth()
-  const { profile, ownerId, memberRole } = useFamily()
+  const { profile, ownerId, memberRole, families, hasMultiple, needsSelector, switchFamily } = useFamily()
   const navigate = useNav()
   const isFamiliar = memberRole === 'familiar'
   const isAdmin = memberRole === null || ownerId === user?.id
@@ -1801,6 +1801,7 @@ export default function Dashboard() {
   const [expandedDays, setExpandedDays] = useState(() => new Set([new Date().toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' })]))
   const [selectedDayTab, setSelectedDayTab] = useState(() => new Date().toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' }))
   const [showMoreTools, setShowMoreTools] = useState(false)
+  const [showFamilySwitcher, setShowFamilySwitcher] = useState(false)
 
   useEffect(() => {
     if (searchParams.get('checkout') === 'success') {
@@ -1810,6 +1811,11 @@ export default function Dashboard() {
       setTimeout(() => setCheckoutSuccess(false), 6000)
     }
   }, [])
+
+  // Auto-open family switcher when user has multiple families and no stored preference
+  useEffect(() => {
+    if (needsSelector && hasMultiple) setShowFamilySwitcher(true)
+  }, [needsSelector, hasMultiple])
 
   const now = new Date()
   const todayKey     = toLocalDateKey(now)
@@ -2938,8 +2944,8 @@ export default function Dashboard() {
             HEADER — compact
         ═══════════════════════════════════════════════════════════════ */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 16px' }}>
-          {/* Left: Logo + FamiliaCerca */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexShrink: 0 }}>
+          {/* Left: Logo + FamiliaCerca + family pill (multi-family) */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexShrink: 0, minWidth: 0 }}>
             <img
               src="/logo.png" alt="FamiliaCerca"
               style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', display: 'block', flexShrink: 0 }}
@@ -2947,14 +2953,37 @@ export default function Dashboard() {
             />
             <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#2D4A1E', display: 'none', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 14 }}>🌿</div>
             <p style={{ margin: 0, fontFamily: 'Inter, system-ui, sans-serif', fontSize: 14, fontWeight: 600, color: '#1E2D26', lineHeight: 1 }}>FamiliaCerca</p>
+            {hasMultiple && (
+              <>
+                <span style={{ color: '#C5B9A8', fontSize: 12, flexShrink: 0 }}>|</span>
+                <button
+                  onClick={() => setShowFamilySwitcher(true)}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 3,
+                    background: 'rgba(0,0,0,0.05)', border: 'none', borderRadius: 20,
+                    padding: '4px 10px', cursor: 'pointer', flexShrink: 0,
+                    maxWidth: 130, overflow: 'hidden', WebkitTapHighlightColor: 'transparent',
+                  }}
+                >
+                  <span style={{ fontSize: 13, fontWeight: 600, color: '#1E2D26', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {profile?.name || 'Mi familiar'}
+                  </span>
+                  <span style={{ fontSize: 10, color: '#6F7A72', flexShrink: 0 }}>▾</span>
+                </button>
+              </>
+            )}
           </div>
-          {/* Center: patient name + status dot */}
-          <div style={{ flex: 1, padding: '0 8px', overflow: 'hidden', minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-            <span style={{ width: 7, height: 7, borderRadius: '50%', flexShrink: 0, background: hasActiveSOS ? '#E45B4C' : (pendingCount > 0 || _isRetrasado) ? '#D6A13B' : '#22C55E' }} />
-            <span style={{ fontSize: 13, fontWeight: 600, color: '#1E2D26', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {patientProfile?.nombre_completo || profile?.name || 'Mi familiar'}
-            </span>
-          </div>
+          {/* Center: patient name + status dot — hidden for multi-family (name shown in left pill) */}
+          {hasMultiple ? (
+            <div style={{ flex: 1 }} />
+          ) : (
+            <div style={{ flex: 1, padding: '0 8px', overflow: 'hidden', minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+              <span style={{ width: 7, height: 7, borderRadius: '50%', flexShrink: 0, background: hasActiveSOS ? '#E45B4C' : (pendingCount > 0 || _isRetrasado) ? '#D6A13B' : '#22C55E' }} />
+              <span style={{ fontSize: 13, fontWeight: 600, color: '#1E2D26', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {patientProfile?.nombre_completo || profile?.name || 'Mi familiar'}
+              </span>
+            </div>
+          )}
           {/* Right: bell + avatar */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
             <button onClick={() => navigate('/chat')} style={{ position: 'relative', background: 'none', border: 'none', cursor: 'pointer', padding: 4 }}>
@@ -3447,6 +3476,114 @@ export default function Dashboard() {
       )}
       <VideoCallScheduleModal open={showVideoCallModal} onClose={() => setShowVideoCallModal(false)} />
       <SuccessAnimation visible={medSuccessTrigger > 0} key={medSuccessTrigger} />
+
+      {/* ── Family Switcher Bottom Sheet ─────────────────────────────────────── */}
+      {showFamilySwitcher && (
+        <>
+          <div
+            onClick={() => setShowFamilySwitcher(false)}
+            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.3)', zIndex: 200 }}
+          />
+          <div style={{
+            position: 'fixed', bottom: 68, left: 0, right: 0, zIndex: 201,
+            background: 'white', borderRadius: '20px 20px 0 0',
+            boxShadow: '0 -8px 40px rgba(0,0,0,0.18)',
+          }}>
+            <div style={{ padding: '20px 20px 0' }}>
+              {/* Header row */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+                <p style={{ margin: 0, fontSize: 15, fontWeight: 600, color: '#1E2D26' }}>Mis familias</p>
+                <button
+                  onClick={() => setShowFamilySwitcher(false)}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', alignItems: 'center' }}
+                >
+                  <XIcon size={18} color="#9CA3AF" strokeWidth={2} />
+                </button>
+              </div>
+
+              {/* Family cards */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxHeight: '50vh', overflowY: 'auto' }}>
+                {families.map(fam => {
+                  const isActive  = fam.ownerId === ownerId
+                  const isAdm     = fam.role === null
+                  const isCuid    = fam.role === 'cuidador'
+                  const roleLabel = isAdm ? 'Administrador' : isCuid ? 'Cuidador' : 'Familiar'
+                  const roleColor = isAdm ? '#3D6B54' : isCuid ? '#1D4ED8' : '#D97706'
+                  const roleBg    = isAdm ? '#E8F5EE'  : isCuid ? '#EFF6FF' : '#FEF3C7'
+                  const initial   = (fam.patientName ?? 'F').charAt(0).toUpperCase()
+                  return (
+                    <button
+                      key={fam.ownerId}
+                      onClick={() => { switchFamily(fam.ownerId); setShowFamilySwitcher(false) }}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 14,
+                        padding: '12px 14px', borderRadius: 14,
+                        background: isActive ? '#F0F7F3' : 'white',
+                        border: isActive ? '1.5px solid #B7D9C4' : '1.5px solid #EDE5D8',
+                        cursor: 'pointer', textAlign: 'left', width: '100%',
+                        WebkitTapHighlightColor: 'transparent',
+                      }}
+                    >
+                      {fam.patientPhotoUrl ? (
+                        <img
+                          src={fam.patientPhotoUrl} alt={fam.patientName ?? ''}
+                          style={{ width: 48, height: 48, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '2px solid #EDE5D8' }}
+                        />
+                      ) : (
+                        <div style={{
+                          width: 48, height: 48, borderRadius: '50%', flexShrink: 0,
+                          background: 'linear-gradient(135deg, #4A7C59, #2D6A4F)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontSize: 18, fontWeight: 700, color: 'white', fontFamily: 'Georgia, serif',
+                        }}>
+                          {initial}
+                        </div>
+                      )}
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#1E2D26', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {fam.patientName ?? 'Mi familiar'}
+                        </p>
+                        <span style={{
+                          display: 'inline-block', marginTop: 4,
+                          fontSize: 11, fontWeight: 700,
+                          color: roleColor, background: roleBg,
+                          padding: '2px 8px', borderRadius: 6,
+                        }}>
+                          {roleLabel}
+                        </span>
+                      </div>
+                      {isActive && (
+                        <div style={{
+                          width: 22, height: 22, borderRadius: '50%', background: '#4A7C59',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                        }}>
+                          <CheckIcon size={12} color="white" strokeWidth={2.5} />
+                        </div>
+                      )}
+                    </button>
+                  )
+                })}
+              </div>
+
+              {/* Join another family */}
+              <button
+                onClick={() => { setShowFamilySwitcher(false); navigate('/familia') }}
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                  width: '100%', padding: '14px', marginTop: 12,
+                  background: 'none', border: 'none', cursor: 'pointer',
+                  fontSize: 13, color: '#6F7A72', fontWeight: 500,
+                  WebkitTapHighlightColor: 'transparent',
+                }}
+              >
+                <span style={{ fontSize: 16, lineHeight: 1 }}>+</span>
+                Unirme a otra familia
+              </button>
+              <div style={{ height: 16 }} />
+            </div>
+          </div>
+        </>
+      )}
     </Layout>
   )
 }

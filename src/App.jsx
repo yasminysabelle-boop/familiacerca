@@ -49,10 +49,9 @@ const P = ({ children }) => <ProtectedRoute>{children}</ProtectedRoute>
 
 function HomeRoute() {
   const { user, loading } = useAuth()
-  const { needsSelector, loading: familyLoading } = useFamily()
+  const { loading: familyLoading } = useFamily()
   if (loading || (user && familyLoading)) return null
   if (!user) return <Landing />
-  if (needsSelector) return <Navigate to="/family-select" replace />
   return <Navigate to="/dashboard" replace />
 }
 
