@@ -6,84 +6,96 @@ export default function FamilySelector() {
 
   return (
     <div style={{
-      position: 'fixed', inset: 0, zIndex: 9999,
-      background: '#F7F3ED',
+      position: 'fixed', inset: 0, zIndex: 9000,
+      background: '#F5F0E8',
       display: 'flex', flexDirection: 'column', alignItems: 'center',
-      justifyContent: 'center', padding: '0 24px',
+      padding: '60px 20px 40px',
+      overflowY: 'auto',
     }}>
-      <div style={{ width: '100%', maxWidth: 400 }}>
-        <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <div style={{ fontSize: 52, marginBottom: 14 }}>👨‍👩‍👧</div>
-          <h1 style={{
-            fontFamily: 'Georgia, serif', fontSize: 22, fontWeight: 700,
-            color: '#1A1A1A', margin: '0 0 8px',
-          }}>
-            ¿A qué familia quieres entrar?
-          </h1>
-          <p style={{ fontSize: 14, color: '#6B7280', margin: 0, lineHeight: 1.5 }}>
-            Tienes acceso a más de una familia
-          </p>
-        </div>
+      {/* FC Logo */}
+      <svg width={64} height={64} viewBox="0 0 40 40" fill="none" aria-hidden="true" style={{ flexShrink: 0 }}>
+        <circle cx="20" cy="20" r="20" fill="#4A7C59" />
+        <circle cx="20" cy="20" r="17.5" fill="white" />
+        <text x="20" y="19.5" textAnchor="middle" dominantBaseline="middle"
+          fill="#4A7C59" fontSize="14" fontWeight="800"
+          fontFamily="Georgia, serif" letterSpacing="-0.5">FC</text>
+        <text x="20" y="31" textAnchor="middle" dominantBaseline="middle"
+          fill="#4A7C59" fillOpacity="0.72" fontSize="10">♥</text>
+      </svg>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {families.map(fam => {
-            const initials = fam.patientName?.charAt(0)?.toUpperCase() ?? '?'
-            const roleLabel = fam.role === null ? 'Eres el admin' : fam.role === 'cuidador' ? 'Eres cuidador' : 'Eres familiar'
-            const roleColor = fam.role === null ? '#4A7C59' : fam.role === 'cuidador' ? '#2563EB' : '#6B7280'
-            const roleBg = fam.role === null ? '#EBF3EE' : fam.role === 'cuidador' ? '#DBEAFE' : '#F3F4F6'
-            return (
-              <button
-                key={fam.ownerId}
-                onClick={() => switchFamily(fam.ownerId)}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 16,
-                  background: 'white', border: '1.5px solid #EDE5D8',
-                  borderRadius: 20, padding: '16px 18px',
-                  cursor: 'pointer', textAlign: 'left',
-                  boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-                  transition: 'all 0.15s',
-                  width: '100%',
-                }}
-              >
-                {fam.patientPhotoUrl ? (
-                  <img
-                    src={fam.patientPhotoUrl} alt={fam.patientName}
-                    style={{
-                      width: 52, height: 52, borderRadius: '50%', objectFit: 'cover',
-                      border: '2px solid #EDE5D8', flexShrink: 0,
-                    }}
-                  />
-                ) : (
-                  <div style={{
-                    width: 52, height: 52, borderRadius: '50%', flexShrink: 0,
-                    background: 'linear-gradient(135deg, #4A7C59, #2D6A4F)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 20, fontWeight: 700, color: 'white',
-                  }}>
-                    {initials}
-                  </div>
-                )}
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{
-                    fontSize: 16, fontWeight: 700, color: '#1A1A1A',
-                    margin: '0 0 6px', fontFamily: 'Georgia, serif',
-                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                  }}>
-                    {fam.patientName ?? 'Mi familia'}
-                  </p>
-                  <span style={{
-                    fontSize: 11, fontWeight: 700,
-                    color: roleColor, background: roleBg,
-                    padding: '3px 10px', borderRadius: 6,
-                  }}>
-                    {roleLabel}
-                  </span>
+      <p style={{
+        fontFamily: "'Cormorant Garamond', Georgia, serif",
+        fontSize: 26, fontWeight: 700, color: '#1A1A1A',
+        textAlign: 'center', marginTop: 20, marginBottom: 6, lineHeight: 1.25,
+      }}>
+        ¿A quién vas a<br />cuidar hoy?
+      </p>
+      <p style={{ color: '#9CA3AF', fontSize: 14, textAlign: 'center', margin: '0 0 32px' }}>
+        Selecciona un grupo familiar
+      </p>
+
+      <div style={{ width: '100%', maxWidth: 420, display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {families.map(fam => {
+          const isAdmin  = fam.role === null
+          const isCuidad = fam.role === 'cuidador'
+          const roleLabel = isAdmin ? 'Administrador' : isCuidad ? 'Cuidador' : 'Familiar'
+          const roleColor = isAdmin ? '#3D6B54' : isCuidad ? '#1D4ED8' : '#D97706'
+          const roleBg    = isAdmin ? '#E8F5EE'  : isCuidad ? '#EFF6FF' : '#FEF3C7'
+          const initial   = (fam.patientName ?? 'F').charAt(0).toUpperCase()
+
+          return (
+            <button
+              key={fam.ownerId}
+              onClick={() => switchFamily(fam.ownerId)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 16,
+                padding: '16px 20px', borderRadius: 16,
+                background: 'white', border: '1.5px solid #EDE5D8',
+                boxShadow: '0 2px 12px rgba(0,0,0,0.07)',
+                cursor: 'pointer', WebkitTapHighlightColor: 'transparent',
+                textAlign: 'left', width: '100%',
+              }}
+            >
+              {fam.patientPhotoUrl ? (
+                <img
+                  src={fam.patientPhotoUrl} alt={fam.patientName}
+                  style={{ width: 64, height: 64, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '2px solid #EDE5D8' }}
+                />
+              ) : (
+                <div style={{
+                  width: 64, height: 64, borderRadius: '50%', flexShrink: 0,
+                  background: 'linear-gradient(135deg, #4A7C59, #2D6A4F)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 24, fontWeight: 700, color: 'white',
+                }}>
+                  {initial}
                 </div>
-                <span style={{ color: '#D1D5DB', fontSize: 22, flexShrink: 0 }}>›</span>
-              </button>
-            )
-          })}
-        </div>
+              )}
+
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{
+                  fontSize: 16, fontWeight: 600, color: '#1A1A1A',
+                  margin: 0, lineHeight: 1.3,
+                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                }}>
+                  {fam.patientName ?? 'Mi familiar'}
+                </p>
+                <span style={{
+                  display: 'inline-block', marginTop: 5,
+                  fontSize: 11, fontWeight: 700, letterSpacing: '0.04em',
+                  color: roleColor, background: roleBg,
+                  padding: '3px 8px', borderRadius: 6,
+                }}>
+                  {roleLabel}
+                </span>
+              </div>
+
+              <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="#C5B9A8" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                <path d="M9 18l6-6-6-6" />
+              </svg>
+            </button>
+          )
+        })}
       </div>
     </div>
   )

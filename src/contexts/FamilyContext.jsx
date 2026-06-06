@@ -118,10 +118,11 @@ export function FamilyProvider({ children }) {
 
       if (storedValid) {
         setActiveOwnerId(stored)
+        setNeedsSelector(false)
       } else {
         setActiveOwnerId(built[0].ownerId)
+        setNeedsSelector(built.length > 1)
       }
-      setNeedsSelector(false)
     } catch (err) {
       console.error(err)
       const fallback = [{ ownerId: user.id, patientName: null, patientPhotoUrl: null, role: null, profile: null }]

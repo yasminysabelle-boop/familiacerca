@@ -42,6 +42,7 @@ import DiarioMedico from './pages/DiarioMedico'
 import CareRecord from './pages/CareRecord'
 import Incidents from './pages/Incidents'
 import FamilyRoles from './pages/FamilyRoles'
+import FamilySelector from './components/FamilySelector'
 import InstallPrompt from './components/InstallPrompt'
 
 const P = ({ children }) => <ProtectedRoute>{children}</ProtectedRoute>
@@ -55,7 +56,7 @@ function HomeRoute() {
 function AppShell() {
   const location  = useLocation()
   const { user }  = useAuth()
-  const { memberRole, loading: familyLoading } = useFamily()
+  const { memberRole, loading: familyLoading, needsSelector } = useFamily()
   const isLanding = location.pathname === '/'
 
   const onboardingDone = !!localStorage.getItem('fc_onboarding_done')
@@ -99,6 +100,7 @@ function AppShell() {
     <>
       {showSlides && !isLanding && <WelcomeSlides onDone={handleOnboardingDone} />}
       {!showSlides && !splashDone && !isLanding && <Splash fading={splashFading} />}
+      {!showMemberOnboarding && !isLanding && needsSelector && <FamilySelector />}
       {showMemberOnboarding && <MemberOnboarding onDone={handleMemberOnboardingDone} />}
       <InstallPrompt />
       <Routes>
