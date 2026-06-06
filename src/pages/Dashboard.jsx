@@ -3262,11 +3262,19 @@ export default function Dashboard() {
         </div>
 
         {/* Cerrar sesión */}
-        <div style={{ padding: '4px 16px 20px', textAlign: 'center' }}>
+        <div style={{ textAlign: 'center' }}>
           <button
             onClick={async () => { await signOut(); navigate('/') }}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: '#9FAF9A', fontFamily: 'Inter, system-ui, sans-serif', padding: '8px 20px' }}
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+              margin: '16px auto 24px', padding: '10px 24px',
+              backgroundColor: 'transparent', border: '1px solid rgba(228,91,76,0.3)',
+              borderRadius: 24, cursor: 'pointer',
+              color: '#E45B4C', fontSize: 13,
+              fontFamily: 'Inter, sans-serif', fontWeight: 500,
+            }}
           >
+            <span style={{ fontSize: 16 }}>🚪</span>
             Cerrar sesión
           </button>
         </div>
