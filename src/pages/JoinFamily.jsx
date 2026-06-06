@@ -42,6 +42,8 @@ export default function JoinFamily() {
   // Load invitation on mount (only when a token is present)
   useEffect(() => {
     if (!token) return
+    // Persist token before any auth redirect so email-confirmation flow can recover it
+    localStorage.setItem('pendingInviteToken', token)
     fetchInvitation()
   }, [token])
 
@@ -108,6 +110,7 @@ export default function JoinFamily() {
 
     setAccepting(false)
     setAccepted(true)
+    localStorage.removeItem('pendingInviteToken')
     localStorage.setItem('fc_active_context', invitation.user_id)
     localStorage.setItem('fc_member_owner_id', invitation.user_id)
     refreshFamily() // connect member to family group immediately

@@ -1,12 +1,18 @@
+import { useNavigate, Navigate } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 
 export default function FamilySelector() {
-  const { families, switchFamily, needsSelector } = useFamily()
-  if (!needsSelector) return null
+  const { user } = useAuth()
+  const { families, switchFamily, loading } = useFamily()
+  const navigate = useNavigate()
+
+  if (!user) return <Navigate to="/login" replace />
+  if (loading) return null
 
   return (
     <div style={{
-      position: 'fixed', inset: 0, zIndex: 9000,
+      minHeight: '100dvh',
       background: '#F5F0E8',
       display: 'flex', flexDirection: 'column', alignItems: 'center',
       padding: '60px 20px 40px',
@@ -46,7 +52,7 @@ export default function FamilySelector() {
           return (
             <button
               key={fam.ownerId}
-              onClick={() => switchFamily(fam.ownerId)}
+              onClick={() => { switchFamily(fam.ownerId); navigate('/dashboard', { replace: true }) }}
               style={{
                 display: 'flex', alignItems: 'center', gap: 16,
                 padding: '16px 20px', borderRadius: 16,

@@ -1,4 +1,4 @@
-import { Navigate } from 'react-router-dom'
+import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import OnboardingFlow from '../pages/OnboardingFlow'
@@ -80,10 +80,15 @@ function PageSkeleton() {
 
 export default function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
-  const { profile, loading: familyLoading } = useFamily()
+  const { profile, loading: familyLoading, needsSelector } = useFamily()
+  const { pathname } = useLocation()
 
   if (loading || (user && familyLoading)) return <PageSkeleton />
   if (!user) return <Navigate to="/login" replace />
+
+  if (needsSelector && pathname !== '/family-select') {
+    return <Navigate to="/family-select" replace />
+  }
 
   const onboardingDone = !!localStorage.getItem('fc_patient_onboarding_done')
   if (!profile && !onboardingDone) return <OnboardingFlow />

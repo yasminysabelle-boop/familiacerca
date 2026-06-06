@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { FamilyProvider, useFamily } from './contexts/FamilyContext'
 import { SubscriptionProvider } from './contexts/SubscriptionContext'
@@ -49,14 +49,18 @@ const P = ({ children }) => <ProtectedRoute>{children}</ProtectedRoute>
 
 function HomeRoute() {
   const { user, loading } = useAuth()
-  if (loading) return null
-  return user ? <Navigate to="/dashboard" replace /> : <Landing />
+  const { needsSelector, loading: familyLoading } = useFamily()
+  if (loading || (user && familyLoading)) return null
+  if (!user) return <Landing />
+  if (needsSelector) return <Navigate to="/family-select" replace />
+  return <Navigate to="/dashboard" replace />
 }
 
 function AppShell() {
   const location  = useLocation()
+  const navigate  = useNavigate()
   const { user }  = useAuth()
-  const { memberRole, loading: familyLoading, needsSelector } = useFamily()
+  const { memberRole, loading: familyLoading } = useFamily()
   const isLanding = location.pathname === '/'
 
   const onboardingDone = !!localStorage.getItem('fc_onboarding_done')
@@ -88,6 +92,15 @@ function AppShell() {
     setShowMemberOnboarding(false)
   }
 
+  // After login, redirect to /join if there's a pending invite token from an email-confirmed signup
+  useEffect(() => {
+    if (!user) return
+    const pending = localStorage.getItem('pendingInviteToken')
+    if (pending && location.pathname !== '/join') {
+      navigate('/join?token=' + pending, { replace: true })
+    }
+  }, [user?.id])
+
   useEffect(() => {
     if (showSlides || splashDone) return
     sessionStorage.setItem('fc_logo_splash_done', '1')
@@ -100,7 +113,6 @@ function AppShell() {
     <>
       {showSlides && !isLanding && <WelcomeSlides onDone={handleOnboardingDone} />}
       {!showSlides && !splashDone && !isLanding && <Splash fading={splashFading} />}
-      {!showMemberOnboarding && !isLanding && needsSelector && <FamilySelector />}
       {showMemberOnboarding && <MemberOnboarding onDone={handleMemberOnboardingDone} />}
       <InstallPrompt />
       <Routes>
@@ -124,7 +136,8 @@ function AppShell() {
         <Route path="/mas"         element={<P><More /></P>} />
         <Route path="/gastos"      element={<P><Expenses /></P>} />
         <Route path="/directorio"  element={<P><Directory /></P>} />
-        <Route path="/join"        element={<JoinFamily />} />
+        <Route path="/join"          element={<JoinFamily />} />
+        <Route path="/family-select" element={<FamilySelector />} />
         <Route path="/permisos"    element={<P><Permissions /></P>} />
         <Route path="/roles"       element={<P><FamilyRoles /></P>} />
         <Route path="/pricing"     element={<Pricing />} />
