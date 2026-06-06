@@ -169,17 +169,24 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
   const [input,   setInput]   = useState('')
   const [loading, setLoading] = useState(false)
 
-  const bottomRef     = useRef(null)
-  const inputRef      = useRef(null)
-  const proactiveRef  = useRef(false)
+  const bottomRef          = useRef(null)
+  const inputRef           = useRef(null)
+  const proactiveRef       = useRef(false)
+  const onExternalCloseRef = useRef(onExternalClose)
+  useEffect(() => { onExternalCloseRef.current = onExternalClose }, [onExternalClose])
+
   const cfg = companion ? COMPANIONS[companion] : null
   const { pathname } = useLocation()
 
-  // Close chat on navigation
-  useEffect(() => { setOpen(false) }, [pathname])
+  // Close chat on navigation — also sync external state so re-tapping works
+  useEffect(() => { setOpen(false); onExternalCloseRef.current?.() }, [pathname])
 
   // Open when triggered externally (e.g. nav bar 🐾 button)
-  useEffect(() => { if (externalOpen) setOpen(true) }, [externalOpen])
+  // If no companion chosen yet, show the selection card instead
+  useEffect(() => {
+    if (!externalOpen) return
+    if (!companion) { setSelecting(true) } else { setOpen(true) }
+  }, [externalOpen, companion])
 
   // Proactive trigger: open after 6 s on dashboard, once per session per user
   // Detects anomalies (low stock, no activity, upcoming appointment) before showing message

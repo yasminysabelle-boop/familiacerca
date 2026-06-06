@@ -10,8 +10,6 @@ import { supabase } from '../lib/supabase'
 import { isLocationEnabled, setLocationEnabled } from '../lib/gps'
 import Layout from '../components/Layout'
 import { ChevronRight, LogOut } from '../components/Icons'
-import { useHospitalMode } from '../contexts/HospitalModeContext'
-import HospitalModeModal from '../components/hospital/HospitalModeModal'
 
 const PLAN_META = {
   free:      { label: 'Gratis',        color: '#9CA3AF', icon: '🌱' },
@@ -94,8 +92,6 @@ export default function Settings() {
   const isAdmin = memberRole === null && ownerId === user?.id
   const { sub, isPaid, isTrialing, trialExpired, daysLeft } = useSubscription()
   const { dark, toggleDark } = useDarkMode()
-  const { isHospitalMode, hospitalMode } = useHospitalMode()
-  const [showHospitalModal, setShowHospitalModal] = useState(false)
   const { permission, subscribed, supported, subscribeError, requestAndSubscribe, resubscribe } = usePushNotifications()
   const navigate = useNavigate()
   const [portalLoading, setPortalLoading] = useState(false)
@@ -475,51 +471,6 @@ export default function Settings() {
           </div>
         )}
 
-        {/* Hospital Mode card */}
-        <div style={{
-          borderRadius: 20, overflow: 'hidden', marginBottom: 12,
-          border: isHospitalMode ? '1.5px solid #B91C1C' : '1px solid #EDE5D8',
-          background: isHospitalMode
-            ? 'linear-gradient(135deg, #FFF5F5, #FFF0F0)'
-            : 'white',
-        }}>
-          <button
-            onClick={() => setShowHospitalModal(true)}
-            style={{
-              width: '100%', display: 'flex', alignItems: 'center', gap: 12,
-              padding: '16px', background: 'none', border: 'none',
-              cursor: 'pointer', textAlign: 'left',
-            }}
-          >
-            <div style={{
-              width: 44, height: 44, borderRadius: 12, flexShrink: 0,
-              background: isHospitalMode ? 'rgba(185,28,28,0.12)' : 'rgba(185,28,28,0.08)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 22,
-            }}>
-              🏥
-            </div>
-            <div style={{ flex: 1 }}>
-              <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: isHospitalMode ? '#B91C1C' : '#1A1A1A' }}>
-                Modo Hospital
-              </p>
-              <p style={{ margin: '2px 0 0', fontSize: 12, color: isHospitalMode ? '#DC2626' : '#9CA3AF' }}>
-                {isHospitalMode
-                  ? `Activo · ${hospitalMode?.hospital_name ?? 'En curso'}`
-                  : 'Activa cuando el paciente esté hospitalizado'}
-              </p>
-            </div>
-            <div style={{
-              padding: '4px 10px', borderRadius: 20,
-              background: isHospitalMode ? '#B91C1C' : '#F3F4F6',
-              color: isHospitalMode ? 'white' : '#9CA3AF',
-              fontSize: 11, fontWeight: 700, flexShrink: 0,
-            }}>
-              {isHospitalMode ? 'ACTIVO' : 'Inactivo'}
-            </div>
-          </button>
-        </div>
-        <HospitalModeModal open={showHospitalModal} onClose={() => setShowHospitalModal(false)} />
 
         {/* More options */}
         <div style={{ background: 'white', borderRadius: 20, border: '1px solid #EDE5D8', overflow: 'hidden', marginBottom: 12 }}>
