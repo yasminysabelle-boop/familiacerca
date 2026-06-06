@@ -2890,7 +2890,7 @@ export default function Dashboard() {
         onTouchStart={pullStart}
         onTouchMove={pullMove}
         onTouchEnd={pullEnd}
-        style={{ background: '#F5F0E8', minHeight: '100vh', paddingBottom: 80, overflowY: 'auto', maxWidth: 480, margin: '0 auto' }}
+        style={{ background: '#F5F0E8', minHeight: '100vh', paddingBottom: 80, overflowY: 'auto', width: '100%', maxWidth: '100%', overflowX: 'hidden', boxSizing: 'border-box', margin: '0 auto' }}
       >
         <PullIndicator />
         <style>{`
@@ -2916,7 +2916,7 @@ export default function Dashboard() {
             </div>
           </div>
           {/* Center: greeting */}
-          <div style={{ flex: 1, textAlign: 'center', padding: '0 8px' }}>
+          <div style={{ flex: 1, textAlign: 'center', padding: '0 8px', overflow: 'hidden', minWidth: 0 }}>
             <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#1E2D26', lineHeight: 1.3 }}>{timeIcon} {timeGreeting}, {firstName}</p>
             <p style={{ margin: 0, fontSize: 12, color: '#6F7A72' }}>Gracias por cuidar con amor</p>
           </div>
@@ -2960,7 +2960,7 @@ export default function Dashboard() {
                 display: 'flex', minHeight: 240,
               }}>
                 {/* Photo — left 50% */}
-                <div style={{ position: 'relative', width: '50%', flexShrink: 0, alignSelf: 'stretch', minHeight: 240 }}>
+                <div style={{ position: 'relative', width: '42%', flexShrink: 0, alignSelf: 'stretch', minHeight: 240 }}>
                   {heroPhoto ? (
                     <img src={heroPhoto} alt="" style={{
                       position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
@@ -2987,7 +2987,7 @@ export default function Dashboard() {
                   }}>🤍</div>
                 </div>
                 {/* Right side info */}
-                <div style={{ flex: 1, padding: '16px 14px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minWidth: 0, position: 'relative', overflow: 'hidden' }}>
+                <div style={{ flex: 1, width: '58%', padding: '16px 14px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minWidth: 0, position: 'relative', overflow: 'hidden' }}>
                   {/* Organic leaf decorations */}
                   <svg style={{ position: 'absolute', top: 0, right: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 0 }} viewBox="0 0 200 220" preserveAspectRatio="xMaxYMid meet">
                     <ellipse cx="185" cy="35" rx="65" ry="28" fill="rgba(61,107,84,0.05)" transform="rotate(-22 185 35)" />
@@ -3004,7 +3004,7 @@ export default function Dashboard() {
                     </button>
                   </div>
                   <div style={{ position: 'relative', zIndex: 1 }}>
-                    <p style={{ margin: '28px 0 0', fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 24, fontWeight: 700, color: '#1E2D26', lineHeight: 1.2 }}>
+                    <p style={{ margin: '28px 0 0', fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 24, fontWeight: 700, color: '#1E2D26', lineHeight: 1.2, wordBreak: 'break-word', overflow: 'hidden' }}>
                       {patientProfile?.nombre_completo || profile?.name || 'Agregar paciente'}
                     </p>
                     {age && (
@@ -3086,11 +3086,12 @@ export default function Dashboard() {
         <div style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 12, animation: 'fadeInUp 0.4s ease 0.1s both' }}>
 
           {/* Medicamentos + Rutinas — two white cards */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, width: '100%', boxSizing: 'border-box' }}>
             <button onClick={() => navigate('/medications')} style={{
               borderRadius: 16, border: 'none', background: 'white', padding: '16px',
               cursor: 'pointer', textAlign: 'left', WebkitTapHighlightColor: 'transparent',
               boxShadow: '0 2px 16px rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column',
+              boxSizing: 'border-box', width: '100%', minWidth: 0,
             }}>
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 8 }}>
                 <span style={{ fontSize: 36 }}>💊</span>
@@ -3127,6 +3128,7 @@ export default function Dashboard() {
               borderRadius: 16, border: 'none', background: 'white', padding: '16px',
               cursor: 'pointer', textAlign: 'left', WebkitTapHighlightColor: 'transparent',
               boxShadow: '0 2px 16px rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column',
+              boxSizing: 'border-box', width: '100%', minWidth: 0,
             }}>
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 8 }}>
                 <span style={{ fontSize: 36 }}>✅</span>
@@ -3156,7 +3158,7 @@ export default function Dashboard() {
           <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
 
             {/* Actividad reciente */}
-            <div style={{ flex: '0 0 calc(55% - 5px)', minWidth: 0 }}>
+            <div style={{ flex: '0 0 calc(55% - 5px)', minWidth: 0, overflow: 'hidden' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
                 <p style={{ margin: 0, fontSize: 15, fontWeight: 600, color: '#1E2D26' }}>Actividad reciente</p>
                 <button onClick={() => navigate('/registros')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: '#D6A13B', fontWeight: 600, padding: 0 }}>Ver todas ›</button>
@@ -3188,7 +3190,7 @@ export default function Dashboard() {
             </div>
 
             {/* Más herramientas — 3-col grid */}
-            <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ flex: '0 0 calc(42% - 5px)', minWidth: 0, overflow: 'hidden' }}>
               <p style={{ margin: '0 0 12px', fontSize: 15, fontWeight: 600, color: '#1E2D26' }}>Más herramientas</p>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
                 {[

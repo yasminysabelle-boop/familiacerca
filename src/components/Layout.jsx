@@ -238,20 +238,20 @@ export default function Layout({ children }) {
           display: 'flex', alignItems: 'center',
         }}>
           {/* Inicio */}
-          <Link to="/dashboard" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, textDecoration: 'none' }}>
+          <Link to="/dashboard" style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, textDecoration: 'none' }}>
             <span style={{ fontSize: 22, lineHeight: 1 }}>🏠</span>
-            <span style={{ fontSize: 9, fontWeight: 700, color: location.pathname === '/dashboard' ? '#3D6B54' : '#9FAF9A' }}>Inicio</span>
+            <span style={{ fontSize: 10, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: location.pathname === '/dashboard' ? '#3D6B54' : '#9FAF9A' }}>Inicio</span>
           </Link>
 
           {/* Chat */}
-          <Link to="/chat" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, textDecoration: 'none' }}>
+          <Link to="/chat" style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, textDecoration: 'none' }}>
             <div style={{ position: 'relative', lineHeight: 1 }}>
               <span style={{ fontSize: 22 }}>💬</span>
               {familyBadge > 0 && (
                 <span style={{ position: 'absolute', top: 0, right: -2, width: 7, height: 7, borderRadius: '50%', background: '#D6A13B', display: 'block' }} />
               )}
             </div>
-            <span style={{ fontSize: 9, fontWeight: 700, color: location.pathname === '/chat' ? '#3D6B54' : '#9FAF9A' }}>Chat</span>
+            <span style={{ fontSize: 10, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: location.pathname === '/chat' ? '#3D6B54' : '#9FAF9A' }}>Chat</span>
           </Link>
 
           {/* Center + */}
@@ -267,15 +267,15 @@ export default function Layout({ children }) {
           </div>
 
           {/* Milo IA */}
-          <Link to="/memorias" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, textDecoration: 'none' }}>
+          <Link to="/memorias" style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, textDecoration: 'none' }}>
             <span style={{ fontSize: 22, lineHeight: 1 }}>🤖</span>
-            <span style={{ fontSize: 9, fontWeight: 700, color: location.pathname === '/memorias' ? '#3D6B54' : '#9FAF9A' }}>Milo IA</span>
+            <span style={{ fontSize: 10, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: location.pathname === '/memorias' ? '#3D6B54' : '#9FAF9A' }}>Milo IA</span>
           </Link>
 
           {/* Mi cuenta */}
-          <Link to="/ajustes" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, textDecoration: 'none' }}>
+          <Link to="/ajustes" style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, textDecoration: 'none' }}>
             <span style={{ fontSize: 22, lineHeight: 1 }}>👤</span>
-            <span style={{ fontSize: 9, fontWeight: 700, color: location.pathname === '/ajustes' ? '#3D6B54' : '#9FAF9A' }}>Mi cuenta</span>
+            <span style={{ fontSize: 10, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: location.pathname === '/ajustes' ? '#3D6B54' : '#9FAF9A' }}>Mi cuenta</span>
           </Link>
         </nav>
       )}
