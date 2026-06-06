@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
@@ -54,6 +55,9 @@ export default function Layout({ children }) {
   const isHome      = location.pathname === '/dashboard'
   const isVideoCall = location.pathname === '/videollamada'
   const isSecondary = !PRIMARY_PAGES.has(location.pathname) && !isVideoCall
+
+  const [showCompanion,   setShowCompanion]   = useState(false)
+  const [showQuickActions, setShowQuickActions] = useState(false)
 
   const bg      = dark ? '#0F1A12' : '#F0EDE6'
   const navBg   = dark ? 'rgba(28,18,8,0.97)' : '#2D4A1E'
@@ -192,7 +196,7 @@ export default function Layout({ children }) {
         </footer>
       </main>
 
-      <CompanionChat />
+      <CompanionChat externalOpen={showCompanion} onExternalClose={() => setShowCompanion(false)} />
 
       <FamilySelector />
       <Paywall />
@@ -228,6 +232,7 @@ export default function Layout({ children }) {
 
       {/* Bottom navigation — 5-item white nav */}
       {isVideoCall || isSecondary || isHospitalMode ? null : (
+        <>
         <nav style={{
           position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100,
           height: 64,
@@ -256,21 +261,22 @@ export default function Layout({ children }) {
 
           {/* Center + */}
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Link to="/cuidado" style={{
+            <button onClick={() => setShowQuickActions(true)} style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               width: 52, height: 52, borderRadius: '50%',
               background: '#2D4A1E', boxShadow: '0 2px 12px rgba(45,74,30,0.35)',
-              marginTop: -20, textDecoration: 'none', flexShrink: 0,
+              marginTop: -20, border: 'none', cursor: 'pointer', flexShrink: 0,
+              WebkitTapHighlightColor: 'transparent',
             }}>
               <span style={{ fontSize: 26, color: 'white', lineHeight: 1, fontWeight: 300 }}>+</span>
-            </Link>
+            </button>
           </div>
 
           {/* Milo IA */}
-          <Link to="/diario-medico" style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, textDecoration: 'none' }}>
+          <button onClick={() => setShowCompanion(true)} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, background: 'none', border: 'none', cursor: 'pointer', padding: 0, WebkitTapHighlightColor: 'transparent' }}>
             <span style={{ fontSize: 22, lineHeight: 1 }}>🐾</span>
-            <span style={{ fontSize: 10, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: location.pathname === '/diario-medico' ? '#3D6B54' : '#9FAF9A' }}>Milo & Luna</span>
-          </Link>
+            <span style={{ fontSize: 10, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: '#9FAF9A' }}>Milo & Luna</span>
+          </button>
 
           {/* Mi cuenta */}
           <Link to="/ajustes" style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, textDecoration: 'none' }}>
@@ -278,6 +284,50 @@ export default function Layout({ children }) {
             <span style={{ fontSize: 10, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: location.pathname === '/ajustes' ? '#3D6B54' : '#9FAF9A' }}>Mi cuenta</span>
           </Link>
         </nav>
+
+        {/* Quick-actions bottom sheet */}
+        {showQuickActions && (
+          <>
+            <div
+              onClick={() => setShowQuickActions(false)}
+              style={{ position: 'fixed', inset: 0, zIndex: 120, background: 'rgba(0,0,0,0.3)' }}
+            />
+            <div style={{
+              position: 'fixed', bottom: 64, left: 0, right: 0, zIndex: 130,
+              background: 'white', borderRadius: '20px 20px 0 0',
+              padding: '16px 16px 24px',
+              boxShadow: '0 -4px 24px rgba(0,0,0,0.15)',
+            }}>
+              <div style={{ width: 36, height: 4, borderRadius: 2, background: '#E5E5E5', margin: '0 auto 14px' }} />
+              <p style={{ margin: '0 0 12px', fontSize: 14, fontWeight: 700, color: '#1E2D26', textAlign: 'center' }}>Acción rápida</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {[
+                  { emoji: '💊', label: 'Registrar medicamento', path: '/medications' },
+                  { emoji: '✅', label: 'Registrar rutina',       path: '/cuidado' },
+                  { emoji: '📝', label: 'Nueva nota',             path: '/notas' },
+                  { emoji: '📸', label: 'Subir foto',             path: '/album' },
+                  { emoji: '🎤', label: 'Nota de voz',            path: '/chat' },
+                ].map(({ emoji, label, path }) => (
+                  <button
+                    key={path}
+                    onClick={() => { setShowQuickActions(false); navigate(path) }}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 12,
+                      padding: '11px 14px', borderRadius: 12,
+                      background: '#F8F6F2', border: 'none', cursor: 'pointer',
+                      textAlign: 'left', width: '100%',
+                      WebkitTapHighlightColor: 'transparent',
+                    }}
+                  >
+                    <span style={{ fontSize: 20 }}>{emoji}</span>
+                    <span style={{ fontSize: 14, fontWeight: 500, color: '#1E2D26' }}>{label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+        </>
       )}
     </div>
   )

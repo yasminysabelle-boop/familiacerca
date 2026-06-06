@@ -152,7 +152,7 @@ async function buildProactiveMessage(chosen, ownerId, patientName) {
 
 // bottomOffset: px from bottom of viewport for the floating button.
 // Pass 24 on Landing (no nav bar), use default 140 inside Layout (above FAB).
-export default function CompanionChat({ bottomOffset = 140 }) {
+export default function CompanionChat({ bottomOffset = 140, externalOpen = false, onExternalClose }) {
   const { ownerId, profile } = useFamily()
   const [companion,  setCompanion]  = useState(() => {
     // migrate from old key
@@ -177,6 +177,9 @@ export default function CompanionChat({ bottomOffset = 140 }) {
 
   // Close chat on navigation
   useEffect(() => { setOpen(false) }, [pathname])
+
+  // Open when triggered externally (e.g. nav bar 🐾 button)
+  useEffect(() => { if (externalOpen) setOpen(true) }, [externalOpen])
 
   // Proactive trigger: open after 6 s on dashboard, once per session per user
   // Detects anomalies (low stock, no activity, upcoming appointment) before showing message
@@ -346,6 +349,7 @@ export default function CompanionChat({ bottomOffset = 140 }) {
             <button
               onClick={() => {
                 setOpen(false)
+                onExternalClose?.()
                 setMessages(companion ? [{ role: 'companion', text: GREETINGS[companion] }] : [])
                 localStorage.removeItem(LS_HISTORY_KEY)
               }}
