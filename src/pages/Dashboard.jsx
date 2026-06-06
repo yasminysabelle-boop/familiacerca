@@ -1910,23 +1910,23 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (!ownerId) return
-    supabase
-      .from('family_members')
-      .select('member_user_id, role, user_profiles(full_name)')
-      .eq('user_id', ownerId)
-      .then(({ data }) => {
-        const members = [
-          { id: user?.id, full_name: fullName || firstName || '?', role: 'admin' },
-          ...(data ?? []).map(m => ({
-            id: m.member_user_id,
-            full_name: m.user_profiles?.full_name ?? '?',
-            role: m.role ?? 'familiar',
-          })),
-        ]
-        setFamilyMembers(members)
-        setFamilyCount(members.length)
-        setFamilyNames(members.map(m => m.full_name.split(' ')[0]))
-      })
+    Promise.all([
+      supabase.from('user_profiles').select('last_seen').eq('id', user?.id).maybeSingle(),
+      supabase.from('family_members').select('member_user_id, role, user_profiles(full_name, last_seen)').eq('user_id', ownerId),
+    ]).then(([{ data: ownerProfile }, { data: membersData }]) => {
+      const members = [
+        { id: user?.id, full_name: fullName || firstName || '?', role: 'admin', last_seen: ownerProfile?.last_seen ?? null },
+        ...(membersData ?? []).map(m => ({
+          id: m.member_user_id,
+          full_name: m.user_profiles?.full_name ?? '?',
+          role: m.role ?? 'familiar',
+          last_seen: m.user_profiles?.last_seen ?? null,
+        })),
+      ]
+      setFamilyMembers(members)
+      setFamilyCount(members.length)
+      setFamilyNames(members.map(m => m.full_name.split(' ')[0]))
+    })
   }, [ownerId])
 
   useEffect(() => {
@@ -3663,6 +3663,19 @@ export default function Dashboard() {
                 const roleLabel = isAdm ? 'Admin' : isCuid ? 'Cuidador' : 'Familiar'
                 const roleColor = isAdm ? '#15803D' : isCuid ? '#1D4ED8' : '#D97706'
                 const roleBg = isAdm ? '#DCFCE7' : isCuid ? '#DBEAFE' : '#FEF3C7'
+                const presence = (() => {
+                  if (!m.last_seen) return { dot: '⚫', label: 'Sin actividad', color: '#9CA3AF' }
+                  const diffMs = Date.now() - new Date(m.last_seen).getTime()
+                  const diffMin = diffMs / 60000
+                  const diffH = diffMs / 3600000
+                  if (diffMin <= 5) return { dot: '🟢', label: 'En línea', color: '#15803D' }
+                  if (diffH <= 24) {
+                    const label = diffH < 1 ? `Hace ${Math.round(diffMin)}min` : `Hace ${Math.round(diffH)}h`
+                    return { dot: '🟡', label, color: '#D97706' }
+                  }
+                  const diffDays = Math.floor(diffH / 24)
+                  return { dot: '⚫', label: diffDays <= 1 ? 'Hace 1 día' : `Hace ${diffDays} días`, color: '#9CA3AF' }
+                })()
                 return (
                   <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                     <div style={{
@@ -3673,8 +3686,11 @@ export default function Dashboard() {
                     }}>
                       {m.full_name?.charAt(0).toUpperCase()}
                     </div>
-                    <p style={{ flex: 1, margin: 0, fontSize: 14, fontWeight: 500, color: '#1E2D26' }}>{m.full_name}</p>
-                    <span style={{ fontSize: 11, fontWeight: 600, color: roleColor, background: roleBg, borderRadius: 20, padding: '3px 10px' }}>
+                    <div style={{ flex: 1 }}>
+                      <p style={{ margin: 0, fontSize: 14, fontWeight: 500, color: '#1E2D26' }}>{m.full_name}</p>
+                      <p style={{ margin: '2px 0 0', fontSize: 11, color: presence.color }}>{presence.dot} {presence.label}</p>
+                    </div>
+                    <span style={{ fontSize: 11, fontWeight: 600, color: roleColor, background: roleBg, borderRadius: 20, padding: '3px 10px', flexShrink: 0 }}>
                       {roleLabel}
                     </span>
                   </div>
