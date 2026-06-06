@@ -3030,10 +3030,10 @@ export default function Dashboard() {
                     {(patientProfile?.nombre_completo || profile?.name)?.charAt(0) ?? '👤'}
                   </div>
                 )}
-                {/* Deep bottom gradient — text readability over photo */}
+                {/* Bottom gradient — text readability without over-darkening the photo */}
                 <div style={{
                   position: 'absolute', inset: 0,
-                  background: 'linear-gradient(to top, rgba(5,14,9,0.94) 0%, rgba(5,14,9,0.58) 38%, rgba(5,14,9,0.08) 65%, transparent 100%)',
+                  background: 'linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.44) 42%, rgba(0,0,0,0.10) 68%, transparent 100%)',
                   pointerEvents: 'none',
                 }} />
                 {/* Content overlaid at bottom */}
@@ -3056,19 +3056,25 @@ export default function Dashboard() {
                     {statusEmoji} {statusText}
                   </p>
                   {familyCount > 0 && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginTop: 10 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10 }}>
                       <div style={{ display: 'flex' }}>
                         {Array.from({ length: avatarCount }).map((_, i) => (
                           <div key={i} style={{
-                            width: 24, height: 24, borderRadius: '50%',
+                            width: 28, height: 28, borderRadius: '50%',
                             background: AVATAR_COLORS[i % AVATAR_COLORS.length],
-                            border: '2px solid rgba(255,255,255,0.32)',
-                            marginLeft: i > 0 ? -8 : 0, flexShrink: 0,
-                          }} />
+                            border: '2px solid rgba(255,255,255,0.5)',
+                            marginLeft: i > 0 ? -10 : 0, flexShrink: 0,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            fontSize: 11, fontWeight: 700, color: 'white',
+                          }}>
+                            {(familyNames[i] ?? '?').charAt(0).toUpperCase()}
+                          </div>
                         ))}
                       </div>
-                      <p style={{ margin: 0, fontSize: 11, color: 'rgba(255,255,255,0.72)', fontWeight: 500 }}>
-                        {familyCount} familiar{familyCount !== 1 ? 'es' : ''} colaborando
+                      <p style={{ margin: 0, fontSize: 11, color: 'rgba(255,255,255,0.75)', fontWeight: 500 }}>
+                        {familyCount > 4
+                          ? `+${familyCount - 4} más cuidando`
+                          : `${familyCount} familiar${familyCount !== 1 ? 'es' : ''} colaborando`}
                       </p>
                     </div>
                   )}
@@ -3124,7 +3130,7 @@ export default function Dashboard() {
               <p style={{ margin: '0 0 3px', fontSize: 15, fontWeight: 700, color: '#1E2D26', lineHeight: 1.2 }}>Medicamentos</p>
               <p style={{ margin: '0 0 8px', fontSize: 12, fontWeight: 500, color: (_isRetrasado || pendingCount > 0) ? '#E45B4C' : '#22C55E', lineHeight: 1.3 }}>
                 {_isRetrasado
-                  ? '⚠️ Requiere atención'
+                  ? (nextPendingMed ? `⚠️ ${nextPendingMed.medName} pendiente` : '⚠️ Requiere atención')
                   : pendingCount > 0
                     ? `${pendingCount} pendiente${pendingCount !== 1 ? 's' : ''}`
                     : confirmedTodayCount > 0
@@ -3179,9 +3185,9 @@ export default function Dashboard() {
                           <span key={key} style={{ fontSize: 14, opacity: careLogsToday[key] ? 1 : 0.22 }}>{icon}</span>
                         ))}
                       </div>
-                      <div style={{ height: 3, borderRadius: 2, background: '#F0EDE6', overflow: 'hidden' }}>
+                      <div style={{ height: 5, borderRadius: 3, background: '#F0EDE6', overflow: 'hidden' }}>
                         <div style={{
-                          height: '100%', borderRadius: 2,
+                          height: '100%', borderRadius: 3,
                           background: pct === 1 ? '#22C55E' : pct > 0.5 ? '#4A7C59' : '#D6A13B',
                           width: `${pct * 100}%`, transition: 'width 0.4s ease',
                         }} />
@@ -3216,7 +3222,7 @@ export default function Dashboard() {
                     <div key={evt.id ?? i} onClick={actRoute ? () => navigate(actRoute) : undefined} style={{
                       display: 'flex', alignItems: 'flex-start', gap: 12,
                       cursor: actRoute ? 'pointer' : 'default',
-                      padding: '11px 0',
+                      padding: '14px 0',
                       borderBottom: isLast ? 'none' : '1px solid #F5F0E8',
                     }}>
                       <div style={{ width: 34, height: 34, borderRadius: '50%', background: meta?.bg ?? '#F5F0E8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, flexShrink: 0, marginTop: 1 }}>{meta?.icon ?? '📋'}</div>

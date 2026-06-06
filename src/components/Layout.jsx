@@ -205,7 +205,7 @@ export default function Layout({ children }) {
         </footer>
       </main>
 
-      <CompanionChat externalOpen={showCompanion} onExternalClose={() => setShowCompanion(false)} />
+      <CompanionChat externalOpen={showCompanion} onExternalClose={() => setShowCompanion(false)} bottomOffset={80} />
 
       <Paywall />
 
