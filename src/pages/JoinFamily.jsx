@@ -136,9 +136,15 @@ export default function JoinFamily() {
       .maybeSingle()
 
     if (error || !data) {
+      localStorage.removeItem('pendingInviteToken')
       setInvError('No encontramos esta invitación. Puede que el enlace sea incorrecto.')
       setInvLoading(false)
       return
+    }
+
+    // Clear token for already-terminal states (expired or already used)
+    if (data.status !== 'pending' || new Date(data.expires_at) < new Date()) {
+      localStorage.removeItem('pendingInviteToken')
     }
 
     setInvitation(data)
@@ -174,6 +180,7 @@ export default function JoinFamily() {
     }
 
     if (result === 'invalid') {
+      localStorage.removeItem('pendingInviteToken')
       setAcceptError('Esta invitación ya no es válida o ha expirado.')
       setAccepting(false)
       return

@@ -96,6 +96,7 @@ function AppShell() {
     const pending = localStorage.getItem('pendingInviteToken')
     if (pending && location.pathname !== '/join') {
       navigate('/join?token=' + pending, { replace: true })
+      localStorage.removeItem('pendingInviteToken')
     }
   }, [user?.id])
 
