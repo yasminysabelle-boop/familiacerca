@@ -2580,7 +2580,6 @@ export default function Dashboard() {
       address: sosLocation?.address ?? null,
     })
     // Send push notification to ALL family members via edge function
-    console.log('[SOS] triggerSOS: ownerId=', ownerId, '| user.id=', user?.id, '| profile.user_id=', profile?.user_id)
     if (ownerId) {
       const payload = {
         ownerId,
@@ -3014,8 +3013,6 @@ export default function Dashboard() {
             || patientProfile?.birthdate
             || null
           const age = calcAge(dobField)
-          console.log('[PatientProfile]', patientProfile, '| heroPhoto:', heroPhoto, '| dob:', dobField, '| age:', age)
-          console.log('[AGE DEBUG] keys:', patientProfile ? Object.keys(patientProfile) : 'null', '| fecha_nacimiento:', patientProfile?.fecha_nacimiento, '| birth_date:', patientProfile?.birth_date, '| dob:', patientProfile?.dob)
           const statusEmoji = isCritical ? '🔴' : isPending ? '🟡' : '🟢'
           const statusText  = isCritical ? 'Requiere atención urgente' : isPending ? 'Requiere atención hoy' : 'Todo bajo control'
           const AVATAR_COLORS = ['#4A7C59', '#C9882A', '#7C3AED', '#1D4ED8', '#E45B4C']

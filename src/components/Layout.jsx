@@ -262,7 +262,7 @@ export default function Layout({ children }) {
 
           {/* Center + */}
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <button onClick={() => { console.log('quick actions clicked'); setShowQuickActions(true) }} style={{
+            <button onClick={() => setShowQuickActions(true)} style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               width: 52, height: 52, borderRadius: '50%',
               background: '#2D4A1E', boxShadow: '0 2px 12px rgba(45,74,30,0.35)',
@@ -274,7 +274,7 @@ export default function Layout({ children }) {
           </div>
 
           {/* Milo IA */}
-          <button onClick={() => { console.log('companion triggered'); setShowCompanion(true) }} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, background: 'none', border: 'none', cursor: 'pointer', padding: 0, WebkitTapHighlightColor: 'transparent' }}>
+          <button onClick={() => setShowCompanion(true)} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, background: 'none', border: 'none', cursor: 'pointer', padding: 0, WebkitTapHighlightColor: 'transparent' }}>
             <span style={{ fontSize: 22, lineHeight: 1 }}>🐾</span>
             <span style={{ fontSize: 10, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: '#9FAF9A' }}>Milo & Luna</span>
           </button>

@@ -1,4 +1,4 @@
-import { Navigate, useLocation } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import OnboardingFlow from '../pages/OnboardingFlow'
@@ -80,8 +80,7 @@ function PageSkeleton() {
 
 export default function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
-  const { profile, loading: familyLoading, needsSelector } = useFamily()
-  const { pathname } = useLocation()
+  const { profile, loading: familyLoading } = useFamily()
 
   if (loading || (user && familyLoading)) return <PageSkeleton />
   if (!user) return <Navigate to="/login" replace />

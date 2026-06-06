@@ -205,9 +205,9 @@ export default function Settings() {
             </p>
             {families.map((fam, i) => {
               const isActive = fam.ownerId === activeOwnerId
-              const roleLabel = fam.role === null ? 'Admin' : fam.role === 'cuidador' ? 'Cuidador' : 'Familiar'
-              const roleColor = fam.role === null ? '#3D6B54' : fam.role === 'cuidador' ? '#1D4ED8' : '#7C3AED'
-              const roleBg   = fam.role === null ? '#E8F5EE' : fam.role === 'cuidador' ? '#EFF6FF' : '#F5F3FF'
+              const roleLabel = fam.role === null ? 'Administrador' : fam.role === 'cuidador' ? 'Cuidador' : 'Familiar'
+              const roleColor = fam.role === null ? '#3D6B54' : fam.role === 'cuidador' ? '#1D4ED8' : '#D97706'
+              const roleBg   = fam.role === null ? '#E8F5EE' : fam.role === 'cuidador' ? '#EFF6FF' : '#FEF3C7'
               const initial  = (fam.patientName ?? 'F').charAt(0).toUpperCase()
               return (
                 <button
