@@ -46,8 +46,10 @@ const PRIMARY_PAGES = new Set(['/dashboard', '/familia', '/ajustes', '/planes', 
 
 
 export default function Layout({ children }) {
-  const { inactivityWarning } = useAuth()
+  const { inactivityWarning, user } = useAuth()
   const { profile } = useFamily()
+  const userAvatar = user?.user_metadata?.avatar_url ?? null
+  const userInitial = (user?.user_metadata?.full_name ?? user?.email ?? '?').charAt(0).toUpperCase()
   const { dark } = useDarkMode()
   const { isHospitalMode, hospitalMode } = useHospitalMode() ?? {}
   const { homeBadge, familyBadge } = useBadgeCounts()
@@ -140,7 +142,13 @@ export default function Layout({ children }) {
           </div>
         ) : (
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <Logo size={28} />
+            <img
+              src="/logo.png"
+              width={32} height={32}
+              alt="FC"
+              style={{ borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
+              onError={e => { e.currentTarget.style.display = 'none' }}
+            />
             <h1 style={{
               fontSize: 15, fontWeight: 700, color: 'white',
               fontFamily: 'Georgia, serif', margin: 0,
@@ -154,19 +162,20 @@ export default function Layout({ children }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
           <FamilySwitcher />
           <Link to="/ajustes" aria-label="Ir a configuración" style={{ flexShrink: 0, lineHeight: 0 }}>
-            {profile?.photo_url ? (
+            {userAvatar ? (
               <img
-                src={profile.photo_url} alt={profile.name}
+                src={userAvatar} alt="Mi cuenta"
                 style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover',
                   border: '2px solid rgba(255,255,255,0.3)' }}
               />
             ) : (
               <div style={{
                 width: 32, height: 32, borderRadius: '50%',
-                background: 'rgba(255,255,255,0.15)', border: '2px solid rgba(255,255,255,0.25)',
+                background: 'rgba(255,255,255,0.18)', border: '2px solid rgba(255,255,255,0.25)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 13, fontWeight: 700, color: 'white', fontFamily: 'Inter, system-ui, sans-serif',
               }}>
-                <User size={16} color="white" strokeWidth={1.5} />
+                {userInitial}
               </div>
             )}
           </Link>
