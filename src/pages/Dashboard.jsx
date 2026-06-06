@@ -2570,6 +2570,7 @@ export default function Dashboard() {
       address: sosLocation?.address ?? null,
     })
     // Send push notification to ALL family members via edge function
+    console.log('[SOS] triggerSOS: ownerId=', ownerId, '| user.id=', user?.id, '| profile.user_id=', profile?.user_id)
     if (ownerId) {
       const payload = {
         ownerId,

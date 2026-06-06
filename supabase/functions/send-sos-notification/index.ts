@@ -92,27 +92,52 @@ Deno.serve(async (req: Request) => {
     })
   }
 
-  console.log(`[send-sos-notification] SOS from user ${user.id} (${triggeredByName}), family owner: ${ownerId}`)
+  console.log(`[send-sos-notification] Triggered by user=${user.id} (${triggeredByName}), payload ownerId=${ownerId}`)
 
-  // Collect all family members (owner + invited members)
-  const { data: members } = await supabase
+  // Resolve the care group owner. FamilyContext on the client has an 8-second
+  // timeout fallback that sets ownerId = sender's own user.id when the DB is slow.
+  // A family member (e.g. Yasmin) would then pass her own id instead of the real
+  // owner (e.g. Armando), causing the member lookup to return nothing.
+  // Detect and correct that here before building the recipient list.
+  let resolvedOwnerId = ownerId
+  let { data: members } = await supabase
     .from('family_members')
     .select('member_user_id')
-    .eq('user_id', ownerId)
+    .eq('user_id', resolvedOwnerId)
+
+  console.log(`[send-sos-notification] Members for ownerId=${resolvedOwnerId}: ${members?.length ?? 0}`)
+
+  if ((!members || members.length === 0) && user.id !== resolvedOwnerId) {
+    // No members found for the declared owner AND sender is different — wrong ownerId.
+    // Look up the sender's family membership to get the correct care group owner.
+    const { data: senderMembership } = await supabase
+      .from('family_members')
+      .select('user_id')
+      .eq('member_user_id', user.id)
+      .maybeSingle()
+    if (senderMembership?.user_id) {
+      resolvedOwnerId = senderMembership.user_id
+      const { data: resolvedMembers } = await supabase
+        .from('family_members').select('member_user_id').eq('user_id', resolvedOwnerId)
+      members = resolvedMembers
+      console.log(`[send-sos-notification] Corrected owner via sender membership: ${resolvedOwnerId}, members: ${members?.length ?? 0}`)
+    }
+  }
 
   const allFamilyIds = [
-    ownerId,
+    resolvedOwnerId,
     ...(members?.map((m: { member_user_id: string }) => m.member_user_id).filter(Boolean) ?? []),
   ]
-  const recipientIds = Array.from(new Set([ownerId, ...allFamilyIds]))
-
-  console.log(`[send-sos-notification] ${recipientIds.length} recipients`)
+  const recipientIds = Array.from(new Set([resolvedOwnerId, ...allFamilyIds]))
+  console.log(`[send-sos-notification] ${recipientIds.length} recipients: ${JSON.stringify(recipientIds)}`)
 
   // ── Push notifications ────────────────────────────────────────────────────
   const { data: subs } = await supabase
     .from('push_subscriptions')
     .select('id, endpoint, p256dh, auth, user_id')
     .in('user_id', recipientIds)
+
+  console.log(`[send-sos-notification] push_subscriptions found: ${subs?.length ?? 0}`)
 
   const locationStr = address
     ? ` · 📍 ${address}`
@@ -196,6 +221,8 @@ Deno.serve(async (req: Request) => {
       const fcmTokens: string[] = (fcmProfiles ?? [])
         .map((p: { fcm_token: string | null }) => p.fcm_token)
         .filter(Boolean)
+
+      console.log(`[send-sos-notification] FCM tokens found: ${fcmTokens.length} for ${recipientIds.length} recipients`)
 
       if (fcmTokens.length > 0) {
         const fcmRes = await fetch('https://fcm.googleapis.com/fcm/send', {

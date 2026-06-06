@@ -108,7 +108,7 @@ Deno.serve(async (req: Request) => {
     }
 
     const userIds = [med.user_id, ...(members?.map((m: { member_user_id: string }) => m.member_user_id).filter(Boolean) ?? [])]
-    console.log(`[send-med-notifications] Notifying ${userIds.length} users for ${med.name}`)
+    console.log(`[send-med-notifications] Notifying ${userIds.length} users for ${med.name}: ${JSON.stringify(userIds)}`)
 
     // Get push subscriptions for all group members
     const { data: subs, error: subsError } = await supabase
@@ -121,7 +121,7 @@ Deno.serve(async (req: Request) => {
       continue
     }
 
-    console.log(`[send-med-notifications] Found ${subs?.length ?? 0} push subscriptions`)
+    console.log(`[send-med-notifications] Found ${subs?.length ?? 0} push subscriptions for ${userIds.length} users`)
 
     for (const sub of subs ?? []) {
       try {
