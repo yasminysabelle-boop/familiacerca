@@ -1795,6 +1795,8 @@ export default function Dashboard() {
   const [notifDismissed, setNotifDismissed] = useState(() => !!localStorage.getItem('notif_dismissed'))
   function dismissNotifBanner() { localStorage.setItem('notif_dismissed', '1'); setNotifDismissed(true) }
   const [familyNames, setFamilyNames] = useState([])
+  const [familyMembers, setFamilyMembers] = useState([])
+  const [showCollaborators, setShowCollaborators] = useState(false)
   // Tracks scheduled appointment reminder timeouts by event id to prevent duplicates
   const apptReminderTimeouts = useRef(new Map())
   const apptReminderScheduled = useRef(new Set())
@@ -1910,14 +1912,20 @@ export default function Dashboard() {
     if (!ownerId) return
     supabase
       .from('family_members')
-      .select('member_user_id, user_profiles(full_name)')
+      .select('member_user_id, role, user_profiles(full_name)')
       .eq('user_id', ownerId)
       .then(({ data }) => {
-        setFamilyCount((data?.length ?? 0) + 1)
-        const names = (data ?? [])
-          .map(m => m.user_profiles?.full_name?.split(' ')[0])
-          .filter(Boolean)
-        setFamilyNames([firstName, ...names])
+        const members = [
+          { id: user?.id, full_name: fullName || firstName || '?', role: 'admin' },
+          ...(data ?? []).map(m => ({
+            id: m.member_user_id,
+            full_name: m.user_profiles?.full_name ?? '?',
+            role: m.role ?? 'familiar',
+          })),
+        ]
+        setFamilyMembers(members)
+        setFamilyCount(members.length)
+        setFamilyNames(members.map(m => m.full_name.split(' ')[0]))
       })
   }, [ownerId])
 
@@ -3045,7 +3053,7 @@ export default function Dashboard() {
                 {/* Fallback gradient — always rendered, covered by photo when available */}
                 <div style={{
                   position: 'absolute', inset: 0,
-                  background: 'linear-gradient(160deg,#3D6B54 0%,#1E2D26 100%)',
+                  background: 'linear-gradient(160deg,#2D4A1E 0%,#3D6B54 100%)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: 56, color: 'rgba(255,255,255,0.22)',
                 }}>
@@ -3066,43 +3074,69 @@ export default function Dashboard() {
                 }} />
                 {/* Content overlaid at bottom */}
                 <div style={{ position: 'relative', zIndex: 1, padding: '0 16px 18px' }}>
+                  {/* 1. Patient name */}
                   <p style={{
                     margin: 0,
                     fontFamily: "'Cormorant Garamond', Georgia, serif",
-                    fontSize: 26, fontWeight: 700, color: 'white', lineHeight: 1.15,
+                    fontSize: 28, fontWeight: 700, color: 'white', lineHeight: 1.15,
                     textShadow: '0 1px 6px rgba(0,0,0,0.3)',
                   }}>
                     {patientProfile?.nombre_completo || profile?.name || 'Agregar paciente'}
                   </p>
-                  <p style={{ margin: '4px 0 0', fontSize: 12, color: 'rgba(255,255,255,0.68)', fontWeight: 400, lineHeight: 1.4 }}>
-                    {age ? `${age} años  ·  ` : ''}❤️ Tu cuidado junto a tu familia
-                  </p>
+                  {/* 2. Age */}
+                  {age && (
+                    <p style={{ margin: '3px 0 0', fontSize: 13, color: 'rgba(255,255,255,0.72)', fontWeight: 400 }}>
+                      {age} años
+                    </p>
+                  )}
+                  {/* 3. Status */}
                   <p style={{
                     margin: '6px 0 0', fontSize: 12, fontWeight: 600, lineHeight: 1.3,
                     color: isCritical ? '#FCA5A5' : isPending ? '#FCD34D' : '#86EFAC',
                   }}>
                     {statusEmoji} {statusText}
                   </p>
-                  {familyCount > 0 && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10 }}>
+                  {/* 4. Tagline */}
+                  <p style={{ margin: '4px 0 0', fontSize: 12, color: 'rgba(255,255,255,0.60)', fontWeight: 400, lineHeight: 1.4 }}>
+                    ❤️ Tu cuidado junto a tu familia
+                  </p>
+                  {/* 5 & 6. Collaborator avatars + count */}
+                  {familyMembers.length > 0 && (
+                    <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 3 }}>
                       <div style={{ display: 'flex' }}>
-                        {Array.from({ length: avatarCount }).map((_, i) => (
-                          <div key={i} style={{
-                            width: 28, height: 28, borderRadius: '50%',
-                            background: AVATAR_COLORS[i % AVATAR_COLORS.length],
-                            border: '2px solid rgba(255,255,255,0.5)',
-                            marginLeft: i > 0 ? -10 : 0, flexShrink: 0,
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontSize: 11, fontWeight: 700, color: 'white',
-                          }}>
-                            {(familyNames[i] ?? '?').charAt(0).toUpperCase()}
+                        {familyMembers.slice(0, 3).map((m, i) => (
+                          <div
+                            key={m.id}
+                            style={{
+                              width: 22, height: 22, borderRadius: '50%',
+                              backgroundColor: ['#3D6B54', '#D6A13B', '#E45B4C'][i % 3],
+                              border: '2px solid white',
+                              marginLeft: i > 0 ? -6 : 0,
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              fontSize: 9, fontWeight: 700, color: 'white',
+                              cursor: 'pointer', zIndex: 3 - i, position: 'relative',
+                            }}
+                            onClick={e => { e.preventDefault(); e.stopPropagation(); setShowCollaborators(true) }}
+                          >
+                            {m.full_name?.charAt(0).toUpperCase()}
                           </div>
                         ))}
+                        {familyMembers.length > 3 && (
+                          <div
+                            style={{
+                              width: 22, height: 22, borderRadius: '50%',
+                              backgroundColor: '#6F7A72',
+                              border: '2px solid white', marginLeft: -6,
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              fontSize: 8, fontWeight: 700, color: 'white',
+                            }}
+                          >
+                            +{familyMembers.length - 3}
+                          </div>
+                        )}
                       </div>
                       <p style={{ margin: 0, fontSize: 11, color: 'rgba(255,255,255,0.75)', fontWeight: 500 }}>
-                        {familyCount > 4
-                          ? `+${familyCount - 4} más cuidando`
-                          : `${familyCount} familiar${familyCount !== 1 ? 'es' : ''} colaborando`}
+                        {familyCount} familiar{familyCount !== 1 ? 'es' : ''} colaborando
                       </p>
                     </div>
                   )}
@@ -3254,7 +3288,7 @@ export default function Dashboard() {
                     <div key={evt.id ?? i} onClick={actRoute ? () => navigate(actRoute) : undefined} style={{
                       display: 'flex', alignItems: 'flex-start', gap: 12,
                       cursor: actRoute ? 'pointer' : 'default',
-                      padding: '16px 0',
+                      padding: '18px 0',
                       borderBottom: isLast ? 'none' : '1px solid #F5F0E8',
                     }}>
                       <div style={{ width: 34, height: 34, borderRadius: '50%', background: meta?.bg ?? '#F5F0E8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, flexShrink: 0, marginTop: 1 }}>{meta?.icon ?? '📋'}</div>
@@ -3604,6 +3638,55 @@ export default function Dashboard() {
               </button>
               <div style={{ height: 16 }} />
             </div>
+          </div>
+        </>,
+        document.body
+      )}
+
+      {/* ── Collaborators Bottom Sheet ────────────────────────────────────────── */}
+      {showCollaborators && createPortal(
+        <>
+          <div
+            onClick={() => setShowCollaborators(false)}
+            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.3)', zIndex: 500 }}
+          />
+          <div style={{
+            position: 'fixed', bottom: 64, left: 0, right: 0, zIndex: 501,
+            background: 'white', borderRadius: '20px 20px 0 0',
+            padding: 20, boxShadow: '0 -8px 40px rgba(0,0,0,0.18)',
+          }}>
+            <p style={{ margin: '0 0 16px', fontSize: 15, fontWeight: 600, color: '#1E2D26' }}>Familia cuidando</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxHeight: '50vh', overflowY: 'auto' }}>
+              {familyMembers.map(m => {
+                const isAdm = m.role === 'admin'
+                const isCuid = m.role === 'cuidador'
+                const roleLabel = isAdm ? 'Admin' : isCuid ? 'Cuidador' : 'Familiar'
+                const roleColor = isAdm ? '#15803D' : isCuid ? '#1D4ED8' : '#D97706'
+                const roleBg = isAdm ? '#DCFCE7' : isCuid ? '#DBEAFE' : '#FEF3C7'
+                return (
+                  <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{
+                      width: 40, height: 40, borderRadius: '50%', flexShrink: 0,
+                      background: 'linear-gradient(135deg,#4A7C59,#2D6A4F)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 16, fontWeight: 700, color: 'white',
+                    }}>
+                      {m.full_name?.charAt(0).toUpperCase()}
+                    </div>
+                    <p style={{ flex: 1, margin: 0, fontSize: 14, fontWeight: 500, color: '#1E2D26' }}>{m.full_name}</p>
+                    <span style={{ fontSize: 11, fontWeight: 600, color: roleColor, background: roleBg, borderRadius: 20, padding: '3px 10px' }}>
+                      {roleLabel}
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
+            <button
+              onClick={() => setShowCollaborators(false)}
+              style={{ width: '100%', marginTop: 20, padding: '12px', borderRadius: 14, border: '1.5px solid #EDE5D8', background: 'white', color: '#6B7280', fontWeight: 600, fontSize: 14, cursor: 'pointer' }}
+            >
+              Cerrar
+            </button>
           </div>
         </>,
         document.body
