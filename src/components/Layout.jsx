@@ -88,8 +88,8 @@ export default function Layout({ children }) {
         </Link>
       )}
 
-      {/* Fixed header */}
-      <header
+      {/* Fixed header — hidden on dashboard (Dashboard renders its own compact header) */}
+      {!isHome && <header
         style={{
           position: 'fixed', top: hospitalBarHeight, left: 0, right: 0, zIndex: 40,
           height: 'calc(56px + env(safe-area-inset-top))',
@@ -166,12 +166,12 @@ export default function Layout({ children }) {
             )}
           </Link>
         </div>
-      </header>
+      </header>}
 
-      {/* Scrollable main — no offsets on video call; no bottom offset on secondary pages */}
+      {/* Scrollable main — top offset excludes header height when on dashboard */}
       <main style={{
         position: 'fixed', inset: 0, overflowY: 'auto',
-        top:    isVideoCall ? 0 : `calc(${hospitalBarHeight}px + 56px + env(safe-area-inset-top))`,
+        top:    isVideoCall ? 0 : isHome ? `calc(${hospitalBarHeight}px + env(safe-area-inset-top))` : `calc(${hospitalBarHeight}px + 56px + env(safe-area-inset-top))`,
         bottom: isVideoCall ? 0 : (isSecondary || isHospitalMode) ? 'env(safe-area-inset-bottom)' : 'calc(64px + env(safe-area-inset-bottom))',
       }}>
         <InstallBanner />

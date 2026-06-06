@@ -3261,6 +3261,16 @@ export default function Dashboard() {
           </button>
         </div>
 
+        {/* Cerrar sesión */}
+        <div style={{ padding: '4px 16px 20px', textAlign: 'center' }}>
+          <button
+            onClick={async () => { await signOut(); navigate('/') }}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: '#9FAF9A', fontFamily: 'Inter, system-ui, sans-serif', padding: '8px 20px' }}
+          >
+            Cerrar sesión
+          </button>
+        </div>
+
         <HospitalModeModal open={showHospitalModal} onClose={() => setShowHospitalModal(false)} />
       </div>
 
