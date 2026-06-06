@@ -112,6 +112,7 @@ Deno.serve(async (req: Request) => {
             url: call.room_url ?? '/videollamada',
             tag: `videocall-${call.id}-${isImmediate ? 'now' : '15'}`,
             requireInteraction: isImmediate,
+            data: { family_id: call.owner_id, patient_name: patientName, event_type: isImmediate ? 'VIDEOCALL_NOW' : 'VIDEOCALL_15MIN', target_screen: 'videollamada' },
           })
         )
         sentCount++

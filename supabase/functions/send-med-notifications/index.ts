@@ -91,6 +91,13 @@ Deno.serve(async (req: Request) => {
     )
   }
 
+  // Batch-fetch patient names for all care group owners
+  const ownerIdSet = [...new Set(meds.map((m: { user_id: string }) => m.user_id))]
+  const { data: careProfilesBatch } = await supabase
+    .from('care_profiles').select('user_id, name').in('user_id', ownerIdSet)
+  const patientNameMap = new Map<string, string>()
+  ;(careProfilesBatch ?? []).forEach((p: { user_id: string; name: string }) => patientNameMap.set(p.user_id, p.name))
+
   let sentCount = 0
   let failCount = 0
 
@@ -132,6 +139,7 @@ Deno.serve(async (req: Request) => {
             body: med.dosage ? `Dosis: ${med.dosage} — prepara la dosis ahora` : 'Prepara la dosis ahora',
             url: '/hoy',
             tag: `med-reminder-${med.id}`,
+            data: { family_id: med.user_id, patient_name: patientNameMap.get(med.user_id) ?? 'tu familiar', event_type: 'MED_REMINDER', target_screen: 'hoy' },
           })
         )
         sentCount++
@@ -195,6 +203,7 @@ Deno.serve(async (req: Request) => {
             url: '/hoy',
             tag: `missed-${med.id}-${todayPR}`,
             requireInteraction: true,
+            data: { family_id: med.user_id, patient_name: patientNameMap.get(med.user_id) ?? 'tu familiar', event_type: 'MISSED_DOSE', target_screen: 'hoy' },
           })
         )
         sentCount++
@@ -218,7 +227,7 @@ Deno.serve(async (req: Request) => {
           body: JSON.stringify({
             registration_ids: fcmTokens,
             notification: { title: `❌ Dosis olvidada — ${med.name}`, body: missedBody, icon: '/icon-192.png', tag: `missed-${med.id}` },
-            data: { type: 'MISSED_DOSE', url: '/hoy', medicationName: med.name },
+            data: { type: 'MISSED_DOSE', url: '/hoy', target_screen: 'hoy', medicationName: med.name },
             priority: 'high',
           }),
         }).catch(() => {})
@@ -268,7 +277,7 @@ Deno.serve(async (req: Request) => {
         body: JSON.stringify({
           registration_ids: fcmTokens,
           notification: { title: `💊 ${med.name} en 10 minutos`, body: med.dosage ? `Dosis: ${med.dosage}` : 'Prepara la dosis', icon: '/icon-192.png', tag: `med-reminder-${med.id}` },
-          data: { type: 'MED_REMINDER', url: '/hoy' },
+          data: { type: 'MED_REMINDER', url: '/hoy', target_screen: 'hoy' },
           priority: 'high',
         }),
       }).catch(() => {})

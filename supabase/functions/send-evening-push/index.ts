@@ -182,6 +182,7 @@ Deno.serve(async (req: Request) => {
             body: 'Hay actividades de hoy sin completar',
             url: '/hoy',
             tag: `evening-push-${today}`,
+            data: { family_id: ownerId, patient_name: patientName, event_type: 'EVENING_REMINDER', target_screen: 'hoy' },
           })
         )
         sentCount++

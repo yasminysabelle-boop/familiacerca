@@ -132,7 +132,7 @@ self.addEventListener('push', event => {
       icon:     '/icon-192.png',
       badge:    '/icon-72.png',
       tag:      data.tag ?? 'fc-notification',
-      data:     { url: data.url ?? '/hoy' },
+      data:     { url: data.url ?? '/hoy', ...(data.data ?? {}) },
       requireInteraction: data.requireInteraction ?? false,
       vibrate:  data.vibrate ?? [200],
       actions:  data.actions ?? [],
@@ -142,8 +142,9 @@ self.addEventListener('push', event => {
 
 self.addEventListener('notificationclick', event => {
   event.notification.close()
-  const target = (event.notification.data?.url ?? '/hoy') +
-    (event.action ? `?action=${event.action}` : '')
+  const d = event.notification.data ?? {}
+  const base = d.target_screen ? `/${d.target_screen}` : (d.url ?? '/hoy')
+  const target = base + (event.action ? `?action=${event.action}` : '')
 
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {

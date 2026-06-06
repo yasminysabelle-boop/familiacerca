@@ -29,7 +29,7 @@ messaging.onBackgroundMessage(payload => {
       icon:             '/icon-192.png',
       badge:            '/icon-72.png',
       tag:              isSOS ? 'sos-alert' : isAppt ? 'appointment-reminder' : 'fcm',
-      data:             { url: data.url ?? '/' },
+      data:             { url: data.url ?? '/', target_screen: data.target_screen ?? null },
       requireInteraction: isSOS,
       vibrate:          isSOS ? [300, 100, 300, 100, 300] : [200],
       actions:          isAppt ? [{ action: 'view', title: '📅 Ver cita' }] : [],
@@ -39,7 +39,8 @@ messaging.onBackgroundMessage(payload => {
 
 self.addEventListener('notificationclick', event => {
   event.notification.close();
-  const url = event.notification.data?.url ?? '/';
+  const d = event.notification.data ?? {};
+  const url = d.target_screen ? `/${d.target_screen}` : (d.url ?? '/');
 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {

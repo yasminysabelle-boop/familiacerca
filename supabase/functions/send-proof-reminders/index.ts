@@ -102,6 +102,7 @@ Deno.serve(async (req: Request) => {
             body: `${medName} fue dado hace 30 min — agrega la foto de prueba`,
             url: '/hoy',
             tag: `proof-missing-${log.id}`,
+            data: { family_id: log.user_id, patient_name: patientName, event_type: 'PROOF_REMINDER', target_screen: 'hoy' },
           })
         )
         sentCount++

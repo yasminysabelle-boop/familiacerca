@@ -131,6 +131,10 @@ Deno.serve(async (req: Request) => {
   const recipientIds = Array.from(new Set([resolvedOwnerId, ...allFamilyIds]))
   console.log(`[send-sos-notification] ${recipientIds.length} recipients: ${JSON.stringify(recipientIds)}`)
 
+  const { data: careProfile } = await supabase
+    .from('care_profiles').select('name').eq('user_id', resolvedOwnerId).maybeSingle()
+  const patientName = careProfile?.name ?? 'tu familiar'
+
   // ── Push notifications ────────────────────────────────────────────────────
   const { data: subs } = await supabase
     .from('push_subscriptions')
@@ -163,6 +167,7 @@ Deno.serve(async (req: Request) => {
           tag: `sos-${Date.now()}`,
           requireInteraction: true,
           vibrate: [300, 100, 300, 100, 300],
+          data: { family_id: resolvedOwnerId, patient_name: patientName, event_type: 'SOS', target_screen: 'dashboard' },
         })
       )
       sentCount++
@@ -243,6 +248,7 @@ Deno.serve(async (req: Request) => {
             data: {
               type: 'SOS',
               url: '/dashboard',
+              target_screen: 'dashboard',
               triggeredByName: triggeredByName ?? '',
               latitude: String(latitude ?? ''),
               longitude: String(longitude ?? ''),
