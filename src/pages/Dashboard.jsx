@@ -1791,7 +1791,7 @@ export default function Dashboard() {
   const [pressedSOS, setPressedSOS] = useState(false)
   const [weekShifts, setWeekShifts] = useState([])
   const [familyCount, setFamilyCount] = useState(1)
-  const { permission, requestAndSubscribe } = usePushNotifications()
+  const { permission, notifActivated, requestAndSubscribe } = usePushNotifications()
   const [notifDismissed, setNotifDismissed] = useState(() => !!localStorage.getItem('notif_dismissed'))
   function dismissNotifBanner() { localStorage.setItem('notif_dismissed', '1'); setNotifDismissed(true) }
   const [familyNames, setFamilyNames] = useState([])
@@ -2858,6 +2858,20 @@ export default function Dashboard() {
         </div>
       )}
       <TrialBanner />
+
+      {/* Notification activated confirmation */}
+      {notifActivated && (
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 10,
+          margin: '0 16px 10px', padding: '10px 14px',
+          background: '#F0FDF4', border: '1px solid #86EFAC', borderRadius: 14,
+        }}>
+          <span style={{ fontSize: 17, flexShrink: 0 }}>✅</span>
+          <p style={{ flex: 1, fontSize: 13, color: '#15803D', margin: 0, fontWeight: 600 }}>
+            Notificaciones activadas
+          </p>
+        </div>
+      )}
 
       {/* Notification permission banner — shown when permission not granted and not dismissed */}
       {permission !== 'granted' && !notifDismissed && (

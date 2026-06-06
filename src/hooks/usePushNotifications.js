@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -20,6 +20,8 @@ export function usePushNotifications() {
   )
   const [subscribed, setSubscribed] = useState(false)
   const [subscribeError, setSubscribeError] = useState(null)
+  const [notifActivated, setNotifActivated] = useState(false)
+  const activatedTimerRef = useRef(null)
   const supported = typeof Notification !== 'undefined' && 'serviceWorker' in navigator && !!VAPID_PUBLIC_KEY
 
   async function subscribe() {
@@ -108,12 +110,47 @@ export function usePushNotifications() {
     if (!supported) return
     const result = await Notification.requestPermission()
     setPermission(result)
-    if (result === 'granted') {
-      await subscribe()
-      // FCM token was likely not saved at login (permission was default/denied then).
-      // Save it now so background FCM push is available immediately after grant.
-      retryFcm?.()
+    if (result !== 'granted') return
+
+    try {
+      // Unsubscribe old browser push to get a fresh endpoint
+      const reg = await navigator.serviceWorker.ready
+      const existing = await reg.pushManager.getSubscription()
+      if (existing) await existing.unsubscribe()
+
+      const sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+      })
+      const json = sub.toJSON()
+
+      // Replace all existing DB records for this user with the new subscription
+      await supabase.from('push_subscriptions').delete().eq('user_id', user.id)
+      const { error } = await supabase.from('push_subscriptions').insert({
+        user_id: user.id,
+        endpoint: json.endpoint,
+        p256dh: json.keys.p256dh,
+        auth: json.keys.auth,
+      })
+      if (error) {
+        console.warn('[usePushNotifications] insert error:', error)
+        setSubscribeError(error.message)
+        return
+      }
+      setSubscribed(true)
+    } catch (err) {
+      console.warn('[usePushNotifications] requestAndSubscribe error:', err)
+      setSubscribeError(err?.message ?? 'Error al activar notificaciones')
+      return
     }
+
+    // FCM token was likely not saved at login (permission was default/denied then).
+    retryFcm?.()
+
+    // Show confirmation banner for 4 seconds
+    setNotifActivated(true)
+    clearTimeout(activatedTimerRef.current)
+    activatedTimerRef.current = setTimeout(() => setNotifActivated(false), 4000)
   }
 
   useEffect(() => {
@@ -121,5 +158,5 @@ export function usePushNotifications() {
     subscribe()
   }, [user])
 
-  return { permission, subscribed, supported, subscribeError, requestAndSubscribe, resubscribe }
+  return { permission, subscribed, supported, subscribeError, notifActivated, requestAndSubscribe, resubscribe }
 }
