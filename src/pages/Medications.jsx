@@ -137,7 +137,7 @@ export default function Medications() {
   const isFamiliar = memberRole === 'familiar'
 
   function canActOn(med) {
-    return isAdmin
+    return !isFamiliar
   }
 
   // ── Medication list state ──────────────────────────────────────────────────
@@ -740,7 +740,7 @@ Return ONLY valid JSON.`
             </h2>
             <p style={{ fontSize: 12, color: '#9CA3AF' }}>Registro de medicamentos del familiar</p>
           </div>
-          {isAdmin && (
+          {!isFamiliar && (
             <button
               onClick={openAdd}
               style={{
@@ -817,8 +817,8 @@ Return ONLY valid JSON.`
             icon="💊"
             title="Sin medicamentos aún"
             description="Agrega los medicamentos del familiar."
-            actionLabel={isAdmin ? '+ Agregar medicamento' : undefined}
-            onAction={isAdmin ? openAdd : undefined}
+            actionLabel={!isFamiliar ? '+ Agregar medicamento' : undefined}
+            onAction={!isFamiliar ? openAdd : undefined}
           />
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16, paddingBottom: 16 }}>
@@ -1007,7 +1007,7 @@ Return ONLY valid JSON.`
         <MedicationStockTab
           med={stockTabMed}
           ownerId={ownerId}
-          isFamiliar={!isAdmin}
+          isFamiliar={isFamiliar}
           onClose={() => { setStockTabMed(null); fetchStockData(medications) }}
         />
       )}

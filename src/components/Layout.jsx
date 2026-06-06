@@ -40,7 +40,7 @@ const PAGE_TITLES = {
   '/incidentes':     'Incidentes',
 }
 
-const PRIMARY_PAGES = new Set(['/dashboard', '/familia', '/ajustes', '/planes', '/pricing'])
+const PRIMARY_PAGES = new Set(['/dashboard', '/familia', '/ajustes', '/planes', '/pricing', '/chat', '/diario-medico'])
 
 
 export default function Layout({ children }) {
@@ -267,9 +267,9 @@ export default function Layout({ children }) {
           </div>
 
           {/* Milo IA */}
-          <Link to="/memorias" style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, textDecoration: 'none' }}>
-            <span style={{ fontSize: 22, lineHeight: 1 }}>🤖</span>
-            <span style={{ fontSize: 10, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: location.pathname === '/memorias' ? '#3D6B54' : '#9FAF9A' }}>Milo IA</span>
+          <Link to="/diario-medico" style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, textDecoration: 'none' }}>
+            <span style={{ fontSize: 22, lineHeight: 1 }}>🐾</span>
+            <span style={{ fontSize: 10, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: location.pathname === '/diario-medico' ? '#3D6B54' : '#9FAF9A' }}>Milo & Luna</span>
           </Link>
 
           {/* Mi cuenta */}

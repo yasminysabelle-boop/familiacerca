@@ -135,7 +135,7 @@ export default function PatientProfile() {
   const { user } = useAuth()
   const { ownerId, memberRole } = useFamily()
   const navigate = useNavigate()
-  const canEdit = memberRole === null
+  const canEdit = memberRole === null || memberRole === 'cuidador'
 
   const [form, setForm]         = useState(EMPTY)
   const [open, setOpen]         = useState({ s1:true, s2:false, s3:false, s4:false, s5:false })

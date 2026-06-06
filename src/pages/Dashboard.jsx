@@ -3021,12 +3021,15 @@ export default function Dashboard() {
                     </div>
                   </div>
                   {/* Status card */}
-                  <div style={{
-                    background: isCritical ? '#FFF5F5' : isPending ? '#FFFBF0' : '#F0FDF4',
-                    borderRadius: 12, padding: '10px 12px',
-                    border: `1px solid ${isCritical ? '#FECACA' : isPending ? '#FDE68A' : '#BBF7D0'}`,
-                    position: 'relative', zIndex: 1,
-                  }}>
+                  <div
+                    onClick={e => { e.preventDefault(); e.stopPropagation(); navigate(hasActiveSOS ? '/dashboard' : (pendingCount > 0 || _isRetrasado) ? '/medications' : isPending ? '/cuidado' : '/paciente/perfil') }}
+                    style={{
+                      background: isCritical ? '#FFF5F5' : isPending ? '#FFFBF0' : '#F0FDF4',
+                      borderRadius: 12, padding: '10px 12px',
+                      border: `1px solid ${isCritical ? '#FECACA' : isPending ? '#FDE68A' : '#BBF7D0'}`,
+                      position: 'relative', zIndex: 1, cursor: 'pointer',
+                    }}
+                  >
                     <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 3 }}>
                       <div style={{
                         width: 28, height: 28, borderRadius: '50%', flexShrink: 0,
@@ -3154,6 +3157,28 @@ export default function Dashboard() {
             </button>
           </div>
 
+          {/* Secondary modules: Equipo · Hospital · Videollamada — always visible */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+            {[
+              { emoji: '👥', label: 'Equipo', sub: 'Tu familia', onClick: () => navigate('/familia') },
+              { emoji: '🏥', label: 'Hospital', sub: 'Modo hospital', onClick: () => setShowHospitalModal(true) },
+              { emoji: '🎥', label: 'Videollamada', sub: 'Llamada instant.', onClick: handleInstantCall },
+            ].map((c, i) => (
+              <button key={i} onClick={c.onClick} style={{
+                background: 'white', borderRadius: 16, padding: '12px 8px',
+                border: 'none', cursor: 'pointer',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
+                boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+                WebkitTapHighlightColor: 'transparent',
+                boxSizing: 'border-box', width: '100%',
+              }}>
+                <span style={{ fontSize: 26 }}>{c.emoji}</span>
+                <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: '#1E2D26', lineHeight: 1.2, textAlign: 'center' }}>{c.label}</p>
+                <p style={{ margin: 0, fontSize: 10, color: '#9CA3AF', lineHeight: 1.2, textAlign: 'center' }}>{c.sub}</p>
+              </button>
+            ))}
+          </div>
+
           {/* Bottom two-column: Activity (55%) + Tools (42%) */}
           <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
 
@@ -3194,12 +3219,12 @@ export default function Dashboard() {
               <p style={{ margin: '0 0 12px', fontSize: 15, fontWeight: 600, color: '#1E2D26' }}>Más herramientas</p>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
                 {[
-                  { emoji: '👥', label: 'Equipo', route: '/familia' },
+                  { emoji: '💬', label: 'Chat', route: '/chat' },
+                  { emoji: '📅', label: 'Citas', route: '/calendar' },
+                  { emoji: '🖼️', label: 'Álbum', route: '/album' },
+                  { emoji: '📋', label: 'Registros', route: '/registros' },
                   { emoji: '📝', label: 'Notas', route: '/diario-medico' },
-                  { emoji: '🏥', label: 'Hospital', onClick: () => setShowHospitalModal(true) },
-                  { emoji: '📋', label: 'Historial', route: '/registros' },
                   { emoji: '💰', label: 'Gastos', route: '/gastos' },
-                  { emoji: '🎥', label: 'Videollamada', onClick: handleInstantCall },
                 ].map((c, i) => (
                   <button key={i} onClick={c.onClick ?? (() => navigate(c.route))} style={{
                     background: '#F8F6F2', borderRadius: 12, padding: '10px 8px',

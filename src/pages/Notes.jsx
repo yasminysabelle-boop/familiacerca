@@ -26,7 +26,7 @@ const onBlur  = e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.bo
 
 export default function Notes() {
   const { user } = useAuth()
-  const { ownerId, profile } = useFamily()
+  const { ownerId, profile, memberRole } = useFamily()
   const { canEdit, trialExpired } = useSubscription()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -44,6 +44,7 @@ export default function Notes() {
   const [confirmDialog, setConfirmDialog] = useState(null)
 
   const isAdmin = user?.id === ownerId
+  const isCuidador = memberRole === 'cuidador'
 
   const { recording, interim, error: speechError, start, stop, clearError } =
     useSpeechToText(text =>
@@ -152,7 +153,7 @@ export default function Notes() {
   }
 
   function canActOn(note) {
-    return isAdmin || note.created_by_user_id === user?.id
+    return isAdmin || isCuidador || note.created_by_user_id === user?.id
   }
 
   const filtered = notes.filter(n =>
