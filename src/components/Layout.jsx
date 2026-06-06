@@ -33,6 +33,7 @@ const PAGE_TITLES = {
   '/gastos':         'Cuentas Claras',
   '/directorio':     'Directorio',
   '/permisos':       'Permisos',
+  '/roles':          'Permisos de acceso',
   '/ajustes':        'Mi Cuenta',
   '/pricing':        'Planes',
   '/paciente/perfil': 'Perfil del paciente',

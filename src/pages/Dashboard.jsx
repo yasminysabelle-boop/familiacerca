@@ -2951,88 +2951,75 @@ export default function Dashboard() {
           const age = calcAge(dobField)
           console.log('[PatientProfile]', patientProfile, '| heroPhoto:', heroPhoto, '| dob:', dobField, '| age:', age)
           console.log('[AGE DEBUG] keys:', patientProfile ? Object.keys(patientProfile) : 'null', '| fecha_nacimiento:', patientProfile?.fecha_nacimiento, '| birth_date:', patientProfile?.birth_date, '| dob:', patientProfile?.dob)
+          const statusEmoji = isCritical ? '🔴' : isPending ? '🟡' : '🟢'
+          const statusText  = isCritical ? 'Requiere atención urgente' : isPending ? 'Requiere atención hoy' : 'Todo bajo control'
+          const AVATAR_COLORS = ['#4A7C59', '#C9882A', '#7C3AED', '#1D4ED8', '#E45B4C']
+          const avatarCount = Math.min(familyCount, 4)
           return (
             <Link to="/paciente/perfil" style={{ textDecoration: 'none', display: 'block', margin: '0 16px 16px' }}>
               <div style={{
-                background: 'white', borderRadius: 24, overflow: 'hidden',
-                boxShadow: '0 4px 24px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.04)',
-                display: 'flex', minHeight: 190,
+                borderRadius: 24, overflow: 'hidden', position: 'relative', minHeight: 220,
+                boxShadow: '0 6px 32px rgba(0,0,0,0.18), 0 1px 4px rgba(0,0,0,0.06)',
+                display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
               }}>
-                {/* Photo — left 44%, gradient bleed unifies with card */}
-                <div style={{ position: 'relative', width: '44%', flexShrink: 0, alignSelf: 'stretch', minHeight: 190 }}>
-                  {heroPhoto ? (
-                    <img src={heroPhoto} alt="" style={{
-                      position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-                      width: '100%', height: '100%',
-                      objectFit: 'cover', objectPosition: 'center top',
-                      display: 'block',
-                    }} />
-                  ) : (
-                    <div style={{
-                      position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-                      background: 'linear-gradient(160deg,#3D6B54,#1E2D26)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 44, color: 'white',
-                    }}>
-                      {(patientProfile?.nombre_completo || profile?.name)?.charAt(0) ?? '👤'}
-                    </div>
-                  )}
-                  {/* Gradient bleed — merges photo into card content */}
-                  <div style={{
-                    position: 'absolute', top: 0, right: 0, bottom: 0, width: 40,
-                    background: 'linear-gradient(to right, transparent, white)',
-                    pointerEvents: 'none',
+                {/* Full-bleed portrait photo */}
+                {heroPhoto ? (
+                  <img src={heroPhoto} alt="" style={{
+                    position: 'absolute', inset: 0, width: '100%', height: '100%',
+                    objectFit: 'cover', objectPosition: 'center top', display: 'block',
                   }} />
-                </div>
-                {/* Right side — patient info */}
-                <div style={{ flex: 1, padding: '16px 14px 14px 8px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minWidth: 0, position: 'relative', overflow: 'hidden' }}>
-                  {/* Subtle leaf decorations */}
-                  <svg style={{ position: 'absolute', top: 0, right: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 0 }} viewBox="0 0 200 220" preserveAspectRatio="xMaxYMid meet">
-                    <ellipse cx="185" cy="35" rx="65" ry="28" fill="rgba(61,107,84,0.04)" transform="rotate(-22 185 35)" />
-                    <ellipse cx="190" cy="110" rx="48" ry="20" fill="rgba(61,107,84,0.03)" transform="rotate(18 190 110)" />
-                    <ellipse cx="178" cy="190" rx="58" ry="24" fill="rgba(61,107,84,0.04)" transform="rotate(-38 178 190)" />
-                  </svg>
-                  <div style={{ position: 'relative', zIndex: 1 }}>
-                    <p style={{ margin: '8px 0 0', fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 22, fontWeight: 700, color: '#1E2D26', lineHeight: 1.2, wordBreak: 'break-word', overflow: 'hidden' }}>
-                      {patientProfile?.nombre_completo || profile?.name || 'Agregar paciente'}
-                    </p>
-                    {/* Emotional tagline */}
-                    <p style={{ margin: '4px 0 0', fontSize: 12, color: '#4A7C59', fontWeight: 500 }}>
-                      ❤️ Tu cuidado junto a tu familia
-                    </p>
-                    {age && (
-                      <p style={{ margin: '4px 0 0', fontSize: 13, color: '#6F7A72' }}>{age} años</p>
-                    )}
-                    <p style={{ margin: '3px 0 0', fontSize: 12, color: '#6F7A72' }}>
-                      {familyCount >= 1 ? `👨‍👩‍👧‍👦 ${familyCount} familiar${familyCount !== 1 ? 'es' : ''} colaborando` : 'Invita a tu familia'}
-                    </p>
+                ) : (
+                  <div style={{
+                    position: 'absolute', inset: 0,
+                    background: 'linear-gradient(160deg,#3D6B54 0%,#1E2D26 100%)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 56, color: 'rgba(255,255,255,0.22)',
+                  }}>
+                    {(patientProfile?.nombre_completo || profile?.name)?.charAt(0) ?? '👤'}
                   </div>
-                  {/* Status card */}
-                  <div
-                    onClick={e => { e.preventDefault(); e.stopPropagation(); navigate(hasActiveSOS ? '/dashboard' : (pendingCount > 0 || _isRetrasado) ? '/medications' : isPending ? '/cuidado' : '/paciente/perfil') }}
-                    style={{
-                      background: isCritical ? '#FFF5F5' : isPending ? '#FFFBF0' : '#F0FDF4',
-                      borderRadius: 12, padding: '10px 12px', marginTop: 10,
-                      border: `1px solid ${isCritical ? '#FECACA' : isPending ? '#FDE68A' : '#BBF7D0'}`,
-                      position: 'relative', zIndex: 1, cursor: 'pointer',
-                    }}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <div style={{
-                        width: 22, height: 22, borderRadius: '50%', flexShrink: 0,
-                        background: isCritical ? '#FEE2E2' : isPending ? '#FEF3C7' : '#DCFCE7',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11,
-                      }}>
-                        {isCritical ? '⚠️' : isPending ? '⚠️' : '✓'}
+                )}
+                {/* Deep bottom gradient — text readability over photo */}
+                <div style={{
+                  position: 'absolute', inset: 0,
+                  background: 'linear-gradient(to top, rgba(5,14,9,0.94) 0%, rgba(5,14,9,0.58) 38%, rgba(5,14,9,0.08) 65%, transparent 100%)',
+                  pointerEvents: 'none',
+                }} />
+                {/* Content overlaid at bottom */}
+                <div style={{ position: 'relative', zIndex: 1, padding: '0 16px 18px' }}>
+                  <p style={{
+                    margin: 0,
+                    fontFamily: "'Cormorant Garamond', Georgia, serif",
+                    fontSize: 26, fontWeight: 700, color: 'white', lineHeight: 1.15,
+                    textShadow: '0 1px 6px rgba(0,0,0,0.3)',
+                  }}>
+                    {patientProfile?.nombre_completo || profile?.name || 'Agregar paciente'}
+                  </p>
+                  <p style={{ margin: '4px 0 0', fontSize: 12, color: 'rgba(255,255,255,0.68)', fontWeight: 400, lineHeight: 1.4 }}>
+                    {age ? `${age} años  ·  ` : ''}❤️ Tu cuidado junto a tu familia
+                  </p>
+                  <p style={{
+                    margin: '6px 0 0', fontSize: 12, fontWeight: 600, lineHeight: 1.3,
+                    color: isCritical ? '#FCA5A5' : isPending ? '#FCD34D' : '#86EFAC',
+                  }}>
+                    {statusEmoji} {statusText}
+                  </p>
+                  {familyCount > 0 && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginTop: 10 }}>
+                      <div style={{ display: 'flex' }}>
+                        {Array.from({ length: avatarCount }).map((_, i) => (
+                          <div key={i} style={{
+                            width: 24, height: 24, borderRadius: '50%',
+                            background: AVATAR_COLORS[i % AVATAR_COLORS.length],
+                            border: '2px solid rgba(255,255,255,0.32)',
+                            marginLeft: i > 0 ? -8 : 0, flexShrink: 0,
+                          }} />
+                        ))}
                       </div>
-                      <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#1E2D26', lineHeight: 1.2 }}>
-                        {isCritical ? 'Atención requerida' : isPending ? 'Requiere atención' : 'Todo bajo control'}
+                      <p style={{ margin: 0, fontSize: 11, color: 'rgba(255,255,255,0.72)', fontWeight: 500 }}>
+                        {familyCount} familiar{familyCount !== 1 ? 'es' : ''} colaborando
                       </p>
                     </div>
-                    <p style={{ margin: '4px 0 0', fontSize: 10, color: '#9CA3AF', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {lastUpdatedBy ?? firstName} · {lastUpdatedAgo ?? 'ahora'}
-                    </p>
-                  </div>
+                  )}
                 </div>
               </div>
             </Link>
@@ -3067,10 +3054,16 @@ export default function Dashboard() {
           {/* Medicamentos + Rutinas — two white cards */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, width: '100%', boxSizing: 'border-box' }}>
             <button onClick={() => navigate('/medications')} style={{
-              borderRadius: 16, border: 'none', background: 'white', padding: '14px',
+              borderRadius: 16, border: 'none', padding: '14px',
               cursor: 'pointer', textAlign: 'left', WebkitTapHighlightColor: 'transparent',
-              boxShadow: '0 2px 16px rgba(0,0,0,0.07)', display: 'flex', flexDirection: 'column',
+              display: 'flex', flexDirection: 'column',
               boxSizing: 'border-box', width: '100%', minWidth: 0,
+              background: _isRetrasado ? '#FFF5F5' : pendingCount > 0 ? '#FFFCF4' : 'white',
+              boxShadow: _isRetrasado
+                ? '0 2px 16px rgba(228,91,76,0.14), inset 0 0 0 1.5px rgba(228,91,76,0.25)'
+                : pendingCount > 0
+                  ? '0 2px 16px rgba(214,161,59,0.14), inset 0 0 0 1.5px rgba(214,161,59,0.25)'
+                  : '0 2px 16px rgba(0,0,0,0.07)',
             }}>
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 8 }}>
                 <span style={{ fontSize: 32 }}>💊</span>
@@ -3114,27 +3107,37 @@ export default function Dashboard() {
                 <div style={{ width: 26, height: 26, borderRadius: '50%', background: '#D6A13B', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 14, flexShrink: 0 }}>›</div>
               </div>
               <p style={{ margin: '0 0 4px', fontSize: 15, fontWeight: 700, color: '#1E2D26', lineHeight: 1.2 }}>Rutinas</p>
-              {pendingRoutinesCount > 0 ? (
-                <p style={{ margin: '0 0 8px', lineHeight: 1 }}>
-                  <span style={{ fontSize: 26, fontWeight: 800, color: '#D6A13B' }}>{pendingRoutinesCount}</span>
-                  <span style={{ fontSize: 12, fontWeight: 500, color: '#D6A13B', marginLeft: 4 }}>pendientes</span>
-                </p>
-              ) : (
-                <p style={{ margin: '0 0 8px', fontSize: 12, fontWeight: 500, color: '#22C55E' }}>Todas completadas</p>
-              )}
-              <div style={{ marginTop: 'auto' }}>
-                <p style={{ margin: '0 0 6px', fontSize: 12, color: '#3D6B54', fontWeight: 500 }}>Ver rutinas del día</p>
-                <div style={{ display: 'flex', gap: 5 }}>
-                  {[
-                    { key: 'hygiene', icon: '☀️' },
-                    { key: 'nutrition', icon: '🍽️' },
-                    { key: 'hydration', icon: '💧' },
-                    { key: 'sleep', icon: '🌙' },
-                  ].map(({ key, icon }) => (
-                    <span key={key} style={{ fontSize: 14, opacity: careLogsToday[key] ? 1 : 0.25 }}>{icon}</span>
-                  ))}
-                </div>
-              </div>
+              {(() => {
+                const done = Object.values(careLogsToday).filter(Boolean).length
+                const total = 4
+                const pct = done / total
+                return (
+                  <>
+                    <p style={{ margin: '0 0 4px', fontSize: 12, fontWeight: 600, color: pct === 1 ? '#22C55E' : done > 0 ? '#D6A13B' : '#9CA3AF' }}>
+                      {pct === 1 ? '✓ Todas completadas' : done > 0 ? `${done} de ${total} completadas` : 'Ninguna aún'}
+                    </p>
+                    <div style={{ marginTop: 'auto' }}>
+                      <div style={{ display: 'flex', gap: 5, marginBottom: 7 }}>
+                        {[
+                          { key: 'hygiene', icon: '☀️' },
+                          { key: 'nutrition', icon: '🍽️' },
+                          { key: 'hydration', icon: '💧' },
+                          { key: 'sleep', icon: '🌙' },
+                        ].map(({ key, icon }) => (
+                          <span key={key} style={{ fontSize: 14, opacity: careLogsToday[key] ? 1 : 0.22 }}>{icon}</span>
+                        ))}
+                      </div>
+                      <div style={{ height: 3, borderRadius: 2, background: '#F0EDE6', overflow: 'hidden' }}>
+                        <div style={{
+                          height: '100%', borderRadius: 2,
+                          background: pct === 1 ? '#22C55E' : pct > 0.5 ? '#4A7C59' : '#D6A13B',
+                          width: `${pct * 100}%`, transition: 'width 0.4s ease',
+                        }} />
+                      </div>
+                    </div>
+                  </>
+                )
+              })()}
             </button>
           </div>
 

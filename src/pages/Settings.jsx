@@ -475,7 +475,7 @@ export default function Settings() {
         {/* More options */}
         <div style={{ background: 'white', borderRadius: 20, border: '1px solid #EDE5D8', overflow: 'hidden', marginBottom: 12 }}>
           {[
-            { label: 'Permisos de acceso',    to: '/permisos',  icon: '🛡️' },
+            { label: 'Permisos de acceso',    to: '/roles',     icon: '🛡️' },
             { label: 'Planes y suscripción',  to: '/pricing',   icon: '⭐' },
             { label: 'Privacidad y seguridad', to: '/privacidad', icon: '🔒' },
             { label: 'Términos de servicio',  to: '/terminos',  icon: '📄' },
