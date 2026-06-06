@@ -2899,26 +2899,25 @@ export default function Dashboard() {
         `}</style>
 
         {/* ═══════════════════════════════════════════════════════════════
-            HEADER
+            HEADER — compact
         ═══════════════════════════════════════════════════════════════ */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 16px 12px' }}>
-          {/* Left: Logo + name + tagline */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 16px' }}>
+          {/* Left: Logo + FamiliaCerca */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexShrink: 0 }}>
             <img
               src="/logo.png" alt="FamiliaCerca"
-              style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover', display: 'block', flexShrink: 0 }}
+              style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', display: 'block', flexShrink: 0 }}
               onError={e => { e.currentTarget.style.display = 'none'; e.currentTarget.nextSibling.style.display = 'flex' }}
             />
-            <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#2D4A1E', display: 'none', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 16 }}>🌿</div>
-            <div>
-              <p style={{ margin: 0, fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 18, fontWeight: 600, color: '#1E2D26', lineHeight: 1.2 }}>FamiliaCerca</p>
-              <p style={{ margin: 0, fontSize: 11, color: '#6F7A72', lineHeight: 1.2 }}>Tu cuidado, junto a tu familia</p>
-            </div>
+            <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#2D4A1E', display: 'none', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 14 }}>🌿</div>
+            <p style={{ margin: 0, fontFamily: 'Inter, system-ui, sans-serif', fontSize: 14, fontWeight: 600, color: '#1E2D26', lineHeight: 1 }}>FamiliaCerca</p>
           </div>
-          {/* Center: greeting */}
-          <div style={{ flex: 1, textAlign: 'center', padding: '0 8px', overflow: 'hidden', minWidth: 0 }}>
-            <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#1E2D26', lineHeight: 1.3 }}>{timeIcon} {timeGreeting}, {firstName}</p>
-            <p style={{ margin: 0, fontSize: 12, color: '#6F7A72' }}>Gracias por cuidar con amor</p>
+          {/* Center: patient name + status dot */}
+          <div style={{ flex: 1, padding: '0 8px', overflow: 'hidden', minWidth: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+            <span style={{ width: 7, height: 7, borderRadius: '50%', flexShrink: 0, background: hasActiveSOS ? '#E45B4C' : (pendingCount > 0 || _isRetrasado) ? '#D6A13B' : '#22C55E' }} />
+            <span style={{ fontSize: 13, fontWeight: 600, color: '#1E2D26', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {patientProfile?.nombre_completo || profile?.name || 'Mi familiar'}
+            </span>
           </div>
           {/* Right: bell + avatar */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
@@ -2930,7 +2929,7 @@ export default function Dashboard() {
                 </span>
               )}
             </button>
-            <div style={{ width: 36, height: 36, borderRadius: '50%', background: '#2D4A1E', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: 15, flexShrink: 0 }}>
+            <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#2D4A1E', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: 14, flexShrink: 0 }}>
               {firstName.charAt(0).toUpperCase()}
             </div>
           </div>
@@ -2957,10 +2956,10 @@ export default function Dashboard() {
               <div style={{
                 background: 'white', borderRadius: 20, overflow: 'hidden',
                 boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-                display: 'flex', minHeight: 240,
+                display: 'flex', minHeight: 182,
               }}>
-                {/* Photo — left 50% */}
-                <div style={{ position: 'relative', width: '42%', flexShrink: 0, alignSelf: 'stretch', minHeight: 240 }}>
+                {/* Photo — left 42% */}
+                <div style={{ position: 'relative', width: '42%', flexShrink: 0, alignSelf: 'stretch', minHeight: 182 }}>
                   {heroPhoto ? (
                     <img src={heroPhoto} alt="" style={{
                       position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
@@ -2987,7 +2986,7 @@ export default function Dashboard() {
                   }}>🤍</div>
                 </div>
                 {/* Right side info */}
-                <div style={{ flex: 1, width: '58%', padding: '16px 14px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minWidth: 0, position: 'relative', overflow: 'hidden' }}>
+                <div style={{ flex: 1, width: '58%', padding: '12px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minWidth: 0, position: 'relative', overflow: 'hidden' }}>
                   {/* Organic leaf decorations */}
                   <svg style={{ position: 'absolute', top: 0, right: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 0 }} viewBox="0 0 200 220" preserveAspectRatio="xMaxYMid meet">
                     <ellipse cx="185" cy="35" rx="65" ry="28" fill="rgba(61,107,84,0.05)" transform="rotate(-22 185 35)" />
@@ -3004,21 +3003,15 @@ export default function Dashboard() {
                     </button>
                   </div>
                   <div style={{ position: 'relative', zIndex: 1 }}>
-                    <p style={{ margin: '28px 0 0', fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 24, fontWeight: 700, color: '#1E2D26', lineHeight: 1.2, wordBreak: 'break-word', overflow: 'hidden' }}>
+                    <p style={{ margin: '18px 0 0', fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 22, fontWeight: 700, color: '#1E2D26', lineHeight: 1.2, wordBreak: 'break-word', overflow: 'hidden' }}>
                       {patientProfile?.nombre_completo || profile?.name || 'Agregar paciente'}
                     </p>
                     {age && (
                       <p style={{ margin: '3px 0 0', fontSize: 13, color: '#6F7A72' }}>{age} años</p>
                     )}
-                    <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                      <p style={{ margin: 0, fontSize: 12, color: '#6F7A72', display: 'flex', alignItems: 'center', gap: 5 }}>
-                        <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#22C55E', display: 'inline-block', flexShrink: 0 }} />
-                        Tu cuidado, junto a tu familia
-                      </p>
-                      <p style={{ margin: 0, fontSize: 12, color: '#6F7A72', paddingLeft: 12 }}>
-                        {familyCount >= 1 ? `👨‍👩‍👧‍👦 ${familyCount} familiares colaborando` : 'Invita a tu familia'}
-                      </p>
-                    </div>
+                    <p style={{ margin: '5px 0 0', fontSize: 12, color: '#6F7A72' }}>
+                      {familyCount >= 1 ? `👨‍👩‍👧‍👦 ${familyCount} familiar${familyCount !== 1 ? 'es' : ''} colaborando` : 'Invita a tu familia'}
+                    </p>
                   </div>
                   {/* Status card */}
                   <div
@@ -3030,30 +3023,19 @@ export default function Dashboard() {
                       position: 'relative', zIndex: 1, cursor: 'pointer',
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 3 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                       <div style={{
-                        width: 28, height: 28, borderRadius: '50%', flexShrink: 0,
+                        width: 22, height: 22, borderRadius: '50%', flexShrink: 0,
                         background: isCritical ? '#FEE2E2' : isPending ? '#FEF3C7' : '#DCFCE7',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11,
                       }}>
                         {isCritical ? '⚠️' : isPending ? '⚠️' : '✓'}
                       </div>
-                      <p style={{ margin: 0, fontSize: 16, fontWeight: 600, color: '#1E2D26', lineHeight: 1.2 }}>
+                      <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#1E2D26', lineHeight: 1.2 }}>
                         {isCritical ? 'Atención requerida' : isPending ? 'Requiere atención' : 'Todo bajo control'}
                       </p>
                     </div>
-                    <p style={{ margin: '0 0 5px', fontSize: 13, color: '#6F7A72', lineHeight: 1.4 }}>
-                      {isCritical
-                        ? (hasActiveSOS
-                            ? 'Alerta SOS activa'
-                            : `${pendingCount} medicamento${pendingCount !== 1 ? 's' : ''} pendiente${pendingCount !== 1 ? 's' : ''}${_retrasadoMins != null ? ` · ${Math.floor(_retrasadoMins / 60)}h de retraso` : ''}`)
-                        : isPending
-                          ? (pendingCount > 0
-                              ? `${pendingCount} medicamento${pendingCount !== 1 ? 's' : ''} pendiente${pendingCount !== 1 ? 's' : ''}${_retrasadoMins != null ? ` · ${Math.floor(_retrasadoMins / 60)}h de retraso` : ''}`
-                              : 'Rutinas pendientes')
-                          : (lastUpdatedAgo ? `Actualizado ${lastUpdatedAgo}` : 'Todo al día hoy')}
-                    </p>
-                    <p style={{ margin: 0, fontSize: 10, color: '#9CA3AF', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <p style={{ margin: '4px 0 0', fontSize: 10, color: '#9CA3AF', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {lastUpdatedBy ?? firstName} · {lastUpdatedAgo ?? 'ahora'}
                     </p>
                   </div>
@@ -3091,7 +3073,7 @@ export default function Dashboard() {
           {/* Medicamentos + Rutinas — two white cards */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, width: '100%', boxSizing: 'border-box' }}>
             <button onClick={() => navigate('/medications')} style={{
-              borderRadius: 16, border: 'none', background: 'white', padding: '16px',
+              borderRadius: 16, border: 'none', background: 'white', padding: '12px',
               cursor: 'pointer', textAlign: 'left', WebkitTapHighlightColor: 'transparent',
               boxShadow: '0 2px 16px rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column',
               boxSizing: 'border-box', width: '100%', minWidth: 0,
@@ -3128,7 +3110,7 @@ export default function Dashboard() {
             </button>
 
             <button onClick={() => navigate('/cuidado')} style={{
-              borderRadius: 16, border: 'none', background: 'white', padding: '16px',
+              borderRadius: 16, border: 'none', background: 'white', padding: '12px',
               cursor: 'pointer', textAlign: 'left', WebkitTapHighlightColor: 'transparent',
               boxShadow: '0 2px 16px rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column',
               boxSizing: 'border-box', width: '100%', minWidth: 0,
@@ -3157,87 +3139,80 @@ export default function Dashboard() {
             </button>
           </div>
 
-          {/* Secondary modules: Equipo · Hospital · Videollamada — always visible */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
-            {[
-              { emoji: '👥', label: 'Equipo', sub: 'Tu familia', onClick: () => navigate('/familia') },
-              { emoji: '🏥', label: 'Hospital', sub: 'Modo hospital', onClick: () => setShowHospitalModal(true) },
-              { emoji: '🎥', label: 'Videollamada', sub: 'Llamada instant.', onClick: handleInstantCall },
-            ].map((c, i) => (
-              <button key={i} onClick={c.onClick} style={{
-                background: 'white', borderRadius: 16, padding: '12px 8px',
-                border: 'none', cursor: 'pointer',
-                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
-                boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-                WebkitTapHighlightColor: 'transparent',
-                boxSizing: 'border-box', width: '100%',
-              }}>
-                <span style={{ fontSize: 26 }}>{c.emoji}</span>
-                <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: '#1E2D26', lineHeight: 1.2, textAlign: 'center' }}>{c.label}</p>
-                <p style={{ margin: 0, fontSize: 10, color: '#9CA3AF', lineHeight: 1.2, textAlign: 'center' }}>{c.sub}</p>
-              </button>
-            ))}
+          {/* Actividad reciente — full width */}
+          <div style={{ background: 'white', borderRadius: 16, padding: '14px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+              <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#1E2D26' }}>Actividad reciente</p>
+              <button onClick={() => navigate('/registros')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: '#D6A13B', fontWeight: 600, padding: 0 }}>Ver todas ›</button>
+            </div>
+            {recentActivityItems.length === 0 ? (
+              <p style={{ margin: 0, fontSize: 12, color: '#9CA3AF', padding: '2px 0' }}>Sin actividad reciente</p>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {recentActivityItems.map((evt, i) => {
+                  const CLM = { sleep: { icon: '😴', color: '#7C3AED', bg: '#F5F3FF', label: 'Sueño registrado' }, nutrition: { icon: '🍽️', color: '#92400E', bg: '#FFFBEB', label: 'Alimentación registrada' }, hygiene: { icon: '🛁', color: '#1D4ED8', bg: '#EFF6FF', label: 'Higiene registrada' } }
+                  const TM = { MED_CONFIRMED: { icon: '💊', color: '#15803D', bg: '#DCFCE7' }, APPOINTMENT: { icon: '📅', color: '#1D4ED8', bg: '#EFF6FF' }, VOICE_MEMORY: { icon: '🎙️', color: '#7C3AED', bg: '#F5F3FF' }, PHOTO: { icon: '📸', color: '#92400E', bg: '#FFFBEB' }, NOTE: { icon: '📝', color: '#1E2D26', bg: '#F5F0E8' }, EXPENSE: { icon: '💰', color: '#C9882A', bg: '#FFFBEB' }, APPOINTMENT_PROOF: { icon: '📋', color: '#1D4ED8', bg: '#EFF6FF' } }
+                  const meta = evt.type === 'CARE_LOG' ? CLM[evt.careLogKey] : TM[evt.type]
+                  const actorName = evt.confirmedBy?.split(' ')[0] || evt.recorderName?.split(' ')[0] || evt.uploaderName?.split(' ')[0] || firstName
+                  const actAction = evt.type === 'CARE_LOG' ? (meta?.label ?? 'Cuidado registrado') : ({ MED_CONFIRMED: `${actorName} confirmó ${evt.medName ?? 'medicamento'}`, APPOINTMENT: evt.appointmentTitle ?? 'Cita médica registrada', VOICE_MEMORY: `${actorName} grabó una memoria`, PHOTO: `${actorName} subió una foto`, NOTE: `${actorName} escribió una nota`, EXPENSE: (`${actorName} registró $${evt.amount ?? ''} ${evt.description ?? ''}`).trim(), APPOINTMENT_PROOF: 'Comprobante subido' }[evt.type] ?? evt.type)
+                  const actRoute = evt.type === 'CARE_LOG' ? '/cuidado' : ({ MED_CONFIRMED: '/medications', VOICE_MEMORY: '/memorias', PHOTO: '/album', NOTE: '/notas', EXPENSE: '/gastos', APPOINTMENT: '/calendar', APPOINTMENT_PROOF: '/calendar' }[evt.type])
+                  const evtAgo = timeAgo(evt.timestamp ?? null)
+                  return (
+                    <div key={evt.id ?? i} onClick={actRoute ? () => navigate(actRoute) : undefined} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: actRoute ? 'pointer' : 'default' }}>
+                      <div style={{ width: 30, height: 30, borderRadius: '50%', background: meta?.bg ?? '#F5F0E8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, flexShrink: 0 }}>{meta?.icon ?? '📋'}</div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{ margin: 0, fontSize: 13, color: '#1E2D26', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: 1.3 }}>{actAction}</p>
+                        {evtAgo && <p style={{ margin: 0, fontSize: 11, color: '#9FAF9A', lineHeight: 1.2 }}>{evtAgo}</p>}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
           </div>
 
-          {/* Bottom two-column: Activity (55%) + Tools (42%) */}
-          <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-
-            {/* Actividad reciente */}
-            <div style={{ flex: '0 0 calc(55% - 5px)', minWidth: 0, overflow: 'hidden' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-                <p style={{ margin: 0, fontSize: 15, fontWeight: 600, color: '#1E2D26' }}>Actividad reciente</p>
-                <button onClick={() => navigate('/registros')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: '#D6A13B', fontWeight: 600, padding: 0 }}>Ver todas ›</button>
-              </div>
-              {recentActivityItems.length === 0 ? (
-                <p style={{ margin: 0, fontSize: 12, color: '#9CA3AF', padding: '6px 0' }}>Sin actividad reciente</p>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                  {recentActivityItems.map((evt, i) => {
-                    const CLM = { sleep: { icon: '😴', color: '#7C3AED', bg: '#F5F3FF', label: 'Sueño registrado' }, nutrition: { icon: '🍽️', color: '#92400E', bg: '#FFFBEB', label: 'Alimentación registrada' }, hygiene: { icon: '🛁', color: '#1D4ED8', bg: '#EFF6FF', label: 'Higiene registrada' } }
-                    const TM = { MED_CONFIRMED: { icon: '💊', color: '#15803D', bg: '#DCFCE7' }, APPOINTMENT: { icon: '📅', color: '#1D4ED8', bg: '#EFF6FF' }, VOICE_MEMORY: { icon: '🎙️', color: '#7C3AED', bg: '#F5F3FF' }, PHOTO: { icon: '📸', color: '#92400E', bg: '#FFFBEB' }, NOTE: { icon: '📝', color: '#1E2D26', bg: '#F5F0E8' }, EXPENSE: { icon: '💰', color: '#C9882A', bg: '#FFFBEB' }, APPOINTMENT_PROOF: { icon: '📋', color: '#1D4ED8', bg: '#EFF6FF' } }
-                    const meta = evt.type === 'CARE_LOG' ? CLM[evt.careLogKey] : TM[evt.type]
-                    const actorName = evt.confirmedBy?.split(' ')[0] || evt.recorderName?.split(' ')[0] || evt.uploaderName?.split(' ')[0] || firstName
-                    const actAction = evt.type === 'CARE_LOG' ? (meta?.label ?? 'Cuidado registrado') : ({ MED_CONFIRMED: `${actorName} confirmó ${evt.medName ?? 'medicamento'}`, APPOINTMENT: evt.appointmentTitle ?? 'Cita médica registrada', VOICE_MEMORY: `${actorName} grabó una memoria`, PHOTO: `${actorName} subió una foto`, NOTE: `${actorName} escribió una nota`, EXPENSE: (`${actorName} registró $${evt.amount ?? ''} ${evt.description ?? ''}`).trim(), APPOINTMENT_PROOF: 'Comprobante subido' }[evt.type] ?? evt.type)
-                    const actRoute = evt.type === 'CARE_LOG' ? '/cuidado' : ({ MED_CONFIRMED: '/medications', VOICE_MEMORY: '/memorias', PHOTO: '/album', NOTE: '/notas', EXPENSE: '/gastos', APPOINTMENT: '/calendar', APPOINTMENT_PROOF: '/calendar' }[evt.type])
-                    const evtAgo = timeAgo(evt.timestamp ?? null)
-                    return (
-                      <div key={evt.id ?? i} onClick={actRoute ? () => navigate(actRoute) : undefined} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: actRoute ? 'pointer' : 'default' }}>
-                        <div style={{ width: 32, height: 32, borderRadius: '50%', background: meta?.bg ?? '#F5F0E8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, flexShrink: 0 }}>{meta?.icon ?? '📋'}</div>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <p style={{ margin: 0, fontSize: 13, color: '#1E2D26', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: 1.3 }}>{actAction}</p>
-                          {evtAgo && <p style={{ margin: 0, fontSize: 11, color: '#9FAF9A', lineHeight: 1.2 }}>{evtAgo}</p>}
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              )}
-            </div>
-
-            {/* Más herramientas — 3-col grid */}
-            <div style={{ flex: '0 0 calc(42% - 5px)', minWidth: 0, overflow: 'hidden' }}>
-              <p style={{ margin: '0 0 12px', fontSize: 15, fontWeight: 600, color: '#1E2D26' }}>Más herramientas</p>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
+          {/* Más herramientas — collapsed accordion */}
+          <div style={{ borderRadius: 16, overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
+            <button
+              onClick={() => setShowMoreTools(v => !v)}
+              style={{
+                width: '100%', background: 'white', border: 'none', cursor: 'pointer',
+                padding: '12px 14px',
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                WebkitTapHighlightColor: 'transparent',
+              }}
+            >
+              <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#1E2D26' }}>Más herramientas</p>
+              <span style={{ fontSize: 11, color: '#9CA3AF', display: 'inline-block', transform: showMoreTools ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>▼</span>
+            </button>
+            {showMoreTools && (
+              <div style={{ background: '#FAFAF8', padding: '10px 12px 12px', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
                 {[
+                  { emoji: '👥', label: 'Equipo', onClick: () => navigate('/familia') },
+                  { emoji: '🏥', label: 'Hospital', onClick: () => setShowHospitalModal(true) },
+                  { emoji: '🎥', label: 'Videollamada', onClick: handleInstantCall },
                   { emoji: '💬', label: 'Chat', route: '/chat' },
                   { emoji: '📅', label: 'Citas', route: '/calendar' },
                   { emoji: '🖼️', label: 'Álbum', route: '/album' },
                   { emoji: '📋', label: 'Registros', route: '/registros' },
+                  { emoji: '📊', label: 'Historial', route: '/historial' },
                   { emoji: '📝', label: 'Notas', route: '/diario-medico' },
                   { emoji: '💰', label: 'Gastos', route: '/gastos' },
+                  { emoji: '🐾', label: 'Milo & Luna', route: '/diario-medico' },
+                  { emoji: '👤', label: 'Mi cuenta', route: '/ajustes' },
                 ].map((c, i) => (
                   <button key={i} onClick={c.onClick ?? (() => navigate(c.route))} style={{
-                    background: '#F8F6F2', borderRadius: 12, padding: '10px 8px',
+                    background: 'white', borderRadius: 12, padding: '10px 8px',
                     border: 'none', cursor: 'pointer',
                     display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-                    WebkitTapHighlightColor: 'transparent',
+                    WebkitTapHighlightColor: 'transparent', boxSizing: 'border-box',
                   }}>
-                    <span style={{ fontSize: 28 }}>{c.emoji}</span>
-                    <p style={{ margin: 0, fontSize: 11, color: '#6F7A72', lineHeight: 1.2, textAlign: 'center' }}>{c.label}</p>
+                    <span style={{ fontSize: 26 }}>{c.emoji}</span>
+                    <p style={{ margin: 0, fontSize: 10, color: '#6F7A72', lineHeight: 1.2, textAlign: 'center' }}>{c.label}</p>
                   </button>
                 ))}
               </div>
-            </div>
+            )}
           </div>
         </div>
 
