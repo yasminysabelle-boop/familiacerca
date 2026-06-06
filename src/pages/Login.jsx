@@ -38,6 +38,11 @@ export default function Login() {
     if (err) {
       setError('Correo o contraseña incorrectos.')
     } else {
+      const pending = localStorage.getItem('pendingInviteToken')
+      if (pending) {
+        navigate('/join?token=' + pending, { replace: true })
+        return
+      }
       const completed = data?.user?.user_metadata?.onboarding_completed
       navigate(completed ? '/permisos' : '/onboarding')
     }

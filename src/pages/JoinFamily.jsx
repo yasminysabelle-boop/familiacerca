@@ -4,57 +4,129 @@ import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { supabase } from '../lib/supabase'
 import Logo from '../components/Logo'
-import { Heart, UserPlus, Eye, EyeOff } from '../components/Icons'
+import { Heart } from '../components/Icons'
 import imgFamilia from '../assets/images/splash-familia.png'
 import PWAInstallBanner from '../components/PWAInstallBanner'
+
+// ── Sub-components ─────────────────────────────────────────────────────────────
+
+function RoleBadge({ role }) {
+  const cfg = role === 'cuidador'
+    ? { label: 'Cuidador', color: '#1D4ED8', bg: '#EFF6FF' }
+    : role === 'familiar'
+    ? { label: 'Familiar', color: '#D97706', bg: '#FEF3C7' }
+    : { label: 'Cuidador', color: '#3D6B54', bg: '#E8F5EE' }
+  return (
+    <span style={{
+      display: 'inline-flex', alignItems: 'center', padding: '5px 14px',
+      borderRadius: 20, fontSize: 12, fontWeight: 700,
+      color: cfg.color, background: cfg.bg,
+    }}>
+      {cfg.label}
+    </span>
+  )
+}
+
+function PatientAvatar({ photo, name, size = 80 }) {
+  if (photo) {
+    return (
+      <img
+        src={photo} alt={name}
+        style={{
+          width: size, height: size, borderRadius: '50%', objectFit: 'cover',
+          border: '3px solid white', boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+          flexShrink: 0,
+        }}
+      />
+    )
+  }
+  const initial = (name || '?').charAt(0).toUpperCase()
+  return (
+    <div style={{
+      width: size, height: size, borderRadius: '50%',
+      background: 'linear-gradient(135deg, #4A7C59, #2D6A4F)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      fontSize: Math.round(size * 0.38), fontWeight: 700, color: 'white',
+      border: '3px solid white', boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+      fontFamily: 'Georgia, serif', flexShrink: 0,
+    }}>
+      {initial}
+    </div>
+  )
+}
+
+const CARD = {
+  background: 'rgba(255,248,240,0.96)',
+  backdropFilter: 'blur(24px)',
+  WebkitBackdropFilter: 'blur(24px)',
+  borderRadius: 24, padding: '36px 24px',
+  textAlign: 'center',
+  boxShadow: '0 24px 64px rgba(0,0,0,0.35)',
+}
+
+const BTN_PRIMARY = {
+  width: '100%', padding: '14px', borderRadius: 14,
+  background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
+  color: 'white', fontWeight: 700, fontSize: 14,
+  border: 'none', cursor: 'pointer',
+  boxShadow: '0 8px 24px rgba(74,124,89,0.35)',
+  transition: 'all 0.2s',
+}
+
+const BTN_OUTLINE = {
+  width: '100%', padding: '13px', borderRadius: 14,
+  border: '1.5px solid #EDE5D8', background: 'white',
+  color: '#374151', fontWeight: 600, fontSize: 14,
+  cursor: 'pointer', transition: 'all 0.2s',
+}
+
+// ── Main component ─────────────────────────────────────────────────────────────
 
 export default function JoinFamily() {
   const [searchParams] = useSearchParams()
   const token = searchParams.get('token')
   const navigate = useNavigate()
-  const { user, loading: sessionLoading, signIn, signUp, signOut } = useAuth()
+  const { user, loading: sessionLoading, signOut } = useAuth()
   const { refresh: refreshFamily } = useFamily()
 
   const [invitation, setInvitation] = useState(null)
   const [invLoading, setInvLoading] = useState(!!token)
-  const [invError, setInvError]     = useState('')
+  const [invError, setInvError] = useState('')
 
-  const [authMode, setAuthMode] = useState('login') // 'login' | 'register'
-  const [authName, setAuthName]       = useState('')
-  const [authEmail, setAuthEmail]     = useState('')
-  const [authPassword, setAuthPassword] = useState('')
-  const [showPw, setShowPw]           = useState(false)
-  const [authLoading, setAuthLoading] = useState(false)
-  const [authError, setAuthError]     = useState('')
-
-  const [accepting, setAccepting]   = useState(false)
-  const [acceptError, setAcceptError] = useState('')
-  const [accepted, setAccepted]     = useState(false)
   const [patientName, setPatientName] = useState('')
+  const [patientPhoto, setPatientPhoto] = useState(null)
 
-  // No token → not an invitation page; redirect once auth state is settled
+  const [accepting, setAccepting] = useState(false)
+  const [acceptError, setAcceptError] = useState('')
+  const [accepted, setAccepted] = useState(false)
+  const [alreadyMember, setAlreadyMember] = useState(false)
+  const [wrongEmailConfirm, setWrongEmailConfirm] = useState(false)
+
+  // No token → redirect
   useEffect(() => {
     if (!token && !sessionLoading) {
       navigate(user ? '/dashboard' : '/login', { replace: true })
     }
   }, [token, user, sessionLoading])
 
-  // Load invitation on mount (only when a token is present)
+  // Save token and load invitation on mount
   useEffect(() => {
     if (!token) return
-    // Persist token before any auth redirect so email-confirmation flow can recover it
     localStorage.setItem('pendingInviteToken', token)
     fetchInvitation()
   }, [token])
 
-  // If user just logged in and we have a valid invitation, accept automatically.
-  // Guard: skip if the logged-in user is the admin, or if acceptance is already in flight.
+  // Auto-accept when user is logged in and invitation is valid
   useEffect(() => {
-    if (user && invitation && invitation.status === 'pending' && !isExpired(invitation) && !accepted && !accepting) {
-      if (user.id === invitation.user_id) return
-      acceptInvitation()
-    }
-  }, [user, invitation])
+    if (!user || !invitation) return
+    if (invitation.status !== 'pending') return
+    if (isExpired(invitation)) return
+    if (accepted || accepting || alreadyMember) return
+    if (user.id === invitation.user_id) return
+    const emailMismatch = invitation.invited_email && user.email !== invitation.invited_email
+    if (emailMismatch && !wrongEmailConfirm) return
+    acceptInvitation()
+  }, [user, invitation, wrongEmailConfirm])
 
   async function fetchInvitation() {
     const { data, error } = await supabase
@@ -63,22 +135,24 @@ export default function JoinFamily() {
       .eq('token', token)
       .maybeSingle()
 
-    setInvLoading(false)
-
     if (error || !data) {
       setInvError('No encontramos esta invitación. Puede que el enlace sea incorrecto.')
+      setInvLoading(false)
       return
     }
 
     setInvitation(data)
 
-    // Fetch the care recipient's name to show "Te invitaron a cuidar a [nombre]"
-    const { data: careProfile } = await supabase
+    const { data: cp } = await supabase
       .from('care_profiles')
-      .select('name')
+      .select('name, photo_url')
       .eq('user_id', data.user_id)
       .maybeSingle()
-    if (careProfile?.name) setPatientName(careProfile.name)
+
+    if (cp?.name) setPatientName(cp.name)
+    if (cp?.photo_url) setPatientPhoto(cp.photo_url)
+
+    setInvLoading(false)
   }
 
   function isExpired(inv) {
@@ -105,67 +179,125 @@ export default function JoinFamily() {
       return
     }
 
-    // Mark onboarding complete — members join an existing family, no profile creation needed
-    await supabase.auth.updateUser({ data: { onboarding_completed: true } })
+    if (result === 'already_member') {
+      localStorage.removeItem('pendingInviteToken')
+      localStorage.setItem('fc_active_context', invitation.user_id)
+      setAlreadyMember(true)
+      setAccepting(false)
+      return
+    }
 
-    setAccepting(false)
-    setAccepted(true)
+    await supabase.auth.updateUser({ data: { onboarding_completed: true } })
     localStorage.removeItem('pendingInviteToken')
     localStorage.setItem('fc_active_context', invitation.user_id)
     localStorage.setItem('fc_member_owner_id', invitation.user_id)
-    refreshFamily() // connect member to family group immediately
+    refreshFamily()
+    setAccepting(false)
+    setAccepted(true)
   }
 
-  async function handleAuth(e) {
-    e.preventDefault()
-    setAuthLoading(true)
-    setAuthError('')
-
-    let result
-    if (authMode === 'login') {
-      result = await signIn(authEmail, authPassword)
-      if (result.error) {
-        setAuthError('Correo o contraseña incorrectos.')
-        setAuthLoading(false)
-        return
-      }
-    } else {
-      result = await signUp(authEmail, authPassword, { full_name: authName })
-      if (result.error) {
-        setAuthError('No se pudo crear la cuenta: ' + result.error.message)
-        setAuthLoading(false)
-        return
-      }
-    }
-
-    setAuthLoading(false)
-    // acceptInvitation will be called by the useEffect watching user
-  }
-
-  const fieldBase = {
-    width: '100%', padding: '11px 14px',
-    border: '1.5px solid #EDE5D8', borderRadius: 12,
-    fontSize: 14, outline: 'none', background: 'white',
-    boxSizing: 'border-box', transition: 'all 0.15s',
-  }
-  const onFocus = e => { e.target.style.borderColor = '#4A7C59'; e.target.style.boxShadow = '0 0 0 3px rgba(74,124,89,0.1)' }
-  const onBlur  = e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.boxShadow = 'none' }
-
-  // Render nothing while the no-token redirect is in flight
   if (!token) return null
 
+  const isValidPending = !!(invitation && invitation.status === 'pending' && !isExpired(invitation) && !invError)
+  const hasWrongEmail = !!(
+    user && isValidPending &&
+    invitation.invited_email && user.email !== invitation.invited_email &&
+    !wrongEmailConfirm
+  )
+
+  // ── WELCOME SCREEN — unauthenticated + valid invitation ─────────────────────
+  if (!sessionLoading && !user && isValidPending && !invLoading) {
+    return (
+      <div style={{
+        minHeight: '100dvh', background: '#F5F0E8',
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+      }}>
+        {/* Logo */}
+        <div style={{ paddingTop: 52, width: '100%', display: 'flex', justifyContent: 'center' }}>
+          <Logo size={36} showWordmark />
+        </div>
+
+        <div style={{
+          flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
+          justifyContent: 'center', padding: '32px 24px 52px',
+          width: '100%', maxWidth: 420,
+        }}>
+          {/* Patient avatar */}
+          <PatientAvatar photo={patientPhoto} name={patientName} size={80} />
+
+          {/* Caption */}
+          <p style={{
+            marginTop: 20, marginBottom: 6,
+            fontSize: 14, color: '#6F7A72',
+            textAlign: 'center', lineHeight: 1.4,
+          }}>
+            Te invitaron a unirte al cuidado de
+          </p>
+
+          {/* Patient name */}
+          <p style={{
+            margin: '0 0 14px',
+            fontFamily: '"Cormorant Garamond", Georgia, serif',
+            fontSize: 28, fontWeight: 700, color: '#1E2D26',
+            textAlign: 'center', lineHeight: 1.2,
+          }}>
+            {patientName || 'tu familiar'}
+          </p>
+
+          {/* Role badge */}
+          <RoleBadge role={invitation.role} />
+
+          {/* Invited by */}
+          {invitation.invited_by && (
+            <p style={{ marginTop: 14, fontSize: 13, color: '#6F7A72', textAlign: 'center' }}>
+              Invitado por{' '}
+              <strong style={{ color: '#1E2D26' }}>{invitation.invited_by}</strong>
+            </p>
+          )}
+
+          {/* Auth buttons */}
+          <div style={{ width: '100%', marginTop: 40, display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <button
+              onClick={() => navigate('/login?redirect=invite')}
+              style={{
+                width: '100%', padding: '15px',
+                background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
+                color: 'white', fontWeight: 700, fontSize: 15,
+                borderRadius: 16, border: 'none', cursor: 'pointer',
+                boxShadow: '0 8px 24px rgba(74,124,89,0.28)',
+              }}
+            >
+              Ya tengo cuenta
+            </button>
+            <button
+              onClick={() => navigate('/register?redirect=invite')}
+              style={{
+                width: '100%', padding: '15px',
+                background: 'white', color: '#1E2D26',
+                fontWeight: 700, fontSize: 15,
+                borderRadius: 16, border: '1.5px solid #D8D0C4', cursor: 'pointer',
+              }}
+            >
+              Crear cuenta nueva
+            </button>
+          </div>
+
+          <p style={{ marginTop: 20, fontSize: 11, color: '#9CA3AF', textAlign: 'center', lineHeight: 1.5 }}>
+            Tus datos están cifrados y protegidos.
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  // ── DARK OVERLAY SCREENS — loading, errors, logged-in states ─────────────────
   return (
     <div style={{
-      position: 'relative',
-      minHeight: '100svh',
-      display: 'flex',
-      flexDirection: 'column',
-      background: '#0A0A0A',
+      position: 'relative', minHeight: '100svh',
+      display: 'flex', flexDirection: 'column', background: '#0A0A0A',
     }}>
-      {/* Background photo */}
       <img
-        src={imgFamilia}
-        alt="Familia"
+        src={imgFamilia} alt=""
         style={{
           position: 'absolute', inset: 0,
           width: '100%', height: '100%',
@@ -177,7 +309,6 @@ export default function JoinFamily() {
         background: 'linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.65) 100%)',
       }} />
 
-      {/* Content */}
       <div style={{
         position: 'relative', zIndex: 1,
         minHeight: '100svh',
@@ -190,29 +321,15 @@ export default function JoinFamily() {
         <div style={{ marginTop: 24, width: '100%', maxWidth: 400 }}>
 
           {/* Loading */}
-          {invLoading && (
-            <div style={{
-              background: 'rgba(255,248,240,0.96)',
-              backdropFilter: 'blur(24px)',
-              WebkitBackdropFilter: 'blur(24px)',
-              borderRadius: 24, padding: '36px 24px',
-              textAlign: 'center',
-              boxShadow: '0 24px 64px rgba(0,0,0,0.35)',
-            }}>
+          {(invLoading || sessionLoading) && (
+            <div style={CARD}>
               <p style={{ color: '#6B7280', fontSize: 14 }}>Verificando invitación...</p>
             </div>
           )}
 
-          {/* Error: not found / bad link */}
-          {!invLoading && invError && (
-            <div style={{
-              background: 'rgba(255,248,240,0.96)',
-              backdropFilter: 'blur(24px)',
-              WebkitBackdropFilter: 'blur(24px)',
-              borderRadius: 24, padding: '36px 24px',
-              textAlign: 'center',
-              boxShadow: '0 24px 64px rgba(0,0,0,0.35)',
-            }}>
+          {/* Error: not found */}
+          {!invLoading && !sessionLoading && invError && (
+            <div style={CARD}>
               <div style={{ fontSize: 48, marginBottom: 16 }}>🔗</div>
               <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#1A1A1A', marginBottom: 8 }}>
                 Enlace no válido
@@ -220,98 +337,63 @@ export default function JoinFamily() {
               <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, marginBottom: 24 }}>
                 {invError}
               </p>
-              <button
-                onClick={() => navigate('/login')}
-                style={{
-                  padding: '12px 28px', borderRadius: 14,
-                  background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
-                  color: 'white', fontWeight: 700, fontSize: 14,
-                  border: 'none', cursor: 'pointer',
-                  boxShadow: '0 6px 20px rgba(74,124,89,0.3)',
-                }}
-              >
+              <button onClick={() => navigate('/login')} style={BTN_PRIMARY}>
                 Ir al inicio
               </button>
             </div>
           )}
 
-          {/* Expired invitation */}
+          {/* Expired */}
           {!invLoading && invitation && isExpired(invitation) && (
-            <div style={{
-              background: 'rgba(255,248,240,0.96)',
-              backdropFilter: 'blur(24px)',
-              WebkitBackdropFilter: 'blur(24px)',
-              borderRadius: 24, padding: '36px 24px',
-              textAlign: 'center',
-              boxShadow: '0 24px 64px rgba(0,0,0,0.35)',
-            }}>
+            <div style={CARD}>
               <div style={{ fontSize: 48, marginBottom: 16 }}>⏰</div>
               <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#1A1A1A', marginBottom: 8 }}>
                 Invitación expirada
               </p>
-              <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, marginBottom: 6 }}>
-                Esta invitación de <strong>{invitation.invited_by}</strong> expiró.
-              </p>
               <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, marginBottom: 24 }}>
-                Pídele que te envíe una nueva.
+                Esta invitación expiró. Pide al administrador que te envíe una nueva.
               </p>
-              <button
-                onClick={() => navigate('/login')}
-                style={{
-                  padding: '12px 28px', borderRadius: 14,
-                  background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
-                  color: 'white', fontWeight: 700, fontSize: 14,
-                  border: 'none', cursor: 'pointer',
-                  boxShadow: '0 6px 20px rgba(74,124,89,0.3)',
-                }}
-              >
+              <button onClick={() => navigate('/login')} style={BTN_PRIMARY}>
                 Ir al inicio
               </button>
             </div>
           )}
 
-          {/* Already accepted */}
-          {!invLoading && invitation && invitation.status === 'accepted' && !accepted && (
-            <div style={{
-              background: 'rgba(255,248,240,0.96)',
-              backdropFilter: 'blur(24px)',
-              WebkitBackdropFilter: 'blur(24px)',
-              borderRadius: 24, padding: '36px 24px',
-              textAlign: 'center',
-              boxShadow: '0 24px 64px rgba(0,0,0,0.35)',
-            }}>
-              <div style={{ fontSize: 48, marginBottom: 16 }}>✅</div>
+          {/* Already used by someone else */}
+          {!invLoading && invitation && invitation.status === 'accepted' && !accepted && !alreadyMember && (
+            <div style={CARD}>
+              <div style={{ fontSize: 48, marginBottom: 16 }}>🔒</div>
               <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#1A1A1A', marginBottom: 8 }}>
-                Invitación ya aceptada
+                Invitación ya usada
               </p>
               <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, marginBottom: 24 }}>
-                Esta invitación ya fue utilizada.
+                Este enlace de invitación ya fue utilizado. Cada enlace es de un solo uso.
               </p>
-              <button
-                onClick={() => navigate('/dashboard')}
-                style={{
-                  padding: '12px 28px', borderRadius: 14,
-                  background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
-                  color: 'white', fontWeight: 700, fontSize: 14,
-                  border: 'none', cursor: 'pointer',
-                  boxShadow: '0 6px 20px rgba(74,124,89,0.3)',
-                }}
-              >
-                Ir al panel
+              <button onClick={() => navigate(user ? '/dashboard' : '/login')} style={BTN_PRIMARY}>
+                {user ? 'Ir al panel' : 'Ir al inicio'}
               </button>
             </div>
           )}
 
-          {/* Success: just accepted */}
+          {/* Already a member */}
+          {alreadyMember && (
+            <div style={CARD}>
+              <div style={{ fontSize: 48, marginBottom: 16 }}>✅</div>
+              <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#1A1A1A', marginBottom: 8 }}>
+                Ya formas parte de esta familia
+              </p>
+              <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, marginBottom: 24 }}>
+                Ya eres miembro del grupo de cuidado{patientName ? ` de ${patientName}` : ''}.
+              </p>
+              <button onClick={() => navigate('/dashboard')} style={BTN_PRIMARY}>
+                Entrar al panel →
+              </button>
+            </div>
+          )}
+
+          {/* Success — just accepted */}
           {accepted && (
-            <div style={{
-              background: 'rgba(255,248,240,0.96)',
-              backdropFilter: 'blur(24px)',
-              WebkitBackdropFilter: 'blur(24px)',
-              borderRadius: 24, padding: '36px 24px',
-              textAlign: 'center',
-              boxShadow: '0 24px 64px rgba(0,0,0,0.35)',
-            }}>
+            <div style={CARD}>
               <div className="animate-heartbeat inline-flex" style={{ marginBottom: 16 }}>
                 <Heart size={56} color="#4A7C59" strokeWidth={1.2} filled />
               </div>
@@ -319,241 +401,99 @@ export default function JoinFamily() {
                 ¡Bienvenido a la familia!
               </p>
               <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, marginBottom: 24 }}>
-                Ya eres parte del grupo de cuidado de <strong>{invitation?.invited_by}</strong>.
+                Ahora formas parte del grupo de cuidado{patientName ? ` de ${patientName}` : ''}.
               </p>
               <button
-                onClick={() => navigate('/dashboard')}
-                style={{
-                  width: '100%', padding: '14px',
-                  background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
-                  color: 'white', fontWeight: 700, fontSize: 14,
-                  borderRadius: 14, border: 'none', cursor: 'pointer',
-                  boxShadow: '0 8px 24px rgba(74,124,89,0.35)',
-                  marginBottom: 12,
-                }}
+                onClick={() => navigate('/dashboard', { replace: true })}
+                style={{ ...BTN_PRIMARY, marginBottom: 12 }}
               >
                 Ir al panel →
               </button>
               <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0, lineHeight: 1.5 }}>
-                Instala la app para recibir alertas cuando haya cambios
+                Instala la app para recibir alertas en tiempo real
               </p>
             </div>
           )}
 
-          {/* Valid invitation — main flow */}
-          {!invLoading && invitation && invitation.status === 'pending' && !isExpired(invitation) && !accepted && (
-            <div style={{
-              background: 'rgba(255,248,240,0.96)',
-              backdropFilter: 'blur(24px)',
-              WebkitBackdropFilter: 'blur(24px)',
-              borderRadius: 24, padding: '28px 24px',
-              boxShadow: '0 24px 64px rgba(0,0,0,0.35)',
-            }}>
-              {/* Invitation header */}
-              <div style={{ textAlign: 'center', marginBottom: 24 }}>
-                <div style={{
-                  width: 52, height: 52, borderRadius: '50%',
-                  background: 'rgba(74,124,89,0.1)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  margin: '0 auto 14px',
-                }}>
-                  <UserPlus size={24} color="#4A7C59" strokeWidth={1.5} />
-                </div>
-                <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#1A1A1A', lineHeight: 1.3, marginBottom: 6 }}>
-                  {patientName ? `Te invitaron a cuidar a ${patientName}` : 'Invitación a FamiliaCerca'}
+          {/* Valid invitation — logged-in user states */}
+          {!invLoading && !sessionLoading && isValidPending && !accepted && !alreadyMember && user && (
+
+            user.id === invitation.user_id ? (
+              /* Admin opening own link */
+              <div style={CARD}>
+                <div style={{ fontSize: 48, marginBottom: 16 }}>⚠️</div>
+                <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#1A1A1A', marginBottom: 8 }}>
+                  Abre desde otra cuenta
                 </p>
-                <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.5 }}>
-                  <strong style={{ color: '#1A1A1A' }}>{invitation.invited_by}</strong> te invita a unirte a su grupo familiar de cuidado.
+                <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, marginBottom: 24 }}>
+                  Creaste este enlace con tu cuenta ({user.email}). Compártelo con el familiar que quieres agregar.
                 </p>
+                <button onClick={signOut} style={BTN_OUTLINE}>
+                  Cambiar de cuenta
+                </button>
               </div>
 
-              {acceptError && (
-                <div style={{
-                  marginBottom: 14, padding: '10px 14px',
-                  background: '#FFF0F0', border: '1px solid #FFBABA',
-                  borderRadius: 10, fontSize: 13, color: '#D63031',
-                }}>
-                  ⚠ {acceptError}
+            ) : hasWrongEmail ? (
+              /* Wrong email warning */
+              <div style={CARD}>
+                <div style={{ fontSize: 48, marginBottom: 16 }}>📧</div>
+                <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#1A1A1A', marginBottom: 8 }}>
+                  Correo diferente
+                </p>
+                <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, marginBottom: 4 }}>
+                  Esta invitación fue enviada a <strong>{invitation.invited_email}</strong>.
+                </p>
+                <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, marginBottom: 24 }}>
+                  Tu cuenta actual es <strong>{user.email}</strong>. ¿Quieres continuar de todas formas?
+                </p>
+                {acceptError && (
+                  <div style={{ marginBottom: 14, padding: '10px 14px', background: '#FFF0F0', border: '1px solid #FFBABA', borderRadius: 10, fontSize: 13, color: '#D63031' }}>
+                    ⚠ {acceptError}
+                  </div>
+                )}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  <button onClick={() => setWrongEmailConfirm(true)} style={BTN_PRIMARY}>
+                    Continuar de todas formas
+                  </button>
+                  <button onClick={signOut} style={BTN_OUTLINE}>
+                    Cambiar de cuenta
+                  </button>
                 </div>
-              )}
+              </div>
 
-              {/* If already logged in: check if this is the admin or a different account */}
-              {user ? (
-                user.id === invitation.user_id ? (
-                  /* Admin opening their own invitation link */
-                  <div>
-                    <div style={{
-                      marginBottom: 16, padding: '12px 14px',
-                      background: '#FFF0F0', border: '1px solid #FFBABA',
-                      borderRadius: 10,
-                    }}>
-                      <p style={{ fontSize: 13, fontWeight: 700, color: '#D63031', margin: '0 0 4px' }}>
-                        Debes abrir este link desde otra cuenta
-                      </p>
-                      <p style={{ fontSize: 12, color: '#D63031', margin: 0, lineHeight: 1.5 }}>
-                        Creaste este enlace con tu cuenta ({user.email}). Compártelo con el familiar que quieres agregar.
-                      </p>
-                    </div>
-                    <button
-                      onClick={signOut}
-                      style={{
-                        width: '100%', padding: '13px', borderRadius: 14,
-                        border: '1.5px solid #EDE5D8', background: 'white',
-                        color: '#374151', fontWeight: 600, fontSize: 14,
-                        cursor: 'pointer', transition: 'all 0.2s',
-                      }}
-                    >
-                      Cambiar de cuenta
-                    </button>
-                  </div>
-                ) : (
-                  /* Different user — show accept button */
-                  <div>
-                    <p style={{ fontSize: 12, color: '#9CA3AF', textAlign: 'center', marginBottom: 16 }}>
-                      Ingresando como <strong>{user.email}</strong>
-                    </p>
-                    <button
-                      onClick={acceptInvitation}
-                      disabled={accepting}
-                      style={{
-                        width: '100%', padding: '14px',
-                        background: accepting
-                          ? '#C0CCC5'
-                          : 'linear-gradient(135deg, #4A7C59, #3A6347)',
-                        color: 'white', fontWeight: 700, fontSize: 14,
-                        borderRadius: 14, border: 'none',
-                        cursor: accepting ? 'not-allowed' : 'pointer',
-                        boxShadow: accepting ? 'none' : '0 8px 24px rgba(74,124,89,0.35)',
-                        transition: 'all 0.2s',
-                      }}
-                    >
-                      {accepting ? 'Uniéndome...' : 'Aceptar invitación →'}
-                    </button>
-                  </div>
-                )
-              ) : (
-                /* Not logged in: show auth form */
-                <div>
-                  {/* Auth mode tabs */}
-                  <div style={{
-                    display: 'flex', background: '#F3F4F6',
-                    borderRadius: 12, padding: 3, marginBottom: 18,
-                  }}>
-                    {['login', 'register'].map(mode => (
-                      <button
-                        key={mode}
-                        onClick={() => { setAuthMode(mode); setAuthError('') }}
-                        style={{
-                          flex: 1, padding: '8px 0', borderRadius: 10, border: 'none',
-                          fontSize: 13, fontWeight: 600, cursor: 'pointer',
-                          transition: 'all 0.15s',
-                          background: authMode === mode ? 'white' : 'transparent',
-                          color: authMode === mode ? '#1A1A1A' : '#9CA3AF',
-                          boxShadow: authMode === mode ? '0 1px 4px rgba(0,0,0,0.1)' : 'none',
-                        }}
-                      >
-                        {mode === 'login' ? 'Ya tengo cuenta' : 'Soy nuevo'}
-                      </button>
-                    ))}
-                  </div>
+            ) : acceptError ? (
+              /* Acceptance failed */
+              <div style={CARD}>
+                <div style={{ fontSize: 48, marginBottom: 16 }}>⚠️</div>
+                <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#1A1A1A', marginBottom: 8 }}>
+                  No se pudo unir
+                </p>
+                <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, marginBottom: 24 }}>
+                  {acceptError}
+                </p>
+                <button onClick={acceptInvitation} style={BTN_PRIMARY}>
+                  Intentar de nuevo
+                </button>
+              </div>
 
-                  {authError && (
-                    <div style={{
-                      marginBottom: 12, padding: '10px 14px',
-                      background: '#FFF0F0', border: '1px solid #FFBABA',
-                      borderRadius: 10, fontSize: 13, color: '#D63031',
-                    }}>
-                      ⚠ {authError}
-                    </div>
-                  )}
-
-                  <form onSubmit={handleAuth} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                    {authMode === 'register' && (
-                      <input
-                        type="text"
-                        required
-                        value={authName}
-                        onChange={e => setAuthName(e.target.value)}
-                        placeholder="Tu nombre completo"
-                        style={fieldBase}
-                        onFocus={onFocus}
-                        onBlur={onBlur}
-                      />
-                    )}
-                    <input
-                      type="email"
-                      required
-                      value={authEmail}
-                      onChange={e => setAuthEmail(e.target.value)}
-                      placeholder="tu@correo.com"
-                      style={fieldBase}
-                      onFocus={onFocus}
-                      onBlur={onBlur}
-                    />
-                    <div style={{ position: 'relative' }}>
-                      <input
-                        type={showPw ? 'text' : 'password'}
-                        required
-                        value={authPassword}
-                        onChange={e => setAuthPassword(e.target.value)}
-                        placeholder="Contraseña"
-                        style={{ ...fieldBase, paddingRight: 44 }}
-                        onFocus={onFocus}
-                        onBlur={onBlur}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPw(v => !v)}
-                        style={{
-                          position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)',
-                          background: 'none', border: 'none', cursor: 'pointer',
-                          padding: 4, display: 'flex', alignItems: 'center',
-                        }}
-                        aria-label={showPw ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-                      >
-                        {showPw
-                          ? <EyeOff size={18} color="#9CA3AF" strokeWidth={1.5} />
-                          : <Eye    size={18} color="#9CA3AF" strokeWidth={1.5} />
-                        }
-                      </button>
-                    </div>
-                    <button
-                      type="submit"
-                      disabled={authLoading}
-                      style={{
-                        marginTop: 4, width: '100%', padding: '13px',
-                        background: authLoading
-                          ? '#C0CCC5'
-                          : 'linear-gradient(135deg, #4A7C59, #3A6347)',
-                        color: 'white', fontWeight: 700, fontSize: 14,
-                        borderRadius: 14, border: 'none',
-                        cursor: authLoading ? 'not-allowed' : 'pointer',
-                        boxShadow: authLoading ? 'none' : '0 6px 20px rgba(74,124,89,0.3)',
-                        transition: 'all 0.2s',
-                      }}
-                    >
-                      {authLoading
-                        ? 'Un momento...'
-                        : authMode === 'login'
-                          ? 'Ingresar y aceptar →'
-                          : 'Crear cuenta y aceptar →'}
-                    </button>
-                  </form>
-                </div>
-              )}
-            </div>
+            ) : (
+              /* Auto-accepting (triggers via useEffect; show while in flight) */
+              <div style={CARD}>
+                <p style={{ color: '#6B7280', fontSize: 14, marginBottom: patientName ? 8 : 0 }}>
+                  Uniéndote al grupo de cuidado...
+                </p>
+                {patientName && (
+                  <p style={{ fontFamily: 'Georgia, serif', fontSize: 16, fontWeight: 600, color: '#1A1A1A', margin: 0 }}>
+                    {patientName}
+                  </p>
+                )}
+              </div>
+            )
           )}
-        </div>
 
-        <p style={{
-          marginTop: 20, textAlign: 'center', fontSize: 11,
-          color: 'rgba(255,255,255,0.4)', lineHeight: 1.6,
-        }}>
-          Tus datos están cifrados y son solo tuyos.
-        </p>
+        </div>
       </div>
 
-      {/* Show install banner once the invitation is accepted */}
       {accepted && <PWAInstallBanner />}
     </div>
   )

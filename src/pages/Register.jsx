@@ -33,6 +33,11 @@ export default function Register() {
       setError(err.message)
     } else {
       track('user_registered', { email: form.email })
+      const pending = localStorage.getItem('pendingInviteToken')
+      if (pending) {
+        navigate('/join?token=' + pending, { replace: true })
+        return
+      }
       navigate('/permisos?next=/onboarding', { replace: true })
     }
   }
