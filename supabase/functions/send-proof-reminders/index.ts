@@ -79,11 +79,14 @@ Deno.serve(async (req: Request) => {
       .eq('user_id', log.user_id)
 
     const userIds = [log.user_id, ...(members?.map((m: { member_user_id: string }) => m.member_user_id).filter(Boolean) ?? [])]
+    console.log(`[send-proof-reminders] Owner ${log.user_id} — notifying ${userIds.length} users: ${JSON.stringify(userIds)}`)
 
     const { data: subs } = await supabase
       .from('push_subscriptions')
       .select('id, endpoint, p256dh, auth')
       .in('user_id', userIds)
+
+    console.log(`[send-proof-reminders] Found ${subs?.length ?? 0} push subscriptions for ${medName}`)
 
     for (const sub of subs ?? []) {
       try {

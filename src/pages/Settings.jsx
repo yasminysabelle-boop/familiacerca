@@ -88,7 +88,7 @@ function ToggleRow({ icon, label, subtitle, checked, onChange }) {
 
 export default function Settings() {
   const { user, signOut } = useAuth()
-  const { ownerId, memberRole } = useFamily()
+  const { ownerId, memberRole, families, switchFamily, hasMultiple, activeOwnerId } = useFamily()
   const isAdmin = memberRole === null && ownerId === user?.id
   const { sub, isPaid, isTrialing, trialExpired, daysLeft } = useSubscription()
   const { dark, toggleDark } = useDarkMode()
@@ -196,6 +196,64 @@ export default function Settings() {
             </div>
           </div>
         </div>
+
+        {/* Mis familias — only shown when user belongs to more than one care group */}
+        {hasMultiple && (
+          <div style={{ background: 'white', borderRadius: 20, border: '1px solid #EDE5D8', overflow: 'hidden', marginBottom: 12 }}>
+            <p style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', letterSpacing: '0.08em', textTransform: 'uppercase', padding: '14px 16px 8px', margin: 0 }}>
+              Mis familias
+            </p>
+            {families.map((fam, i) => {
+              const isActive = fam.ownerId === activeOwnerId
+              const roleLabel = fam.role === null ? 'Admin' : fam.role === 'cuidador' ? 'Cuidador' : 'Familiar'
+              const roleColor = fam.role === null ? '#3D6B54' : fam.role === 'cuidador' ? '#1D4ED8' : '#7C3AED'
+              const roleBg   = fam.role === null ? '#E8F5EE' : fam.role === 'cuidador' ? '#EFF6FF' : '#F5F3FF'
+              const initial  = (fam.patientName ?? 'F').charAt(0).toUpperCase()
+              return (
+                <button
+                  key={fam.ownerId}
+                  onClick={() => switchFamily(fam.ownerId)}
+                  style={{
+                    width: '100%', display: 'flex', alignItems: 'center', gap: 12,
+                    padding: '14px 16px', textAlign: 'left', cursor: 'pointer',
+                    background: isActive ? '#F0FDF4' : 'transparent', border: 'none',
+                    borderBottom: i < families.length - 1 ? '1px solid #F5F0EA' : 'none',
+                    WebkitTapHighlightColor: 'transparent',
+                  }}
+                >
+                  {fam.patientPhotoUrl ? (
+                    <img src={fam.patientPhotoUrl} alt="" style={{ width: 42, height: 42, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: isActive ? '2px solid #4A7C59' : '2px solid transparent' }} />
+                  ) : (
+                    <div style={{
+                      width: 42, height: 42, borderRadius: '50%', flexShrink: 0,
+                      background: isActive ? '#4A7C59' : '#C5B9A8',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      color: 'white', fontWeight: 700, fontSize: 17,
+                    }}>
+                      {initial}
+                    </div>
+                  )}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#1A1A1A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {fam.patientName ?? 'Sin paciente'}
+                    </p>
+                    <p style={{ margin: '2px 0 0', fontSize: 11, color: '#9CA3AF' }}>
+                      {fam.role === null ? 'Tu grupo de cuidado' : 'Miembro del grupo'}
+                    </p>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+                    <span style={{ padding: '3px 9px', borderRadius: 20, fontSize: 11, fontWeight: 700, background: roleBg, color: roleColor }}>
+                      {roleLabel}
+                    </span>
+                    {isActive && (
+                      <span style={{ color: '#4A7C59', fontSize: 16, lineHeight: 1 }}>✓</span>
+                    )}
+                  </div>
+                </button>
+              )
+            })}
+          </div>
+        )}
 
         {/* Subscription card */}
         <div style={{

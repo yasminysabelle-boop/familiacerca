@@ -148,6 +148,7 @@ Deno.serve(async (req: Request) => {
       ownerId,
       ...(members?.map((m: { member_user_id: string }) => m.member_user_id).filter(Boolean) ?? []),
     ]
+    console.log(`[send-evening-push] Owner ${ownerId} — notifying ${userIds.length} users: ${JSON.stringify(userIds)}`)
 
     // Get push subscriptions for all group members
     const { data: subs, error: subsError } = await supabase
@@ -160,7 +161,7 @@ Deno.serve(async (req: Request) => {
       continue
     }
 
-    console.log(`[send-evening-push] Notifying ${subs?.length ?? 0} subscriptions for owner ${ownerId}`)
+    console.log(`[send-evening-push] Found ${subs?.length ?? 0} push subscriptions for ${userIds.length} users`)
 
     for (const sub of subs ?? []) {
       try {
