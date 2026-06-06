@@ -252,6 +252,12 @@ export default function Settings() {
                 </button>
               )
             })}
+            <p style={{
+              margin: 0, padding: '10px 16px 14px',
+              fontSize: 11, color: '#B0A898', lineHeight: 1.5, textAlign: 'center',
+            }}>
+              Para unirte a otra familia, pide al administrador que te envíe una invitación.
+            </p>
           </div>
         )}
 
