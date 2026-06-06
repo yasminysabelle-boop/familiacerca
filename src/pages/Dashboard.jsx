@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { Link, useSearchParams, useNavigate as useNav } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
@@ -3464,14 +3465,14 @@ export default function Dashboard() {
       <SuccessAnimation visible={medSuccessTrigger > 0} key={medSuccessTrigger} />
 
       {/* ── Family Switcher Bottom Sheet ─────────────────────────────────────── */}
-      {showFamilySwitcher && (
+      {showFamilySwitcher && createPortal(
         <>
           <div
             onClick={() => setShowFamilySwitcher(false)}
-            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.3)', zIndex: 200 }}
+            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.3)', zIndex: 500 }}
           />
           <div style={{
-            position: 'fixed', bottom: 68, left: 0, right: 0, zIndex: 201,
+            position: 'fixed', bottom: 68, left: 0, right: 0, zIndex: 501,
             background: 'white', borderRadius: '20px 20px 0 0',
             boxShadow: '0 -8px 40px rgba(0,0,0,0.18)',
           }}>
@@ -3568,7 +3569,8 @@ export default function Dashboard() {
               <div style={{ height: 16 }} />
             </div>
           </div>
-        </>
+        </>,
+        document.body
       )}
     </Layout>
   )
