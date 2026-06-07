@@ -83,8 +83,9 @@ export default function EmergencyAlert() {
       if (!error && data?.sent > 0) {
         pushOk = true
       }
-    } catch {
-      // push failed — fall through to directory contact fallback
+    } catch (err) {
+      console.warn('[EmergencyAlert] push failed:', err)
+      // fall through to directory contact fallback below
     }
 
     if (!pushOk) {
