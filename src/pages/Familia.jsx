@@ -284,15 +284,17 @@ export default function Familia() {
                   </p>
                   <p style={{ fontSize: 11, color: '#9CA3AF', margin: '2px 0 0' }}>Cuidador de hoy</p>
                 </div>
-                <button
-                  onClick={() => { setShiftModal(todayKey); setShiftName(todayShift?.caregiver_name ?? '') }}
-                  style={{
-                    padding: '6px 12px', borderRadius: 10, fontSize: 11, fontWeight: 700,
-                    border: '1.5px solid #4A7C59', background: 'white', color: '#4A7C59', cursor: 'pointer',
-                  }}
-                >
-                  {todayShift ? 'Cambiar' : 'Asignar'}
-                </button>
+                {isAdmin && (
+                  <button
+                    onClick={() => { setShiftModal(todayKey); setShiftName(todayShift?.caregiver_name ?? '') }}
+                    style={{
+                      padding: '6px 12px', borderRadius: 10, fontSize: 11, fontWeight: 700,
+                      border: '1.5px solid #4A7C59', background: 'white', color: '#4A7C59', cursor: 'pointer',
+                    }}
+                  >
+                    {todayShift ? 'Cambiar' : 'Asignar'}
+                  </button>
+                )}
               </div>
               {/* Weekly mini-calendar */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4 }}>
@@ -304,12 +306,12 @@ export default function Familia() {
                   return (
                     <button
                       key={dk}
-                      onClick={() => { setShiftModal(dk); setShiftName(shift?.caregiver_name ?? '') }}
+                      onClick={isAdmin ? () => { setShiftModal(dk); setShiftName(shift?.caregiver_name ?? '') } : undefined}
                       style={{
                         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
                         padding: '6px 2px', borderRadius: 10, border: 'none',
                         background: isToday ? '#EBF3EE' : shift ? '#F0F8F4' : '#F9F5F1',
-                        cursor: 'pointer', transition: 'all 0.15s',
+                        cursor: isAdmin ? 'pointer' : 'default', transition: 'all 0.15s',
                       }}
                     >
                       <span style={{ fontSize: 9, fontWeight: 700, color: '#9CA3AF', letterSpacing: '0.04em' }}>

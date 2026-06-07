@@ -1957,18 +1957,25 @@ export default function Dashboard() {
       const { data: profilesData } = memberIds.length
         ? await supabase.from('user_profiles').select('id, full_name, last_seen').in('id', memberIds)
         : { data: [] }
+      const seen = new Set([ownerId])
       const members = [
         { id: ownerId, full_name: profile?.name || fullName || null, email: null, role: 'admin', last_seen: null },
-        ...(membersData ?? []).map(m => {
-          const p = (profilesData ?? []).find(x => x.id === m.member_user_id)
-          return {
-            id: m.member_user_id,
-            full_name: p?.full_name ?? null,
-            email: m.member_email ?? null,
-            role: m.role ?? 'familiar',
-            last_seen: p?.last_seen ?? null,
-          }
-        }),
+        ...(membersData ?? [])
+          .filter(m => {
+            if (!m.member_user_id || seen.has(m.member_user_id)) return false
+            seen.add(m.member_user_id)
+            return true
+          })
+          .map(m => {
+            const p = (profilesData ?? []).find(x => x.id === m.member_user_id)
+            return {
+              id: m.member_user_id,
+              full_name: p?.full_name ?? null,
+              email: m.member_email ?? null,
+              role: m.role ?? 'familiar',
+              last_seen: p?.last_seen ?? null,
+            }
+          }),
       ]
       setFamilyMembers(members)
       setFamilyCount(members.length)
