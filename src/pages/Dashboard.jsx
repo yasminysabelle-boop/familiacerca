@@ -3663,13 +3663,24 @@ export default function Dashboard() {
                 )}
               </div>
 
-              {/* ── NOTAS DE TURNO ── */}
+              {/* ── NOTAS DE LA FAMILIA ── */}
               <div style={{ padding: '14px 20px 8px' }}>
-                <p style={{ margin: '0 0 10px', fontSize: 11, fontWeight: 700, color: '#9CA3AF', letterSpacing: '0.06em' }}>
-                  📓 NOTAS DE TURNO
-                </p>
+                <button
+                  onClick={() => { setShowNotifSheet(false); navigate('/paciente/notas-turno') }}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, marginBottom: 10, display: 'flex', alignItems: 'center', gap: 4, WebkitTapHighlightColor: 'transparent' }}
+                >
+                  <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: '#9CA3AF', letterSpacing: '0.06em' }}>
+                    📓 NOTAS DE LA FAMILIA
+                  </p>
+                  <span style={{ fontSize: 10, color: '#9CA3AF' }}>›</span>
+                </button>
                 {notifNotes.length === 0 ? (
-                  <p style={{ margin: 0, fontSize: 13, color: '#9CA3AF', padding: '4px 0' }}>No hay notas sin leer</p>
+                  <button
+                    onClick={() => { setShowNotifSheet(false); navigate('/paciente/notas-turno') }}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0', textAlign: 'left', WebkitTapHighlightColor: 'transparent' }}
+                  >
+                    <p style={{ margin: 0, fontSize: 13, color: '#9CA3AF' }}>No hay notas sin leer</p>
+                  </button>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                     {notifNotes.map(note => (
