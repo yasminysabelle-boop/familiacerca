@@ -3395,7 +3395,7 @@ export default function Dashboard() {
                 {[
                   { emoji: '👥', label: 'Equipo', onClick: () => navigate('/familia') },
                   { emoji: '🏥', label: 'Hospital', onClick: () => setShowHospitalModal(true) },
-                  { emoji: '🎥', label: 'Videollamada', onClick: handleInstantCall },
+                  { emoji: '🎥', label: 'Videollamada', onClick: () => setShowVideoCallModal(true) },
                   { emoji: '💬', label: 'Chat', route: '/chat' },
                   { emoji: '📅', label: 'Citas', route: '/calendar' },
                   { emoji: '🖼️', label: 'Álbum', route: '/album' },

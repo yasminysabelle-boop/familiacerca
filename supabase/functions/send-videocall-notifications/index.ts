@@ -36,6 +36,36 @@ Deno.serve(async (req: Request) => {
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
   )
 
+  let sentCount = 0
+  let failCount = 0
+
+  // Direct invocation: ?callId=<uuid>&immediate=true bypasses the cron time
+  // windows and notifies a specific call right now. Used by create-daily-room
+  // to push instant notifications without waiting up to 60s for the cron.
+  const reqUrl    = new URL(req.url)
+  const targetId  = reqUrl.searchParams.get('callId')
+  const immediate = reqUrl.searchParams.get('immediate') === 'true'
+
+  if (targetId) {
+    console.log(`[send-videocall-notifications] Direct invocation for call ${targetId}`)
+    const { data: directCall } = await supabase
+      .from('video_calls')
+      .select('id, owner_id, title, room_url, scheduled_at, created_by_name')
+      .eq('id', targetId)
+      .neq('status', 'cancelled')
+      .maybeSingle()
+
+    if (directCall) {
+      await notifyCall(directCall, immediate)
+    } else {
+      console.warn(`[send-videocall-notifications] Call ${targetId} not found or cancelled`)
+    }
+
+    return new Response(JSON.stringify({ sent: sentCount, failed: failCount }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+  }
+
   const now = new Date()
 
   // 15-minute reminder window: calls scheduled 13–17 min from now
@@ -68,9 +98,6 @@ Deno.serve(async (req: Request) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
   }
-
-  let sentCount = 0
-  let failCount = 0
 
   async function notifyCall(
     call: { id: string; owner_id: string; title: string | null; room_url: string | null; created_by_name: string | null },
