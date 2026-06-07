@@ -41,9 +41,10 @@ export function FamilyProvider({ children }) {
     }, 8000)
 
     try {
-      const [{ data: ownData }, { data: memberships }] = await Promise.all([
+      const [{ data: ownData }, { data: memberships }, { data: ownPatient }] = await Promise.all([
         supabase.from('care_profiles').select('*').eq('user_id', user.id).maybeSingle(),
         supabase.from('family_members').select('user_id, role').eq('member_user_id', user.id).neq('user_id', user.id),
+        supabase.from('patient_profiles').select('nombre_completo').eq('owner_id', user.id).maybeSingle(),
       ])
 
       const built = []
@@ -51,7 +52,7 @@ export function FamilyProvider({ children }) {
       if (ownData) {
         built.push({
           ownerId: user.id,
-          patientName: ownData.name ?? null,
+          patientName: ownPatient?.nombre_completo || ownData.name || null,
           patientPhotoUrl: ownData.photo_url ?? null,
           role: null,
           profile: ownData,
@@ -60,10 +61,14 @@ export function FamilyProvider({ children }) {
 
       if (memberships?.length) {
         const memberOwnerIds = memberships.map(m => m.user_id)
-        const { data: ownerProfiles } = await supabase
-          .from('care_profiles').select('*').in('user_id', memberOwnerIds)
+        const [{ data: ownerProfiles }, { data: memberPatients }] = await Promise.all([
+          supabase.from('care_profiles').select('*').in('user_id', memberOwnerIds),
+          supabase.from('patient_profiles').select('owner_id, nombre_completo').in('owner_id', memberOwnerIds),
+        ])
         const profileMap = {}
         ;(ownerProfiles ?? []).forEach(p => { profileMap[p.user_id] = p })
+        const patientNameMap = {}
+        ;(memberPatients ?? []).forEach(pp => { if (pp.nombre_completo) patientNameMap[pp.owner_id] = pp.nombre_completo })
 
         for (const m of memberships) {
           const op = profileMap[m.user_id]
@@ -71,7 +76,7 @@ export function FamilyProvider({ children }) {
           localStorage.setItem('fc_member_role_' + m.user_id, role)
           built.push({
             ownerId: m.user_id,
-            patientName: op?.name ?? null,
+            patientName: patientNameMap[m.user_id] || op?.name || null,
             patientPhotoUrl: op?.photo_url ?? null,
             role,
             profile: op ?? null,
@@ -116,21 +121,6 @@ export function FamilyProvider({ children }) {
 
       if (built.length === 0) {
         built.push({ ownerId: user.id, patientName: null, patientPhotoUrl: null, role: null, profile: null })
-      }
-
-      // Override patientName with nombre_completo from patient_profiles when available
-      const ownerIds = built.map(f => f.ownerId).filter(Boolean)
-      if (ownerIds.length > 0) {
-        const { data: patientProfiles } = await supabase
-          .from('patient_profiles')
-          .select('owner_id, nombre_completo')
-          .in('owner_id', ownerIds)
-        if (patientProfiles?.length) {
-          const ppMap = Object.fromEntries(patientProfiles.map(pp => [pp.owner_id, pp.nombre_completo]))
-          for (const f of built) {
-            if (ppMap[f.ownerId]) f.patientName = ppMap[f.ownerId]
-          }
-        }
       }
 
       setFamilies(built)
@@ -192,6 +182,7 @@ export function FamilyProvider({ children }) {
       switchFamily,
       activeFamilyLabel,
       activeOwnerId,
+      activePatientName: activeEntry?.patientName ?? null,
 
       hasBoth,
       activeFamily: activeOwnerId === user?.id ? 'owner' : 'member',

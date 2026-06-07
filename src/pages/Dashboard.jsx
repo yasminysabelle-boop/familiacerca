@@ -1913,19 +1913,20 @@ export default function Dashboard() {
     ;(async () => {
       const { data: membersData } = await supabase
         .from('family_members')
-        .select('member_user_id, role')
+        .select('member_user_id, role, member_email')
         .eq('user_id', ownerId)
       const memberIds = (membersData ?? []).map(m => m.member_user_id).filter(Boolean)
       const { data: profilesData } = memberIds.length
         ? await supabase.from('user_profiles').select('id, full_name, last_seen').in('id', memberIds)
         : { data: [] }
       const members = [
-        { id: ownerId, full_name: profile?.name || fullName || '?', role: 'admin', last_seen: null },
+        { id: ownerId, full_name: profile?.name || fullName || null, email: null, role: 'admin', last_seen: null },
         ...(membersData ?? []).map(m => {
           const p = (profilesData ?? []).find(x => x.id === m.member_user_id)
           return {
             id: m.member_user_id,
-            full_name: p?.full_name ?? '?',
+            full_name: p?.full_name ?? null,
+            email: m.member_email ?? null,
             role: m.role ?? 'familiar',
             last_seen: p?.last_seen ?? null,
           }
@@ -3126,7 +3127,7 @@ export default function Dashboard() {
                             }}
                             onClick={e => { e.preventDefault(); e.stopPropagation(); setShowCollaborators(true) }}
                           >
-                            {m.full_name?.charAt(0).toUpperCase()}
+                            {(m.full_name?.charAt(0) || m.email?.charAt(0) || '👤').toUpperCase()}
                           </div>
                         ))}
                         {familyMembers.length > 3 && (
@@ -3692,10 +3693,10 @@ export default function Dashboard() {
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       fontSize: 16, fontWeight: 700, color: 'white',
                     }}>
-                      {m.full_name?.charAt(0).toUpperCase()}
+                      {(m.full_name?.charAt(0) || m.email?.charAt(0) || '👤').toUpperCase()}
                     </div>
                     <div style={{ flex: 1 }}>
-                      <p style={{ margin: 0, fontSize: 14, fontWeight: 500, color: '#1E2D26' }}>{m.full_name}</p>
+                      <p style={{ margin: 0, fontSize: 14, fontWeight: 500, color: '#1E2D26' }}>{m.full_name || m.email || 'Sin nombre'}</p>
                       <p style={{ margin: '2px 0 0', fontSize: 11, color: presence.color }}>{presence.dot} {presence.label}</p>
                     </div>
                     <span style={{ fontSize: 11, fontWeight: 600, color: roleColor, background: roleBg, borderRadius: 20, padding: '3px 10px', flexShrink: 0 }}>
