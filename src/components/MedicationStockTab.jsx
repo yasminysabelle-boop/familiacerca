@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useSubscription } from '../contexts/SubscriptionContext'
 import { supabase } from '../lib/supabase'
 import { XIcon } from './Icons'
+import EvidencePhoto from './EvidencePhoto'
 
 const RENEWAL_LABELS = {
   pharmacy:     '🏪 Farmacia',
@@ -27,12 +28,15 @@ function fmtDate(dateStr) {
 export default function MedicationStockTab({ med, ownerId, isFamiliar, onClose }) {
   const { user } = useAuth()
   const { canEdit } = useSubscription()
+  const isAdmin = user?.id === ownerId
+
   const [stock, setStock] = useState(null)
   const [renewals, setRenewals] = useState([])
   const [loading, setLoading] = useState(true)
   const [showRenewModal, setShowRenewModal] = useState(false)
   const [newPillCount, setNewPillCount] = useState('')
   const [renewing, setRenewing] = useState(false)
+  const [docPhotoUrl, setDocPhotoUrl] = useState(null)
   const displayName = user?.user_metadata?.full_name ?? user?.email ?? 'Familiar'
 
   useEffect(() => {
@@ -90,6 +94,18 @@ export default function MedicationStockTab({ med, ownerId, isFamiliar, onClose }
     load()
   }
 
+  async function saveDocPhoto(field, url) {
+    await supabase.from('medication_stock').update({ [field]: url })
+      .eq('medication_id', med.id).eq('user_id', ownerId)
+    setStock(prev => prev ? { ...prev, [field]: url } : prev)
+  }
+
+  async function deleteDocPhoto(field) {
+    await supabase.from('medication_stock').update({ [field]: null })
+      .eq('medication_id', med.id).eq('user_id', ownerId)
+    setStock(prev => prev ? { ...prev, [field]: null } : prev)
+  }
+
   const days = stock ? daysFromNow(stock.estimated_end_date) : null
   const pct  = stock?.total_pills > 0
     ? Math.max(0, Math.min(100, Math.round((stock.pills_remaining / stock.total_pills) * 100)))
@@ -98,6 +114,8 @@ export default function MedicationStockTab({ med, ownerId, isFamiliar, onClose }
     : days <= 1 ? '#DC2626' : days <= 3 ? '#D97706' : days <= 7 ? '#C9882A' : '#16A34A'
   const urgBg = days == null ? '#F3F4F6'
     : days <= 1 ? '#FEF2F2' : days <= 3 ? '#FEF3C7' : days <= 7 ? '#FFFBEB' : '#F0FDF4'
+
+  const btnStyle = { padding: '7px 14px', borderRadius: 10, fontSize: 12, fontWeight: 600, cursor: 'pointer', border: 'none' }
 
   return (
     <div
@@ -221,6 +239,93 @@ export default function MedicationStockTab({ med, ownerId, isFamiliar, onClose }
               </div>
             )}
 
+            {/* Documents — feature 3 & 7 */}
+            <div style={{ background: 'white', borderRadius: 16, border: '1px solid #EDE5D8', padding: '14px 16px', marginBottom: 14, boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+              <p style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', letterSpacing: '0.08em', textTransform: 'uppercase', margin: '0 0 12px' }}>
+                Documentos
+              </p>
+
+              {/* Prescription */}
+              <div style={{ marginBottom: 12 }}>
+                <p style={{ fontSize: 12, fontWeight: 600, color: '#374151', margin: '0 0 8px' }}>📄 Receta médica</p>
+                {stock.prescription_photo_url ? (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                    <button
+                      onClick={() => setDocPhotoUrl(stock.prescription_photo_url)}
+                      style={{ ...btnStyle, background: '#EFF6FF', color: '#1D4ED8', border: '1px solid #DBEAFE' }}
+                    >
+                      📄 Ver receta
+                    </button>
+                    {isAdmin && (
+                      <>
+                        <EvidencePhoto
+                          onPhotoCapture={url => saveDocPhoto('prescription_photo_url', url)}
+                          bucket="care-photos"
+                          pathPrefix={`${ownerId}/med-docs/${med.id}-rx`}
+                          label="Reemplazar"
+                        />
+                        <button
+                          onClick={() => deleteDocPhoto('prescription_photo_url')}
+                          style={{ ...btnStyle, background: '#FEF2F2', color: '#DC2626', border: '1px solid #FCA5A5', padding: '7px 10px' }}
+                        >
+                          🗑
+                        </button>
+                      </>
+                    )}
+                  </div>
+                ) : isAdmin ? (
+                  <EvidencePhoto
+                    onPhotoCapture={url => saveDocPhoto('prescription_photo_url', url)}
+                    bucket="care-photos"
+                    pathPrefix={`${ownerId}/med-docs/${med.id}-rx`}
+                    label="Subir receta"
+                  />
+                ) : (
+                  <p style={{ fontSize: 12, color: '#9CA3AF', margin: 0 }}>Sin receta guardada</p>
+                )}
+              </div>
+
+              {/* Box photo */}
+              <div>
+                <p style={{ fontSize: 12, fontWeight: 600, color: '#374151', margin: '0 0 8px' }}>📦 Foto de la caja</p>
+                {stock.box_photo_url ? (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                    <button
+                      onClick={() => setDocPhotoUrl(stock.box_photo_url)}
+                      style={{ ...btnStyle, background: '#EEF2FF', color: '#4338CA', border: '1px solid #E0E7FF' }}
+                    >
+                      📦 Ver caja
+                    </button>
+                    {isAdmin && (
+                      <>
+                        <EvidencePhoto
+                          onPhotoCapture={url => saveDocPhoto('box_photo_url', url)}
+                          bucket="care-photos"
+                          pathPrefix={`${ownerId}/med-docs/${med.id}-box`}
+                          label="Reemplazar"
+                        />
+                        <button
+                          onClick={() => deleteDocPhoto('box_photo_url')}
+                          style={{ ...btnStyle, background: '#FEF2F2', color: '#DC2626', border: '1px solid #FCA5A5', padding: '7px 10px' }}
+                        >
+                          🗑
+                        </button>
+                      </>
+                    )}
+                  </div>
+                ) : isAdmin ? (
+                  <EvidencePhoto
+                    onPhotoCapture={url => saveDocPhoto('box_photo_url', url)}
+                    bucket="care-photos"
+                    pathPrefix={`${ownerId}/med-docs/${med.id}-box`}
+                    label="Subir foto de caja"
+                  />
+                ) : (
+                  <p style={{ fontSize: 12, color: '#9CA3AF', margin: 0 }}>Sin foto guardada</p>
+                )}
+              </div>
+            </div>
+
             {/* Renew button */}
             {!isFamiliar && canEdit && (
               <button
@@ -237,7 +342,7 @@ export default function MedicationStockTab({ med, ownerId, isFamiliar, onClose }
               </button>
             )}
 
-            {/* Renewal history */}
+            {/* Renewal history — feature 6 */}
             {renewals.length > 0 && (
               <div>
                 <p style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', letterSpacing: '0.08em', textTransform: 'uppercase', margin: '0 0 10px' }}>
@@ -251,7 +356,7 @@ export default function MedicationStockTab({ med, ownerId, isFamiliar, onClose }
                         <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', margin: 0 }}>+{r.pill_count} pastillas</p>
                         <p style={{ fontSize: 11, color: '#9CA3AF', margin: '2px 0 0' }}>
                           {fmtDate(r.renewed_at?.split('T')[0])}
-                          {r.renewed_by_name ? ` · ${r.renewed_by_name.split(' ')[0]}` : ''}
+                          {r.renewed_by_name ? ` · Renovado por: ${r.renewed_by_name.split(' ')[0]}` : ''}
                         </p>
                       </div>
                       <span style={{ fontSize: 11, fontWeight: 700, color: '#16A34A', background: '#DCFCE7', padding: '2px 8px', borderRadius: 6 }}>✓</span>
@@ -306,6 +411,22 @@ export default function MedicationStockTab({ med, ownerId, isFamiliar, onClose }
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Doc photo lightbox */}
+      {docPhotoUrl && (
+        <div
+          style={{ position: 'fixed', inset: 0, zIndex: 350, background: 'rgba(0,0,0,0.92)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
+          onClick={() => setDocPhotoUrl(null)}
+        >
+          <button
+            onClick={() => setDocPhotoUrl(null)}
+            style={{ position: 'absolute', top: 20, right: 20, width: 38, height: 38, borderRadius: '50%', background: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          >
+            <XIcon size={18} color="white" strokeWidth={2} />
+          </button>
+          <img src={docPhotoUrl} alt="" style={{ maxWidth: '100%', maxHeight: '88vh', objectFit: 'contain', borderRadius: 12 }} onClick={e => e.stopPropagation()} />
         </div>
       )}
     </div>

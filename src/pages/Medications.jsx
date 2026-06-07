@@ -19,6 +19,7 @@ import Layout from '../components/Layout'
 import MedicationListTab from '../components/MedicationListTab'
 import MedicationHistorialTab from '../components/MedicationHistorialTab'
 import MedicationStockList from './medications/MedicationStockList'
+import MedicationRecetasTab from '../components/MedicationRecetasTab'
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -176,6 +177,8 @@ export default function Medications() {
   const [omisionSaving,      setOmisionSaving]      = useState(false)
   const [omisionError,       setOmisionError]       = useState('')
   const [toastMsg,           setToastMsg]           = useState('')
+  const [omissionsByMedId,   setOmissionsByMedId]   = useState({})
+  const [previewPhotoUrl,    setPreviewPhotoUrl]     = useState(null)
   const [, setTick] = useState(0)
   const autoMarkedRef  = useRef(new Set())
   const fetchAllIdRef  = useRef(0)   // stale-request guard for fetchAll
@@ -293,6 +296,23 @@ export default function Medications() {
         logsMap[log.medication_id][log.log_date].push(log)
       })
       setLogsByMedId(logsMap)
+
+      // Fetch last 7 days of omissions to get reasons for detail and historial views
+      const { data: omissionsData } = await supabase
+        .from('medication_omissions')
+        .select('medication_id, reason, omitted_by_name, scheduled_at')
+        .eq('owner_id', ownerId)
+        .gte('scheduled_at', sevenAgoKey + 'T00:00:00')
+        .in('medication_id', meds.map(m => m.id))
+      if (fetchAllIdRef.current !== myId) return
+      const omissionsMap = {}
+      ;(omissionsData ?? []).forEach(o => {
+        if (!o.scheduled_at) return
+        const dk = new Date(o.scheduled_at).toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' })
+        if (!omissionsMap[o.medication_id]) omissionsMap[o.medication_id] = {}
+        omissionsMap[o.medication_id][dk] = o
+      })
+      setOmissionsByMedId(omissionsMap)
     }
 
     setLoading(false)
@@ -712,6 +732,18 @@ export default function Medications() {
     (logsByMedId[med.id]?.[today] ?? []).some(l => l.status === 'confirmed' || l.status === 'missed')
   )
 
+  // Today's contributors derived from existing logsByMedId state (avatars + personalized banner)
+  const todayContributors = [...new Set(
+    medications.flatMap(med =>
+      (logsByMedId[med.id]?.[today] ?? [])
+        .filter(l => l.status === 'confirmed' && l.confirmed_by_name && l.confirmed_by_name !== 'Sistema automático')
+        .map(l => l.confirmed_by_name)
+    )
+  )]
+  const lastAdminLog = medications
+    .flatMap(med => (logsByMedId[med.id]?.[today] ?? []).filter(l => l.status === 'confirmed' && l.confirmed_by_name !== 'Sistema automático'))
+    .sort((a, b) => new Date(b.confirmed_at) - new Date(a.confirmed_at))[0] ?? null
+
   // Auto-mark medications past their clinical window as missed.
   // Dep key is the sorted ID string so the effect fires whenever the SET changes,
   // even when count stays the same (e.g. med A confirmed → med C enters window).
@@ -793,20 +825,20 @@ export default function Medications() {
       {/* Tab bar — fuera del scroll, siempre visible */}
       <div style={{ padding: '0 16px', maxWidth: 600 }}>
         <div style={{ display: 'flex', background: '#f5f5f5', borderRadius: '8px 8px 0 0', overflow: 'hidden' }}>
-          {['hoy', 'todos', 'stock'].map(tab => (
+          {['hoy', 'todos', 'stock', 'recetas'].map(tab => (
             <button key={tab} onClick={() => setActiveTab(tab)}
               style={{
                 flex: 1, padding: '10px 0', border: 'none', cursor: 'pointer',
                 background: activeTab === tab ? '#2D4A1E' : 'transparent',
                 color: activeTab === tab ? 'white' : '#666',
                 fontWeight: activeTab === tab ? 600 : 400,
-                fontSize: 14,
-                borderRadius: tab === 'hoy' ? '8px 0 0 0' : tab === 'stock' ? '0 8px 0 0' : 0,
+                fontSize: 11,
+                borderRadius: tab === 'hoy' ? '8px 0 0 0' : tab === 'recetas' ? '0 8px 0 0' : 0,
                 transition: 'all 0.2s',
                 WebkitTapHighlightColor: 'transparent',
               }}
             >
-              {tab === 'hoy' ? '💊 Hoy' : tab === 'todos' ? '📋 Historial' : '📦 Inventario'}
+              {tab === 'hoy' ? '💊 Hoy' : tab === 'todos' ? '📋 Historial' : tab === 'stock' ? '📦 Inventario' : '📄 Recetas'}
             </button>
           ))}
         </div>
@@ -856,6 +888,27 @@ export default function Medications() {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16, paddingBottom: 16 }}>
 
+            {/* ── Avatares de participantes hoy ── */}
+            {todayContributors.length > 0 && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', background: '#F0FDF4', borderRadius: 12, border: '1px solid #BBF7D0' }}>
+                <div style={{ display: 'flex' }}>
+                  {todayContributors.slice(0, 4).map((name, i) => {
+                    const colors = ['#4A7C59','#2D6A4F','#16A34A','#059669']
+                    return (
+                      <div key={i} style={{ width: 28, height: 28, borderRadius: '50%', background: colors[i % 4], color: 'white', fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: i > 0 ? -8 : 0, border: '2px solid #F0FDF4', flexShrink: 0 }}>
+                        {name.charAt(0).toUpperCase()}
+                      </div>
+                    )
+                  })}
+                </div>
+                <p style={{ fontSize: 12, color: '#15803D', fontWeight: 600, margin: 0 }}>
+                  {todayContributors.length === 1
+                    ? `${todayContributors[0].split(' ')[0]} participó hoy`
+                    : `${todayContributors.slice(0, 2).map(n => n.split(' ')[0]).join(' y ')} participaron hoy`}
+                </p>
+              </div>
+            )}
+
             {/* ── Sección 1: PENDIENTES ──────────────────────────────────── */}
             {pendientesMeds.length > 0 && (
               <div>
@@ -875,9 +928,16 @@ export default function Medications() {
                               💊 {med.name}{med.dosage ? <span style={{ fontWeight: 400, color: '#6B7280', fontSize: 13 }}> · {med.dosage}</span> : null}
                             </p>
                           </div>
-                          <span style={{ fontSize: 11, fontWeight: 700, color: sCfg.color, background: sCfg.bg, border: `1px solid ${sCfg.border}`, padding: '3px 8px', borderRadius: 6, flexShrink: 0 }}>
-                            {sCfg.dot} {sCfg.label}
-                          </span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                            <span style={{ fontSize: 11, fontWeight: 700, color: sCfg.color, background: sCfg.bg, border: `1px solid ${sCfg.border}`, padding: '3px 8px', borderRadius: 6 }}>
+                              {sCfg.dot} {sCfg.label}
+                            </span>
+                            {isAdmin && (
+                              <button onClick={() => openEdit(med)} style={{ padding: 5, border: 'none', background: '#F3F4F6', borderRadius: 8, cursor: 'pointer', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+                                <Pencil size={13} color="#6B7280" strokeWidth={2} />
+                              </button>
+                            )}
+                          </div>
                         </div>
                         {times.length > 0 && (
                           <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 10 }}>
@@ -928,7 +988,14 @@ export default function Medications() {
                               </p>
                             )}
                           </div>
-                          <span style={{ fontSize: 10, fontWeight: 700, color: 'white', background: '#DC2626', padding: '3px 8px', borderRadius: 6, flexShrink: 0 }}>Olvidada</span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                            <span style={{ fontSize: 10, fontWeight: 700, color: 'white', background: '#DC2626', padding: '3px 8px', borderRadius: 6 }}>Olvidada</span>
+                            {isAdmin && (
+                              <button onClick={() => openEdit(med)} style={{ padding: 5, border: 'none', background: 'rgba(255,255,255,0.7)', borderRadius: 8, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                                <Pencil size={13} color="#DC2626" strokeWidth={2} />
+                              </button>
+                            )}
+                          </div>
                         </div>
                         <div style={{ background: '#FFF5F5', border: '1px solid #FECACA', borderRadius: 10, padding: '10px 12px', marginBottom: 10 }}>
                           <p style={{ fontSize: 12, color: '#7F1D1D', lineHeight: 1.6, margin: 0, fontWeight: 500 }}>
@@ -950,13 +1017,33 @@ export default function Medications() {
               </div>
             )}
 
-            {/* Todo listo */}
-            {pendientesMeds.length === 0 && retrasadosMeds.length === 0 && administradosMeds.length > 0 && (
-              <div style={{ textAlign: 'center', padding: '20px 16px', background: '#F0FDF4', borderRadius: 16, border: '1px solid #BBF7D0' }}>
-                <p style={{ fontSize: 16, fontWeight: 700, color: '#15803D', margin: 0 }}>✅ ¡Todo administrado hoy!</p>
-                {profile?.name && <p style={{ fontSize: 13, color: '#4A7C59', margin: '4px 0 0' }}>{profile.name.split(' ')[0]} tomó todos sus medicamentos 💙</p>}
-              </div>
-            )}
+            {/* Todo listo — banner personalizado */}
+            {pendientesMeds.length === 0 && retrasadosMeds.length === 0 && administradosMeds.length > 0 && (() => {
+              const patientFirst = profile?.name?.split(' ')[0] ?? 'el familiar'
+              const lastTime = lastAdminLog?.confirmed_at
+                ? new Date(lastAdminLog.confirmed_at).toLocaleTimeString('es-US', { hour: 'numeric', minute: '2-digit', hour12: true })
+                : null
+              const lastBy = lastAdminLog?.confirmed_by_name?.split(' ')[0]
+              let mainMsg
+              if (todayContributors.length === 1) {
+                mainMsg = `${todayContributors[0].split(' ')[0]} confirmó todas las dosis de ${patientFirst} hoy. 💙`
+              } else if (todayContributors.length > 1) {
+                mainMsg = `Participaron hoy: ${todayContributors.map(n => n.split(' ')[0]).join(' y ')}`
+              } else {
+                mainMsg = `Todas las dosis de ${patientFirst} registradas hoy.`
+              }
+              return (
+                <div style={{ padding: '20px 16px', background: '#F0FDF4', borderRadius: 16, border: '1px solid #BBF7D0' }}>
+                  <p style={{ fontSize: 16, fontWeight: 700, color: '#15803D', margin: 0, textAlign: 'center' }}>✅ ¡Todo administrado hoy!</p>
+                  <p style={{ fontSize: 13, color: '#4A7C59', margin: '6px 0 0', textAlign: 'center' }}>{mainMsg}</p>
+                  {lastTime && lastBy && (
+                    <p style={{ fontSize: 11, color: '#6B7280', margin: '6px 0 0', textAlign: 'center' }}>
+                      Última administración: {lastBy} · {lastTime}
+                    </p>
+                  )}
+                </div>
+              )
+            })()}
 
             {/* ── Sección 3: ADMINISTRADOS (colapsada) ──────────────────── */}
             {administradosMeds.length > 0 && (
@@ -968,30 +1055,69 @@ export default function Medications() {
                 {dadosExpandido && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                     {administradosMeds.map(med => {
-                      const todayLog = (logsByMedId[med.id]?.[today] ?? []).find(l => l.status === 'confirmed' || l.status === 'missed')
-                      const isOmitted = todayLog?.status === 'missed'
-                      const confTime = todayLog?.confirmed_at ? new Date(todayLog.confirmed_at).toLocaleTimeString('es-US', { hour: 'numeric', minute: '2-digit', hour12: true }) : null
-                      const byName = todayLog?.confirmed_by_name?.split(' ')[0]
+                      const todayLog    = (logsByMedId[med.id]?.[today] ?? []).find(l => l.status === 'confirmed' || l.status === 'missed')
+                      const isOmitted   = todayLog?.status === 'missed'
+                      const isAutoMissed = isOmitted && todayLog?.confirmed_by_name === 'Sistema automático'
+                      const confTime    = todayLog?.confirmed_at ? new Date(todayLog.confirmed_at).toLocaleTimeString('es-US', { hour: 'numeric', minute: '2-digit', hour12: true }) : null
+                      const byName      = todayLog?.confirmed_by_name?.split(' ')[0]
+                      const scheduledTime = firstTimeMed(med)
+                      const omissionData  = omissionsByMedId[med.id]?.[today]
+                      const stockDoc      = stockByMedId[med.id]
                       return (
-                        <div key={med.id} style={{ background: isOmitted ? '#FFFBEB' : '#F0FDF4', borderRadius: 14, border: isOmitted ? '1px solid #FDE68A' : '1px solid #BBF7D0', borderLeft: isOmitted ? '4px solid #D97706' : '4px solid #22C55E', padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
-                          <span style={{ fontSize: 18, flexShrink: 0 }}>{isOmitted ? '❌' : '✅'}</span>
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            <p style={{ fontSize: 14, fontWeight: 700, color: isOmitted ? '#92400E' : '#15803D', margin: '0 0 3px' }}>{med.name}</p>
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                              {confTime && <span style={{ fontSize: 11, color: '#4A7C59', fontWeight: 600 }}>🕐 {confTime}</span>}
-                              {byName && <span style={{ fontSize: 11, color: '#6B7280' }}>por {byName}</span>}
-                              {isOmitted ? (
-                                <span style={{ fontSize: 11, fontWeight: 700, color: '#DC2626' }}>❌ Dosis olvidada</span>
-                              ) : (
-                                <span style={{ fontSize: 11, fontWeight: 700, color: todayLog?.given_on_time === false ? '#D97706' : '#15803D' }}>
-                                  {todayLog?.given_on_time === false && todayLog?.minutes_late
-                                    ? `⚠️ Fuera de ventana (${todayLog.minutes_late} min)`
-                                    : '✅ Administrado a tiempo'}
-                                </span>
-                              )}
-                            </div>
+                        <div key={med.id} style={{ background: isAutoMissed ? '#FEF2F2' : isOmitted ? '#FFFBEB' : '#F0FDF4', borderRadius: 14, border: isAutoMissed ? '1px solid #FCA5A5' : isOmitted ? '1px solid #FDE68A' : '1px solid #BBF7D0', borderLeft: isAutoMissed ? '4px solid #DC2626' : isOmitted ? '4px solid #D97706' : '4px solid #22C55E', padding: '12px 14px' }}>
+                          {/* Header row */}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                            <span style={{ fontSize: 16, flexShrink: 0 }}>{isAutoMissed ? '❌' : isOmitted ? '⚠️' : '✅'}</span>
+                            <p style={{ fontSize: 14, fontWeight: 700, color: isAutoMissed ? '#991B1B' : isOmitted ? '#92400E' : '#15803D', margin: 0, flex: 1 }}>
+                              {med.name}{med.dosage ? <span style={{ fontWeight: 400, color: '#6B7280', fontSize: 12 }}> · {med.dosage}</span> : null}
+                            </p>
+                            {isAdmin && (
+                              <button onClick={() => openEdit(med)} style={{ padding: 5, border: 'none', background: 'transparent', cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center' }}>
+                                <Pencil size={12} color="#9CA3AF" strokeWidth={2} />
+                              </button>
+                            )}
                           </div>
-                          {todayLog?.photo_url && <EvidencePhoto photoUrl={todayLog.photo_url} />}
+                          {/* Detail rows */}
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, paddingLeft: 24 }}>
+                            {scheduledTime && <span style={{ fontSize: 11, color: '#6B7280' }}>📅 Programado: {scheduledTime}</span>}
+                            {confTime && <span style={{ fontSize: 11, color: '#4A7C59', fontWeight: 600 }}>🕐 {isOmitted ? 'Registrado:' : 'Administrado:'} {confTime}</span>}
+                            {byName && !isAutoMissed && <span style={{ fontSize: 11, color: '#6B7280' }}>👤 Por: {byName}</span>}
+                            {isAutoMissed && <span style={{ fontSize: 11, color: '#DC2626', fontWeight: 600 }}>❌ Ventana clínica vencida — marcado por el sistema</span>}
+                            {isOmitted && !isAutoMissed && omissionData?.reason && (
+                              <span style={{ fontSize: 11, color: '#92400E' }}>⚠ Motivo: {omissionData.reason}</span>
+                            )}
+                            {isOmitted && !isAutoMissed && !omissionData?.reason && (
+                              <span style={{ fontSize: 11, color: '#92400E' }}>⚠ Dosis omitida</span>
+                            )}
+                            {!isOmitted && (
+                              <span style={{ fontSize: 11, fontWeight: 600, color: todayLog?.given_on_time === false ? '#D97706' : '#15803D' }}>
+                                {todayLog?.given_on_time === false && todayLog?.minutes_late
+                                  ? `⚠️ Fuera de ventana (${todayLog.minutes_late} min)`
+                                  : '✅ Administrado a tiempo'}
+                              </span>
+                            )}
+                            {med.notes && <span style={{ fontSize: 11, color: '#6B7280' }}>📝 {med.notes}</span>}
+                            {/* Photo action buttons */}
+                            {(todayLog?.photo_url || stockDoc?.prescription_photo_url || stockDoc?.box_photo_url) && (
+                              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 2 }}>
+                                {todayLog?.photo_url && (
+                                  <button onClick={() => setPreviewPhotoUrl(todayLog.photo_url)} style={{ padding: '4px 10px', borderRadius: 8, border: '1px solid #BBF7D0', background: 'white', fontSize: 11, fontWeight: 600, color: '#15803D', cursor: 'pointer' }}>
+                                    📷 Ver evidencia
+                                  </button>
+                                )}
+                                {stockDoc?.prescription_photo_url && (
+                                  <button onClick={() => setPreviewPhotoUrl(stockDoc.prescription_photo_url)} style={{ padding: '4px 10px', borderRadius: 8, border: '1px solid #DBEAFE', background: 'white', fontSize: 11, fontWeight: 600, color: '#1D4ED8', cursor: 'pointer' }}>
+                                    📄 Ver receta
+                                  </button>
+                                )}
+                                {stockDoc?.box_photo_url && (
+                                  <button onClick={() => setPreviewPhotoUrl(stockDoc.box_photo_url)} style={{ padding: '4px 10px', borderRadius: 8, border: '1px solid #E0E7FF', background: 'white', fontSize: 11, fontWeight: 600, color: '#4338CA', cursor: 'pointer' }}>
+                                    📦 Ver caja
+                                  </button>
+                                )}
+                              </div>
+                            )}
+                          </div>
                         </div>
                       )
                     })}
@@ -1009,6 +1135,7 @@ export default function Medications() {
             <MedicationHistorialTab
               medications={medications}
               logsByMedId={logsByMedId}
+              omissionsByMedId={omissionsByMedId}
               loading={loading}
             />
           </div>
@@ -1016,6 +1143,19 @@ export default function Medications() {
 
         {activeTab === 'stock' && (
           <MedicationStockList />
+        )}
+
+        {activeTab === 'recetas' && (
+          <div style={{ padding: '0 0 96px' }}>
+            <MedicationRecetasTab
+              medications={medications}
+              stockByMedId={stockByMedId}
+              ownerId={ownerId}
+              isAdmin={isAdmin}
+              onEdit={openEdit}
+              onDelete={handleDelete}
+            />
+          </div>
         )}
 
       </div>
@@ -1558,6 +1698,22 @@ export default function Medications() {
       {toastMsg && (
         <div style={{ position: 'fixed', bottom: 'calc(80px + env(safe-area-inset-bottom))', left: '50%', transform: 'translateX(-50%)', zIndex: 400, background: '#1A1A1A', color: 'white', padding: '12px 20px', borderRadius: 12, fontSize: 13, fontWeight: 600, boxShadow: '0 8px 24px rgba(0,0,0,0.3)', pointerEvents: 'none', whiteSpace: 'nowrap' }}>
           {toastMsg}
+        </div>
+      )}
+
+      {/* ── Photo preview lightbox ────────────────────────────────────────── */}
+      {previewPhotoUrl && (
+        <div
+          style={{ position: 'fixed', inset: 0, zIndex: 500, background: 'rgba(0,0,0,0.92)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
+          onClick={() => setPreviewPhotoUrl(null)}
+        >
+          <button
+            onClick={() => setPreviewPhotoUrl(null)}
+            style={{ position: 'absolute', top: 20, right: 20, width: 38, height: 38, borderRadius: '50%', background: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          >
+            <XIcon size={18} color="white" strokeWidth={2} />
+          </button>
+          <img src={previewPhotoUrl} alt="" style={{ maxWidth: '100%', maxHeight: '88vh', objectFit: 'contain', borderRadius: 12 }} onClick={e => e.stopPropagation()} />
         </div>
       )}
 

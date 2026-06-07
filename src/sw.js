@@ -12,7 +12,7 @@ import { clientsClaim } from 'workbox-core'
 // Build date injected by vite.config.js define — e.g. "20260607"
 // Changing this on every deploy means new runtime cache names are created and
 // old ones are deleted in the activate handler below.
-const CACHE_VER = typeof __BUILD_DATE__ !== 'undefined' ? __BUILD_DATE__ : 'v1'
+const CACHE_VER = typeof __BUILD_DATE__ !== 'undefined' ? __BUILD_DATE__ : '20260607'
 
 // ── Precache all build assets (app shell) ─────────────────────────────────────
 precacheAndRoute(self.__WB_MANIFEST)
