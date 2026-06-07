@@ -17,7 +17,7 @@ function timeAgoEs(dateStr) {
   return new Date(dateStr).toLocaleDateString('es', { day: 'numeric', month: 'short' })
 }
 
-export default function NotasTurno() {
+export default function NotasFamilia() {
   const { ownerId } = useFamily()
   const { user } = useAuth()
 

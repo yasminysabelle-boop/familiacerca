@@ -30,7 +30,7 @@ export default function NotaCuidador() {
     })
     setSaving(false)
     if (err) { setError('Error al guardar. Intenta de nuevo.'); return }
-    navigate('/paciente/notas-turno')
+    navigate('/paciente/notas-familia')
   }
 
   return (

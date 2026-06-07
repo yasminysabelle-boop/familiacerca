@@ -3402,7 +3402,7 @@ export default function Dashboard() {
                   { emoji: '📋', label: 'Registros', route: '/registros' },
                   { emoji: '📊', label: 'Historial', route: '/historial' },
                   { emoji: '📝', label: 'Notas médicas', route: '/diario-medico' },
-                  { emoji: '📓', label: 'Notas de la familia', route: '/paciente/notas-turno' },
+                  { emoji: '📓', label: 'Notas de la familia', route: '/paciente/notas-familia' },
                   { emoji: '💰', label: 'Gastos', route: '/gastos' },
                   { emoji: '🐾', label: 'Milo & Luna', route: '/diario-medico' },
                   { emoji: '👤', label: 'Mi cuenta', route: '/ajustes' },
@@ -3673,7 +3673,7 @@ export default function Dashboard() {
               {/* ── NOTAS DE LA FAMILIA ── */}
               <div style={{ padding: '14px 20px 8px' }}>
                 <button
-                  onClick={() => { setShowNotifSheet(false); navigate('/paciente/notas-turno') }}
+                  onClick={() => { setShowNotifSheet(false); navigate('/paciente/notas-familia') }}
                   style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, marginBottom: 10, display: 'flex', alignItems: 'center', gap: 4, WebkitTapHighlightColor: 'transparent' }}
                 >
                   <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: '#9CA3AF', letterSpacing: '0.06em' }}>
@@ -3683,7 +3683,7 @@ export default function Dashboard() {
                 </button>
                 {notifNotes.length === 0 ? (
                   <button
-                    onClick={() => { setShowNotifSheet(false); navigate('/paciente/notas-turno') }}
+                    onClick={() => { setShowNotifSheet(false); navigate('/paciente/notas-familia') }}
                     style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0', textAlign: 'left', WebkitTapHighlightColor: 'transparent' }}
                   >
                     <p style={{ margin: 0, fontSize: 13, color: '#9CA3AF' }}>No hay notas sin leer</p>
@@ -3693,7 +3693,7 @@ export default function Dashboard() {
                     {notifNotes.map(note => (
                       <button
                         key={note.id}
-                        onClick={() => { setShowNotifSheet(false); navigate('/paciente/notas-turno') }}
+                        onClick={() => { setShowNotifSheet(false); navigate('/paciente/notas-familia') }}
                         style={{
                           background: 'none', border: 'none', cursor: 'pointer', padding: '10px 0',
                           textAlign: 'left', borderBottom: '1px solid #F5F0E8', width: '100%',
