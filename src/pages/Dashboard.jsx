@@ -1805,6 +1805,7 @@ export default function Dashboard() {
   const [selectedDayTab, setSelectedDayTab] = useState(() => new Date().toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' }))
   const [showMoreTools, setShowMoreTools] = useState(false)
   const [showFamilySwitcher, setShowFamilySwitcher] = useState(false)
+  const [lastTurnNote, setLastTurnNote] = useState(null)
 
   useEffect(() => {
     if (searchParams.get('checkout') === 'success') {
@@ -1819,6 +1820,18 @@ export default function Dashboard() {
   useEffect(() => {
     if (needsSelector && hasMultiple) setShowFamilySwitcher(true)
   }, [needsSelector, hasMultiple])
+
+  useEffect(() => {
+    if (!ownerId) return
+    supabase
+      .from('notes')
+      .select('id, title, content, created_at')
+      .eq('user_id', ownerId)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+      .then(({ data }) => setLastTurnNote(data ?? null))
+  }, [ownerId])
 
   const now = new Date()
   const todayKey     = toLocalDateKey(now)
@@ -3319,6 +3332,48 @@ export default function Dashboard() {
             )}
           </div>
 
+          {/* Notas del turno — last note widget */}
+          <div
+            onClick={() => navigate('/paciente/notas-turno')}
+            style={{
+              background: 'white', borderRadius: 16,
+              padding: '14px 16px', cursor: 'pointer',
+              boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: lastTurnNote ? 10 : 0 }}>
+              <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#1E2D26' }}>📓 Notas del turno</p>
+              <button
+                onClick={e => { e.stopPropagation(); navigate('/paciente/nota-nueva') }}
+                style={{
+                  padding: '5px 12px', borderRadius: 10,
+                  background: '#2D4A1E', color: 'white',
+                  border: 'none', cursor: 'pointer',
+                  fontSize: 11, fontWeight: 700, fontFamily: 'inherit',
+                }}
+              >
+                + Nueva
+              </button>
+            </div>
+            {lastTurnNote ? (
+              <div>
+                {lastTurnNote.title && (
+                  <p style={{ margin: '0 0 3px', fontSize: 13, fontWeight: 600, color: '#1E2D26', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {lastTurnNote.title}
+                  </p>
+                )}
+                <p style={{ margin: 0, fontSize: 12, color: '#4B5563', lineHeight: 1.4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {lastTurnNote.content}
+                </p>
+                <p style={{ margin: '5px 0 0', fontSize: 11, color: '#9CA3AF' }}>
+                  {new Date(lastTurnNote.created_at).toLocaleString('es', { dateStyle: 'medium', timeStyle: 'short' })}
+                </p>
+              </div>
+            ) : (
+              <p style={{ margin: '6px 0 0', fontSize: 12, color: '#9CA3AF' }}>Sin notas hoy</p>
+            )}
+          </div>
+
           {/* Más herramientas — collapsed accordion */}
           <div style={{ borderRadius: 16, overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
             <button
@@ -3334,7 +3389,7 @@ export default function Dashboard() {
                 <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#1E2D26' }}>Más herramientas</p>
                 {!showMoreTools && (
                   <p style={{ margin: '2px 0 0', fontSize: 11, color: '#9CA3AF' }}>
-                    Equipo · Hospital · Gastos · Notas
+                    Equipo · Hospital · Gastos · Notas médicas
                   </p>
                 )}
               </div>
@@ -3351,7 +3406,8 @@ export default function Dashboard() {
                   { emoji: '🖼️', label: 'Álbum', route: '/album' },
                   { emoji: '📋', label: 'Registros', route: '/registros' },
                   { emoji: '📊', label: 'Historial', route: '/historial' },
-                  { emoji: '📝', label: 'Notas', route: '/diario-medico' },
+                  { emoji: '📝', label: 'Notas médicas', route: '/diario-medico' },
+                  { emoji: '📓', label: 'Notas del turno', route: '/paciente/notas-turno' },
                   { emoji: '💰', label: 'Gastos', route: '/gastos' },
                   { emoji: '🐾', label: 'Milo & Luna', route: '/diario-medico' },
                   { emoji: '👤', label: 'Mi cuenta', route: '/ajustes' },
