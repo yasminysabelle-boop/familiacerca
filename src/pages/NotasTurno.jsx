@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useFamily } from '../contexts/FamilyContext'
 import { useAuth } from '../contexts/AuthContext'
@@ -19,14 +18,12 @@ function timeAgoEs(dateStr) {
 }
 
 export default function NotasTurno() {
-  const navigate = useNavigate()
   const { ownerId } = useFamily()
   const { user } = useAuth()
 
-  const [tab, setTab] = useState('nueva')
+  const [tab, setTab] = useState('grabar')
 
-  // Nueva nota form
-  const [title, setTitle]     = useState('')
+  // Grabar nota
   const [content, setContent] = useState('')
   const [saving, setSaving]   = useState(false)
   const [saveError, setSaveError] = useState('')
@@ -43,19 +40,18 @@ export default function NotasTurno() {
   }
 
   async function handleSave() {
-    if (!content.trim()) { setSaveError('Escribe algo antes de guardar.'); return }
+    if (!content.trim()) { setSaveError('Agrega un texto o graba algo antes de guardar.'); return }
     setSaving(true); setSaveError('')
     const { error } = await supabase.from('notes').insert({
       user_id: ownerId,
       created_by_user_id: user.id,
-      title: title.trim() || null,
       content: content.trim(),
     })
     setSaving(false)
     if (error) { setSaveError('Error al guardar. Intenta de nuevo.'); return }
-    setTitle(''); setContent(''); setSaved(true)
+    setContent(''); setSaved(true)
     setTimeout(() => setSaved(false), 2500)
-    if (notes.length > 0 || tab === 'historial') loadNotes()
+    loadNotes()
   }
 
   async function loadNotes() {
@@ -71,9 +67,7 @@ export default function NotasTurno() {
     const authorIds = [...new Set(rows.map(n => n.created_by_user_id).filter(Boolean))]
     if (authorIds.length) {
       const { data: profiles } = await supabase
-        .from('user_profiles')
-        .select('id, full_name')
-        .in('id', authorIds)
+        .from('user_profiles').select('id, full_name').in('id', authorIds)
       const map = {}
       ;(profiles ?? []).forEach(p => { map[p.id] = p.full_name })
       setAuthors(map)
@@ -87,18 +81,15 @@ export default function NotasTurno() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#F0EDE6' }}>
-      {/* Header */}
+
+      {/* Header + tabs */}
       <div style={{ background: '#2D4A1E', padding: '20px 20px 0' }}>
-        <h1 style={{
-          fontFamily: 'Georgia, serif', fontSize: 20, fontWeight: 700,
-          color: 'white', margin: '0 0 16px',
-        }}>
+        <h1 style={{ fontFamily: 'Georgia, serif', fontSize: 20, fontWeight: 700, color: 'white', margin: '0 0 16px' }}>
           Notas de la familia
         </h1>
-        {/* Tabs */}
-        <div style={{ display: 'flex', gap: 0 }}>
+        <div style={{ display: 'flex' }}>
           {[
-            { key: 'nueva',    label: '✏️ Nueva nota' },
+            { key: 'grabar',    label: '🎙️ Grabar nota' },
             { key: 'historial', label: '📋 Historial' },
           ].map(t => (
             <button
@@ -111,6 +102,7 @@ export default function NotasTurno() {
                 color: tab === t.key ? 'white' : 'rgba(255,255,255,0.55)',
                 borderBottom: tab === t.key ? '2px solid white' : '2px solid transparent',
                 transition: 'color 0.15s, border-color 0.15s',
+                WebkitTapHighlightColor: 'transparent',
               }}
             >
               {t.label}
@@ -119,78 +111,57 @@ export default function NotasTurno() {
         </div>
       </div>
 
-      {/* Tab content */}
       <div style={{ padding: '20px 16px 48px', maxWidth: 480, margin: '0 auto' }}>
 
-        {/* ── NUEVA NOTA ────────────────────────────────── */}
-        {tab === 'nueva' && (
+        {/* ── GRABAR NOTA ─────────────────────────────────── */}
+        {tab === 'grabar' && (
           <div>
             {saved && (
-              <div style={{
-                background: '#DCFCE7', borderRadius: 12,
-                padding: '12px 16px', marginBottom: 16,
-                display: 'flex', alignItems: 'center', gap: 10,
-                border: '1px solid #BBF7D0',
-              }}>
+              <div style={{ background: '#DCFCE7', borderRadius: 12, padding: '12px 16px', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 10, border: '1px solid #BBF7D0' }}>
                 <span style={{ fontSize: 18 }}>✅</span>
-                <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#15803D' }}>
-                  Nota guardada correctamente
-                </p>
+                <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#15803D' }}>Nota guardada</p>
               </div>
             )}
 
-            <input
-              type="text"
-              placeholder="Título (opcional)"
-              value={title}
-              onChange={e => setTitle(e.target.value)}
-              maxLength={80}
-              style={{
-                width: '100%', boxSizing: 'border-box',
-                padding: '12px 14px', borderRadius: 12,
-                border: '1.5px solid #DDD5C8', background: 'white',
-                fontSize: 14, color: '#1E2D26', marginBottom: 12,
-                outline: 'none', fontFamily: 'inherit',
-              }}
-            />
+            {/* VoiceRecorder — protagonista */}
+            <div style={{
+              background: 'white', borderRadius: 20,
+              padding: '24px 20px', marginBottom: 14,
+              boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+              textAlign: 'center',
+            }}>
+              <p style={{ margin: '0 0 4px', fontSize: 15, fontWeight: 700, color: '#1E2D26' }}>
+                🎙️ Graba tu nota de turno
+              </p>
+              <p style={{ margin: '0 0 20px', fontSize: 12, color: '#9CA3AF' }}>
+                El audio se convierte en texto automáticamente
+              </p>
+              <VoiceRecorder
+                mode="transcribe"
+                onTranscript={appendTranscript}
+                placeholder="Toca el micrófono para empezar"
+                language="es-PR"
+              />
+            </div>
 
+            {/* Textarea — opcional */}
             <textarea
-              placeholder="¿Qué ocurrió en este turno? Medicamentos dados, estado del paciente, incidencias…"
+              placeholder="O escribe aquí (opcional) — el texto dictado también aparece aquí"
               value={content}
               onChange={e => setContent(e.target.value)}
-              rows={7}
+              rows={5}
               style={{
                 width: '100%', boxSizing: 'border-box',
-                padding: '14px', borderRadius: 12,
+                padding: '14px', borderRadius: 14,
                 border: '1.5px solid #DDD5C8', background: 'white',
                 fontSize: 14, color: '#1E2D26', lineHeight: 1.6,
                 resize: 'vertical', outline: 'none',
-                fontFamily: 'inherit', marginBottom: 14,
+                fontFamily: 'inherit', marginBottom: 16,
               }}
             />
 
-            {/* Voice dictation */}
-            <div style={{
-              background: 'white', borderRadius: 14,
-              border: '1.5px solid #DDD5C8',
-              padding: '12px 16px', marginBottom: 20,
-              display: 'flex', alignItems: 'center', gap: 12,
-            }}>
-              <span style={{ fontSize: 20, flexShrink: 0 }}>🎙️</span>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ margin: '0 0 6px', fontSize: 11, fontWeight: 600, color: '#6B7280' }}>DICTAR CON VOZ</p>
-                <VoiceRecorder
-                  mode="transcribe"
-                  onTranscript={appendTranscript}
-                  placeholder="Toca para dictar"
-                />
-              </div>
-            </div>
-
             {saveError && (
-              <p style={{ margin: '0 0 12px', fontSize: 13, color: '#DC2626', fontWeight: 500 }}>
-                {saveError}
-              </p>
+              <p style={{ margin: '0 0 12px', fontSize: 13, color: '#DC2626', fontWeight: 500 }}>{saveError}</p>
             )}
 
             <button
@@ -198,10 +169,11 @@ export default function NotasTurno() {
               disabled={saving || !content.trim()}
               style={{
                 width: '100%', padding: '14px', borderRadius: 14,
-                border: 'none', background: saving ? '#9CA3AF' : '#2D4A1E',
+                border: 'none',
+                background: saving || !content.trim() ? '#9CA3AF' : '#2D4A1E',
                 color: 'white', fontSize: 15, fontWeight: 700,
-                cursor: saving ? 'default' : 'pointer', fontFamily: 'inherit',
-                opacity: !content.trim() ? 0.6 : 1,
+                cursor: saving || !content.trim() ? 'default' : 'pointer',
+                fontFamily: 'inherit',
               }}
             >
               {saving ? 'Guardando…' : 'Guardar nota'}
@@ -209,51 +181,36 @@ export default function NotasTurno() {
           </div>
         )}
 
-        {/* ── HISTORIAL ─────────────────────────────────── */}
+        {/* ── HISTORIAL ──────────────────────────────────── */}
         {tab === 'historial' && (
           loading ? (
-            <p style={{ textAlign: 'center', color: '#9CA3AF', fontSize: 13, padding: 40 }}>
-              Cargando historial…
-            </p>
+            <p style={{ textAlign: 'center', color: '#9CA3AF', fontSize: 13, padding: 40 }}>Cargando…</p>
           ) : notes.length === 0 ? (
-            <div style={{
-              background: 'white', borderRadius: 20, padding: '36px 20px',
-              textAlign: 'center', boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-            }}>
+            <div style={{ background: 'white', borderRadius: 20, padding: '36px 20px', textAlign: 'center', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
               <p style={{ fontSize: 36, margin: '0 0 12px' }}>📋</p>
-              <p style={{ fontSize: 15, fontWeight: 700, color: '#1E2D26', margin: '0 0 6px', fontFamily: 'Georgia, serif' }}>
-                Sin notas aún
-              </p>
-              <p style={{ fontSize: 13, color: '#6B7280', margin: '0 0 20px', lineHeight: 1.5 }}>
-                Las notas del equipo aparecerán aquí
-              </p>
+              <p style={{ fontSize: 15, fontWeight: 700, color: '#1E2D26', margin: '0 0 6px', fontFamily: 'Georgia, serif' }}>Sin notas aún</p>
+              <p style={{ fontSize: 13, color: '#6B7280', margin: '0 0 20px', lineHeight: 1.5 }}>Las notas del equipo aparecerán aquí</p>
               <button
-                onClick={() => setTab('nueva')}
-                style={{
-                  padding: '12px 24px', borderRadius: 14,
-                  background: '#2D4A1E', color: 'white',
-                  border: 'none', cursor: 'pointer',
-                  fontWeight: 700, fontSize: 14, fontFamily: 'inherit',
-                }}
+                onClick={() => setTab('grabar')}
+                style={{ padding: '12px 24px', borderRadius: 14, background: '#2D4A1E', color: 'white', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 14, fontFamily: 'inherit' }}
               >
-                Crear primera nota
+                Grabar primera nota
               </button>
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {notes.map(note => {
                 const isOpen = expanded === note.id
+                const isOwn = note.created_by_user_id === user?.id
                 const authorName = note.created_by_user_id
                   ? (authors[note.created_by_user_id]?.split(' ')[0] ?? 'Cuidador')
                   : 'Cuidador'
-                const isOwn = note.created_by_user_id === user?.id
                 return (
                   <div
                     key={note.id}
                     onClick={() => setExpanded(isOpen ? null : note.id)}
                     style={{
-                      background: 'white', borderRadius: 16,
-                      padding: '14px 16px', cursor: 'pointer',
+                      background: 'white', borderRadius: 16, padding: '14px 16px', cursor: 'pointer',
                       boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
                       border: `1.5px solid ${isOpen ? '#B7D9C4' : 'transparent'}`,
                       transition: 'border-color 0.15s',
@@ -279,19 +236,13 @@ export default function NotasTurno() {
                           </span>
                         </div>
                         {note.title && (
-                          <p style={{
-                            margin: '0 0 3px', fontSize: 13, fontWeight: 600,
-                            color: '#1E2D26', overflow: 'hidden',
-                            textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                          }}>
+                          <p style={{ margin: '0 0 3px', fontSize: 13, fontWeight: 600, color: '#1E2D26', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                             {note.title}
                           </p>
                         )}
                         <p style={{
                           margin: 0, fontSize: 13, color: '#4B5563', lineHeight: 1.5,
-                          ...(isOpen ? {} : {
-                            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                          }),
+                          ...(isOpen ? {} : { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }),
                         }}>
                           {note.content}
                         </p>

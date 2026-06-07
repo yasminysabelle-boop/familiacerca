@@ -3395,7 +3395,7 @@ export default function Dashboard() {
                   { emoji: '📋', label: 'Registros', route: '/registros' },
                   { emoji: '📊', label: 'Historial', route: '/historial' },
                   { emoji: '📝', label: 'Notas médicas', route: '/diario-medico' },
-                  { emoji: '📓', label: 'Notas familia', route: '/paciente/notas-turno' },
+                  { emoji: '📓', label: 'Notas de la familia', route: '/paciente/notas-turno' },
                   { emoji: '💰', label: 'Gastos', route: '/gastos' },
                   { emoji: '🐾', label: 'Milo & Luna', route: '/diario-medico' },
                   { emoji: '👤', label: 'Mi cuenta', route: '/ajustes' },
