@@ -2130,7 +2130,7 @@ export default function Dashboard() {
         .limit(60),
 
       supabase.from('voice_diary')
-        .select('*, user_profiles(full_name)')
+        .select('*')
         .in('user_id', allFamilyIds)
         .gte('created_at', sevenAgoStartISO)
         .order('created_at', { ascending: false })

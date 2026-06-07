@@ -3,10 +3,10 @@ import { useFamily } from '../contexts/FamilyContext'
 import { XIcon } from './Icons'
 
 export default function FamilySwitcher() {
-  const { families, activeOwnerId, switchFamily, activeFamilyLabel, hasMultiple } = useFamily()
+  const { families, activeOwnerId, switchFamily, activeFamilyLabel, activePatientName, hasMultiple } = useFamily()
   const [open, setOpen] = useState(false)
 
-  const patientName = activeFamilyLabel !== 'Mi familia' ? activeFamilyLabel : null
+  const patientName = activePatientName || (activeFamilyLabel !== 'Mi familia' ? activeFamilyLabel : null)
   const displayLabel = patientName ? `Familia de ${patientName}` : 'Mi familia'
 
   if (!hasMultiple) {
