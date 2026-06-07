@@ -12,7 +12,7 @@ export default function TrialBanner() {
   if (trialExpired && isAdmin) {
     return (
       <div
-        onClick={() => navigate('/planes')}
+        onClick={() => navigate('/pricing')}
         style={{
           margin: '0 16px 16px', borderRadius: 14, padding: '11px 16px',
           background: 'linear-gradient(135deg, #FFFBEB, #FEF3C7)',
