@@ -46,7 +46,7 @@ const PRIMARY_PAGES = new Set(['/dashboard', '/familia', '/ajustes', '/planes', 
 
 export default function Layout({ children }) {
   const { inactivityWarning, user } = useAuth()
-  const { profile } = useFamily()
+  const { profile, activeFamilyLabel } = useFamily()
   const userAvatar = user?.user_metadata?.avatar_url ?? null
   const userInitial = (user?.user_metadata?.full_name ?? user?.email ?? '?').charAt(0).toUpperCase()
   const { dark } = useDarkMode()
@@ -134,8 +134,8 @@ export default function Layout({ children }) {
               fontFamily: 'Georgia, serif', margin: 0,
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
             }}>
-              {location.pathname === '/paciente/perfil' && profile?.name
-                ? `Perfil de ${profile.name.split(' ')[0]}`
+              {location.pathname === '/paciente/perfil' && (activeFamilyLabel !== 'Mi familia' ? activeFamilyLabel : profile?.name)
+                ? `Perfil de ${(activeFamilyLabel !== 'Mi familia' ? activeFamilyLabel : profile?.name)?.split(' ')[0]}`
                 : PAGE_TITLES[location.pathname] ?? ''}
             </h1>
           </div>

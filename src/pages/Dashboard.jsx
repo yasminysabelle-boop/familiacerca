@@ -1910,24 +1910,31 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (!ownerId) return
-    supabase
-      .from('family_members')
-      .select('member_user_id, role, user_profiles(full_name, last_seen)')
-      .eq('user_id', ownerId)
-      .then(({ data: membersData }) => {
-        const members = [
-          { id: ownerId, full_name: profile?.name || fullName || '?', role: 'admin', last_seen: null },
-          ...(membersData ?? []).map(m => ({
+    ;(async () => {
+      const { data: membersData } = await supabase
+        .from('family_members')
+        .select('member_user_id, role')
+        .eq('user_id', ownerId)
+      const memberIds = (membersData ?? []).map(m => m.member_user_id).filter(Boolean)
+      const { data: profilesData } = memberIds.length
+        ? await supabase.from('user_profiles').select('id, full_name, last_seen').in('id', memberIds)
+        : { data: [] }
+      const members = [
+        { id: ownerId, full_name: profile?.name || fullName || '?', role: 'admin', last_seen: null },
+        ...(membersData ?? []).map(m => {
+          const p = (profilesData ?? []).find(x => x.id === m.member_user_id)
+          return {
             id: m.member_user_id,
-            full_name: m.user_profiles?.full_name ?? '?',
+            full_name: p?.full_name ?? '?',
             role: m.role ?? 'familiar',
-            last_seen: m.user_profiles?.last_seen ?? null,
-          })),
-        ]
-        setFamilyMembers(members)
-        setFamilyCount(members.length)
-        setFamilyNames(members.map(m => m.full_name.split(' ')[0]))
-      })
+            last_seen: p?.last_seen ?? null,
+          }
+        }),
+      ]
+      setFamilyMembers(members)
+      setFamilyCount(members.length)
+      setFamilyNames(members.map(m => m.full_name.split(' ')[0]))
+    })()
   }, [ownerId])
 
   useEffect(() => {

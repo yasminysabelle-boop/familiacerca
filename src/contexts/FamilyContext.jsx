@@ -118,6 +118,21 @@ export function FamilyProvider({ children }) {
         built.push({ ownerId: user.id, patientName: null, patientPhotoUrl: null, role: null, profile: null })
       }
 
+      // Override patientName with nombre_completo from patient_profiles when available
+      const ownerIds = built.map(f => f.ownerId).filter(Boolean)
+      if (ownerIds.length > 0) {
+        const { data: patientProfiles } = await supabase
+          .from('patient_profiles')
+          .select('owner_id, nombre_completo')
+          .in('owner_id', ownerIds)
+        if (patientProfiles?.length) {
+          const ppMap = Object.fromEntries(patientProfiles.map(pp => [pp.owner_id, pp.nombre_completo]))
+          for (const f of built) {
+            if (ppMap[f.ownerId]) f.patientName = ppMap[f.ownerId]
+          }
+        }
+      }
+
       setFamilies(built)
 
       const stored = localStorage.getItem('fc_active_context')
