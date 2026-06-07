@@ -3624,7 +3624,7 @@ export default function Dashboard() {
                           color: roleColor, background: roleBg,
                           padding: '2px 8px', borderRadius: 6,
                         }}>
-                          {roleLabel}
+                          Tu rol: {roleLabel}
                         </span>
                       </div>
                       {isActive && (

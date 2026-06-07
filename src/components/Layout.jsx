@@ -135,8 +135,8 @@ export default function Layout({ children }) {
               fontFamily: 'Georgia, serif', margin: 0,
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
             }}>
-              {location.pathname === '/paciente/perfil' && activePatientName
-                ? `Perfil de ${activePatientName.split(' ')[0]}`
+              {location.pathname === '/paciente/perfil' && (activePatientName || (activeFamilyLabel !== 'Mi familia' ? activeFamilyLabel : null))
+                ? `Perfil de ${(activePatientName || activeFamilyLabel).split(' ')[0]}`
                 : PAGE_TITLES[location.pathname] ?? ''}
             </h1>
           </div>
