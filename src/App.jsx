@@ -35,7 +35,6 @@ import Settings from './pages/Settings'
 import CareSchedule from './pages/CareSchedule'
 import Cuidado from './pages/Cuidado'
 import PatientProfile from './pages/PatientProfile'
-import NotaCuidador from './pages/NotaCuidador'
 import NotasFamilia from './pages/NotasFamilia'
 import Landing from './pages/Landing'
 import VideoCall from './pages/VideoCall'
@@ -155,7 +154,6 @@ function AppShell() {
         <Route path="/ajustes"            element={<P><Settings /></P>} />
         <Route path="/cuidado/horarios"   element={<Navigate to="/cuidado?tab=horarios" replace />} />
         <Route path="/paciente/perfil"      element={<P><PatientProfile /></P>} />
-        <Route path="/paciente/nota-nueva"   element={<P><NotaCuidador /></P>} />
         <Route path="/paciente/notas-familia" element={<P><NotasFamilia /></P>} />
         <Route path="/videollamada"       element={<P><VideoCall /></P>} />
         <Route path="/admin"              element={<P><Admin /></P>} />
