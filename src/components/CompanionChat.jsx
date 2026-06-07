@@ -2,15 +2,12 @@ import { useState, useEffect, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
 import { geminiChat } from '../lib/gemini'
 import { FAMILIACERCA_KNOWLEDGE } from '../lib/companionKnowledge'
-import { supabase } from '../lib/supabase'
-import { useFamily } from '../contexts/FamilyContext'
 import miloLunaImg  from '../assets/companions/milo-luna.png'
 import miloAvatarImg from '../assets/companions/milo-avatar.png'
 import lunaAvatarImg from '../assets/companions/luna-avatar.png'
 
 const LS_KEY         = 'fc_pet_preference'
 const LS_HISTORY_KEY = 'fc_companion_history'
-const SS_PROACTIVE_PREFIX = 'fc_proactive_shown_'
 
 const BASE_KNOWLEDGE = `
 Cuando el usuario pregunte sobre la app, sus funciones, precios, instalación o soporte, usa ÚNICAMENTE la información del siguiente bloque de conocimiento. Si algo no está ahí, dilo honestamente. Para preguntas emocionales o de apoyo, responde con calidez priorizando el acompañamiento humano.
@@ -38,11 +35,6 @@ const GREETINGS = {
   luna: 'Hola... Soy Luna 🌙 Aquí contigo, sin prisa. ¿Cómo te sientes?',
 }
 
-const PROACTIVE_GREETINGS = {
-  milo: '¡Hola! 🐾 ¿Cómo vas con el cuidado hoy? Aquí estoy si necesitas algo.',
-  luna: 'Hola... 🌙 ¿Todo bien por allá? Estoy aquí si quieres hablar.',
-}
-
 const QUICK_OPTIONS = [
   { emoji: '💊', label: 'Quiero agregar medicamentos' },
   { emoji: '👨‍👩‍👧', label: 'Quiero invitar a mi familia' },
@@ -62,98 +54,9 @@ const FALLBACKS = {
   luna: 'Te escucho 🌙',
 }
 
-// Queries Supabase for contextual anomalies and returns the best proactive message.
-// Priority: A (low stock) > B (no activity) > C (upcoming appointment) > E (high expenses) > D (default)
-async function buildProactiveMessage(chosen, ownerId, patientName) {
-  if (!ownerId) return PROACTIVE_GREETINGS[chosen]
-  try {
-    const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' })
-
-    // A) Low stock medications (≤7 pills remaining)
-    const { data: stocks } = await supabase
-      .from('medication_stock')
-      .select('medication_id, pills_remaining')
-      .eq('user_id', ownerId)
-      .lte('pills_remaining', 7)
-      .gt('pills_remaining', 0)
-      .limit(1)
-
-    if (stocks?.length) {
-      const { data: med } = await supabase
-        .from('medications').select('name').eq('id', stocks[0].medication_id).maybeSingle()
-      const name = med?.name ?? 'un medicamento'
-      return `Hola 👋 Noté que ${name} tiene pocas dosis (${stocks[0].pills_remaining} restantes). ¿Quieres programar la renovación?`
-    }
-
-    // B) No activity registered today
-    const { data: activity } = await supabase
-      .from('activity_log')
-      .select('id')
-      .eq('owner_id', ownerId)
-      .gte('created_at', `${today}T00:00:00`)
-      .limit(1)
-
-    if (!activity?.length) {
-      const name = patientName || 'el paciente'
-      return `Hola 👋 Aún no se ha registrado actividad hoy. ¿Cómo estuvo ${name}?`
-    }
-
-    // C) Upcoming appointment (next 2 days)
-    const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1)
-    const dayAfter  = new Date(); dayAfter.setDate(dayAfter.getDate() + 2)
-    const { data: upcoming } = await supabase
-      .from('events')
-      .select('title, date')
-      .eq('user_id', ownerId)
-      .gte('date', tomorrow.toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' }))
-      .lte('date', dayAfter.toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' }))
-      .order('date', { ascending: true })
-      .limit(1)
-
-    if (upcoming?.length) {
-      const title = upcoming[0].title ? ` (${upcoming[0].title})` : ''
-      return `Hola 👋 Tienen una cita médica pronto${title}. ¿Necesitan ayuda para prepararse?`
-    }
-
-    // E) Monthly expenses above 3-month average (needs ≥2 months of history)
-    const now2 = new Date()
-    const currentMonth = `${now2.getFullYear()}-${String(now2.getMonth() + 1).padStart(2, '0')}`
-    const threeMonthsAgo = new Date(now2.getFullYear(), now2.getMonth() - 3, 1)
-    const threeMonthsAgoDate = `${threeMonthsAgo.getFullYear()}-${String(threeMonthsAgo.getMonth() + 1).padStart(2, '0')}-01`
-
-    const { data: expenses } = await supabase
-      .from('care_expenses')
-      .select('amount, date')
-      .eq('user_id', ownerId)
-      .gte('date', threeMonthsAgoDate)
-
-    if (expenses?.length) {
-      const byMonth = {}
-      for (const exp of expenses) {
-        const m = exp.date.slice(0, 7)
-        byMonth[m] = (byMonth[m] ?? 0) + parseFloat(exp.amount)
-      }
-      const currentTotal = byMonth[currentMonth] ?? 0
-      const prevTotals = Object.entries(byMonth)
-        .filter(([m]) => m < currentMonth)
-        .map(([, v]) => v)
-      if (prevTotals.length >= 2 && currentTotal > 0) {
-        const avg = prevTotals.reduce((s, v) => s + v, 0) / prevTotals.length
-        if (currentTotal > avg) {
-          return `Hola 👋 Este mes los gastos de cuidado están por encima del promedio. ¿Quieres revisar Cuentas Claras?`
-        }
-      }
-    }
-  } catch { }
-
-  // D) No anomalies — friendly default
-  return `Hola 👋 Estoy aquí para ayudarte. ¿En qué puedo apoyarte hoy?`
-}
-
 // bottomOffset: px from bottom of viewport for the floating button.
 // Pass 24 on Landing (no nav bar), use default 140 inside Layout (above FAB).
 export default function CompanionChat({ bottomOffset = 140, externalOpen = false, onExternalClose }) {
-  const { ownerId, profile } = useFamily()
   const [companion,  setCompanion]  = useState(() => {
     // migrate from old key
     const old = localStorage.getItem('fc_companion')
@@ -171,7 +74,6 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
 
   const bottomRef          = useRef(null)
   const inputRef           = useRef(null)
-  const proactiveRef       = useRef(false)
   const onExternalCloseRef = useRef(onExternalClose)
   useEffect(() => { onExternalCloseRef.current = onExternalClose }, [onExternalClose])
 
@@ -187,33 +89,6 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
     if (!externalOpen) return
     if (!companion) { setSelecting(true) } else { setOpen(true) }
   }, [externalOpen, companion])
-
-  // Proactive trigger: open after 6 s on dashboard, once per session per user
-  // Detects anomalies (low stock, no activity, upcoming appointment) before showing message
-  useEffect(() => {
-    if (pathname !== '/dashboard') return
-    const proactiveKey = SS_PROACTIVE_PREFIX + (ownerId ?? 'anon')
-    if (sessionStorage.getItem(proactiveKey)) return
-    if (proactiveRef.current) return
-
-    const timer = setTimeout(async () => {
-      if (proactiveRef.current) return
-      proactiveRef.current = true
-      sessionStorage.setItem(proactiveKey, '1')
-
-      const chosen = localStorage.getItem(LS_KEY)
-      if (!chosen) {
-        setSelecting(true)
-      } else {
-        const patientName = profile?.name?.split(' ')[0] ?? null
-        const msg = await buildProactiveMessage(chosen, ownerId, patientName)
-        setMessages([{ role: 'companion', text: msg }])
-        setOpen(true)
-      }
-    }, 6000)
-
-    return () => clearTimeout(timer)
-  }, [pathname, ownerId])
 
   // Scroll to latest message
   useEffect(() => {

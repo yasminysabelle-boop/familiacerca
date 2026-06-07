@@ -1,41 +1,34 @@
-import { supabase } from './supabase'
-
-const CLAUDE_PROXY = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/claude-proxy`
+const API_KEY  = import.meta.env.VITE_GEMINI_API_KEY
+const MODEL    = 'gemini-2.0-flash'
+const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`
 
 export async function geminiGenerate() { return null }
 
 export async function geminiChat(systemPrompt, history, text, maxTokens = 300) {
+  if (!API_KEY) { console.error('[Gemini] VITE_GEMINI_API_KEY not set'); return null }
+
   try {
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session) return null
+    const contents = history.map(m => ({
+      role: m.role === 'user' ? 'user' : 'model',
+      parts: [{ text: m.text }],
+    }))
+    contents.push({ role: 'user', parts: [{ text }] })
 
-    const messages = [
-      ...history.map(m => ({
-        role: m.role === 'user' ? 'user' : 'assistant',
-        content: m.text
-      })),
-      { role: 'user', content: text }
-    ]
-
-    const res = await fetch(CLAUDE_PROXY, {
+    const res = await fetch(`${ENDPOINT}?key=${API_KEY}`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${session.access_token}`,
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-5',
-        max_tokens: maxTokens,
-        system: systemPrompt,
-        messages
-      })
+        system_instruction: { parts: [{ text: systemPrompt }] },
+        contents,
+        generationConfig: { maxOutputTokens: maxTokens },
+      }),
     })
 
-    if (!res.ok) return null
+    if (!res.ok) { console.error('[Gemini] API error:', res.status, await res.text()); return null }
     const data = await res.json()
-    return data.content?.[0]?.text?.trim() ?? null
+    return data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? null
   } catch (e) {
-    console.error('[Claude] fetch error:', e)
+    console.error('[Gemini] fetch error:', e)
     return null
   }
 }
