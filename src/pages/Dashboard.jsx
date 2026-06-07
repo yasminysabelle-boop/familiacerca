@@ -1748,7 +1748,7 @@ function QuickCard({ emoji, label, subtitle, statusColor, onClick, index, size =
 
 export default function Dashboard() {
   const { user, signOut } = useAuth()
-  const { profile, ownerId, memberRole, families, hasMultiple, needsSelector, switchFamily } = useFamily()
+  const { profile, ownerId, memberRole, families, hasMultiple, needsSelector, switchFamily, activeFamilyLabel, activePatientName } = useFamily()
   const navigate = useNav()
   const isFamiliar = memberRole === 'familiar'
   const isAdmin = memberRole === null || ownerId === user?.id
@@ -3009,7 +3009,7 @@ export default function Dashboard() {
               }}
             >
               <span style={{ fontSize: 13, fontWeight: 600, color: '#1E2D26', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {profile?.name || 'Mi familiar'}
+                {activePatientName || activeFamilyLabel || 'Mi familiar'}
               </span>
               <span style={{ fontSize: 10, color: '#6F7A72', flexShrink: 0 }}>▾</span>
             </button>
