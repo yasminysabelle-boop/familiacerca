@@ -12,7 +12,7 @@ import PaywallModal from '../components/PaywallModal'
 
 export default function Familia() {
   const { user } = useAuth()
-  const { profile, ownerId } = useFamily()
+  const { profile, ownerId, activePatientName } = useFamily()
   const onlineIds = usePresence()
   const { trialExpired } = useSubscription()
   const navigate = useNavigate()
@@ -237,7 +237,7 @@ export default function Familia() {
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 20, fontWeight: 700, color: 'white',
               }}>
-                {profile.name?.charAt(0) ?? '?'}
+                {(activePatientName || profile?.name)?.charAt(0) ?? '?'}
               </div>
             )}
             <div>
@@ -245,7 +245,7 @@ export default function Familia() {
                 Familiar a cuidar
               </p>
               <p style={{ color: 'white', fontSize: 18, fontWeight: 700, fontFamily: 'Georgia, serif', margin: 0 }}>
-                {profile.name}
+                {activePatientName || profile?.name}
               </p>
               {profile.age && (
                 <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 12, margin: '2px 0 0' }}>
