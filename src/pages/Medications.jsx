@@ -47,8 +47,23 @@ const RENEWAL_METHODS = [
   { value: 'manual',       label: '✍️ Lo agrego solo' },
 ]
 
-const CLAUDE_PROXY = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/claude-proxy`
-const AI_MODEL     = 'claude-sonnet-4-6'
+const CLAUDE_PROXY  = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/claude-proxy`  // fallback
+const GEMINI_VISION = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/gemini-vision`
+
+const FORM_MAP = {
+  tablet: 'Tableta', capsule: 'Cápsula', syrup: 'Jarabe', drops: 'Gotas',
+  injection: 'Inyección', cream: 'Crema', inhaler: 'Inhalador', patch: 'Parche', other: 'Otro',
+}
+
+const BOX_PROMPT = `You are extracting visible medication information from an image for a family caregiving app.
+Return ONLY valid JSON. Do NOT give medical advice. Do NOT infer missing values. Do NOT guess. If unclear return null and add a warning. Image may be in Spanish from Puerto Rico, Dominican Republic, or Venezuela. The user will review everything before saving.
+
+{"source_type":"box|bottle|blister|unknown","medications":[{"name":{"value":"string or null","confidence":0},"strength":{"value":"string or null","confidence":0},"form":{"value":"tablet|capsule|syrup|drops|cream|injection|inhaler|patch|other|null","confidence":0},"total_units":{"value":null,"confidence":0},"expiry_date":{"value":"MM/YYYY or null","confidence":0}}],"raw_text_detected":"string","warnings":[],"requires_user_review":true}`
+
+const RX_PROMPT = `You are extracting prescription information for a family caregiving app.
+Return ONLY valid JSON. Do NOT give medical advice. Do NOT infer missing information. If frequency is unclear return null. Preserve original doctor instructions in Spanish. The user must review before saving. Return ALL medications found in the prescription.
+
+{"source_type":"prescription|unknown","medications":[{"name":{"value":"string or null","confidence":0},"strength":{"value":"string or null","confidence":0},"form":{"value":"tablet|capsule|syrup|drops|cream|injection|inhaler|patch|other|null","confidence":0},"frequency":{"value":"once_daily|twice_daily|three_daily|every_8h|every_12h|as_needed|weekly|null","confidence":0},"frequency_raw":{"value":"string or null","confidence":0},"quantity_per_dose":{"value":null,"confidence":0},"duration":{"value":"string or null","confidence":0},"total_units":{"value":null,"confidence":0},"instructions":{"value":"string or null","confidence":0}}],"raw_text_detected":"string","warnings":[],"requires_user_review":true}`
 
 // ── Hoy-tab helpers ───────────────────────────────────────────────────────────
 
@@ -207,6 +222,8 @@ export default function Medications() {
   const [addPhotoPreview, setAddPhotoPreview] = useState(null)
   const [addAiExtracted,  setAddAiExtracted]  = useState(null)
   const [addAiError,      setAddAiError]      = useState('')
+  const [selectedMedIndices, setSelectedMedIndices] = useState(new Set())
+  const [addMedQueue,        setAddMedQueue]         = useState([])
   const photoInputRef = useRef(null)
 
   // ── Stock form state ───────────────────────────────────────────────────────
@@ -349,6 +366,7 @@ export default function Medications() {
     setForm(emptyForm); setScheduledTimes(['']); setSaveError(null)
     setStockForm(emptyStock); setEditStockRecord(null); setAddPhotoFile(null); setAddPhotoPreview(null)
     setAddAiExtracted(null); setAddAiError(''); setAddPhotoType(null)
+    setAddMedQueue([]); setSelectedMedIndices(new Set())
   }
 
   // ── AI photo processing ────────────────────────────────────────────────────
@@ -363,6 +381,29 @@ export default function Medications() {
     processPhoto(file, addPhotoType)
   }
 
+  function applyMedToForm(med) {
+    const name       = med.name?.value              ?? ''
+    const dosage     = med.strength?.value          ?? ''
+    const frequency  = med.frequency?.value         ?? ''
+    const form_val   = FORM_MAP[med.form?.value]    ?? emptyForm.form
+    const notes      = med.instructions?.value      ?? ''
+    const qtyPerDose = Number(med.quantity_per_dose?.value ?? 1) || 1
+
+    setForm({ ...emptyForm, name, dosage, frequency, form: form_val, notes, quantityPerDose: qtyPerDose })
+
+    const opt = FREQ_OPTIONS.find(o => o.value === frequency)
+    if (!opt || opt.times === 0) {
+      setScheduledTimes([])
+    } else {
+      const count = opt.interval ? 1 : opt.times
+      setScheduledTimes(Array(count).fill(''))
+    }
+
+    const totalPills = med.total_units?.value
+    setStockForm(totalPills ? { ...emptyStock, totalPills: String(totalPills) } : emptyStock)
+    setEditStockRecord(null)
+  }
+
   async function processPhoto(file, type) {
     setAddStep('ai-processing')
     setAddAiError('')
@@ -375,33 +416,20 @@ export default function Medications() {
     try {
       const b64  = await toBase64(file)
       const mime = file.type || 'image/jpeg'
-      const prompt = type === 'box'
-        ? `Analyze this medication box photo. Extract ONLY in JSON:
-{"name":"medication name","dosage":"strength+form e.g. 500mg","total_pills":number_or_null,"expiry_date":"MM/YYYY or null","notes":"other info or null"}
-Return ONLY valid JSON.`
-        : `Analyze this prescription. Extract the main medication in JSON:
-{"name":"medication name","dosage":"strength and form","frequency":"one of: once_daily|twice_daily|three_daily|every_8h|every_12h|as_needed|weekly","total_pills":number_or_null,"notes":"doctor instructions or null"}
-Return ONLY valid JSON.`
-
-      const res  = await fetch(CLAUDE_PROXY, {
+      const res  = await fetch(GEMINI_VISION, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session?.access_token}`,
+          'Authorization': `Bearer ${session.access_token}`,
         },
-        body: JSON.stringify({
-          model: AI_MODEL, max_tokens: 512,
-          messages: [{ role: 'user', content: [
-            { type: 'image', source: { type: 'base64', media_type: mime, data: b64 } },
-            { type: 'text', text: prompt },
-          ]}],
-        }),
+        body: JSON.stringify({ image_base64: b64, media_type: mime, prompt: type === 'box' ? BOX_PROMPT : RX_PROMPT }),
       })
-      if (!res.ok) throw new Error(`Claude API ${res.status}`)
-      const data = await res.json()
-      const text = data.content?.[0]?.text ?? ''
-      const match = text.match(/\{[\s\S]*\}/)
-      const parsed = match ? JSON.parse(match[0]) : JSON.parse(text)
+      if (!res.ok) throw new Error(`Gemini ${res.status}`)
+      const parsed = await res.json()
+      if (parsed.error) throw new Error(parsed.error)
+      if (parsed.medications?.length > 0) {
+        setSelectedMedIndices(new Set(parsed.medications.map((_, i) => i)))
+      }
       setAddAiExtracted(parsed)
     } catch (err) {
       console.error(err)
@@ -412,20 +440,17 @@ Return ONLY valid JSON.`
   }
 
   function applyAiAndContinue() {
-    if (addAiExtracted) {
-      const freq = addAiExtracted.frequency
-      setForm(prev => ({
-        ...prev,
-        name:      addAiExtracted.name      || prev.name,
-        dosage:    addAiExtracted.dosage    || prev.dosage,
-        frequency: freq                     || prev.frequency,
-        notes:     addAiExtracted.notes     || prev.notes,
-      }))
-      if (freq) handleFrequencyChange(freq)
-      if (addAiExtracted.total_pills) {
-        setStockForm(prev => ({ ...prev, totalPills: String(addAiExtracted.total_pills) }))
-      }
-    }
+    if (!addAiExtracted?.medications?.length) { setAddStep('form'); return }
+    applyMedToForm(addAiExtracted.medications[0])
+    setAddStep('form')
+  }
+
+  function applySelectedMeds() {
+    if (!addAiExtracted?.medications?.length) return
+    const selected = addAiExtracted.medications.filter((_, i) => selectedMedIndices.has(i))
+    if (selected.length === 0) return
+    applyMedToForm(selected[0])
+    setAddMedQueue(selected.slice(1))
     setAddStep('form')
   }
 
@@ -500,7 +525,15 @@ Return ONLY valid JSON.`
     }
 
     setSaving(false)
-    closeForm()
+    if (addMedQueue.length > 0) {
+      const [next, ...rest] = addMedQueue
+      setAddMedQueue(rest)
+      setEditId(null); setSaveError(null)
+      applyMedToForm(next)
+      setAddStep('form')
+    } else {
+      closeForm()
+    }
     fetchAll()
   }
 
@@ -1092,52 +1125,189 @@ Return ONLY valid JSON.`
             )}
 
             {/* ── STEP: AI confirmation ─────────────────────────────────── */}
-            {addStep === 'ai-confirm' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                {addPhotoPreview && (
-                  <img src={addPhotoPreview} alt="Foto" style={{ width: '100%', maxHeight: 180, objectFit: 'cover', borderRadius: 14 }} />
-                )}
-                {addAiError ? (
-                  <div style={{ background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 12, padding: '12px 14px' }}>
-                    <p style={{ fontSize: 13, color: '#DC2626', margin: 0 }}>⚠️ {addAiError}</p>
-                  </div>
-                ) : addAiExtracted ? (
-                  <div style={{ background: '#F0F9F4', border: '1px solid #BBF7D0', borderRadius: 14, padding: '16px' }}>
-                    <p style={{ fontSize: 12, fontWeight: 700, color: '#15803D', letterSpacing: '0.06em', textTransform: 'uppercase', margin: '0 0 12px' }}>
-                      ✅ La IA encontró lo siguiente
-                    </p>
-                    {/* Editable extracted fields */}
-                    {[
-                      { key: 'name',       label: 'Nombre', placeholder: 'Nombre del medicamento' },
-                      { key: 'dosage',     label: 'Dosis',  placeholder: 'Ej: 500mg' },
-                      { key: 'total_pills',label: 'Cantidad de pastillas', placeholder: 'Número', type: 'number' },
-                      { key: 'expiry_date',label: 'Vencimiento',           placeholder: 'MM/YYYY' },
-                    ].map(f => (
-                      <div key={f.key} style={{ marginBottom: 10 }}>
-                        <label style={{ ...labelStyle, color: '#4A7C59' }}>{f.label}</label>
-                        <input
-                          type={f.type ?? 'text'}
-                          value={addAiExtracted[f.key] ?? ''}
-                          onChange={e => setAddAiExtracted(prev => ({ ...prev, [f.key]: e.target.value }))}
-                          placeholder={f.placeholder}
-                          style={{ ...fieldStyle, borderColor: '#BBF7D0', background: 'white' }}
-                          onFocus={onFocus} onBlur={onBlur}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                ) : null}
+            {addStep === 'ai-confirm' && (() => {
+              const meds     = addAiExtracted?.medications ?? []
+              const warnings = addAiExtracted?.warnings    ?? []
+              const isMulti  = meds.length > 1
+              const boxFields = [
+                { key: 'name',        label: 'Nombre del medicamento', placeholder: 'Ej. Metformina' },
+                { key: 'strength',    label: 'Concentración',          placeholder: 'Ej. 500mg' },
+                { key: 'total_units', label: 'Cantidad de unidades',   placeholder: 'Número',    type: 'number' },
+                { key: 'expiry_date', label: 'Vencimiento',            placeholder: 'MM/YYYY' },
+              ]
+              const rxFields = [
+                { key: 'name',              label: 'Nombre del medicamento',       placeholder: 'Ej. Metformina' },
+                { key: 'strength',          label: 'Concentración',                placeholder: 'Ej. 50mg' },
+                { key: 'frequency_raw',     label: 'Frecuencia (texto de receta)', placeholder: 'Como en la receta' },
+                { key: 'quantity_per_dose', label: 'Cantidad por toma',            placeholder: '1', type: 'number' },
+                { key: 'instructions',      label: 'Instrucciones del médico',     placeholder: 'Indicaciones especiales' },
+              ]
+              const fields = addPhotoType === 'box' ? boxFields : rxFields
 
-                <div style={{ display: 'flex', gap: 10 }}>
-                  <button onClick={() => setAddStep('method')} style={{ flex: 1, padding: '13px', borderRadius: 14, border: '1.5px solid #EDE5D8', background: 'white', color: '#6B7280', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>
-                    Volver
-                  </button>
-                  <button onClick={applyAiAndContinue} style={{ flex: 2, padding: '13px', borderRadius: 14, border: 'none', background: 'linear-gradient(135deg, #4A7C59, #3A6347)', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer', boxShadow: '0 6px 20px rgba(74,124,89,0.3)' }}>
-                    {addAiExtracted ? 'Continuar →' : 'Ingresar manual →'}
-                  </button>
+              return (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                  {addPhotoPreview && (
+                    <img src={addPhotoPreview} alt="Foto" style={{ width: '100%', maxHeight: 180, objectFit: 'cover', borderRadius: 14 }} />
+                  )}
+
+                  {addAiError ? (
+                    <div style={{ background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 12, padding: '12px 14px' }}>
+                      <p style={{ fontSize: 13, color: '#DC2626', margin: 0 }}>⚠️ {addAiError}</p>
+                    </div>
+                  ) : addAiExtracted ? (
+                    <>
+                      {/* Warnings from AI */}
+                      {warnings.length > 0 && (
+                        <div style={{ background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: 12, padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 4 }}>
+                          {warnings.map((w, i) => (
+                            <p key={i} style={{ fontSize: 12, color: '#C2410C', margin: 0 }}>⚠️ {w}</p>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Always: review notice */}
+                      <div style={{ background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 10, padding: '10px 14px', display: 'flex', gap: 8, alignItems: 'center' }}>
+                        <span style={{ fontSize: 16 }}>👁️</span>
+                        <p style={{ fontSize: 12, color: '#92400E', fontWeight: 600, margin: 0 }}>
+                          Revisa los datos antes de continuar — la IA puede cometer errores
+                        </p>
+                      </div>
+
+                      {isMulti ? (
+                        /* ── Multiple meds: checkbox selection ────────── */
+                        <>
+                          <p style={{ fontSize: 14, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>
+                            Encontramos {meds.length} medicamentos en esta receta
+                          </p>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                            {meds.map((med, i) => {
+                              const checked     = selectedMedIndices.has(i)
+                              const hasLowConf  = Object.values(med).some(f => f?.confidence != null && f.confidence < 0.7)
+                              return (
+                                <label
+                                  key={i}
+                                  style={{
+                                    display: 'flex', alignItems: 'flex-start', gap: 12,
+                                    padding: '12px 14px', borderRadius: 12, cursor: 'pointer',
+                                    border: checked ? '1.5px solid #4A7C59' : '1px solid #EDE5D8',
+                                    background: checked ? '#F0FDF4' : 'white',
+                                  }}
+                                >
+                                  <input
+                                    type="checkbox"
+                                    checked={checked}
+                                    onChange={() => setSelectedMedIndices(prev => {
+                                      const next = new Set(prev)
+                                      next.has(i) ? next.delete(i) : next.add(i)
+                                      return next
+                                    })}
+                                    style={{ marginTop: 3, accentColor: '#4A7C59', width: 16, height: 16, flexShrink: 0 }}
+                                  />
+                                  <div style={{ flex: 1 }}>
+                                    <p style={{ fontSize: 14, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>
+                                      💊 {med.name?.value ?? '(sin nombre)'}
+                                      {hasLowConf && <span style={{ marginLeft: 6, fontSize: 11, color: '#D97706', fontWeight: 600 }}>⚠️ revisar</span>}
+                                    </p>
+                                    <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginTop: 4 }}>
+                                      {med.strength?.value && (
+                                        <span style={{ fontSize: 11, background: '#EBF3EE', color: '#4A7C59', padding: '1px 7px', borderRadius: 6 }}>{med.strength.value}</span>
+                                      )}
+                                      {med.form?.value && (
+                                        <span style={{ fontSize: 11, background: '#F3F4F6', color: '#6B7280', padding: '1px 7px', borderRadius: 6 }}>{FORM_MAP[med.form.value] ?? med.form.value}</span>
+                                      )}
+                                      {med.frequency?.value && (
+                                        <span style={{ fontSize: 11, background: '#F3F4F6', color: '#6B7280', padding: '1px 7px', borderRadius: 6 }}>
+                                          {FREQ_OPTIONS.find(o => o.value === med.frequency.value)?.label ?? med.frequency.value}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                </label>
+                              )
+                            })}
+                          </div>
+                          <button
+                            onClick={applySelectedMeds}
+                            disabled={selectedMedIndices.size === 0}
+                            style={{
+                              padding: '13px', borderRadius: 14, border: 'none',
+                              background: selectedMedIndices.size === 0 ? '#C0CCC5' : 'linear-gradient(135deg, #4A7C59, #3A6347)',
+                              color: 'white', fontWeight: 700, fontSize: 14,
+                              cursor: selectedMedIndices.size === 0 ? 'not-allowed' : 'pointer',
+                              boxShadow: selectedMedIndices.size === 0 ? 'none' : '0 6px 20px rgba(74,124,89,0.3)',
+                            }}
+                          >
+                            Agregar {selectedMedIndices.size} medicamento{selectedMedIndices.size !== 1 ? 's' : ''} →
+                          </button>
+                        </>
+                      ) : (
+                        /* ── Single med: editable fields with confidence ─ */
+                        meds.length === 1 && (
+                          <div style={{ background: '#F0F9F4', border: '1px solid #BBF7D0', borderRadius: 14, padding: '16px' }}>
+                            <p style={{ fontSize: 12, fontWeight: 700, color: '#15803D', letterSpacing: '0.06em', textTransform: 'uppercase', margin: '0 0 12px' }}>
+                              ✅ La IA encontró lo siguiente
+                            </p>
+                            {fields.map(f => {
+                              const fieldData  = meds[0][f.key]
+                              const value      = fieldData?.value ?? ''
+                              const confidence = fieldData?.confidence
+                              const lowConf    = confidence != null && confidence < 0.7
+                              return (
+                                <div key={f.key} style={{ marginBottom: 10 }}>
+                                  <label style={{ ...labelStyle, color: lowConf ? '#D97706' : '#4A7C59' }}>
+                                    {lowConf ? '⚠️ ' : ''}{f.label}
+                                    {confidence != null && (
+                                      <span style={{ fontWeight: 400, color: '#9CA3AF', marginLeft: 6, textTransform: 'none', letterSpacing: 0 }}>
+                                        ({Math.round(confidence * 100)}%)
+                                      </span>
+                                    )}
+                                  </label>
+                                  <input
+                                    type={f.type ?? 'text'}
+                                    value={String(value)}
+                                    onChange={e => setAddAiExtracted(prev => ({
+                                      ...prev,
+                                      medications: prev.medications.map((m, i) =>
+                                        i === 0 ? { ...m, [f.key]: { ...(m[f.key] ?? {}), value: f.type === 'number' ? Number(e.target.value) : e.target.value } } : m
+                                      ),
+                                    }))}
+                                    placeholder={f.placeholder}
+                                    style={{
+                                      ...fieldStyle,
+                                      borderColor: lowConf ? '#FDE68A' : '#BBF7D0',
+                                      background:  lowConf ? '#FFFBEB' : 'white',
+                                    }}
+                                    onFocus={onFocus}
+                                    onBlur={onBlur}
+                                  />
+                                </div>
+                              )
+                            })}
+                          </div>
+                        )
+                      )}
+                    </>
+                  ) : null}
+
+                  <div style={{ display: 'flex', gap: 10 }}>
+                    <button
+                      onClick={() => setAddStep('method')}
+                      style={{ flex: 1, padding: '13px', borderRadius: 14, border: '1.5px solid #EDE5D8', background: 'white', color: '#6B7280', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}
+                    >
+                      Volver
+                    </button>
+                    {(!isMulti || !addAiExtracted) && (
+                      <button
+                        onClick={applyAiAndContinue}
+                        style={{ flex: 2, padding: '13px', borderRadius: 14, border: 'none', background: 'linear-gradient(135deg, #4A7C59, #3A6347)', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer', boxShadow: '0 6px 20px rgba(74,124,89,0.3)' }}
+                      >
+                        {addAiExtracted ? 'Continuar →' : 'Ingresar manual →'}
+                      </button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            )}
+              )
+            })()}
 
             {/* ── STEP: Main form ───────────────────────────────────────── */}
             {addStep === 'form' && (
