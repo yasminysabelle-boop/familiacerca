@@ -1910,23 +1910,24 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (!ownerId) return
-    Promise.all([
-      supabase.from('user_profiles').select('last_seen').eq('id', user?.id).maybeSingle(),
-      supabase.from('family_members').select('member_user_id, role, user_profiles(full_name, last_seen)').eq('user_id', ownerId),
-    ]).then(([{ data: ownerProfile }, { data: membersData }]) => {
-      const members = [
-        { id: user?.id, full_name: fullName || firstName || '?', role: 'admin', last_seen: ownerProfile?.last_seen ?? null },
-        ...(membersData ?? []).map(m => ({
-          id: m.member_user_id,
-          full_name: m.user_profiles?.full_name ?? '?',
-          role: m.role ?? 'familiar',
-          last_seen: m.user_profiles?.last_seen ?? null,
-        })),
-      ]
-      setFamilyMembers(members)
-      setFamilyCount(members.length)
-      setFamilyNames(members.map(m => m.full_name.split(' ')[0]))
-    })
+    supabase
+      .from('family_members')
+      .select('member_user_id, role, user_profiles(full_name, last_seen)')
+      .eq('user_id', ownerId)
+      .then(({ data: membersData }) => {
+        const members = [
+          { id: ownerId, full_name: profile?.name || fullName || '?', role: 'admin', last_seen: null },
+          ...(membersData ?? []).map(m => ({
+            id: m.member_user_id,
+            full_name: m.user_profiles?.full_name ?? '?',
+            role: m.role ?? 'familiar',
+            last_seen: m.user_profiles?.last_seen ?? null,
+          })),
+        ]
+        setFamilyMembers(members)
+        setFamilyCount(members.length)
+        setFamilyNames(members.map(m => m.full_name.split(' ')[0]))
+      })
   }, [ownerId])
 
   useEffect(() => {
@@ -1947,7 +1948,7 @@ export default function Dashboard() {
   useEffect(() => {
     if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return
 
-    const patientName = profile?.name ?? 'el familiar'
+    const patientName = patientProfile?.nombre_completo || profile?.name || 'el familiar'
 
     function msUntil(targetH, targetM) {
       const n = new Date()
