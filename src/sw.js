@@ -9,30 +9,49 @@ import { ExpirationPlugin } from 'workbox-expiration'
 import { CacheableResponsePlugin } from 'workbox-cacheable-response'
 import { clientsClaim } from 'workbox-core'
 
+// Build date injected by vite.config.js define — e.g. "20260607"
+// Changing this on every deploy means new runtime cache names are created and
+// old ones are deleted in the activate handler below.
+const CACHE_VER = typeof __BUILD_DATE__ !== 'undefined' ? __BUILD_DATE__ : 'v1'
+
 // ── Precache all build assets (app shell) ─────────────────────────────────────
-// vite-plugin-pwa injects the manifest here; each entry has a content-hash
-// revision so deployments automatically bust stale caches.
 precacheAndRoute(self.__WB_MANIFEST)
 cleanupOutdatedCaches()
 
-// ── Activate: claim clients + broadcast SW_UPDATED so main.jsx can reload ────
+// ── Install: skip waiting immediately so the new SW activates on next load ────
+// This is the critical fix: without it the SW stays in "waiting" state until
+// every open tab is closed, meaning users see stale cached code after deploys.
+self.addEventListener('install', () => self.skipWaiting())
+
+// ── Activate: claim all clients + clean old runtime caches + broadcast reload ─
 clientsClaim()
 self.addEventListener('activate', event => {
-  event.waitUntil(
+  const VERSIONED_PREFIXES = ['navigation-', 'supabase-data-', 'supabase-storage-', 'images-', 'google-fonts-']
+  event.waitUntil(Promise.all([
+    // Delete runtime caches from previous deploys (different CACHE_VER)
+    caches.keys().then(keys =>
+      Promise.all(
+        keys
+          .filter(k => VERSIONED_PREFIXES.some(p => k.startsWith(p)))
+          .filter(k => !k.endsWith(CACHE_VER))
+          .map(k => caches.delete(k))
+      )
+    ),
+    // Broadcast to all open tabs so main.jsx can reload
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
       for (const c of list) c.postMessage({ type: 'SW_UPDATED' })
-    })
-  )
+    }),
+  ]))
 })
 
-// ── Skip-waiting on demand (main.jsx sends this when update is found) ─────────
+// ── Skip-waiting on demand (kept as fallback for older main.jsx in flight) ────
 self.addEventListener('message', event => {
   if (event.data?.type === 'SKIP_WAITING') self.skipWaiting()
 })
 
 // ── Navigation: network-first, fall back to offline.html ─────────────────────
 const navHandler = new NetworkFirst({
-  cacheName: 'navigation-v1',
+  cacheName: `navigation-${CACHE_VER}`,
   networkTimeoutSeconds: 5,
   plugins: [new CacheableResponsePlugin({ statuses: [200] })],
 })
@@ -54,7 +73,7 @@ registerRoute(
     url.hostname.includes('supabase.co') &&
     (url.pathname.startsWith('/rest/v1') || url.pathname.startsWith('/storage/v1/render')),
   new NetworkFirst({
-    cacheName: 'supabase-data-v1',
+    cacheName: `supabase-data-${CACHE_VER}`,
     networkTimeoutSeconds: 8,
     plugins: [
       new CacheableResponsePlugin({ statuses: [0, 200] }),
@@ -73,7 +92,7 @@ registerRoute(
     url.hostname.includes('supabase.co') &&
     url.pathname.startsWith('/storage/v1/object/public'),
   new CacheFirst({
-    cacheName: 'supabase-storage-v1',
+    cacheName: `supabase-storage-${CACHE_VER}`,
     plugins: [
       new CacheableResponsePlugin({ statuses: [0, 200] }),
       new ExpirationPlugin({
@@ -88,7 +107,7 @@ registerRoute(
 registerRoute(
   ({ request }) => request.destination === 'image',
   new CacheFirst({
-    cacheName: 'images-v1',
+    cacheName: `images-${CACHE_VER}`,
     plugins: [
       new CacheableResponsePlugin({ statuses: [0, 200] }),
       new ExpirationPlugin({
@@ -103,7 +122,7 @@ registerRoute(
 registerRoute(
   ({ url }) => url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com',
   new StaleWhileRevalidate({
-    cacheName: 'google-fonts-v1',
+    cacheName: `google-fonts-${CACHE_VER}`,
     plugins: [
       new CacheableResponsePlugin({ statuses: [0, 200] }),
       new ExpirationPlugin({ maxEntries: 20, maxAgeSeconds: 365 * 24 * 60 * 60 }),
