@@ -1934,7 +1934,7 @@ export default function Dashboard() {
       ]
       setFamilyMembers(members)
       setFamilyCount(members.length)
-      setFamilyNames(members.map(m => m.full_name.split(' ')[0]))
+      setFamilyNames(members.map(m => m.full_name?.split(' ')?.[0] || m.email?.split('@')?.[0] || 'Usuario'))
     })()
   }, [ownerId])
 
@@ -3128,6 +3128,13 @@ export default function Dashboard() {
                             onClick={e => { e.preventDefault(); e.stopPropagation(); setShowCollaborators(true) }}
                           >
                             {(m.full_name?.charAt(0) || m.email?.charAt(0) || '👤').toUpperCase()}
+                            {m.last_seen && Date.now() - new Date(m.last_seen).getTime() < 5 * 60 * 1000 && (
+                              <div style={{
+                                position: 'absolute', bottom: 0, right: 0,
+                                width: 7, height: 7, borderRadius: '50%',
+                                backgroundColor: '#4CAF50', border: '1.5px solid white',
+                              }} />
+                            )}
                           </div>
                         ))}
                         {familyMembers.length > 3 && (
