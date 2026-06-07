@@ -1805,7 +1805,9 @@ export default function Dashboard() {
   const [selectedDayTab, setSelectedDayTab] = useState(() => new Date().toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' }))
   const [showMoreTools, setShowMoreTools] = useState(false)
   const [showFamilySwitcher, setShowFamilySwitcher] = useState(false)
-  const [lastTurnNote, setLastTurnNote] = useState(null)
+  const [showNotifSheet, setShowNotifSheet] = useState(false)
+  const [notifMessages, setNotifMessages] = useState([])
+  const [notifNotes, setNotifNotes] = useState([])
 
   useEffect(() => {
     if (searchParams.get('checkout') === 'success') {
@@ -1820,18 +1822,6 @@ export default function Dashboard() {
   useEffect(() => {
     if (needsSelector && hasMultiple) setShowFamilySwitcher(true)
   }, [needsSelector, hasMultiple])
-
-  useEffect(() => {
-    if (!ownerId) return
-    supabase
-      .from('notes')
-      .select('id, title, content, created_at')
-      .eq('user_id', ownerId)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle()
-      .then(({ data }) => setLastTurnNote(data ?? null))
-  }, [ownerId])
 
   const now = new Date()
   const todayKey     = toLocalDateKey(now)
@@ -1874,14 +1864,49 @@ export default function Dashboard() {
   }, [user?.id])
 
   useEffect(() => {
-    if (!ownerId) return
+    if (!ownerId || !user) return
     supabase
       .from('chat_messages')
       .select('id', { count: 'exact', head: true })
       .eq('owner_id', ownerId)
+      .neq('user_id', user.id)
       .gte('created_at', todayStartISO)
       .then(({ count }) => setChatCount(count ?? 0))
-  }, [ownerId, todayKey])
+  }, [ownerId, user?.id, todayKey])
+
+  useEffect(() => {
+    if (!ownerId || !user) return
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+    Promise.all([
+      supabase
+        .from('chat_messages')
+        .select('id, message, user_name, created_at')
+        .eq('owner_id', ownerId)
+        .neq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(5),
+      supabase
+        .from('notes')
+        .select('id, title, content, created_at, created_by_user_id')
+        .eq('user_id', ownerId)
+        .neq('created_by_user_id', user.id)
+        .not('created_by_user_id', 'is', null)
+        .gte('created_at', sevenDaysAgo)
+        .order('created_at', { ascending: false })
+        .limit(5),
+    ]).then(async ([{ data: msgs }, { data: nts }]) => {
+      setNotifMessages(msgs ?? [])
+      const rows = nts ?? []
+      const authorIds = [...new Set(rows.map(n => n.created_by_user_id).filter(Boolean))]
+      let authorMap = {}
+      if (authorIds.length) {
+        const { data: profiles } = await supabase
+          .from('user_profiles').select('id, full_name').in('id', authorIds)
+        ;(profiles ?? []).forEach(p => { authorMap[p.id] = p.full_name })
+      }
+      setNotifNotes(rows.map(n => ({ ...n, authorName: authorMap[n.created_by_user_id] ?? 'Cuidador' })))
+    })
+  }, [ownerId, user?.id])
 
   useEffect(() => {
     if (!ownerId) return
@@ -3033,14 +3058,19 @@ export default function Dashboard() {
           </div>
           {/* Right: bell + avatar */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-            <button onClick={() => navigate('/chat')} style={{ position: 'relative', background: 'none', border: 'none', cursor: 'pointer', padding: 4 }}>
-              <span style={{ fontSize: 20 }}>🔔</span>
-              {chatCount > 0 && (
-                <span style={{ position: 'absolute', top: 0, right: 0, background: '#E45B4C', color: 'white', fontSize: 9, fontWeight: 800, borderRadius: '50%', width: 16, height: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  {chatCount > 9 ? '9+' : chatCount}
-                </span>
-              )}
-            </button>
+            {(() => {
+              const totalBadge = (notifMessages.length) + (notifNotes.length)
+              return (
+                <button onClick={() => setShowNotifSheet(true)} style={{ position: 'relative', background: 'none', border: 'none', cursor: 'pointer', padding: 4 }}>
+                  <span style={{ fontSize: 20 }}>🔔</span>
+                  {totalBadge > 0 && (
+                    <span style={{ position: 'absolute', top: 0, right: 0, background: '#E45B4C', color: 'white', fontSize: 9, fontWeight: 800, borderRadius: '50%', width: 16, height: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      {totalBadge > 9 ? '9+' : totalBadge}
+                    </span>
+                  )}
+                </button>
+              )
+            })()}
             <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#2D4A1E', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: 14, flexShrink: 0 }}>
               {firstName.charAt(0).toUpperCase()}
             </div>
@@ -3332,48 +3362,6 @@ export default function Dashboard() {
             )}
           </div>
 
-          {/* Notas del turno — last note widget */}
-          <div
-            onClick={() => navigate('/paciente/notas-turno')}
-            style={{
-              background: 'white', borderRadius: 16,
-              padding: '14px 16px', cursor: 'pointer',
-              boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: lastTurnNote ? 10 : 0 }}>
-              <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#1E2D26' }}>📓 Notas del turno</p>
-              <button
-                onClick={e => { e.stopPropagation(); navigate('/paciente/nota-nueva') }}
-                style={{
-                  padding: '5px 12px', borderRadius: 10,
-                  background: '#2D4A1E', color: 'white',
-                  border: 'none', cursor: 'pointer',
-                  fontSize: 11, fontWeight: 700, fontFamily: 'inherit',
-                }}
-              >
-                + Nueva
-              </button>
-            </div>
-            {lastTurnNote ? (
-              <div>
-                {lastTurnNote.title && (
-                  <p style={{ margin: '0 0 3px', fontSize: 13, fontWeight: 600, color: '#1E2D26', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {lastTurnNote.title}
-                  </p>
-                )}
-                <p style={{ margin: 0, fontSize: 12, color: '#4B5563', lineHeight: 1.4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {lastTurnNote.content}
-                </p>
-                <p style={{ margin: '5px 0 0', fontSize: 11, color: '#9CA3AF' }}>
-                  {new Date(lastTurnNote.created_at).toLocaleString('es', { dateStyle: 'medium', timeStyle: 'short' })}
-                </p>
-              </div>
-            ) : (
-              <p style={{ margin: '6px 0 0', fontSize: 12, color: '#9CA3AF' }}>Sin notas hoy</p>
-            )}
-          </div>
-
           {/* Más herramientas — collapsed accordion */}
           <div style={{ borderRadius: 16, overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
             <button
@@ -3407,7 +3395,7 @@ export default function Dashboard() {
                   { emoji: '📋', label: 'Registros', route: '/registros' },
                   { emoji: '📊', label: 'Historial', route: '/historial' },
                   { emoji: '📝', label: 'Notas médicas', route: '/diario-medico' },
-                  { emoji: '📓', label: 'Notas del turno', route: '/paciente/notas-turno' },
+                  { emoji: '📓', label: 'Notas familia', route: '/paciente/notas-turno' },
                   { emoji: '💰', label: 'Gastos', route: '/gastos' },
                   { emoji: '🐾', label: 'Milo & Luna', route: '/diario-medico' },
                   { emoji: '👤', label: 'Mi cuenta', route: '/ajustes' },
@@ -3607,6 +3595,119 @@ export default function Dashboard() {
       )}
       <VideoCallScheduleModal open={showVideoCallModal} onClose={() => setShowVideoCallModal(false)} />
       <SuccessAnimation visible={medSuccessTrigger > 0} key={medSuccessTrigger} />
+
+      {/* ── Notifications Bottom Sheet ───────────────────────────────────────── */}
+      {showNotifSheet && createPortal(
+        <>
+          <div
+            onClick={() => setShowNotifSheet(false)}
+            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.35)', zIndex: 500 }}
+          />
+          <div style={{
+            position: 'fixed', bottom: 68, left: 0, right: 0, zIndex: 501,
+            background: 'white', borderRadius: '20px 20px 0 0',
+            boxShadow: '0 -8px 40px rgba(0,0,0,0.18)',
+            maxHeight: '75vh', display: 'flex', flexDirection: 'column',
+          }}>
+            {/* Sheet header */}
+            <div style={{ padding: '16px 20px 12px', borderBottom: '1px solid #F0EDE6', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+              <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#1E2D26' }}>🔔 Notificaciones</p>
+              <button
+                onClick={() => setShowNotifSheet(false)}
+                style={{ background: 'rgba(0,0,0,0.06)', border: 'none', borderRadius: '50%', width: 28, height: 28, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, color: '#6B7280', flexShrink: 0 }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Scrollable content */}
+            <div style={{ overflowY: 'auto', flex: 1, padding: '0 0 20px' }}>
+
+              {/* ── MENSAJES ── */}
+              <div style={{ padding: '14px 20px 8px' }}>
+                <p style={{ margin: '0 0 10px', fontSize: 11, fontWeight: 700, color: '#9CA3AF', letterSpacing: '0.06em' }}>
+                  💬 MENSAJES
+                </p>
+                {notifMessages.length === 0 ? (
+                  <p style={{ margin: 0, fontSize: 13, color: '#9CA3AF', padding: '4px 0' }}>No hay mensajes nuevos</p>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    {notifMessages.map(msg => (
+                      <button
+                        key={msg.id}
+                        onClick={() => { setShowNotifSheet(false); navigate('/chat') }}
+                        style={{
+                          background: 'none', border: 'none', cursor: 'pointer', padding: '10px 0',
+                          textAlign: 'left', borderBottom: '1px solid #F5F0E8', width: '100%',
+                          display: 'flex', alignItems: 'flex-start', gap: 10,
+                          WebkitTapHighlightColor: 'transparent',
+                        }}
+                      >
+                        <div style={{ width: 34, height: 34, borderRadius: '50%', background: '#EFF6FF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>
+                          💬
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <p style={{ margin: '0 0 2px', fontSize: 12, fontWeight: 700, color: '#1E2D26' }}>
+                            {msg.user_name ?? 'Familiar'}
+                          </p>
+                          <p style={{ margin: 0, fontSize: 12, color: '#4B5563', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: 1.4 }}>
+                            {msg.message}
+                          </p>
+                        </div>
+                        <span style={{ fontSize: 10, color: '#9CA3AF', whiteSpace: 'nowrap', flexShrink: 0, marginTop: 2 }}>
+                          {timeAgo(new Date(msg.created_at))}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* ── NOTAS DE TURNO ── */}
+              <div style={{ padding: '14px 20px 8px' }}>
+                <p style={{ margin: '0 0 10px', fontSize: 11, fontWeight: 700, color: '#9CA3AF', letterSpacing: '0.06em' }}>
+                  📓 NOTAS DE TURNO
+                </p>
+                {notifNotes.length === 0 ? (
+                  <p style={{ margin: 0, fontSize: 13, color: '#9CA3AF', padding: '4px 0' }}>No hay notas sin leer</p>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    {notifNotes.map(note => (
+                      <button
+                        key={note.id}
+                        onClick={() => { setShowNotifSheet(false); navigate('/paciente/notas-turno') }}
+                        style={{
+                          background: 'none', border: 'none', cursor: 'pointer', padding: '10px 0',
+                          textAlign: 'left', borderBottom: '1px solid #F5F0E8', width: '100%',
+                          display: 'flex', alignItems: 'flex-start', gap: 10,
+                          WebkitTapHighlightColor: 'transparent',
+                        }}
+                      >
+                        <div style={{ width: 34, height: 34, borderRadius: '50%', background: '#FFF3E0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>
+                          📝
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <p style={{ margin: '0 0 2px', fontSize: 12, fontWeight: 700, color: '#1E2D26' }}>
+                            {note.authorName}
+                          </p>
+                          <p style={{ margin: 0, fontSize: 12, color: '#4B5563', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: 1.4 }}>
+                            {note.title ? `${note.title}: ` : ''}{note.content}
+                          </p>
+                        </div>
+                        <span style={{ fontSize: 10, color: '#9CA3AF', whiteSpace: 'nowrap', flexShrink: 0, marginTop: 2 }}>
+                          {timeAgo(new Date(note.created_at))}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+            </div>
+          </div>
+        </>,
+        document.body
+      )}
 
       {/* ── Family Switcher Bottom Sheet ─────────────────────────────────────── */}
       {showFamilySwitcher && createPortal(
