@@ -129,7 +129,7 @@ export default function FamilySwitcher() {
                         color: roleColor, background: roleBg,
                         padding: '2px 8px', borderRadius: 5,
                       }}>
-                        {roleLabel}
+                        Tu rol: {roleLabel}
                       </span>
                     </div>
 

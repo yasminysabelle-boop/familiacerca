@@ -47,6 +47,7 @@ const PRIMARY_PAGES = new Set(['/dashboard', '/familia', '/ajustes', '/planes', 
 export default function Layout({ children }) {
   const { inactivityWarning, user } = useAuth()
   const { profile, activeFamilyLabel, activePatientName } = useFamily()
+  console.log('[LAYOUT] activePatientName:', activePatientName, 'activeFamilyLabel:', activeFamilyLabel)
   const userAvatar = user?.user_metadata?.avatar_url ?? null
   const userInitial = (user?.user_metadata?.full_name ?? user?.email ?? '?').charAt(0).toUpperCase()
   const { dark } = useDarkMode()
