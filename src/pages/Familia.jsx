@@ -114,7 +114,7 @@ export default function Familia() {
     if (ids.length) {
       const { data: profiles } = await supabase
         .from('user_profiles')
-        .select('id, full_name, avatar_url, last_seen')
+        .select('id, full_name, email, avatar_url, last_seen')
         .in('id', ids)
       const map = {}
       ;(profiles ?? []).forEach(p => { map[p.id] = p })
@@ -385,7 +385,9 @@ export default function Familia() {
               {(() => {
                 const adminId = ownerId
                 const adminMp = memberProfiles[adminId]
-                const adminName = isAdmin ? displayName : (adminMp?.full_name ?? 'Administrador')
+                const adminName = isAdmin
+                  ? displayName
+                  : (adminMp?.full_name?.trim() || adminMp?.email?.trim() || 'Familiar')
                 const adminInitials = adminName.charAt(0).toUpperCase()
                 const adminOnline = isAdmin ? true : onlineIds.has(adminId)
                 return (

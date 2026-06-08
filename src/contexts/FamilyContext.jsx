@@ -61,14 +61,17 @@ export function FamilyProvider({ children }) {
 
       if (memberships?.length) {
         const memberOwnerIds = memberships.map(m => m.user_id)
-        const [{ data: ownerProfiles }, { data: memberPatients }] = await Promise.all([
+        const [{ data: ownerProfiles }, { data: memberPatients }, { data: ownerUserProfiles }] = await Promise.all([
           supabase.from('care_profiles').select('*').in('user_id', memberOwnerIds),
           supabase.from('patient_profiles').select('owner_id, nombre_completo').in('owner_id', memberOwnerIds),
+          supabase.from('user_profiles').select('id, full_name, email').in('id', memberOwnerIds),
         ])
         const profileMap = {}
         ;(ownerProfiles ?? []).forEach(p => { profileMap[p.user_id] = p })
         const patientNameMap = {}
         ;(memberPatients ?? []).forEach(pp => { if (pp.nombre_completo) patientNameMap[pp.owner_id] = pp.nombre_completo })
+        const ownerUserProfileMap = {}
+        ;(ownerUserProfiles ?? []).forEach(p => { ownerUserProfileMap[p.id] = p })
 
         for (const m of memberships) {
           const op = profileMap[m.user_id]
@@ -76,7 +79,14 @@ export function FamilyProvider({ children }) {
           localStorage.setItem('fc_member_role_' + m.user_id, role)
           built.push({
             ownerId: m.user_id,
-            patientName: patientNameMap[m.user_id] || op?.name || null,
+            patientName: (() => {
+            const fromPatient = patientNameMap[m.user_id]
+            const fromUserProfile = ownerUserProfileMap[m.user_id]?.full_name?.trim()
+            const careProfileName = op?.name
+            const fromCare = careProfileName?.includes('@') ? null : careProfileName?.trim()
+            const fromEmail = ownerUserProfileMap[m.user_id]?.email?.trim()
+            return fromPatient || fromUserProfile || fromCare || fromEmail || null
+          })(),
             patientPhotoUrl: op?.photo_url ?? null,
             role,
             profile: op ?? null,
