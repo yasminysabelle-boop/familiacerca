@@ -50,6 +50,13 @@ export function usePushNotifications() {
         applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
       })
       const json = sub.toJSON()
+      // Remove stale subs for this user and any cross-user endpoint conflict
+      await Promise.all([
+        supabase.from('push_subscriptions').delete()
+          .eq('user_id', user.id).neq('endpoint', json.endpoint),
+        supabase.from('push_subscriptions').delete()
+          .eq('endpoint', json.endpoint).neq('user_id', user.id),
+      ])
       const { error } = await supabase.from('push_subscriptions').upsert(
         {
           user_id: user.id,
@@ -85,6 +92,13 @@ export function usePushNotifications() {
         applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
       })
       const json = sub.toJSON()
+      // Remove stale subs for this user and any cross-user endpoint conflict
+      await Promise.all([
+        supabase.from('push_subscriptions').delete()
+          .eq('user_id', user.id).neq('endpoint', json.endpoint),
+        supabase.from('push_subscriptions').delete()
+          .eq('endpoint', json.endpoint).neq('user_id', user.id),
+      ])
       const { error } = await supabase.from('push_subscriptions').upsert(
         {
           user_id: user.id,
@@ -124,8 +138,10 @@ export function usePushNotifications() {
       })
       const json = sub.toJSON()
 
-      // Replace all existing DB records for this user with the new subscription
+      // Replace all existing DB records for this user + clear cross-user endpoint conflicts
       await supabase.from('push_subscriptions').delete().eq('user_id', user.id)
+      await supabase.from('push_subscriptions').delete()
+        .eq('endpoint', json.endpoint).neq('user_id', user.id)
       const { error } = await supabase.from('push_subscriptions').insert({
         user_id: user.id,
         endpoint: json.endpoint,

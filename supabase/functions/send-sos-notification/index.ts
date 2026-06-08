@@ -1,9 +1,7 @@
 // FamiliaCerca — SOS Emergency Push Notification + Email
-// Sends high-priority push notifications (Web Push + Firebase FCM) AND email
-// to every family member.
+// Sends high-priority Web Push notifications AND email to every family member.
 // Deploy: supabase functions deploy send-sos-notification
-// Required secrets: VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, VAPID_CONTACT_EMAIL,
-//                   FIREBASE_SERVER_KEY (Firebase Console → Project Settings → Cloud Messaging → Server key)
+// Required secrets: VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, VAPID_CONTACT_EMAIL, RESEND_API_KEY
 
 import webpush from 'npm:web-push@3.6.7'
 import { createClient } from 'npm:@supabase/supabase-js@2'
@@ -168,7 +166,8 @@ Deno.serve(async (req: Request) => {
           requireInteraction: true,
           vibrate: [300, 100, 300, 100, 300],
           data: { family_id: resolvedOwnerId, patient_name: patientName, event_type: 'SOS', target_screen: 'dashboard' },
-        })
+        }),
+        { TTL: 3600 }
       )
       sentCount++
       console.log(`[send-sos-notification] ✓ Push sent to user ${sub.user_id}`)
@@ -176,7 +175,7 @@ Deno.serve(async (req: Request) => {
       failCount++
       const statusCode = (err as { statusCode?: number }).statusCode
       console.error(`[send-sos-notification] ✗ Push failed for user ${sub.user_id}, status=${statusCode}`)
-      if (statusCode === 410) {
+      if (statusCode && statusCode >= 400 && statusCode !== 429 && statusCode !== 413) {
         await supabase.from('push_subscriptions').delete().eq('id', sub.id)
       }
     }
@@ -211,62 +210,6 @@ Deno.serve(async (req: Request) => {
     }
   } else {
     console.warn('[send-sos-notification] RESEND_API_KEY not set, skipping email')
-  }
-
-  // ── Firebase FCM push ────────────────────────────────────────────────────
-  const firebaseServerKey = Deno.env.get('FIREBASE_SERVER_KEY')
-  if (firebaseServerKey) {
-    try {
-      const { data: fcmProfiles } = await supabase
-        .from('user_profiles')
-        .select('fcm_token')
-        .in('id', recipientIds)
-        .not('fcm_token', 'is', null)
-
-      const fcmTokens: string[] = (fcmProfiles ?? [])
-        .map((p: { fcm_token: string | null }) => p.fcm_token)
-        .filter(Boolean)
-
-      console.log(`[send-sos-notification] FCM tokens found: ${fcmTokens.length} for ${recipientIds.length} recipients`)
-
-      if (fcmTokens.length > 0) {
-        const fcmRes = await fetch('https://fcm.googleapis.com/fcm/send', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `key=${firebaseServerKey}`,
-          },
-          body: JSON.stringify({
-            registration_ids: fcmTokens,
-            notification: {
-              title: `🚨 EMERGENCIA — ${triggeredByName}`,
-              body: address ? `📍 ${address} — Toca para ver los detalles` : 'Toca para ver los detalles',
-              icon: '/icon-192.png',
-              badge: '/icon-72.png',
-              tag: 'sos-alert',
-            },
-            data: {
-              type: 'SOS',
-              url: '/dashboard',
-              target_screen: 'dashboard',
-              triggeredByName: triggeredByName ?? '',
-              latitude: String(latitude ?? ''),
-              longitude: String(longitude ?? ''),
-              address: address ?? '',
-            },
-            priority: 'high',
-            content_available: true,
-          }),
-        })
-        const fcmResult = await fcmRes.json()
-        sentCount += fcmResult.success ?? 0
-        console.log(`[send-sos-notification] FCM sent=${fcmResult.success} failed=${fcmResult.failure}`)
-      }
-    } catch (err) {
-      console.error('[send-sos-notification] FCM send failed:', err)
-    }
-  } else {
-    console.warn('[send-sos-notification] FIREBASE_SERVER_KEY not set, skipping FCM')
   }
 
   console.log(`[send-sos-notification] Done. push sent=${sentCount}, failed=${failCount}`)
