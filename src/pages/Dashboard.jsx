@@ -1796,7 +1796,7 @@ export default function Dashboard() {
   function dismissNotifBanner() { localStorage.setItem('notif_dismissed', '1'); setNotifDismissed(true) }
   const [familyNames, setFamilyNames] = useState([])
   const [familyMembers, setFamilyMembers] = useState([])
-  const [showCollaborators, setShowCollaborators] = useState(false)
+
   // Tracks scheduled appointment reminder timeouts by event id to prevent duplicates
   const apptReminderTimeouts = useRef(new Map())
   const apptReminderScheduled = useRef(new Set())
@@ -1959,7 +1959,7 @@ export default function Dashboard() {
         : { data: [] }
       const seen = new Set([ownerId])
       const members = [
-        { id: ownerId, full_name: profile?.name || fullName || null, email: null, role: 'admin', last_seen: null },
+        { id: ownerId, full_name: fullName || null, email: null, role: 'admin', last_seen: null },
         ...(membersData ?? [])
           .filter(m => {
             if (!m.member_user_id || seen.has(m.member_user_id)) return false
@@ -3175,7 +3175,7 @@ export default function Dashboard() {
                               fontSize: 9, fontWeight: 700, color: 'white',
                               cursor: 'pointer', zIndex: 3 - i, position: 'relative',
                             }}
-                            onClick={e => { e.preventDefault(); e.stopPropagation(); setShowCollaborators(true) }}
+                            onClick={e => { e.preventDefault(); e.stopPropagation(); setShowFamilySwitcher(true) }}
                           >
                             {(m.full_name?.charAt(0) || m.email?.charAt(0) || '👤').toUpperCase()}
                             {m.last_seen && Date.now() - new Date(m.last_seen).getTime() < 5 * 60 * 1000 && (
@@ -3740,9 +3740,16 @@ export default function Dashboard() {
             boxShadow: '0 -8px 40px rgba(0,0,0,0.18)',
           }}>
             <div style={{ padding: '20px 20px 0' }}>
-              {/* Header row */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-                <p style={{ margin: 0, fontSize: 15, fontWeight: 600, color: '#1E2D26' }}>Mis familias</p>
+              {/* Header: patient name + close */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
+                <div>
+                  <p style={{ margin: 0, fontSize: 13, fontWeight: 500, color: '#9CA3AF', letterSpacing: '0.03em', textTransform: 'uppercase' }}>
+                    Cuidando a
+                  </p>
+                  <p style={{ margin: '2px 0 0', fontSize: 18, fontWeight: 700, color: '#1E2D26', fontFamily: 'Georgia, serif' }}>
+                    {activePatientName || activeFamilyLabel || 'Mi familiar'}
+                  </p>
+                </div>
                 <button
                   onClick={() => setShowFamilySwitcher(false)}
                   style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', alignItems: 'center' }}
@@ -3751,75 +3758,120 @@ export default function Dashboard() {
                 </button>
               </div>
 
-              {/* Family cards */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxHeight: '50vh', overflowY: 'auto' }}>
-                {families.map(fam => {
-                  const isActive  = fam.ownerId === ownerId
-                  const isAdm     = fam.role === null
-                  const isCuid    = fam.role === 'cuidador'
-                  const roleLabel = isAdm ? 'Administrador' : isCuid ? 'Cuidador' : 'Familiar'
-                  const roleColor = isAdm ? '#3D6B54' : isCuid ? '#1D4ED8' : '#D97706'
-                  const roleBg    = isAdm ? '#E8F5EE'  : isCuid ? '#EFF6FF' : '#FEF3C7'
-                  const initial   = (fam.patientName ?? 'F').charAt(0).toUpperCase()
+              {/* Section 1: Care team */}
+              <p style={{ margin: '0 0 10px', fontSize: 12, fontWeight: 700, color: '#9CA3AF', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                Equipo de cuidado
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxHeight: '40vh', overflowY: 'auto' }}>
+                {familyMembers.map(m => {
+                  const isMe = m.id === user?.id
+                  const isAdm = m.role === 'admin'
+                  const isCuid = m.role === 'cuidador'
+                  const roleLabel = isAdm ? 'Admin' : isCuid ? 'Cuidador' : 'Familiar'
+                  const roleColor = isAdm ? '#15803D' : isCuid ? '#1D4ED8' : '#D97706'
+                  const roleBg = isAdm ? '#DCFCE7' : isCuid ? '#DBEAFE' : '#FEF3C7'
+                  const displayName = m.full_name?.trim() || (m.email ? m.email.split('@')[0] : 'Sin nombre')
+                  const initial = displayName.charAt(0).toUpperCase()
+                  const presence = (() => {
+                    if (!m.last_seen) return { dot: '⚫', label: 'Sin actividad', color: '#9CA3AF' }
+                    const diffMs = Date.now() - new Date(m.last_seen).getTime()
+                    const diffMin = diffMs / 60000
+                    const diffH = diffMs / 3600000
+                    if (diffMin <= 5) return { dot: '🟢', label: 'En línea', color: '#15803D' }
+                    if (diffH <= 24) {
+                      const label = diffH < 1 ? `Hace ${Math.round(diffMin)}min` : `Hace ${Math.round(diffH)}h`
+                      return { dot: '🟡', label, color: '#D97706' }
+                    }
+                    const diffDays = Math.floor(diffH / 24)
+                    return { dot: '⚫', label: diffDays <= 1 ? 'Hace 1 día' : `Hace ${diffDays} días`, color: '#9CA3AF' }
+                  })()
                   return (
-                    <button
-                      key={fam.ownerId}
-                      onClick={() => { switchFamily(fam.ownerId); setShowFamilySwitcher(false) }}
-                      style={{
-                        display: 'flex', alignItems: 'center', gap: 14,
-                        padding: '12px 14px', borderRadius: 14,
-                        background: isActive ? '#F0F7F3' : 'white',
-                        border: isActive ? '1.5px solid #B7D9C4' : '1.5px solid #EDE5D8',
-                        cursor: 'pointer', textAlign: 'left', width: '100%',
-                        WebkitTapHighlightColor: 'transparent',
-                      }}
-                    >
-                      {fam.patientPhotoUrl ? (
-                        <img
-                          src={fam.patientPhotoUrl} alt={fam.patientName ?? ''}
-                          style={{ width: 48, height: 48, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '2px solid #EDE5D8' }}
-                        />
-                      ) : (
-                        <div style={{
-                          width: 48, height: 48, borderRadius: '50%', flexShrink: 0,
-                          background: 'linear-gradient(135deg, #4A7C59, #2D6A4F)',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          fontSize: 18, fontWeight: 700, color: 'white', fontFamily: 'Georgia, serif',
-                        }}>
-                          {initial}
-                        </div>
-                      )}
+                    <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      <div style={{
+                        width: 40, height: 40, borderRadius: '50%', flexShrink: 0,
+                        background: isMe ? 'linear-gradient(135deg,#2D4A1E,#4A7C59)' : 'linear-gradient(135deg,#4A7C59,#2D6A4F)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: 16, fontWeight: 700, color: 'white',
+                      }}>
+                        {initial}
+                      </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#1E2D26', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {fam.patientName ?? 'Mi familiar'}
+                          {displayName}{isMe && <span style={{ fontWeight: 400, color: '#9CA3AF', fontSize: 13 }}> · Tú</span>}
                         </p>
-                        <span style={{
-                          display: 'inline-block', marginTop: 4,
-                          fontSize: 11, fontWeight: 700,
-                          color: roleColor, background: roleBg,
-                          padding: '2px 8px', borderRadius: 6,
-                        }}>
-                          Tu rol: {roleLabel}
-                        </span>
+                        <p style={{ margin: '2px 0 0', fontSize: 11, color: presence.color }}>{presence.dot} {presence.label}</p>
                       </div>
-                      {isActive && (
-                        <div style={{
-                          width: 22, height: 22, borderRadius: '50%', background: '#4A7C59',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                        }}>
-                          <CheckIcon size={12} color="white" strokeWidth={2.5} />
-                        </div>
-                      )}
-                    </button>
+                      <span style={{ fontSize: 11, fontWeight: 600, color: roleColor, background: roleBg, borderRadius: 20, padding: '3px 10px', flexShrink: 0 }}>
+                        {roleLabel}
+                      </span>
+                    </div>
                   )
                 })}
               </div>
+
+              {/* Section 2: Other families (only when user belongs to more than one) */}
+              {families.length > 1 && (() => {
+                const otherFamilies = families.filter(f => f.ownerId !== ownerId)
+                if (!otherFamilies.length) return null
+                return (
+                  <>
+                    <p style={{ margin: '18px 0 10px', fontSize: 12, fontWeight: 700, color: '#9CA3AF', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                      Otras familias
+                    </p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                      {otherFamilies.map(fam => {
+                        const isCuid = fam.role === 'cuidador'
+                        const famRoleLabel = fam.role === null ? 'Admin' : isCuid ? 'Cuidador' : 'Familiar'
+                        const famRoleColor = fam.role === null ? '#15803D' : isCuid ? '#1D4ED8' : '#D97706'
+                        const famRoleBg = fam.role === null ? '#DCFCE7' : isCuid ? '#DBEAFE' : '#FEF3C7'
+                        const famInitial = (fam.patientName ?? 'F').charAt(0).toUpperCase()
+                        return (
+                          <button
+                            key={fam.ownerId}
+                            onClick={() => { switchFamily(fam.ownerId); setShowFamilySwitcher(false) }}
+                            style={{
+                              display: 'flex', alignItems: 'center', gap: 12,
+                              padding: '10px 12px', borderRadius: 14,
+                              background: '#FDFAF7', border: '1.5px solid #EDE5D8',
+                              cursor: 'pointer', textAlign: 'left', width: '100%',
+                              WebkitTapHighlightColor: 'transparent',
+                            }}
+                          >
+                            {fam.patientPhotoUrl ? (
+                              <img src={fam.patientPhotoUrl} alt={fam.patientName ?? ''}
+                                style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '2px solid #EDE5D8' }} />
+                            ) : (
+                              <div style={{
+                                width: 40, height: 40, borderRadius: '50%', flexShrink: 0,
+                                background: 'linear-gradient(135deg,#9CA3AF,#6B7280)',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                fontSize: 15, fontWeight: 700, color: 'white',
+                              }}>
+                                {famInitial}
+                              </div>
+                            )}
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#1E2D26', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                {fam.patientName ?? 'Mi familiar'}
+                              </p>
+                              <span style={{ fontSize: 11, fontWeight: 600, color: famRoleColor, background: famRoleBg, borderRadius: 20, padding: '2px 8px' }}>
+                                {famRoleLabel}
+                              </span>
+                            </div>
+                            <span style={{ fontSize: 13, color: '#9CA3AF', flexShrink: 0 }}>›</span>
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </>
+                )
+              })()}
 
               {/* Close button */}
               <button
                 onClick={() => setShowFamilySwitcher(false)}
                 style={{
-                  width: '100%', padding: '13px', marginTop: 12,
+                  width: '100%', padding: '13px', marginTop: 16,
                   background: '#F5F0E8', border: 'none', borderRadius: 12,
                   cursor: 'pointer', fontSize: 14, color: '#6F7A72', fontWeight: 600,
                   WebkitTapHighlightColor: 'transparent',
@@ -3829,71 +3881,6 @@ export default function Dashboard() {
               </button>
               <div style={{ height: 16 }} />
             </div>
-          </div>
-        </>,
-        document.body
-      )}
-
-      {/* ── Collaborators Bottom Sheet ────────────────────────────────────────── */}
-      {showCollaborators && createPortal(
-        <>
-          <div
-            onClick={() => setShowCollaborators(false)}
-            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.3)', zIndex: 500 }}
-          />
-          <div style={{
-            position: 'fixed', bottom: 64, left: 0, right: 0, zIndex: 501,
-            background: 'white', borderRadius: '20px 20px 0 0',
-            padding: 20, boxShadow: '0 -8px 40px rgba(0,0,0,0.18)',
-          }}>
-            <p style={{ margin: '0 0 16px', fontSize: 15, fontWeight: 600, color: '#1E2D26' }}>Familia cuidando</p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxHeight: '50vh', overflowY: 'auto' }}>
-              {familyMembers.map(m => {
-                const isAdm = m.role === 'admin'
-                const isCuid = m.role === 'cuidador'
-                const roleLabel = isAdm ? 'Admin' : isCuid ? 'Cuidador' : 'Familiar'
-                const roleColor = isAdm ? '#15803D' : isCuid ? '#1D4ED8' : '#D97706'
-                const roleBg = isAdm ? '#DCFCE7' : isCuid ? '#DBEAFE' : '#FEF3C7'
-                const presence = (() => {
-                  if (!m.last_seen) return { dot: '⚫', label: 'Sin actividad', color: '#9CA3AF' }
-                  const diffMs = Date.now() - new Date(m.last_seen).getTime()
-                  const diffMin = diffMs / 60000
-                  const diffH = diffMs / 3600000
-                  if (diffMin <= 5) return { dot: '🟢', label: 'En línea', color: '#15803D' }
-                  if (diffH <= 24) {
-                    const label = diffH < 1 ? `Hace ${Math.round(diffMin)}min` : `Hace ${Math.round(diffH)}h`
-                    return { dot: '🟡', label, color: '#D97706' }
-                  }
-                  const diffDays = Math.floor(diffH / 24)
-                  return { dot: '⚫', label: diffDays <= 1 ? 'Hace 1 día' : `Hace ${diffDays} días`, color: '#9CA3AF' }
-                })()
-                return (
-                  <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div style={{
-                      width: 40, height: 40, borderRadius: '50%', flexShrink: 0,
-                      background: 'linear-gradient(135deg,#4A7C59,#2D6A4F)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 16, fontWeight: 700, color: 'white',
-                    }}>
-                      {(m.full_name?.charAt(0) || m.email?.charAt(0) || '👤').toUpperCase()}
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <p style={{ margin: 0, fontSize: 14, fontWeight: 500, color: '#1E2D26' }}>{m.full_name || m.email || 'Sin nombre'}</p>
-                      <p style={{ margin: '2px 0 0', fontSize: 11, color: presence.color }}>{presence.dot} {presence.label}</p>
-                    </div>
-                    <span style={{ fontSize: 11, fontWeight: 600, color: roleColor, background: roleBg, borderRadius: 20, padding: '3px 10px', flexShrink: 0 }}>
-                      {roleLabel}
-                    </span>
-                  </div>
-                )
-              })}
-            </div>
-            <button
-              onClick={() => setShowCollaborators(false)}
-              style={{ width: '100%', marginTop: 20, padding: '12px', borderRadius: 14, border: '1.5px solid #EDE5D8', background: 'white', color: '#6B7280', fontWeight: 600, fontSize: 14, cursor: 'pointer' }}
-            >
-              Cerrar
-            </button>
           </div>
         </>,
         document.body
