@@ -10,29 +10,33 @@ import EmptyState from '../components/EmptyState'
 import { usePullToRefresh } from '../hooks/usePullToRefresh'
 
 const EVENT_CONFIG = {
-  med_confirmed:      { icon: '💊', label: 'Medicamento',        color: '#4A7C59', bg: '#F0FDF4', border: '#BBF7D0' },
-  hospital_mode_on:   { icon: '🏥', label: 'Hospitalización',    color: '#B91C1C', bg: '#FFF5F5', border: '#FECACA' },
-  hospital_discharge: { icon: '🏠', label: 'Alta hospitalaria',  color: '#2563EB', bg: '#EFF6FF', border: '#BFDBFE' },
-  doctor_note:        { icon: '📋', label: 'Nota médica',        color: '#7C5CBF', bg: '#F5F3FF', border: '#DDD6FE' },
-  appointment:        { icon: '📅', label: 'Cita médica',        color: '#2D86A0', bg: '#F0F9FF', border: '#BAE6FD' },
-  caregiver_assigned: { icon: '👤', label: 'Turno asignado',     color: '#C9882A', bg: '#FFFBEB', border: '#FDE68A' },
-  sos:                { icon: '🆘', label: 'Alerta SOS',         color: '#DC2626', bg: '#FEF2F2', border: '#FECACA' },
-  expense:            { icon: '💰', label: 'Gasto registrado',   color: '#059669', bg: '#ECFDF5', border: '#A7F3D0' },
-  care_routine:       { icon: '✅', label: 'Rutina completada',  color: '#16A34A', bg: '#F0FDF4', border: '#BBF7D0' },
-  care_photo:         { icon: '📸', label: 'Foto de cuidado',    color: '#C9882A', bg: '#FFFBEB', border: '#FDE68A' },
+  med_confirmed:        { icon: '💊', label: 'Medicamento',        color: '#4A7C59', bg: '#F0FDF4', border: '#BBF7D0' },
+  med_missed:           { icon: '❌', label: 'Dosis omitida',       color: '#DC2626', bg: '#FEF2F2', border: '#FECACA' },
+  hospital_mode_on:     { icon: '🏥', label: 'Hospitalización',    color: '#B91C1C', bg: '#FFF5F5', border: '#FECACA' },
+  hospital_discharge:   { icon: '🏠', label: 'Alta hospitalaria',  color: '#2563EB', bg: '#EFF6FF', border: '#BFDBFE' },
+  doctor_note:          { icon: '📋', label: 'Nota médica',        color: '#7C5CBF', bg: '#F5F3FF', border: '#DDD6FE' },
+  appointment:          { icon: '📅', label: 'Cita médica',        color: '#2D86A0', bg: '#F0F9FF', border: '#BAE6FD' },
+  caregiver_assigned:   { icon: '👤', label: 'Turno asignado',     color: '#C9882A', bg: '#FFFBEB', border: '#FDE68A' },
+  sos:                  { icon: '🆘', label: 'Alerta SOS',         color: '#DC2626', bg: '#FEF2F2', border: '#FECACA' },
+  expense:              { icon: '💰', label: 'Gasto registrado',   color: '#059669', bg: '#ECFDF5', border: '#A7F3D0' },
+  care_routine:         { icon: '✅', label: 'Rutina completada',  color: '#16A34A', bg: '#F0FDF4', border: '#BBF7D0' },
+  care_routine_missed:  { icon: '⚠️', label: 'Rutina omitida',     color: '#D97706', bg: '#FFFBEB', border: '#FDE68A' },
+  care_photo:           { icon: '📸', label: 'Foto de cuidado',    color: '#C9882A', bg: '#FFFBEB', border: '#FDE68A' },
 }
 
 const FILTER_OPTIONS = [
-  { id: 'all',               label: 'Todo',          icon: '📖' },
-  { id: 'med_confirmed',     label: 'Medicamentos',  icon: '💊' },
-  { id: 'care_routine',      label: 'Rutinas',       icon: '✅' },
-  { id: 'hospital_mode_on',  label: 'Hospital',      icon: '🏥' },
-  { id: 'doctor_note',       label: 'Notas',         icon: '📋' },
-  { id: 'appointment',       label: 'Citas',         icon: '📅' },
-  { id: 'sos',               label: 'SOS',           icon: '🆘' },
-  { id: 'expense',           label: 'Gastos',        icon: '💰' },
-  { id: 'care_photo',        label: 'Fotos',         icon: '📸' },
-  { id: 'caregiver_assigned',label: 'Turnos',        icon: '👤' },
+  { id: 'all',                  label: 'Todo',           icon: '📖' },
+  { id: 'med_confirmed',        label: 'Medicamentos',   icon: '💊' },
+  { id: 'med_missed',           label: 'Dosis omitidas', icon: '❌' },
+  { id: 'care_routine',         label: 'Rutinas',        icon: '✅' },
+  { id: 'care_routine_missed',  label: 'Rutinas omitidas', icon: '⚠️' },
+  { id: 'hospital_mode_on',     label: 'Hospital',       icon: '🏥' },
+  { id: 'doctor_note',          label: 'Notas',          icon: '📋' },
+  { id: 'appointment',          label: 'Citas',          icon: '📅' },
+  { id: 'sos',                  label: 'SOS',            icon: '🆘' },
+  { id: 'expense',              label: 'Gastos',         icon: '💰' },
+  { id: 'care_photo',           label: 'Fotos',          icon: '📸' },
+  { id: 'caregiver_assigned',   label: 'Turnos',         icon: '👤' },
 ]
 
 const PERIOD_OPTIONS = [
@@ -40,6 +44,7 @@ const PERIOD_OPTIONS = [
   { id: 'yesterday', label: 'Ayer' },
   { id: '7',         label: '7 días' },
   { id: '30',        label: '30 días' },
+  { id: 'custom',    label: '📅 Fecha' },
 ]
 
 const EVENT_ROUTES = {
@@ -81,7 +86,7 @@ function dayLabel(dateStr) {
 function EventMetadata({ type, meta }) {
   if (!meta) return null
 
-  if (type === 'med_confirmed') {
+  if (type === 'med_confirmed' || type === 'med_missed') {
     return (
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 14px', marginTop: 6 }}>
         {meta.med_dosage && (
@@ -101,7 +106,7 @@ function EventMetadata({ type, meta }) {
     )
   }
 
-  if (type === 'care_routine') {
+  if (type === 'care_routine' || type === 'care_routine_missed') {
     return (
       <p style={{ fontSize: 12, color: '#4A7C59', fontWeight: 600, margin: '4px 0 0' }}>
         {careItemIcon(meta.item_key)} {careItemLabel(meta.item_key)}
@@ -271,7 +276,7 @@ function EventCard({ event, onClick }) {
           overflow: 'hidden', textOverflow: 'ellipsis',
           display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
         }}>
-          {event.type === 'care_routine'
+          {(event.type === 'care_routine' || event.type === 'care_routine_missed')
             ? `${careItemIcon(event.description)} ${careItemLabel(event.description)}`
             : event.description}
         </p>
@@ -307,20 +312,29 @@ export default function MedicationTimeline() {
   const [error, setError] = useState('')
   const [filterType, setFilterType] = useState('all')
   const [period, setPeriod] = useState('today')
+  const [customDate, setCustomDate] = useState('')
   const [expandedDays, setExpandedDays] = useState(new Set([toLocalDateKey()]))
 
   useEffect(() => {
     if (ownerId) fetchLog()
-  }, [ownerId, filterType, period])
+  }, [ownerId, filterType, period, customDate])
 
   async function fetchLog() {
+    if (period === 'custom' && !customDate) {
+      setEvents([])
+      setLoading(false)
+      return
+    }
     setLoading(true)
     setError('')
     try {
       const now = new Date()
       let since, until = null
 
-      if (period === 'today') {
+      if (period === 'custom') {
+        since = new Date(customDate + 'T00:00:00')
+        until = new Date(customDate + 'T23:59:59.999')
+      } else if (period === 'today') {
         since = new Date(now.getFullYear(), now.getMonth(), now.getDate())
       } else if (period === 'yesterday') {
         const y = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1)
@@ -404,7 +418,7 @@ export default function MedicationTimeline() {
         </div>
 
         {/* Filtros de período */}
-        <div style={{ display: 'flex', gap: 6, marginBottom: 20 }}>
+        <div style={{ display: 'flex', gap: 6, marginBottom: period === 'custom' ? 10 : 20 }}>
           {PERIOD_OPTIONS.map(opt => (
             <button
               key={opt.id}
@@ -424,6 +438,30 @@ export default function MedicationTimeline() {
             </button>
           ))}
         </div>
+
+        {/* Date picker — visible only when period === 'custom' */}
+        {period === 'custom' && (
+          <div style={{ marginBottom: 20 }}>
+            <input
+              type="date"
+              value={customDate}
+              max={todayKey}
+              onChange={e => setCustomDate(e.target.value)}
+              style={{
+                width: '100%', padding: '10px 14px',
+                borderRadius: 12, border: '1.5px solid #EDE5D8',
+                fontSize: 14, fontWeight: 600, color: customDate ? '#1E2D26' : '#9CA3AF',
+                background: 'white', boxSizing: 'border-box',
+                fontFamily: 'inherit', outline: 'none',
+              }}
+            />
+            {!customDate && (
+              <p style={{ margin: '6px 0 0', fontSize: 12, color: '#9CA3AF', textAlign: 'center' }}>
+                Elige un día para ver su actividad
+              </p>
+            )}
+          </div>
+        )}
 
         {/* Content */}
         {loading ? (

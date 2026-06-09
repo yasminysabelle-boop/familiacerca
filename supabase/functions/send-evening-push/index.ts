@@ -13,10 +13,10 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-// Mirrors CARE_ITEMS in Hoy.jsx: non-weekly, non-asneeded items expected every day
+// Mirrors CARE_ITEMS category:'daily' in src/lib/careItems.js — must match DB CHECK constraint
 const DAILY_CARE_KEYS = [
-  'morning_bath', 'morning_clothes', 'morning_dental', 'breakfast',
-  'lunch', 'rest', 'exercise', 'dinner', 'night_dental',
+  'bath', 'dental_morning', 'dental_afternoon', 'dental_night',
+  'clothes', 'breakfast', 'lunch', 'dinner',
 ]
 
 function localDateForOffset(utcOffsetHours: number): string {
@@ -54,7 +54,7 @@ Deno.serve(async (req: Request) => {
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
   )
 
-  // utc_offset passed from cron body (-5 or -6); defaults to -5
+  // utc_offset passed from cron body (-4, -5, or -6); defaults to -5
   let utcOffset = -5
   try {
     const body = await req.json()
@@ -64,7 +64,7 @@ Deno.serve(async (req: Request) => {
   const today = localDateForOffset(utcOffset)
   console.log(`[send-evening-push] utc_offset=${utcOffset}, today=${today}`)
 
-  // Fetch all medications and today's confirmed logs in parallel
+  // Fetch all medications and today's logs in parallel
   const [
     { data: medications, error: medsError },
     { data: medLogs },
@@ -85,25 +85,59 @@ Deno.serve(async (req: Request) => {
     })
   }
 
-  if (!medications?.length) {
-    console.log('[send-evening-push] No medications configured — nothing to do')
-    return new Response(JSON.stringify({ sent: 0, today }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    })
-  }
-
-  // Index confirmed medication IDs for O(1) lookup
+  // Index care data (needed for both no_completado inserts and push logic)
   const confirmedMedIds = new Set((medLogs ?? []).map((l: { medication_id: string }) => l.medication_id))
-
-  // Index care owners who use the checklist
   const activeCareOwners = new Set((careLogsRecent ?? []).map((l: { user_id: string }) => l.user_id))
-
-  // Index care items logged today per owner
   const careLoggedToday = new Map<string, Set<string>>()
   for (const log of careLogsToday ?? []) {
     const entry = careLoggedToday.get(log.user_id) ?? new Set<string>()
     entry.add(log.item_key)
     careLoggedToday.set(log.user_id, entry)
+  }
+
+  // ── Mark missed care items (no_completado) ───────────────────────────────────
+  // For every owner who actively uses the checklist, insert no_completado for
+  // any daily item not yet logged today. The trigger trg_fn_care_routine fires
+  // on each INSERT and logs care_routine_missed in activity_log.
+  // ignoreDuplicates:true makes this idempotent if the cron fires multiple times.
+  if (activeCareOwners.size > 0) {
+    const missingCareRows: Array<{
+      user_id: string; item_key: string; log_date: string;
+      status: string; checked_by: string; checked_at: string;
+    }> = []
+    for (const ownerId of activeCareOwners) {
+      const loggedItems = careLoggedToday.get(ownerId) ?? new Set<string>()
+      for (const item_key of DAILY_CARE_KEYS) {
+        if (!loggedItems.has(item_key)) {
+          missingCareRows.push({
+            user_id: ownerId,
+            item_key,
+            log_date: today,
+            status: 'no_completado',
+            checked_by: 'Sistema automático',
+            checked_at: new Date().toISOString(),
+          })
+        }
+      }
+    }
+    if (missingCareRows.length > 0) {
+      const { error: insertErr } = await supabase
+        .from('daily_care_logs')
+        .upsert(missingCareRows, { onConflict: 'user_id,item_key,log_date', ignoreDuplicates: true })
+      if (insertErr) {
+        console.error('[send-evening-push] Error inserting no_completado rows:', insertErr)
+      } else {
+        console.log(`[send-evening-push] no_completado: attempted ${missingCareRows.length} rows`)
+      }
+    }
+  }
+
+  // ── Push notifications ───────────────────────────────────────────────────────
+  if (!medications?.length) {
+    console.log('[send-evening-push] No medications configured — skipping push notifications')
+    return new Response(JSON.stringify({ sent: 0, today }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
   }
 
   // Group medications by owner
@@ -146,7 +180,6 @@ Deno.serve(async (req: Request) => {
   let failCount = 0
 
   for (const ownerId of ownersWithPending) {
-    // Get all family members for this care group (same query as send-med-notifications)
     const { data: members } = await supabase
       .from('family_members')
       .select('member_user_id')
@@ -158,7 +191,6 @@ Deno.serve(async (req: Request) => {
     ]
     console.log(`[send-evening-push] Owner ${ownerId} — notifying ${userIds.length} users: ${JSON.stringify(userIds)}`)
 
-    // Get push subscriptions for all group members
     const { data: subs, error: subsError } = await supabase
       .from('push_subscriptions')
       .select('id, endpoint, p256dh, auth, user_id')
