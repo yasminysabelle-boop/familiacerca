@@ -72,7 +72,7 @@ function dayLabel(dateKey) {
 
 export default function CareRecord() {
   const { user } = useAuth()
-  const { ownerId, memberRole } = useFamily()
+  const { ownerId, memberRole, activePatientName } = useFamily()
   const isFamiliar = memberRole === 'familiar'
 
   const todayKey = toLocalDateKey()
@@ -169,10 +169,10 @@ export default function CareRecord() {
             {dayLabel(todayKey)}
           </p>
           <h2 style={{ fontSize: 22, fontWeight: 700, color: 'white', fontFamily: 'Georgia, serif', margin: '0 0 6px' }}>
-            Registro de hoy
+            Síntomas físicos del día
           </h2>
           <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', margin: 0, lineHeight: 1.5 }}>
-            {existingId ? 'Registro guardado — toca para editar' : 'Toca las opciones para registrar el estado del día'}
+            {existingId ? 'Registro guardado — toca para editar' : `Registra cómo se encuentra ${activePatientName || 'tu familiar'} hoy`}
           </p>
           {existingId && (
             <div style={{
