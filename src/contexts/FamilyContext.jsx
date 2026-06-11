@@ -81,11 +81,9 @@ export function FamilyProvider({ children }) {
             ownerId: m.user_id,
             patientName: (() => {
             const fromPatient = patientNameMap[m.user_id]
-            const fromUserProfile = ownerUserProfileMap[m.user_id]?.full_name?.trim()
             const careProfileName = op?.name
             const fromCare = careProfileName?.includes('@') ? null : careProfileName?.trim()
-            const fromEmail = ownerUserProfileMap[m.user_id]?.email?.trim()
-            return fromPatient || fromUserProfile || fromCare || fromEmail || null
+            return fromPatient || fromCare || null
           })(),
             patientPhotoUrl: op?.photo_url ?? null,
             role,
