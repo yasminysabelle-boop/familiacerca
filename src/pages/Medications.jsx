@@ -180,9 +180,11 @@ export default function Medications() {
   const [omissionsByMedId,   setOmissionsByMedId]   = useState({})
   const [previewPhotoUrl,    setPreviewPhotoUrl]     = useState(null)
   const [, setTick] = useState(0)
-  const autoMarkedRef  = useRef(new Set())
-  const fetchAllIdRef  = useRef(0)   // stale-request guard for fetchAll
-  const mountedRef     = useRef(true) // unmount guard for async setState
+  const autoMarkedRef   = useRef(new Set())
+  const fetchAllIdRef   = useRef(0)   // stale-request guard for fetchAll
+  const mountedRef      = useRef(true) // unmount guard for async setState
+  const adminCameraRef  = useRef(null)
+  const adminGalleryRef = useRef(null)
 
   // Tick each minute so pending-status badges stay accurate
   useEffect(() => {
@@ -346,7 +348,8 @@ export default function Medications() {
   }
 
   function openAdd() {
-    if (trialExpired && isAdmin) { setShowPaywall(true); return }
+    if (!isAdmin) return
+    if (trialExpired) { setShowPaywall(true); return }
     setForm(emptyForm); setScheduledTimes(['']); setEditId(null)
     setStockForm(emptyStock); setAddPhotoFile(null); setAddPhotoPreview(null)
     setAddAiExtracted(null); setAddAiError(''); setAddPhotoType(null)
@@ -574,17 +577,20 @@ export default function Medications() {
     setTimeout(() => setToastMsg(''), 3000)
   }
 
+  function handleAdminFileSelect(e) {
+    const f = e.target.files?.[0]
+    if (!f) return
+    setAdminPhotoBlob(f)
+    const r = new FileReader()
+    r.onload = ev => setAdminPhotoPreview(ev.target.result)
+    r.readAsDataURL(f)
+    e.target.value = ''
+  }
   function adminOpenCamera() {
-    const el = document.createElement('input')
-    el.type = 'file'; el.accept = 'image/*'; el.capture = 'environment'
-    el.addEventListener('change', e => { const f = e.target.files?.[0]; if (!f) return; setAdminPhotoBlob(f); const r = new FileReader(); r.onload = ev => setAdminPhotoPreview(ev.target.result); r.readAsDataURL(f) }, { once: true })
-    el.click()
+    adminCameraRef.current?.click()
   }
   function adminOpenGallery() {
-    const el = document.createElement('input')
-    el.type = 'file'; el.accept = 'image/*'
-    el.addEventListener('change', e => { const f = e.target.files?.[0]; if (!f) return; setAdminPhotoBlob(f); const r = new FileReader(); r.onload = ev => setAdminPhotoPreview(ev.target.result); r.readAsDataURL(f) }, { once: true })
-    el.click()
+    adminGalleryRef.current?.click()
   }
 
   async function handleAdministrar() {
@@ -805,7 +811,7 @@ export default function Medications() {
             </h2>
             <p style={{ fontSize: 12, color: '#9CA3AF' }}>Registro de medicamentos del familiar</p>
           </div>
-          {!isFamiliar && (
+          {isAdmin && (
             <button
               onClick={openAdd}
               style={{
@@ -882,8 +888,8 @@ export default function Medications() {
             icon="💊"
             title="Sin medicamentos aún"
             description="Agrega los medicamentos del familiar."
-            actionLabel={!isFamiliar ? '+ Agregar medicamento' : undefined}
-            onAction={!isFamiliar ? openAdd : undefined}
+            actionLabel={isAdmin ? '+ Agregar medicamento' : undefined}
+            onAction={isAdmin ? openAdd : undefined}
           />
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16, paddingBottom: 16 }}>
@@ -1604,6 +1610,8 @@ export default function Medications() {
           onClick={e => { if (e.target === e.currentTarget && !adminSaving) { setAdminModal(null); setAdminPhotoBlob(null); setAdminPhotoPreview(null) } }}
         >
           <div style={{ width: '100%', maxHeight: '90vh', background: 'white', borderRadius: '24px 24px 0 0', padding: '24px 20px 80px', overflowY: 'auto', boxShadow: '0 -8px 48px rgba(0,0,0,0.2)' }}>
+            <input ref={adminCameraRef}  type="file" accept="image/*" capture="environment" onChange={handleAdminFileSelect} style={{ display: 'none' }} />
+            <input ref={adminGalleryRef} type="file" accept="image/*"                       onChange={handleAdminFileSelect} style={{ display: 'none' }} />
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 16 }}>
               <div>
                 <p style={{ fontFamily: 'Georgia, serif', fontSize: 20, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>💊 {adminModal.name}</p>
