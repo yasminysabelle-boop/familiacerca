@@ -1957,20 +1957,20 @@ export default function Dashboard() {
       const { data: profilesData } = memberIds.length
         ? await supabase.from('user_profiles').select('id, full_name, last_seen').in('id', memberIds)
         : { data: [] }
-      const ROLE_RANK = { admin: 0, cuidador: 1, familiar: 2 }
-      const dedupedMembers = Object.values(
-        (membersData ?? []).reduce((acc, m) => {
-          if (!m.member_user_id || m.member_user_id === ownerId) return acc
-          const existing = acc[m.member_user_id]
-          const curRank = ROLE_RANK[m.role] ?? 2
-          const exRank = existing ? (ROLE_RANK[existing.role] ?? 2) : Infinity
-          if (!existing || curRank < exRank) acc[m.member_user_id] = m
-          return acc
-        }, {})
-      )
+      // Sort by role priority (admin=0 > cuidador=1 > familiar/null=2), then first-occurrence dedup per member_user_id
+      const _rolePri = r => r === 'admin' ? 0 : r === 'cuidador' ? 1 : 2
+      const _sorted = [...(membersData ?? [])]
+        .filter(m => m.member_user_id && m.member_user_id !== ownerId)
+        .sort((a, b) => _rolePri(a.role) - _rolePri(b.role))
+      const _seenMembers = new Set()
+      const uniqueMembersData = _sorted.filter(m => {
+        if (_seenMembers.has(m.member_user_id)) return false
+        _seenMembers.add(m.member_user_id)
+        return true
+      })
       const members = [
         { id: ownerId, full_name: fullName || null, email: null, role: 'admin', last_seen: null },
-        ...dedupedMembers.map(m => {
+        ...uniqueMembersData.map(m => {
           const p = (profilesData ?? []).find(x => x.id === m.member_user_id)
           return {
             id: m.member_user_id,

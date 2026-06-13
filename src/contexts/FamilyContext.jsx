@@ -61,16 +61,15 @@ export function FamilyProvider({ children }) {
 
       if (memberships?.length) {
         // Deduplicate by family owner (user_id), keeping highest-priority role
-        const ROLE_RANK = { admin: 0, cuidador: 1, familiar: 2 }
-        const dedupedMemberships = Object.values(
-          memberships.reduce((acc, m) => {
-            const existing = acc[m.user_id]
-            const curRank = ROLE_RANK[m.role] ?? 2
-            const exRank = existing ? (ROLE_RANK[existing.role] ?? 2) : Infinity
-            if (!existing || curRank < exRank) acc[m.user_id] = m
-            return acc
-          }, {})
-        )
+        // Sort first (admin=0 > cuidador=1 > familiar/null=2), then keep first occurrence per user_id
+        const rolePri = r => r === 'admin' ? 0 : r === 'cuidador' ? 1 : 2
+        const sortedMbships = [...memberships].sort((a, b) => rolePri(a.role) - rolePri(b.role))
+        const _seenOwners = new Set()
+        const dedupedMemberships = sortedMbships.filter(m => {
+          if (_seenOwners.has(m.user_id)) return false
+          _seenOwners.add(m.user_id)
+          return true
+        })
         const memberOwnerIds = dedupedMemberships.map(m => m.user_id)
         const [{ data: ownerProfiles }, { data: memberPatients }, { data: ownerUserProfiles }] = await Promise.all([
           supabase.from('care_profiles').select('*').in('user_id', memberOwnerIds),
