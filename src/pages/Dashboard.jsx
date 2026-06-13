@@ -1953,7 +1953,7 @@ export default function Dashboard() {
         .from('family_members')
         .select('member_user_id, role, member_email')
         .eq('user_id', ownerId)
-      const memberIds = (membersData ?? []).map(m => m.member_user_id).filter(Boolean)
+      const memberIds = [...new Set([ownerId, ...(membersData ?? []).map(m => m.member_user_id).filter(Boolean)])]
       const { data: profilesData } = memberIds.length
         ? await supabase.from('user_profiles').select('id, full_name, last_seen').in('id', memberIds)
         : { data: [] }
@@ -1968,8 +1968,9 @@ export default function Dashboard() {
         _seenMembers.add(m.member_user_id)
         return true
       })
+      const ownerProfile = (profilesData ?? []).find(p => p.id === ownerId)
       const members = [
-        { id: ownerId, full_name: fullName || null, email: null, role: 'admin', last_seen: null },
+        { id: ownerId, full_name: ownerProfile?.full_name ?? fullName ?? null, email: null, role: 'admin', last_seen: ownerProfile?.last_seen ?? null },
         ...uniqueMembersData.map(m => {
           const p = (profilesData ?? []).find(x => x.id === m.member_user_id)
           return {
