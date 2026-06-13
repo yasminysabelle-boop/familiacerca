@@ -3002,11 +3002,11 @@ export default function Dashboard() {
           return (
             <div style={{ margin: '-16px 16px 0', borderRadius: 20, overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,0.18)', animation: 'fadeInUp 0.4s ease both' }}>
               {/* TOP — verde con foto de fondo difuminada */}
-              <Link to="/paciente/perfil" style={{ display: 'block', textDecoration: 'none', background: '#2D4A1E', padding: '18px 16px 14px', position: 'relative', overflow: 'hidden', minHeight: 110 }}>
+              <Link to="/paciente/perfil" style={{ display: 'block', textDecoration: 'none', background: '#162710', padding: '18px 16px 14px', position: 'relative', overflow: 'hidden', minHeight: 110 }}>
                 {heroPhoto && (
-                  <img src={heroPhoto} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', opacity: 0.22, display: 'block' }} onError={e => { e.currentTarget.style.display = 'none' }} />
+                  <img src={heroPhoto} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', opacity: 0.6, display: 'block' }} onError={e => { e.currentTarget.style.display = 'none' }} />
                 )}
-                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(45,74,30,0.4) 0%, rgba(45,74,30,0.88) 100%)', pointerEvents: 'none' }} />
+                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.65) 100%)', pointerEvents: 'none' }} />
                 <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: 12 }}>
                   <div style={{ width: 54, height: 54, borderRadius: '50%', background: '#3D6B54', border: '2.5px solid rgba(255,255,255,0.4)', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, color: 'white', fontWeight: 700 }}>
                     {heroPhoto
@@ -3202,7 +3202,7 @@ export default function Dashboard() {
               ].map((c, i) => (
                 <button key={i} onClick={c.onClick ?? (() => navigate(c.route))} style={{
                   background: 'white', borderRadius: 14, padding: '12px 6px',
-                  border: 'none', cursor: 'pointer',
+                  border: 'none', cursor: 'pointer', width: '100%', minWidth: 0,
                   display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5,
                   WebkitTapHighlightColor: 'transparent', boxSizing: 'border-box',
                   boxShadow: '0 1px 6px rgba(0,0,0,0.05)',
