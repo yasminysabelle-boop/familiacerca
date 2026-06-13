@@ -111,12 +111,16 @@ export function FamilyProvider({ children }) {
         if (storedOwnerId && storedContext === storedOwnerId) {
           const alreadyAdded = built.some(f => f.ownerId === storedOwnerId)
           if (!alreadyAdded) {
-            const { data: ownerProfile } = await supabase
-              .from('care_profiles').select('*').eq('user_id', storedOwnerId).maybeSingle()
+            const [{ data: ownerProfile }, { data: storedPatient }] = await Promise.all([
+              supabase.from('care_profiles').select('*').eq('user_id', storedOwnerId).maybeSingle(),
+              supabase.from('patient_profiles').select('nombre_completo').eq('owner_id', storedOwnerId).maybeSingle(),
+            ])
             if (ownerProfile) {
+              const _careNameRaw = ownerProfile.name
+              const _careName = _careNameRaw?.includes('@') ? null : _careNameRaw?.trim()
               built.push({
                 ownerId: storedOwnerId,
-                patientName: ownerProfile.name ?? null,
+                patientName: storedPatient?.nombre_completo || _careName || null,
                 patientPhotoUrl: ownerProfile.photo_url ?? null,
                 role: localStorage.getItem('fc_member_role_' + storedOwnerId) ?? 'familiar',
                 profile: ownerProfile,

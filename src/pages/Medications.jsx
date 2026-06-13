@@ -595,7 +595,7 @@ export default function Medications() {
   }
 
   async function handleAdministrar() {
-    if (!adminModal || adminSaving) return
+    if (!adminModal?.id || adminSaving) return
     const med = adminModal
     const _sched = firstTimeMed(med)
     if (_sched) {
@@ -768,6 +768,9 @@ export default function Medications() {
         const [hh, mm] = scheduledTime.split(':').map(Number)
         const d = new Date(); d.setHours(hh, mm, 0, 0); scheduledAt = d.toISOString()
       }
+      // Skip if state already has a log for today — avoids duplicate on remount
+      const existingLogs = logsByMedId[med.id]?.[todayLocal] ?? []
+      if (existingLogs.some(l => l.status === 'confirmed' || l.status === 'missed')) continue
       Promise.all([
         supabase.from('medication_omissions').insert({
           medication_id: med.id, owner_id: ownerId, scheduled_at: scheduledAt,
@@ -779,7 +782,7 @@ export default function Medications() {
           medication_id: med.id, user_id: ownerId, status: 'missed',
           log_date: todayLocal, confirmed_by_name: 'Sistema automático',
           confirmed_at: new Date().toISOString(), scheduled_at: scheduledAt,
-        }, { onConflict: 'medication_id,log_date,user_id' }),
+        }, { onConflict: 'medication_id,log_date,user_id', ignoreDuplicates: true }),
       ]).then(() => {
         if (!mountedRef.current) return  // D2: component unmounted before promise resolved
         setLogsByMedId(prev => {

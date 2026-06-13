@@ -288,7 +288,7 @@ export default function Chat() {
     return acc
   }, {})
 
-  const isMe = id => id === user?.id
+  const isMe = id => !!id && !!user?.id && id === user.id
   const pinnedMsgs = messages.filter(m => m.is_pinned).sort((a, b) => (a.pinned_at ?? '').localeCompare(b.pinned_at ?? ''))
 
   return (
