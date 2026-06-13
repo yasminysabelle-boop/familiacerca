@@ -184,6 +184,7 @@ export default function Layout({ children }) {
       {/* Scrollable main — top offset excludes header height when on dashboard */}
       <main style={{
         position: 'fixed', inset: 0, overflowY: 'auto',
+        background: bg,
         top:    isVideoCall ? 0 : isHome ? `calc(${hospitalBarHeight}px + env(safe-area-inset-top))` : `calc(${hospitalBarHeight}px + 56px + env(safe-area-inset-top))`,
         bottom: isVideoCall ? 0 : (isSecondary || isHospitalMode) ? 'env(safe-area-inset-bottom)' : 'calc(64px + env(safe-area-inset-bottom))',
       }}>

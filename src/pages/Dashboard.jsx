@@ -2919,91 +2919,6 @@ export default function Dashboard() {
           🎉 ¡Suscripción activada! Gracias por confiar en FamiliaCerca.
         </div>
       )}
-      <TrialBanner />
-
-      {/* Notification activated confirmation */}
-      {notifActivated && (
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 10,
-          margin: '0 16px 10px', padding: '10px 14px',
-          background: '#F0FDF4', border: '1px solid #86EFAC', borderRadius: 14,
-        }}>
-          <span style={{ fontSize: 17, flexShrink: 0 }}>✅</span>
-          <p style={{ flex: 1, fontSize: 13, color: '#15803D', margin: 0, fontWeight: 600 }}>
-            Notificaciones activadas
-          </p>
-        </div>
-      )}
-
-      {/* Notification permission banner — shown when permission not granted and not dismissed */}
-      {permission !== 'granted' && !notifDismissed && (
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 10,
-          margin: '0 16px 10px', padding: '10px 14px',
-          background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 14,
-        }}>
-          <span style={{ fontSize: 17, flexShrink: 0 }}>🔔</span>
-          <p style={{ flex: 1, fontSize: 13, color: '#1E40AF', margin: 0, fontWeight: 500, lineHeight: 1.3 }}>
-            Activa las notificaciones para estar al tanto
-          </p>
-          <button
-            onClick={requestAndSubscribe}
-            style={{
-              padding: '6px 13px', borderRadius: 9,
-              background: '#1D4ED8', color: 'white',
-              fontSize: 12, fontWeight: 700, border: 'none', cursor: 'pointer', flexShrink: 0,
-            }}
-          >
-            Activar
-          </button>
-          <button
-            onClick={dismissNotifBanner}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, flexShrink: 0, display: 'flex' }}
-            aria-label="Cerrar"
-          >
-            <XIcon size={14} color="#9CA3AF" strokeWidth={2} />
-          </button>
-        </div>
-      )}
-
-      {/* Sticky renewal alerts */}
-      {renewalAlerts.map(med => {
-        const days = med.stock?.estimated_end_date
-          ? Math.ceil((new Date(med.stock.estimated_end_date + 'T12:00:00') - new Date()) / (1000 * 60 * 60 * 24))
-          : null
-        const urgent = days != null && days <= 3
-        return (
-          <div
-            key={med.id}
-            style={{
-              display: 'flex', alignItems: 'center', gap: 12,
-              margin: '0 16px 10px', padding: '12px 14px',
-              borderRadius: 14, border: `1.5px solid ${urgent ? '#FCA5A5' : '#FDE68A'}`,
-              background: urgent ? '#FEF2F2' : '#FFFBEB',
-            }}
-          >
-            <span style={{ fontSize: 20, flexShrink: 0 }}>{urgent ? '🚨' : '🔔'}</span>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ fontSize: 13, fontWeight: 700, color: urgent ? '#DC2626' : '#7A5A18', margin: 0, lineHeight: 1.3 }}>
-                {days <= 0 ? `${med.name} se agotó` : `${med.name} — ${days === 1 ? 'mañana se acaba' : `${days} días restantes`}`}
-              </p>
-              <p style={{ fontSize: 11, color: '#9CA3AF', margin: '2px 0 0' }}>
-                {med.stock?.pills_remaining} pastillas · toca para renovar
-              </p>
-            </div>
-            <button
-              onClick={() => navigate('/medications')}
-              style={{
-                padding: '6px 12px', borderRadius: 10, border: 'none', flexShrink: 0,
-                background: urgent ? '#DC2626' : '#C9882A',
-                color: 'white', fontWeight: 700, fontSize: 12, cursor: 'pointer',
-              }}
-            >
-              Renovar
-            </button>
-          </div>
-        )
-      })}
 
       {confirmError && (
         <div style={{
@@ -3022,7 +2937,7 @@ export default function Dashboard() {
         onTouchStart={pullStart}
         onTouchMove={pullMove}
         onTouchEnd={pullEnd}
-        style={{ background: '#F5F0E8', minHeight: '100vh', paddingBottom: 80, overflowY: 'auto', width: '100%', maxWidth: '100%', overflowX: 'hidden', boxSizing: 'border-box', margin: '0 auto' }}
+        style={{ background: '#F0EDE6', minHeight: '100vh', paddingBottom: 80, overflowY: 'auto', width: '100%', maxWidth: '100%', overflowX: 'hidden', boxSizing: 'border-box', margin: '0 auto' }}
       >
         <PullIndicator />
         <style>{`
@@ -3031,193 +2946,147 @@ export default function Dashboard() {
         `}</style>
 
         {/* ═══════════════════════════════════════════════════════════════
-            HEADER — compact
+            HEADER — verde #2D4A1E
         ═══════════════════════════════════════════════════════════════ */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 16px' }}>
-          {/* Left: Logo + FamiliaCerca + family pill (multi-family) */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexShrink: 0, minWidth: 0 }}>
-            <img
-              src="/logo.png" alt="FamiliaCerca"
-              style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', display: 'block', flexShrink: 0 }}
-              onError={e => { e.currentTarget.style.display = 'none'; e.currentTarget.nextSibling.style.display = 'flex' }}
-            />
-            <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#2D4A1E', display: 'none', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 14 }}>🌿</div>
-            <p style={{ margin: 0, fontFamily: 'Inter, system-ui, sans-serif', fontSize: 14, fontWeight: 600, color: '#1E2D26', lineHeight: 1 }}>FamiliaCerca</p>
-            <span style={{ color: '#C5B9A8', fontSize: 12, flexShrink: 0 }}>|</span>
-            <button
-              onClick={() => setShowFamilySwitcher(true)}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 3,
-                background: 'rgba(0,0,0,0.05)', border: 'none', borderRadius: 20,
-                padding: '4px 10px', cursor: 'pointer', flexShrink: 0,
-                maxWidth: 140, overflow: 'hidden', WebkitTapHighlightColor: 'transparent',
-              }}
-            >
-              <span style={{ fontSize: 13, fontWeight: 600, color: '#1E2D26', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {activePatientName || activeFamilyLabel || 'Mi familiar'}
-              </span>
-              <span style={{ fontSize: 10, color: '#6F7A72', flexShrink: 0 }}>▾</span>
-            </button>
-          </div>
-          {/* Center: status dot only */}
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ width: 7, height: 7, borderRadius: '50%', background: hasActiveSOS ? '#E45B4C' : (pendingCount > 0 || _isRetrasado) ? '#D6A13B' : '#22C55E' }} />
-          </div>
-          {/* Right: bell + avatar */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-            {(() => {
-              const totalBadge = (notifMessages.length) + (notifNotes.length)
-              return (
-                <button onClick={() => setShowNotifSheet(true)} style={{ position: 'relative', background: 'none', border: 'none', cursor: 'pointer', padding: 4 }}>
-                  <span style={{ fontSize: 20 }}>🔔</span>
-                  {totalBadge > 0 && (
-                    <span style={{ position: 'absolute', top: 0, right: 0, background: '#E45B4C', color: 'white', fontSize: 9, fontWeight: 800, borderRadius: '50%', width: 16, height: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      {totalBadge > 9 ? '9+' : totalBadge}
-                    </span>
-                  )}
-                </button>
-              )
-            })()}
-            <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#2D4A1E', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: 14, flexShrink: 0 }}>
-              {firstName.charAt(0).toUpperCase()}
+        <div style={{ background: '#2D4A1E', padding: '12px 16px 28px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            {/* Left: logo corazón + nombre + chip paciente */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0, overflow: 'hidden' }}>
+              <div style={{ width: 30, height: 30, borderRadius: '50%', background: 'rgba(255,255,255,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <Heart size={16} color="#C9894A" strokeWidth={2} />
+              </div>
+              <span style={{ fontSize: 14, fontWeight: 700, color: 'white', lineHeight: 1, flexShrink: 0 }}>FamiliaCerca</span>
+              <button
+                onClick={() => setShowFamilySwitcher(true)}
+                style={{ display: 'flex', alignItems: 'center', gap: 3, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.18)', borderRadius: 20, padding: '4px 10px', cursor: 'pointer', WebkitTapHighlightColor: 'transparent', flexShrink: 0, maxWidth: 120, overflow: 'hidden' }}
+              >
+                <span style={{ fontSize: 12, fontWeight: 600, color: 'white', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {activePatientName || activeFamilyLabel || 'Mi familiar'}
+                </span>
+                <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.7)', flexShrink: 0 }}>▾</span>
+              </button>
+            </div>
+            {/* Right: campanita dorado + avatar */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+              {(() => {
+                const totalBadge = notifMessages.length + notifNotes.length
+                return (
+                  <button onClick={() => setShowNotifSheet(true)} style={{ position: 'relative', background: 'rgba(255,255,255,0.1)', border: 'none', cursor: 'pointer', width: 36, height: 36, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <span style={{ fontSize: 18 }}>🔔</span>
+                    {totalBadge > 0 && (
+                      <span style={{ position: 'absolute', top: 2, right: 2, background: '#C9894A', color: 'white', fontSize: 8, fontWeight: 800, borderRadius: '50%', width: 14, height: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        {totalBadge > 9 ? '9+' : totalBadge}
+                      </span>
+                    )}
+                  </button>
+                )
+              })()}
+              <div style={{ width: 34, height: 34, borderRadius: '50%', background: 'rgba(255,255,255,0.18)', border: '2px solid rgba(255,255,255,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: 14, flexShrink: 0 }}>
+                {firstName.charAt(0).toUpperCase()}
+              </div>
             </div>
           </div>
         </div>
 
         {/* ═══════════════════════════════════════════════════════════════
-            PATIENT HERO — light premium card
+            HERO CARD — sobresale del header, top verde + bottom blanco
         ═══════════════════════════════════════════════════════════════ */}
         {(() => {
+          const heroPhoto = patientProfile?.foto_url || profile?.photo_url || null
+          const dobField = patientProfile?.fecha_nacimiento || patientProfile?.birth_date || patientProfile?.dob || patientProfile?.date_of_birth || patientProfile?.birthdate || null
+          const age = calcAge(dobField)
           const isCritical = hasActiveSOS || (_isRetrasado && _retrasadoMins != null && _retrasadoMins >= 720)
           const isPending = !isCritical && (pendingCount > 0 || _isRetrasado)
-          const heroPhoto = patientProfile?.foto_url || profile?.photo_url || null
-          const dobField = patientProfile?.fecha_nacimiento
-            || patientProfile?.birth_date
-            || patientProfile?.dob
-            || patientProfile?.date_of_birth
-            || patientProfile?.birthdate
-            || null
-          const age = calcAge(dobField)
-          const statusEmoji = isCritical ? '🔴' : isPending ? '🟡' : '🟢'
-          const statusText  = isCritical ? 'Requiere atención urgente' : isPending ? 'Requiere atención hoy' : 'Todo bajo control'
-          const AVATAR_COLORS = ['#4A7C59', '#C9882A', '#7C3AED', '#1D4ED8', '#E45B4C']
-          const avatarCount = Math.min(familyCount, 4)
+          const totalRoutines = 4
+          const doneRoutines = Math.min(Object.values(careLogsToday).filter(Boolean).length, totalRoutines)
           return (
-            <Link to="/paciente/perfil" style={{ textDecoration: 'none', display: 'block', margin: '0 16px 16px' }}>
-              <div style={{
-                borderRadius: 24, overflow: 'hidden', position: 'relative', minHeight: 220,
-                boxShadow: '0 6px 32px rgba(0,0,0,0.18), 0 1px 4px rgba(0,0,0,0.06)',
-                display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
-              }}>
-                {/* Fallback gradient — always rendered, covered by photo when available */}
-                <div style={{
-                  position: 'absolute', inset: 0,
-                  background: 'linear-gradient(160deg,#2D4A1E 0%,#3D6B54 100%)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 56, color: 'rgba(255,255,255,0.22)',
-                }}>
-                  {(patientProfile?.nombre_completo || profile?.name)?.charAt(0) ?? '👤'}
-                </div>
-                {/* Full-bleed portrait photo */}
+            <div style={{ margin: '-16px 16px 0', borderRadius: 20, overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,0.18)', animation: 'fadeInUp 0.4s ease both' }}>
+              {/* TOP — verde con foto de fondo difuminada */}
+              <Link to="/paciente/perfil" style={{ display: 'block', textDecoration: 'none', background: '#2D4A1E', padding: '18px 16px 14px', position: 'relative', overflow: 'hidden', minHeight: 110 }}>
                 {heroPhoto && (
-                  <img src={heroPhoto} alt="" style={{
-                    position: 'absolute', inset: 0, width: '100%', height: '100%',
-                    objectFit: 'cover', objectPosition: 'center top', display: 'block',
-                  }} onError={e => { e.currentTarget.style.display = 'none' }} />
+                  <img src={heroPhoto} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', opacity: 0.22, display: 'block' }} onError={e => { e.currentTarget.style.display = 'none' }} />
                 )}
-                {/* Bottom gradient — text readability without over-darkening the photo */}
-                <div style={{
-                  position: 'absolute', inset: 0,
-                  background: 'linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.44) 42%, rgba(0,0,0,0.10) 68%, transparent 100%)',
-                  pointerEvents: 'none',
-                }} />
-                {/* Content overlaid at bottom */}
-                <div style={{ position: 'relative', zIndex: 1, padding: '0 16px 18px' }}>
-                  {/* 1. Patient name */}
-                  <p style={{
-                    margin: 0,
-                    fontFamily: "'Cormorant Garamond', Georgia, serif",
-                    fontSize: 28, fontWeight: 700, color: 'white', lineHeight: 1.15,
-                    textShadow: '0 1px 6px rgba(0,0,0,0.3)',
-                  }}>
-                    {patientProfile?.nombre_completo || profile?.name || 'Agregar paciente'}
-                  </p>
-                  {/* 2. Age */}
-                  {age && (
-                    <p style={{ margin: '3px 0 0', fontSize: 13, color: 'rgba(255,255,255,0.72)', fontWeight: 400 }}>
-                      {age} años
+                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(45,74,30,0.4) 0%, rgba(45,74,30,0.88) 100%)', pointerEvents: 'none' }} />
+                <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div style={{ width: 54, height: 54, borderRadius: '50%', background: '#3D6B54', border: '2.5px solid rgba(255,255,255,0.4)', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, color: 'white', fontWeight: 700 }}>
+                    {heroPhoto
+                      ? <img src={heroPhoto} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { e.currentTarget.style.display = 'none' }} />
+                      : (patientProfile?.nombre_completo || profile?.name || '?').charAt(0).toUpperCase()
+                    }
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ margin: 0, fontSize: 18, fontWeight: 700, color: 'white', lineHeight: 1.2, fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
+                      {patientProfile?.nombre_completo || profile?.name || 'Agregar paciente'}
                     </p>
-                  )}
-                  {/* 3. Status */}
-                  <p style={{
-                    margin: '6px 0 0', fontSize: 12, fontWeight: 600, lineHeight: 1.3,
-                    color: isCritical ? '#FCA5A5' : isPending ? '#FCD34D' : '#86EFAC',
-                  }}>
-                    {statusEmoji} {statusText}
-                  </p>
-                  {/* 4. Tagline */}
-                  <p style={{ margin: '4px 0 0', fontSize: 12, color: 'rgba(255,255,255,0.60)', fontWeight: 400, lineHeight: 1.4 }}>
-                    ❤️ Tu cuidado junto a tu familia
-                  </p>
-                  {/* 5 & 6. Collaborator avatars + count */}
-                  {familyMembers.length > 0 && (
-                    <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 3 }}>
-                      <div style={{ display: 'flex' }}>
-                        {familyMembers.slice(0, 3).map((m, i) => (
-                          <div
-                            key={m.id}
-                            style={{
-                              width: 22, height: 22, borderRadius: '50%',
-                              backgroundColor: ['#3D6B54', '#D6A13B', '#E45B4C'][i % 3],
-                              border: '2px solid white',
-                              marginLeft: i > 0 ? -6 : 0,
-                              display: 'flex', alignItems: 'center', justifyContent: 'center',
-                              fontSize: 9, fontWeight: 700, color: 'white',
-                              cursor: 'pointer', zIndex: 3 - i, position: 'relative',
-                            }}
-                            onClick={e => { e.preventDefault(); e.stopPropagation(); setShowFamilySwitcher(true) }}
-                          >
-                            {(m.full_name?.charAt(0) || m.email?.charAt(0) || '👤').toUpperCase()}
-                            {m.last_seen && Date.now() - new Date(m.last_seen).getTime() < 5 * 60 * 1000 && (
-                              <div style={{
-                                position: 'absolute', bottom: 0, right: 0,
-                                width: 7, height: 7, borderRadius: '50%',
-                                backgroundColor: '#4CAF50', border: '1.5px solid white',
-                              }} />
-                            )}
-                          </div>
-                        ))}
-                        {familyMembers.length > 3 && (
-                          <div
-                            style={{
-                              width: 22, height: 22, borderRadius: '50%',
-                              backgroundColor: '#6F7A72',
-                              border: '2px solid white', marginLeft: -6,
-                              display: 'flex', alignItems: 'center', justifyContent: 'center',
-                              fontSize: 8, fontWeight: 700, color: 'white',
-                            }}
-                          >
-                            +{familyMembers.length - 3}
-                          </div>
-                        )}
-                      </div>
-                      <p style={{ margin: 0, fontSize: 11, color: 'rgba(255,255,255,0.75)', fontWeight: 500 }}>
-                        {familyCount} familiar{familyCount !== 1 ? 'es' : ''} colaborando
-                      </p>
-                    </div>
-                  )}
+                    {age && <p style={{ margin: '2px 0 0', fontSize: 12, color: 'rgba(255,255,255,0.7)' }}>{age} años</p>}
+                    {(isCritical || isPending) && (
+                      <span style={{ display: 'inline-block', marginTop: 5, background: '#C9894A', color: 'white', fontSize: 10, fontWeight: 700, borderRadius: 20, padding: '2px 9px' }}>
+                        {isCritical ? '⚠ Atención urgente' : '⚠ Atención hoy'}
+                      </span>
+                    )}
+                  </div>
                 </div>
+                {familyMembers.length > 0 && (
+                  <div
+                    style={{ position: 'relative', zIndex: 1, marginTop: 10, display: 'flex', alignItems: 'center', gap: 8 }}
+                    onClick={e => { e.preventDefault(); e.stopPropagation(); setShowFamilySwitcher(true) }}
+                  >
+                    <div style={{ display: 'flex' }}>
+                      {familyMembers.slice(0, 3).map((m, i) => (
+                        <div key={m.id} style={{ width: 22, height: 22, borderRadius: '50%', background: ['#3D6B54','#D6A13B','#E45B4C'][i % 3], border: '2px solid white', marginLeft: i > 0 ? -6 : 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 700, color: 'white', zIndex: 3 - i, position: 'relative' }}>
+                          {(m.full_name?.charAt(0) || m.email?.charAt(0) || '?').toUpperCase()}
+                          {m.last_seen && Date.now() - new Date(m.last_seen).getTime() < 5 * 60 * 1000 && (
+                            <div style={{ position: 'absolute', bottom: 0, right: 0, width: 6, height: 6, borderRadius: '50%', background: '#4CAF50', border: '1px solid white' }} />
+                          )}
+                        </div>
+                      ))}
+                      {familyMembers.length > 3 && (
+                        <div style={{ width: 22, height: 22, borderRadius: '50%', background: '#6F7A72', border: '2px solid white', marginLeft: -6, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 8, fontWeight: 700, color: 'white' }}>
+                          +{familyMembers.length - 3}
+                        </div>
+                      )}
+                    </div>
+                    <p style={{ margin: 0, fontSize: 11, color: 'rgba(255,255,255,0.75)' }}>{familyCount} cuidando juntos</p>
+                  </div>
+                )}
+              </Link>
+              {/* BOTTOM — blanco, 2 columnas: Medicamentos + Rutinas */}
+              <div style={{ background: 'white', display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+                <button onClick={() => navigate('/medications')} style={{ border: 'none', background: 'none', cursor: 'pointer', padding: '14px 14px 14px 16px', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 3, WebkitTapHighlightColor: 'transparent', borderRight: '1px solid #F0EDE6' }}>
+                  <div style={{ width: 34, height: 34, borderRadius: 10, background: '#FEF3C7', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 2 }}>
+                    <span style={{ fontSize: 18 }}>💊</span>
+                  </div>
+                  <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#1E2D26', lineHeight: 1.2 }}>Medicamentos</p>
+                  <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: (_isRetrasado || pendingCount > 0) ? '#E45B4C' : confirmedTodayCount > 0 ? '#22C55E' : '#9CA3AF', lineHeight: 1.3 }}>
+                    {_isRetrasado
+                      ? (nextPendingMed ? `⚠ ${nextPendingMed.medName}` : '⚠ Requiere atención')
+                      : pendingCount > 0
+                        ? (nextPendingMed ? nextPendingMed.medName : `${pendingCount} pendiente${pendingCount !== 1 ? 's' : ''}`)
+                        : confirmedTodayCount > 0
+                          ? `${confirmedTodayCount} dado${confirmedTodayCount !== 1 ? 's' : ''} hoy`
+                          : 'Sin meds hoy'}
+                  </p>
+                </button>
+                <button onClick={() => navigate('/cuidado')} style={{ border: 'none', background: 'none', cursor: 'pointer', padding: '14px 16px 14px 14px', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 3, WebkitTapHighlightColor: 'transparent' }}>
+                  <div style={{ width: 34, height: 34, borderRadius: 10, background: '#DCFCE7', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 2 }}>
+                    <span style={{ fontSize: 18 }}>✅</span>
+                  </div>
+                  <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#1E2D26', lineHeight: 1.2 }}>Rutinas</p>
+                  <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: doneRoutines === totalRoutines ? '#22C55E' : doneRoutines > 0 ? '#D6A13B' : '#9CA3AF', lineHeight: 1.3 }}>
+                    {doneRoutines === totalRoutines ? '✓ Todas listas' : doneRoutines > 0 ? `${doneRoutines} de ${totalRoutines} hechas` : 'Ninguna aún'}
+                  </p>
+                </button>
               </div>
-            </Link>
+            </div>
           )
         })()}
 
 
         {/* ═══════════════════════════════════════════════════════════════
-            SOS BANNER — only when active
+            SOS BANNER — solo cuando hay alerta activa
         ═══════════════════════════════════════════════════════════════ */}
         {hasActiveSOS && (
-          <div style={{ margin: '0 16px 14px', background: 'linear-gradient(135deg,#7F1D1D,#991B1B)', borderRadius: 16, padding: '16px 18px', boxShadow: '0 4px 24px rgba(185,28,28,0.4)', display: 'flex', alignItems: 'center', gap: 14, animation: 'fadeInUp 0.3s ease both' }}>
+          <div style={{ margin: '16px 16px 0', background: 'linear-gradient(135deg,#7F1D1D,#991B1B)', borderRadius: 16, padding: '16px 18px', boxShadow: '0 4px 24px rgba(185,28,28,0.4)', display: 'flex', alignItems: 'center', gap: 14, animation: 'fadeInUp 0.3s ease both' }}>
             <span style={{ fontSize: 26, flexShrink: 0, animation: 'sos-ring 1.4s ease-in-out infinite' }}>🚨</span>
             <div style={{ flex: 1 }}>
               <p style={{ margin: 0, fontSize: 15, fontWeight: 800, color: 'white' }}>Alerta SOS activa</p>
@@ -3232,110 +3101,53 @@ export default function Dashboard() {
         )}
 
 
-        {/* ═══════════════════════════════════════════════════════════════
-            PRIMARY MODULES + BOTTOM TWO-COLUMN
-        ═══════════════════════════════════════════════════════════════ */}
-        <div style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 12, animation: 'fadeInUp 0.4s ease 0.1s both' }}>
-
-          {/* Medicamentos + Rutinas — two white cards */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, width: '100%', boxSizing: 'border-box' }}>
-            <button onClick={() => navigate('/medications')} style={{
-              borderRadius: 16, border: 'none', padding: '14px',
-              cursor: 'pointer', textAlign: 'left', WebkitTapHighlightColor: 'transparent',
-              display: 'flex', flexDirection: 'column',
-              boxSizing: 'border-box', width: '100%', minWidth: 0,
-              background: _isRetrasado ? '#FFF5F5' : pendingCount > 0 ? '#FFFCF4' : 'white',
-              boxShadow: _isRetrasado
-                ? '0 2px 16px rgba(228,91,76,0.14), inset 0 0 0 1.5px rgba(228,91,76,0.25)'
-                : pendingCount > 0
-                  ? '0 2px 16px rgba(214,161,59,0.14), inset 0 0 0 1.5px rgba(214,161,59,0.25)'
-                  : '0 2px 16px rgba(0,0,0,0.07)',
-            }}>
-              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 8 }}>
-                <span style={{ fontSize: 32 }}>💊</span>
-                <div style={{ width: 26, height: 26, borderRadius: '50%', background: '#1E2D26', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 14, flexShrink: 0 }}>›</div>
-              </div>
-              <p style={{ margin: '0 0 3px', fontSize: 15, fontWeight: 700, color: '#1E2D26', lineHeight: 1.2 }}>Medicamentos</p>
-              <p style={{ margin: '0 0 8px', fontSize: 12, fontWeight: 500, color: (_isRetrasado || pendingCount > 0) ? '#E45B4C' : '#22C55E', lineHeight: 1.3 }}>
-                {_isRetrasado
-                  ? (nextPendingMed ? `⚠️ ${nextPendingMed.medName} pendiente` : '⚠️ Requiere atención')
-                  : pendingCount > 0
-                    ? (nextPendingMed ? `⚠️ ${nextPendingMed.medName} pendiente` : `${pendingCount} pendiente${pendingCount !== 1 ? 's' : ''}`)
-                    : confirmedTodayCount > 0
-                      ? `${confirmedTodayCount} dado${confirmedTodayCount !== 1 ? 's' : ''} hoy`
-                      : 'Sin meds hoy'}
-              </p>
-              {nextPendingMed && (
-                <div style={{ marginTop: 'auto', borderTop: '1px solid #F5F0E8', paddingTop: 8 }}>
-                  <p style={{ margin: '0 0 4px', fontSize: 12, fontWeight: 600, color: '#1E2D26', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {nextPendingMed.medName}
-                  </p>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexWrap: 'wrap' }}>
-                    {_isRetrasado && _retrasadoMins >= 120 && (
-                      <span style={{ fontSize: 9, fontWeight: 700, color: '#15803D', background: '#DCFCE7', borderRadius: 20, padding: '2px 7px' }}>Ventana clínica activa</span>
-                    )}
-                    {nextPendingMed.medTime && (
-                      <span style={{ fontSize: 11, color: '#D6A13B', fontWeight: 600 }}>{fmtTime(nextPendingMed.medTime)}</span>
-                    )}
-                  </div>
-                </div>
-              )}
-            </button>
-
-            <button onClick={() => navigate('/cuidado')} style={{
-              borderRadius: 16, border: 'none', background: 'white', padding: '14px',
-              cursor: 'pointer', textAlign: 'left', WebkitTapHighlightColor: 'transparent',
-              boxShadow: '0 2px 16px rgba(0,0,0,0.07)', display: 'flex', flexDirection: 'column',
-              boxSizing: 'border-box', width: '100%', minWidth: 0,
-            }}>
-              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 8 }}>
-                <span style={{ fontSize: 32 }}>✅</span>
-                <div style={{ width: 26, height: 26, borderRadius: '50%', background: '#D6A13B', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 14, flexShrink: 0 }}>›</div>
-              </div>
-              <p style={{ margin: '0 0 4px', fontSize: 15, fontWeight: 700, color: '#1E2D26', lineHeight: 1.2 }}>Rutinas</p>
-              {(() => {
-                const total = 4
-                const done = Math.min(Object.values(careLogsToday).filter(Boolean).length, total)
-                const pct = done / total
-                return (
-                  <>
-                    <p style={{ margin: '0 0 6px', lineHeight: 1.1, color: pct === 1 ? '#22C55E' : done > 0 ? '#D6A13B' : '#9CA3AF' }}>
-                      {pct === 1
-                        ? <span style={{ fontSize: 13, fontWeight: 700 }}>✓ Todas completadas</span>
-                        : done > 0
-                          ? <><span style={{ fontSize: 22, fontWeight: 800 }}>{done}</span><span style={{ fontSize: 11, fontWeight: 500 }}> de {total} completadas</span></>
-                          : <span style={{ fontSize: 12, fontWeight: 500 }}>Ninguna aún</span>}
-                    </p>
-                    <div style={{ marginTop: 'auto' }}>
-                      <div style={{ display: 'flex', gap: 5, marginBottom: 7 }}>
-                        {[
-                          { key: 'hygiene', icon: '☀️' },
-                          { key: 'nutrition', icon: '🍽️' },
-                          { key: 'hydration', icon: '💧' },
-                          { key: 'sleep', icon: '🌙' },
-                        ].map(({ key, icon }) => (
-                          <span key={key} style={{ fontSize: 14, opacity: careLogsToday[key] ? 1 : 0.22 }}>{icon}</span>
-                        ))}
-                      </div>
-                      <div style={{ height: 5, borderRadius: 3, background: '#F0EDE6', overflow: 'hidden' }}>
-                        <div style={{
-                          height: '100%', borderRadius: 3,
-                          background: pct === 1 ? '#22C55E' : pct > 0.5 ? '#4A7C59' : '#D6A13B',
-                          width: `${pct * 100}%`, transition: 'width 0.4s ease',
-                        }} />
-                      </div>
-                    </div>
-                  </>
-                )
-              })()}
+        {/* Banners — dentro del scroll para que el header verde quede al tope */}
+        <TrialBanner />
+        {notifActivated && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '12px 16px 0', padding: '10px 14px', background: '#F0FDF4', border: '1px solid #86EFAC', borderRadius: 14 }}>
+            <span style={{ fontSize: 17, flexShrink: 0 }}>✅</span>
+            <p style={{ flex: 1, fontSize: 13, color: '#15803D', margin: 0, fontWeight: 600 }}>Notificaciones activadas</p>
+          </div>
+        )}
+        {permission !== 'granted' && !notifDismissed && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '12px 16px 0', padding: '10px 14px', background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 14 }}>
+            <span style={{ fontSize: 17, flexShrink: 0 }}>🔔</span>
+            <p style={{ flex: 1, fontSize: 13, color: '#1E40AF', margin: 0, fontWeight: 500, lineHeight: 1.3 }}>Activa las notificaciones para estar al tanto</p>
+            <button onClick={requestAndSubscribe} style={{ padding: '6px 13px', borderRadius: 9, background: '#1D4ED8', color: 'white', fontSize: 12, fontWeight: 700, border: 'none', cursor: 'pointer', flexShrink: 0 }}>Activar</button>
+            <button onClick={dismissNotifBanner} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, flexShrink: 0, display: 'flex' }} aria-label="Cerrar">
+              <XIcon size={14} color="#9CA3AF" strokeWidth={2} />
             </button>
           </div>
+        )}
+        {renewalAlerts.map(med => {
+          const days = med.stock?.estimated_end_date
+            ? Math.ceil((new Date(med.stock.estimated_end_date + 'T12:00:00') - new Date()) / (1000 * 60 * 60 * 24))
+            : null
+          const urgent = days != null && days <= 3
+          return (
+            <div key={med.id} style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '12px 16px 0', padding: '12px 14px', borderRadius: 14, border: `1.5px solid ${urgent ? '#FCA5A5' : '#FDE68A'}`, background: urgent ? '#FEF2F2' : '#FFFBEB' }}>
+              <span style={{ fontSize: 20, flexShrink: 0 }}>{urgent ? '🚨' : '🔔'}</span>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ fontSize: 13, fontWeight: 700, color: urgent ? '#DC2626' : '#7A5A18', margin: 0, lineHeight: 1.3 }}>
+                  {days <= 0 ? `${med.name} se agotó` : `${med.name} — ${days === 1 ? 'mañana se acaba' : `${days} días restantes`}`}
+                </p>
+                <p style={{ fontSize: 11, color: '#9CA3AF', margin: '2px 0 0' }}>{med.stock?.pills_remaining} pastillas · toca para renovar</p>
+              </div>
+              <button onClick={() => navigate('/medications')} style={{ padding: '6px 12px', borderRadius: 10, border: 'none', flexShrink: 0, background: urgent ? '#DC2626' : '#C9882A', color: 'white', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>Renovar</button>
+            </div>
+          )
+        })}
 
-          {/* Actividad reciente — timeline */}
-          <div style={{ background: 'white', borderRadius: 16, padding: '16px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
+        {/* ═══════════════════════════════════════════════════════════════
+            CONTENIDO PRINCIPAL
+        ═══════════════════════════════════════════════════════════════ */}
+        <div style={{ padding: '16px 16px 0', display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+          {/* Actividad reciente */}
+          <div style={{ background: 'white', borderRadius: 14, padding: '16px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
               <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#1E2D26' }}>Actividad reciente</p>
-              <button onClick={() => navigate('/historial')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: '#D6A13B', fontWeight: 600, padding: 0 }}>Ver todas ›</button>
+              <button onClick={() => navigate('/historial')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: '#C9894A', fontWeight: 600, padding: 0 }}>Ver todas ›</button>
             </div>
             {recentActivityItems.length === 0 ? (
               <p style={{ margin: 0, fontSize: 12, color: '#9CA3AF', padding: '4px 0' }}>Sin actividad reciente</p>
@@ -3354,10 +3166,10 @@ export default function Dashboard() {
                     <div key={evt.id ?? i} onClick={actRoute ? () => navigate(actRoute) : undefined} style={{
                       display: 'flex', alignItems: 'flex-start', gap: 12,
                       cursor: actRoute ? 'pointer' : 'default',
-                      padding: '18px 0',
+                      padding: '16px 0',
                       borderBottom: isLast ? 'none' : '1px solid #F5F0E8',
                     }}>
-                      <div style={{ width: 34, height: 34, borderRadius: '50%', background: meta?.bg ?? '#F5F0E8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, flexShrink: 0, marginTop: 1 }}>{meta?.icon ?? '📋'}</div>
+                      <div style={{ width: 36, height: 36, borderRadius: 10, background: meta?.bg ?? '#F5F0E8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0, marginTop: 1 }}>{meta?.icon ?? '📋'}</div>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <p style={{ margin: 0, fontSize: 13, fontWeight: 500, color: '#1E2D26', lineHeight: 1.4 }}>{actAction}</p>
                         {evtAgo && <p style={{ margin: '3px 0 0', fontSize: 11, color: '#9FAF9A' }}>{evtAgo}</p>}
@@ -3369,120 +3181,69 @@ export default function Dashboard() {
             )}
           </div>
 
-          {/* Más herramientas — collapsed accordion */}
-          <div style={{ borderRadius: 16, overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
-            <button
-              onClick={() => setShowMoreTools(v => !v)}
-              style={{
-                width: '100%', background: 'white', border: 'none', cursor: 'pointer',
-                padding: '13px 14px',
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                WebkitTapHighlightColor: 'transparent',
-              }}
-            >
-              <div>
-                <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#1E2D26' }}>Más herramientas</p>
-                {!showMoreTools && (
-                  <p style={{ margin: '2px 0 0', fontSize: 11, color: '#9CA3AF' }}>
-                    Equipo · Hospital · Gastos · Notas médicas
-                  </p>
-                )}
-              </div>
-              <span style={{ fontSize: 11, color: '#9CA3AF', display: 'inline-block', transform: showMoreTools ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', flexShrink: 0 }}>▼</span>
-            </button>
-            {showMoreTools && (
-              <div style={{ background: '#FAFAF8', padding: '10px 12px 12px', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
-                {[
-                  { emoji: '👥', label: 'Equipo', onClick: () => navigate('/familia') },
-                  { emoji: '🏥', label: 'Hospital', onClick: () => setShowHospitalModal(true) },
-                  { emoji: '🎥', label: 'Videollamada', onClick: () => setShowVideoCallModal(true) },
-                  { emoji: '💬', label: 'Chat', route: '/chat' },
-                  { emoji: '📅', label: 'Citas', route: '/calendar' },
-                  { emoji: '🖼️', label: 'Álbum', route: '/album' },
-                  { emoji: '📋', label: 'Registros', route: '/registros' },
-                  { emoji: '📊', label: 'Historial', route: '/historial' },
-                  { emoji: '📝', label: 'Notas médicas', route: '/diario-medico' },
-                  { emoji: '📓', label: 'Notas de la familia', route: '/paciente/notas-familia' },
-                  { emoji: '💰', label: 'Gastos', route: '/gastos' },
-                  { emoji: '🐾', label: 'Milo & Luna', route: '/diario-medico' },
-                  { emoji: '👤', label: 'Mi cuenta', route: '/ajustes' },
-                ].map((c, i) => (
-                  <button key={i} onClick={c.onClick ?? (() => navigate(c.route))} style={{
-                    background: 'white', borderRadius: 12, padding: '10px 8px',
-                    border: 'none', cursor: 'pointer',
-                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
-                    WebkitTapHighlightColor: 'transparent', boxSizing: 'border-box',
-                  }}>
-                    <span style={{ fontSize: 26 }}>{c.emoji}</span>
-                    <p style={{ margin: 0, fontSize: 10, color: '#6F7A72', lineHeight: 1.2, textAlign: 'center' }}>{c.label}</p>
-                  </button>
-                ))}
-              </div>
-            )}
+          {/* Más herramientas — grid 4 columnas, siempre visible */}
+          <div>
+            <p style={{ margin: '0 0 10px', fontSize: 14, fontWeight: 600, color: '#1E2D26' }}>Más herramientas</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+              {[
+                { emoji: '👥', label: 'Equipo',          onClick: () => navigate('/familia') },
+                { emoji: '🏥', label: 'Hospital',        onClick: () => setShowHospitalModal(true) },
+                { emoji: '🎥', label: 'Videollamada',    onClick: () => setShowVideoCallModal(true) },
+                { emoji: '💬', label: 'Chat',            route: '/chat' },
+                { emoji: '📅', label: 'Citas',           route: '/calendar' },
+                { emoji: '🖼️', label: 'Álbum',          route: '/album' },
+                { emoji: '📋', label: 'Registros',       route: '/registros' },
+                { emoji: '📊', label: 'Historial',       route: '/historial' },
+                { emoji: '📝', label: 'Notas médicas',   route: '/diario-medico' },
+                { emoji: '📓', label: 'Notas familia',   route: '/paciente/notas-familia' },
+                { emoji: '💰', label: 'Gastos',          route: '/gastos' },
+                { emoji: '🐾', label: 'Milo & Luna',     route: '/diario-medico' },
+                { emoji: '👤', label: 'Mi cuenta',       route: '/ajustes' },
+              ].map((c, i) => (
+                <button key={i} onClick={c.onClick ?? (() => navigate(c.route))} style={{
+                  background: 'white', borderRadius: 14, padding: '12px 6px',
+                  border: 'none', cursor: 'pointer',
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5,
+                  WebkitTapHighlightColor: 'transparent', boxSizing: 'border-box',
+                  boxShadow: '0 1px 6px rgba(0,0,0,0.05)',
+                }}>
+                  <span style={{ fontSize: 22 }}>{c.emoji}</span>
+                  <p style={{ margin: 0, fontSize: 9, color: '#2D4A1E', lineHeight: 1.2, textAlign: 'center', fontWeight: 500 }}>{c.label}</p>
+                </button>
+              ))}
+            </div>
           </div>
+
         </div>
 
         {/* ═══════════════════════════════════════════════════════════════
-            SOS BAR
+            SOS CARD
         ═══════════════════════════════════════════════════════════════ */}
-        <div style={{ padding: '20px 16px 0' }}>
-          <button
-            onClick={prepareSOS}
-            onPointerDown={() => setPressedSOS(true)}
-            onPointerUp={() => setPressedSOS(false)}
-            onPointerLeave={() => setPressedSOS(false)}
-            style={{
-              width: '100%', borderRadius: 20,
-              background: (sosSent || hasActiveSOS) ? 'linear-gradient(135deg,#E45B4C,#C0392B)' : 'white',
-              border: '1px solid #F0EDE6',
-              padding: '14px 18px', cursor: 'pointer',
-              display: 'flex', alignItems: 'center', gap: 14,
-              WebkitTapHighlightColor: 'transparent',
-              boxShadow: pressedSOS ? 'none' : (sosSent || hasActiveSOS) ? '0 4px 20px rgba(228,91,76,0.35)' : '0 2px 12px rgba(0,0,0,0.06)',
-              transform: pressedSOS ? 'translateY(2px)' : 'none',
-              transition: 'transform 0.08s, box-shadow 0.08s',
-              animation: 'fadeInUp 0.4s ease 0.32s both',
-            }}
-          >
-            <div style={{
-              width: 40, height: 40, borderRadius: 10, flexShrink: 0,
-              background: (sosSent || hasActiveSOS) ? 'rgba(255,255,255,0.2)' : '#FEE2E2',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20,
-            }}>🆘</div>
+        <div style={{ padding: '16px 16px 0' }}>
+          <div style={{
+            background: 'white', borderRadius: 14,
+            padding: '14px 16px',
+            boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+            display: 'flex', alignItems: 'center', gap: 12,
+          }}>
+            <div style={{ width: 44, height: 44, borderRadius: 12, flexShrink: 0, background: '#FEE2E2', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>
+              🆘
+            </div>
             <div style={{ flex: 1 }}>
-              <p style={{ margin: 0, fontSize: 15, fontWeight: 600, color: (sosSent || hasActiveSOS) ? 'white' : '#E45B4C', lineHeight: 1.2 }}>SOS y Emergencias</p>
-              <p style={{ margin: '2px 0 0', fontSize: 12, color: (sosSent || hasActiveSOS) ? 'rgba(255,255,255,0.8)' : '#6F7A72' }}>
-                {sosSent ? 'Alerta enviada · La familia fue notificada' : hasActiveSOS ? '⚡ Emergencia activa' : 'Alerta a toda la familia'}
+              <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: (sosSent || hasActiveSOS) ? '#D63031' : '#1E2D26', lineHeight: 1.2 }}>
+                {sosSent ? 'Alerta enviada' : hasActiveSOS ? 'Emergencia activa' : 'SOS y Emergencias'}
+              </p>
+              <p style={{ margin: '2px 0 0', fontSize: 12, color: '#9CA3AF' }}>
+                {sosSent ? 'La familia fue notificada' : hasActiveSOS ? '⚡ Resuelve la alerta' : 'Alerta a toda la familia'}
               </p>
             </div>
-            <div style={{
-              flexShrink: 0, borderRadius: 20, padding: '8px 16px',
-              background: (sosSent || hasActiveSOS) ? 'rgba(255,255,255,0.2)' : 'transparent',
-              border: (sosSent || hasActiveSOS) ? 'none' : '1.5px solid #E45B4C',
-            }}>
-              <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: (sosSent || hasActiveSOS) ? 'white' : '#E45B4C' }}>
-                {sosSent ? 'Enviado' : 'Activar'}
-              </p>
-            </div>
-          </button>
-        </div>
-
-        {/* Cerrar sesión */}
-        <div style={{ textAlign: 'center' }}>
-          <button
-            onClick={async () => { await signOut(); navigate('/') }}
-            style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-              margin: '16px auto 24px', padding: '10px 24px',
-              backgroundColor: 'transparent', border: '1px solid rgba(228,91,76,0.3)',
-              borderRadius: 24, cursor: 'pointer',
-              color: '#E45B4C', fontSize: 13,
-              fontFamily: 'Inter, sans-serif', fontWeight: 500,
-            }}
-          >
-            <span style={{ fontSize: 16 }}>🚪</span>
-            Cerrar sesión
-          </button>
+            <button
+              onClick={prepareSOS}
+              style={{ padding: '8px 14px', borderRadius: 20, border: 'none', background: '#FEE2E2', color: '#D63031', fontWeight: 700, fontSize: 12, cursor: 'pointer', flexShrink: 0, WebkitTapHighlightColor: 'transparent' }}
+            >
+              {sosSent ? 'Enviado' : 'Activar'}
+            </button>
+          </div>
         </div>
 
         <HospitalModeModal open={showHospitalModal} onClose={() => setShowHospitalModal(false)} />
