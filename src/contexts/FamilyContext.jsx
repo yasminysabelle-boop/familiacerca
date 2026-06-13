@@ -11,10 +11,12 @@ export function FamilyProvider({ children }) {
   const [loading, setLoading] = useState(true)
   const [needsSelector, setNeedsSelector] = useState(false)
   const loadFamiliesRef = useRef(null)
+  const fallbackTimerRef = useRef(null)
 
   useEffect(() => {
     if (user) loadFamilies()
     else reset()
+    return () => clearTimeout(fallbackTimerRef.current)
   }, [user])
 
   useEffect(() => {
@@ -32,7 +34,7 @@ export function FamilyProvider({ children }) {
 
   async function loadFamilies() {
     setLoading(true)
-    const timer = setTimeout(() => {
+    fallbackTimerRef.current = setTimeout(() => {
       const fallback = [{ ownerId: user.id, patientName: null, patientPhotoUrl: null, role: null, profile: null }]
       setFamilies(fallback)
       setActiveOwnerId(user.id)
@@ -160,7 +162,7 @@ export function FamilyProvider({ children }) {
       setActiveOwnerId(user.id)
       setNeedsSelector(false)
     } finally {
-      clearTimeout(timer)
+      clearTimeout(fallbackTimerRef.current)
       setLoading(false)
     }
   }

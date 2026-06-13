@@ -1986,7 +1986,7 @@ export default function Dashboard() {
       setFamilyCount(members.length)
       setFamilyNames(members.map(m => m.full_name?.split(' ')?.[0] || m.email?.split('@')?.[0] || 'Usuario'))
     })()
-  }, [ownerId])
+  }, [ownerId, fullName])
 
   useEffect(() => {
     if (!ownerId) return

@@ -8,6 +8,7 @@ import { supabase } from '../lib/supabase'
 import { Plus, XIcon, Pencil, Trash, Bell, CheckIcon } from '../components/Icons'
 import { usePushNotifications } from '../hooks/usePushNotifications'
 import { track } from '../lib/analytics'
+import { getTodayPR } from '../lib/utils'
 import MedicationStockTab from '../components/MedicationStockTab'
 import EvidencePhoto from '../components/EvidencePhoto'
 import { SkeletonMedCard } from '../components/SkeletonLoader'
@@ -198,9 +199,9 @@ export default function Medications() {
   // Auto-reset at midnight PR: detect date change while PWA is open
   useEffect(() => {
     if (!ownerId) return
-    const lastDate = { current: new Date().toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' }) }
+    const lastDate = { current: getTodayPR() }
     const id = setInterval(() => {
-      const nowDate = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' })
+      const nowDate = getTodayPR()
       if (nowDate !== lastDate.current) {
         lastDate.current = nowDate
         fetchAll()
@@ -512,7 +513,7 @@ export default function Medications() {
       const pillsRemaining = isRestocking ? totalPills : (editStockRecord.pills_remaining ?? totalPills)
       const days = Math.floor(pillsRemaining / dosesPerDay)
       const end  = new Date(); end.setDate(end.getDate() + days)
-      const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' })
+      const today = getTodayPR()
 
       const stockOps = [
         supabase.from('medication_stock').upsert({
@@ -711,7 +712,7 @@ export default function Medications() {
   })()
 
   // ── Hoy-tab derived values ────────────────────────────────────────────────
-  const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' })
+  const today = getTodayPR()
 
   const _noLogMeds = medications.filter(med =>
     !(logsByMedId[med.id]?.[today] ?? []).some(l => l.status === 'confirmed' || l.status === 'missed')
@@ -758,7 +759,7 @@ export default function Medications() {
     if (loading || !ownerId || !retrasadosMedIds) return
     const toMark = retrasadosMeds.filter(med => !autoMarkedRef.current.has(med.id))
     if (toMark.length === 0) return
-    const todayLocal = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' })
+    const todayLocal = getTodayPR()
     for (const med of toMark) {
       autoMarkedRef.current.add(med.id)
       const scheduledTime = firstTimeMed(med)

@@ -4,10 +4,7 @@ import { useFamily } from '../contexts/FamilyContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import { CheckIcon } from '../components/Icons'
-
-function toLocalDateKey(d = new Date()) {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-}
+import { getTodayPR } from '../lib/utils'
 
 const SECTIONS = [
   {
@@ -75,7 +72,7 @@ export default function CareRecord() {
   const { ownerId, memberRole, activePatientName } = useFamily()
   const isFamiliar = memberRole === 'familiar'
 
-  const todayKey = toLocalDateKey()
+  const todayKey = getTodayPR()
 
   const [form, setForm] = useState({ mood: null, food: null, hydration: null, sleep: null, evacuation: null, notes: '' })
   const [existingId, setExistingId] = useState(null)
