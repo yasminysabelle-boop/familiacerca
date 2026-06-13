@@ -60,7 +60,18 @@ export function FamilyProvider({ children }) {
       }
 
       if (memberships?.length) {
-        const memberOwnerIds = memberships.map(m => m.user_id)
+        // Deduplicate by family owner (user_id), keeping highest-priority role
+        const ROLE_RANK = { admin: 0, cuidador: 1, familiar: 2 }
+        const dedupedMemberships = Object.values(
+          memberships.reduce((acc, m) => {
+            const existing = acc[m.user_id]
+            const curRank = ROLE_RANK[m.role] ?? 2
+            const exRank = existing ? (ROLE_RANK[existing.role] ?? 2) : Infinity
+            if (!existing || curRank < exRank) acc[m.user_id] = m
+            return acc
+          }, {})
+        )
+        const memberOwnerIds = dedupedMemberships.map(m => m.user_id)
         const [{ data: ownerProfiles }, { data: memberPatients }, { data: ownerUserProfiles }] = await Promise.all([
           supabase.from('care_profiles').select('*').in('user_id', memberOwnerIds),
           supabase.from('patient_profiles').select('owner_id, nombre_completo').in('owner_id', memberOwnerIds),
@@ -73,7 +84,7 @@ export function FamilyProvider({ children }) {
         const ownerUserProfileMap = {}
         ;(ownerUserProfiles ?? []).forEach(p => { ownerUserProfileMap[p.id] = p })
 
-        for (const m of memberships) {
+        for (const m of dedupedMemberships) {
           const op = profileMap[m.user_id]
           const role = m.role ?? 'familiar'
           localStorage.setItem('fc_member_role_' + m.user_id, role)
