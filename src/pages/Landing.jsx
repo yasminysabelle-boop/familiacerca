@@ -273,35 +273,24 @@ export default function Landing() {
     <div style={{ background: WHITE, color: DARK, overflowX: 'hidden', fontFamily: SANS }}>
 
       {/* ─────────────── 1. NAV ─────────────── */}
-      <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: '#F8F4ED', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(11,79,74,0.10)' }}>
+      <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: '#0B4F4A', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(248,244,237,0.10)' }}>
         <div style={{ maxWidth: 1140, margin: '0 auto', padding: '0 32px', height: 72, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display:'flex', alignItems:'center', gap:'12px' }}>
-            <div style={{
-              background: '#0B4F4A',
-              borderRadius: '50%',
-              width: '52px',
-              height: '52px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0
-            }}>
-              <img src="/logo-icon.png" alt="FamiliaCerca" style={{ width:'38px', height:'38px', objectFit:'contain' }} />
-            </div>
+            <img src="/logo-icon.png" alt="FamiliaCerca" style={{ height:'56px', width:'56px', objectFit:'contain' }} />
             <span style={{ fontFamily:'Georgia,serif', fontSize:'24px', fontWeight:700 }}>
-              <span style={{ color:'#0B4F4A' }}>Familia</span>
+              <span style={{ color:'#F8F4ED' }}>Familia</span>
               <span style={{ color:'#E58B73' }}>Cerca</span>
             </span>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 36 }} className="landing-desktop-nav">
             {navLinks.map(l => (
-              <a key={l.href} href={l.href} style={{ fontSize: 16, fontWeight: 400, color: '#20312C', textDecoration: 'none', fontFamily: SANS }}
-                onMouseEnter={e => e.currentTarget.style.color = '#0B4F4A'}
-                onMouseLeave={e => e.currentTarget.style.color = '#20312C'}
+              <a key={l.href} href={l.href} style={{ fontSize: 16, fontWeight: 400, color: 'rgba(248,244,237,0.85)', textDecoration: 'none', fontFamily: SANS }}
+                onMouseEnter={e => e.currentTarget.style.color = '#F8F4ED'}
+                onMouseLeave={e => e.currentTarget.style.color = 'rgba(248,244,237,0.85)'}
               >{l.label}</a>
             ))}
-            <Link to="/login" className="btn-outlined-teal" style={{ padding: '10px 28px', borderRadius: 9999, border: '1.5px solid #0B4F4A', background: 'transparent', color: '#0B4F4A', fontWeight: 500, fontSize: 16, textDecoration: 'none', fontFamily: SANS }}>
+            <Link to="/login" className="btn-nav-cream" style={{ padding: '10px 28px', borderRadius: 9999, border: '1.5px solid #F8F4ED', background: 'transparent', color: '#F8F4ED', fontWeight: 500, fontSize: 16, textDecoration: 'none', fontFamily: SANS }}>
               Iniciar sesión
             </Link>
           </div>
@@ -309,19 +298,19 @@ export default function Landing() {
           <button onClick={() => setMobileMenuOpen(o => !o)} className="landing-hamburger"
             style={{ display: 'none', background: 'none', border: 'none', cursor: 'pointer', padding: 8, flexDirection: 'column', gap: 5 }}
             aria-label="Menú">
-            {[0,1,2].map(i => <div key={i} style={{ width: 22, height: 1.5, background: '#0B4F4A', borderRadius: 2 }} />)}
+            {[0,1,2].map(i => <div key={i} style={{ width: 22, height: 1.5, background: '#F8F4ED', borderRadius: 2 }} />)}
           </button>
         </div>
 
         {mobileMenuOpen && (
-          <div style={{ padding: '12px 32px 24px', display: 'flex', flexDirection: 'column', gap: 2, borderTop: '1px solid rgba(11,79,74,0.10)', background: '#F8F4ED' }}>
+          <div style={{ padding: '12px 32px 24px', display: 'flex', flexDirection: 'column', gap: 2, borderTop: '1px solid rgba(248,244,237,0.10)', background: '#0B4F4A' }}>
             {navLinks.map(l => (
               <a key={l.href} href={l.href} onClick={() => setMobileMenuOpen(false)}
-                style={{ padding: '13px 8px', fontSize: 15, color: '#20312C', textDecoration: 'none', fontFamily: SANS }}>
+                style={{ padding: '13px 8px', fontSize: 15, color: 'rgba(248,244,237,0.85)', textDecoration: 'none', fontFamily: SANS }}>
                 {l.label}
               </a>
             ))}
-            <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="btn-outlined-teal" style={{ marginTop: 10, padding: '16px', borderRadius: 9999, textAlign: 'center', border: '1.5px solid #0B4F4A', background: 'transparent', color: '#0B4F4A', fontWeight: 500, fontSize: 16, textDecoration: 'none', fontFamily: SANS }}>
+            <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="btn-nav-cream" style={{ marginTop: 10, padding: '16px', borderRadius: 9999, textAlign: 'center', border: '1.5px solid #F8F4ED', background: 'transparent', color: '#F8F4ED', fontWeight: 500, fontSize: 16, textDecoration: 'none', fontFamily: SANS }}>
               Iniciar sesión
             </Link>
           </div>
@@ -1160,6 +1149,8 @@ export default function Landing() {
         .cta-coral:hover { background: #d4785f !important; }
         .btn-outlined-teal { transition: background 0.2s ease, color 0.2s ease; }
         .btn-outlined-teal:hover { background: #0B4F4A !important; color: white !important; }
+        .btn-nav-cream { transition: background 0.2s ease, color 0.2s ease; }
+        .btn-nav-cream:hover { background: #F8F4ED !important; color: #0B4F4A !important; }
 
         @media (max-width: 768px) {
           .landing-desktop-nav { display: none !important; }
