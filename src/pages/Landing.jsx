@@ -275,9 +275,9 @@ export default function Landing() {
       {/* ─────────────── 1. NAV ─────────────── */}
       <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: '#0B4F4A', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(248,244,237,0.10)' }}>
         <div style={{ maxWidth: 1140, margin: '0 auto', padding: '0 32px', height: 72, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display:'flex', alignItems:'center', gap:'8px' }}>
-            <img src="/logo-icon.png" alt="FamiliaCerca" style={{ height:'80px', width:'auto', objectFit:'contain' }} />
-            <span style={{ fontFamily:'Georgia,serif', fontSize:'22px', fontWeight:600 }}>
+          <div style={{ display:'flex', alignItems:'center', gap:'12px' }}>
+            <img src="/logo-icon.png" alt="FamiliaCerca" style={{ height:'72px', width:'auto', objectFit:'contain' }} />
+            <span style={{ fontFamily:'Georgia,serif', fontSize:'26px', fontWeight:700 }}>
               <span style={{ color:'#F8F4ED' }}>Familia</span>
               <span style={{ color:'#E58B73' }}>Cerca</span>
             </span>
@@ -1003,13 +1003,8 @@ export default function Landing() {
           <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 48, marginBottom: 52 }}>
             <div style={{ flex: '0 0 auto', maxWidth: 280 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, padding: '4px 0' }}>
-                <svg width={44} height={44} viewBox="0 0 40 40" fill="none">
-                  <circle cx="20" cy="20" r="20" fill={ACTION} fillOpacity="0.15" />
-                  <circle cx="20" cy="20" r="17" fill={ACTION} />
-                  <text x="20" y="19.5" textAnchor="middle" dominantBaseline="middle" fill="white" fontSize="13" fontWeight="800" fontFamily="Georgia,serif" letterSpacing="-0.5">FC</text>
-                  <text x="20" y="31" textAnchor="middle" dominantBaseline="middle" fill="white" fillOpacity="0.75" fontSize="9">♥</text>
-                </svg>
-                <span style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 700 }}><span style={{ color: '#0B4F4A' }}>Familia</span><span style={{ color: '#E58B73' }}>Cerca</span></span>
+                <img src="/logo-icon.png" alt="FamiliaCerca" style={{ height: '64px', width: 'auto' }} />
+                <span style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 700 }}><span style={{ color: '#F8F4ED' }}>Familia</span><span style={{ color: '#E58B73' }}>Cerca</span></span>
               </div>
               <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.32)', lineHeight: 1.7, fontFamily: SANS, fontWeight: 300, margin: '0 0 24px' }}>
                 Cuidado familiar coordinado para la comunidad hispana. Medicamentos, rutinas y amor — todo en un solo lugar.
