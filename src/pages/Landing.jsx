@@ -275,9 +275,9 @@ export default function Landing() {
       {/* ─────────────── 1. NAV ─────────────── */}
       <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: '#0B4F4A', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(248,244,237,0.10)' }}>
         <div style={{ maxWidth: 1140, margin: '0 auto', padding: '0 32px', height: 72, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display:'flex', alignItems:'center', gap:'10px' }}>
-            <img src="/logo-icon.png" alt="FamiliaCerca" style={{ height:'64px', width:'auto', objectFit:'contain' }} />
-            <span style={{ fontFamily:'Georgia,serif', fontSize:'28px', fontWeight:700 }}>
+          <div style={{ display:'flex', alignItems:'center', gap:'8px' }}>
+            <img src="/logo-icon.png" alt="FamiliaCerca" style={{ height:'80px', width:'auto', objectFit:'contain' }} />
+            <span style={{ fontFamily:'Georgia,serif', fontSize:'22px', fontWeight:600 }}>
               <span style={{ color:'#F8F4ED' }}>Familia</span>
               <span style={{ color:'#E58B73' }}>Cerca</span>
             </span>
