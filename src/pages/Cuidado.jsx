@@ -18,7 +18,7 @@ const fieldStyle = {
   fontSize: 14, outline: 'none', boxSizing: 'border-box',
   transition: 'all 0.15s', color: '#1A1A1A',
 }
-const onFocusStyle = e => { e.target.style.borderColor = '#4A7C59'; e.target.style.boxShadow = '0 0 0 3px rgba(74,124,89,0.1)' }
+const onFocusStyle = e => { e.target.style.borderColor = '#0d6b63'; e.target.style.boxShadow = '0 0 0 3px rgba(13,107,99,0.1)' }
 const onBlurStyle  = e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.boxShadow = 'none' }
 
 function getPeriodo(timeStr) {
@@ -251,8 +251,8 @@ export default function Cuidado() {
               </p>
               <span style={{
                 fontSize: 11, fontWeight: 700,
-                color: completedRequired === requiredItems.length ? '#16A34A' : '#4A7C59',
-                background: completedRequired === requiredItems.length ? '#DCFCE7' : '#EBF3EE',
+                color: completedRequired === requiredItems.length ? '#16A34A' : '#0d6b63',
+                background: completedRequired === requiredItems.length ? '#DCFCE7' : '#E0F0EF',
                 padding: '3px 10px', borderRadius: 20,
               }}>
                 {completedRequired}/{requiredItems.length}
@@ -268,7 +268,7 @@ export default function Cuidado() {
                       ? '¡Todo listo por hoy! 🎉'
                       : `${completedRequired} de ${requiredItems.length} completadas`}
                   </p>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: completedRequired === requiredItems.length ? '#16A34A' : '#4A7C59' }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: completedRequired === requiredItems.length ? '#16A34A' : '#0d6b63' }}>
                     {Math.round((completedRequired / requiredItems.length) * 100)}%
                   </span>
                 </div>
@@ -278,7 +278,7 @@ export default function Cuidado() {
                     width: `${(completedRequired / requiredItems.length) * 100}%`,
                     background: completedRequired === requiredItems.length
                       ? 'linear-gradient(90deg, #22C55E, #16A34A)'
-                      : 'linear-gradient(90deg, #2D4A1E, #4A7C59)',
+                      : 'linear-gradient(90deg, #0B4F4A, #0d6b63)',
                     transition: 'width 0.4s ease',
                   }} />
                 </div>
@@ -302,7 +302,7 @@ export default function Cuidado() {
               <div style={{ display: 'flex', justifyContent: 'center', padding: 48 }}>
                 <div style={{
                   width: 28, height: 28, borderRadius: '50%',
-                  border: '3px solid #EDE5D8', borderTopColor: '#4A7C59',
+                  border: '3px solid #EDE5D8', borderTopColor: '#0d6b63',
                   animation: 'spin 0.8s linear infinite',
                 }} />
               </div>
@@ -362,7 +362,7 @@ export default function Cuidado() {
                     </p>
                     <div style={{ background: 'white', borderRadius: 16, border: '1px solid #EDE5D8', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}>
                       {proximas.map((item, idx) => {
-                        const cat = CARE_CATEGORIES.find(c => c.id === item.category) ?? { color: '#4A7C59', bg: '#EBF3EE' }
+                        const cat = CARE_CATEGORIES.find(c => c.id === item.category) ?? { color: '#0d6b63', bg: '#E0F0EF' }
                         const status = calcularEstadoCuidado(item, false, careSchedules[item.key])
                         const isEarly = status === 'programado'
                         const isToggling = careToggling === item.key
@@ -396,7 +396,7 @@ export default function Cuidado() {
                     </p>
                     <div style={{ background: 'white', borderRadius: 16, border: '1px solid #EDE5D8', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}>
                       {sinHorario.map((item, idx) => {
-                        const cat = CARE_CATEGORIES.find(c => c.id === item.category) ?? { color: '#4A7C59', bg: '#EBF3EE' }
+                        const cat = CARE_CATEGORIES.find(c => c.id === item.category) ?? { color: '#0d6b63', bg: '#E0F0EF' }
                         const isToggling = careToggling === item.key
                         return (
                           <div key={item.key} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '13px 14px', background: 'white', borderBottom: idx < sinHorario.length - 1 ? '1px solid #F5EEE6' : 'none', transition: 'background 0.2s', opacity: isToggling ? 0.55 : 1 }}>
@@ -496,7 +496,7 @@ export default function Cuidado() {
               <div style={{ display: 'flex', justifyContent: 'center', padding: 48 }}>
                 <div style={{
                   width: 26, height: 26, borderRadius: '50%',
-                  border: '3px solid #EDE5D8', borderTopColor: '#4A7C59',
+                  border: '3px solid #EDE5D8', borderTopColor: '#0d6b63',
                   animation: 'spin 0.8s linear infinite',
                 }} />
               </div>
@@ -568,7 +568,7 @@ export default function Cuidado() {
                         ? 'linear-gradient(135deg, #22C55E, #16A34A)'
                         : saving
                           ? '#C0CCC5'
-                          : 'linear-gradient(135deg, #4A7C59, #3A6347)',
+                          : 'linear-gradient(135deg, #0d6b63, #095248)',
                       color: 'white', fontWeight: 700, fontSize: 14,
                       cursor: saving ? 'not-allowed' : 'pointer',
                       boxShadow: saving ? 'none' : '0 4px 16px rgba(74,124,89,0.25)',
@@ -599,7 +599,7 @@ export default function Cuidado() {
       {blockedMsg && (
         <div style={{
           position: 'fixed', bottom: 96, left: '50%', transform: 'translateX(-50%)',
-          zIndex: 400, background: '#1E2D26', color: 'white',
+          zIndex: 400, background: '#083b37', color: 'white',
           borderRadius: 14, padding: '12px 18px',
           fontSize: 13, fontWeight: 600,
           maxWidth: 320, width: 'calc(100% - 32px)',
