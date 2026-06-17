@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
@@ -20,6 +20,15 @@ const fieldStyle = {
 }
 const onFocusStyle = e => { e.target.style.borderColor = '#4A7C59'; e.target.style.boxShadow = '0 0 0 3px rgba(74,124,89,0.1)' }
 const onBlurStyle  = e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.boxShadow = 'none' }
+
+function getPeriodo(timeStr) {
+  if (!timeStr) return null
+  const h = parseInt(timeStr.split(':')[0], 10)
+  if (h >= 6 && h < 12) return { label: 'la mañana', desde: '06:00', desdeHora: 6 }
+  if (h >= 12 && h < 18) return { label: 'la tarde', desde: '12:00', desdeHora: 12 }
+  if (h >= 18) return { label: 'la noche', desde: '18:00', desdeHora: 18 }
+  return null
+}
 
 function calcularEstadoCuidado(item, isChecked = false, customTime = null) {
   if (isChecked) return 'completado'
@@ -70,6 +79,8 @@ export default function Cuidado() {
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [saveError, setSaveError] = useState('')
+  const [blockedMsg, setBlockedMsg] = useState('')
+  const blockedTimer = useRef(null)
 
   useEffect(() => {
     if (user && ownerId) fetchData()
@@ -79,6 +90,13 @@ export default function Cuidado() {
     const tabParam = searchParams.get('tab')
     if (tabParam === 'horarios') setActiveTab('horarios')
   }, [searchParams])
+
+  useEffect(() => {
+    if (!blockedMsg) return
+    clearTimeout(blockedTimer.current)
+    blockedTimer.current = setTimeout(() => setBlockedMsg(''), 3500)
+    return () => clearTimeout(blockedTimer.current)
+  }, [blockedMsg])
 
   async function fetchData() {
     setLoading(true)
@@ -106,6 +124,16 @@ export default function Cuidado() {
   async function toggleCareItem(item) {
     if (isFamiliar || careToggling) return
     const existing = careLogs[item.key]
+
+    if (!existing) {
+      const schedTime = careSchedules[item.key] ?? item.scheduledTime
+      const periodo = getPeriodo(schedTime)
+      if (periodo && new Date().getHours() < periodo.desdeHora) {
+        setBlockedMsg(`Esta rutina está programada para ${periodo.label}. Podrás registrarla a partir de las ${periodo.desde}`)
+        return
+      }
+    }
+
     setCareToggling(item.key)
     try {
       if (existing) {
@@ -567,6 +595,21 @@ export default function Cuidado() {
 
       </div>
       <SuccessAnimation visible={!!justCompletedKey} key={justCompletedKey ?? 'none'} />
+
+      {blockedMsg && (
+        <div style={{
+          position: 'fixed', bottom: 96, left: '50%', transform: 'translateX(-50%)',
+          zIndex: 400, background: '#1E2D26', color: 'white',
+          borderRadius: 14, padding: '12px 18px',
+          fontSize: 13, fontWeight: 600,
+          maxWidth: 320, width: 'calc(100% - 32px)',
+          boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
+          textAlign: 'center', lineHeight: 1.5,
+          pointerEvents: 'none',
+        }}>
+          🕐 {blockedMsg}
+        </div>
+      )}
     </Layout>
   )
 }

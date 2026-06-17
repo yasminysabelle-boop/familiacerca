@@ -37,7 +37,7 @@ const PAGE_TITLES = {
   '/pricing':        'Planes',
   '/paciente/perfil': 'Perfil del paciente',
   '/videollamada':   'Videollamada',
-  '/registros':      'Registro diario',
+  '/registros':      'Síntomas físicos',
   '/incidentes':     'Incidentes',
 }
 

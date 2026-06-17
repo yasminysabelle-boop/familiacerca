@@ -3197,7 +3197,7 @@ export default function Dashboard() {
                 { emoji: '💬', label: 'Chat',            route: '/chat' },
                 { emoji: '📅', label: 'Citas',           route: '/calendar' },
                 { emoji: '🖼️', label: 'Álbum',          route: '/album' },
-                { emoji: '📋', label: 'Registros',       route: '/registros' },
+                { emoji: '📋', label: 'Síntomas físicos', route: '/registros' },
                 { emoji: '📊', label: 'Historial',       route: '/historial' },
                 { emoji: '📝', label: 'Notas médicas',   route: '/diario-medico' },
                 { emoji: '📓', label: 'Notas familia',   route: '/paciente/notas-familia' },
