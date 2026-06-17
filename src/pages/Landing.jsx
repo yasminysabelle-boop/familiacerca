@@ -273,20 +273,20 @@ export default function Landing() {
     <div style={{ background: WHITE, color: DARK, overflowX: 'hidden', fontFamily: SANS }}>
 
       {/* ─────────────── 1. NAV ─────────────── */}
-      <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: '#0B4F4A', backdropFilter: 'blur(20px)', borderBottom: `1px solid rgba(229,139,115,0.12)` }}>
+      <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: '#F8F4ED', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(11,79,74,0.10)' }}>
         <div style={{ maxWidth: 1140, margin: '0 auto', padding: '0 32px', height: 72, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '4px 0' }}>
             <img src="/icon-192.png" alt="FamiliaCerca" style={{ width: 44, height: 44, minHeight: 36, background: 'transparent' }} />
             <span style={{ fontFamily: SERIF, fontSize: 24, fontWeight: 700, letterSpacing: '0.01em' }}>
-              <span style={{ color: '#F8F4ED' }}>Familia</span><span style={{ color: '#E58B73' }}>Cerca</span>
+              <span style={{ color: '#0B4F4A' }}>Familia</span><span style={{ color: '#E58B73' }}>Cerca</span>
             </span>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 36 }} className="landing-desktop-nav">
             {navLinks.map(l => (
-              <a key={l.href} href={l.href} style={{ fontSize: 16, fontWeight: 400, color: 'rgba(255,255,255,0.55)', textDecoration: 'none', fontFamily: SANS }}
-                onMouseEnter={e => e.currentTarget.style.color = GOLD}
-                onMouseLeave={e => e.currentTarget.style.color = 'rgba(255,255,255,0.55)'}
+              <a key={l.href} href={l.href} style={{ fontSize: 16, fontWeight: 400, color: '#20312C', textDecoration: 'none', fontFamily: SANS }}
+                onMouseEnter={e => e.currentTarget.style.color = '#0B4F4A'}
+                onMouseLeave={e => e.currentTarget.style.color = '#20312C'}
               >{l.label}</a>
             ))}
             <Link to="/login" className="btn-outlined-teal" style={{ padding: '10px 28px', borderRadius: 9999, border: '1.5px solid #0B4F4A', background: 'transparent', color: '#0B4F4A', fontWeight: 500, fontSize: 16, textDecoration: 'none', fontFamily: SANS }}>
@@ -297,15 +297,15 @@ export default function Landing() {
           <button onClick={() => setMobileMenuOpen(o => !o)} className="landing-hamburger"
             style={{ display: 'none', background: 'none', border: 'none', cursor: 'pointer', padding: 8, flexDirection: 'column', gap: 5 }}
             aria-label="Menú">
-            {[0,1,2].map(i => <div key={i} style={{ width: 22, height: 1.5, background: WHITE, borderRadius: 2 }} />)}
+            {[0,1,2].map(i => <div key={i} style={{ width: 22, height: 1.5, background: '#0B4F4A', borderRadius: 2 }} />)}
           </button>
         </div>
 
         {mobileMenuOpen && (
-          <div style={{ padding: '12px 32px 24px', display: 'flex', flexDirection: 'column', gap: 2, borderTop: `1px solid rgba(229,139,115,0.12)`, background: 'rgba(11,79,74,0.99)' }}>
+          <div style={{ padding: '12px 32px 24px', display: 'flex', flexDirection: 'column', gap: 2, borderTop: '1px solid rgba(11,79,74,0.10)', background: '#F8F4ED' }}>
             {navLinks.map(l => (
               <a key={l.href} href={l.href} onClick={() => setMobileMenuOpen(false)}
-                style={{ padding: '13px 8px', fontSize: 15, color: 'rgba(255,255,255,0.70)', textDecoration: 'none', fontFamily: SANS }}>
+                style={{ padding: '13px 8px', fontSize: 15, color: '#20312C', textDecoration: 'none', fontFamily: SANS }}>
                 {l.label}
               </a>
             ))}
