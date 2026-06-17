@@ -273,7 +273,7 @@ export default function Landing() {
     <div style={{ background: WHITE, color: DARK, overflowX: 'hidden', fontFamily: SANS }}>
 
       {/* ─────────────── 1. NAV ─────────────── */}
-      <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: '#20312C', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(248,244,237,0.10)' }}>
+      <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: '#0B4F4A', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(248,244,237,0.10)' }}>
         <div style={{ maxWidth: 1140, margin: '0 auto', padding: '20px 2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display:'flex', alignItems:'center', gap:'0px' }}>
             <img src="/logo-icon.png" alt="FamiliaCerca" style={{ height:'100px', width:'auto', objectFit:'contain' }} />
