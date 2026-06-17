@@ -275,10 +275,22 @@ export default function Landing() {
       {/* ─────────────── 1. NAV ─────────────── */}
       <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: '#F8F4ED', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(11,79,74,0.10)' }}>
         <div style={{ maxWidth: 1140, margin: '0 auto', padding: '0 32px', height: 72, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '4px 0' }}>
-            <img src="/logo-icon.png" alt="FamiliaCerca" style={{ width: 48, height: 48, background: 'transparent' }} />
-            <span style={{ fontFamily: SERIF, fontSize: 24, fontWeight: 700, letterSpacing: '0.01em' }}>
-              <span style={{ color: '#0B4F4A' }}>Familia</span><span style={{ color: '#E58B73' }}>Cerca</span>
+          <div style={{ display:'flex', alignItems:'center', gap:'12px' }}>
+            <div style={{
+              background: '#0B4F4A',
+              borderRadius: '50%',
+              width: '52px',
+              height: '52px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0
+            }}>
+              <img src="/logo-icon.png" alt="FamiliaCerca" style={{ width:'38px', height:'38px', objectFit:'contain' }} />
+            </div>
+            <span style={{ fontFamily:'Georgia,serif', fontSize:'24px', fontWeight:700 }}>
+              <span style={{ color:'#0B4F4A' }}>Familia</span>
+              <span style={{ color:'#E58B73' }}>Cerca</span>
             </span>
           </div>
 
