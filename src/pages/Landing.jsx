@@ -277,7 +277,7 @@ export default function Landing() {
         <div style={{ maxWidth: 1140, margin: '0 auto', padding: '20px 2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display:'flex', alignItems:'center', gap:'0px' }}>
             <img src="/logo-icon.png" alt="FamiliaCerca" style={{ height:'110px', width:'auto', objectFit:'contain', display:'block' }} />
-            <span style={{ fontFamily:'Georgia,serif', fontWeight:700, margin:0, padding:0, marginLeft:'-16px' }}>
+            <span style={{ fontFamily:'Georgia,serif', fontWeight:700, margin:0, padding:0, marginLeft:'-12px' }}>
               <span style={{ color:'#F8F4ED', fontSize:'26px' }}>Familia</span>
               <span style={{ color:'#E58B73', fontSize:'26px' }}>Cerca</span>
             </span>
@@ -1004,7 +1004,7 @@ export default function Landing() {
             <div style={{ flex: '0 0 auto', maxWidth: 280 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 0, marginBottom: 16, padding: '4px 0' }}>
                 <img src="/logo-icon.png" alt="FamiliaCerca" style={{ height: '110px', width: 'auto', display: 'block' }} />
-                <span style={{ fontFamily: SERIF, fontWeight: 700, margin: 0, padding: 0, marginLeft: '-16px' }}>
+                <span style={{ fontFamily: SERIF, fontWeight: 700, margin: 0, padding: 0, marginLeft: '-12px' }}>
                   <span style={{ color: '#F8F4ED', fontSize: 26 }}>Familia</span>
                   <span style={{ color: '#E58B73', fontSize: 26 }}>Cerca</span>
                 </span>
