@@ -359,35 +359,37 @@ export default function Landing() {
           <img src={HERO_IMG} alt="Familia cuidando juntos" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }} />
           <div style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(to right, rgba(11,79,74,0.38) 0%, transparent 30%)', pointerEvents: 'none' }} />
 
-          {/* Floating medication card */}
-          <div className="hero-reveal hero-delay-4" style={{ position: 'absolute', bottom: '14%', left: -32, zIndex: 4, background: WHITE, borderRadius: 20, padding: '18px 22px', boxShadow: '0 24px 72px rgba(0,0,0,0.28)', width: 268 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-              <div style={{ width: 34, height: 34, borderRadius: 9, background: `rgba(11,79,74,0.08)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 17 }}>💊</div>
+          {/* Floating status card */}
+          <div className="hero-reveal hero-delay-4" style={{
+            position:'absolute', bottom:'2rem', right:'1.5rem',
+            background:'#F8F4ED', borderRadius:'24px',
+            padding:'18px 22px', boxShadow:'0 8px 32px rgba(11,79,74,0.15)',
+            minWidth:'255px', maxWidth:'285px', zIndex: 4
+          }}>
+            <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'12px'}}>
+              <div style={{width:38,height:38,borderRadius:'50%',background:'#8FAF9A',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'17px'}}>👵</div>
               <div>
-                <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: PRIMARY, fontFamily: SANS }}>Medicamentos de hoy</p>
-                <p style={{ margin: 0, fontSize: 10, color: '#9CA3AF', fontFamily: SANS }}>3 programados</p>
-              </div>
-              <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 4, background: `rgba(228,91,76,0.10)`, borderRadius: 9999, padding: '3px 8px' }}>
-                <div style={{ width: 6, height: 6, borderRadius: '50%', background: CORAL }} />
-                <span style={{ fontSize: 9, color: CORAL, fontFamily: SANS, fontWeight: 600 }}>1 pendiente</span>
+                <div style={{fontWeight:700,fontSize:'14px',color:'#20312C'}}>Deborah</div>
+                <div style={{display:'flex',alignItems:'center',gap:'5px',marginTop:'2px'}}>
+                  <div style={{width:7,height:7,borderRadius:'50%',background:'#0B4F4A'}}></div>
+                  <span style={{fontSize:'11px',color:'#0B4F4A',fontWeight:600}}>Todo al día</span>
+                </div>
               </div>
             </div>
             {[
-              { med: 'Atenolol 25mg', time: '8:00 AM', done: true },
-              { med: 'Metformina 500mg', time: '1:00 PM', done: true },
-              { med: 'Losartán 50mg', time: '8:00 PM', done: false, alert: true },
-            ].map((item, i, arr) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '7px 0', borderBottom: i < arr.length - 1 ? '1px solid rgba(0,0,0,0.05)' : 'none' }}>
-                <div style={{ width: 17, height: 17, borderRadius: '50%', border: `1.5px solid ${item.done ? ACTION : item.alert ? CORAL : 'rgba(0,0,0,0.18)'}`, background: item.done ? ACTION : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  {item.done && <span style={{ color: WHITE, fontSize: 8 }}>✓</span>}
-                </div>
-                <span style={{ fontSize: 11, fontFamily: SANS, color: item.done ? '#9CA3AF' : item.alert ? CORAL : '#374151', textDecoration: item.done ? 'line-through' : 'none', flex: 1, fontWeight: item.alert ? 500 : 300 }}>{item.med}</span>
-                <span style={{ fontSize: 10, color: item.alert ? CORAL : '#9CA3AF', fontFamily: SANS }}>{item.time}</span>
+              {icon:'💊',text:'Medicamentos completados'},
+              {icon:'🕙',text:'Última actualización 10:45 AM'},
+              {icon:'👨‍👩‍👧',text:'4 familiares informados'},
+            ].map((item,i)=>(
+              <div key={i} style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'7px'}}>
+                <span style={{fontSize:'13px'}}>{item.icon}</span>
+                <span style={{fontSize:'11px',color:'#20312C',opacity:0.8}}>{item.text}</span>
+                <span style={{marginLeft:'auto',color:'#0B4F4A',fontSize:'12px',fontWeight:700}}>✓</span>
               </div>
             ))}
-            <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 6, padding: '8px 12px', background: `rgba(228,91,76,0.06)`, borderRadius: 10, border: `1px solid rgba(228,91,76,0.18)` }}>
-              <span style={{ fontSize: 12 }}>🔔</span>
-              <span style={{ fontSize: 10, color: CORAL, fontFamily: SANS, fontWeight: 500 }}>Alerta enviada a 3 cuidadores</span>
+            <div style={{borderTop:'1px solid rgba(11,79,74,0.1)',marginTop:'8px',paddingTop:'8px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+              <span style={{fontSize:'10px',color:'#20312C',opacity:0.6}}>Actualizado por Rosa</span>
+              <span style={{fontSize:'10px',color:'#E58B73',fontWeight:600}}>Hace 15 min</span>
             </div>
           </div>
         </div>
