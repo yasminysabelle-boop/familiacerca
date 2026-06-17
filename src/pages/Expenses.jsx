@@ -16,9 +16,9 @@ import { usePullToRefresh } from '../hooks/usePullToRefresh'
 import EvidencePhoto from '../components/EvidencePhoto'
 
 const CATEGORIES = [
-  { id: 'Medicamentos',    emoji: '💊', color: '#4A7C59' },
+  { id: 'Medicamentos',    emoji: '💊', color: '#0d6b63' },
   { id: 'Citas médicas',   emoji: '🏥', color: '#2D86A0' },
-  { id: 'Transporte',      emoji: '🚗', color: '#4A7C59' },
+  { id: 'Transporte',      emoji: '🚗', color: '#0d6b63' },
   { id: 'Cuidador',        emoji: '🤝', color: '#7C5CBF' },
   { id: 'Equipos médicos', emoji: '🩺', color: '#C9882A' },
   { id: 'Otros',           emoji: '📋', color: '#9CA3AF' },
@@ -255,7 +255,7 @@ export default function Expenses() {
     fontSize: 14, outline: 'none', background: 'white',
     boxSizing: 'border-box', color: '#1A1A1A', transition: 'all 0.15s',
   }
-  const onFocus = e => { e.target.style.borderColor = '#4A7C59'; e.target.style.boxShadow = '0 0 0 3px rgba(74,124,89,0.1)' }
+  const onFocus = e => { e.target.style.borderColor = '#0d6b63'; e.target.style.boxShadow = '0 0 0 3px rgba(13,107,99,0.1)' }
   const onBlur  = e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.boxShadow = 'none' }
 
   const canSave = !saving && !!form.amount && !!(form.paid_by ?? '').trim()
@@ -296,9 +296,9 @@ export default function Expenses() {
         {/* Total card */}
         <div style={{ padding: '0 20px 16px' }}>
           <div style={{
-            background: 'linear-gradient(145deg, #4A7C59 0%, #2E5240 100%)',
+            background: 'linear-gradient(145deg, #0d6b63 0%, #2E5240 100%)',
             borderRadius: 22, padding: '22px 24px',
-            boxShadow: '0 8px 28px rgba(74,124,89,0.28)',
+            boxShadow: '0 8px 28px rgba(13,107,99,0.28)',
           }}>
             <p style={{
               color: 'rgba(255,255,255,0.65)', fontSize: 11, fontWeight: 700,
@@ -364,7 +364,7 @@ export default function Expenses() {
               <p style={{ fontSize: 14, color: '#D63031', marginBottom: 12 }}>{loadError}</p>
               <button onClick={loadExpenses} style={{
                 padding: '10px 20px', borderRadius: 12, border: 'none',
-                background: '#4A7C59', color: 'white', fontWeight: 700, fontSize: 13, cursor: 'pointer',
+                background: '#0d6b63', color: 'white', fontWeight: 700, fontSize: 13, cursor: 'pointer',
               }}>Reintentar</button>
             </div>
           ) : expenses.length === 0 ? (
@@ -495,18 +495,18 @@ export default function Expenses() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {memberContributions.map((m, i) => (
                 <div key={m.name} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: i === 0 ? '#EBF3EE' : '#F3F4F6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, flexShrink: 0, fontWeight: 700, color: i === 0 ? '#4A7C59' : '#9CA3AF' }}>
+                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: i === 0 ? '#EBF3EE' : '#F3F4F6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, flexShrink: 0, fontWeight: 700, color: i === 0 ? '#0d6b63' : '#9CA3AF' }}>
                     {i === 0 ? '🥇' : i === 1 ? '🥈' : '🥉'}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
                       <span style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.name}</span>
                       <span style={{ fontSize: 13, fontWeight: 700, color: '#1A1A1A', flexShrink: 0, marginLeft: 8 }}>
-                        {formatCurrency(m.amount)} · <span style={{ color: '#4A7C59' }}>{m.pct}%</span>
+                        {formatCurrency(m.amount)} · <span style={{ color: '#0d6b63' }}>{m.pct}%</span>
                       </span>
                     </div>
                     <div style={{ height: 4, background: '#F3F4F6', borderRadius: 2, overflow: 'hidden' }}>
-                      <div style={{ height: '100%', borderRadius: 2, background: i === 0 ? '#4A7C59' : '#9CA3AF', width: `${m.pct}%`, transition: 'width 0.4s ease' }} />
+                      <div style={{ height: '100%', borderRadius: 2, background: i === 0 ? '#0d6b63' : '#9CA3AF', width: `${m.pct}%`, transition: 'width 0.4s ease' }} />
                     </div>
                   </div>
                 </div>
@@ -523,9 +523,9 @@ export default function Expenses() {
           style={{
             position: 'fixed', bottom: 84, right: 20, zIndex: 30,
             width: 54, height: 54, borderRadius: '50%',
-            background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
+            background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
             border: 'none', cursor: 'pointer',
-            boxShadow: '0 6px 20px rgba(74,124,89,0.4)',
+            boxShadow: '0 6px 20px rgba(13,107,99,0.4)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             transition: 'transform 0.15s',
           }}
@@ -787,7 +787,7 @@ export default function Expenses() {
                       }}
                     >
                       <span style={{ fontSize: 15 }}>📷</span>
-                      <span style={{ fontSize: 12, color: '#4A7C59', fontWeight: 600 }}>Tomar foto</span>
+                      <span style={{ fontSize: 12, color: '#0d6b63', fontWeight: 600 }}>Tomar foto</span>
                     </button>
                     <button
                       type="button"
@@ -800,7 +800,7 @@ export default function Expenses() {
                       }}
                     >
                       <span style={{ fontSize: 15 }}>🖼️</span>
-                      <span style={{ fontSize: 12, color: '#4A7C59', fontWeight: 600 }}>Elegir de galería</span>
+                      <span style={{ fontSize: 12, color: '#0d6b63', fontWeight: 600 }}>Elegir de galería</span>
                     </button>
                   </div>
                 )}

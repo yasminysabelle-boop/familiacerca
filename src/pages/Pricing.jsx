@@ -36,7 +36,7 @@ const PLANS = [
     price: '$12.99',
     period: '/mes',
     badge: 'Más popular',
-    color: '#4A7C59',
+    color: '#0d6b63',
     features: [
       'Todo lo del plan Gratis',
       'Hasta 6 cuidadores',
@@ -144,7 +144,7 @@ export default function Pricing() {
       {/* Hero */}
       <div style={{ textAlign: 'center', padding: '32px 24px 28px' }}>
         <p style={{
-          fontSize: 11, fontWeight: 700, color: '#4A7C59', letterSpacing: '0.12em',
+          fontSize: 11, fontWeight: 700, color: '#0d6b63', letterSpacing: '0.12em',
           textTransform: 'uppercase', marginBottom: 10,
         }}>
           Planes y precios
@@ -168,7 +168,7 @@ export default function Pricing() {
             border: `1px solid ${daysLeft <= 3 ? '#FECACA' : '#EDE5D8'}`,
           }}>
             <span style={{ fontSize: 14 }}>{daysLeft <= 3 ? '⚠️' : '🌱'}</span>
-            <span style={{ fontSize: 13, fontWeight: 600, color: daysLeft <= 3 ? '#DC2626' : '#4A7C59' }}>
+            <span style={{ fontSize: 13, fontWeight: 600, color: daysLeft <= 3 ? '#DC2626' : '#0d6b63' }}>
               Te quedan {daysLeft} día{daysLeft !== 1 ? 's' : ''} de prueba gratuita
             </span>
           </div>
@@ -196,7 +196,7 @@ export default function Pricing() {
                 padding: '20px 20px 22px',
                 position: 'relative',
                 boxShadow: isHighlighted
-                  ? '0 8px 32px rgba(74,124,89,0.15)'
+                  ? '0 8px 32px rgba(13,107,99,0.15)'
                   : plan.id === 'care_plus'
                   ? '0 8px 32px rgba(124,58,237,0.1)'
                   : '0 2px 8px rgba(0,0,0,0.04)',
@@ -311,7 +311,7 @@ export default function Pricing() {
                   {item.q}
                 </span>
                 <span style={{
-                  color: '#4A7C59', fontSize: 18, flexShrink: 0,
+                  color: '#0d6b63', fontSize: 18, flexShrink: 0,
                   display: 'inline-block',
                   transform: openFaq === i ? 'rotate(180deg)' : 'rotate(0)',
                   transition: 'transform 0.2s',

@@ -193,7 +193,7 @@ export default function EvidencePhoto({
             disabled={uploading}
             style={{
               padding: '7px 14px', borderRadius: 8, border: 'none',
-              background: uploading ? '#C0CCC5' : '#4A7C59',
+              background: uploading ? '#C0CCC5' : '#0d6b63',
               color: 'white', fontSize: 12, fontWeight: 700,
               cursor: uploading ? 'not-allowed' : 'pointer',
             }}
@@ -218,7 +218,7 @@ export default function EvidencePhoto({
               justifyContent: 'center', gap: 4,
               padding: '8px', borderRadius: 10,
               border: '1.5px dashed #C0CCC5', background: '#FDF8F4',
-              cursor: 'pointer', fontSize: 12, color: '#4A7C59', fontWeight: 600,
+              cursor: 'pointer', fontSize: 12, color: '#0d6b63', fontWeight: 600,
             }}
           >
             📷 Tomar foto
@@ -231,7 +231,7 @@ export default function EvidencePhoto({
               justifyContent: 'center', gap: 4,
               padding: '8px', borderRadius: 10,
               border: '1.5px dashed #C0CCC5', background: '#FDF8F4',
-              cursor: 'pointer', fontSize: 12, color: '#4A7C59', fontWeight: 600,
+              cursor: 'pointer', fontSize: 12, color: '#0d6b63', fontWeight: 600,
             }}
           >
             🖼️ Galería
@@ -256,7 +256,7 @@ export default function EvidencePhoto({
             display: 'inline-flex', alignItems: 'center', gap: 6,
             padding: '7px 12px', borderRadius: 10,
             border: '1.5px dashed #C0CCC5', background: '#FDF8F4',
-            cursor: 'pointer', fontSize: 12, color: '#4A7C59', fontWeight: 600,
+            cursor: 'pointer', fontSize: 12, color: '#0d6b63', fontWeight: 600,
             marginTop: 6,
           }}
         >

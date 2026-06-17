@@ -27,7 +27,7 @@ function formatDate(ts) {
 
 // Stable warm color per sender based on their first letter
 const AVATAR_COLORS = [
-  '#4A7C59', '#7C5CBF', '#2D86A0', '#4A7C59',
+  '#0d6b63', '#7C5CBF', '#2D86A0', '#0d6b63',
   '#C9882A', '#D63031', '#8B5E3C', '#5E86A0',
 ]
 function avatarColor(name = '') {
@@ -65,7 +65,7 @@ function Avatar({ name, photoUrl, size = 32 }) {
 }
 
 const CATEGORIES = [
-  { id: 'all',          emoji: '💬', label: 'Todos',        color: '#4A7C59' },
+  { id: 'all',          emoji: '💬', label: 'Todos',        color: '#0d6b63' },
   { id: 'aviso',        emoji: '📢', label: 'Aviso',        color: '#2563EB' },
   { id: 'incidente',    emoji: '🚨', label: 'Incidente',    color: '#DC2626' },
   { id: 'evidencia',    emoji: '📷', label: 'Evidencia',    color: '#7C3AED' },
@@ -376,7 +376,7 @@ export default function Chat() {
               </div>
               <button
                 onClick={() => togglePin(contextMsg)}
-                style={{ width: '100%', padding: '14px 16px', border: 'none', background: 'none', cursor: 'pointer', textAlign: 'left', fontSize: 14, fontWeight: 600, color: contextMsg.is_pinned ? '#D63031' : '#2D4A1E', display: 'flex', alignItems: 'center', gap: 10 }}
+                style={{ width: '100%', padding: '14px 16px', border: 'none', background: 'none', cursor: 'pointer', textAlign: 'left', fontSize: 14, fontWeight: 600, color: contextMsg.is_pinned ? '#D63031' : '#0B4F4A', display: 'flex', alignItems: 'center', gap: 10 }}
               >
                 <span style={{ fontSize: 18 }}>{contextMsg.is_pinned ? '📍' : '📌'}</span>
                 {contextMsg.is_pinned ? 'Desfijar mensaje' : 'Fijar mensaje'}
@@ -490,13 +490,13 @@ export default function Chat() {
                             ? '18px 18px 4px 18px'
                             : '18px 18px 18px 4px',
                           background: mine
-                            ? 'linear-gradient(135deg, #4A7C59, #3A6347)'
+                            ? 'linear-gradient(135deg, #0d6b63, #3A6347)'
                             : 'white',
                           color: mine ? 'white' : '#1A1A1A',
                           fontSize: 14,
                           lineHeight: 1.45,
                           boxShadow: mine
-                            ? '0 2px 8px rgba(74,124,89,0.25)'
+                            ? '0 2px 8px rgba(13,107,99,0.25)'
                             : '0 1px 4px rgba(0,0,0,0.08)',
                           border: mine ? 'none' : '1px solid #EDE5D8',
                           wordBreak: 'break-word',
@@ -658,7 +658,7 @@ export default function Chat() {
                 fontFamily: 'inherit',
                 transition: 'border-color 0.15s',
               }}
-              onFocus={e => { e.target.style.borderColor = '#4A7C59' }}
+              onFocus={e => { e.target.style.borderColor = '#0d6b63' }}
               onBlur={e => { e.target.style.borderColor = '#EDE5D8' }}
             />
             <MicButton recording={recording} onStart={start} onStop={stop} />

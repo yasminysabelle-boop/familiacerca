@@ -174,7 +174,7 @@ function Splash({ fading }) {
     <div
       style={{
         position: 'fixed', inset: 0, zIndex: 9999,
-        background: 'linear-gradient(160deg, #4A7C59 0%, #2D6A4F 60%, #1A4A32 100%)',
+        background: 'linear-gradient(160deg, #0d6b63 0%, #2D6A4F 60%, #1A4A32 100%)',
         opacity: fading ? 0 : 1,
         transition: 'opacity 0.5s ease-out',
         pointerEvents: fading ? 'none' : 'all',
@@ -197,10 +197,10 @@ function Splash({ fading }) {
           <circle cx="20" cy="20" r="20" fill="rgba(255,255,255,0.15)" />
           <circle cx="20" cy="20" r="17.5" fill="white" />
           <text x="20" y="19.5" textAnchor="middle" dominantBaseline="middle"
-            fill="#4A7C59" fontSize="14" fontWeight="800"
+            fill="#0d6b63" fontSize="14" fontWeight="800"
             fontFamily="Georgia, serif" letterSpacing="-0.5">FC</text>
           <text x="20" y="31" textAnchor="middle" dominantBaseline="middle"
-            fill="#4A7C59" fillOpacity="0.72" fontSize="10">♥</text>
+            fill="#0d6b63" fillOpacity="0.72" fontSize="10">♥</text>
         </svg>
 
         <div className="animate-splash-tag" style={{ textAlign: 'center', marginTop: 22 }}>

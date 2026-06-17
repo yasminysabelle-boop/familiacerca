@@ -145,7 +145,7 @@ export default function MedicationStockTab({ med, ownerId, isFamiliar, onClose }
 
         {loading ? (
           <div style={{ display: 'flex', justifyContent: 'center', padding: 48 }}>
-            <div style={{ width: 28, height: 28, borderRadius: '50%', border: '3px solid #EDE5D8', borderTopColor: '#4A7C59', animation: 'spin 0.8s linear infinite' }} />
+            <div style={{ width: 28, height: 28, borderRadius: '50%', border: '3px solid #EDE5D8', borderTopColor: '#0d6b63', animation: 'spin 0.8s linear infinite' }} />
           </div>
         ) : !stock ? (
           <div style={{ textAlign: 'center', padding: '32px 0' }}>
@@ -186,7 +186,7 @@ export default function MedicationStockTab({ med, ownerId, isFamiliar, onClose }
                 <div style={{
                   height: '100%', borderRadius: 7, width: `${pct}%`,
                   background: pct > 30
-                    ? 'linear-gradient(90deg, #4A7C59, #22C55E)'
+                    ? 'linear-gradient(90deg, #0d6b63, #22C55E)'
                     : pct > 10
                       ? 'linear-gradient(90deg, #D97706, #F59E0B)'
                       : 'linear-gradient(90deg, #DC2626, #EF4444)',
@@ -332,9 +332,9 @@ export default function MedicationStockTab({ med, ownerId, isFamiliar, onClose }
                 onClick={() => setShowRenewModal(true)}
                 style={{
                   width: '100%', padding: '14px', borderRadius: 14, border: 'none', marginBottom: 20,
-                  background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
+                  background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
                   color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer',
-                  boxShadow: '0 6px 20px rgba(74,124,89,0.3)',
+                  boxShadow: '0 6px 20px rgba(13,107,99,0.3)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                 }}
               >
@@ -402,7 +402,7 @@ export default function MedicationStockTab({ med, ownerId, isFamiliar, onClose }
                 disabled={!newPillCount || parseInt(newPillCount) <= 0 || renewing}
                 style={{
                   flex: 2, padding: '12px', borderRadius: 12, border: 'none',
-                  background: (!newPillCount || renewing) ? '#C0CCC5' : 'linear-gradient(135deg, #4A7C59, #3A6347)',
+                  background: (!newPillCount || renewing) ? '#C0CCC5' : 'linear-gradient(135deg, #0d6b63, #3A6347)',
                   color: 'white', fontWeight: 700, fontSize: 14,
                   cursor: (!newPillCount || renewing) ? 'not-allowed' : 'pointer',
                 }}

@@ -103,7 +103,7 @@ function EntryCard({ entry }) {
         {/* Medications */}
         {hasMeds && (
           <div style={{ margin: '0 0 10px' }}>
-            <p style={{ margin: '0 0 6px', fontSize: 10, fontWeight: 700, color: '#4A7C59', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            <p style={{ margin: '0 0 6px', fontSize: 10, fontWeight: 700, color: '#0d6b63', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
               💊 Medicamentos
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
@@ -160,7 +160,7 @@ function EntryCard({ entry }) {
           onClick={() => setExpanded(e => !e)}
           style={{
             background: 'none', border: 'none', cursor: 'pointer',
-            color: '#4A7C59', fontSize: 12, fontWeight: 700, padding: '4px 0',
+            color: '#0d6b63', fontSize: 12, fontWeight: 700, padding: '4px 0',
           }}
         >
           {expanded ? '▲ Ver menos' : '▼ Ver más detalle'}
@@ -239,7 +239,7 @@ export default function DiarioMedico() {
 
         {/* Header */}
         <div style={{
-          background: 'linear-gradient(135deg, #2D4A1E, #1A3A12)',
+          background: 'linear-gradient(135deg, #0B4F4A, #1A3A12)',
           borderRadius: 20, padding: '20px 18px', marginBottom: 20,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         }}>
@@ -293,9 +293,9 @@ export default function DiarioMedico() {
                 onClick={openEntry}
                 style={{
                   padding: '12px 24px', borderRadius: 12, border: 'none',
-                  background: '#4A7C59', color: 'white', fontWeight: 700,
+                  background: '#0d6b63', color: 'white', fontWeight: 700,
                   fontSize: 14, cursor: 'pointer',
-                  boxShadow: '0 4px 16px rgba(74,124,89,0.3)',
+                  boxShadow: '0 4px 16px rgba(13,107,99,0.3)',
                 }}
               >
                 Agregar primera entrada →

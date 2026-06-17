@@ -2,12 +2,12 @@
 
 @theme {
   /* Verde bosque — primary brand */
-  --color-primary:       #4A7C59;
+  --color-primary:       #0d6b63;
   --color-primary-dark:  #3A6347;
   --color-primary-light: #EBF3EE;
 
   /* Sage green — secondary (mantener para compatibilidad) */
-  --color-sage:          #4A7C59;
+  --color-sage:          #0d6b63;
   --color-sage-dark:     #3A6347;
   --color-sage-light:    #EBF3EE;
 

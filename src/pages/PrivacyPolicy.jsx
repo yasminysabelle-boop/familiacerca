@@ -20,7 +20,7 @@ function Section({ title, children }) {
 function Item({ children }) {
   return (
     <div className="flex gap-2.5">
-      <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full" style={{ background: '#4A7C59', marginTop: 6 }} />
+      <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full" style={{ background: '#0d6b63', marginTop: 6 }} />
       <p>{children}</p>
     </div>
   )
@@ -323,7 +323,7 @@ export default function PrivacyPolicy() {
         >
           <p className="text-xs text-gray-400 text-center leading-relaxed">
             ¿Prefieres leer esto en inglés? Escríbenos a{' '}
-            <a href="mailto:legal@familiacerca.com" className="underline" style={{ color: '#4A7C59' }}>
+            <a href="mailto:legal@familiacerca.com" className="underline" style={{ color: '#0d6b63' }}>
               legal@familiacerca.com
             </a>{' '}
             y te enviamos la versión en inglés.
@@ -331,7 +331,7 @@ export default function PrivacyPolicy() {
           <Link
             to="/terminos"
             className="text-xs font-semibold underline"
-            style={{ color: '#4A7C59' }}
+            style={{ color: '#0d6b63' }}
           >
             Ver Términos de Servicio →
           </Link>

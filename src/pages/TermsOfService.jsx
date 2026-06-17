@@ -20,7 +20,7 @@ function Section({ title, children }) {
 function Item({ children }) {
   return (
     <div className="flex gap-2.5">
-      <span className="mt-1 flex-shrink-0 w-1.5 h-1.5 rounded-full" style={{ background: '#4A7C59', marginTop: 6 }} />
+      <span className="mt-1 flex-shrink-0 w-1.5 h-1.5 rounded-full" style={{ background: '#0d6b63', marginTop: 6 }} />
       <p>{children}</p>
     </div>
   )
@@ -145,7 +145,7 @@ export default function TermsOfService() {
               >
                 <div className="flex items-center justify-between mb-1">
                   <p className="font-bold text-gray-900" style={{ fontFamily: 'Georgia, serif' }}>Plan Familiar</p>
-                  <span className="font-bold" style={{ color: '#4A7C59' }}>$19 / mes</span>
+                  <span className="font-bold" style={{ color: '#0d6b63' }}>$19 / mes</span>
                 </div>
                 <p className="text-xs text-gray-500">Coordinación familiar básica: medicamentos, calendario, notas y álbum familiar.</p>
               </div>
@@ -281,7 +281,7 @@ export default function TermsOfService() {
         >
           <p className="text-xs text-gray-400 text-center leading-relaxed">
             ¿Prefieres leer esto en inglés? Escríbenos a{' '}
-            <a href="mailto:legal@familiacerca.com" className="underline" style={{ color: '#4A7C59' }}>
+            <a href="mailto:legal@familiacerca.com" className="underline" style={{ color: '#0d6b63' }}>
               legal@familiacerca.com
             </a>{' '}
             y te enviamos la versión en inglés.
@@ -289,7 +289,7 @@ export default function TermsOfService() {
           <Link
             to="/privacidad"
             className="text-xs font-semibold underline"
-            style={{ color: '#4A7C59' }}
+            style={{ color: '#0d6b63' }}
           >
             Ver Política de Privacidad →
           </Link>

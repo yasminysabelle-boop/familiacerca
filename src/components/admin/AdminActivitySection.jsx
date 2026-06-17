@@ -16,12 +16,12 @@ function timeAgo(isoStr) {
 }
 
 const TYPE_META = {
-  med_confirmed:  { icon: '💊', color: '#4A7C59', label: 'Medicamento confirmado' },
+  med_confirmed:  { icon: '💊', color: '#0d6b63', label: 'Medicamento confirmado' },
   note_added:     { icon: '📝', color: '#2D86A0', label: 'Nota agregada' },
   voice_memo:     { icon: '🎙️', color: '#7C5CBF', label: 'Memoria de voz' },
   expense_added:  { icon: '💰', color: '#C9882A', label: 'Gasto registrado' },
   hospital_doc:   { icon: '📁', color: '#B91C1C', label: 'Documento subido' },
-  visit_added:    { icon: '👥', color: '#4A7C59', label: 'Visita anotada' },
+  visit_added:    { icon: '👥', color: '#0d6b63', label: 'Visita anotada' },
   videocall:      { icon: '📹', color: '#1D4ED8', label: 'Videollamada programada' },
 }
 
@@ -163,7 +163,7 @@ export default function AdminActivitySection() {
               <div style={{
                 display: 'flex', alignItems: 'flex-start', gap: 12,
                 padding: '10px 12px', borderRadius: 10,
-                background: 'white', border: '1px solid #F0EDE6',
+                background: 'white', border: '1px solid #F8F4ED',
                 marginBottom: 6,
               }}>
                 <div style={{

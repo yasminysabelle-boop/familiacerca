@@ -108,7 +108,7 @@ export default function HospitalDocumentsCard() {
       borderRadius: 16,
       padding: '16px 18px',
       boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-      border: '1px solid #F0EDE6',
+      border: '1px solid #F8F4ED',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
         <span style={{ fontSize: 20 }}>📁</span>
@@ -119,7 +119,7 @@ export default function HospitalDocumentsCard() {
           onClick={() => setShowForm(f => !f)}
           style={{
             padding: '5px 12px', borderRadius: 8, border: 'none',
-            background: '#4A7C59', color: 'white', fontSize: 12,
+            background: '#0d6b63', color: 'white', fontSize: 12,
             fontWeight: 700, cursor: 'pointer',
           }}
         >
@@ -206,8 +206,8 @@ export default function HospitalDocumentsCard() {
                   onClick={() => setDocType(t.value)}
                   style={{
                     padding: '5px 10px', borderRadius: 8, fontSize: 12, fontWeight: 600,
-                    border: `1.5px solid ${docType === t.value ? '#4A7C59' : '#D1C9BF'}`,
-                    background: docType === t.value ? '#4A7C59' : 'white',
+                    border: `1.5px solid ${docType === t.value ? '#0d6b63' : '#D1C9BF'}`,
+                    background: docType === t.value ? '#0d6b63' : 'white',
                     color: docType === t.value ? 'white' : '#374151',
                     cursor: 'pointer',
                   }}
@@ -260,7 +260,7 @@ export default function HospitalDocumentsCard() {
               disabled={!file || !title.trim() || uploading}
               style={{
                 padding: '8px 20px', borderRadius: 8, border: 'none',
-                background: file && title.trim() ? '#4A7C59' : '#9CA3AF',
+                background: file && title.trim() ? '#0d6b63' : '#9CA3AF',
                 color: 'white', fontWeight: 700, fontSize: 13,
                 cursor: file && title.trim() ? 'pointer' : 'default',
               }}

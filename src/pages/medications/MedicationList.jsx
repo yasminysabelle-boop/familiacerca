@@ -97,10 +97,10 @@ export default function MedicationList() {
             onClick={openAdd}
             style={{
               width: 40, height: 40, borderRadius: 12,
-              background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
+              background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
               border: 'none', cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 4px 12px rgba(74,124,89,0.3)',
+              boxShadow: '0 4px 12px rgba(13,107,99,0.3)',
               flexShrink: 0,
             }}
             title="Agregar medicamento"
@@ -142,7 +142,7 @@ export default function MedicationList() {
                   background: 'white',
                   borderRadius: 16,
                   border: '1px solid #EDE5D8',
-                  borderLeft: `4px solid ${stockDot ?? '#4A7C59'}`,
+                  borderLeft: `4px solid ${stockDot ?? '#0d6b63'}`,
                   padding: '14px 14px 14px 16px',
                   boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
                   display: 'flex',
@@ -172,7 +172,7 @@ export default function MedicationList() {
                     )}
                     {med.frequency && (
                       <span style={{
-                        background: '#EBF3EE', color: '#4A7C59',
+                        background: '#EBF3EE', color: '#0d6b63',
                         padding: '2px 8px', borderRadius: 6,
                         fontSize: 11, fontWeight: 600,
                       }}>

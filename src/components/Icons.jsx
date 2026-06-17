@@ -1,5 +1,5 @@
 // Thin-stroke icon system — all 24×24, stroke-only, no fill by default.
-// Usage: <Home size={22} color="#4A7C59" strokeWidth={1.5} />
+// Usage: <Home size={22} color="#0d6b63" strokeWidth={1.5} />
 
 function Svg({ size = 24, color = 'currentColor', strokeWidth = 1.5, fill = 'none', children }) {
   return (

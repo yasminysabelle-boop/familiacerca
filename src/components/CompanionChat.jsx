@@ -156,8 +156,8 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
           style={{
             position: 'fixed', bottom: bottomOffset, right: 16, zIndex: 42,
             width: 52, height: 52, borderRadius: '50%', border: 'none',
-            background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
-            boxShadow: '0 4px 16px rgba(74,124,89,0.4)',
+            background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
+            boxShadow: '0 4px 16px rgba(13,107,99,0.4)',
             cursor: 'pointer', fontSize: 22,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}
@@ -212,7 +212,7 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
         >
           {/* Header */}
           <div style={{
-            background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
+            background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
             padding: '12px 14px',
             display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0,
           }}>
@@ -258,7 +258,7 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
                   borderRadius: msg.role === 'user'
                     ? '16px 16px 4px 16px'
                     : '16px 16px 16px 4px',
-                  background: msg.role === 'user' ? '#F0F0F0' : '#4A7C59',
+                  background: msg.role === 'user' ? '#F0F0F0' : '#0d6b63',
                   color: msg.role === 'user' ? '#1A1A1A' : 'white',
                   fontSize: 13, lineHeight: 1.55,
                 }}>
@@ -280,7 +280,7 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
                     style={{
                       padding: '7px 10px',
                       borderRadius: 20,
-                      border: `1.5px solid ${i % 2 === 0 ? '#4A7C59' : '#C9882A'}`,
+                      border: `1.5px solid ${i % 2 === 0 ? '#0d6b63' : '#C9882A'}`,
                       background: i % 2 === 0 ? '#F0F7F3' : '#FDF6EC',
                       color: i % 2 === 0 ? '#3A6347' : '#9A6420',
                       fontSize: 11, fontWeight: 600,
@@ -300,7 +300,7 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
                 <div style={{
                   padding: '10px 14px',
                   borderRadius: '16px 16px 16px 4px',
-                  background: '#4A7C59',
+                  background: '#0d6b63',
                 }}>
                   <TypingDots />
                 </div>
@@ -348,7 +348,7 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
               aria-label="Enviar mensaje"
               style={{
                 width: 36, height: 36, borderRadius: '50%', border: 'none', flexShrink: 0,
-                background: input.trim() && !loading ? '#4A7C59' : '#E5E7EB',
+                background: input.trim() && !loading ? '#0d6b63' : '#E5E7EB',
                 cursor: input.trim() && !loading ? 'pointer' : 'default',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 transition: 'background 0.2s',
@@ -409,7 +409,7 @@ function SelectionCard({ onPick, onClose }) {
                 transition: 'border-color 0.15s, background 0.15s',
               }}
               onMouseEnter={e => {
-                e.currentTarget.style.borderColor = '#4A7C59'
+                e.currentTarget.style.borderColor = '#0d6b63'
                 e.currentTarget.style.background = '#EBF3EE'
               }}
               onMouseLeave={e => {

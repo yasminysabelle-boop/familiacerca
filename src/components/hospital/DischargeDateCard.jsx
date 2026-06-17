@@ -48,7 +48,7 @@ export default function DischargeDateCard() {
       borderRadius: 16,
       padding: '16px 18px',
       boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-      border: '1px solid #F0EDE6',
+      border: '1px solid #F8F4ED',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
         <span style={{ fontSize: 20 }}>🗓️</span>
@@ -59,7 +59,7 @@ export default function DischargeDateCard() {
           onClick={() => setEditing(e => !e)}
           style={{
             padding: '5px 12px', borderRadius: 8, border: '1px solid #D1C9BF',
-            background: 'white', color: '#4A7C59', fontSize: 12,
+            background: 'white', color: '#0d6b63', fontSize: 12,
             fontWeight: 700, cursor: 'pointer',
           }}
         >
@@ -110,7 +110,7 @@ export default function DischargeDateCard() {
             disabled={saving}
             style={{
               alignSelf: 'flex-end', padding: '8px 20px', borderRadius: 10,
-              border: 'none', background: '#4A7C59', color: 'white',
+              border: 'none', background: '#0d6b63', color: 'white',
               fontWeight: 700, fontSize: 13, cursor: saving ? 'default' : 'pointer',
             }}
           >

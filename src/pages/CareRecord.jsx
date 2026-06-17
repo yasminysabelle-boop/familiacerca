@@ -157,10 +157,10 @@ export default function CareRecord() {
 
         {/* Header */}
         <div style={{
-          background: 'linear-gradient(145deg, #2D4A1E 0%, #3D6128 100%)',
+          background: 'linear-gradient(145deg, #0B4F4A 0%, #3D6128 100%)',
           borderRadius: 20, padding: '20px 20px 18px',
           marginBottom: 20,
-          boxShadow: '0 4px 20px rgba(45,74,30,0.25)',
+          boxShadow: '0 4px 20px rgba(11,79,74,0.25)',
         }}>
           <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', margin: '0 0 4px', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
             {dayLabel(todayKey)}
@@ -174,12 +174,12 @@ export default function CareRecord() {
           {existingId && (
             <div style={{
               display: 'inline-flex', alignItems: 'center', gap: 5,
-              marginTop: 10, background: 'rgba(201,137,74,0.25)',
-              border: '1px solid rgba(201,137,74,0.45)',
+              marginTop: 10, background: 'rgba(229,139,115,0.25)',
+              border: '1px solid rgba(229,139,115,0.45)',
               borderRadius: 20, padding: '4px 10px',
             }}>
-              <CheckIcon size={11} color="#C9894A" strokeWidth={2.5} />
-              <span style={{ fontSize: 11, fontWeight: 700, color: '#C9894A' }}>Actualizar registro de hoy</span>
+              <CheckIcon size={11} color="#E58B73" strokeWidth={2.5} />
+              <span style={{ fontSize: 11, fontWeight: 700, color: '#E58B73' }}>Actualizar registro de hoy</span>
             </div>
           )}
         </div>
@@ -199,7 +199,7 @@ export default function CareRecord() {
                 marginBottom: 12,
                 boxShadow: '0 1px 6px rgba(0,0,0,0.04)',
               }}>
-                <p style={{ fontSize: 12, fontWeight: 700, color: '#2D4A1E', margin: '0 0 12px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                <p style={{ fontSize: 12, fontWeight: 700, color: '#0B4F4A', margin: '0 0 12px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
                   {section.label}
                 </p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
@@ -214,15 +214,15 @@ export default function CareRecord() {
                           display: 'flex', alignItems: 'center', gap: 6,
                           padding: '8px 14px',
                           borderRadius: 24,
-                          border: isSelected ? '2px solid #2D4A1E' : '1.5px solid #E5DDD2',
-                          background: isSelected ? '#2D4A1E' : 'white',
+                          border: isSelected ? '2px solid #0B4F4A' : '1.5px solid #E5DDD2',
+                          background: isSelected ? '#0B4F4A' : 'white',
                           color: isSelected ? 'white' : '#4B5563',
                           fontSize: 13, fontWeight: isSelected ? 700 : 500,
                           cursor: isFamiliar ? 'default' : 'pointer',
                           transition: 'all 0.15s',
                           WebkitTapHighlightColor: 'transparent',
                           opacity: isFamiliar ? 0.7 : 1,
-                          boxShadow: isSelected ? '0 2px 8px rgba(45,74,30,0.3)' : 'none',
+                          boxShadow: isSelected ? '0 2px 8px rgba(11,79,74,0.3)' : 'none',
                         }}
                       >
                         <span style={{ fontSize: 16, lineHeight: 1 }}>{opt.emoji}</span>
@@ -242,7 +242,7 @@ export default function CareRecord() {
               marginBottom: 20,
               boxShadow: '0 1px 6px rgba(0,0,0,0.04)',
             }}>
-              <p style={{ fontSize: 12, fontWeight: 700, color: '#2D4A1E', margin: '0 0 10px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+              <p style={{ fontSize: 12, fontWeight: 700, color: '#0B4F4A', margin: '0 0 10px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
                 Notas (opcional)
               </p>
               <textarea
@@ -293,12 +293,12 @@ export default function CareRecord() {
                     ? 'linear-gradient(135deg, #22C55E, #16A34A)'
                     : (!hasAnySelection || saving)
                       ? '#D1D5DB'
-                      : 'linear-gradient(135deg, #2D4A1E, #3D6128)',
+                      : 'linear-gradient(135deg, #0B4F4A, #3D6128)',
                   color: 'white', fontWeight: 700, fontSize: 15,
                   cursor: (!hasAnySelection || saving) ? 'not-allowed' : 'pointer',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                   transition: 'all 0.2s',
-                  boxShadow: hasAnySelection && !saving ? '0 4px 16px rgba(45,74,30,0.35)' : 'none',
+                  boxShadow: hasAnySelection && !saving ? '0 4px 16px rgba(11,79,74,0.35)' : 'none',
                   WebkitTapHighlightColor: 'transparent',
                 }}
               >

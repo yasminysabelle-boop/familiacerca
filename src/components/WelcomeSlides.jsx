@@ -77,7 +77,7 @@ export default function WelcomeSlides({ onDone }) {
           <div style={{
             position: 'absolute',
             width: 260, height: 260, borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(74,124,89,0.25) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(13,107,99,0.25) 0%, transparent 70%)',
           }} />
 
           <div style={{ position: 'relative', zIndex: 1, textAlign: 'center', padding: '0 36px' }}>
@@ -87,10 +87,10 @@ export default function WelcomeSlides({ onDone }) {
               <circle cx="20" cy="20" r="20" fill="rgba(255,255,255,0.15)" />
               <circle cx="20" cy="20" r="17.5" fill="white" />
               <text x="20" y="19.5" textAnchor="middle" dominantBaseline="middle"
-                fill="#4A7C59" fontSize="14" fontWeight="800"
+                fill="#0d6b63" fontSize="14" fontWeight="800"
                 fontFamily="Georgia, serif" letterSpacing="-0.5">FC</text>
               <text x="20" y="31" textAnchor="middle" dominantBaseline="middle"
-                fill="#4A7C59" fillOpacity="0.72" fontSize="10">♥</text>
+                fill="#0d6b63" fillOpacity="0.72" fontSize="10">♥</text>
             </svg>
 
             <h1 style={{
@@ -132,7 +132,7 @@ export default function WelcomeSlides({ onDone }) {
         }}>
           {/* Header */}
           <div style={{
-            background: 'linear-gradient(135deg, #4A7C59 0%, #3A6347 100%)',
+            background: 'linear-gradient(135deg, #0d6b63 0%, #3A6347 100%)',
             padding: 'calc(env(safe-area-inset-top) + 52px) 28px 32px',
             textAlign: 'center',
             flexShrink: 0,
@@ -186,7 +186,7 @@ export default function WelcomeSlides({ onDone }) {
         {/* ── Slide 3: CTA ── */}
         <div style={{
           width: '100vw', height: '100%', flexShrink: 0,
-          background: 'linear-gradient(160deg, #4A7C59 0%, #2D6A4F 58%, #1A4A32 100%)',
+          background: 'linear-gradient(160deg, #0d6b63 0%, #2D6A4F 58%, #1A4A32 100%)',
           position: 'relative',
           display: 'flex', flexDirection: 'column',
           alignItems: 'center', justifyContent: 'center',
@@ -237,7 +237,7 @@ export default function WelcomeSlides({ onDone }) {
                 width: '100%', padding: '18px',
                 borderRadius: 16,
                 background: 'white',
-                color: '#4A7C59',
+                color: '#0d6b63',
                 fontSize: 17, fontWeight: 800,
                 border: 'none', cursor: 'pointer',
                 boxShadow: '0 8px 32px rgba(0,0,0,0.22)',
@@ -317,7 +317,7 @@ export default function WelcomeSlides({ onDone }) {
                   padding: 0, border: 'none', cursor: 'pointer',
                   transition: 'all 0.3s',
                   background: isLightSlide
-                    ? (i === slide ? '#4A7C59' : '#D4B8A8')
+                    ? (i === slide ? '#0d6b63' : '#D4B8A8')
                     : (i === slide ? 'white' : 'rgba(255,255,255,0.38)'),
                   boxShadow: isLightSlide ? 'none' : '0 1px 4px rgba(0,0,0,0.2)',
                 }}
@@ -333,9 +333,9 @@ export default function WelcomeSlides({ onDone }) {
               padding: '15px 48px',
               borderRadius: 50,
               background: isLightSlide
-                ? 'linear-gradient(135deg, #4A7C59, #3A6347)'
+                ? 'linear-gradient(135deg, #0d6b63, #3A6347)'
                 : 'white',
-              color: isLightSlide ? 'white' : '#4A7C59',
+              color: isLightSlide ? 'white' : '#0d6b63',
               fontSize: 16, fontWeight: 700,
               border: 'none', cursor: 'pointer',
               boxShadow: '0 6px 28px rgba(0,0,0,0.18)',

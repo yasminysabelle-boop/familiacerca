@@ -124,10 +124,10 @@ export default function Incidents() {
 
         {/* Header */}
         <div style={{
-          background: 'linear-gradient(145deg, #2D4A1E 0%, #3D6128 100%)',
+          background: 'linear-gradient(145deg, #0B4F4A 0%, #3D6128 100%)',
           borderRadius: 20, padding: '18px 20px',
           marginBottom: 20,
-          boxShadow: '0 4px 20px rgba(45,74,30,0.25)',
+          boxShadow: '0 4px 20px rgba(11,79,74,0.25)',
         }}>
           <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', margin: '0 0 4px', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
             Registro de incidentes
@@ -143,12 +143,12 @@ export default function Incidents() {
         {/* List */}
         {loading ? (
           <div style={{ display: 'flex', justifyContent: 'center', padding: 48 }}>
-            <div style={{ width: 28, height: 28, borderRadius: '50%', border: '3px solid #EDE5D8', borderTopColor: '#4A7C59', animation: 'spin 0.8s linear infinite' }} />
+            <div style={{ width: 28, height: 28, borderRadius: '50%', border: '3px solid #EDE5D8', borderTopColor: '#0d6b63', animation: 'spin 0.8s linear infinite' }} />
           </div>
         ) : dateKeys.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '48px 24px' }}>
             <div style={{ fontSize: 52, marginBottom: 16 }}>🩺</div>
-            <p style={{ fontSize: 16, fontWeight: 700, color: '#2D4A1E', fontFamily: 'Georgia, serif', margin: '0 0 8px' }}>
+            <p style={{ fontSize: 16, fontWeight: 700, color: '#0B4F4A', fontFamily: 'Georgia, serif', margin: '0 0 8px' }}>
               Sin incidentes registrados
             </p>
             <p style={{ fontSize: 14, color: '#9CA3AF', margin: 0, lineHeight: 1.6 }}>
@@ -219,8 +219,8 @@ export default function Incidents() {
           style={{
             position: 'fixed', bottom: 'calc(80px + env(safe-area-inset-bottom))', right: 20,
             width: 56, height: 56, borderRadius: '50%', border: 'none',
-            background: 'linear-gradient(135deg, #2D4A1E, #4A7C59)',
-            boxShadow: '0 4px 16px rgba(45,74,30,0.45)',
+            background: 'linear-gradient(135deg, #0B4F4A, #0d6b63)',
+            boxShadow: '0 4px 16px rgba(11,79,74,0.45)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             cursor: 'pointer', zIndex: 30,
             WebkitTapHighlightColor: 'transparent',
@@ -254,7 +254,7 @@ export default function Incidents() {
             </div>
 
             {/* Type selector */}
-            <p style={{ fontSize: 12, fontWeight: 700, color: '#2D4A1E', margin: '0 0 10px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+            <p style={{ fontSize: 12, fontWeight: 700, color: '#0B4F4A', margin: '0 0 10px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
               Tipo de incidente
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginBottom: 20 }}>
@@ -267,21 +267,21 @@ export default function Incidents() {
                     style={{
                       display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
                       padding: '10px 4px', borderRadius: 14,
-                      border: isSelected ? '2px solid #2D4A1E' : '1.5px solid #E5DDD2',
+                      border: isSelected ? '2px solid #0B4F4A' : '1.5px solid #E5DDD2',
                       background: isSelected ? '#EAF0E6' : 'white',
                       cursor: 'pointer', transition: 'all 0.15s',
                       WebkitTapHighlightColor: 'transparent',
                     }}
                   >
                     <span style={{ fontSize: 22 }}>{t.emoji}</span>
-                    <span style={{ fontSize: 10, fontWeight: 700, color: isSelected ? '#2D4A1E' : '#6B7280', textAlign: 'center', lineHeight: 1.2 }}>{t.label}</span>
+                    <span style={{ fontSize: 10, fontWeight: 700, color: isSelected ? '#0B4F4A' : '#6B7280', textAlign: 'center', lineHeight: 1.2 }}>{t.label}</span>
                   </button>
                 )
               })}
             </div>
 
             {/* Date & time */}
-            <p style={{ fontSize: 12, fontWeight: 700, color: '#2D4A1E', margin: '0 0 8px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+            <p style={{ fontSize: 12, fontWeight: 700, color: '#0B4F4A', margin: '0 0 8px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
               Fecha y hora
             </p>
             <input
@@ -297,7 +297,7 @@ export default function Incidents() {
             />
 
             {/* Description */}
-            <p style={{ fontSize: 12, fontWeight: 700, color: '#2D4A1E', margin: '0 0 8px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+            <p style={{ fontSize: 12, fontWeight: 700, color: '#0B4F4A', margin: '0 0 8px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
               Descripción (opcional)
             </p>
             <textarea
@@ -315,7 +315,7 @@ export default function Incidents() {
             <p style={{ fontSize: 11, color: '#9CA3AF', margin: '0 0 16px', textAlign: 'right' }}>{form.description.length}/300</p>
 
             {/* Photo */}
-            <p style={{ fontSize: 12, fontWeight: 700, color: '#2D4A1E', margin: '0 0 8px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+            <p style={{ fontSize: 12, fontWeight: 700, color: '#0B4F4A', margin: '0 0 8px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
               Foto (opcional)
             </p>
             {form.photo_url ? (
@@ -352,11 +352,11 @@ export default function Incidents() {
               disabled={!form.type || saving}
               style={{
                 width: '100%', padding: '15px', borderRadius: 16, border: 'none',
-                background: !form.type || saving ? '#D1D5DB' : 'linear-gradient(135deg, #2D4A1E, #3D6128)',
+                background: !form.type || saving ? '#D1D5DB' : 'linear-gradient(135deg, #0B4F4A, #3D6128)',
                 color: 'white', fontWeight: 700, fontSize: 15,
                 cursor: !form.type || saving ? 'not-allowed' : 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                boxShadow: form.type && !saving ? '0 4px 16px rgba(45,74,30,0.35)' : 'none',
+                boxShadow: form.type && !saving ? '0 4px 16px rgba(11,79,74,0.35)' : 'none',
                 WebkitTapHighlightColor: 'transparent',
               }}
             >

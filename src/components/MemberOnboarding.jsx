@@ -160,7 +160,7 @@ export default function MemberOnboarding({ onDone }) {
                   width: 88, height: 88, borderRadius: '50%', border: 'none',
                   background: photoPreview ? 'transparent' : '#F0F9F4',
                   cursor: 'pointer', padding: 0, overflow: 'hidden',
-                  border: '3px solid #4A7C59',
+                  border: '3px solid #0d6b63',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}
               >
@@ -172,7 +172,7 @@ export default function MemberOnboarding({ onDone }) {
               <div style={{
                 position: 'absolute', bottom: 2, right: 2,
                 width: 24, height: 24, borderRadius: '50%',
-                background: '#4A7C59', border: '2px solid white',
+                background: '#0d6b63', border: '2px solid white',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 12, pointerEvents: 'none',
               }}>
@@ -215,8 +215,8 @@ export default function MemberOnboarding({ onDone }) {
                   onClick={() => setRelationship(r.value)}
                   style={{
                     padding: '10px 4px', borderRadius: 12, border: 'none',
-                    background: relationship === r.value ? '#4A7C59' : '#F9F7F4',
-                    border: `1.5px solid ${relationship === r.value ? '#4A7C59' : '#E5E0D8'}`,
+                    background: relationship === r.value ? '#0d6b63' : '#F9F7F4',
+                    border: `1.5px solid ${relationship === r.value ? '#0d6b63' : '#E5E0D8'}`,
                     cursor: 'pointer', display: 'flex', flexDirection: 'column',
                     alignItems: 'center', gap: 4,
                     transition: 'all 0.15s',
@@ -248,9 +248,9 @@ export default function MemberOnboarding({ onDone }) {
             }}
             style={{
               width: '100%', padding: '14px', borderRadius: 14, border: 'none',
-              background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
+              background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
               color: 'white', fontWeight: 800, fontSize: 15,
-              cursor: 'pointer', boxShadow: '0 6px 20px rgba(74,124,89,0.3)',
+              cursor: 'pointer', boxShadow: '0 6px 20px rgba(13,107,99,0.3)',
             }}
           >
             Continuar →
@@ -301,10 +301,10 @@ export default function MemberOnboarding({ onDone }) {
             disabled={saving}
             style={{
               width: '100%', padding: '14px', borderRadius: 14, border: 'none',
-              background: saving ? '#9CA3AF' : 'linear-gradient(135deg, #4A7C59, #3A6347)',
+              background: saving ? '#9CA3AF' : 'linear-gradient(135deg, #0d6b63, #3A6347)',
               color: 'white', fontWeight: 800, fontSize: 15,
               cursor: saving ? 'default' : 'pointer',
-              boxShadow: saving ? 'none' : '0 6px 20px rgba(74,124,89,0.3)',
+              boxShadow: saving ? 'none' : '0 6px 20px rgba(13,107,99,0.3)',
               marginBottom: 10,
             }}
           >

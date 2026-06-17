@@ -10,7 +10,7 @@ import EmptyState from '../components/EmptyState'
 import { usePullToRefresh } from '../hooks/usePullToRefresh'
 
 const EVENT_CONFIG = {
-  med_confirmed:        { icon: '💊', label: 'Medicamento',        color: '#4A7C59', bg: '#F0FDF4', border: '#BBF7D0' },
+  med_confirmed:        { icon: '💊', label: 'Medicamento',        color: '#0d6b63', bg: '#F0FDF4', border: '#BBF7D0' },
   med_missed:           { icon: '❌', label: 'Dosis omitida',       color: '#DC2626', bg: '#FEF2F2', border: '#FECACA' },
   hospital_mode_on:     { icon: '🏥', label: 'Hospitalización',    color: '#B91C1C', bg: '#FFF5F5', border: '#FECACA' },
   hospital_discharge:   { icon: '🏠', label: 'Alta hospitalaria',  color: '#2563EB', bg: '#EFF6FF', border: '#BFDBFE' },
@@ -108,7 +108,7 @@ function EventMetadata({ type, meta }) {
 
   if (type === 'care_routine' || type === 'care_routine_missed') {
     return (
-      <p style={{ fontSize: 12, color: '#4A7C59', fontWeight: 600, margin: '4px 0 0' }}>
+      <p style={{ fontSize: 12, color: '#0d6b63', fontWeight: 600, margin: '4px 0 0' }}>
         {careItemIcon(meta.item_key)} {careItemLabel(meta.item_key)}
         {meta.log_date ? <span style={{ color: '#9CA3AF', fontWeight: 400 }}> · {meta.log_date}</span> : null}
       </p>
@@ -407,9 +407,9 @@ export default function MedicationTimeline() {
                 fontSize: 12, fontWeight: 700,
                 cursor: 'pointer',
                 transition: 'all 0.15s',
-                background: filterType === opt.id ? '#2D4A1E' : '#F3F4F6',
+                background: filterType === opt.id ? '#0B4F4A' : '#F3F4F6',
                 color: filterType === opt.id ? 'white' : '#6B7280',
-                boxShadow: filterType === opt.id ? '0 2px 8px rgba(45,74,30,0.25)' : 'none',
+                boxShadow: filterType === opt.id ? '0 2px 8px rgba(11,79,74,0.25)' : 'none',
               }}
             >
               {opt.icon} {opt.label}
@@ -429,9 +429,9 @@ export default function MedicationTimeline() {
                 fontSize: 12, fontWeight: 700,
                 cursor: 'pointer',
                 transition: 'all 0.15s',
-                background: period === opt.id ? '#2D4A1E' : '#F3F4F6',
+                background: period === opt.id ? '#0B4F4A' : '#F3F4F6',
                 color: period === opt.id ? 'white' : '#6B7280',
-                boxShadow: period === opt.id ? '0 2px 8px rgba(45,74,30,0.25)' : 'none',
+                boxShadow: period === opt.id ? '0 2px 8px rgba(11,79,74,0.25)' : 'none',
               }}
             >
               {opt.label}
@@ -489,7 +489,7 @@ export default function MedicationTimeline() {
               onClick={fetchLog}
               style={{
                 padding: '10px 24px', borderRadius: 12, border: 'none',
-                background: '#4A7C59', color: 'white', fontWeight: 700,
+                background: '#0d6b63', color: 'white', fontWeight: 700,
                 fontSize: 13, cursor: 'pointer',
               }}
             >
@@ -538,12 +538,12 @@ export default function MedicationTimeline() {
                     <div style={{ flex: 1, textAlign: 'left' }}>
                       <p style={{
                         fontSize: 13, fontWeight: 700,
-                        color: isToday ? '#2D4A1E' : '#374151',
+                        color: isToday ? '#0B4F4A' : '#374151',
                         margin: 0,
                       }}>
                         {dayLabel(dateKey)}
                         {isToday && (
-                          <span style={{ marginLeft: 7, fontSize: 10, fontWeight: 700, color: '#4A7C59', background: '#C6EDD0', padding: '2px 7px', borderRadius: 6 }}>
+                          <span style={{ marginLeft: 7, fontSize: 10, fontWeight: 700, color: '#0d6b63', background: '#C6EDD0', padding: '2px 7px', borderRadius: 6 }}>
                             Hoy
                           </span>
                         )}

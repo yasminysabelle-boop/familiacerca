@@ -129,10 +129,10 @@ export default function VideoCall() {
               padding: '16px 40px', borderRadius: 20, border: 'none',
               background: startingInstant
                 ? 'rgba(255,255,255,0.2)'
-                : 'linear-gradient(135deg, #4A7C59, #2D6A4F)',
+                : 'linear-gradient(135deg, #0d6b63, #2D6A4F)',
               color: 'white', fontWeight: 800, fontSize: 16,
               cursor: startingInstant ? 'default' : 'pointer',
-              boxShadow: startingInstant ? 'none' : '0 8px 32px rgba(74,124,89,0.4)',
+              boxShadow: startingInstant ? 'none' : '0 8px 32px rgba(13,107,99,0.4)',
               display: 'flex', alignItems: 'center', gap: 10,
             }}
           >
@@ -189,7 +189,7 @@ export default function VideoCall() {
           onClick={() => navigate('/dashboard')}
           style={{
             padding: '12px 28px', borderRadius: 12, border: 'none',
-            background: '#4A7C59', color: 'white', fontWeight: 700,
+            background: '#0d6b63', color: 'white', fontWeight: 700,
             fontSize: 14, cursor: 'pointer',
           }}
         >
@@ -219,7 +219,7 @@ export default function VideoCall() {
           onClick={() => navigate('/dashboard')}
           style={{
             padding: '12px 28px', borderRadius: 12, border: 'none',
-            background: '#4A7C59', color: 'white', fontWeight: 700,
+            background: '#0d6b63', color: 'white', fontWeight: 700,
             fontSize: 14, cursor: 'pointer',
           }}
         >
@@ -332,10 +332,10 @@ export default function VideoCall() {
                   padding: '16px 40px', borderRadius: 20, border: 'none',
                   background: permStatus === 'requesting'
                     ? 'rgba(255,255,255,0.2)'
-                    : 'linear-gradient(135deg, #4A7C59, #2D6A4F)',
+                    : 'linear-gradient(135deg, #0d6b63, #2D6A4F)',
                   color: 'white', fontWeight: 800, fontSize: 16,
                   cursor: permStatus === 'requesting' ? 'default' : 'pointer',
-                  boxShadow: permStatus === 'requesting' ? 'none' : '0 8px 32px rgba(74,124,89,0.4)',
+                  boxShadow: permStatus === 'requesting' ? 'none' : '0 8px 32px rgba(13,107,99,0.4)',
                   transition: 'all 0.2s',
                   display: 'flex', alignItems: 'center', gap: 10,
                 }}

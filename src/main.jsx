@@ -26,7 +26,7 @@ if ('serviceWorker' in navigator) {
     btn.textContent = 'Actualizar'
     btn.style.cssText = [
       'padding:7px 14px', 'border-radius:10px', 'border:none',
-      'background:#4A7C59', 'color:#fff', 'font-size:13px', 'font-weight:700',
+      'background:#0d6b63', 'color:#fff', 'font-size:13px', 'font-weight:700',
       'cursor:pointer', 'white-space:nowrap', 'flex-shrink:0',
     ].join(';')
     btn.addEventListener('click', () => window.location.reload())

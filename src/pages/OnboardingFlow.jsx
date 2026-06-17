@@ -66,7 +66,7 @@ function PrimaryBtn({ children, onClick, disabled, pressed, onPD, onPU, onPL }) 
       onPointerLeave={onPL}
       style={{
         width: '100%', padding: '16px', borderRadius: 16, border: 'none',
-        background: disabled ? '#C5C9C4' : '#2D4A1E',
+        background: disabled ? '#C5C9C4' : '#0B4F4A',
         color: 'white', fontSize: 16, fontWeight: 700,
         cursor: disabled ? 'not-allowed' : 'pointer',
         boxShadow: pressed || disabled ? 'none' : '0 3px 0px #1A2E12',
@@ -311,14 +311,14 @@ export default function OnboardingFlow() {
 
   // ── RENDER ─────────────────────────────────────────────────────────────
   return (
-    <div style={{ minHeight: '100dvh', background: '#F0EDE6', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ minHeight: '100dvh', background: '#F8F4ED', display: 'flex', flexDirection: 'column' }}>
 
       {/* ── Header con barra de progreso ── */}
-      <div style={{ background: '#2D4A1E', padding: '0 20px', paddingTop: 'calc(env(safe-area-inset-top) + 14px)' }}>
+      <div style={{ background: '#0B4F4A', padding: '0 20px', paddingTop: 'calc(env(safe-area-inset-top) + 14px)' }}>
         <Logo showWordmark size={28} />
         <div style={{ marginTop: 16, height: 4, background: 'rgba(255,255,255,0.15)', borderRadius: 4 }}>
           <div style={{
-            height: '100%', width: `${progress}%`, background: '#C9894A', borderRadius: 4,
+            height: '100%', width: `${progress}%`, background: '#E58B73', borderRadius: 4,
             transition: 'width 0.4s cubic-bezier(0.4,0,0.2,1)',
           }} />
         </div>
@@ -420,7 +420,7 @@ export default function OnboardingFlow() {
                 style={{
                   width: 88, height: 88, borderRadius: '50%',
                   background: photoPreview ? 'transparent' : '#EAF0E6',
-                  border: '2px dashed #4A7C59',
+                  border: '2px dashed #0d6b63',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   overflow: 'hidden', cursor: 'pointer',
                 }}
@@ -436,11 +436,11 @@ export default function OnboardingFlow() {
               {photoMenuOpen && (
                 <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
                   <button onClick={() => { cameraRef.current.click(); setPhotoMenuOpen(false) }}
-                    style={{ padding: '10px 18px', borderRadius: 12, border: '1.5px solid #4A7C59', background: 'white', color: '#2D4A1E', fontWeight: 700, fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'inherit' }}>
+                    style={{ padding: '10px 18px', borderRadius: 12, border: '1.5px solid #0d6b63', background: 'white', color: '#0B4F4A', fontWeight: 700, fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'inherit' }}>
                     📷 Cámara
                   </button>
                   <button onClick={() => { galleryRef.current.click(); setPhotoMenuOpen(false) }}
-                    style={{ padding: '10px 18px', borderRadius: 12, border: '1.5px solid #4A7C59', background: 'white', color: '#2D4A1E', fontWeight: 700, fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'inherit' }}>
+                    style={{ padding: '10px 18px', borderRadius: 12, border: '1.5px solid #0d6b63', background: 'white', color: '#0B4F4A', fontWeight: 700, fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'inherit' }}>
                     🖼️ Galería
                   </button>
                 </div>
@@ -496,7 +496,7 @@ export default function OnboardingFlow() {
                     style={{
                       display: 'flex', alignItems: 'center', gap: 16,
                       padding: '16px 18px', borderRadius: 16,
-                      border: `2px solid ${selected ? '#2D4A1E' : '#E8E4DC'}`,
+                      border: `2px solid ${selected ? '#0B4F4A' : '#E8E4DC'}`,
                       background: selected ? '#EAF0E6' : 'white',
                       cursor: 'pointer', textAlign: 'left',
                       fontFamily: 'inherit', transition: 'all 0.12s',
@@ -504,10 +504,10 @@ export default function OnboardingFlow() {
                     }}
                   >
                     <span style={{ fontSize: 24, flexShrink: 0 }}>{emoji}</span>
-                    <span style={{ fontSize: 15, fontWeight: 600, color: selected ? '#2D4A1E' : '#374151', flex: 1 }}>
+                    <span style={{ fontSize: 15, fontWeight: 600, color: selected ? '#0B4F4A' : '#374151', flex: 1 }}>
                       {label}
                     </span>
-                    {selected && <span style={{ fontSize: 16, color: '#2D4A1E', flexShrink: 0 }}>✓</span>}
+                    {selected && <span style={{ fontSize: 16, color: '#0B4F4A', flexShrink: 0 }}>✓</span>}
                   </button>
                 )
               })}
@@ -598,7 +598,7 @@ export default function OnboardingFlow() {
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                     padding: '13px', borderRadius: 14,
                     border: '1.5px solid #E8E4DC', background: 'white', cursor: 'pointer',
-                    color: '#2D4A1E', fontSize: 14, fontWeight: 700, fontFamily: 'inherit',
+                    color: '#0B4F4A', fontSize: 14, fontWeight: 700, fontFamily: 'inherit',
                   }}
                 >
                   {copied ? '✓ ¡Enlace copiado!' : '🔗 Copiar enlace de invitación'}
@@ -629,7 +629,7 @@ export default function OnboardingFlow() {
             {step6Type === 'meds' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 <div style={{ padding: '12px 14px', background: '#EAF0E6', borderRadius: 12 }}>
-                  <p style={{ margin: 0, fontSize: 13, color: '#2D4A1E', fontWeight: 600 }}>
+                  <p style={{ margin: 0, fontSize: 13, color: '#0B4F4A', fontWeight: 600 }}>
                     💊 Primer medicamento de {patientFirst}
                   </p>
                 </div>
@@ -661,7 +661,7 @@ export default function OnboardingFlow() {
             {step6Type === 'task' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 <div style={{ padding: '12px 14px', background: '#EAF0E6', borderRadius: 12 }}>
-                  <p style={{ margin: 0, fontSize: 13, color: '#2D4A1E', fontWeight: 600 }}>
+                  <p style={{ margin: 0, fontSize: 13, color: '#0B4F4A', fontWeight: 600 }}>
                     📋 Primera rutina diaria de {patientFirst}
                   </p>
                 </div>
@@ -682,7 +682,7 @@ export default function OnboardingFlow() {
             {step6Type === 'note' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 <div style={{ padding: '12px 14px', background: '#EAF0E6', borderRadius: 12 }}>
-                  <p style={{ margin: 0, fontSize: 13, color: '#2D4A1E', fontWeight: 600 }}>
+                  <p style={{ margin: 0, fontSize: 13, color: '#0B4F4A', fontWeight: 600 }}>
                     📝 Primera nota médica de {patientFirst}
                   </p>
                 </div>

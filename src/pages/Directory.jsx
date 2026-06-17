@@ -32,8 +32,8 @@ const CONTACT_RELATIONSHIPS = [
   'Cuidador profesional','Vecino cercano','Amigo cercano','Otro',
 ]
 const INST_TYPE_COLORS = {
-  Hospital: '#D63031', Clínica: '#2D86A0', Consultorio: '#4A7C59',
-  Laboratorio: '#7C5CBF', Farmacia: '#4A7C59', Otro: '#9CA3AF',
+  Hospital: '#D63031', Clínica: '#2D86A0', Consultorio: '#0d6b63',
+  Laboratorio: '#7C5CBF', Farmacia: '#0d6b63', Otro: '#9CA3AF',
 }
 
 const F = {
@@ -43,7 +43,7 @@ const F = {
   boxSizing: 'border-box', transition: 'border-color 0.15s',
   fontFamily: 'inherit',
 }
-const onFocus = e => { e.target.style.borderColor = '#4A7C59'; e.target.style.boxShadow = '0 0 0 3px rgba(74,124,89,0.1)' }
+const onFocus = e => { e.target.style.borderColor = '#0d6b63'; e.target.style.boxShadow = '0 0 0 3px rgba(13,107,99,0.1)' }
 const onBlur  = e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.boxShadow = 'none' }
 
 // ── Shared small components ────────────────────────────────────────
@@ -117,7 +117,7 @@ function EmptyState({ Icon: Ic, title, subtitle }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '40px 0', gap: 12 }}>
       <div style={{ width: 56, height: 56, borderRadius: '50%', background: '#F5EEE6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Ic size={26} color="#4A7C59" strokeWidth={1.3} />
+        <Ic size={26} color="#0d6b63" strokeWidth={1.3} />
       </div>
       <p style={{ fontSize: 14, fontWeight: 600, color: '#374151', textAlign: 'center' }}>{title}</p>
       <p style={{ fontSize: 12, color: '#9CA3AF', textAlign: 'center', maxWidth: 220, lineHeight: 1.6 }}>{subtitle}</p>
@@ -129,11 +129,11 @@ function AddBtn({ onClick, label }) {
   return (
     <button onClick={onClick} style={{
       width: '100%', padding: '14px', borderRadius: 16, marginTop: 8,
-      border: '1.5px dashed #4A7C59', background: '#FFF8F4', color: '#4A7C59',
+      border: '1.5px dashed #0d6b63', background: '#FFF8F4', color: '#0d6b63',
       fontWeight: 600, fontSize: 13, cursor: 'pointer',
       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
     }}>
-      <Plus size={16} color="#4A7C59" strokeWidth={2} />
+      <Plus size={16} color="#0d6b63" strokeWidth={2} />
       {label}
     </button>
   )
@@ -158,10 +158,10 @@ function SheetModal({ title, subtitle, onClose, onSave, saveLabel, saving, child
         </div>
         <button onClick={onSave} disabled={saving} style={{
           width: '100%', marginTop: 24, padding: '14px', borderRadius: 16, border: 'none',
-          background: saving ? '#C0CCC5' : 'linear-gradient(135deg, #4A7C59, #3A6347)',
+          background: saving ? '#C0CCC5' : 'linear-gradient(135deg, #0d6b63, #3A6347)',
           color: 'white', fontWeight: 700, fontSize: 14,
           cursor: saving ? 'not-allowed' : 'pointer',
-          boxShadow: saving ? 'none' : '0 6px 20px rgba(74,124,89,0.3)',
+          boxShadow: saving ? 'none' : '0 6px 20px rgba(13,107,99,0.3)',
         }}>
           {saving ? 'Guardando...' : saveLabel}
         </button>
@@ -173,11 +173,11 @@ function SheetModal({ title, subtitle, onClose, onSave, saveLabel, saving, child
 // ── Doctor card ────────────────────────────────────────────────────
 function DoctorCard({ doc, onEdit, onDeleteRequest, canDelete }) {
   return (
-    <div style={{ background: 'white', borderRadius: 16, border: '1px solid #EDE5D8', borderTop: '3px solid #4A7C59', padding: '14px 16px', marginBottom: 10, boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+    <div style={{ background: 'white', borderRadius: 16, border: '1px solid #EDE5D8', borderTop: '3px solid #0d6b63', padding: '14px 16px', marginBottom: 10, boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10 }}>
         <div style={{ minWidth: 0, flex: 1 }}>
           <p style={{ fontFamily: 'Georgia, serif', fontSize: 14, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>{doc.name}</p>
-          {doc.specialty && <p style={{ fontSize: 12, fontWeight: 600, color: '#4A7C59', marginTop: 2 }}>{doc.specialty}</p>}
+          {doc.specialty && <p style={{ fontSize: 12, fontWeight: 600, color: '#0d6b63', marginTop: 2 }}>{doc.specialty}</p>}
         </div>
         <CardActions onEdit={onEdit} onDeleteRequest={onDeleteRequest} canDelete={canDelete} />
       </div>
@@ -238,7 +238,7 @@ function ContactCard({ con, onEdit, onToggleEmergency, onDeleteRequest, canDelet
     <div style={{
       background: 'white', borderRadius: 16, padding: '14px 16px', marginBottom: 10,
       border: isEmergency ? '1.5px solid #FECACA' : '1px solid #EDE5D8',
-      borderTop: `3px solid ${isEmergency ? '#D63031' : '#4A7C59'}`,
+      borderTop: `3px solid ${isEmergency ? '#D63031' : '#0d6b63'}`,
       boxShadow: isEmergency ? '0 2px 12px rgba(214,48,49,0.1)' : '0 2px 8px rgba(0,0,0,0.05)',
     }}>
       {isEmergency && (
@@ -290,7 +290,7 @@ function ContactCard({ con, onEdit, onToggleEmergency, onDeleteRequest, canDelet
 
 function JoinedMemberCard({ member, inDirectory, onClick }) {
   const roleLabel  = member.role === 'cuidador' ? 'Cuidador' : 'Familiar'
-  const roleColor  = member.role === 'cuidador' ? '#4A7C59' : '#7C5CBF'
+  const roleColor  = member.role === 'cuidador' ? '#0d6b63' : '#7C5CBF'
   const roleBg     = member.role === 'cuidador' ? '#F0FDF4' : '#EDE9FE'
   const roleBorder = member.role === 'cuidador' ? '#BBF7D0' : '#C4B5FD'
   return (
@@ -328,7 +328,7 @@ function JoinedMemberCard({ member, inDirectory, onClick }) {
           {roleLabel}
         </span>
       </div>
-      <p style={{ fontSize: 11, color: inDirectory ? '#4A7C59' : '#4A7C59', margin: '8px 0 0', fontWeight: 600 }}>
+      <p style={{ fontSize: 11, color: inDirectory ? '#0d6b63' : '#0d6b63', margin: '8px 0 0', fontWeight: 600 }}>
         {inDirectory ? '✓ En directorio — toca para editar' : '+ Toca para añadir al directorio'}
       </p>
     </div>
@@ -565,7 +565,7 @@ export default function Directory() {
             {loading
               ? <p style={{ textAlign: 'center', color: '#9CA3AF', fontSize: 13, padding: '32px 0' }}>Cargando...</p>
               : loadError
-              ? <div style={{ textAlign: 'center', padding: '32px 0' }}><p style={{ fontSize: 13, color: '#D63031', marginBottom: 10 }}>{loadError}</p><button onClick={fetchAll} style={{ padding: '9px 20px', borderRadius: 12, background: '#4A7C59', color: 'white', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>Reintentar</button></div>
+              ? <div style={{ textAlign: 'center', padding: '32px 0' }}><p style={{ fontSize: 13, color: '#D63031', marginBottom: 10 }}>{loadError}</p><button onClick={fetchAll} style={{ padding: '9px 20px', borderRadius: 12, background: '#0d6b63', color: 'white', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>Reintentar</button></div>
               : doctors.length === 0
               ? <EmptyState Icon={BookOpen} title="Sin médicos registrados" subtitle="Agrega los médicos tratantes para tenerlos siempre a la mano" />
               : doctors.map(d => (
@@ -585,7 +585,7 @@ export default function Directory() {
             {loading
               ? <p style={{ textAlign: 'center', color: '#9CA3AF', fontSize: 13, padding: '32px 0' }}>Cargando...</p>
               : loadError
-              ? <div style={{ textAlign: 'center', padding: '32px 0' }}><p style={{ fontSize: 13, color: '#D63031', marginBottom: 10 }}>{loadError}</p><button onClick={fetchAll} style={{ padding: '9px 20px', borderRadius: 12, background: '#4A7C59', color: 'white', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>Reintentar</button></div>
+              ? <div style={{ textAlign: 'center', padding: '32px 0' }}><p style={{ fontSize: 13, color: '#D63031', marginBottom: 10 }}>{loadError}</p><button onClick={fetchAll} style={{ padding: '9px 20px', borderRadius: 12, background: '#0d6b63', color: 'white', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>Reintentar</button></div>
               : institutions.length === 0
               ? <EmptyState Icon={BookOpen} title="Sin instituciones registradas" subtitle="Agrega hospitales, clínicas y farmacias de referencia" />
               : institutions.map(i => (
@@ -605,7 +605,7 @@ export default function Directory() {
             {loading
               ? <p style={{ textAlign: 'center', color: '#9CA3AF', fontSize: 13, padding: '32px 0' }}>Cargando...</p>
               : loadError
-              ? <div style={{ textAlign: 'center', padding: '32px 0' }}><p style={{ fontSize: 13, color: '#D63031', marginBottom: 10 }}>{loadError}</p><button onClick={fetchAll} style={{ padding: '9px 20px', borderRadius: 12, background: '#4A7C59', color: 'white', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>Reintentar</button></div>
+              ? <div style={{ textAlign: 'center', padding: '32px 0' }}><p style={{ fontSize: 13, color: '#D63031', marginBottom: 10 }}>{loadError}</p><button onClick={fetchAll} style={{ padding: '9px 20px', borderRadius: 12, background: '#0d6b63', color: 'white', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>Reintentar</button></div>
               : (
                 <>
                   {/* Joined app members */}
@@ -670,9 +670,9 @@ export default function Directory() {
                     style={{
                       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                       padding: '14px', borderRadius: 16, marginTop: 4,
-                      background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
+                      background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
                       color: 'white', fontWeight: 700, fontSize: 14, textDecoration: 'none',
-                      boxShadow: '0 4px 16px rgba(74,124,89,0.3)',
+                      boxShadow: '0 4px 16px rgba(13,107,99,0.3)',
                     }}
                   >
                     Completar perfil del paciente →
@@ -683,7 +683,7 @@ export default function Directory() {
               <div>
                 {/* Header card */}
                 <div style={{
-                  background: 'linear-gradient(135deg, #4A7C59, #2E5240)',
+                  background: 'linear-gradient(135deg, #0d6b63, #2E5240)',
                   borderRadius: 18, padding: '18px 20px', marginBottom: 16,
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>

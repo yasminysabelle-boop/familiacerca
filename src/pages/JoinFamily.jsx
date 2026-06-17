@@ -44,7 +44,7 @@ function PatientAvatar({ photo, name, size = 80 }) {
   return (
     <div style={{
       width: size, height: size, borderRadius: '50%',
-      background: 'linear-gradient(135deg, #4A7C59, #2D6A4F)',
+      background: 'linear-gradient(135deg, #0d6b63, #2D6A4F)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       fontSize: Math.round(size * 0.38), fontWeight: 700, color: 'white',
       border: '3px solid white', boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
@@ -66,10 +66,10 @@ const CARD = {
 
 const BTN_PRIMARY = {
   width: '100%', padding: '14px', borderRadius: 14,
-  background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
+  background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
   color: 'white', fontWeight: 700, fontSize: 14,
   border: 'none', cursor: 'pointer',
-  boxShadow: '0 8px 24px rgba(74,124,89,0.35)',
+  boxShadow: '0 8px 24px rgba(13,107,99,0.35)',
   transition: 'all 0.2s',
 }
 
@@ -268,10 +268,10 @@ export default function JoinFamily() {
               onClick={() => navigate('/login?redirect=invite')}
               style={{
                 width: '100%', padding: '15px',
-                background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
+                background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
                 color: 'white', fontWeight: 700, fontSize: 15,
                 borderRadius: 16, border: 'none', cursor: 'pointer',
-                boxShadow: '0 8px 24px rgba(74,124,89,0.28)',
+                boxShadow: '0 8px 24px rgba(13,107,99,0.28)',
               }}
             >
               Ya tengo cuenta
@@ -402,7 +402,7 @@ export default function JoinFamily() {
           {accepted && (
             <div style={CARD}>
               <div className="animate-heartbeat inline-flex" style={{ marginBottom: 16 }}>
-                <Heart size={56} color="#4A7C59" strokeWidth={1.2} filled />
+                <Heart size={56} color="#0d6b63" strokeWidth={1.2} filled />
               </div>
               <p style={{ fontFamily: 'Georgia, serif', fontSize: 20, fontWeight: 700, color: '#1A1A1A', marginBottom: 8 }}>
                 ¡Bienvenido a la familia!

@@ -63,7 +63,7 @@ export default function Admin() {
             onClick={() => navigate('/dashboard')}
             style={{
               padding: '12px 28px', borderRadius: 12, border: 'none',
-              background: '#4A7C59', color: 'white', fontWeight: 700,
+              background: '#0d6b63', color: 'white', fontWeight: 700,
               fontSize: 14, cursor: 'pointer',
             }}
           >
@@ -80,7 +80,7 @@ export default function Admin() {
 
         {/* Header */}
         <div style={{
-          background: 'linear-gradient(135deg, #2D4A1E, #1A3A12)',
+          background: 'linear-gradient(135deg, #0B4F4A, #1A3A12)',
           borderRadius: 20, padding: '20px', marginBottom: 20,
           display: 'flex', alignItems: 'center', gap: 14,
         }}>
@@ -117,7 +117,7 @@ export default function Admin() {
               onClick={() => setActiveTab(t.id)}
               style={{
                 padding: '10px 4px', borderRadius: 12, border: 'none',
-                background: activeTab === t.id ? '#2D4A1E' : '#F3F4F6',
+                background: activeTab === t.id ? '#0B4F4A' : '#F3F4F6',
                 color: activeTab === t.id ? 'white' : '#6B7280',
                 fontWeight: 700, fontSize: 11, cursor: 'pointer',
                 display: 'flex', flexDirection: 'column',

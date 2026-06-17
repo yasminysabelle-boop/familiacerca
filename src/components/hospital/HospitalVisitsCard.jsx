@@ -81,7 +81,7 @@ export default function HospitalVisitsCard() {
       borderRadius: 16,
       padding: '16px 18px',
       boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-      border: '1px solid #F0EDE6',
+      border: '1px solid #F8F4ED',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
         <span style={{ fontSize: 20 }}>👥</span>
@@ -92,7 +92,7 @@ export default function HospitalVisitsCard() {
           onClick={() => setShowForm(f => !f)}
           style={{
             padding: '5px 12px', borderRadius: 8, border: 'none',
-            background: '#4A7C59', color: 'white', fontSize: 12,
+            background: '#0d6b63', color: 'white', fontSize: 12,
             fontWeight: 700, cursor: 'pointer',
           }}
         >
@@ -122,8 +122,8 @@ export default function HospitalVisitsCard() {
               onClick={() => toggleConfirm(v)}
               style={{
                 width: 22, height: 22, borderRadius: '50%', flexShrink: 0,
-                border: `2px solid ${v.confirmed ? '#4A7C59' : '#D1C9BF'}`,
-                background: v.confirmed ? '#4A7C59' : 'white',
+                border: `2px solid ${v.confirmed ? '#0d6b63' : '#D1C9BF'}`,
+                background: v.confirmed ? '#0d6b63' : 'white',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 cursor: 'pointer', padding: 0,
               }}
@@ -215,7 +215,7 @@ export default function HospitalVisitsCard() {
               disabled={!visitorName.trim() || saving}
               style={{
                 padding: '8px 20px', borderRadius: 8, border: 'none',
-                background: visitorName.trim() ? '#4A7C59' : '#9CA3AF',
+                background: visitorName.trim() ? '#0d6b63' : '#9CA3AF',
                 color: 'white', fontWeight: 700, fontSize: 13,
                 cursor: visitorName.trim() ? 'pointer' : 'default',
               }}

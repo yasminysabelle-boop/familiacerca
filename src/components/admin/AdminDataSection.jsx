@@ -227,7 +227,7 @@ export default function AdminDataSection() {
               disabled={exporting}
               style={{
                 padding: '10px 20px', borderRadius: 10, border: 'none',
-                background: exporting ? '#9CA3AF' : '#4A7C59',
+                background: exporting ? '#9CA3AF' : '#0d6b63',
                 color: 'white', fontWeight: 700, fontSize: 13,
                 cursor: exporting ? 'default' : 'pointer',
               }}
@@ -317,7 +317,7 @@ export default function AdminDataSection() {
             )}
 
             {deletePhase === 'done' && (
-              <p style={{ fontSize: 13, color: '#4A7C59', fontWeight: 700 }}>✓ Cuenta eliminada. Redirigiendo...</p>
+              <p style={{ fontSize: 13, color: '#0d6b63', fontWeight: 700 }}>✓ Cuenta eliminada. Redirigiendo...</p>
             )}
           </div>
         </div>

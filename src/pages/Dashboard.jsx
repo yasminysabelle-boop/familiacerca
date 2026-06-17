@@ -36,7 +36,7 @@ function getMoodEmoji(val) { return MOOD_MAP[val]?.emoji ?? '🎙️' }
 function getMoodColor(val) { return MOOD_MAP[val]?.color ?? '#7C5CBF' }
 
 const MOOD_OPTIONS = [
-  { mood: 'good',    emoji: '😊', label: 'Buen día', bg: '#FEF3C7',               border: '#C9894A',                   shadow: '0 3px 0px #C9894A' },
+  { mood: 'good',    emoji: '😊', label: 'Buen día', bg: '#FEF3C7',               border: '#E58B73',                   shadow: '0 3px 0px #E58B73' },
   { mood: 'regular', emoji: '😐', label: 'Regular',  bg: 'rgba(255,255,255,0.18)', border: 'rgba(255,255,255,0.3)',     shadow: '0 3px 0px rgba(255,255,255,0.15)' },
   { mood: 'hard',    emoji: '😔', label: 'Difícil',  bg: 'rgba(239,68,68,0.2)',   border: 'rgba(239,68,68,0.45)',      shadow: '0 3px 0px rgba(239,68,68,0.3)' },
 ]
@@ -133,7 +133,7 @@ function PendingCard({ evt, confirming, onConfirm, todayKey, isFamiliar }) {
       background: '#FFFBEB', borderRadius: 16,
       border: '1.5px solid #FDE68A',
       padding: '12px 14px',
-      boxShadow: '0 2px 8px rgba(74,124,89,0.06)',
+      boxShadow: '0 2px 8px rgba(13,107,99,0.06)',
     }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
         <span style={{ fontSize: 20, flexShrink: 0, marginTop: 1 }}>⚠️</span>
@@ -246,12 +246,12 @@ function ReactionBar({ eventKey, reactions, userId, onToggle }) {
               display: 'flex', alignItems: 'center', gap: 3,
               padding: '3px 8px', borderRadius: 20,
               background: mine ? '#EBF3EE' : '#F3F4F6',
-              border: mine ? '1px solid #4A7C59' : '1px solid #E5E7EB',
+              border: mine ? '1px solid #0d6b63' : '1px solid #E5E7EB',
               cursor: 'pointer', fontSize: 13, lineHeight: 1,
               transition: 'all 0.15s',
             }}>
             <span>{emoji}</span>
-            {count > 0 && <span style={{ fontSize: 11, color: mine ? '#4A7C59' : '#6B7280', fontWeight: 600 }}>{count}</span>}
+            {count > 0 && <span style={{ fontSize: 11, color: mine ? '#0d6b63' : '#6B7280', fontWeight: 600 }}>{count}</span>}
           </button>
         )
       })}
@@ -390,7 +390,7 @@ function ExpenseCard({ evt, onTap }) {
         </p>
       </div>
       {evt.amount != null && (
-        <span style={{ fontSize: 14, fontWeight: 700, color: '#4A7C59', flexShrink: 0 }}>
+        <span style={{ fontSize: 14, fontWeight: 700, color: '#0d6b63', flexShrink: 0 }}>
           ${Number(evt.amount).toFixed(2)}
         </span>
       )}
@@ -644,7 +644,7 @@ function MedConfirmedDetail({ evt }) {
             >
               {attachStamping ? (
                 <div style={{ height: 110, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, color: '#9CA3AF' }}>
-                  <div style={{ width: 20, height: 20, border: '2px solid #4A7C59', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
+                  <div style={{ width: 20, height: 20, border: '2px solid #0d6b63', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
                   <span style={{ fontSize: 12 }}>Aplicando sello...</span>
                 </div>
               ) : attachPreview ? (
@@ -676,7 +676,7 @@ function MedConfirmedDetail({ evt }) {
               <button
                 onClick={submitAttachPhoto}
                 disabled={attachSaving || attachStamping}
-                style={{ flex: 1, padding: '11px', borderRadius: 12, border: 'none', background: '#4A7C59', color: 'white', fontWeight: 700, fontSize: 13, cursor: (attachSaving || attachStamping) ? 'default' : 'pointer', opacity: (attachSaving || attachStamping) ? 0.6 : 1 }}
+                style={{ flex: 1, padding: '11px', borderRadius: 12, border: 'none', background: '#0d6b63', color: 'white', fontWeight: 700, fontSize: 13, cursor: (attachSaving || attachStamping) ? 'default' : 'pointer', opacity: (attachSaving || attachStamping) ? 0.6 : 1 }}
               >
                 {attachSaving ? 'Guardando...' : '✓ Guardar foto'}
               </button>
@@ -788,7 +788,7 @@ function ExpenseDetail({ evt }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
         <span style={{ fontSize: 28 }}>💰</span>
         <div>
-          <p style={{ fontSize: 22, fontWeight: 700, color: '#4A7C59', margin: 0 }}>
+          <p style={{ fontSize: 22, fontWeight: 700, color: '#0d6b63', margin: 0 }}>
             ${evt.amount != null ? Number(evt.amount).toFixed(2) : '—'}
           </p>
           <p style={{ fontSize: 13, color: '#6B7280', margin: '2px 0 0' }}>{evt.description}</p>
@@ -995,7 +995,7 @@ function EmptyState({ profile }) {
         style={{
           display: 'inline-flex', alignItems: 'center', gap: 6,
           padding: '10px 20px', borderRadius: 12,
-          background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
+          background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
           color: 'white', fontWeight: 700, fontSize: 13,
           textDecoration: 'none',
         }}
@@ -1299,8 +1299,8 @@ function EmergencyCard({ onPress, sosSent }) {
 const RECENT_EVENT_CONFIG = {
   MED_CONFIRMED:     { icon: '💊', color: '#15803D', label: e => `${e.medName ?? 'Medicamento'} dado${e.confirmedBy ? ` por ${e.confirmedBy.split(' ')[0]}` : ''}` },
   VOICE_MEMORY:      { icon: '🎙️', color: '#7C5CBF', label: e => `Memoria de voz${e.recorderName ? ` de ${e.recorderName.split(' ')[0]}` : ''}` },
-  PHOTO:             { icon: '📸', color: '#4A7C59', label: e => `Foto${e.uploaderName ? ` de ${e.uploaderName.split(' ')[0]}` : ' familiar'}` },
-  EXPENSE:           { icon: '💰', color: '#4A7C59', label: e => e.description ?? 'Gasto registrado' },
+  PHOTO:             { icon: '📸', color: '#0d6b63', label: e => `Foto${e.uploaderName ? ` de ${e.uploaderName.split(' ')[0]}` : ' familiar'}` },
+  EXPENSE:           { icon: '💰', color: '#0d6b63', label: e => e.description ?? 'Gasto registrado' },
   SOS_ALERT:         { icon: '🚨', color: '#D63031', label: () => 'Alerta de emergencia' },
   APPOINTMENT:       { icon: '📅', color: '#3B82F6', label: e => e.appointmentTitle ?? 'Cita médica' },
   APPOINTMENT_PROOF: { icon: '✅', color: '#15803D', label: e => `Cita: ${e.appointmentTitle ?? 'médica'}` },
@@ -1394,7 +1394,7 @@ function DashCard({ Icon, title, subtitle, status, statusType, to, onClick }) {
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           flexShrink: 0,
         }}>
-          <Icon size={20} color="#4A7C59" strokeWidth={1.75} />
+          <Icon size={20} color="#0d6b63" strokeWidth={1.75} />
         </div>
         {status && (
           <div style={{
@@ -1436,7 +1436,7 @@ function VideoCallDashCard({ onInstant, onSchedule, starting, error }) {
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           flexShrink: 0,
         }}>
-          <Camera size={20} color="#4A7C59" strokeWidth={1.75} />
+          <Camera size={20} color="#0d6b63" strokeWidth={1.75} />
         </div>
       </div>
       <div style={{ flex: 1 }}>
@@ -1451,12 +1451,12 @@ function VideoCallDashCard({ onInstant, onSchedule, starting, error }) {
         onPointerLeave={() => setPressed(false)}
         style={{
           width: '100%', padding: '8px 0', borderRadius: 10, border: 'none',
-          background: starting ? '#C0CCC5' : 'linear-gradient(135deg, #4A7C59, #3A6347)',
+          background: starting ? '#C0CCC5' : 'linear-gradient(135deg, #0d6b63, #3A6347)',
           color: 'white', fontWeight: 700, fontSize: 12,
           cursor: starting ? 'default' : 'pointer',
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
           transform: pressed ? 'translateY(1px)' : 'none',
-          boxShadow: starting ? 'none' : '0 3px 10px rgba(74,124,89,0.3)',
+          boxShadow: starting ? 'none' : '0 3px 10px rgba(13,107,99,0.3)',
           transition: 'all 0.1s',
           WebkitTapHighlightColor: 'transparent',
         }}
@@ -2942,7 +2942,7 @@ export default function Dashboard() {
         onTouchStart={pullStart}
         onTouchMove={pullMove}
         onTouchEnd={pullEnd}
-        style={{ background: '#F0EDE6', minHeight: '100vh', paddingBottom: 80, overflowY: 'auto', width: '100%', maxWidth: '100%', overflowX: 'hidden', boxSizing: 'border-box', margin: '0 auto' }}
+        style={{ background: '#F8F4ED', minHeight: '100vh', paddingBottom: 80, overflowY: 'auto', width: '100%', maxWidth: '100%', overflowX: 'hidden', boxSizing: 'border-box', margin: '0 auto' }}
       >
         <PullIndicator />
         <style>{`
@@ -2951,14 +2951,14 @@ export default function Dashboard() {
         `}</style>
 
         {/* ═══════════════════════════════════════════════════════════════
-            HEADER — verde #2D4A1E
+            HEADER — verde #0B4F4A
         ═══════════════════════════════════════════════════════════════ */}
-        <div style={{ background: '#2D4A1E', padding: '12px 16px 28px' }}>
+        <div style={{ background: '#0B4F4A', padding: '12px 16px 28px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             {/* Left: logo corazón + nombre + chip paciente */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0, overflow: 'hidden' }}>
               <div style={{ width: 30, height: 30, borderRadius: '50%', background: 'rgba(255,255,255,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <Heart size={16} color="#C9894A" strokeWidth={2} />
+                <Heart size={16} color="#E58B73" strokeWidth={2} />
               </div>
               <span style={{ fontSize: 14, fontWeight: 700, color: 'white', lineHeight: 1, flexShrink: 0 }}>FamiliaCerca</span>
               <button
@@ -2979,7 +2979,7 @@ export default function Dashboard() {
                   <button onClick={() => setShowNotifSheet(true)} style={{ position: 'relative', background: 'rgba(255,255,255,0.1)', border: 'none', cursor: 'pointer', width: 36, height: 36, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <span style={{ fontSize: 18 }}>🔔</span>
                     {totalBadge > 0 && (
-                      <span style={{ position: 'absolute', top: 2, right: 2, background: '#C9894A', color: 'white', fontSize: 8, fontWeight: 800, borderRadius: '50%', width: 14, height: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ position: 'absolute', top: 2, right: 2, background: '#E58B73', color: 'white', fontSize: 8, fontWeight: 800, borderRadius: '50%', width: 14, height: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         {totalBadge > 9 ? '9+' : totalBadge}
                       </span>
                     )}
@@ -3025,7 +3025,7 @@ export default function Dashboard() {
                     </p>
                     {age && <p style={{ margin: '2px 0 0', fontSize: 12, color: 'rgba(255,255,255,0.7)' }}>{age} años</p>}
                     {(isCritical || isPending) && (
-                      <span style={{ display: 'inline-block', marginTop: 5, background: '#C9894A', color: 'white', fontSize: 10, fontWeight: 700, borderRadius: 20, padding: '2px 9px' }}>
+                      <span style={{ display: 'inline-block', marginTop: 5, background: '#E58B73', color: 'white', fontSize: 10, fontWeight: 700, borderRadius: 20, padding: '2px 9px' }}>
                         {isCritical ? '⚠ Atención urgente' : '⚠ Atención hoy'}
                       </span>
                     )}
@@ -3057,7 +3057,7 @@ export default function Dashboard() {
               </Link>
               {/* BOTTOM — blanco, 2 columnas: Medicamentos + Rutinas */}
               <div style={{ background: 'white', display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
-                <button onClick={() => navigate('/medications')} style={{ border: 'none', background: 'none', cursor: 'pointer', padding: '14px 14px 14px 16px', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 3, WebkitTapHighlightColor: 'transparent', borderRight: '1px solid #F0EDE6' }}>
+                <button onClick={() => navigate('/medications')} style={{ border: 'none', background: 'none', cursor: 'pointer', padding: '14px 14px 14px 16px', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 3, WebkitTapHighlightColor: 'transparent', borderRight: '1px solid #F8F4ED' }}>
                   <div style={{ width: 34, height: 34, borderRadius: 10, background: '#FEF3C7', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 2 }}>
                     <span style={{ fontSize: 18 }}>💊</span>
                   </div>
@@ -3152,7 +3152,7 @@ export default function Dashboard() {
           <div style={{ background: 'white', borderRadius: 14, padding: '16px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
               <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#1E2D26' }}>Actividad reciente</p>
-              <button onClick={() => navigate('/historial')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: '#C9894A', fontWeight: 600, padding: 0 }}>Ver todas ›</button>
+              <button onClick={() => navigate('/historial')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: '#E58B73', fontWeight: 600, padding: 0 }}>Ver todas ›</button>
             </div>
             {recentActivityItems.length === 0 ? (
               <p style={{ margin: 0, fontSize: 12, color: '#9CA3AF', padding: '4px 0' }}>Sin actividad reciente</p>
@@ -3213,7 +3213,7 @@ export default function Dashboard() {
                   boxShadow: '0 1px 6px rgba(0,0,0,0.05)',
                 }}>
                   <span style={{ fontSize: 22 }}>{c.emoji}</span>
-                  <p style={{ margin: 0, fontSize: 9, color: '#2D4A1E', lineHeight: 1.2, textAlign: 'center', fontWeight: 500 }}>{c.label}</p>
+                  <p style={{ margin: 0, fontSize: 9, color: '#0B4F4A', lineHeight: 1.2, textAlign: 'center', fontWeight: 500 }}>{c.label}</p>
                 </button>
               ))}
             </div>
@@ -3383,7 +3383,7 @@ export default function Dashboard() {
             maxHeight: '75vh', display: 'flex', flexDirection: 'column',
           }}>
             {/* Sheet header */}
-            <div style={{ padding: '16px 20px 12px', borderBottom: '1px solid #F0EDE6', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+            <div style={{ padding: '16px 20px 12px', borderBottom: '1px solid #F8F4ED', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
               <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#1E2D26' }}>🔔 Notificaciones</p>
               <button
                 onClick={() => setShowNotifSheet(false)}
@@ -3555,7 +3555,7 @@ export default function Dashboard() {
                     <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                       <div style={{
                         width: 40, height: 40, borderRadius: '50%', flexShrink: 0,
-                        background: isMe ? 'linear-gradient(135deg,#2D4A1E,#4A7C59)' : 'linear-gradient(135deg,#4A7C59,#2D6A4F)',
+                        background: isMe ? 'linear-gradient(135deg,#0B4F4A,#0d6b63)' : 'linear-gradient(135deg,#0d6b63,#2D6A4F)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         fontSize: 16, fontWeight: 700, color: 'white',
                       }}>

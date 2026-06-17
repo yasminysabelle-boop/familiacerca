@@ -5,10 +5,10 @@ export default function Logo({ showWordmark = false, size = 36, variant = 'defau
     <div className="flex items-center gap-2.5">
       <svg width={size} height={size} viewBox="0 0 40 40" fill="none" aria-hidden="true">
         {/* Outer ring */}
-        <circle cx="20" cy="20" r="20" fill={light ? 'white' : '#4A7C59'} />
+        <circle cx="20" cy="20" r="20" fill={light ? 'white' : '#0d6b63'} />
         {/* Soft inner highlight */}
         <circle cx="14" cy="13" r="8"
-          fill={light ? '#4A7C59' : 'white'}
+          fill={light ? '#0d6b63' : 'white'}
           fillOpacity="0.07"
         />
         {/* FC monogram */}
@@ -16,7 +16,7 @@ export default function Logo({ showWordmark = false, size = 36, variant = 'defau
           x="20" y="19"
           textAnchor="middle"
           dominantBaseline="middle"
-          fill={light ? '#4A7C59' : 'white'}
+          fill={light ? '#0d6b63' : 'white'}
           fontSize="14"
           fontWeight="800"
           fontFamily="Georgia, serif"
@@ -29,7 +29,7 @@ export default function Logo({ showWordmark = false, size = 36, variant = 'defau
           x="20" y="31"
           textAnchor="middle"
           dominantBaseline="middle"
-          fill={light ? '#4A7C59' : 'white'}
+          fill={light ? '#0d6b63' : 'white'}
           fillOpacity={light ? '0.7' : '0.82'}
           fontSize="10"
         >
@@ -43,7 +43,7 @@ export default function Logo({ showWordmark = false, size = 36, variant = 'defau
             className="text-[15px] font-bold leading-tight"
             style={{
               fontFamily: 'Georgia, serif',
-              color: light ? 'white' : '#4A7C59',
+              color: light ? 'white' : '#0d6b63',
             }}
           >
             FamiliaCerca

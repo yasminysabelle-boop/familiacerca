@@ -137,7 +137,7 @@ function MedList({ meds, onChange }) {
       ))}
       <button onClick={add} style={{
         padding: '8px', borderRadius: 10, border: '1.5px dashed #BBF7D0',
-        background: 'transparent', color: '#4A7C59', fontWeight: 700,
+        background: 'transparent', color: '#0d6b63', fontWeight: 700,
         fontSize: 13, cursor: 'pointer',
       }}>
         + Agregar medicamento
@@ -156,7 +156,7 @@ function StepsList({ steps, onChange }) {
       {steps.map((s, i) => (
         <div key={i} style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
           <span style={{
-            width: 20, height: 20, borderRadius: '50%', background: '#4A7C59',
+            width: 20, height: 20, borderRadius: '50%', background: '#0d6b63',
             color: 'white', fontSize: 11, fontWeight: 700, flexShrink: 0,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>{i + 1}</span>
@@ -371,7 +371,7 @@ export default function DiarioMedicoEntryModal({ open, onClose, onSaved }) {
                   onClick={() => setInputType(t.id)}
                   style={{
                     flex: 1, padding: '12px', borderRadius: 12, border: 'none',
-                    background: inputType === t.id ? '#4A7C59' : '#F3F4F6',
+                    background: inputType === t.id ? '#0d6b63' : '#F3F4F6',
                     color: inputType === t.id ? 'white' : '#6B7280',
                     fontWeight: 700, fontSize: 14, cursor: 'pointer',
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
@@ -402,7 +402,7 @@ export default function DiarioMedicoEntryModal({ open, onClose, onSaved }) {
                     padding: '12px', borderRadius: 12,
                     background: '#F0F9F4', border: '1px solid #BBF7D0',
                   }}>
-                    <p style={{ margin: '0 0 6px', fontSize: 11, fontWeight: 700, color: '#4A7C59', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                    <p style={{ margin: '0 0 6px', fontSize: 11, fontWeight: 700, color: '#0d6b63', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                       Transcripción
                     </p>
                     <p style={{ margin: 0, fontSize: 13, color: '#1A1A1A', lineHeight: 1.6 }}>{transcript}</p>
@@ -437,10 +437,10 @@ export default function DiarioMedicoEntryModal({ open, onClose, onSaved }) {
                   disabled={!transcript.trim()}
                   style={{
                     padding: '14px', borderRadius: 14, border: 'none',
-                    background: transcript.trim() ? '#4A7C59' : '#9CA3AF',
+                    background: transcript.trim() ? '#0d6b63' : '#9CA3AF',
                     color: 'white', fontWeight: 800, fontSize: 15,
                     cursor: transcript.trim() ? 'pointer' : 'default',
-                    boxShadow: transcript.trim() ? '0 4px 16px rgba(74,124,89,0.3)' : 'none',
+                    boxShadow: transcript.trim() ? '0 4px 16px rgba(13,107,99,0.3)' : 'none',
                   }}
                 >
                   ✨ Estructurar con IA →
@@ -463,8 +463,8 @@ export default function DiarioMedicoEntryModal({ open, onClose, onSaved }) {
                       onClick={() => setPhotoType(t.value)}
                       style={{
                         padding: '6px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600,
-                        border: `1.5px solid ${photoType === t.value ? '#4A7C59' : '#D1C9BF'}`,
-                        background: photoType === t.value ? '#4A7C59' : 'white',
+                        border: `1.5px solid ${photoType === t.value ? '#0d6b63' : '#D1C9BF'}`,
+                        background: photoType === t.value ? '#0d6b63' : 'white',
                         color: photoType === t.value ? 'white' : '#374151',
                         cursor: 'pointer',
                       }}
@@ -490,7 +490,7 @@ export default function DiarioMedicoEntryModal({ open, onClose, onSaved }) {
                     : (
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
                         <span style={{ fontSize: 32 }}>📷</span>
-                        <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#4A7C59' }}>
+                        <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#0d6b63' }}>
                           Toca para tomar foto o elegir imagen
                         </p>
                       </div>
@@ -519,10 +519,10 @@ export default function DiarioMedicoEntryModal({ open, onClose, onSaved }) {
                   disabled={!photoFile}
                   style={{
                     padding: '14px', borderRadius: 14, border: 'none',
-                    background: photoFile ? '#4A7C59' : '#9CA3AF',
+                    background: photoFile ? '#0d6b63' : '#9CA3AF',
                     color: 'white', fontWeight: 800, fontSize: 15,
                     cursor: photoFile ? 'pointer' : 'default',
-                    boxShadow: photoFile ? '0 4px 16px rgba(74,124,89,0.3)' : 'none',
+                    boxShadow: photoFile ? '0 4px 16px rgba(13,107,99,0.3)' : 'none',
                   }}
                 >
                   🔍 Analizar con IA →
@@ -541,7 +541,7 @@ export default function DiarioMedicoEntryModal({ open, onClose, onSaved }) {
           }}>
             <div style={{
               width: 64, height: 64, borderRadius: '50%',
-              background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
+              background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: 28, animation: 'spin 1.5s linear infinite',
             }}>✨</div>
@@ -599,8 +599,8 @@ export default function DiarioMedicoEntryModal({ open, onClose, onSaved }) {
                     onClick={() => setLocation(l.value)}
                     style={{
                       padding: '6px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600,
-                      border: `1.5px solid ${location === l.value ? '#4A7C59' : '#D1C9BF'}`,
-                      background: location === l.value ? '#4A7C59' : 'white',
+                      border: `1.5px solid ${location === l.value ? '#0d6b63' : '#D1C9BF'}`,
+                      background: location === l.value ? '#0d6b63' : 'white',
                       color: location === l.value ? 'white' : '#374151',
                       cursor: 'pointer',
                     }}
@@ -660,10 +660,10 @@ export default function DiarioMedicoEntryModal({ open, onClose, onSaved }) {
               disabled={saving}
               style={{
                 padding: '15px', borderRadius: 14, border: 'none',
-                background: saving ? '#9CA3AF' : 'linear-gradient(135deg, #4A7C59, #3A6347)',
+                background: saving ? '#9CA3AF' : 'linear-gradient(135deg, #0d6b63, #3A6347)',
                 color: 'white', fontWeight: 800, fontSize: 15,
                 cursor: saving ? 'default' : 'pointer',
-                boxShadow: saving ? 'none' : '0 4px 16px rgba(74,124,89,0.3)',
+                boxShadow: saving ? 'none' : '0 4px 16px rgba(13,107,99,0.3)',
                 marginTop: 4,
               }}
             >

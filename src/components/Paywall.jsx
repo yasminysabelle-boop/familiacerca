@@ -59,9 +59,9 @@ export default function Paywall() {
             onClick={() => navigate('/pricing')}
             style={{
               width: '100%', padding: '15px', borderRadius: 16, border: 'none',
-              background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
+              background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
               color: 'white', fontWeight: 700, fontSize: 15, cursor: 'pointer',
-              boxShadow: '0 8px 24px rgba(74,124,89,0.35)',
+              boxShadow: '0 8px 24px rgba(13,107,99,0.35)',
             }}
           >
             Ver planes →

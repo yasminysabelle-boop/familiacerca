@@ -73,11 +73,11 @@ export default function MedicationTabs() {
                 padding: '13px 8px 11px',
                 border: 'none',
                 borderBottom: active
-                  ? '2.5px solid #2D4A1E'
+                  ? '2.5px solid #0B4F4A'
                   : '2.5px solid transparent',
                 background: 'none',
                 cursor: 'pointer',
-                color: active ? '#2D4A1E' : '#9CA3AF',
+                color: active ? '#0B4F4A' : '#9CA3AF',
                 fontWeight: active ? 700 : 500,
                 fontSize: 13,
                 position: 'relative',

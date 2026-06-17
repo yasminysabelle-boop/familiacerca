@@ -165,10 +165,10 @@ export default function Permissions() {
                 onClick={markAndGo}
                 style={{
                   width: '100%', padding: '13px',
-                  background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
+                  background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
                   color: 'white', fontWeight: 700, fontSize: 14,
                   borderRadius: 14, border: 'none', cursor: 'pointer',
-                  boxShadow: '0 6px 20px rgba(74,124,89,0.3)',
+                  boxShadow: '0 6px 20px rgba(13,107,99,0.3)',
                 }}
               >
                 Continuar sin permisos →
@@ -188,7 +188,7 @@ export default function Permissions() {
               <div style={{ textAlign: 'center', marginBottom: 24 }}>
                 <div style={{
                   width: 56, height: 56, borderRadius: '50%',
-                  background: 'rgba(74,124,89,0.1)',
+                  background: 'rgba(13,107,99,0.1)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   margin: '0 auto 14px', fontSize: 26,
                 }}>
@@ -242,11 +242,11 @@ export default function Permissions() {
                   width: '100%', padding: '14px',
                   background: status === 'requesting'
                     ? '#D4C4B8'
-                    : 'linear-gradient(135deg, #4A7C59, #3A6347)',
+                    : 'linear-gradient(135deg, #0d6b63, #3A6347)',
                   color: 'white', fontWeight: 700, fontSize: 15,
                   borderRadius: 16, border: 'none',
                   cursor: status === 'requesting' ? 'not-allowed' : 'pointer',
-                  boxShadow: status === 'requesting' ? 'none' : '0 8px 24px rgba(74,124,89,0.35)',
+                  boxShadow: status === 'requesting' ? 'none' : '0 8px 24px rgba(13,107,99,0.35)',
                   transition: 'all 0.2s',
                 }}
               >

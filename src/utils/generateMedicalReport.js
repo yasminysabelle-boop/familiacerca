@@ -2,8 +2,8 @@ import jsPDF from 'jspdf'
 import { supabase } from '../lib/supabase'
 
 // ── Color palette ─────────────────────────────────────────────────────────────
-const G  = [45, 74, 30]    // #2D4A1E forest green
-const GM = [74, 124, 89]   // #4A7C59 mid green
+const G  = [45, 74, 30]    // #0B4F4A forest green
+const GM = [74, 124, 89]   // #0d6b63 mid green
 const DK = [26, 26, 26]    // #1A1A1A dark
 const GR = [107, 114, 128] // #6B7280 gray
 const RD = [214, 48, 49]   // #D63031 red

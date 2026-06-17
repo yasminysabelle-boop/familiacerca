@@ -130,7 +130,7 @@ const fieldStyle = {
   fontSize: 14, outline: 'none', boxSizing: 'border-box',
   transition: 'all 0.15s', appearance: 'none', WebkitAppearance: 'none',
 }
-const onFocus = e => { e.target.style.borderColor = '#4A7C59'; e.target.style.boxShadow = '0 0 0 3px rgba(74,124,89,0.1)' }
+const onFocus = e => { e.target.style.borderColor = '#0d6b63'; e.target.style.boxShadow = '0 0 0 3px rgba(13,107,99,0.1)' }
 const onBlur  = e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.boxShadow = 'none' }
 const labelStyle = {
   display: 'block', fontSize: 11, fontWeight: 700, color: '#6B7280',
@@ -820,10 +820,10 @@ export default function Medications() {
               onClick={openAdd}
               style={{
                 width: 40, height: 40, borderRadius: 12,
-                background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
+                background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
                 border: 'none', cursor: 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                boxShadow: '0 4px 12px rgba(74,124,89,0.3)',
+                boxShadow: '0 4px 12px rgba(13,107,99,0.3)',
               }}
             >
               <Plus size={20} color="white" strokeWidth={2.5} />
@@ -839,7 +839,7 @@ export default function Medications() {
             <button key={tab} onClick={() => setActiveTab(tab)}
               style={{
                 flex: 1, padding: '10px 0', border: 'none', cursor: 'pointer',
-                background: activeTab === tab ? '#2D4A1E' : 'transparent',
+                background: activeTab === tab ? '#0B4F4A' : 'transparent',
                 color: activeTab === tab ? 'white' : '#666',
                 fontWeight: activeTab === tab ? 600 : 400,
                 fontSize: 11,
@@ -870,13 +870,13 @@ export default function Medications() {
         {supported && permission !== 'granted' && permission !== 'denied' && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'white', borderRadius: 14, border: '1px solid #EDE5D8', padding: '12px 14px', marginBottom: 14, boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
             <div style={{ width: 36, height: 36, borderRadius: 10, flexShrink: 0, background: '#EBF3EE', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Bell size={18} color="#4A7C59" strokeWidth={1.5} />
+              <Bell size={18} color="#0d6b63" strokeWidth={1.5} />
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', marginBottom: 1 }}>Recordatorios de medicamentos</p>
               <p style={{ fontSize: 11, color: '#9CA3AF' }}>Activa las notificaciones para no olvidar ninguna dosis.</p>
             </div>
-            <button onClick={requestAndSubscribe} style={{ padding: '7px 14px', borderRadius: 10, background: 'linear-gradient(135deg, #4A7C59, #3A6347)', color: 'white', fontWeight: 700, fontSize: 12, border: 'none', cursor: 'pointer', flexShrink: 0 }}>
+            <button onClick={requestAndSubscribe} style={{ padding: '7px 14px', borderRadius: 10, background: 'linear-gradient(135deg, #0d6b63, #3A6347)', color: 'white', fontWeight: 700, fontSize: 12, border: 'none', cursor: 'pointer', flexShrink: 0 }}>
               Activar
             </button>
           </div>
@@ -903,7 +903,7 @@ export default function Medications() {
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', background: '#F0FDF4', borderRadius: 12, border: '1px solid #BBF7D0' }}>
                 <div style={{ display: 'flex' }}>
                   {todayContributors.slice(0, 4).map((name, i) => {
-                    const colors = ['#4A7C59','#2D6A4F','#16A34A','#059669']
+                    const colors = ['#0d6b63','#2D6A4F','#16A34A','#059669']
                     return (
                       <div key={i} style={{ width: 28, height: 28, borderRadius: '50%', background: colors[i % 4], color: 'white', fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: i > 0 ? -8 : 0, border: '2px solid #F0FDF4', flexShrink: 0 }}>
                         {name.charAt(0).toUpperCase()}
@@ -931,7 +931,7 @@ export default function Medications() {
                     const firstT = times.length ? [...times].sort()[0] : null
                     const sCfg = MED_STATUS[calcMedStatus(firstT, med.time_window_minutes ?? 60)]
                     return (
-                      <div key={med.id} style={{ background: 'white', borderRadius: 16, border: '1px solid #EDE5D8', borderLeft: '4px solid #4A7C59', padding: '14px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+                      <div key={med.id} style={{ background: 'white', borderRadius: 16, border: '1px solid #EDE5D8', borderLeft: '4px solid #0d6b63', padding: '14px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: times.length ? 8 : 0 }}>
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <p style={{ fontSize: 15, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>
@@ -956,7 +956,7 @@ export default function Medications() {
                           </div>
                         )}
                         {!isFamiliar && (
-                          <button onClick={() => { setAdminModal(med); setAdminPhotoBlob(null); setAdminPhotoPreview(null); setAdminError('') }} style={{ width: '100%', padding: '10px', borderRadius: 12, border: 'none', background: 'linear-gradient(135deg, #4A7C59, #3A6347)', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer', boxShadow: '0 4px 12px rgba(74,124,89,0.25)' }}>
+                          <button onClick={() => { setAdminModal(med); setAdminPhotoBlob(null); setAdminPhotoPreview(null); setAdminError('') }} style={{ width: '100%', padding: '10px', borderRadius: 12, border: 'none', background: 'linear-gradient(135deg, #0d6b63, #3A6347)', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer', boxShadow: '0 4px 12px rgba(13,107,99,0.25)' }}>
                             ✅ Administrar
                           </button>
                         )}
@@ -1045,7 +1045,7 @@ export default function Medications() {
               return (
                 <div style={{ padding: '20px 16px', background: '#F0FDF4', borderRadius: 16, border: '1px solid #BBF7D0' }}>
                   <p style={{ fontSize: 16, fontWeight: 700, color: '#15803D', margin: 0, textAlign: 'center' }}>✅ ¡Todo administrado hoy!</p>
-                  <p style={{ fontSize: 13, color: '#4A7C59', margin: '6px 0 0', textAlign: 'center' }}>{mainMsg}</p>
+                  <p style={{ fontSize: 13, color: '#0d6b63', margin: '6px 0 0', textAlign: 'center' }}>{mainMsg}</p>
                   {lastTime && lastBy && (
                     <p style={{ fontSize: 11, color: '#6B7280', margin: '6px 0 0', textAlign: 'center' }}>
                       Última administración: {lastBy} · {lastTime}
@@ -1090,7 +1090,7 @@ export default function Medications() {
                           {/* Detail rows */}
                           <div style={{ display: 'flex', flexDirection: 'column', gap: 4, paddingLeft: 24 }}>
                             {scheduledTime && <span style={{ fontSize: 11, color: '#6B7280' }}>📅 Programado: {scheduledTime}</span>}
-                            {confTime && <span style={{ fontSize: 11, color: '#4A7C59', fontWeight: 600 }}>🕐 {isOmitted ? 'Registrado:' : 'Administrado:'} {confTime}</span>}
+                            {confTime && <span style={{ fontSize: 11, color: '#0d6b63', fontWeight: 600 }}>🕐 {isOmitted ? 'Registrado:' : 'Administrado:'} {confTime}</span>}
                             {byName && !isAutoMissed && <span style={{ fontSize: 11, color: '#6B7280' }}>👤 Por: {byName}</span>}
                             {isAutoMissed && <span style={{ fontSize: 11, color: '#DC2626', fontWeight: 600 }}>❌ Ventana clínica vencida — marcado por el sistema</span>}
                             {isOmitted && !isAutoMissed && omissionData?.reason && (
@@ -1263,7 +1263,7 @@ export default function Medications() {
             {/* ── STEP: AI processing spinner ────────────────────────────── */}
             {addStep === 'ai-processing' && (
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, padding: '32px 0' }}>
-                <div style={{ width: 56, height: 56, borderRadius: '50%', border: '4px solid #EDE5D8', borderTopColor: '#4A7C59', animation: 'spin 0.9s linear infinite' }} />
+                <div style={{ width: 56, height: 56, borderRadius: '50%', border: '4px solid #EDE5D8', borderTopColor: '#0d6b63', animation: 'spin 0.9s linear infinite' }} />
                 <div style={{ textAlign: 'center' }}>
                   <p style={{ fontSize: 16, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>Analizando con IA…</p>
                   <p style={{ fontSize: 13, color: '#9CA3AF', margin: '6px 0 0' }}>Extrayendo información del medicamento</p>
@@ -1339,7 +1339,7 @@ export default function Medications() {
                                   style={{
                                     display: 'flex', alignItems: 'flex-start', gap: 12,
                                     padding: '12px 14px', borderRadius: 12, cursor: 'pointer',
-                                    border: checked ? '1.5px solid #4A7C59' : '1px solid #EDE5D8',
+                                    border: checked ? '1.5px solid #0d6b63' : '1px solid #EDE5D8',
                                     background: checked ? '#F0FDF4' : 'white',
                                   }}
                                 >
@@ -1351,7 +1351,7 @@ export default function Medications() {
                                       next.has(i) ? next.delete(i) : next.add(i)
                                       return next
                                     })}
-                                    style={{ marginTop: 3, accentColor: '#4A7C59', width: 16, height: 16, flexShrink: 0 }}
+                                    style={{ marginTop: 3, accentColor: '#0d6b63', width: 16, height: 16, flexShrink: 0 }}
                                   />
                                   <div style={{ flex: 1 }}>
                                     <p style={{ fontSize: 14, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>
@@ -1360,7 +1360,7 @@ export default function Medications() {
                                     </p>
                                     <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginTop: 4 }}>
                                       {med.strength?.value && (
-                                        <span style={{ fontSize: 11, background: '#EBF3EE', color: '#4A7C59', padding: '1px 7px', borderRadius: 6 }}>{med.strength.value}</span>
+                                        <span style={{ fontSize: 11, background: '#EBF3EE', color: '#0d6b63', padding: '1px 7px', borderRadius: 6 }}>{med.strength.value}</span>
                                       )}
                                       {med.form?.value && (
                                         <span style={{ fontSize: 11, background: '#F3F4F6', color: '#6B7280', padding: '1px 7px', borderRadius: 6 }}>{FORM_MAP[med.form.value] ?? med.form.value}</span>
@@ -1381,10 +1381,10 @@ export default function Medications() {
                             disabled={selectedMedIndices.size === 0}
                             style={{
                               padding: '13px', borderRadius: 14, border: 'none',
-                              background: selectedMedIndices.size === 0 ? '#C0CCC5' : 'linear-gradient(135deg, #4A7C59, #3A6347)',
+                              background: selectedMedIndices.size === 0 ? '#C0CCC5' : 'linear-gradient(135deg, #0d6b63, #3A6347)',
                               color: 'white', fontWeight: 700, fontSize: 14,
                               cursor: selectedMedIndices.size === 0 ? 'not-allowed' : 'pointer',
-                              boxShadow: selectedMedIndices.size === 0 ? 'none' : '0 6px 20px rgba(74,124,89,0.3)',
+                              boxShadow: selectedMedIndices.size === 0 ? 'none' : '0 6px 20px rgba(13,107,99,0.3)',
                             }}
                           >
                             Agregar {selectedMedIndices.size} medicamento{selectedMedIndices.size !== 1 ? 's' : ''} →
@@ -1404,7 +1404,7 @@ export default function Medications() {
                               const lowConf    = confidence != null && confidence < 0.7
                               return (
                                 <div key={f.key} style={{ marginBottom: 10 }}>
-                                  <label style={{ ...labelStyle, color: lowConf ? '#D97706' : '#4A7C59' }}>
+                                  <label style={{ ...labelStyle, color: lowConf ? '#D97706' : '#0d6b63' }}>
                                     {lowConf ? '⚠️ ' : ''}{f.label}
                                     {confidence != null && (
                                       <span style={{ fontWeight: 400, color: '#9CA3AF', marginLeft: 6, textTransform: 'none', letterSpacing: 0 }}>
@@ -1449,7 +1449,7 @@ export default function Medications() {
                     {(!isMulti || !addAiExtracted) && (
                       <button
                         onClick={applyAiAndContinue}
-                        style={{ flex: 2, padding: '13px', borderRadius: 14, border: 'none', background: 'linear-gradient(135deg, #4A7C59, #3A6347)', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer', boxShadow: '0 6px 20px rgba(74,124,89,0.3)' }}
+                        style={{ flex: 2, padding: '13px', borderRadius: 14, border: 'none', background: 'linear-gradient(135deg, #0d6b63, #3A6347)', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer', boxShadow: '0 6px 20px rgba(13,107,99,0.3)' }}
                       >
                         {addAiExtracted ? 'Continuar →' : 'Ingresar manual →'}
                       </button>
@@ -1538,7 +1538,7 @@ export default function Medications() {
                 </div>
 
                 {/* ── Stock section ──────────────────────────────────────── */}
-                <div style={{ borderTop: '1px solid #F0EDE6', paddingTop: 20 }}>
+                <div style={{ borderTop: '1px solid #F8F4ED', paddingTop: 20 }}>
                   <p style={{ fontFamily: 'Georgia, serif', fontSize: 14, fontWeight: 700, color: '#1A1A1A', margin: '0 0 4px' }}>
                     📦 Stock y Renovación
                   </p>
@@ -1633,7 +1633,7 @@ export default function Medications() {
               </div>
               <div>
                 <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>Hora actual</p>
-                <p style={{ fontSize: 14, fontWeight: 700, color: '#4A7C59', margin: '2px 0 0' }}>{new Date().toLocaleTimeString('es-US', { hour: 'numeric', minute: '2-digit', hour12: true })}</p>
+                <p style={{ fontSize: 14, fontWeight: 700, color: '#0d6b63', margin: '2px 0 0' }}>{new Date().toLocaleTimeString('es-US', { hour: 'numeric', minute: '2-digit', hour12: true })}</p>
               </div>
             </div>
 
@@ -1643,13 +1643,13 @@ export default function Medications() {
                 <>
                   <img src={adminPhotoPreview} alt="Evidencia" style={{ width: '100%', maxHeight: 180, objectFit: 'cover' }} />
                   <div style={{ padding: '8px 12px', display: 'flex', gap: 8 }}>
-                    <button onClick={adminOpenCamera} style={{ flex: 1, padding: '7px', borderRadius: 8, border: '1px solid #4A7C59', background: '#EBF3EE', color: '#4A7C59', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>📷 Cambiar</button>
+                    <button onClick={adminOpenCamera} style={{ flex: 1, padding: '7px', borderRadius: 8, border: '1px solid #0d6b63', background: '#EBF3EE', color: '#0d6b63', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>📷 Cambiar</button>
                     <button onClick={() => { setAdminPhotoBlob(null); setAdminPhotoPreview(null) }} style={{ flex: 1, padding: '7px', borderRadius: 8, border: '1px solid #EDE5D8', background: 'white', color: '#6B7280', fontSize: 12, cursor: 'pointer' }}>Quitar</button>
                   </div>
                 </>
               ) : (
                 <div style={{ padding: '18px 16px', display: 'flex', gap: 8 }}>
-                  <button onClick={adminOpenCamera} style={{ flex: 1, padding: '10px', borderRadius: 12, border: '1.5px solid #4A7C59', background: '#EBF3EE', color: '#4A7C59', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>📷 Tomar foto</button>
+                  <button onClick={adminOpenCamera} style={{ flex: 1, padding: '10px', borderRadius: 12, border: '1.5px solid #0d6b63', background: '#EBF3EE', color: '#0d6b63', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>📷 Tomar foto</button>
                   <button onClick={adminOpenGallery} style={{ flex: 1, padding: '10px', borderRadius: 12, border: '1.5px solid #C0CCC5', background: '#FDFAF7', color: '#6B7280', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>🖼 Galería</button>
                 </div>
               )}
@@ -1684,7 +1684,7 @@ export default function Medications() {
               <select
                 value={omisionReason}
                 onChange={e => setOmisionReason(e.target.value)}
-                style={{ width: '100%', padding: '11px 32px 11px 14px', borderRadius: 12, border: `1.5px solid ${omisionReason ? '#4A7C59' : '#EDE5D8'}`, background: '#FDFAF7', fontSize: 14, outline: 'none', appearance: 'none', cursor: 'pointer', boxSizing: 'border-box' }}
+                style={{ width: '100%', padding: '11px 32px 11px 14px', borderRadius: 12, border: `1.5px solid ${omisionReason ? '#0d6b63' : '#EDE5D8'}`, background: '#FDFAF7', fontSize: 14, outline: 'none', appearance: 'none', cursor: 'pointer', boxSizing: 'border-box' }}
               >
                 <option value="">Seleccionar motivo...</option>
                 <option value="Paciente rechazó el medicamento">Paciente rechazó el medicamento</option>

@@ -167,7 +167,7 @@ export default function VoiceRecorder({
         {(active ? [0, 0.5, 1] : [0, 0.7, 1.4]).map((delay, i) => (
           <div key={i} style={{
             position: 'absolute', inset: 0, borderRadius: '50%',
-            background: active ? 'rgba(220,38,38,0.18)' : 'rgba(45,74,30,0.12)',
+            background: active ? 'rgba(220,38,38,0.18)' : 'rgba(11,79,74,0.12)',
             animation: `${active ? 'vr-rec 1.6s' : 'vr-idle 2.1s'} ease-out infinite ${delay}s`,
             pointerEvents: 'none',
           }} />
@@ -178,12 +178,12 @@ export default function VoiceRecorder({
             position: 'absolute', inset: 0, borderRadius: '50%', border: 'none',
             background: active
               ? 'linear-gradient(135deg, #DC2626, #B91C1C)'
-              : 'linear-gradient(135deg, #2D4A1E, #4A7C59)',
+              : 'linear-gradient(135deg, #0B4F4A, #0d6b63)',
             cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             boxShadow: active
               ? '0 0 0 4px rgba(220,38,38,0.2), 0 6px 20px rgba(185,28,28,0.4)'
-              : '0 6px 20px rgba(45,74,30,0.35)',
+              : '0 6px 20px rgba(11,79,74,0.35)',
             transition: 'background 0.2s, box-shadow 0.2s',
           }}
         >
@@ -202,7 +202,7 @@ export default function VoiceRecorder({
       )}
 
       {/* Status text */}
-      <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: active ? '#DC2626' : '#2D4A1E' }}>
+      <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: active ? '#DC2626' : '#0B4F4A' }}>
         {active ? 'Grabando... toca para detener' : placeholder}
       </p>
 

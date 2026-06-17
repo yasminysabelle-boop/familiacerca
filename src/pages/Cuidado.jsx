@@ -571,7 +571,7 @@ export default function Cuidado() {
                           : 'linear-gradient(135deg, #0d6b63, #095248)',
                       color: 'white', fontWeight: 700, fontSize: 14,
                       cursor: saving ? 'not-allowed' : 'pointer',
-                      boxShadow: saving ? 'none' : '0 4px 16px rgba(74,124,89,0.25)',
+                      boxShadow: saving ? 'none' : '0 4px 16px rgba(13,107,99,0.25)',
                       transition: 'all 0.2s',
                       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                     }}

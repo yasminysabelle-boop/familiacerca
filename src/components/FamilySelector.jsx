@@ -20,13 +20,13 @@ export default function FamilySelector() {
     }}>
       {/* FC Logo */}
       <svg width={64} height={64} viewBox="0 0 40 40" fill="none" aria-hidden="true" style={{ flexShrink: 0 }}>
-        <circle cx="20" cy="20" r="20" fill="#4A7C59" />
+        <circle cx="20" cy="20" r="20" fill="#0d6b63" />
         <circle cx="20" cy="20" r="17.5" fill="white" />
         <text x="20" y="19.5" textAnchor="middle" dominantBaseline="middle"
-          fill="#4A7C59" fontSize="14" fontWeight="800"
+          fill="#0d6b63" fontSize="14" fontWeight="800"
           fontFamily="Georgia, serif" letterSpacing="-0.5">FC</text>
         <text x="20" y="31" textAnchor="middle" dominantBaseline="middle"
-          fill="#4A7C59" fillOpacity="0.72" fontSize="10">♥</text>
+          fill="#0d6b63" fillOpacity="0.72" fontSize="10">♥</text>
       </svg>
 
       <p style={{
@@ -70,7 +70,7 @@ export default function FamilySelector() {
               ) : (
                 <div style={{
                   width: 64, height: 64, borderRadius: '50%', flexShrink: 0,
-                  background: 'linear-gradient(135deg, #4A7C59, #2D6A4F)',
+                  background: 'linear-gradient(135deg, #0d6b63, #2D6A4F)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontSize: 24, fontWeight: 700, color: 'white',
                 }}>

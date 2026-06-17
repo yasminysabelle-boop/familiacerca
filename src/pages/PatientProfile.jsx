@@ -47,7 +47,7 @@ const L = {
   fontSize:11, fontWeight:700, color:'#6B7280',
   letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:5, display:'block',
 }
-const fo = e => { e.target.style.borderColor='#4A7C59'; e.target.style.boxShadow='0 0 0 3px rgba(74,124,89,0.1)' }
+const fo = e => { e.target.style.borderColor='#0d6b63'; e.target.style.boxShadow='0 0 0 3px rgba(13,107,99,0.1)' }
 const fb = e => { e.target.style.borderColor='#EDE5D8'; e.target.style.boxShadow='none' }
 
 // ── Helper components ─────────────────────────────────────────────────────────
@@ -108,7 +108,7 @@ function Section({ color, icon, title, badge, open, onToggle, children }) {
   )
 }
 
-function CheckChips({ opts, value, onChange, colorOn='#4A7C59', bgOn='#EBF3EE' }) {
+function CheckChips({ opts, value, onChange, colorOn='#0d6b63', bgOn='#EBF3EE' }) {
   const toggle = o => onChange(value.includes(o) ? value.filter(x=>x!==o) : [...value, o])
   return (
     <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
@@ -330,7 +330,7 @@ export default function PatientProfile() {
       <div style={{ paddingBottom:100 }}>
         {/* ── Header ── */}
         <div style={{
-          background:'linear-gradient(135deg, #4A7C59 0%, #2E5240 100%)',
+          background:'linear-gradient(135deg, #0d6b63 0%, #2E5240 100%)',
           padding:'20px 16px 32px',
         }}>
           <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:20 }}>
@@ -375,7 +375,7 @@ export default function PatientProfile() {
               {canEdit && (
                 <div onClick={() => fileRef.current?.click()} style={{
                   position:'absolute', bottom:0, right:0, width:22, height:22,
-                  borderRadius:'50%', background:'white', border:'2px solid #4A7C59',
+                  borderRadius:'50%', background:'white', border:'2px solid #0d6b63',
                   display:'flex', alignItems:'center', justifyContent:'center',
                   fontSize:11, cursor:'pointer',
                 }}>📷</div>
@@ -404,7 +404,7 @@ export default function PatientProfile() {
           <form onSubmit={handleSave} style={{ padding:'16px 16px 0' }}>
 
             {/* ══ S1: Información básica ═══════════════════════════════════ */}
-            <Section color="#4A7C59" icon="📋" title="Información básica" badge={b1}
+            <Section color="#0d6b63" icon="📋" title="Información básica" badge={b1}
               open={open.s1} onToggle={() => setOpen(p=>({...p,s1:!p.s1}))}>
 
               <Fld label="Nombre completo">
@@ -427,7 +427,7 @@ export default function PatientProfile() {
                       onClick={() => set('sexo', form.sexo===o.v ? '' : o.v)}
                       style={{
                         flex:1, padding:'12px 0', borderRadius:12, fontWeight:700, fontSize:14, cursor:'pointer',
-                        border:`1.5px solid ${form.sexo===o.v ? '#4A7C59' : '#EDE5D8'}`,
+                        border:`1.5px solid ${form.sexo===o.v ? '#0d6b63' : '#EDE5D8'}`,
                         background: form.sexo===o.v ? '#EBF3EE' : 'white',
                         color: form.sexo===o.v ? '#2E5240' : '#6B7280',
                         transition:'all 0.15s',
@@ -547,23 +547,23 @@ export default function PatientProfile() {
               disabled={generatingPDF}
               style={{
                 width: '100%', marginBottom: 12, padding: '13px 16px',
-                borderRadius: 16, border: '1.5px solid #2D4A1E',
+                borderRadius: 16, border: '1.5px solid #0B4F4A',
                 background: generatingPDF ? '#F0F9F4' : 'white',
                 display: 'flex', alignItems: 'center', gap: 10,
                 cursor: generatingPDF ? 'not-allowed' : 'pointer',
-                boxShadow: '0 2px 8px rgba(45,74,30,0.08)',
+                boxShadow: '0 2px 8px rgba(11,79,74,0.08)',
               }}
             >
               <span style={{ fontSize: 20 }}>{generatingPDF ? '⏳' : '📄'}</span>
               <div style={{ flex: 1, textAlign: 'left' }}>
-                <p style={{ fontSize: 13, fontWeight: 700, color: '#2D4A1E', margin: 0 }}>
+                <p style={{ fontSize: 13, fontWeight: 700, color: '#0B4F4A', margin: 0 }}>
                   {generatingPDF ? 'Generando reporte...' : 'Generar reporte PDF'}
                 </p>
                 <p style={{ fontSize: 11, color: '#9CA3AF', margin: '1px 0 0' }}>
                   Medicamentos, directorio, notas y citas
                 </p>
               </div>
-              {!generatingPDF && <span style={{ color: '#4A7C59', fontSize: 16 }}>↓</span>}
+              {!generatingPDF && <span style={{ color: '#0d6b63', fontSize: 16 }}>↓</span>}
             </button>
 
             {/* ══ S3: Preferencias ═══════════════════════════════════════════ */}

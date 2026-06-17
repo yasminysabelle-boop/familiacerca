@@ -17,8 +17,8 @@ const MORE_SECTIONS = [
   {
     label: 'Gestión del cuidado',
     items: [
-      { to: '/diario-medico', Icon: BookOpen,       label: 'Notas Médicas IA',   desc: 'Historia clínica con IA — voz y foto',         color: '#2D4A1E' },
-      { to: '/registros',    Icon: ClipboardCheck,  label: 'Síntomas físicos',   desc: 'Ánimo, comida, sueño, hidratación y evacuación', color: '#4A7C59' },
+      { to: '/diario-medico', Icon: BookOpen,       label: 'Notas Médicas IA',   desc: 'Historia clínica con IA — voz y foto',         color: '#0B4F4A' },
+      { to: '/registros',    Icon: ClipboardCheck,  label: 'Síntomas físicos',   desc: 'Ánimo, comida, sueño, hidratación y evacuación', color: '#0d6b63' },
       { to: '/incidentes',   Icon: AlertTriangle,   label: 'Incidentes',          desc: 'Caídas, fiebre y eventos importantes',            color: '#DC2626' },
     ],
   },
@@ -39,7 +39,7 @@ const MORE_SECTIONS = [
   },
 ]
 
-const PLAN_COLORS = { free: '#9CA3AF', familiar: '#4A7C59', care_plus: '#7C3AED' }
+const PLAN_COLORS = { free: '#9CA3AF', familiar: '#0d6b63', care_plus: '#7C3AED' }
 const PLAN_LABELS = { free: 'Prueba gratuita', familiar: 'Plan Familiar', care_plus: 'Cuidado Total' }
 
 export default function More() {
@@ -71,7 +71,7 @@ export default function More() {
         {/* Profile hero card */}
         <div
           className="rounded-3xl overflow-hidden mb-5"
-          style={{ background: 'linear-gradient(145deg, #4A7C59 0%, #2E5240 100%)' }}
+          style={{ background: 'linear-gradient(145deg, #0d6b63 0%, #2E5240 100%)' }}
         >
           <div className="p-6 flex items-center gap-4">
             {profile?.photo_url ? (

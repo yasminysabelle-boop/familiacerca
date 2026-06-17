@@ -34,7 +34,7 @@ export default function HospitalDashboard({ onManageMode, onSOS, onVideoCall }) 
   return (
     <div style={{
       position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999,
-      backgroundColor: '#F0EDE6', overflowY: 'auto',
+      backgroundColor: '#F8F4ED', overflowY: 'auto',
       padding: '12px 16px 32px', display: 'flex', flexDirection: 'column', gap: 14,
     }}>
 
@@ -63,7 +63,7 @@ export default function HospitalDashboard({ onManageMode, onSOS, onVideoCall }) 
         emoji="💬"
         title="Chat familiar"
         subtitle="Mantente comunicado con el equipo"
-        color="#4A7C59"
+        color="#0d6b63"
         bg="#F0F9F4"
         border="#BBF7D0"
       />
@@ -73,7 +73,7 @@ export default function HospitalDashboard({ onManageMode, onSOS, onVideoCall }) 
         onClick={onVideoCall}
         style={{
           width: '100%', background: 'white', borderRadius: 16, padding: '16px 18px',
-          boxShadow: '0 2px 12px rgba(0,0,0,0.06)', border: '1px solid #F0EDE6',
+          boxShadow: '0 2px 12px rgba(0,0,0,0.06)', border: '1px solid #F8F4ED',
           cursor: 'pointer', textAlign: 'left', display: 'flex', alignItems: 'center', gap: 12,
         }}
       >
@@ -82,7 +82,7 @@ export default function HospitalDashboard({ onManageMode, onSOS, onVideoCall }) 
           <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#1A1A1A' }}>Videollamadas</p>
           <p style={{ margin: '2px 0 0', fontSize: 12, color: '#6B7280' }}>Programar o unirse a la sala familiar</p>
         </div>
-        <span style={{ color: '#4A7C59', fontSize: 18, flexShrink: 0 }}>›</span>
+        <span style={{ color: '#0d6b63', fontSize: 18, flexShrink: 0 }}>›</span>
       </button>
 
       {/* ── Emergencia ────────────────────────────────────── */}
@@ -154,10 +154,10 @@ export default function HospitalDashboard({ onManageMode, onSOS, onVideoCall }) 
               style={{
                 flex: 1, padding: '12px', borderRadius: 12,
                 border: 'none',
-                background: deactivating ? '#9CA3AF' : 'linear-gradient(135deg, #4A7C59, #3A6347)',
+                background: deactivating ? '#9CA3AF' : 'linear-gradient(135deg, #0d6b63, #3A6347)',
                 color: 'white', fontWeight: 700, fontSize: 14,
                 cursor: deactivating ? 'default' : 'pointer',
-                boxShadow: deactivating ? 'none' : '0 4px 14px rgba(74,124,89,0.3)',
+                boxShadow: deactivating ? 'none' : '0 4px 14px rgba(13,107,99,0.3)',
               }}
             >
               {deactivating ? 'Desactivando...' : '✅ Confirmar alta'}

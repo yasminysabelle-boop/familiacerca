@@ -34,9 +34,9 @@ export default function PaywallModal({ onClose, patientName }) {
           onClick={() => { navigate('/pricing'); onClose() }}
           style={{
             width: '100%', padding: '14px', borderRadius: 14, border: 'none',
-            background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
+            background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
             color: 'white', fontWeight: 700, fontSize: 15, cursor: 'pointer',
-            boxShadow: '0 6px 20px rgba(74,124,89,0.3)', marginBottom: 10,
+            boxShadow: '0 6px 20px rgba(13,107,99,0.3)', marginBottom: 10,
           }}
         >
           Ver planes →

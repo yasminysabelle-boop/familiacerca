@@ -3,7 +3,7 @@ import { supabase } from '../../lib/supabase'
 import { useFamily } from '../../contexts/FamilyContext'
 
 const ROLE_LABEL = { familiar: 'Familiar', cuidador: 'Cuidador' }
-const ROLE_COLOR = { familiar: '#4A7C59', cuidador: '#2D86A0' }
+const ROLE_COLOR = { familiar: '#0d6b63', cuidador: '#2D86A0' }
 
 function timeAgo(isoStr) {
   if (!isoStr) return 'Nunca'

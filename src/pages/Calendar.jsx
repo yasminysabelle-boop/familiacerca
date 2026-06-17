@@ -482,7 +482,7 @@ export default function Calendar() {
                         onClick={() => { setMonth(i); setShowPicker(false) }}
                         style={{
                           padding: '7px 4px', borderRadius: 8, border: 'none',
-                          background: i === month ? '#4A7C59' : 'transparent',
+                          background: i === month ? '#0d6b63' : 'transparent',
                           color: i === month ? 'white' : '#374151',
                           fontWeight: i === month ? 700 : 400,
                           fontSize: 12, cursor: 'pointer',
@@ -513,7 +513,7 @@ export default function Calendar() {
                           display: 'block', width: '100%',
                           padding: '7px 12px', border: 'none',
                           background: y === year ? '#EBF3EE' : 'transparent',
-                          color: y === year ? '#4A7C59' : '#374151',
+                          color: y === year ? '#0d6b63' : '#374151',
                           fontWeight: y === year ? 700 : 400,
                           fontSize: 13, textAlign: 'center',
                           cursor: 'pointer', borderRadius: 8,

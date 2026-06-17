@@ -73,7 +73,7 @@ export default function InstallPrompt() {
           onClick={install}
           style={{
             padding: '8px 14px', borderRadius: 10, border: 'none',
-            background: 'linear-gradient(135deg, #2D4A1E, #4A7C59)',
+            background: 'linear-gradient(135deg, #0B4F4A, #0d6b63)',
             fontSize: 13, fontWeight: 700, color: 'white', cursor: 'pointer',
           }}
         >

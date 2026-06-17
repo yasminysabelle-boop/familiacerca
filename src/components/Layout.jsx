@@ -61,9 +61,9 @@ export default function Layout({ children }) {
   const [showCompanion,   setShowCompanion]   = useState(false)
   const [showQuickActions, setShowQuickActions] = useState(false)
 
-  const bg      = dark ? '#0F1A12' : '#F0EDE6'
-  const navBg   = dark ? 'rgba(28,18,8,0.97)' : '#2D4A1E'
-  const hdrBg   = dark ? 'rgba(28,18,8,0.95)' : '#2D4A1E'
+  const bg      = dark ? '#0F1A12' : '#F8F4ED'
+  const navBg   = dark ? 'rgba(28,18,8,0.97)' : '#0B4F4A'
+  const hdrBg   = dark ? 'rgba(28,18,8,0.95)' : '#0B4F4A'
   const border  = dark ? '#1E3A28' : 'rgba(255,255,255,0.08)'
 
   const hospitalBarHeight = isHospitalMode ? 40 : 0
@@ -226,7 +226,7 @@ export default function Layout({ children }) {
             onClick={() => window.dispatchEvent(new MouseEvent('mousemove'))}
             style={{
               padding: '10px 16px', borderRadius: 10, border: 'none',
-              background: '#4A7C59', color: 'white', fontWeight: 700,
+              background: '#0d6b63', color: 'white', fontWeight: 700,
               fontSize: 13, cursor: 'pointer', alignSelf: 'flex-start',
             }}
           >
@@ -247,7 +247,7 @@ export default function Layout({ children }) {
           height: 64,
           paddingBottom: 'env(safe-area-inset-bottom)',
           backgroundColor: 'white',
-          borderTop: '1px solid #F0EDE6',
+          borderTop: '1px solid #F8F4ED',
           boxShadow: '0 -2px 12px rgba(0,0,0,0.05)',
           display: 'flex', alignItems: 'center',
         }}>
@@ -273,7 +273,7 @@ export default function Layout({ children }) {
             <button onClick={() => setShowQuickActions(true)} style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               width: 52, height: 52, borderRadius: '50%',
-              background: '#2D4A1E', boxShadow: '0 2px 12px rgba(45,74,30,0.35)',
+              background: '#0B4F4A', boxShadow: '0 2px 12px rgba(11,79,74,0.35)',
               marginTop: -20, border: 'none', cursor: 'pointer', flexShrink: 0,
               WebkitTapHighlightColor: 'transparent',
             }}>

@@ -83,7 +83,7 @@ export default function FamilySwitcher() {
                 const isActive = fam.ownerId === activeOwnerId
                 const initials = fam.patientName?.charAt(0)?.toUpperCase() ?? '?'
                 const roleLabel = fam.role === null ? 'Administrador' : fam.role === 'cuidador' ? 'Cuidador' : 'Familiar'
-                const roleColor = fam.role === null ? '#4A7C59' : fam.role === 'cuidador' ? '#2563EB' : '#6B7280'
+                const roleColor = fam.role === null ? '#0d6b63' : fam.role === 'cuidador' ? '#2563EB' : '#6B7280'
                 const roleBg   = fam.role === null ? '#EBF3EE' : fam.role === 'cuidador' ? '#DBEAFE' : '#F3F4F6'
 
                 return (
@@ -92,7 +92,7 @@ export default function FamilySwitcher() {
                     style={{
                       display: 'flex', alignItems: 'center', gap: 14,
                       padding: '14px 16px', borderRadius: 16,
-                      border: `1.5px solid ${isActive ? '#4A7C59' : '#EDE5D8'}`,
+                      border: `1.5px solid ${isActive ? '#0d6b63' : '#EDE5D8'}`,
                       background: isActive ? '#EBF3EE' : '#FDFAF7',
                     }}
                   >
@@ -106,7 +106,7 @@ export default function FamilySwitcher() {
                     ) : (
                       <div style={{
                         width: 44, height: 44, borderRadius: '50%', flexShrink: 0,
-                        background: isActive ? 'linear-gradient(135deg, #4A7C59, #2D6A4F)' : '#E5E7EB',
+                        background: isActive ? 'linear-gradient(135deg, #0d6b63, #2D6A4F)' : '#E5E7EB',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         fontSize: 18, fontWeight: 700,
                         color: isActive ? 'white' : '#9CA3AF',
@@ -136,7 +136,7 @@ export default function FamilySwitcher() {
                     {/* Action */}
                     {isActive ? (
                       <span style={{
-                        fontSize: 11, fontWeight: 700, color: '#4A7C59',
+                        fontSize: 11, fontWeight: 700, color: '#0d6b63',
                         flexShrink: 0,
                       }}>
                         ✓ Viendo
@@ -146,7 +146,7 @@ export default function FamilySwitcher() {
                         onClick={() => { switchFamily(fam.ownerId); setOpen(false) }}
                         style={{
                           padding: '8px 14px', borderRadius: 10,
-                          background: '#2D4A1E', color: 'white',
+                          background: '#0B4F4A', color: 'white',
                           border: 'none', cursor: 'pointer',
                           fontSize: 13, fontWeight: 700,
                           flexShrink: 0, fontFamily: 'inherit',

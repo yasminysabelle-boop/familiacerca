@@ -8,7 +8,7 @@ export default function EmptyState({ icon, title, description, actionLabel, onAc
       <div style={{ fontSize: 48, marginBottom: 14, lineHeight: 1 }}>{icon}</div>
       <p style={{
         fontFamily: 'Georgia, serif', fontSize: 16, fontWeight: 700,
-        color: '#2D4A1E', margin: '0 0 8px',
+        color: '#0B4F4A', margin: '0 0 8px',
       }}>
         {title}
       </p>
@@ -26,9 +26,9 @@ export default function EmptyState({ icon, title, description, actionLabel, onAc
           style={{
             display: 'inline-flex', alignItems: 'center', gap: 6,
             padding: '10px 22px', borderRadius: 12, border: 'none',
-            background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
+            background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
             color: 'white', fontWeight: 700, fontSize: 13,
-            cursor: 'pointer', boxShadow: '0 4px 12px rgba(74,124,89,0.25)',
+            cursor: 'pointer', boxShadow: '0 4px 12px rgba(13,107,99,0.25)',
           }}
         >
           {actionLabel}

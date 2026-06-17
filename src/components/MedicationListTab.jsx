@@ -83,7 +83,7 @@ export default function MedicationListTab({
                 background: 'white',
                 borderRadius: 16,
                 border: '1px solid #EDE5D8',
-                borderLeft: `4px solid ${stockDotColor ?? '#4A7C59'}`,
+                borderLeft: `4px solid ${stockDotColor ?? '#0d6b63'}`,
                 padding: '14px 14px 14px 16px',
                 boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
                 display: 'flex',
@@ -114,7 +114,7 @@ export default function MedicationListTab({
                   )}
                   {med.frequency && (
                     <span style={{
-                      background: '#EBF3EE', color: '#4A7C59',
+                      background: '#EBF3EE', color: '#0d6b63',
                       padding: '2px 8px', borderRadius: 6,
                       fontSize: 11, fontWeight: 600,
                     }}>

@@ -199,7 +199,7 @@ export default function MedicationStockList() {
                         💊 {med.name}
                       </span>
                       {med.form && (
-                        <span style={{ fontSize: 10, fontWeight: 600, color: '#4A7C59', background: '#EBF3EE', padding: '2px 7px', borderRadius: 10 }}>
+                        <span style={{ fontSize: 10, fontWeight: 600, color: '#0d6b63', background: '#EBF3EE', padding: '2px 7px', borderRadius: 10 }}>
                           {med.form}
                         </span>
                       )}
@@ -231,7 +231,7 @@ export default function MedicationStockList() {
                       <div style={{
                         height: '100%', borderRadius: 3, width: `${pct}%`,
                         background: pct > 30
-                          ? 'linear-gradient(90deg, #4A7C59, #22C55E)'
+                          ? 'linear-gradient(90deg, #0d6b63, #22C55E)'
                           : pct > 10
                             ? 'linear-gradient(90deg, #D97706, #F59E0B)'
                             : 'linear-gradient(90deg, #DC2626, #EF4444)',
@@ -304,7 +304,7 @@ export default function MedicationStockList() {
                     {/* Admin actions */}
                     {isAdmin && (
                       <div style={{
-                        borderTop: '1px solid #F0EDE6', paddingTop: 10,
+                        borderTop: '1px solid #F8F4ED', paddingTop: 10,
                         display: 'flex', flexDirection: 'column', gap: 8,
                       }}>
                         {/* Inline edit pills_remaining */}
@@ -327,7 +327,7 @@ export default function MedicationStockList() {
                                 }}
                                 style={{
                                   flex: 1, padding: '6px 10px',
-                                  borderRadius: 8, border: '1.5px solid #4A7C59',
+                                  borderRadius: 8, border: '1.5px solid #0d6b63',
                                   fontSize: 13, outline: 'none',
                                   width: 80,
                                 }}
@@ -336,7 +336,7 @@ export default function MedicationStockList() {
                                 onClick={() => saveInlineStock(med.id, inlineEditValue)}
                                 style={{
                                   padding: '6px 12px', borderRadius: 8,
-                                  background: '#4A7C59', border: 'none',
+                                  background: '#0d6b63', border: 'none',
                                   color: 'white', fontWeight: 700,
                                   fontSize: 12, cursor: 'pointer',
                                 }}
@@ -380,10 +380,10 @@ export default function MedicationStockList() {
                           style={{
                             width: '100%', padding: '10px',
                             borderRadius: 12, border: 'none',
-                            background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
+                            background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
                             color: 'white', fontWeight: 700,
                             fontSize: 13, cursor: 'pointer',
-                            boxShadow: '0 4px 14px rgba(74,124,89,0.25)',
+                            boxShadow: '0 4px 14px rgba(13,107,99,0.25)',
                             display: 'flex', alignItems: 'center',
                             justifyContent: 'center', gap: 6,
                           }}
@@ -400,7 +400,7 @@ export default function MedicationStockList() {
                         style={{
                           width: '100%', padding: '8px',
                           borderRadius: 10, border: '1px solid #EDE5D8',
-                          background: '#FDFAF7', color: '#4A7C59',
+                          background: '#FDFAF7', color: '#0d6b63',
                           fontWeight: 600, fontSize: 12, cursor: 'pointer',
                           marginTop: 2,
                         }}
@@ -423,8 +423,8 @@ export default function MedicationStockList() {
                         onClick={() => setStockTabMed(med)}
                         style={{
                           padding: '6px 14px', borderRadius: 10,
-                          border: '1px solid #4A7C59', background: '#EBF3EE',
-                          color: '#4A7C59', fontWeight: 700,
+                          border: '1px solid #0d6b63', background: '#EBF3EE',
+                          color: '#0d6b63', fontWeight: 700,
                           fontSize: 11, cursor: 'pointer',
                         }}
                       >

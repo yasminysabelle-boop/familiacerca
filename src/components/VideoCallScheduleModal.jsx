@@ -218,7 +218,7 @@ export default function VideoCallScheduleModal({ open, onClose }) {
               style={{
                 flex: 1, padding: '9px', borderRadius: 10, border: 'none',
                 fontWeight: 700, fontSize: 13, cursor: 'pointer',
-                background: view === v ? '#4A7C59' : '#F3F4F6',
+                background: view === v ? '#0d6b63' : '#F3F4F6',
                 color: view === v ? 'white' : '#6B7280',
               }}
             >
@@ -239,10 +239,10 @@ export default function VideoCallScheduleModal({ open, onClose }) {
                 width: '100%', padding: '15px', borderRadius: 16, border: 'none',
                 background: startingInstant
                   ? '#9CA3AF'
-                  : 'linear-gradient(135deg, #4A7C59, #2D6A4F)',
+                  : 'linear-gradient(135deg, #0d6b63, #2D6A4F)',
                 color: 'white', fontWeight: 800, fontSize: 15,
                 cursor: startingInstant ? 'default' : 'pointer',
-                boxShadow: startingInstant ? 'none' : '0 6px 20px rgba(74,124,89,0.35)',
+                boxShadow: startingInstant ? 'none' : '0 6px 20px rgba(13,107,99,0.35)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
                 transition: 'all 0.2s',
               }}
@@ -280,7 +280,7 @@ export default function VideoCallScheduleModal({ open, onClose }) {
                   onClick={() => setView('schedule')}
                   style={{
                     marginTop: 16, padding: '10px 24px', borderRadius: 12, border: 'none',
-                    background: '#4A7C59', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer',
+                    background: '#0d6b63', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer',
                   }}
                 >
                   Programar ahora →
@@ -296,7 +296,7 @@ export default function VideoCallScheduleModal({ open, onClose }) {
                   key={call.id}
                   style={{
                     padding: '14px', borderRadius: 14,
-                    border: `1.5px solid ${isLive ? '#4A7C59' : '#E5E0D8'}`,
+                    border: `1.5px solid ${isLive ? '#0d6b63' : '#E5E0D8'}`,
                     background: isLive ? '#F0F9F4' : '#FAFAF9',
                     display: 'flex', alignItems: 'center', gap: 12,
                   }}
@@ -305,7 +305,7 @@ export default function VideoCallScheduleModal({ open, onClose }) {
                     <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#1A1A1A' }}>
                       {call.title}
                     </p>
-                    <p style={{ margin: '3px 0 0', fontSize: 12, color: isLive ? '#4A7C59' : '#6B7280', fontWeight: isLive ? 700 : 400 }}>
+                    <p style={{ margin: '3px 0 0', fontSize: 12, color: isLive ? '#0d6b63' : '#6B7280', fontWeight: isLive ? 700 : 400 }}>
                       {isLive ? '🟢 En curso' : fmtScheduled(call.scheduled_at)}
                       {!isLive && canJoinNow && ` · en ${mins} min`}
                     </p>
@@ -314,7 +314,7 @@ export default function VideoCallScheduleModal({ open, onClose }) {
                     onClick={() => joinCall(call)}
                     style={{
                       padding: '8px 16px', borderRadius: 10, border: 'none',
-                      background: canJoinNow ? '#4A7C59' : '#E5E0D8',
+                      background: canJoinNow ? '#0d6b63' : '#E5E0D8',
                       color: canJoinNow ? 'white' : '#9CA3AF',
                       fontWeight: 700, fontSize: 13,
                       cursor: canJoinNow ? 'pointer' : 'default',
@@ -375,8 +375,8 @@ export default function VideoCallScheduleModal({ open, onClose }) {
                     onClick={() => setParticipantMode(mode)}
                     style={{
                       flex: 1, padding: '8px', borderRadius: 9, fontSize: 13, fontWeight: 600,
-                      border: `1.5px solid ${participantMode === mode ? '#4A7C59' : '#D1C9BF'}`,
-                      background: participantMode === mode ? '#4A7C59' : 'white',
+                      border: `1.5px solid ${participantMode === mode ? '#0d6b63' : '#D1C9BF'}`,
+                      background: participantMode === mode ? '#0d6b63' : 'white',
                       color: participantMode === mode ? 'white' : '#374151',
                       cursor: 'pointer',
                     }}
@@ -405,7 +405,7 @@ export default function VideoCallScheduleModal({ open, onClose }) {
                             ? [...prev, m.member_user_id]
                             : prev.filter(id => id !== m.member_user_id)
                         )}
-                        style={{ width: 16, height: 16, accentColor: '#4A7C59' }}
+                        style={{ width: 16, height: 16, accentColor: '#0d6b63' }}
                       />
                       <span style={{ fontSize: 14, fontWeight: 600, color: '#1A1A1A' }}>{m.name}</span>
                       <span style={{ fontSize: 11, color: '#9CA3AF', marginLeft: 'auto' }}>
@@ -433,10 +433,10 @@ export default function VideoCallScheduleModal({ open, onClose }) {
               disabled={!date || !time || scheduling}
               style={{
                 padding: '15px', borderRadius: 14, border: 'none',
-                background: date && time && !scheduling ? '#4A7C59' : '#9CA3AF',
+                background: date && time && !scheduling ? '#0d6b63' : '#9CA3AF',
                 color: 'white', fontWeight: 800, fontSize: 15,
                 cursor: date && time && !scheduling ? 'pointer' : 'default',
-                boxShadow: date && time ? '0 4px 16px rgba(74,124,89,0.3)' : 'none',
+                boxShadow: date && time ? '0 4px 16px rgba(13,107,99,0.3)' : 'none',
               }}
             >
               {scheduling ? 'Programando...' : '📅 Programar videollamada'}

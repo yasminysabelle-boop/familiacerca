@@ -97,7 +97,7 @@ export default function Register() {
                 placeholder="María García"
                 className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none transition-all"
                 style={{ border: '1.5px solid #EDE5D8', background: '#FDFAF7' }}
-                onFocus={e => { e.target.style.borderColor = '#4A7C59'; e.target.style.boxShadow = '0 0 0 3px rgba(74,124,89,0.1)' }}
+                onFocus={e => { e.target.style.borderColor = '#0d6b63'; e.target.style.boxShadow = '0 0 0 3px rgba(13,107,99,0.1)' }}
                 onBlur={e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.boxShadow = 'none' }}
               />
             </div>
@@ -115,7 +115,7 @@ export default function Register() {
                 placeholder="tu@correo.com"
                 className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none transition-all"
                 style={{ border: '1.5px solid #EDE5D8', background: '#FDFAF7' }}
-                onFocus={e => { e.target.style.borderColor = '#4A7C59'; e.target.style.boxShadow = '0 0 0 3px rgba(74,124,89,0.1)' }}
+                onFocus={e => { e.target.style.borderColor = '#0d6b63'; e.target.style.boxShadow = '0 0 0 3px rgba(13,107,99,0.1)' }}
                 onBlur={e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.boxShadow = 'none' }}
               />
             </div>
@@ -134,7 +134,7 @@ export default function Register() {
                   placeholder="Mínimo 6 caracteres"
                   className="w-full rounded-xl text-sm focus:outline-none transition-all"
                   style={{ border: '1.5px solid #EDE5D8', background: '#FDFAF7', padding: '12px 44px 12px 16px', boxSizing: 'border-box', width: '100%' }}
-                  onFocus={e => { e.target.style.borderColor = '#4A7C59'; e.target.style.boxShadow = '0 0 0 3px rgba(74,124,89,0.1)' }}
+                  onFocus={e => { e.target.style.borderColor = '#0d6b63'; e.target.style.boxShadow = '0 0 0 3px rgba(13,107,99,0.1)' }}
                   onBlur={e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.boxShadow = 'none' }}
                 />
                 <button
@@ -160,8 +160,8 @@ export default function Register() {
               disabled={loading}
               className="w-full py-3.5 text-white font-bold rounded-2xl text-sm transition-all active:scale-[0.97] disabled:opacity-60 mt-2"
               style={{
-                background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
-                boxShadow: '0 6px 20px rgba(74,124,89,0.35)',
+                background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
+                boxShadow: '0 6px 20px rgba(13,107,99,0.35)',
               }}
             >
               {loading ? 'Creando cuenta...' : 'Comenzar prueba gratis →'}
@@ -172,7 +172,7 @@ export default function Register() {
           <div className="flex items-center justify-center gap-3 mt-4 flex-wrap">
             {BENEFITS.map(b => (
               <span key={b} className="flex items-center gap-1 text-[10px] text-gray-400 font-medium">
-                <span style={{ color: '#4A7C59' }}>✓</span> {b}
+                <span style={{ color: '#0d6b63' }}>✓</span> {b}
               </span>
             ))}
           </div>
@@ -180,7 +180,7 @@ export default function Register() {
 
         <p className="mt-5 text-center text-sm text-gray-500">
           ¿Ya tienes cuenta?{' '}
-          <Link to="/login" className="font-semibold hover:underline" style={{ color: '#4A7C59' }}>
+          <Link to="/login" className="font-semibold hover:underline" style={{ color: '#0d6b63' }}>
             Inicia sesión
           </Link>
         </p>

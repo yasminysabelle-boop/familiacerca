@@ -34,11 +34,11 @@ const cardStyle = {
 
 const primaryBtn = (disabled) => ({
   width: '100%', padding: '14px',
-  background: disabled ? '#C0CCC5' : 'linear-gradient(135deg, #4A7C59, #3A6347)',
+  background: disabled ? '#C0CCC5' : 'linear-gradient(135deg, #0d6b63, #3A6347)',
   color: 'white', fontWeight: 700, fontSize: 14,
   borderRadius: 16, border: 'none',
   cursor: disabled ? 'not-allowed' : 'pointer',
-  boxShadow: disabled ? 'none' : '0 8px 24px rgba(74,124,89,0.35)',
+  boxShadow: disabled ? 'none' : '0 8px 24px rgba(13,107,99,0.35)',
   transition: 'all 0.2s',
 })
 
@@ -51,9 +51,9 @@ const secondaryBtn = {
 const inputStyle = (active) => ({
   width: '100%', padding: '14px 16px', textAlign: 'center',
   fontSize: 16, fontWeight: 600, color: '#1A1A1A',
-  border: `2px solid ${active ? '#4A7C59' : '#EDE5D8'}`,
+  border: `2px solid ${active ? '#0d6b63' : '#EDE5D8'}`,
   borderRadius: 14, background: 'white', outline: 'none',
-  boxShadow: active ? '0 0 0 4px rgba(74,124,89,0.1)' : 'none',
+  boxShadow: active ? '0 0 0 4px rgba(13,107,99,0.1)' : 'none',
   transition: 'all 0.2s', boxSizing: 'border-box',
 })
 

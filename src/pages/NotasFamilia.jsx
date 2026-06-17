@@ -80,10 +80,10 @@ export default function NotasFamilia() {
   }, [tab, ownerId])
 
   return (
-    <div style={{ minHeight: '100vh', background: '#F0EDE6' }}>
+    <div style={{ minHeight: '100vh', background: '#F8F4ED' }}>
 
       {/* Header + tabs */}
-      <div style={{ background: '#2D4A1E', padding: '20px 20px 0' }}>
+      <div style={{ background: '#0B4F4A', padding: '20px 20px 0' }}>
         <h1 style={{ fontFamily: 'Georgia, serif', fontSize: 20, fontWeight: 700, color: 'white', margin: '0 0 16px' }}>
           Notas de la familia
         </h1>
@@ -170,7 +170,7 @@ export default function NotasFamilia() {
               style={{
                 width: '100%', padding: '14px', borderRadius: 14,
                 border: 'none',
-                background: saving || !content.trim() ? '#9CA3AF' : '#2D4A1E',
+                background: saving || !content.trim() ? '#9CA3AF' : '#0B4F4A',
                 color: 'white', fontSize: 15, fontWeight: 700,
                 cursor: saving || !content.trim() ? 'default' : 'pointer',
                 fontFamily: 'inherit',
@@ -192,7 +192,7 @@ export default function NotasFamilia() {
               <p style={{ fontSize: 13, color: '#6B7280', margin: '0 0 20px', lineHeight: 1.5 }}>Las notas del equipo aparecerán aquí</p>
               <button
                 onClick={() => setTab('grabar')}
-                style={{ padding: '12px 24px', borderRadius: 14, background: '#2D4A1E', color: 'white', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 14, fontFamily: 'inherit' }}
+                style={{ padding: '12px 24px', borderRadius: 14, background: '#0B4F4A', color: 'white', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 14, fontFamily: 'inherit' }}
               >
                 Grabar primera nota
               </button>

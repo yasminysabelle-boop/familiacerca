@@ -32,7 +32,7 @@ function MemberRow({ name, email, avatarUrl, role, isCurrentUser, isAdmin, isOwn
   return (
     <div style={{
       background: 'white', borderRadius: 16, padding: '14px 16px',
-      boxShadow: '0 1px 8px rgba(0,0,0,0.06)', border: '1px solid #F0EDE6',
+      boxShadow: '0 1px 8px rgba(0,0,0,0.06)', border: '1px solid #F8F4ED',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         {avatarUrl ? (
@@ -41,7 +41,7 @@ function MemberRow({ name, email, avatarUrl, role, isCurrentUser, isAdmin, isOwn
         ) : (
           <div style={{
             width: 40, height: 40, borderRadius: '50%', flexShrink: 0,
-            background: isOwner ? '#2D4A1E' : '#3D6B54',
+            background: isOwner ? '#0B4F4A' : '#3D6B54',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             color: 'white', fontWeight: 700, fontSize: 16,
           }}>
@@ -84,7 +84,7 @@ function MemberRow({ name, email, avatarUrl, role, isCurrentUser, isAdmin, isOwn
       </div>
 
       {editing && (
-        <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid #F0EDE6' }}>
+        <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid #F8F4ED' }}>
           <p style={{ margin: '0 0 10px', fontSize: 12, fontWeight: 600, color: '#6B7280' }}>
             Cambiar rol:
           </p>
@@ -284,7 +284,7 @@ export default function FamilyRoles() {
               <div style={{
                 textAlign: 'center', padding: '32px 16px',
                 background: 'white', borderRadius: 16,
-                border: '1px solid #F0EDE6', color: '#9CA3AF', fontSize: 13,
+                border: '1px solid #F8F4ED', color: '#9CA3AF', fontSize: 13,
               }}>
                 No hay otros miembros en el equipo todavía.<br />
                 <span style={{ fontSize: 12 }}>Invita a tu familia desde <b>Mi Familia</b>.</span>

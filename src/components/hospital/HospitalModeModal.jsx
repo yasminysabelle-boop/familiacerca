@@ -48,7 +48,7 @@ export default function HospitalModeModal({ open, onClose }) {
   }
 
   // ── Shared styles ──────────────────────────────────────────────────────────
-  const btnPrimary = (color = '#4A7C59') => ({
+  const btnPrimary = (color = '#0d6b63') => ({
     width: '100%', padding: '15px', borderRadius: 14, border: 'none',
     background: saving ? '#C0CCC5' : color,
     color: 'white', fontWeight: 700, fontSize: 15,
@@ -175,7 +175,7 @@ export default function HospitalModeModal({ open, onClose }) {
 
           {step === 'confirmDeactivate' && (
             <>
-              <button onClick={handleDeactivate} disabled={saving} style={btnPrimary('#4A7C59')}>
+              <button onClick={handleDeactivate} disabled={saving} style={btnPrimary('#0d6b63')}>
                 {saving ? 'Desactivando...' : '✅ Sí, desactivar Modo Hospital'}
               </button>
               <button
@@ -208,7 +208,7 @@ export default function HospitalModeModal({ open, onClose }) {
 
           {step === 'main' && isHospitalMode && (
             <>
-              <button onClick={handleUpdate} disabled={saving} style={btnPrimary('#4A7C59')}>
+              <button onClick={handleUpdate} disabled={saving} style={btnPrimary('#0d6b63')}>
                 {saving ? 'Guardando...' : 'Actualizar información'}
               </button>
               <button

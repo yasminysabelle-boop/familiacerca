@@ -15,7 +15,7 @@ const fieldStyle = {
   fontSize: 14, outline: 'none', boxSizing: 'border-box',
   transition: 'all 0.15s', color: '#1A1A1A',
 }
-const onFocus = e => { e.target.style.borderColor = '#4A7C59'; e.target.style.boxShadow = '0 0 0 3px rgba(74,124,89,0.1)' }
+const onFocus = e => { e.target.style.borderColor = '#0d6b63'; e.target.style.boxShadow = '0 0 0 3px rgba(13,107,99,0.1)' }
 const onBlur  = e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.boxShadow = 'none' }
 
 export default function CareSchedule() {
@@ -122,7 +122,7 @@ export default function CareSchedule() {
           <div style={{ display: 'flex', justifyContent: 'center', padding: 48 }}>
             <div style={{
               width: 26, height: 26, borderRadius: '50%',
-              border: '3px solid #EDE5D8', borderTopColor: '#4A7C59',
+              border: '3px solid #EDE5D8', borderTopColor: '#0d6b63',
               animation: 'spin 0.8s linear infinite',
             }} />
           </div>
@@ -192,10 +192,10 @@ export default function CareSchedule() {
                     ? 'linear-gradient(135deg, #22C55E, #16A34A)'
                     : saving
                       ? '#C0CCC5'
-                      : 'linear-gradient(135deg, #4A7C59, #3A6347)',
+                      : 'linear-gradient(135deg, #0d6b63, #3A6347)',
                   color: 'white', fontWeight: 700, fontSize: 14,
                   cursor: saving ? 'not-allowed' : 'pointer',
-                  boxShadow: saving ? 'none' : '0 4px 16px rgba(74,124,89,0.25)',
+                  boxShadow: saving ? 'none' : '0 4px 16px rgba(13,107,99,0.25)',
                   transition: 'all 0.2s',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                 }}

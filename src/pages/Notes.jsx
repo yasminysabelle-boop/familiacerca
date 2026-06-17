@@ -21,7 +21,7 @@ const fieldStyle = {
   fontSize: 14, outline: 'none', boxSizing: 'border-box',
   transition: 'all 0.15s', fontFamily: 'inherit',
 }
-const onFocus = e => { e.target.style.borderColor = '#4A7C59'; e.target.style.boxShadow = '0 0 0 3px rgba(74,124,89,0.1)' }
+const onFocus = e => { e.target.style.borderColor = '#0d6b63'; e.target.style.boxShadow = '0 0 0 3px rgba(13,107,99,0.1)' }
 const onBlur  = e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.boxShadow = 'none' }
 
 export default function Notes() {
@@ -183,10 +183,10 @@ export default function Notes() {
             onClick={openAdd}
             style={{
               width: 40, height: 40, borderRadius: 12,
-              background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
+              background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
               border: 'none', cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 4px 12px rgba(74,124,89,0.3)',
+              boxShadow: '0 4px 12px rgba(13,107,99,0.3)',
             }}
           >
             <Plus size={20} color="white" strokeWidth={2.5} />
@@ -206,12 +206,12 @@ export default function Notes() {
         {/* Notes list */}
         {loading ? (
           <div style={{ display: 'flex', justifyContent: 'center', padding: '48px 0' }}>
-            <div style={{ width: 28, height: 28, borderRadius: '50%', border: '3px solid #EDE5D8', borderTopColor: '#4A7C59', animation: 'spin 0.8s linear infinite' }} />
+            <div style={{ width: 28, height: 28, borderRadius: '50%', border: '3px solid #EDE5D8', borderTopColor: '#0d6b63', animation: 'spin 0.8s linear infinite' }} />
           </div>
         ) : loadError ? (
           <div style={{ background: 'white', borderRadius: 20, border: '1px solid #EDE5D8', padding: '40px 24px', textAlign: 'center' }}>
             <p style={{ fontSize: 14, color: '#D63031', marginBottom: 12 }}>{loadError}</p>
-            <button onClick={fetchNotes} style={{ padding: '10px 24px', borderRadius: 12, background: '#4A7C59', color: 'white', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>
+            <button onClick={fetchNotes} style={{ padding: '10px 24px', borderRadius: 12, background: '#0d6b63', color: 'white', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>
               Reintentar
             </button>
           </div>
@@ -225,7 +225,7 @@ export default function Notes() {
               {search ? 'Intenta con otras palabras.' : 'Registra las observaciones del cuidado diario.'}
             </p>
             {!search && (
-              <button onClick={openAdd} style={{ padding: '10px 24px', borderRadius: 12, background: 'linear-gradient(135deg, #4A7C59, #3A6347)', color: 'white', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>
+              <button onClick={openAdd} style={{ padding: '10px 24px', borderRadius: 12, background: 'linear-gradient(135deg, #0d6b63, #3A6347)', color: 'white', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>
                 + Nueva nota
               </button>
             )}
@@ -254,7 +254,7 @@ export default function Notes() {
                           {new Date(note.created_at).toLocaleDateString('es-US', { day: 'numeric', month: 'short', year: 'numeric' })}
                         </span>
                         {note.tags?.map(tag => (
-                          <span key={tag} style={{ fontSize: 10, fontWeight: 700, color: '#4A7C59', background: '#EBF3EE', padding: '2px 8px', borderRadius: 20 }}>
+                          <span key={tag} style={{ fontSize: 10, fontWeight: 700, color: '#0d6b63', background: '#EBF3EE', padding: '2px 8px', borderRadius: 20 }}>
                             {tag}
                           </span>
                         ))}
@@ -391,7 +391,7 @@ export default function Notes() {
                       style={{
                         padding: '6px 14px', borderRadius: 20,
                         border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600,
-                        background: form.tags.includes(tag) ? '#4A7C59' : '#F3F4F6',
+                        background: form.tags.includes(tag) ? '#0d6b63' : '#F3F4F6',
                         color: form.tags.includes(tag) ? 'white' : '#6B7280',
                         transition: 'all 0.15s',
                       }}
@@ -416,10 +416,10 @@ export default function Notes() {
                   onClick={!canEdit ? e => { e.preventDefault(); navigate('/pricing') } : undefined}
                   style={{
                     flex: 2, padding: '13px', borderRadius: 14, border: 'none',
-                    background: (saving || !canEdit) ? '#D4C4B8' : 'linear-gradient(135deg, #4A7C59, #3A6347)',
+                    background: (saving || !canEdit) ? '#D4C4B8' : 'linear-gradient(135deg, #0d6b63, #3A6347)',
                     color: 'white', fontWeight: 700, fontSize: 14,
                     cursor: saving ? 'not-allowed' : 'pointer',
-                    boxShadow: saving ? 'none' : '0 6px 20px rgba(74,124,89,0.3)',
+                    boxShadow: saving ? 'none' : '0 6px 20px rgba(13,107,99,0.3)',
                     transition: 'all 0.15s',
                   }}
                 >

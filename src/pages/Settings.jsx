@@ -13,7 +13,7 @@ import { ChevronRight, LogOut } from '../components/Icons'
 
 const PLAN_META = {
   free:      { label: 'Gratis',        color: '#9CA3AF', icon: '🌱' },
-  familiar:  { label: 'Plan Familiar', color: '#4A7C59', icon: '❤️' },
+  familiar:  { label: 'Plan Familiar', color: '#0d6b63', icon: '❤️' },
   care_plus: { label: 'Cuidado Total',  color: '#7C3AED', icon: '⭐' },
 }
 
@@ -70,7 +70,7 @@ function ToggleRow({ icon, label, subtitle, checked, onChange }) {
         onClick={() => onChange(!checked)}
         style={{
           width: 44, height: 26, borderRadius: 13, border: 'none',
-          background: checked ? '#4A7C59' : '#D1D5DB',
+          background: checked ? '#0d6b63' : '#D1D5DB',
           position: 'relative', cursor: 'pointer',
           transition: 'background 0.2s', flexShrink: 0,
         }}
@@ -173,7 +173,7 @@ export default function Settings() {
 
         {/* Account card */}
         <div style={{
-          background: 'linear-gradient(135deg, #4A7C59, #2E5240)',
+          background: 'linear-gradient(135deg, #0d6b63, #2E5240)',
           borderRadius: 20, padding: '20px 20px', marginBottom: 16,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
@@ -222,11 +222,11 @@ export default function Settings() {
                   }}
                 >
                   {fam.patientPhotoUrl ? (
-                    <img src={fam.patientPhotoUrl} alt="" style={{ width: 42, height: 42, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: isActive ? '2px solid #4A7C59' : '2px solid transparent' }} />
+                    <img src={fam.patientPhotoUrl} alt="" style={{ width: 42, height: 42, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: isActive ? '2px solid #0d6b63' : '2px solid transparent' }} />
                   ) : (
                     <div style={{
                       width: 42, height: 42, borderRadius: '50%', flexShrink: 0,
-                      background: isActive ? '#4A7C59' : '#C5B9A8',
+                      background: isActive ? '#0d6b63' : '#C5B9A8',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       color: 'white', fontWeight: 700, fontSize: 17,
                     }}>
@@ -246,7 +246,7 @@ export default function Settings() {
                       {roleLabel}
                     </span>
                     {isActive && (
-                      <span style={{ color: '#4A7C59', fontSize: 16, lineHeight: 1 }}>✓</span>
+                      <span style={{ color: '#0d6b63', fontSize: 16, lineHeight: 1 }}>✓</span>
                     )}
                   </div>
                 </button>
@@ -340,10 +340,10 @@ export default function Settings() {
                 disabled={portalLoading}
                 style={{
                   width: '100%', padding: '13px', borderRadius: 14, border: 'none',
-                  background: portalLoading ? '#C0CCC5' : 'linear-gradient(135deg, #4A7C59, #3A6347)',
+                  background: portalLoading ? '#C0CCC5' : 'linear-gradient(135deg, #0d6b63, #3A6347)',
                   color: 'white', fontWeight: 700, fontSize: 14,
                   cursor: portalLoading ? 'not-allowed' : 'pointer',
-                  boxShadow: portalLoading ? 'none' : '0 6px 20px rgba(74,124,89,0.3)',
+                  boxShadow: portalLoading ? 'none' : '0 6px 20px rgba(13,107,99,0.3)',
                   transition: 'all 0.2s',
                 }}
               >
@@ -370,9 +370,9 @@ export default function Settings() {
               onClick={() => navigate('/pricing')}
               style={{
                 width: '100%', padding: '13px', borderRadius: 14, border: 'none',
-                background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
+                background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
                 color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer',
-                boxShadow: '0 6px 20px rgba(74,124,89,0.3)',
+                boxShadow: '0 6px 20px rgba(13,107,99,0.3)',
               }}
             >
               {trialExpired ? 'Reactivar acceso →' : 'Ver planes →'}
@@ -445,9 +445,9 @@ export default function Settings() {
                 onClick={requestAndSubscribe}
                 style={{
                   width: '100%', padding: '12px', borderRadius: 14, border: 'none',
-                  background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
+                  background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
                   color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer',
-                  boxShadow: '0 4px 16px rgba(74,124,89,0.25)',
+                  boxShadow: '0 4px 16px rgba(13,107,99,0.25)',
                   marginBottom: 8,
                 }}
               >
@@ -462,8 +462,8 @@ export default function Settings() {
                 disabled={testingPush}
                 style={{
                   width: '100%', padding: '12px', borderRadius: 14,
-                  border: '1.5px solid #4A7C59', background: 'white',
-                  color: '#4A7C59', fontWeight: 700, fontSize: 14,
+                  border: '1.5px solid #0d6b63', background: 'white',
+                  color: '#0d6b63', fontWeight: 700, fontSize: 14,
                   cursor: testingPush ? 'not-allowed' : 'pointer',
                   opacity: testingPush ? 0.6 : 1,
                   transition: 'all 0.2s',
@@ -489,9 +489,9 @@ export default function Settings() {
                     onClick={() => { setTestResult(null); resubscribe() }}
                     style={{
                       width: '100%', padding: '11px', borderRadius: 14, border: 'none',
-                      background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
+                      background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
                       color: 'white', fontWeight: 700, fontSize: 13, cursor: 'pointer',
-                      marginTop: 8, boxShadow: '0 4px 14px rgba(74,124,89,0.25)',
+                      marginTop: 8, boxShadow: '0 4px 14px rgba(13,107,99,0.25)',
                     }}
                   >
                     🔄 Reactivar suscripción
@@ -506,7 +506,7 @@ export default function Settings() {
         {isAdmin && (
           <div style={{
             borderRadius: 20, overflow: 'hidden', marginBottom: 12,
-            border: '1px solid #2D4A1E30', background: '#F0F9F4',
+            border: '1px solid #0B4F4A30', background: '#F0F9F4',
           }}>
             <button
               onClick={() => navigate('/admin')}
@@ -518,19 +518,19 @@ export default function Settings() {
             >
               <div style={{
                 width: 44, height: 44, borderRadius: 12, flexShrink: 0,
-                background: '#2D4A1E18',
+                background: '#0B4F4A18',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 22,
               }}>⚙️</div>
               <div style={{ flex: 1 }}>
-                <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#2D4A1E' }}>
+                <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#0B4F4A' }}>
                   Panel de administración
                 </p>
-                <p style={{ margin: '2px 0 0', fontSize: 12, color: '#4A7C59' }}>
+                <p style={{ margin: '2px 0 0', fontSize: 12, color: '#0d6b63' }}>
                   Equipo, cuenta, datos y actividad
                 </p>
               </div>
-              <ChevronRight size={16} color="#4A7C59" strokeWidth={2} />
+              <ChevronRight size={16} color="#0d6b63" strokeWidth={2} />
             </button>
           </div>
         )}
@@ -597,10 +597,10 @@ export default function Settings() {
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 24 }}>
               <div style={{
                 width: 72, height: 72, borderRadius: '50%',
-                background: 'linear-gradient(135deg, #4A7C59, #2E5240)',
+                background: 'linear-gradient(135deg, #0d6b63, #2E5240)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 34, marginBottom: 14,
-                boxShadow: '0 6px 20px rgba(74,124,89,0.3)',
+                boxShadow: '0 6px 20px rgba(13,107,99,0.3)',
               }}>
                 🐾
               </div>
@@ -693,9 +693,9 @@ export default function Settings() {
                   onClick={() => setShowCancelMilo(false)}
                   style={{
                     width: '100%', padding: '13px', borderRadius: 14, border: 'none',
-                    background: 'linear-gradient(135deg, #4A7C59, #3A6347)',
+                    background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
                     color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer',
-                    boxShadow: '0 6px 20px rgba(74,124,89,0.3)',
+                    boxShadow: '0 6px 20px rgba(13,107,99,0.3)',
                     marginBottom: 10,
                   }}
                 >
