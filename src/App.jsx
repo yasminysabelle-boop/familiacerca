@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom'
-import { PayPalScriptProvider } from '@paypal/react-paypal-js'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { FamilyProvider, useFamily } from './contexts/FamilyContext'
 import { SubscriptionProvider } from './contexts/SubscriptionContext'
@@ -230,30 +229,22 @@ function Splash({ fading }) {
   )
 }
 
-const PAYPAL_OPTIONS = {
-  clientId: 'BAA59ArCPyhPel6E3o3Fg35_Ppi7ObhJyAUCKfSupXe_Ki7m6j6eY1wW_gTg9VFZs4wwrt0BHN0QlQ6nf0',
-  intent: 'subscription',
-  vault: true,
-}
-
 export default function App() {
   return (
-    <PayPalScriptProvider options={PAYPAL_OPTIONS}>
-      <BrowserRouter>
-        <AuthProvider>
-          <DarkModeProvider>
-            <FamilyProvider>
-              <PresenceProvider>
-                <SubscriptionProvider>
-                  <HospitalModeProvider>
-                    <AppShell />
-                  </HospitalModeProvider>
-                </SubscriptionProvider>
-              </PresenceProvider>
-            </FamilyProvider>
-          </DarkModeProvider>
-        </AuthProvider>
-      </BrowserRouter>
-    </PayPalScriptProvider>
+    <BrowserRouter>
+      <AuthProvider>
+        <DarkModeProvider>
+          <FamilyProvider>
+            <PresenceProvider>
+              <SubscriptionProvider>
+                <HospitalModeProvider>
+                  <AppShell />
+                </HospitalModeProvider>
+              </SubscriptionProvider>
+            </PresenceProvider>
+          </FamilyProvider>
+        </DarkModeProvider>
+      </AuthProvider>
+    </BrowserRouter>
   )
 }

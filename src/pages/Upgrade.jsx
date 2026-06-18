@@ -1,11 +1,19 @@
 import { useNavigate } from 'react-router-dom'
+import { PayPalScriptProvider, usePayPalScriptReducer } from '@paypal/react-paypal-js'
 import { useSubscription } from '../contexts/SubscriptionContext'
 import PayPalSubscription from '../components/PayPalSubscription'
 import Layout from '../components/Layout'
 
-export default function Upgrade() {
+const PAYPAL_OPTIONS = {
+  clientId: 'BAA59ArCPyhPel6E3o3Fg35_Ppi7ObhJyAUCKfSupXe_Ki7m6j6eY1wW_gTg9VFZs4wwrt0BHN0QlQ6nf0',
+  intent: 'subscription',
+  vault: true,
+}
+
+function UpgradeContent() {
   const { isPaid, sub } = useSubscription()
   const navigate = useNavigate()
+  const [{ isPending, isRejected }] = usePayPalScriptReducer()
 
   const currentPlan = sub?.plan ?? 'free'
 
@@ -74,7 +82,22 @@ export default function Upgrade() {
               </div>
             </div>
 
-            <PayPalSubscription />
+            {isPending && (
+              <div style={{ textAlign: 'center', padding: '32px 0', color: '#9CA3AF', fontSize: 14 }}>
+                Cargando opciones de pago...
+              </div>
+            )}
+            {isRejected && (
+              <div style={{
+                background: '#FFF0F0', border: '1px solid #FFBABA', borderRadius: 14,
+                padding: '16px', textAlign: 'center', marginBottom: 16,
+              }}>
+                <p style={{ color: '#DC2626', fontSize: 14, margin: 0 }}>
+                  No se pudo cargar PayPal. Verifica tu conexión e intenta de nuevo.
+                </p>
+              </div>
+            )}
+            {!isPending && !isRejected && <PayPalSubscription />}
           </>
         )}
 
@@ -83,5 +106,13 @@ export default function Upgrade() {
         </p>
       </div>
     </Layout>
+  )
+}
+
+export default function Upgrade() {
+  return (
+    <PayPalScriptProvider options={PAYPAL_OPTIONS}>
+      <UpgradeContent />
+    </PayPalScriptProvider>
   )
 }
