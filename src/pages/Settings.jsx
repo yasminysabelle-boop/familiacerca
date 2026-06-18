@@ -367,15 +367,15 @@ export default function Settings() {
             </>
           ) : (
             <button
-              onClick={() => navigate('/pricing')}
+              onClick={() => navigate('/upgrade')}
               style={{
                 width: '100%', padding: '13px', borderRadius: 14, border: 'none',
-                background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
+                background: 'linear-gradient(135deg, #E58B73, #d4785f)',
                 color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer',
-                boxShadow: '0 6px 20px rgba(13,107,99,0.3)',
+                boxShadow: '0 6px 20px rgba(229,139,115,0.35)',
               }}
             >
-              {trialExpired ? 'Reactivar acceso →' : 'Ver planes →'}
+              {trialExpired ? 'Reactivar acceso →' : 'Mejorar plan →'}
             </button>
           )}
         </div>

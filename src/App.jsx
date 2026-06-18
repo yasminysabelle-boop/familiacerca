@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { PayPalScriptProvider } from '@paypal/react-paypal-js'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { FamilyProvider, useFamily } from './contexts/FamilyContext'
 import { SubscriptionProvider } from './contexts/SubscriptionContext'
@@ -36,6 +37,7 @@ import Cuidado from './pages/Cuidado'
 import PatientProfile from './pages/PatientProfile'
 import NotasFamilia from './pages/NotasFamilia'
 import Landing from './pages/Landing'
+import Upgrade from './pages/Upgrade'
 import VideoCall from './pages/VideoCall'
 import Admin from './pages/Admin'
 import DiarioMedico from './pages/DiarioMedico'
@@ -150,6 +152,7 @@ function AppShell() {
         <Route path="/permisos"    element={<P><Permissions /></P>} />
         <Route path="/roles"       element={<P><FamilyRoles /></P>} />
         <Route path="/pricing"     element={<Pricing />} />
+        <Route path="/upgrade"     element={<P><Upgrade /></P>} />
         <Route path="/ajustes"            element={<P><Settings /></P>} />
         <Route path="/cuidado/horarios"   element={<Navigate to="/cuidado?tab=horarios" replace />} />
         <Route path="/paciente/perfil"      element={<P><PatientProfile /></P>} />
@@ -227,22 +230,30 @@ function Splash({ fading }) {
   )
 }
 
+const PAYPAL_OPTIONS = {
+  clientId: 'BAA59ArCPyhPel6E3o3Fg35_Ppi7ObhJyAUCKfSupXe_Ki7m6j6eY1wW_gTg9VFZs4wwrt0BHN0QlQ6nf0',
+  intent: 'subscription',
+  vault: true,
+}
+
 export default function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <DarkModeProvider>
-          <FamilyProvider>
-            <PresenceProvider>
-              <SubscriptionProvider>
-                <HospitalModeProvider>
-                  <AppShell />
-                </HospitalModeProvider>
-              </SubscriptionProvider>
-            </PresenceProvider>
-          </FamilyProvider>
-        </DarkModeProvider>
-      </AuthProvider>
-    </BrowserRouter>
+    <PayPalScriptProvider options={PAYPAL_OPTIONS}>
+      <BrowserRouter>
+        <AuthProvider>
+          <DarkModeProvider>
+            <FamilyProvider>
+              <PresenceProvider>
+                <SubscriptionProvider>
+                  <HospitalModeProvider>
+                    <AppShell />
+                  </HospitalModeProvider>
+                </SubscriptionProvider>
+              </PresenceProvider>
+            </FamilyProvider>
+          </DarkModeProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </PayPalScriptProvider>
   )
 }
