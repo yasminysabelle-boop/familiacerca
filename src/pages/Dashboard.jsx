@@ -3052,7 +3052,7 @@ export default function Dashboard() {
           )
         })}
 
-        {/* ═══ MAIN CONTENT — fondo crema #F8F4ED ═══ */}
+        {/* ═══ MAIN CONTENT ═══ */}
         <div style={{ padding: '14px 14px 0', display: 'flex', flexDirection: 'column', gap: 14, paddingBottom: 96 }}>
           {(() => {
             const heroPhoto = patientProfile?.foto_url || profile?.photo_url || null
@@ -3060,116 +3060,143 @@ export default function Dashboard() {
             const _totalRoutines = 4
             const _doneRoutines = Math.min(Object.values(careLogsToday).filter(Boolean).length, _totalRoutines)
 
-            const isCritical    = hasActiveSOS || (_isRetrasado && _retrasadoMins != null && _retrasadoMins >= 720)
+            const isCritical     = hasActiveSOS || (_isRetrasado && _retrasadoMins != null && _retrasadoMins >= 720)
             const isPendingToday = !isCritical && (pendingCount > 0 || _isRetrasado)
-            const statusLabel   = isCritical ? '⚠ Atención urgente' : isPendingToday ? '⚠ Atención hoy' : '✓ Todo bajo control'
-            const statusBg      = isCritical ? '#FFF0F0' : isPendingToday ? '#FFFBEB' : '#DCFCE7'
-            const statusColor   = isCritical ? '#D63031' : isPendingToday ? '#92400E' : '#15803D'
-
-            const medsPct      = medTotal > 0 ? Math.round(confirmedTodayCount / medTotal * 100) : confirmedTodayCount > 0 ? 100 : 0
-            const routinesPct  = Math.round(_doneRoutines / Math.max(_totalRoutines, 1) * 100)
-            const emotionalPct = dailyMood === 'good' ? 100 : dailyMood === 'regular' ? 60 : dailyMood === 'hard' ? 20 : 50
-            const wellbeingPct = Math.round((medsPct + routinesPct + emotionalPct) / 3)
-            const wellbeingColor = wellbeingPct >= 70 ? '#0B4F4A' : wellbeingPct >= 40 ? '#C9882A' : '#D63031'
-            const wellbeingLabel = wellbeingPct >= 70 ? 'Excelente' : wellbeingPct >= 40 ? 'Bueno' : 'Regular'
+            const statusEmoji = isCritical ? '🔴' : isPendingToday ? '🟡' : '🟢'
+            const statusLabel = isCritical ? 'Requiere atención urgente' : isPendingToday ? 'Requiere atención' : 'Todo bajo control'
+            const statusBg    = isCritical ? '#FFF0F0' : isPendingToday ? '#FFFBEB' : '#EDFAF3'
+            const statusColor = isCritical ? '#B91C1C' : isPendingToday ? '#92400E' : '#166534'
+            const statusBorder = isCritical ? '#FECACA' : isPendingToday ? '#FDE68A' : '#BBF7D0'
 
             const momentoHoy = (todaySection?.events ?? [])
               .filter(e => e.type === 'PHOTO' || e.type === 'VOICE_MEMORY')
               .sort((a, b) => (b.timestamp ?? 0) - (a.timestamp ?? 0))[0] ?? null
 
             const actividadHoy = (todaySection?.events ?? [])
-              .filter(e => !['MED_MISSED', 'CAREGIVER_CARD'].includes(e.type))
+              .filter(e => !['MED_MISSED', 'CAREGIVER_CARD', 'MED_PENDING'].includes(e.type))
               .sort((a, b) => (b.timestamp ?? 0) - (a.timestamp ?? 0))
               .slice(0, 4)
 
-            // Donut SVG helpers
-            const R = 30, STROKE = 7
-            const circ = 2 * Math.PI * R
-            const filled = (wellbeingPct / 100) * circ
+            const recentMembers = familyMembers.filter(m => m.last_seen && Date.now() - new Date(m.last_seen).getTime() < 24 * 60 * 60 * 1000)
+            const participacion = recentMembers.length >= 2 ? 'Alta' : recentMembers.length === 1 ? 'Moderada' : 'Baja'
 
             return (
               <>
-                {/* ─ 1. PATIENT CARD ─ */}
-                <div style={{ background: 'white', borderRadius: 20, padding: '18px 16px', boxShadow: '0 2px 16px rgba(0,0,0,0.08)', animation: 'fadeInUp 0.4s ease both' }}>
-                  <div style={{ display: 'flex', gap: 14, alignItems: 'center', marginBottom: 14 }}>
-                    {/* Avatar 80px */}
+                {/* ── 1. HERO ── corazón del dashboard */}
+                <div style={{ background: '#F0F7F5', borderRadius: 24, padding: '28px 20px 20px', boxShadow: '0 4px 24px rgba(11,79,74,0.1)', animation: 'fadeInUp 0.4s ease both', border: '1px solid #D6EAE6' }}>
+                  {/* Photo + name + status — centered */}
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, marginBottom: 16 }}>
                     <div
                       onClick={() => navigate('/paciente/perfil')}
-                      style={{ width: 80, height: 80, borderRadius: '50%', background: '#3D6B54', border: '3px solid #EDE5D8', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, color: 'white', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 14px rgba(11,79,74,0.2)' }}
+                      style={{ width: 90, height: 90, borderRadius: '50%', background: '#3D6B54', border: '4px solid white', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, color: 'white', fontWeight: 700, cursor: 'pointer', boxShadow: '0 6px 20px rgba(11,79,74,0.22)' }}
                     >
                       {heroPhoto
                         ? <img src={heroPhoto} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { e.currentTarget.style.display = 'none' }} />
                         : patientName.charAt(0).toUpperCase()}
                     </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ fontSize: 18, fontWeight: 700, fontFamily: 'Georgia, serif', color: '#20312C', margin: '0 0 6px', lineHeight: 1.2 }}>
+                    <div style={{ textAlign: 'center' }}>
+                      <p style={{ fontSize: 22, fontWeight: 700, fontFamily: 'Georgia, serif', color: '#0B4F4A', margin: '0 0 8px', lineHeight: 1.2 }}>
                         {patientName}
                       </p>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 12px', borderRadius: 20, background: statusBg, fontSize: 11, fontWeight: 700, color: statusColor }}>
-                        {statusLabel}
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 16px', borderRadius: 24, background: statusBg, fontSize: 13, fontWeight: 600, color: statusColor, border: `1px solid ${statusBorder}` }}>
+                        {statusEmoji} {statusLabel}
                       </span>
-                      <p style={{ fontSize: 11, color: '#B0A898', margin: '6px 0 0', lineHeight: 1.3 }}>
-                        Última actualización · {lastUpdatedAgo || 'Sin actividad hoy'}
-                      </p>
                     </div>
+                    <p style={{ fontSize: 12, color: '#9CA3AF', margin: 0, textAlign: 'center' }}>
+                      Última actualización · {lastUpdatedAgo || 'Sin actividad hoy'}
+                    </p>
                   </div>
-                  {/* 3 mini-badges */}
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
-                    <button onClick={() => navigate('/medications')} style={{ background: (pendingCount > 0 || _isRetrasado) ? '#FFFBEB' : '#F0FDF4', borderRadius: 12, border: 'none', padding: '10px 6px', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, WebkitTapHighlightColor: 'transparent' }}>
+
+                  {/* Collaborators */}
+                  {familyMembers.length > 0 && (
+                    <>
+                      <div style={{ height: 1, background: '#D6EAE6', margin: '0 0 16px' }} />
+                      <div
+                        onClick={() => setShowFamilySwitcher(true)}
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, cursor: 'pointer' }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                          {familyMembers.slice(0, 4).map((m, i) => {
+                            const nm = m.full_name?.trim() || m.email?.split('@')[0] || '?'
+                            const isOnline = m.last_seen && Date.now() - new Date(m.last_seen).getTime() < 5 * 60 * 1000
+                            return (
+                              <div key={m.id} style={{ position: 'relative', marginLeft: i > 0 ? -8 : 0, zIndex: 10 - i }}>
+                                <div style={{ width: 34, height: 34, borderRadius: '50%', background: ['#0B4F4A','#C9882A','#7C3AED','#E58B73'][i % 4], border: '2.5px solid white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, color: 'white' }}>
+                                  {nm.charAt(0).toUpperCase()}
+                                </div>
+                                {isOnline && <div style={{ position: 'absolute', bottom: 0, right: 0, width: 9, height: 9, borderRadius: '50%', background: '#22C55E', border: '1.5px solid white' }} />}
+                              </div>
+                            )
+                          })}
+                        </div>
+                        <div>
+                          <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#0B4F4A' }}>
+                            {familyMembers.slice(0, 2).map(m => (m.full_name ?? m.email ?? '').split(' ')[0]).filter(Boolean).join(' · ')}
+                            {familyMembers.length > 2 && <span style={{ color: '#9CA3AF', fontWeight: 400 }}> +{familyMembers.length - 2}</span>}
+                          </p>
+                          <p style={{ margin: 0, fontSize: 11, color: '#9CA3AF' }}>{familyCount} cuidando juntos</p>
+                        </div>
+                        <span style={{ fontSize: 14, color: '#B0A898', marginLeft: 'auto' }}>›</span>
+                      </div>
+                    </>
+                  )}
+
+                  {/* Mini metric badges */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginTop: 16 }}>
+                    <button onClick={() => navigate('/medications')} style={{ background: 'white', borderRadius: 12, border: '1px solid #D6EAE6', padding: '10px 6px', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, WebkitTapHighlightColor: 'transparent' }}>
                       <span style={{ fontSize: 18 }}>💊</span>
-                      <span style={{ fontSize: 9, fontWeight: 700, color: (pendingCount > 0 || _isRetrasado) ? '#92400E' : '#15803D', textAlign: 'center', lineHeight: 1.3 }}>
-                        {_isRetrasado ? '⚠ Retrasado' : pendingCount > 0 ? `${pendingCount} pend.` : confirmedTodayCount > 0 ? `${confirmedTodayCount} dados ✓` : 'Sin meds'}
+                      <span style={{ fontSize: 8, fontWeight: 700, color: (pendingCount > 0 || _isRetrasado) ? '#92400E' : '#166534', textAlign: 'center', lineHeight: 1.4 }}>
+                        {_isRetrasado ? 'Retrasado' : pendingCount > 0 ? `${pendingCount} pendiente${pendingCount !== 1 ? 's' : ''}` : confirmedTodayCount > 0 ? `${confirmedTodayCount} dados ✓` : 'Sin meds hoy'}
                       </span>
                     </button>
-                    <button onClick={() => navigate('/cuidado')} style={{ background: _doneRoutines === _totalRoutines ? '#F0FDF4' : '#F8F4ED', borderRadius: 12, border: 'none', padding: '10px 6px', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, WebkitTapHighlightColor: 'transparent' }}>
+                    <button onClick={() => navigate('/cuidado')} style={{ background: 'white', borderRadius: 12, border: '1px solid #D6EAE6', padding: '10px 6px', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, WebkitTapHighlightColor: 'transparent' }}>
                       <span style={{ fontSize: 18 }}>✅</span>
-                      <span style={{ fontSize: 9, fontWeight: 700, color: _doneRoutines === _totalRoutines ? '#15803D' : '#C9882A', textAlign: 'center', lineHeight: 1.3 }}>
-                        {_doneRoutines === _totalRoutines ? 'Rutinas ✓' : `${_doneRoutines}/${_totalRoutines} hechas`}
+                      <span style={{ fontSize: 8, fontWeight: 700, color: _doneRoutines === _totalRoutines ? '#166534' : '#92400E', textAlign: 'center', lineHeight: 1.4 }}>
+                        {_doneRoutines === _totalRoutines ? 'Completadas ✓' : _doneRoutines > 0 ? `${_doneRoutines} de ${_totalRoutines} hechas` : `${_totalRoutines} pendientes hoy`}
                       </span>
                     </button>
-                    <button onClick={() => navigate('/calendar')} style={{ background: nextAppointment ? '#EFF6FF' : '#F8F4ED', borderRadius: 12, border: 'none', padding: '10px 6px', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, WebkitTapHighlightColor: 'transparent' }}>
+                    <button onClick={() => navigate('/calendar')} style={{ background: 'white', borderRadius: 12, border: '1px solid #D6EAE6', padding: '10px 6px', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, WebkitTapHighlightColor: 'transparent' }}>
                       <span style={{ fontSize: 18 }}>📅</span>
-                      <span style={{ fontSize: 9, fontWeight: 700, color: nextAppointment ? '#1D4ED8' : '#9CA3AF', textAlign: 'center', lineHeight: 1.3 }}>
-                        {nextAppointment ? (nextAppointment.appointmentTitle ?? 'Próx. cita').slice(0, 12) : 'Sin citas'}
+                      <span style={{ fontSize: 8, fontWeight: 700, color: nextAppointment ? '#1D4ED8' : '#9CA3AF', textAlign: 'center', lineHeight: 1.4 }}>
+                        {nextAppointment ? (nextAppointment.appointmentTitle ?? 'Próxima cita').slice(0, 14) : 'Sin citas programadas'}
                       </span>
                     </button>
                   </div>
                 </div>
 
-                {/* ─ 2. TODAY'S ACTIVITY — timeline con línea vertical ─ */}
-                <div style={{ background: 'white', borderRadius: 20, padding: '16px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-                    <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#20312C' }}>Actividad de hoy</p>
+                {/* ── 2. ACTIVITY — frases humanas ── */}
+                <div style={{ background: 'white', borderRadius: 20, padding: '16px', boxShadow: '0 2px 12px rgba(0,0,0,0.05)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+                    <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#0B4F4A' }}>Actividad de hoy</p>
                     <button onClick={() => navigate('/historial')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: '#E58B73', fontWeight: 600, padding: 0, WebkitTapHighlightColor: 'transparent' }}>Ver todo →</button>
                   </div>
                   {loading ? (
-                    <p style={{ color: '#9CA3AF', fontSize: 13, margin: 0, padding: '8px 0' }}>Cargando...</p>
+                    <p style={{ color: '#9CA3AF', fontSize: 13, margin: 0 }}>Cargando...</p>
                   ) : actividadHoy.length === 0 ? (
-                    <p style={{ color: '#9CA3AF', fontSize: 13, margin: 0, padding: '8px 0' }}>Sin actividad hoy — comienza registrando</p>
+                    <div style={{ textAlign: 'center', padding: '12px 0 4px' }}>
+                      <p style={{ color: '#B0A898', fontSize: 13, margin: 0 }}>Sin actividad registrada hoy</p>
+                    </div>
                   ) : (
                     <div style={{ position: 'relative' }}>
-                      {/* Línea vertical — corre desde el primer dot al último */}
                       {actividadHoy.length > 1 && (
-                        <div style={{ position: 'absolute', left: 45, top: 20, bottom: 20, width: 1.5, background: '#EDE5D8', zIndex: 0 }} />
+                        <div style={{ position: 'absolute', left: 45, top: 20, bottom: 20, width: 1.5, background: '#E8F5F0', zIndex: 0 }} />
                       )}
                       {actividadHoy.map((evt, i) => {
-                        const EMOJIS = { MED_CONFIRMED: '💊', MED_PENDING: '⏳', VOICE_MEMORY: '🎙️', PHOTO: '📸', NOTE: '📝', EXPENSE: '💰', APPOINTMENT: '📅', APPOINTMENT_PROOF: '✅', SOS_ALERT: '🚨', CARE_LOG: '✔️' }
-                        const LABELS = {
-                          MED_CONFIRMED:     `${evt.medName ?? 'Medicamento'} dado`,
-                          MED_PENDING:       `${evt.medName ?? 'Medicamento'} pendiente`,
-                          VOICE_MEMORY:      'Memoria de voz grabada',
-                          PHOTO:             'Foto compartida',
-                          NOTE:              'Nota registrada',
-                          EXPENSE:           evt.description ? `Gasto: ${evt.description}` : 'Gasto registrado',
-                          APPOINTMENT:       evt.appointmentTitle ?? 'Cita médica',
-                          APPOINTMENT_PROOF: `Cita confirmada${evt.appointmentTitle ? `: ${evt.appointmentTitle}` : ''}`,
-                          SOS_ALERT:         'Alerta SOS activada',
-                          CARE_LOG:          'Rutina completada',
+                        const actor = (evt.confirmedBy ?? evt.uploaderName ?? evt.recorderName ?? evt.authorName ?? firstName ?? 'Cuidador').split(' ')[0]
+                        const HUMAN = {
+                          MED_CONFIRMED:     { icon: '💊', text: `${actor} confirmó ${evt.medName ?? 'medicamento'}` },
+                          VOICE_MEMORY:      { icon: '🎙️', text: `${actor} grabó una memoria de voz` },
+                          PHOTO:             { icon: '📸', text: `${actor} subió una foto` },
+                          NOTE:              { icon: '📝', text: `${actor} escribió una nota` },
+                          EXPENSE:           { icon: '💰', text: `${actor} registró gasto${evt.description ? `: ${evt.description}` : ''}` },
+                          APPOINTMENT:       { icon: '📅', text: `Cita: ${evt.appointmentTitle ?? 'médica'}` },
+                          APPOINTMENT_PROOF: { icon: '✅', text: `${actor} confirmó cita${evt.appointmentTitle ? `: ${evt.appointmentTitle}` : ''}` },
+                          SOS_ALERT:         { icon: '🚨', text: `${actor} activó alerta SOS` },
+                          CARE_LOG:          { icon: '✔️', text: `${actor} completó una rutina` },
                         }
-                        const icon   = EMOJIS[evt.type] ?? '📌'
-                        const label  = LABELS[evt.type] ?? 'Actividad'
+                        const meta  = HUMAN[evt.type] ?? { icon: '📌', text: 'Actividad registrada' }
                         const isDone = ['MED_CONFIRMED', 'APPOINTMENT_PROOF', 'VOICE_MEMORY', 'PHOTO', 'NOTE', 'EXPENSE', 'CARE_LOG'].includes(evt.type)
-                        const time   = evt.timestamp
+                        const time  = evt.timestamp
                           ? new Date(evt.timestamp).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit', hour12: false })
                           : '--'
                         return (
@@ -3178,17 +3205,13 @@ export default function Dashboard() {
                             onClick={() => setSelectedEvent(evt)}
                             style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '9px 0', cursor: 'pointer', position: 'relative', zIndex: 1 }}
                           >
-                            {/* Hora */}
-                            <span style={{ fontSize: 10, color: '#B0A898', width: 34, textAlign: 'right', flexShrink: 0, lineHeight: 1 }}>{time}</span>
-                            {/* Dot sobre la línea */}
+                            <span style={{ fontSize: 10, color: '#B0A898', width: 34, textAlign: 'right', flexShrink: 0 }}>{time}</span>
                             <div style={{ width: 8, height: 8, borderRadius: '50%', background: isDone ? '#0B4F4A' : '#E58B73', flexShrink: 0, zIndex: 2 }} />
-                            {/* Ícono */}
-                            <div style={{ width: 32, height: 32, borderRadius: 9, background: '#F5F0E8', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15 }}>
-                              {icon}
+                            <div style={{ width: 32, height: 32, borderRadius: 9, background: '#F0F7F5', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15 }}>
+                              {meta.icon}
                             </div>
-                            {/* Texto */}
-                            <span style={{ flex: 1, fontSize: 12, color: '#20312C', fontWeight: 500, lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{label}</span>
-                            {isDone && <span style={{ fontSize: 13, color: '#22C55E', flexShrink: 0 }}>✓</span>}
+                            <span style={{ flex: 1, fontSize: 12, color: '#20312C', fontWeight: 500, lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{meta.text}</span>
+                            {isDone && <span style={{ fontSize: 12, color: '#22C55E', flexShrink: 0 }}>✓</span>}
                           </div>
                         )
                       })}
@@ -3196,102 +3219,104 @@ export default function Dashboard() {
                   )}
                 </div>
 
-                {/* ─ 3. MOMENTOS + BIENESTAR ─ */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-
-                  {/* Momentos de hoy — foto con overlay */}
-                  <div style={{ background: 'white', borderRadius: 20, overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column', minHeight: 180 }}>
-                    <div style={{ padding: '12px 12px 8px', flexShrink: 0 }}>
-                      <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: '#20312C' }}>Momentos de hoy</p>
-                    </div>
-                    {momentoHoy ? (
-                      <div
-                        onClick={() => setSelectedEvent(momentoHoy)}
-                        style={{ flex: 1, position: 'relative', cursor: 'pointer', minHeight: 120 }}
-                      >
-                        {/* Foto o fondo de voz */}
-                        {momentoHoy.type === 'PHOTO' && momentoHoy.fileUrl ? (
-                          <img
-                            src={momentoHoy.fileUrl} alt="Momento"
-                            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                          />
-                        ) : (
-                          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, #0B4F4A, #1a7a6e)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <span style={{ fontSize: 40, opacity: 0.6 }}>🎙️</span>
-                          </div>
+                {/* ── 3. MOMENTOS — full-width, especial ── */}
+                <div style={{ background: 'white', borderRadius: 20, overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
+                  <div style={{ padding: '14px 16px 10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#0B4F4A' }}>Momentos de hoy</p>
+                    <button onClick={() => navigate('/paciente/notas-familia')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: '#E58B73', fontWeight: 600, padding: 0, WebkitTapHighlightColor: 'transparent' }}>Ver todos →</button>
+                  </div>
+                  {momentoHoy ? (
+                    <div onClick={() => setSelectedEvent(momentoHoy)} style={{ cursor: 'pointer', position: 'relative', height: 190 }}>
+                      {momentoHoy.type === 'PHOTO' && momentoHoy.fileUrl ? (
+                        <img src={momentoHoy.fileUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                      ) : (
+                        <div style={{ width: '100%', height: '100%', background: 'linear-gradient(135deg,#0B4F4A,#1a7a6e)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <span style={{ fontSize: 52, opacity: 0.45 }}>🎙️</span>
+                        </div>
+                      )}
+                      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.1) 55%, transparent 100%)' }} />
+                      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '14px 16px' }}>
+                        {(momentoHoy.nota ?? momentoHoy.caption ?? momentoHoy.title ?? momentoHoy.transcription) && (
+                          <p style={{ color: 'white', fontSize: 13, fontWeight: 500, margin: '0 0 6px', lineHeight: 1.4, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                            {momentoHoy.nota ?? momentoHoy.caption ?? momentoHoy.title ?? momentoHoy.transcription}
+                          </p>
                         )}
-                        {/* Overlay gradiente con info */}
-                        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.1) 55%, transparent 100%)', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '10px 10px 10px' }}>
-                          {momentoHoy.type === 'VOICE_MEMORY' && momentoHoy.transcription && (
-                            <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: 9, margin: '0 0 4px', lineHeight: 1.4, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
-                              "{momentoHoy.transcription}"
-                            </p>
-                          )}
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                            <span style={{ fontSize: 11, color: '#E58B73' }}>♥</span>
-                            <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.8)', fontWeight: 600 }}>
-                              {(momentoHoy.uploaderName ?? momentoHoy.recorderName ?? 'Cuidador').split(' ')[0]}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <span style={{ fontSize: 13, color: '#E58B73' }}>♥</span>
+                          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.9)', fontWeight: 600 }}>
+                            {(momentoHoy.uploaderName ?? momentoHoy.recorderName ?? 'Cuidador').split(' ')[0]}
+                          </span>
+                          {momentoHoy.timestamp && (
+                            <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)' }}>
+                              · {timeAgo(new Date(momentoHoy.timestamp))}
                             </span>
-                            {momentoHoy.timestamp && (
-                              <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.55)', marginLeft: 2 }}>
-                                · {new Date(momentoHoy.timestamp).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit', hour12: false })}
-                              </span>
-                            )}
-                          </div>
+                          )}
                         </div>
                       </div>
-                    ) : (
-                      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '0 12px 12px' }}>
-                        <span style={{ fontSize: 28, opacity: 0.3 }}>📷</span>
-                        <span style={{ fontSize: 10, color: '#B0A898', textAlign: 'center', lineHeight: 1.4 }}>Sin momentos hoy</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Índice de bienestar — donut SVG */}
-                  <div style={{ background: 'white', borderRadius: 20, padding: '14px 12px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column' }}>
-                    <p style={{ margin: '0 0 8px', fontSize: 12, fontWeight: 700, color: '#20312C' }}>Índice de bienestar</p>
-                    {/* Donut SVG */}
-                    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 8 }}>
-                      <svg width="76" height="76" viewBox="0 0 76 76">
-                        {/* Track */}
-                        <circle cx="38" cy="38" r={R} fill="none" stroke="#F0EAE0" strokeWidth={STROKE} />
-                        {/* Progress */}
-                        <circle
-                          cx="38" cy="38" r={R}
-                          fill="none"
-                          stroke={wellbeingColor}
-                          strokeWidth={STROKE}
-                          strokeDasharray={`${filled} ${circ}`}
-                          strokeLinecap="round"
-                          transform="rotate(-90 38 38)"
-                        />
-                        {/* % text */}
-                        <text x="38" y="35" textAnchor="middle" fontSize="13" fontWeight="800" fill={wellbeingColor} fontFamily="Georgia, serif">{wellbeingPct}%</text>
-                        {/* label text */}
-                        <text x="38" y="48" textAnchor="middle" fontSize="8" fill="#9CA3AF" fontFamily="sans-serif">{wellbeingLabel}</text>
-                      </svg>
                     </div>
-                    {/* Barras */}
-                    {[
-                      { label: 'Medicamentos', pct: medsPct },
-                      { label: 'Rutinas', pct: routinesPct },
-                      { label: 'Emocional', pct: emotionalPct },
-                    ].map(({ label, pct }) => (
-                      <div key={label} style={{ marginBottom: 6 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
-                          <span style={{ fontSize: 9, color: '#9CA3AF' }}>{label}</span>
-                          <span style={{ fontSize: 9, color: '#0B4F4A', fontWeight: 700 }}>{pct}%</span>
-                        </div>
-                        <div style={{ height: 3, borderRadius: 2, background: '#F0EAE0', overflow: 'hidden' }}>
-                          <div style={{ height: '100%', width: `${pct}%`, borderRadius: 2, background: pct >= 70 ? '#0B4F4A' : pct >= 40 ? '#C9882A' : '#E58B73', transition: 'width 0.6s ease' }} />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                  ) : (
+                    <div style={{ padding: '16px', textAlign: 'center', background: '#FAFAF8' }}>
+                      <span style={{ fontSize: 32, opacity: 0.25, display: 'block', marginBottom: 6 }}>📷</span>
+                      <p style={{ color: '#B0A898', fontSize: 13, margin: '0 0 4px' }}>Sin momentos hoy</p>
+                      <p style={{ color: '#9CA3AF', fontSize: 11, margin: 0, lineHeight: 1.4 }}>Los momentos aparecen cuando alguien sube fotos o graba memorias de voz</p>
+                    </div>
+                  )}
                 </div>
 
-                {/* ─ 4. QUICK ACTIONS ─ */}
+                {/* ── 4. ESTADO GENERAL — sin porcentajes ── */}
+                <div style={{ background: 'white', borderRadius: 20, padding: '16px', boxShadow: '0 2px 12px rgba(0,0,0,0.05)' }}>
+                  <p style={{ margin: '0 0 12px', fontSize: 14, fontWeight: 700, color: '#0B4F4A' }}>Estado general</p>
+                  {[
+                    {
+                      icon: '💊', label: 'Medicamentos',
+                      value: _isRetrasado ? 'Retrasados' : pendingCount > 0 ? `${pendingCount} pendiente${pendingCount !== 1 ? 's' : ''}` : confirmedTodayCount > 0 ? 'Al día' : 'Sin meds hoy',
+                      ok: !_isRetrasado && pendingCount === 0 && confirmedTodayCount > 0,
+                      warn: pendingCount > 0 || _isRetrasado,
+                      onClick: () => navigate('/medications'),
+                    },
+                    {
+                      icon: '✅', label: 'Rutinas',
+                      value: _doneRoutines === _totalRoutines ? 'Completadas' : _doneRoutines > 0 ? `${_doneRoutines} de ${_totalRoutines} hechas` : 'Pendientes hoy',
+                      ok: _doneRoutines === _totalRoutines,
+                      warn: _doneRoutines < _totalRoutines,
+                      onClick: () => navigate('/cuidado'),
+                    },
+                    {
+                      icon: '⚡', label: 'Actividad',
+                      value: recentActivityItems.length > 0 ? 'Reciente' : 'Sin actividad hoy',
+                      ok: recentActivityItems.length > 0,
+                      warn: false,
+                      onClick: () => navigate('/historial'),
+                    },
+                    {
+                      icon: '👥', label: 'Participación familiar',
+                      value: `${participacion}${recentMembers.length > 0 ? ` · ${recentMembers.length} activo${recentMembers.length !== 1 ? 's' : ''}` : ''}`,
+                      ok: recentMembers.length >= 2,
+                      warn: recentMembers.length === 1,
+                      onClick: () => setShowFamilySwitcher(true),
+                    },
+                  ].map(({ icon, label, value, ok, warn, onClick }, i, arr) => (
+                    <button
+                      key={label}
+                      onClick={onClick}
+                      style={{
+                        width: '100%', display: 'flex', alignItems: 'center', gap: 12,
+                        padding: '11px 0', background: 'none', border: 'none', cursor: 'pointer',
+                        borderBottom: i < arr.length - 1 ? '1px solid #F5F0E8' : 'none',
+                        WebkitTapHighlightColor: 'transparent', textAlign: 'left',
+                      }}
+                    >
+                      <span style={{ fontSize: 18, flexShrink: 0 }}>{icon}</span>
+                      <span style={{ flex: 1, fontSize: 13, fontWeight: 600, color: '#20312C' }}>{label}</span>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: ok ? '#166534' : warn ? '#92400E' : '#9CA3AF', flexShrink: 0 }}>
+                        {value}{ok ? ' ✓' : ''}
+                      </span>
+                      <span style={{ fontSize: 13, color: '#D1CCC4', flexShrink: 0 }}>›</span>
+                    </button>
+                  ))}
+                </div>
+
+                {/* ── 5. QUICK ACTIONS ── */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
                   {[
                     { icon: '📞', label: 'Llamar',     onClick: () => navigate('/familia'), emergency: false },
@@ -3305,12 +3330,12 @@ export default function Dashboard() {
                       style={{
                         background: emergency ? '#FFF0F0' : 'white',
                         borderRadius: 16,
-                        border: emergency ? '1.5px solid #FECACA' : '1.5px solid #EDE5D8',
+                        border: emergency ? '1.5px solid #FECACA' : '1.5px solid #D6EAE6',
                         padding: '14px 6px',
                         cursor: 'pointer',
                         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5,
                         WebkitTapHighlightColor: 'transparent',
-                        boxShadow: '0 1px 6px rgba(0,0,0,0.05)',
+                        boxShadow: '0 1px 6px rgba(0,0,0,0.04)',
                       }}
                     >
                       <span style={{ fontSize: 22 }}>{icon}</span>
@@ -3319,7 +3344,7 @@ export default function Dashboard() {
                   ))}
                 </div>
 
-                {/* ─ 5. MORE TOOLS ─ */}
+                {/* ── 6. MORE TOOLS ── */}
                 <div>
                   <p style={{ margin: '0 0 10px', fontSize: 14, fontWeight: 600, color: '#20312C' }}>Más herramientas</p>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
