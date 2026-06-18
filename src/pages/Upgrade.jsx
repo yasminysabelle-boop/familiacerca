@@ -8,12 +8,14 @@ const PAYPAL_OPTIONS = {
   clientId: 'BAA59ArCPyhPel6E3o3Fg35_Ppi7ObhJyAUCKfSupXe_Ki7m6j6eY1wW_gTg9VFZs4wwrt0BHN0QlQ6nf0',
   intent: 'subscription',
   vault: true,
+  currency: 'USD',
+  components: 'buttons',
 }
 
 function UpgradeContent() {
   const { isPaid, sub } = useSubscription()
   const navigate = useNavigate()
-  const [{ isPending, isRejected }] = usePayPalScriptReducer()
+  const [{ isPending, isResolved, isRejected }] = usePayPalScriptReducer()
 
   const currentPlan = sub?.plan ?? 'free'
 
@@ -82,7 +84,7 @@ function UpgradeContent() {
               </div>
             </div>
 
-            {isPending && (
+            {(isPending || (!isResolved && !isRejected)) && (
               <div style={{ textAlign: 'center', padding: '32px 0', color: '#9CA3AF', fontSize: 14 }}>
                 Cargando opciones de pago...
               </div>
@@ -97,7 +99,7 @@ function UpgradeContent() {
                 </p>
               </div>
             )}
-            {!isPending && !isRejected && <PayPalSubscription />}
+            {isResolved && <PayPalSubscription />}
           </>
         )}
 
