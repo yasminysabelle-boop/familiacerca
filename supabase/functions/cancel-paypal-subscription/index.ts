@@ -52,26 +52,27 @@ serve(async (req) => {
       .maybeSingle()
 
     if (subErr) throw subErr
-    if (!sub?.paypal_subscription_id) throw new Error('No PayPal subscription found')
-    if (sub.status === 'cancelled')   throw new Error('Subscription already cancelled')
 
-    const token = await getPayPalToken()
+    // Only call PayPal if there is an active PayPal subscription ID
+    if (sub?.paypal_subscription_id) {
+      const token = await getPayPalToken()
 
-    const cancelRes = await fetch(
-      `https://api-m.paypal.com/v1/billing/subscriptions/${sub.paypal_subscription_id}/cancel`,
-      {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type':  'application/json',
-        },
-        body: JSON.stringify({ reason: 'Customer requested cancellation' }),
+      const cancelRes = await fetch(
+        `https://api-m.paypal.com/v1/billing/subscriptions/${sub.paypal_subscription_id}/cancel`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type':  'application/json',
+          },
+          body: JSON.stringify({ reason: 'Customer requested cancellation' }),
+        }
+      )
+
+      // PayPal returns 204 No Content on success
+      if (!cancelRes.ok && cancelRes.status !== 204) {
+        throw new Error(`PayPal cancel failed (${cancelRes.status}): ${await cancelRes.text()}`)
       }
-    )
-
-    // PayPal returns 204 No Content on success
-    if (!cancelRes.ok && cancelRes.status !== 204) {
-      throw new Error(`PayPal cancel failed (${cancelRes.status}): ${await cancelRes.text()}`)
     }
 
     const { error: updateErr } = await supabaseAdmin
