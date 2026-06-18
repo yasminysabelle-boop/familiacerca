@@ -45,6 +45,8 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')  ?? ''
     )
 
+    const { cancel_reason } = await req.json().catch(() => ({}))
+
     const { data: sub, error: subErr } = await supabaseAdmin
       .from('subscriptions')
       .select('paypal_subscription_id, status')
@@ -75,9 +77,12 @@ serve(async (req) => {
       }
     }
 
+    const updatePayload: Record<string, unknown> = { status: 'cancelled' }
+    if (cancel_reason) updatePayload.cancel_reason = cancel_reason
+
     const { error: updateErr } = await supabaseAdmin
       .from('subscriptions')
-      .update({ status: 'cancelled' })
+      .update(updatePayload)
       .eq('user_id', user.id)
 
     if (updateErr) throw updateErr

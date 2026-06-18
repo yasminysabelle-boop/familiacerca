@@ -96,7 +96,8 @@ export default function Settings() {
   const [locationOn, setLocationOn] = useState(() => isLocationEnabled())
   const [testingPush, setTestingPush] = useState(false)
   const [testResult, setTestResult] = useState(null)
-  const [showCancelModal, setShowCancelModal] = useState(false)
+  const [cancelStep, setCancelStep] = useState(0) // 0=closed 1=milo 2=reason
+  const [cancelReason, setCancelReason] = useState(null)
   const [cancelLoading, setCancelLoading] = useState(false)
   const [cancelDone, setCancelDone] = useState(false)
   const [cancelError, setCancelError] = useState(null)
@@ -128,15 +129,29 @@ export default function Settings() {
     setLocationOn(val)
   }
 
+  function openCancelFlow() {
+    setCancelStep(1)
+    setCancelReason(null)
+    setCancelDone(false)
+    setCancelError(null)
+  }
+
+  function closeCancelFlow() {
+    if (cancelLoading) return
+    setCancelStep(0)
+  }
+
   async function handleCancelSubscription() {
     setCancelLoading(true)
     setCancelError(null)
     try {
-      const { error } = await supabase.functions.invoke('cancel-paypal-subscription')
+      const { error } = await supabase.functions.invoke('cancel-paypal-subscription', {
+        body: { cancel_reason: cancelReason },
+      })
       if (error) throw error
       setCancelDone(true)
       setTimeout(() => {
-        setShowCancelModal(false)
+        setCancelStep(0)
         setCancelDone(false)
         window.location.href = '/ajustes'
       }, 2500)
@@ -353,7 +368,7 @@ export default function Settings() {
           </button>
           {isPaid && (
             <button
-              onClick={() => { setShowCancelModal(true); setCancelDone(false); setCancelError(null) }}
+              onClick={openCancelFlow}
               style={{
                 width: '100%', padding: '11px', borderRadius: 12, marginTop: 8,
                 border: '1.5px solid #EDE5D8', background: 'transparent',
@@ -562,15 +577,15 @@ export default function Settings() {
         </p>
       </div>
 
-      {/* Cancel subscription confirmation modal */}
-      {showCancelModal && (
+      {/* Cancel subscription flow — 3 steps */}
+      {cancelStep > 0 && (
         <div
           style={{
             position: 'fixed', inset: 0, zIndex: 400,
             background: 'rgba(0,0,0,0.55)',
             display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
           }}
-          onClick={e => { if (e.target === e.currentTarget && !cancelLoading) setShowCancelModal(false) }}
+          onClick={e => { if (e.target === e.currentTarget) closeCancelFlow() }}
         >
           <div style={{
             width: '100%', maxWidth: 480, background: 'white',
@@ -578,41 +593,117 @@ export default function Settings() {
             padding: '32px 24px 48px',
             boxShadow: '0 -12px 48px rgba(0,0,0,0.18)',
           }}>
-            {cancelDone ? (
+
+            {/* Step done */}
+            {cancelDone && (
               <div style={{ textAlign: 'center', padding: '8px 0' }}>
-                <p style={{ fontSize: 32, margin: '0 0 12px' }}>✅</p>
+                <p style={{ fontSize: 36, margin: '0 0 12px' }}>✅</p>
                 <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#1A1A1A', margin: '0 0 10px' }}>
                   Suscripción cancelada
                 </p>
                 <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.6, margin: 0 }}>
-                  Tu suscripción fue cancelada. Tu plan estará activo hasta el fin del período.
+                  Tu plan estará activo hasta el fin del período pagado.
                 </p>
               </div>
-            ) : (
+            )}
+
+            {/* Step 1 — Milo */}
+            {!cancelDone && cancelStep === 1 && (
+              <>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 24 }}>
+                  <div style={{
+                    width: 80, height: 80, borderRadius: '50%',
+                    background: 'linear-gradient(135deg, #0d6b63, #2E5240)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 38, marginBottom: 16,
+                    boxShadow: '0 6px 24px rgba(13,107,99,0.28)',
+                  }}>
+                    🐶
+                  </div>
+                  <p style={{
+                    fontSize: 15, color: '#374151', textAlign: 'center',
+                    lineHeight: 1.65, margin: 0, maxWidth: 320,
+                  }}>
+                    ¡Espera! ¿Seguro que quieres cancelar? Me quedaré sin poder ayudarte a cuidar a tu familia 🥺
+                  </p>
+                </div>
+
+                <button
+                  onClick={closeCancelFlow}
+                  style={{
+                    width: '100%', padding: '13px', borderRadius: 14, border: 'none',
+                    background: 'linear-gradient(135deg, #E58B73, #d4785f)',
+                    color: 'white', fontWeight: 700, fontSize: 15, cursor: 'pointer',
+                    boxShadow: '0 6px 20px rgba(229,139,115,0.35)',
+                    marginBottom: 10,
+                  }}
+                >
+                  Seguir con mi plan
+                </button>
+                <button
+                  onClick={() => setCancelStep(2)}
+                  style={{
+                    width: '100%', padding: '12px', borderRadius: 12,
+                    border: '1.5px solid #EDE5D8', background: 'transparent',
+                    color: '#9CA3AF', fontWeight: 600, fontSize: 14, cursor: 'pointer',
+                  }}
+                >
+                  Sí, quiero cancelar
+                </button>
+              </>
+            )}
+
+            {/* Step 2 — Reason */}
+            {!cancelDone && cancelStep === 2 && (
               <>
                 <p style={{
-                  fontFamily: 'Georgia, serif', fontSize: 20, fontWeight: 700,
-                  color: '#1A1A1A', margin: '0 0 12px', textAlign: 'center',
+                  fontFamily: 'Georgia, serif', fontSize: 19, fontWeight: 700,
+                  color: '#1A1A1A', margin: '0 0 18px', textAlign: 'center',
                 }}>
-                  ¿Cancelar tu plan?
+                  ¿Por qué cancelas?
                 </p>
-                <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.6, margin: '0 0 28px', textAlign: 'center' }}>
-                  Tu plan seguirá activo hasta el final del período pagado. Después pasarás al Plan Gratis.
-                </p>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
+                  {[
+                    'Es muy costoso',
+                    'No le doy suficiente uso',
+                    'Falta alguna función que necesito',
+                    'Otro motivo',
+                  ].map(r => (
+                    <button
+                      key={r}
+                      onClick={() => setCancelReason(r)}
+                      style={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                        padding: '13px 16px', borderRadius: 14,
+                        border: cancelReason === r ? '2px solid #0d6b63' : '1.5px solid #EDE5D8',
+                        background: cancelReason === r ? '#F0F9F4' : '#FDFAF7',
+                        cursor: 'pointer', textAlign: 'left', width: '100%',
+                        transition: 'all 0.15s',
+                      }}
+                    >
+                      <span style={{ fontSize: 14, fontWeight: 600, color: cancelReason === r ? '#0d6b63' : '#374151' }}>
+                        {r}
+                      </span>
+                      {cancelReason === r && (
+                        <span style={{ color: '#0d6b63', fontSize: 16, flexShrink: 0 }}>✓</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
 
                 {cancelError && (
                   <p style={{
-                    fontSize: 13, color: '#DC2626', margin: '0 0 16px',
+                    fontSize: 13, color: '#DC2626', margin: '0 0 14px',
                     padding: '10px 14px', background: '#FEF2F2',
-                    border: '1px solid #FECACA', borderRadius: 12,
-                    textAlign: 'center',
+                    border: '1px solid #FECACA', borderRadius: 12, textAlign: 'center',
                   }}>
                     ⚠ {cancelError}
                   </p>
                 )}
 
                 <button
-                  onClick={() => setShowCancelModal(false)}
+                  onClick={closeCancelFlow}
                   style={{
                     width: '100%', padding: '13px', borderRadius: 14, border: 'none',
                     background: 'linear-gradient(135deg, #E58B73, #d4785f)',
@@ -623,7 +714,6 @@ export default function Settings() {
                 >
                   Mantener mi plan
                 </button>
-
                 <button
                   onClick={handleCancelSubscription}
                   disabled={cancelLoading}
@@ -635,10 +725,11 @@ export default function Settings() {
                     opacity: cancelLoading ? 0.6 : 1,
                   }}
                 >
-                  {cancelLoading ? 'Cancelando...' : 'Sí, cancelar'}
+                  {cancelLoading ? 'Cancelando...' : 'Cancelar de todas formas'}
                 </button>
               </>
             )}
+
           </div>
         </div>
       )}
