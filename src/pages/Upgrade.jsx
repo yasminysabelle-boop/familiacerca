@@ -16,25 +16,37 @@ const PAYPAL_OPTIONS = {
 
 const FREE_FEATURES = [
   'Hasta 2 cuidadores',
+  '1 paciente',
   'Chat familiar',
-  'Medicamentos básicos',
+  'Medicamentos básicos (manual)',
+  'Checklist de cuidado diario',
   'Historial 7 días',
+  'Síntomas físicos básicos',
 ]
 
 const FAMILIAR_FEATURES = [
   'Hasta 3 cuidadores',
-  'Medicamentos con OCR',
-  'Videollamadas',
-  'Milo & Luna IA',
+  'Medicamentos con OCR (foto)',
+  'Videollamadas integradas',
+  'Milo & Luna IA 🐶🐱',
+  'Rutinas por período (mañana/tarde/noche)',
+  'Notas con evidencia fotográfica',
+  'Rastreo GPS en notas',
+  'Indicadores de presencia del equipo',
+  'Directorio médico del paciente',
   'Historial 30 días',
+  'Todo lo del Plan Gratis',
 ]
 
 const TOTAL_FEATURES = [
   'Cuidadores ilimitados',
-  'Todo el Plan Familiar',
-  'Hospital Mode',
+  'Hospital Mode (pantalla completa dedicada)',
+  'Cuentas Claras (gastos y finanzas del cuidado)',
+  'Reporte médico en PDF',
+  'Cuidador profesional incluido',
   'Soporte prioritario',
   'Historial ilimitado',
+  'Todo lo del Plan Familiar',
 ]
 
 function PayPalSection({ planKey, paypalPlanId, success, errors, isResolved, isRejected, onApprove, onError }) {
