@@ -96,8 +96,10 @@ export default function Settings() {
   const [locationOn, setLocationOn] = useState(() => isLocationEnabled())
   const [testingPush, setTestingPush] = useState(false)
   const [testResult, setTestResult] = useState(null)
-  const [showCancelMilo, setShowCancelMilo] = useState(false)
-  const [cancelReason, setCancelReason] = useState(null)
+  const [showCancelModal, setShowCancelModal] = useState(false)
+  const [cancelLoading, setCancelLoading] = useState(false)
+  const [cancelDone, setCancelDone] = useState(false)
+  const [cancelError, setCancelError] = useState(null)
 
   const plan = sub?.plan ?? 'free'
   const meta = PLAN_META[plan] ?? PLAN_META.free
@@ -124,6 +126,25 @@ export default function Settings() {
   function handleLocationToggle(val) {
     setLocationEnabled(val)
     setLocationOn(val)
+  }
+
+  async function handleCancelSubscription() {
+    setCancelLoading(true)
+    setCancelError(null)
+    try {
+      const { error } = await supabase.functions.invoke('cancel-paypal-subscription')
+      if (error) throw error
+      setCancelDone(true)
+      setTimeout(() => {
+        setShowCancelModal(false)
+        setCancelDone(false)
+        window.location.href = '/ajustes'
+      }, 2500)
+    } catch (err) {
+      setCancelError(err?.message ?? 'No se pudo cancelar. Intenta de nuevo.')
+    } finally {
+      setCancelLoading(false)
+    }
   }
 
   async function sendTestNotification() {
@@ -332,7 +353,7 @@ export default function Settings() {
           </button>
           {isPaid && (
             <button
-              onClick={() => { setShowCancelMilo(true); setCancelReason(null) }}
+              onClick={() => { setShowCancelModal(true); setCancelDone(false); setCancelError(null) }}
               style={{
                 width: '100%', padding: '11px', borderRadius: 12, marginTop: 8,
                 border: '1.5px solid #EDE5D8', background: 'transparent',
@@ -541,15 +562,15 @@ export default function Settings() {
         </p>
       </div>
 
-      {/* Milo cancellation dialog */}
-      {showCancelMilo && (
+      {/* Cancel subscription confirmation modal */}
+      {showCancelModal && (
         <div
           style={{
             position: 'fixed', inset: 0, zIndex: 400,
             background: 'rgba(0,0,0,0.55)',
             display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
           }}
-          onClick={e => { if (e.target === e.currentTarget) setShowCancelMilo(false) }}
+          onClick={e => { if (e.target === e.currentTarget && !cancelLoading) setShowCancelModal(false) }}
         >
           <div style={{
             width: '100%', maxWidth: 480, background: 'white',
@@ -557,128 +578,67 @@ export default function Settings() {
             padding: '32px 24px 48px',
             boxShadow: '0 -12px 48px rgba(0,0,0,0.18)',
           }}>
-            {/* Milo avatar */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 24 }}>
-              <div style={{
-                width: 72, height: 72, borderRadius: '50%',
-                background: 'linear-gradient(135deg, #0d6b63, #2E5240)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 34, marginBottom: 14,
-                boxShadow: '0 6px 20px rgba(13,107,99,0.3)',
-              }}>
-                🐾
+            {cancelDone ? (
+              <div style={{ textAlign: 'center', padding: '8px 0' }}>
+                <p style={{ fontSize: 32, margin: '0 0 12px' }}>✅</p>
+                <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#1A1A1A', margin: '0 0 10px' }}>
+                  Suscripción cancelada
+                </p>
+                <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.6, margin: 0 }}>
+                  Tu suscripción fue cancelada. Tu plan estará activo hasta el fin del período.
+                </p>
               </div>
-              <p style={{
-                fontFamily: 'Georgia, serif', fontSize: 19, fontWeight: 700,
-                color: '#1A1A1A', margin: '0 0 6px', textAlign: 'center',
-              }}>
-                Espera 🥺
-              </p>
-              <p style={{ fontSize: 14, color: '#6B7280', textAlign: 'center', lineHeight: 1.6, margin: 0 }}>
-                Soy Milo, tu asistente de cuidado.<br />
-                ¿Puedo preguntarte algo antes de irte?
-              </p>
-            </div>
-
-            {!cancelReason ? (
+            ) : (
               <>
                 <p style={{
-                  fontSize: 12, fontWeight: 700, color: '#9CA3AF',
-                  letterSpacing: '0.07em', textTransform: 'uppercase',
-                  textAlign: 'center', marginBottom: 14,
+                  fontFamily: 'Georgia, serif', fontSize: 20, fontWeight: 700,
+                  color: '#1A1A1A', margin: '0 0 12px', textAlign: 'center',
                 }}>
-                  ¿Por qué quieres cancelar?
+                  ¿Cancelar tu plan?
                 </p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  {[
-                    { id: 'price',   emoji: '💸', label: 'Es muy caro' },
-                    { id: 'usage',   emoji: '📉', label: 'No lo uso suficiente' },
-                    { id: 'missing', emoji: '🔍', label: 'Le falta algo' },
-                    { id: 'other',   emoji: '💬', label: 'Otra razón' },
-                  ].map(r => (
-                    <button
-                      key={r.id}
-                      onClick={() => setCancelReason(r.id)}
-                      style={{
-                        display: 'flex', alignItems: 'center', gap: 12,
-                        padding: '14px 16px', borderRadius: 14,
-                        border: '1.5px solid #EDE5D8', background: '#FDFAF7',
-                        cursor: 'pointer', textAlign: 'left', width: '100%',
-                        transition: 'all 0.15s',
-                      }}
-                    >
-                      <span style={{ fontSize: 22 }}>{r.emoji}</span>
-                      <span style={{ fontSize: 14, fontWeight: 600, color: '#374151' }}>{r.label}</span>
-                    </button>
-                  ))}
-                </div>
-              </>
-            ) : (
-              <div style={{ textAlign: 'center' }}>
-                {cancelReason === 'price' && (
-                  <div style={{ background: '#F0F9F4', borderRadius: 16, padding: '18px', marginBottom: 20 }}>
-                    <p style={{ fontSize: 14, color: '#2E5240', lineHeight: 1.7, margin: 0 }}>
-                      Entiendo 💚 El cuidado familiar ya tiene suficientes gastos.<br /><br />
-                      ¿Sabías que puedes <strong>pausar</strong> tu plan y reactivarlo cuando lo necesites?
-                      También ofrecemos descuentos para familias con múltiples cuidadores.
-                    </p>
-                  </div>
+                <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.6, margin: '0 0 28px', textAlign: 'center' }}>
+                  Tu plan seguirá activo hasta el final del período pagado. Después pasarás al Plan Gratis.
+                </p>
+
+                {cancelError && (
+                  <p style={{
+                    fontSize: 13, color: '#DC2626', margin: '0 0 16px',
+                    padding: '10px 14px', background: '#FEF2F2',
+                    border: '1px solid #FECACA', borderRadius: 12,
+                    textAlign: 'center',
+                  }}>
+                    ⚠ {cancelError}
+                  </p>
                 )}
-                {cancelReason === 'usage' && (
-                  <div style={{ background: '#F0F9F4', borderRadius: 16, padding: '18px', marginBottom: 20 }}>
-                    <p style={{ fontSize: 14, color: '#2E5240', lineHeight: 1.7, margin: 0 }}>
-                      Lo entiendo, la vida de cuidador es muy ocupada 🤝<br /><br />
-                      Muchas familias nos dicen que las <strong>alertas de medicamentos</strong> y el
-                      <strong> diario médico compartido</strong> son lo que más valoran.
-                      ¿Quieres explorarlos antes de decidir?
-                    </p>
-                  </div>
-                )}
-                {cancelReason === 'missing' && (
-                  <div style={{ background: '#F0F9F4', borderRadius: 16, padding: '18px', marginBottom: 20 }}>
-                    <p style={{ fontSize: 14, color: '#2E5240', lineHeight: 1.7, margin: 0 }}>
-                      Nos encantaría saberlo 🙏<br /><br />
-                      Tu opinión es lo más valioso que puedes darnos.
-                      Estamos construyendo FamiliaCerca con familias como la tuya.
-                      ¿Nos escribes a <strong>hola@familiacerca.com</strong> para contarnos?
-                    </p>
-                  </div>
-                )}
-                {cancelReason === 'other' && (
-                  <div style={{ background: '#F0F9F4', borderRadius: 16, padding: '18px', marginBottom: 20 }}>
-                    <p style={{ fontSize: 14, color: '#2E5240', lineHeight: 1.7, margin: 0 }}>
-                      Gracias por acompañarnos hasta aquí 💚<br /><br />
-                      Si alguna vez regresas, tu historial familiar y datos estarán seguros.
-                      Siempre tendrás un lugar en FamiliaCerca.
-                    </p>
-                  </div>
-                )}
+
                 <button
-                  onClick={() => setShowCancelMilo(false)}
+                  onClick={() => setShowCancelModal(false)}
                   style={{
                     width: '100%', padding: '13px', borderRadius: 14, border: 'none',
-                    background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
-                    color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer',
-                    boxShadow: '0 6px 20px rgba(13,107,99,0.3)',
+                    background: 'linear-gradient(135deg, #E58B73, #d4785f)',
+                    color: 'white', fontWeight: 700, fontSize: 15, cursor: 'pointer',
+                    boxShadow: '0 6px 20px rgba(229,139,115,0.35)',
                     marginBottom: 10,
                   }}
                 >
-                  Mantener mi suscripción
+                  Mantener mi plan
                 </button>
-              </div>
-            )}
 
-            {/* Always visible cancel anyway */}
-            <button
-              onClick={() => { setShowCancelMilo(false); window.open('https://www.paypal.com/myaccount/autopay/', '_blank') }}
-              style={{
-                width: '100%', padding: '12px', borderRadius: 12, marginTop: cancelReason ? 0 : 16,
-                border: '1.5px solid #EDE5D8', background: 'transparent',
-                color: '#9CA3AF', fontWeight: 600, fontSize: 13, cursor: 'pointer',
-              }}
-            >
-              Cancelar desde PayPal →
-            </button>
+                <button
+                  onClick={handleCancelSubscription}
+                  disabled={cancelLoading}
+                  style={{
+                    width: '100%', padding: '12px', borderRadius: 12,
+                    border: '1.5px solid #EDE5D8', background: 'transparent',
+                    color: '#9CA3AF', fontWeight: 600, fontSize: 14,
+                    cursor: cancelLoading ? 'not-allowed' : 'pointer',
+                    opacity: cancelLoading ? 0.6 : 1,
+                  }}
+                >
+                  {cancelLoading ? 'Cancelando...' : 'Sí, cancelar'}
+                </button>
+              </>
+            )}
           </div>
         </div>
       )}
