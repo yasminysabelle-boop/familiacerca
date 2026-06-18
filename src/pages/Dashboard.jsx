@@ -3064,6 +3064,10 @@ export default function Dashboard() {
             const isPendingToday = !isCritical && (pendingCount > 0 || _isRetrasado)
             const statusEmoji = isCritical ? '🔴' : isPendingToday ? '🟡' : '🟢'
             const statusLabel = isCritical ? 'Requiere atención urgente' : isPendingToday ? 'Requiere atención' : 'Todo bajo control'
+            const statusBg     = isCritical ? 'rgba(254,226,226,0.95)' : isPendingToday ? 'rgba(254,243,199,0.95)' : 'rgba(220,252,231,0.95)'
+            const statusColor  = isCritical ? '#991B1B' : isPendingToday ? '#78350F' : '#14532D'
+            const statusBorder = isCritical ? 'rgba(252,165,165,0.6)' : isPendingToday ? 'rgba(253,224,71,0.6)' : 'rgba(134,239,172,0.6)'
+            const dotColor     = isCritical ? '#EF4444' : isPendingToday ? '#F59E0B' : '#22C55E'
 
             const momentoHoy = (todaySection?.events ?? [])
               .filter(e => e.type === 'PHOTO' || e.type === 'VOICE_MEMORY')
@@ -3082,137 +3086,133 @@ export default function Dashboard() {
             return (
               <>
                 {/* ════════════════════════════════════
-                    HERO — patient photo fills the card
-                    ════════════════════════════════════ */}
-                <div style={{ borderRadius: 28, overflow: 'hidden', boxShadow: '0 12px 48px rgba(11,79,74,0.22)', animation: 'fadeInUp 0.4s ease both', position: 'relative' }}>
-
-                  {/* ── Photo layer ── */}
-                  <div style={{ height: 280, position: 'relative' }}>
-                    {heroPhoto ? (
-                      <img
-                        src={heroPhoto} alt=""
-                        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                        onError={e => { e.currentTarget.style.display = 'none' }}
-                      />
-                    ) : (
-                      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(160deg, #0B4F4A 0%, #1D7A6C 45%, #3DA98E 100%)' }}>
-                        <span style={{ position: 'absolute', bottom: 32, left: '50%', transform: 'translateX(-50%)', fontSize: 108, opacity: 0.18, fontFamily: 'Georgia, serif', fontWeight: 700, color: 'white', lineHeight: 1, userSelect: 'none' }}>
-                          {patientName.charAt(0).toUpperCase()}
-                        </span>
+                {/* ══════════════════════════════════════════
+                    HERO — heart of the experience
+                    Centered portrait, name, status, family
+                    ══════════════════════════════════════════ */}
+                <div style={{
+                  borderRadius: 28,
+                  background: 'linear-gradient(160deg, #E4F4EF 0%, #EEE7D9 100%)',
+                  padding: '32px 24px 26px',
+                  boxShadow: '0 8px 40px rgba(11,79,74,0.14)',
+                  animation: 'fadeInUp 0.4s ease both',
+                }}>
+                  {/* Centered portrait */}
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14 }}>
+                    <div style={{ position: 'relative' }}>
+                      <div
+                        onClick={() => navigate('/paciente/perfil')}
+                        style={{
+                          width: 106, height: 106, borderRadius: '50%',
+                          background: 'linear-gradient(135deg,#3D6B54,#0B4F4A)',
+                          overflow: 'hidden', cursor: 'pointer',
+                          border: '4px solid white',
+                          boxShadow: '0 10px 36px rgba(11,79,74,0.26)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontSize: 38, color: 'white', fontWeight: 700, fontFamily: 'Georgia, serif',
+                        }}
+                      >
+                        {heroPhoto
+                          ? <img src={heroPhoto} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { e.currentTarget.style.display = 'none' }} />
+                          : patientName.charAt(0).toUpperCase()}
                       </div>
-                    )}
-
-                    {/* Gradient — transparent top, deep bottom */}
-                    <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.04) 40%, rgba(7,28,24,0.72) 75%, rgba(7,28,24,0.92) 100%)' }} />
-
-                    {/* Status chip — top right */}
-                    <div style={{ position: 'absolute', top: 16, right: 16 }}>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '5px 13px', borderRadius: 20, background: 'rgba(255,255,255,0.18)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)', fontSize: 12, fontWeight: 700, color: 'white', border: '1px solid rgba(255,255,255,0.3)', letterSpacing: 0.2 }}>
-                        {statusEmoji} {statusLabel}
-                      </span>
+                      <div style={{ position: 'absolute', bottom: 5, right: 5, width: 22, height: 22, borderRadius: '50%', background: dotColor, border: '3.5px solid white', boxShadow: '0 2px 8px rgba(0,0,0,0.18)' }} />
                     </div>
-
-                    {/* Name + update — bottom */}
-                    <div
+                    <p
                       onClick={() => navigate('/paciente/perfil')}
-                      style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '0 22px 22px', cursor: 'pointer' }}
+                      style={{ fontSize: 28, fontWeight: 700, fontFamily: 'Georgia, serif', color: '#0B4F4A', margin: 0, textAlign: 'center', letterSpacing: -0.4, lineHeight: 1.15, cursor: 'pointer' }}
                     >
-                      <p style={{ fontSize: 30, fontWeight: 700, fontFamily: 'Georgia, serif', color: 'white', margin: '0 0 4px', lineHeight: 1.1, textShadow: '0 2px 16px rgba(0,0,0,0.35)', letterSpacing: -0.5 }}>
-                        {patientName}
-                      </p>
-                      <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.62)', margin: 0, letterSpacing: 0.1 }}>
-                        {lastUpdatedAgo ? `Actualizado ${lastUpdatedAgo}` : 'Sin actividad hoy'}
-                      </p>
-                    </div>
+                      {patientName}
+                    </p>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 18px', borderRadius: 28, background: statusBg, fontSize: 13, fontWeight: 700, color: statusColor, border: `1.5px solid ${statusBorder}`, letterSpacing: 0.1 }}>
+                      {statusEmoji} {statusLabel}
+                    </span>
+                    <p style={{ fontSize: 12, color: '#9CA3AF', margin: 0, textAlign: 'center', lineHeight: 1.4 }}>
+                      {lastUpdatedAgo ? `Última actualización · ${lastUpdatedAgo}` : 'Sin actividad registrada hoy'}
+                    </p>
                   </div>
 
-                  {/* ── Family row ── warm cream panel below photo */}
+                  {/* Divider */}
+                  <div style={{ height: 1, background: 'rgba(11,79,74,0.1)', margin: '22px 0 18px' }} />
+
+                  {/* Family */}
                   <div
                     onClick={() => setShowFamilySwitcher(true)}
-                    style={{ background: '#F5EFE5', padding: '14px 20px 16px', display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer' }}
+                    style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, cursor: 'pointer' }}
                   >
-                    {/* Avatar stack */}
-                    <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-                      {familyMembers.length === 0
-                        ? <div style={{ width: 38, height: 38, borderRadius: '50%', background: '#D6EAE6', border: '2.5px solid white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>👤</div>
-                        : familyMembers.slice(0, 5).map((m, i) => {
+                    {familyMembers.length === 0 ? (
+                      <p style={{ fontSize: 13, color: '#9CA3AF', margin: 0 }}>Invita a tu familia →</p>
+                    ) : (
+                      <>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          {familyMembers.slice(0, 5).map((m, i) => {
                             const nm = m.full_name?.trim() || m.email?.split('@')[0] || '?'
                             const isOnline = m.last_seen && Date.now() - new Date(m.last_seen).getTime() < 5 * 60 * 1000
                             return (
-                              <div key={m.id} style={{ position: 'relative', marginLeft: i > 0 ? -11 : 0, zIndex: 10 - i }}>
-                                <div style={{ width: 38, height: 38, borderRadius: '50%', background: PALETTE[i % PALETTE.length], border: '2.5px solid #F5EFE5', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 700, color: 'white' }}>
+                              <div key={m.id} style={{ position: 'relative', marginLeft: i > 0 ? -12 : 0, zIndex: 10 - i }}>
+                                <div style={{ width: 44, height: 44, borderRadius: '50%', background: PALETTE[i % PALETTE.length], border: '3px solid rgba(238,231,217,0.9)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 700, color: 'white', boxShadow: '0 2px 8px rgba(0,0,0,0.12)' }}>
                                   {nm.charAt(0).toUpperCase()}
                                 </div>
-                                {isOnline && <div style={{ position: 'absolute', bottom: 1, right: 1, width: 10, height: 10, borderRadius: '50%', background: '#22C55E', border: '2px solid #F5EFE5' }} />}
+                                {isOnline && <div style={{ position: 'absolute', bottom: 2, right: 2, width: 12, height: 12, borderRadius: '50%', background: '#22C55E', border: '2.5px solid rgba(238,231,217,0.9)' }} />}
                               </div>
                             )
-                          })
-                      }
-                    </div>
-                    {/* Names */}
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      {familyMembers.length === 0 ? (
-                        <p style={{ margin: 0, fontSize: 13, color: '#9CA3AF' }}>Invita a tu familia →</p>
-                      ) : (
-                        <>
-                          <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#0B4F4A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                            {familyMembers.slice(0, 3).map(m => (m.full_name ?? m.email ?? '').split(' ')[0]).filter(Boolean).join(' · ')}
-                            {familyMembers.length > 3 && <span style={{ color: '#9CA3AF', fontWeight: 400 }}> +{familyMembers.length - 3}</span>}
-                          </p>
-                          <p style={{ margin: 0, fontSize: 11, color: '#9CA3AF' }}>
-                            {recentMembers.length > 0 ? `${recentMembers.length} activo${recentMembers.length !== 1 ? 's' : ''} hoy · ` : ''}{familyCount} cuidando juntos
-                          </p>
-                        </>
-                      )}
-                    </div>
-                    <span style={{ fontSize: 18, color: '#C5BDB2', flexShrink: 0 }}>›</span>
+                          })}
+                        </div>
+                        <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#0B4F4A', textAlign: 'center', lineHeight: 1.4 }}>
+                          {familyMembers.slice(0, 3).map(m => (m.full_name ?? m.email ?? '').split(' ')[0]).filter(Boolean).join(' · ')}
+                          {familyMembers.length > 3 && <span style={{ color: '#9CA3AF', fontWeight: 400 }}> +{familyMembers.length - 3}</span>}
+                        </p>
+                        <p style={{ margin: 0, fontSize: 12, color: '#9CA3AF', textAlign: 'center' }}>
+                          {familyCount} persona{familyCount !== 1 ? 's' : ''} cuidando juntas
+                          {recentMembers.length > 0 && ` · ${recentMembers.length} activa${recentMembers.length !== 1 ? 's' : ''} hoy`}
+                        </p>
+                      </>
+                    )}
                   </div>
                 </div>
 
-                {/* ════════════════════════════════════
-                    STAT CHIPS — horizontal scroll row
-                    ════════════════════════════════════ */}
-                <div style={{ display: 'flex', gap: 10, overflowX: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none', paddingBottom: 2 }}>
+                {/* ══════════════════════════════════════════
+                    SUMMARY CARDS — 3 spacious tiles
+                    ══════════════════════════════════════════ */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
                   {[
                     {
-                      icon: '💊', top: 'Medicamentos',
-                      value: _isRetrasado ? 'Retrasado' : pendingCount > 0 ? `${pendingCount} pendiente${pendingCount !== 1 ? 's' : ''}` : confirmedTodayCount > 0 ? 'Al día' : 'Sin meds hoy',
+                      icon: '💊', label: 'Medicamentos',
+                      value: _isRetrasado ? 'Retrasado' : pendingCount > 0 ? `${pendingCount} pendiente${pendingCount !== 1 ? 's' : ''}` : confirmedTodayCount > 0 ? 'Al día' : 'Sin meds',
                       ok: !_isRetrasado && pendingCount === 0 && confirmedTodayCount > 0,
                       warn: pendingCount > 0 || _isRetrasado,
                       onClick: () => navigate('/medications'),
                     },
                     {
-                      icon: '✅', top: 'Rutinas',
-                      value: _doneRoutines === _totalRoutines ? 'Completadas' : _doneRoutines > 0 ? `${_doneRoutines} de ${_totalRoutines}` : `${_totalRoutines} pendientes`,
+                      icon: '✅', label: 'Rutinas',
+                      value: _doneRoutines === _totalRoutines ? 'Completadas' : _doneRoutines > 0 ? `${_doneRoutines}/${_totalRoutines} hechas` : `${_totalRoutines} pendientes`,
                       ok: _doneRoutines === _totalRoutines,
                       warn: _doneRoutines < _totalRoutines,
                       onClick: () => navigate('/cuidado'),
                     },
                     {
-                      icon: '📅', top: 'Próxima cita',
-                      value: nextAppointment ? (nextAppointment.appointmentTitle ?? 'Cita').slice(0, 18) : 'Sin citas',
+                      icon: '📅', label: 'Próx. cita',
+                      value: nextAppointment ? (nextAppointment.appointmentTitle ?? 'Cita').slice(0, 12) : 'Sin citas',
                       ok: !!nextAppointment,
                       warn: false,
                       onClick: () => navigate('/calendar'),
                     },
-                  ].map(({ icon, top, value, ok, warn, onClick }) => (
+                  ].map(({ icon, label, value, ok, warn, onClick }) => (
                     <button
-                      key={top}
-                      onClick={onClick}
-                      style={{ flexShrink: 0, background: 'white', borderRadius: 20, border: 'none', padding: '14px 18px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 2px 16px rgba(0,0,0,0.06)', WebkitTapHighlightColor: 'transparent', minWidth: 160 }}
+                      key={label} onClick={onClick}
+                      style={{ background: 'white', borderRadius: 24, border: 'none', padding: '18px 10px 16px', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 7, boxShadow: '0 2px 16px rgba(0,0,0,0.07)', WebkitTapHighlightColor: 'transparent' }}
                     >
-                      <span style={{ fontSize: 24 }}>{icon}</span>
-                      <div style={{ textAlign: 'left' }}>
-                        <p style={{ margin: 0, fontSize: 10, color: '#B0A898', fontWeight: 500, marginBottom: 2 }}>{top}</p>
-                        <p style={{ margin: 0, fontSize: 14, color: ok ? '#166534' : warn ? '#92400E' : '#9CA3AF', fontWeight: 700, lineHeight: 1.2 }}>
-                          {value}{ok ? ' ✓' : ''}
-                        </p>
+                      <div style={{ width: 48, height: 48, borderRadius: 18, background: ok ? '#EDFAF3' : warn ? '#FEF9C3' : '#F0F7F5', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>
+                        {icon}
                       </div>
+                      <p style={{ margin: 0, fontSize: 9, color: '#B0A898', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.4, textAlign: 'center' }}>{label}</p>
+                      <p style={{ margin: 0, fontSize: 12, color: ok ? '#166534' : warn ? '#92400E' : '#9CA3AF', fontWeight: 700, textAlign: 'center', lineHeight: 1.3 }}>
+                        {value}{ok ? ' ✓' : ''}
+                      </p>
                     </button>
                   ))}
                 </div>
 
-                {/* ════════════════════════════════════
                     MOMENTOS — full-width, emotional
                     ════════════════════════════════════ */}
                 <div style={{ borderRadius: 28, overflow: 'hidden', boxShadow: '0 4px 24px rgba(0,0,0,0.08)' }}>
