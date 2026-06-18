@@ -5,7 +5,6 @@ import { useFamily } from '../contexts/FamilyContext'
 import { useSubscription } from '../contexts/SubscriptionContext'
 import { useDarkMode } from '../contexts/DarkModeContext'
 import { usePushNotifications } from '../hooks/usePushNotifications'
-import { createPortalSession } from '../lib/stripe'
 import { supabase } from '../lib/supabase'
 import { isLocationEnabled, setLocationEnabled } from '../lib/gps'
 import Layout from '../components/Layout'
@@ -94,9 +93,7 @@ export default function Settings() {
   const { dark, toggleDark } = useDarkMode()
   const { permission, subscribed, supported, subscribeError, requestAndSubscribe, resubscribe } = usePushNotifications()
   const navigate = useNavigate()
-  const [portalLoading, setPortalLoading] = useState(false)
   const [locationOn, setLocationOn] = useState(() => isLocationEnabled())
-  const [portalError, setPortalError] = useState('')
   const [testingPush, setTestingPush] = useState(false)
   const [testResult, setTestResult] = useState(null)
   const [showCancelMilo, setShowCancelMilo] = useState(false)
@@ -112,18 +109,6 @@ export default function Settings() {
   const periodEnd = sub?.current_period_end
     ? new Date(sub.current_period_end).toLocaleDateString('es-US', { day: 'numeric', month: 'long', year: 'numeric' })
     : null
-
-  async function handlePortal() {
-    setPortalLoading(true)
-    setPortalError('')
-    try {
-      const url = await createPortalSession()
-      window.location.href = url
-    } catch {
-      setPortalLoading(false)
-      setPortalError('No se pudo abrir el portal. Intenta de nuevo.')
-    }
-  }
 
   async function handleSignOut() {
     try {
@@ -333,49 +318,28 @@ export default function Settings() {
             </div>
           )}
 
-          {isPaid ? (
-            <>
-              <button
-                onClick={handlePortal}
-                disabled={portalLoading}
-                style={{
-                  width: '100%', padding: '13px', borderRadius: 14, border: 'none',
-                  background: portalLoading ? '#C0CCC5' : 'linear-gradient(135deg, #0d6b63, #3A6347)',
-                  color: 'white', fontWeight: 700, fontSize: 14,
-                  cursor: portalLoading ? 'not-allowed' : 'pointer',
-                  boxShadow: portalLoading ? 'none' : '0 6px 20px rgba(13,107,99,0.3)',
-                  transition: 'all 0.2s',
-                }}
-              >
-                {portalLoading ? 'Abriendo portal...' : 'Gestionar suscripción →'}
-              </button>
-              {portalError && (
-                <p style={{ fontSize: 12, color: '#D63031', margin: '8px 0 0', padding: '8px 12px', background: '#FFF0F0', border: '1px solid #FFBABA', borderRadius: 10 }}>
-                  ⚠ {portalError}
-                </p>
-              )}
-              <button
-                onClick={() => { setShowCancelMilo(true); setCancelReason(null) }}
-                style={{
-                  width: '100%', padding: '11px', borderRadius: 12, marginTop: 8,
-                  border: '1.5px solid #EDE5D8', background: 'transparent',
-                  color: '#9CA3AF', fontWeight: 600, fontSize: 13, cursor: 'pointer',
-                }}
-              >
-                Cancelar suscripción
-              </button>
-            </>
-          ) : (
+          <button
+            onClick={() => navigate('/upgrade')}
+            style={{
+              width: '100%', padding: '13px', borderRadius: 14, border: 'none',
+              background: 'linear-gradient(135deg, #E58B73, #d4785f)',
+              color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer',
+              boxShadow: '0 6px 20px rgba(229,139,115,0.35)',
+              transition: 'all 0.2s',
+            }}
+          >
+            Mejorar mi plan →
+          </button>
+          {isPaid && (
             <button
-              onClick={() => navigate('/upgrade')}
+              onClick={() => { setShowCancelMilo(true); setCancelReason(null) }}
               style={{
-                width: '100%', padding: '13px', borderRadius: 14, border: 'none',
-                background: 'linear-gradient(135deg, #E58B73, #d4785f)',
-                color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer',
-                boxShadow: '0 6px 20px rgba(229,139,115,0.35)',
+                width: '100%', padding: '11px', borderRadius: 12, marginTop: 8,
+                border: '1.5px solid #EDE5D8', background: 'transparent',
+                color: '#9CA3AF', fontWeight: 600, fontSize: 13, cursor: 'pointer',
               }}
             >
-              {trialExpired ? 'Reactivar acceso →' : 'Mejorar plan →'}
+              Cancelar suscripción
             </button>
           )}
         </div>
@@ -706,14 +670,14 @@ export default function Settings() {
 
             {/* Always visible cancel anyway */}
             <button
-              onClick={() => { setShowCancelMilo(false); handlePortal() }}
+              onClick={() => { setShowCancelMilo(false); window.open('https://www.paypal.com/myaccount/autopay/', '_blank') }}
               style={{
                 width: '100%', padding: '12px', borderRadius: 12, marginTop: cancelReason ? 0 : 16,
                 border: '1.5px solid #EDE5D8', background: 'transparent',
                 color: '#9CA3AF', fontWeight: 600, fontSize: 13, cursor: 'pointer',
               }}
             >
-              Cancelar de todas formas →
+              Cancelar desde PayPal →
             </button>
           </div>
         </div>
