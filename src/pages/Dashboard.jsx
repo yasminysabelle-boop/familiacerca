@@ -9,7 +9,7 @@ import Layout from '../components/Layout'
 import { SkeletonDashSummary, SkeletonCard } from '../components/SkeletonLoader'
 import SuccessAnimation, { useSuccessAnimation } from '../components/SuccessAnimation'
 import { usePullToRefresh } from '../hooks/usePullToRefresh'
-import { AlertTriangle, CheckIcon, User, XIcon, Pill, ClipboardCheck, Chat, Calendar, Receipt, Users, Camera, Heart, Clock, BookOpen } from '../components/Icons'
+import { AlertTriangle, CheckIcon, User, XIcon, Pill, ClipboardCheck, Chat, Calendar, Receipt, Users, Camera, Clock, BookOpen } from '../components/Icons'
 import { geminiGenerate } from '../lib/gemini'
 import { CARE_ITEMS } from '../lib/careItems'
 import TrialBanner from '../components/TrialBanner'
@@ -2942,7 +2942,7 @@ export default function Dashboard() {
         onTouchStart={pullStart}
         onTouchMove={pullMove}
         onTouchEnd={pullEnd}
-        style={{ background: '#F8F4ED', minHeight: '100vh', paddingBottom: 80, overflowY: 'auto', width: '100%', maxWidth: '100%', overflowX: 'hidden', boxSizing: 'border-box', margin: '0 auto' }}
+        style={{ background: '#F8F4ED', minHeight: '100svh', paddingBottom: 80, overflowY: 'auto', width: '100%', maxWidth: '100%', overflowX: 'hidden', boxSizing: 'border-box', margin: '0 auto' }}
       >
         <PullIndicator />
         <style>{`
@@ -2950,148 +2950,77 @@ export default function Dashboard() {
           @keyframes sos-ring  { 0%,100%{box-shadow:0 0 0 3px rgba(228,91,76,0.35)} 50%{box-shadow:0 0 0 9px rgba(228,91,76,0)} }
         `}</style>
 
-        {/* ═══════════════════════════════════════════════════════════════
-            HEADER — verde #0B4F4A
-        ═══════════════════════════════════════════════════════════════ */}
-        <div style={{ background: '#0B4F4A', padding: '12px 16px 28px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            {/* Left: logo corazón + nombre + chip paciente */}
+        {/* ═══ HEADER ═══ */}
+        <div style={{ background: '#0B4F4A', padding: '14px 16px 36px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+            {/* Logo + brand + patient chip */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 0, overflow: 'hidden' }}>
-              <div style={{ width: 30, height: 30, borderRadius: '50%', background: 'rgba(255,255,255,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <Heart size={16} color="#E58B73" strokeWidth={2} />
-              </div>
-              <span style={{ fontSize: 14, fontWeight: 700, color: 'white', lineHeight: 1, flexShrink: 0 }}>FamiliaCerca</span>
+              <img
+                src="/logo-icon.png" alt=""
+                style={{ width: 30, height: 30, objectFit: 'contain', flexShrink: 0 }}
+                onError={e => { e.currentTarget.style.display = 'none' }}
+              />
+              <span style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, lineHeight: 1, flexShrink: 0 }}>
+                <span style={{ color: '#F8F4ED' }}>Familia</span>
+                <span style={{ color: '#E58B73' }}>Cerca</span>
+              </span>
               <button
                 onClick={() => setShowFamilySwitcher(true)}
-                style={{ display: 'flex', alignItems: 'center', gap: 3, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.18)', borderRadius: 20, padding: '4px 10px', cursor: 'pointer', WebkitTapHighlightColor: 'transparent', flexShrink: 0, maxWidth: 120, overflow: 'hidden' }}
+                style={{ display: 'flex', alignItems: 'center', gap: 3, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.18)', borderRadius: 20, padding: '4px 10px', cursor: 'pointer', WebkitTapHighlightColor: 'transparent', flexShrink: 0, maxWidth: 110, overflow: 'hidden', marginLeft: 2 }}
               >
-                <span style={{ fontSize: 12, fontWeight: 600, color: 'white', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <span style={{ fontSize: 11, fontWeight: 600, color: 'white', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {activePatientName || activeFamilyLabel || 'Mi familiar'}
                 </span>
                 <span style={{ fontSize: 9, color: 'rgba(255,255,255,0.7)', flexShrink: 0 }}>▾</span>
               </button>
             </div>
-            {/* Right: campanita dorado + avatar */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-              {(() => {
-                const totalBadge = notifMessages.length + notifNotes.length
-                return (
-                  <button onClick={() => setShowNotifSheet(true)} style={{ position: 'relative', background: 'rgba(255,255,255,0.1)', border: 'none', cursor: 'pointer', width: 36, height: 36, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <span style={{ fontSize: 18 }}>🔔</span>
-                    {totalBadge > 0 && (
-                      <span style={{ position: 'absolute', top: 2, right: 2, background: '#E58B73', color: 'white', fontSize: 8, fontWeight: 800, borderRadius: '50%', width: 14, height: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        {totalBadge > 9 ? '9+' : totalBadge}
-                      </span>
-                    )}
-                  </button>
-                )
-              })()}
-              <div style={{ width: 34, height: 34, borderRadius: '50%', background: 'rgba(255,255,255,0.18)', border: '2px solid rgba(255,255,255,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: 14, flexShrink: 0 }}>
-                {firstName.charAt(0).toUpperCase()}
-              </div>
-            </div>
+            {/* Notification bell */}
+            {(() => {
+              const totalBadge = notifMessages.length + notifNotes.length
+              return (
+                <button
+                  onClick={() => setShowNotifSheet(true)}
+                  style={{ position: 'relative', background: 'rgba(255,255,255,0.1)', border: 'none', cursor: 'pointer', width: 38, height: 38, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', WebkitTapHighlightColor: 'transparent', flexShrink: 0 }}
+                >
+                  <span style={{ fontSize: 18 }}>🔔</span>
+                  {totalBadge > 0 && (
+                    <span style={{ position: 'absolute', top: 2, right: 2, background: '#E58B73', color: 'white', fontSize: 8, fontWeight: 800, borderRadius: '50%', width: 14, height: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      {totalBadge > 9 ? '9+' : totalBadge}
+                    </span>
+                  )}
+                </button>
+              )
+            })()}
           </div>
+          {/* Greeting */}
+          <p style={{ color: 'white', fontSize: 22, fontWeight: 700, fontFamily: 'Georgia, serif', margin: '0 0 4px', lineHeight: 1.2 }}>
+            {timeGreeting}, {firstName}
+          </p>
+          <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 13, margin: 0 }}>
+            {activePatientName ? `Cuidando a ${activePatientName}` : 'Tu panel de cuidado familiar'}
+          </p>
         </div>
 
-        {/* ═══════════════════════════════════════════════════════════════
-            HERO CARD — sobresale del header, top verde + bottom blanco
-        ═══════════════════════════════════════════════════════════════ */}
-        {(() => {
-          const heroPhoto = patientProfile?.foto_url || profile?.photo_url || null
-          const dobField = patientProfile?.fecha_nacimiento || patientProfile?.birth_date || patientProfile?.dob || patientProfile?.date_of_birth || patientProfile?.birthdate || null
-          const age = calcAge(dobField)
-          const isCritical = hasActiveSOS || (_isRetrasado && _retrasadoMins != null && _retrasadoMins >= 720)
-          const isPending = !isCritical && (pendingCount > 0 || _isRetrasado)
-          const totalRoutines = 4
-          const doneRoutines = Math.min(Object.values(careLogsToday).filter(Boolean).length, totalRoutines)
-          return (
-            <div style={{ margin: '-16px 16px 0', borderRadius: 20, overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,0.18)', animation: 'fadeInUp 0.4s ease both' }}>
-              {/* TOP — verde con foto de fondo difuminada */}
-              <Link to="/paciente/perfil" style={{ display: 'block', textDecoration: 'none', background: '#162710', padding: '18px 16px 14px', position: 'relative', overflow: 'hidden', minHeight: 110 }}>
-                {heroPhoto && (
-                  <img src={heroPhoto} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', opacity: 0.6, display: 'block' }} onError={e => { e.currentTarget.style.display = 'none' }} />
-                )}
-                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.65) 100%)', pointerEvents: 'none' }} />
-                <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div style={{ width: 54, height: 54, borderRadius: '50%', background: '#3D6B54', border: '2.5px solid rgba(255,255,255,0.4)', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, color: 'white', fontWeight: 700 }}>
-                    {heroPhoto
-                      ? <img src={heroPhoto} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { e.currentTarget.style.display = 'none' }} />
-                      : (patientProfile?.nombre_completo || profile?.name || '?').charAt(0).toUpperCase()
-                    }
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ margin: 0, fontSize: 18, fontWeight: 700, color: 'white', lineHeight: 1.2, fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
-                      {patientProfile?.nombre_completo || profile?.name || 'Agregar paciente'}
-                    </p>
-                    {age && <p style={{ margin: '2px 0 0', fontSize: 12, color: 'rgba(255,255,255,0.7)' }}>{age} años</p>}
-                    {(isCritical || isPending) && (
-                      <span style={{ display: 'inline-block', marginTop: 5, background: '#E58B73', color: 'white', fontSize: 10, fontWeight: 700, borderRadius: 20, padding: '2px 9px' }}>
-                        {isCritical ? '⚠ Atención urgente' : '⚠ Atención hoy'}
-                      </span>
-                    )}
-                  </div>
-                </div>
-                {familyMembers.length > 0 && (
-                  <div
-                    style={{ position: 'relative', zIndex: 1, marginTop: 10, display: 'flex', alignItems: 'center', gap: 8 }}
-                    onClick={e => { e.preventDefault(); e.stopPropagation(); setShowFamilySwitcher(true) }}
-                  >
-                    <div style={{ display: 'flex' }}>
-                      {familyMembers.slice(0, 3).map((m, i) => (
-                        <div key={m.id} style={{ width: 22, height: 22, borderRadius: '50%', background: ['#3D6B54','#D6A13B','#E45B4C'][i % 3], border: '2px solid white', marginLeft: i > 0 ? -6 : 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 700, color: 'white', zIndex: 3 - i, position: 'relative' }}>
-                          {(m.full_name?.charAt(0) || m.email?.charAt(0) || '?').toUpperCase()}
-                          {m.last_seen && Date.now() - new Date(m.last_seen).getTime() < 5 * 60 * 1000 && (
-                            <div style={{ position: 'absolute', bottom: 0, right: 0, width: 6, height: 6, borderRadius: '50%', background: '#4CAF50', border: '1px solid white' }} />
-                          )}
-                        </div>
-                      ))}
-                      {familyMembers.length > 3 && (
-                        <div style={{ width: 22, height: 22, borderRadius: '50%', background: '#6F7A72', border: '2px solid white', marginLeft: -6, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 8, fontWeight: 700, color: 'white' }}>
-                          +{familyMembers.length - 3}
-                        </div>
-                      )}
-                    </div>
-                    <p style={{ margin: 0, fontSize: 11, color: 'rgba(255,255,255,0.75)' }}>{familyCount} cuidando juntos</p>
-                  </div>
-                )}
-              </Link>
-              {/* BOTTOM — blanco, 2 columnas: Medicamentos + Rutinas */}
-              <div style={{ background: 'white', display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
-                <button onClick={() => navigate('/medications')} style={{ border: 'none', background: 'none', cursor: 'pointer', padding: '14px 14px 14px 16px', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 3, WebkitTapHighlightColor: 'transparent', borderRight: '1px solid #F8F4ED' }}>
-                  <div style={{ width: 34, height: 34, borderRadius: 10, background: '#FEF3C7', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 2 }}>
-                    <span style={{ fontSize: 18 }}>💊</span>
-                  </div>
-                  <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#1E2D26', lineHeight: 1.2 }}>Medicamentos</p>
-                  <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: (_isRetrasado || pendingCount > 0) ? '#E45B4C' : confirmedTodayCount > 0 ? '#22C55E' : '#9CA3AF', lineHeight: 1.3 }}>
-                    {_isRetrasado
-                      ? (nextPendingMed ? `⚠ ${nextPendingMed.medName}` : '⚠ Requiere atención')
-                      : pendingCount > 0
-                        ? (nextPendingMed ? nextPendingMed.medName : `${pendingCount} pendiente${pendingCount !== 1 ? 's' : ''}`)
-                        : confirmedTodayCount > 0
-                          ? `${confirmedTodayCount} dado${confirmedTodayCount !== 1 ? 's' : ''} hoy`
-                          : 'Sin meds hoy'}
-                  </p>
-                </button>
-                <button onClick={() => navigate('/cuidado')} style={{ border: 'none', background: 'none', cursor: 'pointer', padding: '14px 16px 14px 14px', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 3, WebkitTapHighlightColor: 'transparent' }}>
-                  <div style={{ width: 34, height: 34, borderRadius: 10, background: '#DCFCE7', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 2 }}>
-                    <span style={{ fontSize: 18 }}>✅</span>
-                  </div>
-                  <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#1E2D26', lineHeight: 1.2 }}>Rutinas</p>
-                  <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: doneRoutines === totalRoutines ? '#22C55E' : doneRoutines > 0 ? '#D6A13B' : '#9CA3AF', lineHeight: 1.3 }}>
-                    {doneRoutines === totalRoutines ? '✓ Todas listas' : doneRoutines > 0 ? `${doneRoutines} de ${totalRoutines} hechas` : 'Ninguna aún'}
-                  </p>
-                </button>
-              </div>
-            </div>
-          )
-        })()}
-
-
-        {/* ═══════════════════════════════════════════════════════════════
-            SOS BANNER — solo cuando hay alerta activa
-        ═══════════════════════════════════════════════════════════════ */}
+        {/* Banners */}
+        <TrialBanner />
+        {notifActivated && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '0 16px', padding: '10px 14px', background: '#F0FDF4', border: '1px solid #86EFAC', borderRadius: 14 }}>
+            <span style={{ fontSize: 17, flexShrink: 0 }}>✅</span>
+            <p style={{ flex: 1, fontSize: 13, color: '#15803D', margin: 0, fontWeight: 600 }}>Notificaciones activadas</p>
+          </div>
+        )}
+        {permission !== 'granted' && !notifDismissed && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '0 16px', padding: '10px 14px', background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 14 }}>
+            <span style={{ fontSize: 17, flexShrink: 0 }}>🔔</span>
+            <p style={{ flex: 1, fontSize: 13, color: '#1E40AF', margin: 0, fontWeight: 500, lineHeight: 1.3 }}>Activa las notificaciones para estar al tanto</p>
+            <button onClick={requestAndSubscribe} style={{ padding: '6px 13px', borderRadius: 9, background: '#1D4ED8', color: 'white', fontSize: 12, fontWeight: 700, border: 'none', cursor: 'pointer', flexShrink: 0 }}>Activar</button>
+            <button onClick={dismissNotifBanner} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, flexShrink: 0, display: 'flex' }} aria-label="Cerrar">
+              <XIcon size={14} color="#9CA3AF" strokeWidth={2} />
+            </button>
+          </div>
+        )}
         {hasActiveSOS && (
-          <div style={{ margin: '16px 16px 0', background: 'linear-gradient(135deg,#7F1D1D,#991B1B)', borderRadius: 16, padding: '16px 18px', boxShadow: '0 4px 24px rgba(185,28,28,0.4)', display: 'flex', alignItems: 'center', gap: 14, animation: 'fadeInUp 0.3s ease both' }}>
+          <div style={{ margin: '0 16px', background: 'linear-gradient(135deg,#7F1D1D,#991B1B)', borderRadius: 16, padding: '16px 18px', boxShadow: '0 4px 24px rgba(185,28,28,0.4)', display: 'flex', alignItems: 'center', gap: 14, animation: 'fadeInUp 0.3s ease both' }}>
             <span style={{ fontSize: 26, flexShrink: 0, animation: 'sos-ring 1.4s ease-in-out infinite' }}>🚨</span>
             <div style={{ flex: 1 }}>
               <p style={{ margin: 0, fontSize: 15, fontWeight: 800, color: 'white' }}>Alerta SOS activa</p>
@@ -3104,33 +3033,13 @@ export default function Dashboard() {
             </button>
           </div>
         )}
-
-
-        {/* Banners — dentro del scroll para que el header verde quede al tope */}
-        <TrialBanner />
-        {notifActivated && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '12px 16px 0', padding: '10px 14px', background: '#F0FDF4', border: '1px solid #86EFAC', borderRadius: 14 }}>
-            <span style={{ fontSize: 17, flexShrink: 0 }}>✅</span>
-            <p style={{ flex: 1, fontSize: 13, color: '#15803D', margin: 0, fontWeight: 600 }}>Notificaciones activadas</p>
-          </div>
-        )}
-        {permission !== 'granted' && !notifDismissed && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '12px 16px 0', padding: '10px 14px', background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 14 }}>
-            <span style={{ fontSize: 17, flexShrink: 0 }}>🔔</span>
-            <p style={{ flex: 1, fontSize: 13, color: '#1E40AF', margin: 0, fontWeight: 500, lineHeight: 1.3 }}>Activa las notificaciones para estar al tanto</p>
-            <button onClick={requestAndSubscribe} style={{ padding: '6px 13px', borderRadius: 9, background: '#1D4ED8', color: 'white', fontSize: 12, fontWeight: 700, border: 'none', cursor: 'pointer', flexShrink: 0 }}>Activar</button>
-            <button onClick={dismissNotifBanner} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, flexShrink: 0, display: 'flex' }} aria-label="Cerrar">
-              <XIcon size={14} color="#9CA3AF" strokeWidth={2} />
-            </button>
-          </div>
-        )}
         {renewalAlerts.map(med => {
           const days = med.stock?.estimated_end_date
             ? Math.ceil((new Date(med.stock.estimated_end_date + 'T12:00:00') - new Date()) / (1000 * 60 * 60 * 24))
             : null
           const urgent = days != null && days <= 3
           return (
-            <div key={med.id} style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '12px 16px 0', padding: '12px 14px', borderRadius: 14, border: `1.5px solid ${urgent ? '#FCA5A5' : '#FDE68A'}`, background: urgent ? '#FEF2F2' : '#FFFBEB' }}>
+            <div key={med.id} style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '0 16px', padding: '12px 14px', borderRadius: 14, border: `1.5px solid ${urgent ? '#FCA5A5' : '#FDE68A'}`, background: urgent ? '#FEF2F2' : '#FFFBEB' }}>
               <span style={{ fontSize: 20, flexShrink: 0 }}>{urgent ? '🚨' : '🔔'}</span>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <p style={{ fontSize: 13, fontWeight: 700, color: urgent ? '#DC2626' : '#7A5A18', margin: 0, lineHeight: 1.3 }}>
@@ -3143,112 +3052,253 @@ export default function Dashboard() {
           )
         })}
 
-        {/* ═══════════════════════════════════════════════════════════════
-            CONTENIDO PRINCIPAL
-        ═══════════════════════════════════════════════════════════════ */}
-        <div style={{ padding: '16px 16px 0', display: 'flex', flexDirection: 'column', gap: 16 }}>
+        {/* ═══ MAIN CONTENT — overlaps header with marginTop: -20 ═══ */}
+        <div style={{ padding: '0 14px', marginTop: -20, display: 'flex', flexDirection: 'column', gap: 14, paddingBottom: 96 }}>
+          {(() => {
+            const heroPhoto = patientProfile?.foto_url || profile?.photo_url || null
+            const patientName = patientProfile?.nombre_completo || profile?.name || 'Agregar paciente'
+            const _totalRoutines = 4
+            const _doneRoutines = Math.min(Object.values(careLogsToday).filter(Boolean).length, _totalRoutines)
 
-          {/* Actividad reciente */}
-          <div style={{ background: 'white', borderRadius: 14, padding: '16px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-              <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#1E2D26' }}>Actividad reciente</p>
-              <button onClick={() => navigate('/historial')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: '#E58B73', fontWeight: 600, padding: 0 }}>Ver todas ›</button>
-            </div>
-            {recentActivityItems.length === 0 ? (
-              <p style={{ margin: 0, fontSize: 12, color: '#9CA3AF', padding: '4px 0' }}>Sin actividad reciente</p>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                {recentActivityItems.map((evt, i) => {
-                  const CLM = { sleep: { icon: '😴', color: '#7C3AED', bg: '#F5F3FF', label: 'Sueño registrado' }, nutrition: { icon: '🍽️', color: '#92400E', bg: '#FFFBEB', label: 'Alimentación registrada' }, hygiene: { icon: '🛁', color: '#1D4ED8', bg: '#EFF6FF', label: 'Higiene registrada' } }
-                  const TM = { MED_CONFIRMED: { icon: '💊', color: '#15803D', bg: '#DCFCE7' }, APPOINTMENT: { icon: '📅', color: '#1D4ED8', bg: '#EFF6FF' }, VOICE_MEMORY: { icon: '🎙️', color: '#7C3AED', bg: '#F5F3FF' }, PHOTO: { icon: '📸', color: '#92400E', bg: '#FFFBEB' }, NOTE: { icon: '📝', color: '#1E2D26', bg: '#F5F0E8' }, EXPENSE: { icon: '💰', color: '#C9882A', bg: '#FFFBEB' }, APPOINTMENT_PROOF: { icon: '📋', color: '#1D4ED8', bg: '#EFF6FF' } }
-                  const meta = evt.type === 'CARE_LOG' ? CLM[evt.careLogKey] : TM[evt.type]
-                  const actorName = evt.confirmedBy?.split(' ')[0] || evt.recorderName?.split(' ')[0] || evt.uploaderName?.split(' ')[0] || firstName
-                  const actAction = evt.type === 'CARE_LOG' ? (meta?.label ?? 'Cuidado registrado') : ({ MED_CONFIRMED: `${actorName} confirmó ${evt.medName ?? 'medicamento'}`, APPOINTMENT: evt.appointmentTitle ?? 'Cita médica registrada', VOICE_MEMORY: `${actorName} grabó una memoria`, PHOTO: `${actorName} subió una foto`, NOTE: `${actorName} escribió una nota`, EXPENSE: (`${actorName} registró $${evt.amount ?? ''} ${evt.description ?? ''}`).trim(), APPOINTMENT_PROOF: 'Comprobante subido' }[evt.type] ?? evt.type)
-                  const actRoute = evt.type === 'CARE_LOG' ? '/cuidado' : ({ MED_CONFIRMED: '/medications', VOICE_MEMORY: '/paciente/notas-familia', PHOTO: '/historial', NOTE: '/paciente/notas-familia', EXPENSE: '/gastos', APPOINTMENT: '/calendar', APPOINTMENT_PROOF: '/calendar' }[evt.type] ?? '/historial')
-                  const evtAgo = timeAgo(evt.timestamp ?? null)
-                  const isLast = i === recentActivityItems.length - 1
-                  return (
-                    <div key={evt.id ?? i} onClick={actRoute ? () => navigate(actRoute) : undefined} style={{
-                      display: 'flex', alignItems: 'flex-start', gap: 12,
-                      cursor: actRoute ? 'pointer' : 'default',
-                      padding: '16px 0',
-                      borderBottom: isLast ? 'none' : '1px solid #F5F0E8',
-                    }}>
-                      <div style={{ width: 36, height: 36, borderRadius: 10, background: meta?.bg ?? '#F5F0E8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0, marginTop: 1 }}>{meta?.icon ?? '📋'}</div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <p style={{ margin: 0, fontSize: 13, fontWeight: 500, color: '#1E2D26', lineHeight: 1.4 }}>{actAction}</p>
-                        {evtAgo && <p style={{ margin: '3px 0 0', fontSize: 11, color: '#9FAF9A' }}>{evtAgo}</p>}
-                      </div>
+            const isCritical = hasActiveSOS || (_isRetrasado && _retrasadoMins != null && _retrasadoMins >= 720)
+            const isPendingToday = !isCritical && (pendingCount > 0 || _isRetrasado)
+            const statusLabel = isCritical ? '⚠ Atención urgente' : isPendingToday ? '⚠ Atención hoy' : '✓ Todo bajo control'
+            const statusBg    = isCritical ? '#FFF0F0' : isPendingToday ? '#FFFBEB' : '#DCFCE7'
+            const statusColor = isCritical ? '#D63031' : isPendingToday ? '#92400E' : '#15803D'
+
+            const medsPct      = medTotal > 0 ? Math.round(confirmedTodayCount / medTotal * 100) : confirmedTodayCount > 0 ? 100 : 0
+            const routinesPct  = Math.round(_doneRoutines / Math.max(_totalRoutines, 1) * 100)
+            const emotionalPct = dailyMood === 'good' ? 100 : dailyMood === 'regular' ? 60 : dailyMood === 'hard' ? 20 : 50
+            const wellbeingPct = Math.round((medsPct + routinesPct + emotionalPct) / 3)
+            const wellbeingColor = wellbeingPct >= 70 ? '#0B4F4A' : wellbeingPct >= 40 ? '#C9882A' : '#D63031'
+
+            const momentoHoy = (todaySection?.events ?? [])
+              .filter(e => e.type === 'PHOTO' || e.type === 'VOICE_MEMORY')
+              .sort((a, b) => (b.timestamp ?? 0) - (a.timestamp ?? 0))[0] ?? null
+
+            const actividadHoy = (todaySection?.events ?? [])
+              .filter(e => !['MED_MISSED', 'CAREGIVER_CARD'].includes(e.type))
+              .sort((a, b) => (b.timestamp ?? 0) - (a.timestamp ?? 0))
+              .slice(0, 4)
+
+            return (
+              <>
+                {/* ─ 1. PATIENT CARD ─ */}
+                <div style={{ background: 'white', borderRadius: 20, padding: '18px 16px', boxShadow: '0 4px 24px rgba(0,0,0,0.12)', animation: 'fadeInUp 0.4s ease both' }}>
+                  <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start', marginBottom: 14 }}>
+                    <div
+                      onClick={() => navigate('/paciente/perfil')}
+                      style={{ width: 56, height: 56, borderRadius: '50%', background: '#3D6B54', border: '3px solid #F0FDF4', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, color: 'white', fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 10px rgba(11,79,74,0.25)' }}
+                    >
+                      {heroPhoto
+                        ? <img src={heroPhoto} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { e.currentTarget.style.display = 'none' }} />
+                        : patientName.charAt(0).toUpperCase()}
                     </div>
-                  )
-                })}
-              </div>
-            )}
-          </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ fontSize: 17, fontWeight: 700, fontFamily: 'Georgia, serif', color: '#20312C', margin: '0 0 6px', lineHeight: 1.2 }}>
+                        {patientName}
+                      </p>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 10px', borderRadius: 20, background: statusBg, fontSize: 11, fontWeight: 700, color: statusColor }}>
+                        {statusLabel}
+                      </span>
+                      <p style={{ fontSize: 11, color: '#9CA3AF', margin: '6px 0 0', lineHeight: 1.3 }}>
+                        Última actualización · {lastUpdatedAgo || 'Sin actividad hoy'}
+                      </p>
+                    </div>
+                  </div>
+                  {/* 3 status badges */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
+                    <button onClick={() => navigate('/medications')} style={{ background: (pendingCount > 0 || _isRetrasado) ? '#FFFBEB' : '#F0FDF4', borderRadius: 12, border: 'none', padding: '10px 6px', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, WebkitTapHighlightColor: 'transparent' }}>
+                      <span style={{ fontSize: 18 }}>💊</span>
+                      <span style={{ fontSize: 9, fontWeight: 700, color: (pendingCount > 0 || _isRetrasado) ? '#92400E' : '#15803D', textAlign: 'center', lineHeight: 1.3 }}>
+                        {_isRetrasado ? '⚠ Retrasado' : pendingCount > 0 ? `${pendingCount} pend.` : confirmedTodayCount > 0 ? `${confirmedTodayCount} dados ✓` : 'Sin meds'}
+                      </span>
+                    </button>
+                    <button onClick={() => navigate('/cuidado')} style={{ background: _doneRoutines === _totalRoutines ? '#F0FDF4' : '#F8F4ED', borderRadius: 12, border: 'none', padding: '10px 6px', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, WebkitTapHighlightColor: 'transparent' }}>
+                      <span style={{ fontSize: 18 }}>✅</span>
+                      <span style={{ fontSize: 9, fontWeight: 700, color: _doneRoutines === _totalRoutines ? '#15803D' : '#C9882A', textAlign: 'center', lineHeight: 1.3 }}>
+                        {_doneRoutines === _totalRoutines ? 'Rutinas ✓' : `${_doneRoutines}/${_totalRoutines} hechas`}
+                      </span>
+                    </button>
+                    <button onClick={() => navigate('/calendar')} style={{ background: nextAppointment ? '#EFF6FF' : '#F8F4ED', borderRadius: 12, border: 'none', padding: '10px 6px', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, WebkitTapHighlightColor: 'transparent' }}>
+                      <span style={{ fontSize: 18 }}>📅</span>
+                      <span style={{ fontSize: 9, fontWeight: 700, color: nextAppointment ? '#1D4ED8' : '#9CA3AF', textAlign: 'center', lineHeight: 1.3 }}>
+                        {nextAppointment ? (nextAppointment.appointmentTitle ?? 'Próx. cita').slice(0, 12) : 'Sin citas'}
+                      </span>
+                    </button>
+                  </div>
+                </div>
 
-          {/* Más herramientas — grid 4 columnas, siempre visible */}
-          <div>
-            <p style={{ margin: '0 0 10px', fontSize: 14, fontWeight: 600, color: '#1E2D26' }}>Más herramientas</p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
-              {[
-                { emoji: '👥', label: 'Equipo',          onClick: () => navigate('/familia') },
-                { emoji: '🏥', label: 'Hospital',        onClick: () => setShowHospitalModal(true) },
-                { emoji: '🎥', label: 'Videollamada',    onClick: () => setShowVideoCallModal(true) },
-                { emoji: '💬', label: 'Chat',            route: '/chat' },
-                { emoji: '📅', label: 'Citas',           route: '/calendar' },
-                { emoji: '🖼️', label: 'Álbum',          route: '/album' },
-                { emoji: '📋', label: 'Síntomas físicos', route: '/registros' },
-                { emoji: '📊', label: 'Historial',       route: '/historial' },
-                { emoji: '📝', label: 'Notas médicas',   route: '/diario-medico' },
-                { emoji: '📓', label: 'Notas familia',   route: '/paciente/notas-familia' },
-                { emoji: '💰', label: 'Gastos',          route: '/gastos' },
-                { emoji: '🐾', label: 'Milo & Luna',     route: '/diario-medico' },
-                { emoji: '👤', label: 'Mi cuenta',       route: '/ajustes' },
-              ].map((c, i) => (
-                <button key={i} onClick={c.onClick ?? (() => navigate(c.route))} style={{
-                  background: 'white', borderRadius: 14, padding: '12px 6px',
-                  border: 'none', cursor: 'pointer', width: '100%', minWidth: 0,
-                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5,
-                  WebkitTapHighlightColor: 'transparent', boxSizing: 'border-box',
-                  boxShadow: '0 1px 6px rgba(0,0,0,0.05)',
-                }}>
-                  <span style={{ fontSize: 22 }}>{c.emoji}</span>
-                  <p style={{ margin: 0, fontSize: 9, color: '#0B4F4A', lineHeight: 1.2, textAlign: 'center', fontWeight: 500 }}>{c.label}</p>
-                </button>
-              ))}
-            </div>
-          </div>
+                {/* ─ 2. TODAY'S ACTIVITY ─ */}
+                <div style={{ background: 'white', borderRadius: 20, padding: '16px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                    <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#20312C' }}>Actividad de hoy</p>
+                    <button onClick={() => navigate('/historial')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: '#E58B73', fontWeight: 600, padding: 0, WebkitTapHighlightColor: 'transparent' }}>Ver todo →</button>
+                  </div>
+                  {loading ? (
+                    <p style={{ color: '#9CA3AF', fontSize: 13, margin: 0, padding: '8px 0' }}>Cargando...</p>
+                  ) : actividadHoy.length === 0 ? (
+                    <p style={{ color: '#9CA3AF', fontSize: 13, margin: 0, padding: '8px 0' }}>Sin actividad hoy — comienza registrando</p>
+                  ) : actividadHoy.map((evt, i) => {
+                    const EMOJIS = { MED_CONFIRMED: '💊', MED_PENDING: '⏳', VOICE_MEMORY: '🎙️', PHOTO: '📸', NOTE: '📝', EXPENSE: '💰', APPOINTMENT: '📅', APPOINTMENT_PROOF: '✅', SOS_ALERT: '🚨', CARE_LOG: '✔️' }
+                    const LABELS = {
+                      MED_CONFIRMED: `${evt.medName ?? 'Medicamento'} dado`,
+                      MED_PENDING:   `${evt.medName ?? 'Medicamento'} pendiente`,
+                      VOICE_MEMORY:  'Memoria de voz grabada',
+                      PHOTO:         'Foto compartida',
+                      NOTE:          'Nota registrada',
+                      EXPENSE:       evt.description ? `Gasto: ${evt.description}` : 'Gasto registrado',
+                      APPOINTMENT:   evt.appointmentTitle ?? 'Cita médica',
+                      APPOINTMENT_PROOF: `Cita confirmada${evt.appointmentTitle ? `: ${evt.appointmentTitle}` : ''}`,
+                      SOS_ALERT:     'Alerta SOS activada',
+                      CARE_LOG:      'Rutina completada',
+                    }
+                    const icon    = EMOJIS[evt.type] ?? '📌'
+                    const label   = LABELS[evt.type] ?? 'Actividad'
+                    const isDone  = ['MED_CONFIRMED', 'APPOINTMENT_PROOF', 'VOICE_MEMORY', 'PHOTO', 'NOTE', 'EXPENSE', 'CARE_LOG'].includes(evt.type)
+                    const time    = evt.timestamp
+                      ? new Date(evt.timestamp).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit', hour12: false })
+                      : null
+                    return (
+                      <div
+                        key={evt.id ?? i}
+                        onClick={() => setSelectedEvent(evt)}
+                        style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 0', borderBottom: i < actividadHoy.length - 1 ? '1px solid #F5F0E8' : 'none', cursor: 'pointer' }}
+                      >
+                        {time && <span style={{ fontSize: 10, color: '#9CA3AF', minWidth: 38, textAlign: 'right', flexShrink: 0 }}>{time}</span>}
+                        <div style={{ width: 34, height: 34, borderRadius: 10, background: '#F0F9F4', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>
+                          {icon}
+                        </div>
+                        <span style={{ flex: 1, fontSize: 13, color: '#20312C', fontWeight: 500, lineHeight: 1.4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{label}</span>
+                        {isDone && <span style={{ fontSize: 14, color: '#22C55E', flexShrink: 0 }}>✓</span>}
+                      </div>
+                    )
+                  })}
+                </div>
 
-        </div>
+                {/* ─ 3. MOMENTOS + BIENESTAR ─ */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                  {/* Momentos de hoy */}
+                  <div style={{ background: 'white', borderRadius: 20, padding: '14px 12px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', display: 'flex', flexDirection: 'column', minHeight: 160 }}>
+                    <p style={{ margin: '0 0 8px', fontSize: 12, fontWeight: 700, color: '#20312C' }}>Momentos de hoy</p>
+                    {momentoHoy ? (
+                      <>
+                        {momentoHoy.type === 'PHOTO' && momentoHoy.fileUrl ? (
+                          <div onClick={() => setSelectedEvent(momentoHoy)} style={{ cursor: 'pointer', borderRadius: 10, overflow: 'hidden', flex: 1, minHeight: 72 }}>
+                            <img src={momentoHoy.fileUrl} alt="Momento" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                          </div>
+                        ) : (
+                          <div
+                            onClick={() => setSelectedEvent(momentoHoy)}
+                            style={{ background: '#F0F9F4', borderRadius: 10, padding: '10px 8px', display: 'flex', alignItems: 'flex-start', gap: 6, cursor: 'pointer', flex: 1 }}
+                          >
+                            <span style={{ fontSize: 20, flexShrink: 0 }}>🎙️</span>
+                            <p style={{ fontSize: 10, color: '#4B7A5D', margin: 0, lineHeight: 1.4, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' }}>
+                              {momentoHoy.transcription ?? 'Memoria de voz registrada'}
+                            </p>
+                          </div>
+                        )}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 6 }}>
+                          <span style={{ fontSize: 13, color: '#E58B73' }}>♥</span>
+                          <span style={{ fontSize: 10, color: '#9CA3AF', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {(momentoHoy.uploaderName ?? momentoHoy.recorderName ?? 'Cuidador').split(' ')[0]}
+                          </span>
+                        </div>
+                      </>
+                    ) : (
+                      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                        <span style={{ fontSize: 28, opacity: 0.35 }}>📷</span>
+                        <span style={{ fontSize: 10, color: '#9CA3AF', textAlign: 'center', lineHeight: 1.4 }}>Sin momentos hoy</span>
+                      </div>
+                    )}
+                  </div>
 
-        {/* ═══════════════════════════════════════════════════════════════
-            SOS CARD
-        ═══════════════════════════════════════════════════════════════ */}
-        <div style={{ padding: '16px 16px 0' }}>
-          <div style={{
-            background: 'white', borderRadius: 14,
-            padding: '14px 16px',
-            boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-            display: 'flex', alignItems: 'center', gap: 12,
-          }}>
-            <div style={{ width: 44, height: 44, borderRadius: 12, flexShrink: 0, background: '#FEE2E2', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>
-              🆘
-            </div>
-            <div style={{ flex: 1 }}>
-              <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: (sosSent || hasActiveSOS) ? '#D63031' : '#1E2D26', lineHeight: 1.2 }}>
-                {sosSent ? 'Alerta enviada' : hasActiveSOS ? 'Emergencia activa' : 'SOS y Emergencias'}
-              </p>
-              <p style={{ margin: '2px 0 0', fontSize: 12, color: '#9CA3AF' }}>
-                {sosSent ? 'La familia fue notificada' : hasActiveSOS ? '⚡ Resuelve la alerta' : 'Alerta a toda la familia'}
-              </p>
-            </div>
-            <button
-              onClick={prepareSOS}
-              style={{ padding: '8px 14px', borderRadius: 20, border: 'none', background: '#FEE2E2', color: '#D63031', fontWeight: 700, fontSize: 12, cursor: 'pointer', flexShrink: 0, WebkitTapHighlightColor: 'transparent' }}
-            >
-              {sosSent ? 'Enviado' : 'Activar'}
-            </button>
-          </div>
+                  {/* Índice de bienestar */}
+                  <div style={{ background: 'white', borderRadius: 20, padding: '14px 12px', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
+                    <p style={{ margin: '0 0 8px', fontSize: 12, fontWeight: 700, color: '#20312C' }}>Índice de bienestar</p>
+                    <div style={{ textAlign: 'center', marginBottom: 10 }}>
+                      <span style={{ fontSize: 30, fontWeight: 800, color: wellbeingColor, lineHeight: 1 }}>{wellbeingPct}%</span>
+                    </div>
+                    {[
+                      { label: 'Medicamentos', pct: medsPct },
+                      { label: 'Rutinas', pct: routinesPct },
+                      { label: 'Bienestar emocional', pct: emotionalPct },
+                    ].map(({ label, pct }) => (
+                      <div key={label} style={{ marginBottom: 7 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
+                          <span style={{ fontSize: 9, color: '#9CA3AF', lineHeight: 1 }}>{label}</span>
+                          <span style={{ fontSize: 9, color: '#0B4F4A', fontWeight: 700, lineHeight: 1 }}>{pct}%</span>
+                        </div>
+                        <div style={{ height: 4, borderRadius: 2, background: '#F3F4F6', overflow: 'hidden' }}>
+                          <div style={{ height: '100%', width: `${pct}%`, borderRadius: 2, background: pct >= 70 ? '#0B4F4A' : pct >= 40 ? '#C9882A' : '#D63031', transition: 'width 0.6s ease' }} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* ─ 4. QUICK ACTIONS ─ */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
+                  {[
+                    { icon: '📞', label: 'Llamar',     onClick: () => navigate('/familia'), emergency: false },
+                    { icon: '💬', label: 'Chat',       onClick: () => navigate('/chat'),    emergency: false },
+                    { icon: '📹', label: 'Video',      onClick: handleInstantCall,          emergency: false },
+                    { icon: '🚨', label: 'Emergencia', onClick: prepareSOS,                 emergency: true  },
+                  ].map(({ icon, label, onClick, emergency }) => (
+                    <button
+                      key={label}
+                      onClick={onClick}
+                      style={{
+                        background: emergency ? '#FFF0F0' : '#F0F7F6',
+                        borderRadius: 16,
+                        border: emergency ? '1.5px solid #FECACA' : '1.5px solid #D6EAE8',
+                        padding: '14px 6px',
+                        cursor: 'pointer',
+                        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5,
+                        WebkitTapHighlightColor: 'transparent',
+                      }}
+                    >
+                      <span style={{ fontSize: 22 }}>{icon}</span>
+                      <span style={{ fontSize: 10, fontWeight: 700, color: emergency ? '#E58B73' : '#0B4F4A', lineHeight: 1.2, textAlign: 'center' }}>{label}</span>
+                    </button>
+                  ))}
+                </div>
+
+                {/* ─ 5. MORE TOOLS ─ */}
+                <div>
+                  <p style={{ margin: '0 0 10px', fontSize: 14, fontWeight: 600, color: '#20312C' }}>Más herramientas</p>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+                    {[
+                      { emoji: '👥', label: 'Equipo',           onClick: () => navigate('/familia') },
+                      { emoji: '🏥', label: 'Hospital',         onClick: () => setShowHospitalModal(true) },
+                      { emoji: '🎥', label: 'Videollamada',     onClick: () => setShowVideoCallModal(true) },
+                      { emoji: '💬', label: 'Chat',             route: '/chat' },
+                      { emoji: '📅', label: 'Citas',            route: '/calendar' },
+                      { emoji: '🖼️', label: 'Álbum',           route: '/album' },
+                      { emoji: '📋', label: 'Síntomas físicos', route: '/registros' },
+                      { emoji: '📊', label: 'Historial',        route: '/historial' },
+                      { emoji: '📝', label: 'Notas médicas',    route: '/diario-medico' },
+                      { emoji: '📓', label: 'Notas familia',    route: '/paciente/notas-familia' },
+                      { emoji: '💰', label: 'Gastos',           route: '/gastos' },
+                      { emoji: '🐾', label: 'Milo & Luna',      route: '/diario-medico' },
+                      { emoji: '👤', label: 'Mi cuenta',        route: '/ajustes' },
+                    ].map((c, i) => (
+                      <button key={i} onClick={c.onClick ?? (() => navigate(c.route))} style={{
+                        background: 'white', borderRadius: 14, padding: '12px 6px',
+                        border: 'none', cursor: 'pointer', width: '100%', minWidth: 0,
+                        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5,
+                        WebkitTapHighlightColor: 'transparent', boxSizing: 'border-box',
+                        boxShadow: '0 1px 6px rgba(0,0,0,0.05)',
+                      }}>
+                        <span style={{ fontSize: 22 }}>{c.emoji}</span>
+                        <p style={{ margin: 0, fontSize: 9, color: '#0B4F4A', lineHeight: 1.2, textAlign: 'center', fontWeight: 500 }}>{c.label}</p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )
+          })()}
         </div>
 
         <HospitalModeModal open={showHospitalModal} onClose={() => setShowHospitalModal(false)} />
