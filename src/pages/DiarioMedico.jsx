@@ -6,6 +6,7 @@ import { useSubscription } from '../contexts/SubscriptionContext'
 import Layout from '../components/Layout'
 import DiarioMedicoEntryModal from '../components/DiarioMedicoEntryModal'
 import PaywallModal from '../components/PaywallModal'
+import CompanionChat from '../components/CompanionChat'
 
 const LOCATION_META = {
   hospital: { label: 'Hospital',  emoji: '🏥', bg: '#FFF0F0', color: '#B91C1C' },
@@ -178,6 +179,7 @@ export default function DiarioMedico() {
   const [loading, setLoading]        = useState(true)
   const [showModal, setShowModal]    = useState(false)
   const [showPaywall, setShowPaywall] = useState(false)
+  const [showCompanion, setShowCompanion] = useState(false)
   const channelRef                   = useRef(null)
 
   // Admin or cuidador can add entries
@@ -254,19 +256,32 @@ export default function DiarioMedico() {
               </p>
             </div>
           </div>
-          {canAdd && (
+          <div style={{ display: 'flex', gap: 8 }}>
             <button
-              onClick={openEntry}
+              onClick={() => setShowCompanion(true)}
               style={{
-                padding: '10px 16px', borderRadius: 12, border: 'none',
+                padding: '10px 14px', borderRadius: 12, border: 'none',
                 background: 'rgba(255,255,255,0.15)', color: 'white',
                 fontWeight: 700, fontSize: 13, cursor: 'pointer',
-                backdropFilter: 'blur(8px)',
+                backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', gap: 6,
               }}
             >
-              + Agregar
+              <span style={{ fontSize: 16 }}>🐾</span> Milo
             </button>
-          )}
+            {canAdd && (
+              <button
+                onClick={openEntry}
+                style={{
+                  padding: '10px 16px', borderRadius: 12, border: 'none',
+                  background: 'rgba(255,255,255,0.15)', color: 'white',
+                  fontWeight: 700, fontSize: 13, cursor: 'pointer',
+                  backdropFilter: 'blur(8px)',
+                }}
+              >
+                + Agregar
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Loading */}
@@ -345,6 +360,11 @@ export default function DiarioMedico() {
           patientName={profile?.name?.split(' ')[0]}
         />
       )}
+      <CompanionChat
+        externalOpen={showCompanion}
+        onExternalClose={() => setShowCompanion(false)}
+        bottomOffset={80}
+      />
     </Layout>
   )
 }

@@ -9,14 +9,12 @@ import InstallBanner from './InstallBanner'
 import OfflineBanner from './OfflineBanner'
 import { useDarkMode } from '../contexts/DarkModeContext'
 import FamilySwitcher from './FamilySwitcher'
-import CompanionChat from './CompanionChat'
 import { useHospitalMode } from '../contexts/HospitalModeContext'
 import { useBadgeCounts } from '../hooks/useBadgeCounts'
 
 const PAGE_TITLES = {
   '/dashboard':      'Inicio',
   '/hoy':            'Medicamentos',
-  '/cuidado':        'Rutinas de hoy',
   '/memorias':       'Memorias de voz',
   '/diario-voz':     'Memorias de voz',
   '/familia':        'Mi Familia',
@@ -58,7 +56,6 @@ export default function Layout({ children }) {
   const isVideoCall = location.pathname === '/videollamada'
   const isSecondary = !PRIMARY_PAGES.has(location.pathname) && !isVideoCall
 
-  const [showCompanion,   setShowCompanion]   = useState(false)
   const [showQuickActions, setShowQuickActions] = useState(false)
 
   const bg      = dark ? '#0F1A12' : '#F8F4ED'
@@ -206,8 +203,6 @@ export default function Layout({ children }) {
         </footer>
       </main>
 
-      <CompanionChat externalOpen={showCompanion} onExternalClose={() => setShowCompanion(false)} bottomOffset={80} />
-
       <Paywall />
 
       {/* Inactivity warning banner */}
@@ -282,11 +277,11 @@ export default function Layout({ children }) {
             </button>
           </div>
 
-          {/* Milo IA */}
-          <button onClick={() => setShowCompanion(true)} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, background: 'none', border: 'none', cursor: 'pointer', padding: 0, WebkitTapHighlightColor: 'transparent' }}>
-            <span style={{ fontSize: 22, lineHeight: 1 }}>🐾</span>
-            <span style={{ fontSize: 10, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: '#9FAF9A' }}>Milo & Luna</span>
-          </button>
+          {/* Notas médicas */}
+          <Link to="/diario-medico" style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, textDecoration: 'none' }}>
+            <span style={{ fontSize: 22, lineHeight: 1 }}>📓</span>
+            <span style={{ fontSize: 10, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: location.pathname === '/diario-medico' ? '#3D6B54' : '#9FAF9A' }}>Notas</span>
+          </Link>
 
           {/* Mi cuenta */}
           <Link to="/ajustes" style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, textDecoration: 'none' }}>
@@ -316,7 +311,6 @@ export default function Layout({ children }) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {[
                 { emoji: '💊', label: 'Registrar medicamento', path: '/medications' },
-                { emoji: '✅', label: 'Registrar rutina',       path: '/cuidado' },
                 { emoji: '📝', label: 'Notas de la familia',    path: '/paciente/notas-familia' },
                 { emoji: '📸', label: 'Subir foto',             path: '/album' },
               ].map(({ emoji, label, path }) => (

@@ -3101,9 +3101,6 @@ export default function Dashboard() {
           {(() => {
             const heroPhoto = patientProfile?.foto_url || profile?.photo_url || null
             const patientName = patientProfile?.nombre_completo || profile?.name || 'Agregar paciente'
-            const _totalRoutines = 4
-            const _doneRoutines = Math.min(Object.values(careLogsToday).filter(Boolean).length, _totalRoutines)
-
             const isCritical     = hasActiveSOS || (_isRetrasado && _retrasadoMins != null && _retrasadoMins >= 720)
             const isPendingToday = !isCritical && (pendingCount > 0 || _isRetrasado)
             const statusEmoji = isCritical ? '🔴' : isPendingToday ? '🟡' : '🟢'
@@ -3397,7 +3394,7 @@ export default function Dashboard() {
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
                     <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: '#9AA89E', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Momentos recientes</p>
-                    <button onClick={() => navigate('/paciente/notas-familia')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: '#E9826E', fontWeight: 700, padding: 0, WebkitTapHighlightColor: 'transparent' }}>Ver todos →</button>
+                    <button onClick={() => navigate('/album')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: '#E9826E', fontWeight: 700, padding: 0, WebkitTapHighlightColor: 'transparent' }}>Ver todos →</button>
                   </div>
                   {recentPhotos.length === 0 ? (
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', background: 'rgba(255,255,255,0.8)', borderRadius: 20, border: '1px solid rgba(20,35,30,0.05)' }}>
@@ -3406,7 +3403,7 @@ export default function Dashboard() {
                         <p style={{ margin: 0, fontSize: 12, color: '#9AA89E', lineHeight: 1.4 }}>Captura una foto o nota de voz<br />para guardar recuerdos.</p>
                       </div>
                       <button
-                        onClick={() => navigate('/paciente/notas-familia')}
+                        onClick={() => navigate('/album')}
                         style={{ background: '#E9826E', border: 'none', borderRadius: 999, padding: '9px 16px', cursor: 'pointer', fontSize: 12, fontWeight: 700, color: 'white', flexShrink: 0, WebkitTapHighlightColor: 'transparent', boxShadow: '0 4px 14px rgba(233,130,110,0.38)' }}
                       >
                         Capturar
@@ -3433,9 +3430,8 @@ export default function Dashboard() {
                     ════════════════════════════════════ */}
                 <div>
                   <p style={{ margin: '0 0 12px', fontSize: 11, fontWeight: 700, color: '#9AA89E', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Acciones rápidas</p>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
                     {[
-                      { icon: '📞', label: 'Llamar',       onClick: () => navigate('/familia'), emergency: false },
                       { icon: '💬', label: 'Chat',         onClick: () => navigate('/chat'),    emergency: false },
                       { icon: '📹', label: 'Video',        onClick: handleInstantCall,          emergency: false },
                       { icon: '🚨', label: 'Emergencia',   onClick: prepareSOS,                 emergency: true  },
