@@ -3439,7 +3439,7 @@ export default function Dashboard() {
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4 }}>
                     {[
                       { icon: '💬', label: 'Chat',         onClick: () => navigate('/chat'),           color: '#143C32' },
-                      { icon: '📹', label: 'Videollamada', onClick: handleInstantCall,                 color: '#143C32' },
+                      { icon: '📹', label: 'Videollamada', onClick: () => navigate('/videollamada'),   color: '#143C32' },
                       { icon: '🚨', label: 'Emergencia',   onClick: prepareSOS,                        color: '#E9826E' },
                     ].map(({ icon, label, onClick, color }) => (
                       <button
