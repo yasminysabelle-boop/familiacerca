@@ -3472,6 +3472,7 @@ export default function Dashboard() {
                     { emoji: '💬', label: 'Chat',             onClick: () => navigate('/chat') },
                     { emoji: '📋', label: 'Síntomas',         onClick: () => navigate('/registros') },
                     { emoji: '📊', label: 'Historial',        onClick: () => navigate('/historial') },
+                    { emoji: '✅', label: 'Rutinas',          onClick: () => navigate('/cuidado') },
                     { emoji: '📝', label: 'Notas médicas',    onClick: () => navigate('/diario-medico') },
                     { emoji: '📓', label: 'Notas familia',    onClick: () => navigate('/paciente/notas-familia') },
                     { emoji: '💰', label: 'Gastos',           onClick: () => navigate('/gastos') },
