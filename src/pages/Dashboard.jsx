@@ -3137,48 +3137,29 @@ export default function Dashboard() {
             return (
               <>
                 {/* ══════════════════════════════════════════
-                    HERO — glassmorphism card (v0)
+                    HERO — photo as background-image, glass panel absolute
                     ══════════════════════════════════════════ */}
                 <div style={{
+                  position: 'relative',
                   height: 300,
+                  width: '100%',
                   borderRadius: 24,
                   overflow: 'hidden',
-                  position: 'relative',
                   flexShrink: 0,
+                  ...(heroPhoto
+                    ? { backgroundImage: `url(${heroPhoto})`, backgroundSize: 'cover', backgroundPosition: 'center 25%' }
+                    : { background: 'linear-gradient(135deg, #0B4F4A 0%, #143C32 100%)' }
+                  ),
                 }}>
-                  {/* Patient photo as full background */}
-                  {heroPhoto ? (
-                    <img
-                      src={heroPhoto}
-                      alt={patientName}
-                      style={{
-                        position: 'absolute', inset: 0,
-                        width: '100%', height: '100%',
-                        objectFit: 'cover', objectPosition: 'center 25%',
-                        display: 'block',
-                      }}
-                    />
-                  ) : (
-                    <div style={{
-                      position: 'absolute', inset: 0,
-                      background: 'linear-gradient(135deg, #0B4F4A 0%, #1a7a6e 60%, #2C5F2E 100%)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    }}>
-                      <span style={{ fontSize: 120, color: 'rgba(255,255,255,0.08)', fontFamily: 'Georgia, serif', lineHeight: 1, userSelect: 'none', pointerEvents: 'none' }}>
-                        {patientName.charAt(0).toUpperCase()}
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Gradient overlay — light left, cream right where glass panel sits */}
-                  <div style={{
-                    position: 'absolute', inset: 0,
-                    background: 'linear-gradient(90deg, rgba(10,40,32,0.15) 0%, rgba(248,245,239,0.85) 100%)',
-                    zIndex: 2, pointerEvents: 'none',
-                  }} />
-
                   {/* Hidden file input */}
                   <input ref={heroPhotoInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleHeroPhotoUpload} />
+
+                  {/* Gradient overlay — on top of photo, below glass panel */}
+                  <div style={{
+                    position: 'absolute', inset: 0,
+                    background: 'linear-gradient(90deg, rgba(10,40,32,0.20) 0%, rgba(10,40,32,0.10) 40%, rgba(248,245,239,0.75) 100%)',
+                    pointerEvents: 'none', zIndex: 1,
+                  }} />
 
                   {/* Camera button — top left */}
                   <button
@@ -3197,18 +3178,19 @@ export default function Dashboard() {
                     <span style={{ fontSize: 14 }}>{heroUploading ? '⏳' : '📷'}</span>
                   </button>
 
-                  {/* Glassmorphism panel — right side, compact */}
+                  {/* Glass panel — floating on top of photo */}
                   <div
                     onClick={() => navigate('/paciente/perfil')}
                     style={{
-                      position: 'absolute', right: 12, top: 12, bottom: 12,
-                      width: '52%',
-                      borderRadius: 20,
-                      background: 'rgba(255,255,255,0.72)',
+                      position: 'absolute', top: 12, right: 12, bottom: 12,
+                      width: '54%',
+                      background: 'rgba(255,255,255,0.55)',
                       backdropFilter: 'blur(20px)',
                       WebkitBackdropFilter: 'blur(20px)',
-                      border: '1px solid rgba(255,255,255,0.60)',
-                      padding: 14,
+                      borderRadius: 20,
+                      border: '1px solid rgba(255,255,255,0.45)',
+                      boxShadow: '0 20px 50px rgba(20,35,30,0.15)',
+                      padding: 16,
                       display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
                       zIndex: 3, cursor: 'pointer', overflow: 'hidden',
                     }}
@@ -3224,7 +3206,7 @@ export default function Dashboard() {
                       <span style={{
                         display: 'inline-flex', alignItems: 'center', gap: 5,
                         padding: '4px 9px', borderRadius: 999,
-                        background: statusBg, fontSize: 10, fontWeight: 600, color: statusColor,
+                        background: statusBg, fontSize: 12, fontWeight: 600, color: statusColor,
                       }}>
                         <span style={{ width: 6, height: 6, borderRadius: '50%', background: dotColor, flexShrink: 0 }} />
                         {statusLabel}
@@ -3273,7 +3255,7 @@ export default function Dashboard() {
                           )}
                         </div>
                         {familyMembers.length > 0 ? (
-                          <p style={{ margin: 0, fontSize: 10, color: '#143C32', fontWeight: 500 }}>
+                          <p style={{ margin: 0, fontSize: 10, color: '#6D7B74', fontWeight: 500 }}>
                             {familyCount} persona{familyCount !== 1 ? 's' : ''} cuidando juntas
                           </p>
                         ) : (
