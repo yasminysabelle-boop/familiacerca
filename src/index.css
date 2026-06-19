@@ -26,9 +26,14 @@
 }
 
 body {
-  background-color: #F7F3ED;
+  background-color: #ffffff;
   -webkit-font-smoothing: antialiased;
   color: #1A1A1A;
+}
+
+#root {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 /* ── Dark mode ────────────────────────────────────────────────────── */

@@ -244,12 +244,13 @@ export default function Layout({ children }) {
         <>
         <nav style={{
           position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100,
-          height: 64,
-          paddingBottom: 'env(safe-area-inset-bottom)',
-          backgroundColor: 'white',
-          borderTop: '1px solid #F8F4ED',
+          backgroundColor: '#ffffff',
+          borderTop: '1px solid rgba(0,0,0,0.06)',
           boxShadow: '0 -2px 12px rgba(0,0,0,0.05)',
           display: 'flex', alignItems: 'center',
+          paddingBottom: 'calc(env(safe-area-inset-bottom) + 8px)',
+          paddingTop: 8,
+          minHeight: 64,
         }}>
           {/* Inicio */}
           <Link to="/dashboard" style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, textDecoration: 'none' }}>

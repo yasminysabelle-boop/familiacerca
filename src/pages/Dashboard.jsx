@@ -1772,6 +1772,8 @@ export default function Dashboard() {
   const [medTotal, setMedTotal] = useState(0)
   const [medsList, setMedsList]  = useState([])
   const [totalStock, setTotalStock] = useState(0)
+  const [heroUploading, setHeroUploading] = useState(false)
+  const heroPhotoInputRef = useRef(null)
   const [showSOS, setShowSOS] = useState(false)
   const [sosSent, setSosSent] = useState(false)
   const [sosConfirming, setSosConfirming] = useState(false)
@@ -2632,6 +2634,28 @@ export default function Dashboard() {
       })
   }, [ownerId])
 
+  async function handleHeroPhotoUpload(e) {
+    const file = e.target.files?.[0]
+    if (!file || !ownerId) return
+    setHeroUploading(true)
+    try {
+      const ext = file.name.split('.').pop() || 'jpg'
+      const path = `${ownerId}/avatar.${ext}`
+      const { error: upErr } = await supabase.storage
+        .from('patient-photos')
+        .upload(path, file, { upsert: true, contentType: file.type })
+      if (upErr) throw upErr
+      const { data: { publicUrl } } = supabase.storage.from('patient-photos').getPublicUrl(path)
+      await supabase.from('patient_profiles').update({ foto_url: publicUrl }).eq('owner_id', ownerId)
+      setPatientProfile(prev => prev ? { ...prev, foto_url: publicUrl } : prev)
+    } catch {
+      // silently ignore upload errors
+    } finally {
+      setHeroUploading(false)
+      if (heroPhotoInputRef.current) heroPhotoInputRef.current.value = ''
+    }
+  }
+
   async function handleInstantCall() {
     if (!ownerId || startingInstantCall) return
     setStartingInstantCall(true)
@@ -2964,7 +2988,7 @@ export default function Dashboard() {
         `}</style>
 
         {/* ═══ HEADER — fondo blanco ═══ */}
-        <div style={{ background: 'white', padding: '14px 16px 14px', borderBottom: '1px solid #F0EAE0' }}>
+        <div style={{ background: '#ffffff', padding: '14px 16px', borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             {/* Logo + FamiliaCerca */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -3123,7 +3147,7 @@ export default function Dashboard() {
                     animation: 'fadeInUp 0.4s ease both',
                     backgroundImage: heroPhoto ? `url(${heroPhoto})` : undefined,
                     backgroundSize: 'cover',
-                    backgroundPosition: 'center',
+                    backgroundPosition: 'center top',
                     background: heroPhoto ? undefined : 'linear-gradient(135deg, #0B4F4A 0%, #1a7a6e 50%, #2C5F2E 100%)',
                   }}
                 >
@@ -3134,18 +3158,66 @@ export default function Dashboard() {
                     background: 'linear-gradient(90deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.05) 40%, rgba(248,244,237,0.88) 100%)',
                   }} />
 
-                  {/* No-photo fallback initial — left side */}
+                  {/* Hidden file input — always present */}
+                  <input
+                    ref={heroPhotoInputRef}
+                    type="file"
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    onChange={handleHeroPhotoUpload}
+                  />
+
+                  {/* No-photo: initial + upload button */}
                   {!heroPhoto && (
                     <div style={{
                       position: 'absolute',
                       left: 0, top: 0, bottom: 0,
                       width: '44%',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                      gap: 14, padding: '0 10px',
                     }}>
-                      <span style={{ fontSize: 72, fontWeight: 700, color: 'rgba(255,255,255,0.28)', fontFamily: 'Georgia, serif', lineHeight: 1 }}>
+                      <span style={{ fontSize: 64, fontWeight: 700, color: 'rgba(255,255,255,0.22)', fontFamily: 'Georgia, serif', lineHeight: 1 }}>
                         {patientName.charAt(0).toUpperCase()}
                       </span>
+                      <button
+                        onClick={() => heroPhotoInputRef.current?.click()}
+                        disabled={heroUploading}
+                        style={{
+                          background: 'rgba(255,255,255,0.92)',
+                          border: 'none', borderRadius: 50,
+                          padding: '9px 14px',
+                          cursor: heroUploading ? 'default' : 'pointer',
+                          display: 'flex', alignItems: 'center', gap: 6,
+                          boxShadow: '0 2px 12px rgba(0,0,0,0.18)',
+                          WebkitTapHighlightColor: 'transparent',
+                        }}
+                      >
+                        <span style={{ fontSize: 14 }}>📷</span>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: '#1E2D26', whiteSpace: 'nowrap' }}>
+                          {heroUploading ? 'Subiendo...' : `Agregar foto de ${patientName.split(' ')[0]}`}
+                        </span>
+                      </button>
                     </div>
+                  )}
+
+                  {/* Photo exists: small edit overlay */}
+                  {heroPhoto && (
+                    <button
+                      onClick={() => heroPhotoInputRef.current?.click()}
+                      disabled={heroUploading}
+                      style={{
+                        position: 'absolute', bottom: 14, left: 14,
+                        background: 'rgba(0,0,0,0.45)',
+                        border: 'none', borderRadius: '50%',
+                        width: 32, height: 32,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        cursor: heroUploading ? 'default' : 'pointer',
+                        WebkitTapHighlightColor: 'transparent',
+                        zIndex: 2,
+                      }}
+                    >
+                      <span style={{ fontSize: 15 }}>📷</span>
+                    </button>
                   )}
 
                   {/* Glass info panel — right side */}
