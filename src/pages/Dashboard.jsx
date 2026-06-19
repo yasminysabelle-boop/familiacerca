@@ -3136,27 +3136,27 @@ export default function Dashboard() {
             return (
               <>
                 {/* ══════════════════════════════════════════
-                    HERO — premium storytelling card
+                    HERO — glassmorphism card (v0)
                     ══════════════════════════════════════════ */}
                 <div style={{
-                  marginLeft: -16,
-                  marginRight: -16,
-                  marginTop: -16,
                   height: 300,
-                  minHeight: 300,
-                  position: 'relative',
+                  borderRadius: 24,
                   overflow: 'hidden',
-                  borderRadius: '0 0 32px 32px',
+                  position: 'relative',
                   flexShrink: 0,
                 }}>
-                  {/* Layer 1 — Background: photo or gradient */}
+                  {/* Patient photo as full background */}
                   {heroPhoto ? (
-                    <div style={{
-                      position: 'absolute', inset: 0,
-                      backgroundImage: `url(${heroPhoto})`,
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center',
-                    }} />
+                    <img
+                      src={heroPhoto}
+                      alt={patientName}
+                      style={{
+                        position: 'absolute', inset: 0,
+                        width: '100%', height: '100%',
+                        objectFit: 'cover', objectPosition: 'center top',
+                        display: 'block',
+                      }}
+                    />
                   ) : (
                     <div style={{
                       position: 'absolute', inset: 0,
@@ -3169,21 +3169,6 @@ export default function Dashboard() {
                     </div>
                   )}
 
-                  {/* Layer 2 — Premium gradient overlay (left dark → right cream) */}
-                  <div style={{
-                    position: 'absolute', inset: 0,
-                    background: 'linear-gradient(90deg, rgba(10,40,32,0.62) 0%, rgba(10,40,32,0.35) 42%, rgba(248,245,239,0.82) 100%)',
-                    pointerEvents: 'none',
-                  }} />
-
-                  {/* Layer 3 — Bottom fade into page background */}
-                  <div style={{
-                    position: 'absolute', left: 0, right: 0, bottom: 0,
-                    height: 90,
-                    background: 'linear-gradient(180deg, rgba(250,247,241,0) 0%, rgba(250,247,241,1) 100%)',
-                    pointerEvents: 'none',
-                  }} />
-
                   {/* Hidden file input */}
                   <input ref={heroPhotoInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleHeroPhotoUpload} />
 
@@ -3192,7 +3177,7 @@ export default function Dashboard() {
                     onClick={() => heroPhotoInputRef.current?.click()}
                     disabled={heroUploading}
                     style={{
-                      position: 'absolute', top: 14, left: 14,
+                      position: 'absolute', top: 12, left: 12,
                       background: 'rgba(0,0,0,0.28)',
                       border: 'none', borderRadius: '50%',
                       width: 34, height: 34,
@@ -3204,90 +3189,89 @@ export default function Dashboard() {
                     <span style={{ fontSize: 14 }}>{heroUploading ? '⏳' : '📷'}</span>
                   </button>
 
-                  {/* Glass panel — right/bottom with patient info */}
+                  {/* Glassmorphism panel — right side, full height */}
                   <div
                     onClick={() => navigate('/paciente/perfil')}
                     style={{
-                      position: 'absolute', right: 16, bottom: 22,
-                      width: '58%', maxWidth: 230,
-                      padding: 18,
-                      borderRadius: 24,
-                      background: 'rgba(255,255,255,0.58)',
-                      backdropFilter: 'blur(22px)',
-                      WebkitBackdropFilter: 'blur(22px)',
-                      border: '1px solid rgba(255,255,255,0.45)',
-                      boxShadow: '0 18px 45px rgba(20,35,30,0.18)',
-                      zIndex: 3, cursor: 'pointer',
+                      position: 'absolute', right: 12, top: 12, bottom: 12,
+                      width: '58%',
+                      borderRadius: 16,
+                      background: 'rgba(255,255,255,0.30)',
+                      backdropFilter: 'blur(12px)',
+                      WebkitBackdropFilter: 'blur(12px)',
+                      border: '1px solid rgba(255,255,255,0.40)',
+                      padding: 16,
+                      display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+                      zIndex: 3, cursor: 'pointer', overflow: 'hidden',
                     }}
                   >
-                    {/* Greeting */}
-                    <p style={{ margin: '0 0 4px', fontSize: 12, fontWeight: 500, color: '#5F6F68', lineHeight: 1.3 }}>
-                      {timeGreeting}, {firstName} {timeIcon}
-                    </p>
-                    {/* Patient name */}
-                    <p style={{ margin: '0 0 10px', fontSize: 30, fontWeight: 700, color: '#143C32', fontFamily: 'Georgia, serif', lineHeight: 1.05, letterSpacing: '-0.03em' }}>
-                      {patientName.split(' ')[0]}
-                    </p>
-                    {/* Status pill */}
-                    <div style={{ marginBottom: lastUpdatedAgo ? 8 : 12 }}>
+                    {/* Top — greeting + name + status */}
+                    <div>
+                      <p style={{ margin: '0 0 6px', fontSize: 12, fontWeight: 500, color: 'rgba(255,255,255,0.9)', lineHeight: 1.3 }}>
+                        {timeGreeting}, {firstName} {timeIcon}
+                      </p>
+                      <p style={{ margin: '0 0 10px', fontSize: 28, fontWeight: 700, color: 'white', fontFamily: 'Georgia, serif', lineHeight: 1.05, letterSpacing: '-0.03em', textShadow: '0 1px 4px rgba(0,0,0,0.15)' }}>
+                        {patientName.split(' ')[0]}
+                      </p>
                       <span style={{
-                        display: 'inline-flex', alignItems: 'center', gap: 6,
-                        padding: '6px 10px', borderRadius: 999,
-                        background: statusBg, fontSize: 12, fontWeight: 600, color: statusColor,
-                        border: `1px solid ${statusBorder}`,
+                        display: 'inline-flex', alignItems: 'center', gap: 5,
+                        padding: '5px 10px', borderRadius: 999,
+                        background: statusBg, fontSize: 11, fontWeight: 600, color: statusColor,
                       }}>
                         <span style={{ width: 6, height: 6, borderRadius: '50%', background: dotColor, flexShrink: 0 }} />
                         {statusLabel}
                       </span>
                     </div>
-                    {/* Last updated */}
-                    {lastUpdatedAgo && (
-                      <p style={{ margin: '0 0 12px', fontSize: 11, color: '#8A9E97', fontWeight: 400, lineHeight: 1.3 }}>
-                        Última actualización<br />{lastUpdatedAgo}
-                      </p>
-                    )}
-                    {/* Family avatars */}
-                    <div
-                      onClick={e => { e.stopPropagation(); setShowFamilySwitcher(true) }}
-                      style={{ display: 'flex', flexDirection: 'column', gap: 5 }}
-                    >
-                      <div style={{ display: 'flex', alignItems: 'center' }}>
-                        {familyMembers.slice(0, 4).map((m, i) => {
-                          const nm = m.full_name?.trim() || m.email?.split('@')[0] || '?'
-                          const avatarColors = ['#2F6B4F', '#D99A18', '#7A659C', '#E58B73']
-                          return (
-                            <div key={m.id} style={{
+
+                    {/* Bottom — last updated + family avatars */}
+                    <div>
+                      {lastUpdatedAgo && (
+                        <p style={{ margin: '0 0 10px', fontSize: 11, color: 'rgba(255,255,255,0.80)', fontWeight: 400, lineHeight: 1.35 }}>
+                          Última actualización · {lastUpdatedAgo}
+                        </p>
+                      )}
+                      <div
+                        onClick={e => { e.stopPropagation(); setShowFamilySwitcher(true) }}
+                        style={{ display: 'flex', flexDirection: 'column', gap: 5 }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                          {familyMembers.slice(0, 4).map((m, i) => {
+                            const nm = m.full_name?.trim() || m.email?.split('@')[0] || '?'
+                            const avatarColors = ['#2F6B4F', '#D99A18', '#7A659C', '#E58B73']
+                            return (
+                              <div key={m.id} style={{
+                                width: 28, height: 28, borderRadius: '50%',
+                                background: avatarColors[i % avatarColors.length],
+                                border: '2px solid rgba(255,255,255,0.9)',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                fontSize: 12, fontWeight: 700, color: 'white',
+                                marginLeft: i > 0 ? -6 : 0, position: 'relative', zIndex: 10 - i,
+                              }}>
+                                {nm.charAt(0).toUpperCase()}
+                              </div>
+                            )
+                          })}
+                          {familyMembers.length > 4 && (
+                            <div style={{
                               width: 28, height: 28, borderRadius: '50%',
-                              background: avatarColors[i % avatarColors.length],
+                              background: 'rgba(255,255,255,0.30)',
                               border: '2px solid rgba(255,255,255,0.9)',
                               display: 'flex', alignItems: 'center', justifyContent: 'center',
-                              fontSize: 12, fontWeight: 700, color: 'white',
-                              marginLeft: i > 0 ? -6 : 0, position: 'relative', zIndex: 10 - i,
+                              fontSize: 9, fontWeight: 700, color: 'white',
+                              marginLeft: -6, zIndex: 6,
                             }}>
-                              {nm.charAt(0).toUpperCase()}
+                              +{familyMembers.length - 4}
                             </div>
-                          )
-                        })}
-                        {familyMembers.length > 4 && (
-                          <div style={{
-                            width: 28, height: 28, borderRadius: '50%',
-                            background: 'rgba(255,255,255,0.5)',
-                            border: '2px solid rgba(255,255,255,0.9)',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontSize: 9, fontWeight: 700, color: '#143C32',
-                            marginLeft: -6, zIndex: 6,
-                          }}>
-                            +{familyMembers.length - 4}
-                          </div>
+                          )}
+                        </div>
+                        {familyMembers.length > 0 ? (
+                          <p style={{ margin: 0, fontSize: 11, color: 'rgba(255,255,255,0.88)', fontWeight: 500 }}>
+                            {familyCount} persona{familyCount !== 1 ? 's' : ''} cuidando juntas
+                          </p>
+                        ) : (
+                          <p style={{ margin: 0, fontSize: 11, color: 'rgba(255,255,255,0.65)' }}>Invita a tu familia →</p>
                         )}
                       </div>
-                      {familyMembers.length > 0 ? (
-                        <p style={{ margin: 0, fontSize: 11, color: '#6D7B74', fontWeight: 500 }}>
-                          {familyCount} persona{familyCount !== 1 ? 's' : ''} cuidando juntas
-                        </p>
-                      ) : (
-                        <p style={{ margin: 0, fontSize: 11, color: '#8A9E97' }}>Invita a tu familia →</p>
-                      )}
                     </div>
                   </div>
                 </div>
