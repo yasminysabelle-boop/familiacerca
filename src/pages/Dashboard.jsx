@@ -3484,7 +3484,7 @@ export default function Dashboard() {
                           onClick={() => setShowMoreTools(false)}
                         >
                           <div
-                            style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: '#FAF7F1', borderRadius: '28px 28px 0 0', padding: '20px 20px 40px', maxHeight: '80vh', overflowY: 'auto' }}
+                            style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: '#FAF7F1', borderRadius: '28px 28px 0 0', padding: '20px 20px 90px', maxHeight: '80vh', overflowY: 'auto' }}
                             onClick={e => e.stopPropagation()}
                           >
                             <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(20,60,50,0.15)', margin: '0 auto 20px' }} />

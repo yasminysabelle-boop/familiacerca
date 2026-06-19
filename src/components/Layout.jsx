@@ -182,8 +182,9 @@ export default function Layout({ children }) {
       <main style={{
         position: 'fixed', inset: 0, overflowY: 'auto',
         background: bg,
-        top:    isVideoCall ? 0 : isHome ? `calc(${hospitalBarHeight}px + env(safe-area-inset-top))` : `calc(${hospitalBarHeight}px + 56px + env(safe-area-inset-top))`,
-        bottom: isVideoCall ? 0 : (isSecondary || isHospitalMode) ? 'env(safe-area-inset-bottom)' : 'calc(64px + env(safe-area-inset-bottom))',
+        top:           isVideoCall ? 0 : isHome ? `calc(${hospitalBarHeight}px + env(safe-area-inset-top))` : `calc(${hospitalBarHeight}px + 56px + env(safe-area-inset-top))`,
+        bottom:        isVideoCall ? 0 : (isSecondary || isHospitalMode) ? 'env(safe-area-inset-bottom)' : 'calc(64px + env(safe-area-inset-bottom))',
+        paddingBottom: isVideoCall ? 0 : 80,
       }}>
         <InstallBanner />
         <OfflineBanner />
