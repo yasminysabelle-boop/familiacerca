@@ -27,6 +27,7 @@
 
 body {
   background-color: #ffffff;
+  padding-bottom: env(safe-area-inset-bottom);
   -webkit-font-smoothing: antialiased;
   color: #1A1A1A;
 }

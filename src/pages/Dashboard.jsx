@@ -2648,8 +2648,8 @@ export default function Dashboard() {
       const { data: { publicUrl } } = supabase.storage.from('patient-photos').getPublicUrl(path)
       await supabase.from('patient_profiles').update({ foto_url: publicUrl }).eq('owner_id', ownerId)
       setPatientProfile(prev => prev ? { ...prev, foto_url: publicUrl } : prev)
-    } catch {
-      // silently ignore upload errors
+    } catch (err) {
+      console.error('Hero photo upload failed:', err)
     } finally {
       setHeroUploading(false)
       if (heroPhotoInputRef.current) heroPhotoInputRef.current.value = ''
@@ -3139,8 +3139,12 @@ export default function Dashboard() {
                     ══════════════════════════════════════════ */}
                 <div
                   style={{
-                    borderRadius: 28,
+                    borderTopLeftRadius: 0,
+                    borderBottomLeftRadius: 0,
+                    borderTopRightRadius: 28,
+                    borderBottomRightRadius: 28,
                     height: 280,
+                    marginLeft: -16,
                     position: 'relative',
                     overflow: 'hidden',
                     boxShadow: '0 8px 40px rgba(11,79,74,0.18)',
@@ -3422,7 +3426,23 @@ export default function Dashboard() {
                   {recentPhotos.length === 0 ? (
                     <div style={{ textAlign: 'center', padding: '20px 0 8px' }}>
                       <span style={{ fontSize: 36, display: 'block', marginBottom: 8, opacity: 0.3 }}>📷</span>
-                      <p style={{ color: '#B0A898', fontSize: 13, margin: 0 }}>Sin fotos aún</p>
+                      <p style={{ color: '#B0A898', fontSize: 13, margin: '0 0 16px' }}>Sin fotos aún</p>
+                      <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
+                        <button
+                          onClick={() => navigate('/paciente/notas-familia')}
+                          style={{ background: '#E58B73', border: 'none', borderRadius: 50, padding: '10px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, WebkitTapHighlightColor: 'transparent', boxShadow: '0 4px 12px rgba(229,139,115,0.35)' }}
+                        >
+                          <span style={{ fontSize: 14 }}>📷</span>
+                          <span style={{ fontSize: 12, fontWeight: 700, color: 'white' }}>Subir momento</span>
+                        </button>
+                        <button
+                          onClick={() => navigate('/paciente/notas-familia')}
+                          style={{ background: '#0B4F4A', border: 'none', borderRadius: 50, padding: '10px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, WebkitTapHighlightColor: 'transparent', boxShadow: '0 4px 12px rgba(11,79,74,0.3)' }}
+                        >
+                          <span style={{ fontSize: 14 }}>🎙️</span>
+                          <span style={{ fontSize: 12, fontWeight: 700, color: 'white' }}>Nota de voz</span>
+                        </button>
+                      </div>
                     </div>
                   ) : (
                     <div style={{ display: 'grid', gridTemplateColumns: `repeat(${recentPhotos.length}, 1fr)`, gap: 10 }}>
