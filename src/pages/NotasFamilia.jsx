@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useFamily } from '../contexts/FamilyContext'
 import { useAuth } from '../contexts/AuthContext'
@@ -20,6 +21,7 @@ function timeAgoEs(dateStr) {
 export default function NotasFamilia() {
   const { ownerId } = useFamily()
   const { user } = useAuth()
+  const navigate = useNavigate()
 
   const [tab, setTab] = useState('grabar')
 
@@ -84,9 +86,17 @@ export default function NotasFamilia() {
 
       {/* Header + tabs */}
       <div style={{ background: '#0B4F4A', padding: '20px 20px 0' }}>
-        <h1 style={{ fontFamily: 'Georgia, serif', fontSize: 20, fontWeight: 700, color: 'white', margin: '0 0 16px' }}>
-          Notas de la familia
-        </h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+          <button
+            onClick={() => navigate('/dashboard')}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.8)', fontSize: 20, padding: '4px 2px', lineHeight: 1, WebkitTapHighlightColor: 'transparent' }}
+          >
+            ←
+          </button>
+          <h1 style={{ fontFamily: 'Georgia, serif', fontSize: 20, fontWeight: 700, color: 'white', margin: 0 }}>
+            Notas de la familia
+          </h1>
+        </div>
         <div style={{ display: 'flex' }}>
           {[
             { key: 'grabar',    label: '🎙️ Grabar nota' },

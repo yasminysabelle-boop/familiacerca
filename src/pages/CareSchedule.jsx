@@ -84,7 +84,7 @@ export default function CareSchedule() {
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => navigate('/dashboard')}
             style={{
               width: 36, height: 36, borderRadius: 10,
               border: '1px solid #EDE5D8', background: 'white',

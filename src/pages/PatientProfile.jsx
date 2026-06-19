@@ -334,7 +334,7 @@ export default function PatientProfile() {
           padding:'20px 16px 32px',
         }}>
           <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:20 }}>
-            <button onClick={() => navigate(-1)} style={{
+            <button onClick={() => navigate('/dashboard')} style={{
               width:36, height:36, borderRadius:'50%',
               background:'rgba(255,255,255,0.15)', border:'none',
               cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
