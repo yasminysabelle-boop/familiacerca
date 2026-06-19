@@ -3436,9 +3436,8 @@ export default function Dashboard() {
                     ════════════════════════════════════ */}
                 <div>
                   <p style={{ margin: '0 0 12px', fontSize: 11, fontWeight: 700, color: '#9AA89E', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Acciones rápidas</p>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 4 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4 }}>
                     {[
-                      { icon: '📞', label: 'Llamar',       onClick: () => setShowVideoCallModal(true), color: '#143C32' },
                       { icon: '💬', label: 'Chat',         onClick: () => navigate('/chat'),           color: '#143C32' },
                       { icon: '📹', label: 'Videollamada', onClick: handleInstantCall,                 color: '#143C32' },
                       { icon: '🚨', label: 'Emergencia',   onClick: prepareSOS,                        color: '#E9826E' },

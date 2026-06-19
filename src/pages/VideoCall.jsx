@@ -618,28 +618,26 @@ export default function VideoCall() {
   // Active call screen — iframe + visible hang-up button
   return (
     <div style={{ position: 'fixed', inset: 0, background: '#0A0A0A', display: 'flex', flexDirection: 'column' }}>
-      {/* Hang-up bar — always visible */}
+      {/* Terminar llamada — fixed bottom centered */}
       <div style={{
-        position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 20,
-        paddingBottom: 'env(safe-area-inset-bottom)',
+        position: 'absolute', bottom: 32, left: 0, right: 0, zIndex: 20,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        padding: '12px 16px',
-        background: 'linear-gradient(to top, rgba(0,0,0,0.85), transparent)',
         pointerEvents: 'none',
+        paddingBottom: 'env(safe-area-inset-bottom)',
       }}>
         <button
-          onClick={() => { setJoined(false) }}
+          onClick={() => { setJoined(false); navigate('/dashboard') }}
           style={{
             pointerEvents: 'auto',
             display: 'flex', alignItems: 'center', gap: 8,
-            padding: '14px 32px', borderRadius: 30, border: 'none',
+            padding: '12px 24px', borderRadius: 999, border: 'none',
             background: '#DC2626',
             color: 'white', fontWeight: 800, fontSize: 15,
             cursor: 'pointer',
             boxShadow: '0 4px 20px rgba(220,38,38,0.5)',
           }}
         >
-          📵 Colgar
+          📵 Terminar llamada
         </button>
       </div>
 

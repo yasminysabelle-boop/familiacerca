@@ -1,12 +1,16 @@
 import { useEffect, useRef, useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
+import { useFamily } from '../contexts/FamilyContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
+import { Trash } from '../components/Icons'
 
 const REACTIONS = ['❤️', '😊', '🙏', '💪', '😢']
 
 export default function MemoryAlbum() {
   const { user } = useAuth()
+  const { memberRole } = useFamily()
+  const isAdmin = memberRole === null || memberRole === 'admin'
   const fileRef = useRef(null)
   const [memories, setMemories] = useState([])
   const [loading, setLoading] = useState(true)
@@ -16,6 +20,7 @@ export default function MemoryAlbum() {
   const [preview, setPreview] = useState(null)
   const [caption, setCaption] = useState('')
   const [viewing, setViewing] = useState(null)
+  const [deleteConfirm, setDeleteConfirm] = useState(null)
   const displayName = user?.user_metadata?.full_name ?? user?.email ?? 'Familiar'
 
   useEffect(() => { if (user) fetchMemories() }, [user])
@@ -83,10 +88,17 @@ export default function MemoryAlbum() {
     if (viewing?.id === memory.id) setViewing(v => ({ ...v, reactions: updated }))
   }
 
-  async function deleteMemory(id) {
-    await supabase.from('memories').delete().eq('id', id)
-    setMemories(prev => prev.filter(m => m.id !== id))
+  async function deleteMemory(memory) {
+    // Optimistic update
+    setMemories(prev => prev.filter(m => m.id !== memory.id))
     setViewing(null)
+    setDeleteConfirm(null)
+    // Delete from storage
+    if (memory.file_url) {
+      const storagePath = memory.file_url.split('/storage/v1/object/public/memories/')[1]
+      if (storagePath) await supabase.storage.from('memories').remove([storagePath])
+    }
+    await supabase.from('memories').delete().eq('id', memory.id)
   }
 
   return (
@@ -147,7 +159,7 @@ export default function MemoryAlbum() {
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {memories.map(memory => (
-              <div key={memory.id} className="bg-white rounded-xl border border-green-100 overflow-hidden">
+              <div key={memory.id} className="bg-white rounded-xl border border-green-100" style={{ position: 'relative', overflow: 'hidden' }}>
                 <button onClick={() => setViewing(memory)} className="w-full aspect-square overflow-hidden block group">
                   {memory.file_type === 'video' ? (
                     <video src={memory.file_url} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
@@ -155,6 +167,21 @@ export default function MemoryAlbum() {
                     <img src={memory.file_url} alt={memory.caption ?? ''} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                   )}
                 </button>
+                {isAdmin && (
+                  <button
+                    onClick={e => { e.stopPropagation(); setDeleteConfirm(memory) }}
+                    style={{
+                      position: 'absolute', top: 6, right: 6,
+                      width: 28, height: 28, borderRadius: '50%',
+                      background: 'rgba(220,38,38,0.85)',
+                      border: 'none', cursor: 'pointer',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      zIndex: 10,
+                    }}
+                  >
+                    <Trash size={14} color="white" strokeWidth={2} />
+                  </button>
+                )}
                 <div className="p-3">
                   {memory.caption && <p className="text-xs text-gray-700 mb-2 leading-snug">{memory.caption}</p>}
                   <div className="flex items-center justify-between gap-1">
@@ -180,6 +207,39 @@ export default function MemoryAlbum() {
           </div>
         )}
       </div>
+
+      {/* Delete confirmation dialog */}
+      {deleteConfirm && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 9000,
+          background: 'rgba(0,0,0,0.65)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          padding: 24,
+        }}>
+          <div style={{ background: 'white', borderRadius: 20, padding: 24, maxWidth: 320, width: '100%' }}>
+            <p style={{ fontSize: 17, fontWeight: 700, color: '#16231F', margin: '0 0 8px', fontFamily: 'Georgia, serif' }}>
+              ¿Eliminar este momento?
+            </p>
+            <p style={{ fontSize: 14, color: '#6D7B74', margin: '0 0 20px', lineHeight: 1.5 }}>
+              Esta acción no se puede deshacer.
+            </p>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button
+                onClick={() => setDeleteConfirm(null)}
+                style={{ flex: 1, padding: '12px', borderRadius: 12, border: '1.5px solid #E5E0D8', background: 'white', color: '#16231F', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => deleteMemory(deleteConfirm)}
+                style={{ flex: 1, padding: '12px', borderRadius: 12, border: 'none', background: '#DC2626', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}
+              >
+                Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Full view lightbox */}
       {viewing && (
@@ -210,8 +270,8 @@ export default function MemoryAlbum() {
                 className="flex-1 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl text-sm font-medium transition-colors">
                 Cerrar
               </button>
-              {viewing.user_id === user.id && (
-                <button onClick={() => deleteMemory(viewing.id)}
+              {(viewing.user_id === user.id || isAdmin) && (
+                <button onClick={() => setDeleteConfirm(viewing)}
                   className="px-4 py-2.5 bg-red-600/80 hover:bg-red-600 text-white rounded-xl text-sm font-medium transition-colors">
                   Eliminar
                 </button>
