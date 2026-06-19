@@ -57,7 +57,7 @@ export default function TermsOfService() {
         }}
       >
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => navigate('/')}
           className="w-9 h-9 flex items-center justify-center rounded-full flex-shrink-0 transition-all active:scale-90"
           style={{ background: '#EDE5D8', color: '#555' }}
         >

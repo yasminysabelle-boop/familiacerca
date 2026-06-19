@@ -209,36 +209,227 @@ export default function VideoCallScheduleModal({ open, onClose }) {
           </button>
         </div>
 
-        {/* Instant call — only option */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <button
-            onClick={handleInstantCall}
-            disabled={startingInstant}
-            style={{
-              width: '100%', padding: '15px', borderRadius: 16, border: 'none',
-              background: startingInstant
-                ? '#9CA3AF'
-                : 'linear-gradient(135deg, #0d6b63, #2D6A4F)',
-              color: 'white', fontWeight: 800, fontSize: 15,
-              cursor: startingInstant ? 'default' : 'pointer',
-              boxShadow: startingInstant ? 'none' : '0 6px 20px rgba(13,107,99,0.35)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-              transition: 'all 0.2s',
-            }}
-          >
-            {startingInstant ? (
-              <>
-                <div style={{ width: 16, height: 16, border: '2px solid rgba(255,255,255,0.5)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
-                Iniciando...
-              </>
-            ) : '📹 Iniciar llamada ahora'}
-          </button>
-          {instantError && (
-            <p style={{ margin: 0, fontSize: 12, color: '#DC2626', padding: '8px 12px', borderRadius: 8, background: '#FEF2F2' }}>
-              {instantError}
-            </p>
-          )}
+        {/* Tab switcher */}
+        <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+          {['list', 'schedule'].map(v => (
+            <button
+              key={v}
+              onClick={() => setView(v)}
+              style={{
+                flex: 1, padding: '9px', borderRadius: 10, border: 'none',
+                fontWeight: 700, fontSize: 13, cursor: 'pointer',
+                background: view === v ? '#0d6b63' : '#F3F4F6',
+                color: view === v ? 'white' : '#6B7280',
+              }}
+            >
+              {v === 'list' ? '📹 Iniciar ahora' : '📅 Programar'}
+            </button>
+          ))}
         </div>
+
+        {/* ─── VIEW: INICIAR ─── */}
+        {view === 'list' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <button
+              onClick={handleInstantCall}
+              disabled={startingInstant}
+              style={{
+                width: '100%', padding: '15px', borderRadius: 16, border: 'none',
+                background: startingInstant
+                  ? '#9CA3AF'
+                  : 'linear-gradient(135deg, #0d6b63, #2D6A4F)',
+                color: 'white', fontWeight: 800, fontSize: 15,
+                cursor: startingInstant ? 'default' : 'pointer',
+                boxShadow: startingInstant ? 'none' : '0 6px 20px rgba(13,107,99,0.35)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+                transition: 'all 0.2s',
+              }}
+            >
+              {startingInstant ? (
+                <>
+                  <div style={{ width: 16, height: 16, border: '2px solid rgba(255,255,255,0.5)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
+                  Iniciando...
+                </>
+              ) : '📹 Iniciar llamada ahora'}
+            </button>
+
+            {instantError && (
+              <p style={{ margin: 0, fontSize: 12, color: '#DC2626', padding: '8px 12px', borderRadius: 8, background: '#FEF2F2' }}>
+                {instantError}
+              </p>
+            )}
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ flex: 1, height: 1, background: '#E5E7EB' }} />
+              <span style={{ fontSize: 11, color: '#9CA3AF', fontWeight: 600 }}>PROGRAMADAS</span>
+              <div style={{ flex: 1, height: 1, background: '#E5E7EB' }} />
+            </div>
+
+            {loadingCalls && (
+              <p style={{ textAlign: 'center', color: '#9CA3AF', fontSize: 13 }}>Cargando...</p>
+            )}
+            {!loadingCalls && upcomingCalls.length === 0 && (
+              <div style={{ textAlign: 'center', padding: '20px 0' }}>
+                <p style={{ fontSize: 28 }}>📅</p>
+                <p style={{ fontSize: 13, color: '#6B7280', margin: '6px 0 0' }}>
+                  No hay llamadas programadas
+                </p>
+              </div>
+            )}
+            {upcomingCalls.map(call => {
+              const mins = minutesUntil(call.scheduled_at)
+              const canJoinNow = mins <= 15
+              const isLive = mins <= 0 && mins > -60
+              return (
+                <div
+                  key={call.id}
+                  style={{
+                    padding: '14px', borderRadius: 14,
+                    border: `1.5px solid ${isLive ? '#0d6b63' : '#E5E0D8'}`,
+                    background: isLive ? '#F0F9F4' : '#FAFAF9',
+                    display: 'flex', alignItems: 'center', gap: 12,
+                  }}
+                >
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#1A1A1A' }}>
+                      {call.title}
+                    </p>
+                    <p style={{ margin: '3px 0 0', fontSize: 12, color: isLive ? '#0d6b63' : '#6B7280', fontWeight: isLive ? 700 : 400 }}>
+                      {isLive ? '🟢 En curso' : fmtScheduled(call.scheduled_at)}
+                      {!isLive && canJoinNow && ` · en ${mins} min`}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => joinCall(call)}
+                    style={{
+                      padding: '8px 16px', borderRadius: 10, border: 'none',
+                      background: canJoinNow ? '#0d6b63' : '#E5E0D8',
+                      color: canJoinNow ? 'white' : '#9CA3AF',
+                      fontWeight: 700, fontSize: 13,
+                      cursor: canJoinNow ? 'pointer' : 'default',
+                      flexShrink: 0,
+                    }}
+                  >
+                    {canJoinNow ? 'Unirse' : 'Ver'}
+                  </button>
+                </div>
+              )
+            })}
+          </div>
+        )}
+
+        {/* ─── VIEW: PROGRAMAR ─── */}
+        {view === 'schedule' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <VoiceInput
+              value={title}
+              onChange={setTitle}
+              placeholder="Ej: Reunión semanal, Actualización médica..."
+              rows={1}
+              label="Título (opcional)"
+            />
+
+            <div style={{ display: 'flex', gap: 10 }}>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 5 }}>
+                <label style={{ fontSize: 12, fontWeight: 600, color: '#374151' }}>Fecha</label>
+                <input
+                  type="date"
+                  value={date}
+                  min={minDate}
+                  onChange={e => setDate(e.target.value)}
+                  style={{ padding: '10px 12px', borderRadius: 10, border: '1.5px solid #D1C9BF', fontSize: 14, color: '#1A1A1A' }}
+                />
+              </div>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 5 }}>
+                <label style={{ fontSize: 12, fontWeight: 600, color: '#374151' }}>Hora</label>
+                <input
+                  type="time"
+                  value={time}
+                  onChange={e => setTime(e.target.value)}
+                  style={{ padding: '10px 12px', borderRadius: 10, border: '1.5px solid #D1C9BF', fontSize: 14, color: '#1A1A1A' }}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label style={{ fontSize: 12, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 8 }}>
+                Participantes
+              </label>
+              <div style={{ display: 'flex', gap: 8, marginBottom: members.length > 0 && participantMode === 'select' ? 10 : 0 }}>
+                {['all', 'select'].map(mode => (
+                  <button
+                    key={mode}
+                    onClick={() => setParticipantMode(mode)}
+                    style={{
+                      flex: 1, padding: '8px', borderRadius: 9, fontSize: 13, fontWeight: 600,
+                      border: `1.5px solid ${participantMode === mode ? '#0d6b63' : '#D1C9BF'}`,
+                      background: participantMode === mode ? '#0d6b63' : 'white',
+                      color: participantMode === mode ? 'white' : '#374151',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {mode === 'all' ? '👨‍👩‍👧 Todos' : '✓ Escoger'}
+                  </button>
+                ))}
+              </div>
+              {participantMode === 'select' && members.length > 0 && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  {members.map(m => (
+                    <label
+                      key={m.member_user_id}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 10,
+                        padding: '9px 12px', borderRadius: 10, cursor: 'pointer',
+                        background: selectedIds.includes(m.member_user_id) ? '#F0F9F4' : '#F9F7F4',
+                        border: `1px solid ${selectedIds.includes(m.member_user_id) ? '#BBF7D0' : '#E5E0D8'}`,
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.includes(m.member_user_id)}
+                        onChange={e => setSelectedIds(prev =>
+                          e.target.checked
+                            ? [...prev, m.member_user_id]
+                            : prev.filter(id => id !== m.member_user_id)
+                        )}
+                        style={{ width: 16, height: 16, accentColor: '#0d6b63' }}
+                      />
+                      <span style={{ fontSize: 14, fontWeight: 600, color: '#1A1A1A' }}>{m.name}</span>
+                      <span style={{ fontSize: 11, color: '#9CA3AF', marginLeft: 'auto' }}>
+                        {m.role === 'cuidador' ? 'Cuidador' : 'Familiar'}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              )}
+              {participantMode === 'select' && members.length === 0 && (
+                <p style={{ fontSize: 12, color: '#9CA3AF', marginTop: 6 }}>
+                  No hay miembros adicionales en la familia.
+                </p>
+              )}
+            </div>
+
+            {scheduleError && (
+              <p style={{ margin: 0, fontSize: 12, color: '#DC2626', padding: '8px 12px', borderRadius: 8, background: '#FEF2F2' }}>
+                {scheduleError}
+              </p>
+            )}
+
+            <button
+              onClick={handleSchedule}
+              disabled={!date || !time || scheduling}
+              style={{
+                padding: '15px', borderRadius: 14, border: 'none',
+                background: date && time && !scheduling ? '#0d6b63' : '#9CA3AF',
+                color: 'white', fontWeight: 800, fontSize: 15,
+                cursor: date && time && !scheduling ? 'pointer' : 'default',
+                boxShadow: date && time ? '0 4px 16px rgba(13,107,99,0.3)' : 'none',
+              }}
+            >
+              {scheduling ? 'Programando...' : '📅 Programar videollamada'}
+            </button>
+          </div>
+        )}
       </div>
     </div>,
     document.body

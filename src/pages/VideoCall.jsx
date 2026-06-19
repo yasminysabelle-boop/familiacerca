@@ -255,7 +255,7 @@ export default function VideoCall() {
           background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)',
         }}>
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => navigate('/dashboard')}
             style={{
               width: 36, height: 36, borderRadius: '50%', border: 'none',
               background: 'rgba(255,255,255,0.15)', cursor: 'pointer',
@@ -355,7 +355,7 @@ export default function VideoCall() {
           )}
 
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => navigate('/dashboard')}
             style={{
               background: 'none', border: 'none',
               color: 'rgba(255,255,255,0.45)', fontSize: 13, cursor: 'pointer',

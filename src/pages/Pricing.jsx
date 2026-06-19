@@ -129,7 +129,7 @@ export default function Pricing() {
       {/* Header */}
       <div style={{ padding: '24px 20px 0', display: 'flex', alignItems: 'center', gap: 14 }}>
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => navigate('/')}
           style={{
             width: 36, height: 36, borderRadius: 10, border: '1.5px solid #EDE5D8',
             background: 'white', cursor: 'pointer', fontSize: 20, color: '#6B7280',
