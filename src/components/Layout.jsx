@@ -311,6 +311,7 @@ export default function Layout({ children }) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {[
                 { emoji: '💊', label: 'Registrar medicamento', path: '/medications' },
+                { emoji: '✅', label: 'Registrar rutina',       path: '/cuidado' },
                 { emoji: '📝', label: 'Notas de la familia',    path: '/paciente/notas-familia' },
                 { emoji: '📸', label: 'Subir foto',             path: '/album' },
               ].map(({ emoji, label, path }) => (

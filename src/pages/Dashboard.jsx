@@ -18,6 +18,7 @@ import { useHospitalMode } from '../contexts/HospitalModeContext'
 import HospitalDashboard from '../components/hospital/HospitalDashboard'
 import { generateMedicalReport, fetchReportData } from '../utils/generateMedicalReport'
 import HospitalModeModal from '../components/hospital/HospitalModeModal'
+import CompanionChat from '../components/CompanionChat'
 import VideoCallScheduleModal from '../components/VideoCallScheduleModal'
 import { getLocation, mapsUrl } from '../lib/gps'
 import { track } from '../lib/analytics'
@@ -1808,6 +1809,7 @@ export default function Dashboard() {
   const [expandedDays, setExpandedDays] = useState(() => new Set([new Date().toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' })]))
   const [selectedDayTab, setSelectedDayTab] = useState(() => new Date().toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' }))
   const [showMoreTools, setShowMoreTools] = useState(false)
+  const [showCompanion, setShowCompanion] = useState(false)
   const [showFamilySwitcher, setShowFamilySwitcher] = useState(false)
   const [showNotifSheet, setShowNotifSheet] = useState(false)
   const [notifMessages, setNotifMessages] = useState([])
@@ -3101,6 +3103,8 @@ export default function Dashboard() {
           {(() => {
             const heroPhoto = patientProfile?.foto_url || profile?.photo_url || null
             const patientName = patientProfile?.nombre_completo || profile?.name || 'Agregar paciente'
+            const _totalRoutines = 4
+            const _doneRoutines = Math.min(Object.values(careLogsToday).filter(Boolean).length, _totalRoutines)
             const isCritical     = hasActiveSOS || (_isRetrasado && _retrasadoMins != null && _retrasadoMins >= 720)
             const isPendingToday = !isCritical && (pendingCount > 0 || _isRetrasado)
             const statusEmoji = isCritical ? '🔴' : isPendingToday ? '🟡' : '🟢'
@@ -3471,7 +3475,8 @@ export default function Dashboard() {
                     { emoji: '📝', label: 'Notas médicas',    onClick: () => navigate('/diario-medico') },
                     { emoji: '📓', label: 'Notas familia',    onClick: () => navigate('/paciente/notas-familia') },
                     { emoji: '💰', label: 'Gastos',           onClick: () => navigate('/gastos') },
-                    { emoji: '🐾', label: 'Milo & Luna',      onClick: () => navigate('/diario-medico') },
+                    { emoji: '📋', label: 'Directorio',       onClick: () => navigate('/directorio') },
+                    { emoji: '🐾', label: 'Milo & Luna',      onClick: () => setShowCompanion(true) },
                     { emoji: '👤', label: 'Mi cuenta',        onClick: () => navigate('/ajustes') },
                   ]
                   const visibleTools = allTools.slice(0, 4)
@@ -3522,6 +3527,7 @@ export default function Dashboard() {
         </div>
 
         <HospitalModeModal open={showHospitalModal} onClose={() => setShowHospitalModal(false)} />
+        <CompanionChat externalOpen={showCompanion} onExternalClose={() => setShowCompanion(false)} bottomOffset={80} />
       </div>
 
       {/* ── SOS confirm dialog ────────────────────────────────────────────── */}

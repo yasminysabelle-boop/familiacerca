@@ -32,6 +32,7 @@ import Permissions from './pages/Permissions'
 import Directory from './pages/Directory'
 import Pricing from './pages/Pricing'
 import Settings from './pages/Settings'
+import Cuidado from './pages/Cuidado'
 import PatientProfile from './pages/PatientProfile'
 import NotasFamilia from './pages/NotasFamilia'
 import Landing from './pages/Landing'
@@ -140,6 +141,8 @@ function AppShell() {
         <Route path="/diario-voz"  element={<P><Memorias /></P>} />
         <Route path="/memorias"    element={<P><Memorias /></P>} />
         <Route path="/hoy"         element={<P><Hoy /></P>} />
+        <Route path="/cuidado"     element={<P><Cuidado /></P>} />
+        <Route path="/cuidado/horarios" element={<Navigate to="/cuidado?tab=horarios" replace />} />
 
         <Route path="/familia"     element={<P><Familia /></P>} />
         <Route path="/reportes"    element={<P><Reports /></P>} />

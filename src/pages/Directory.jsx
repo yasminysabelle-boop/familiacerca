@@ -354,6 +354,31 @@ export default function Directory() {
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
   const [confirmDialog, setConfirmDialog] = useState(null)
+  const [photoUploading, setPhotoUploading] = useState(false)
+  const photoInputRef = useRef(null)
+
+  async function uploadPatientPhoto(file) {
+    if (!file || !patientProfile?.id) return
+    setPhotoUploading(true)
+    try {
+      const path = `${patientProfile.id}/photo.jpg`
+      const { error: upErr } = await supabase.storage
+        .from('patient-photos')
+        .upload(path, file, { upsert: true, contentType: file.type })
+      if (upErr) throw upErr
+      const { data: { publicUrl } } = supabase.storage.from('patient-photos').getPublicUrl(path)
+      const { error: updErr } = await supabase
+        .from('patient_profiles')
+        .update({ foto_url: publicUrl })
+        .eq('id', patientProfile.id)
+      if (updErr) throw updErr
+      setPatientProfile(prev => ({ ...prev, foto_url: publicUrl }))
+    } catch (e) {
+      console.error('Photo upload failed', e)
+    } finally {
+      setPhotoUploading(false)
+    }
+  }
 
   // Doctor form state
   const [docModal, setDocModal] = useState(false)
@@ -686,9 +711,54 @@ export default function Directory() {
                   background: 'linear-gradient(135deg, #0d6b63, #2E5240)',
                   borderRadius: 18, padding: '18px 20px', marginBottom: 16,
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-                    <div>
-                      <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: 'white', margin: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                    {/* Patient photo */}
+                    <div style={{ position: 'relative', flexShrink: 0 }}>
+                      <input
+                        ref={photoInputRef}
+                        type="file"
+                        accept="image/*"
+                        style={{ display: 'none' }}
+                        onChange={e => { const f = e.target.files?.[0]; if (f) uploadPatientPhoto(f) }}
+                      />
+                      <div
+                        onClick={() => canEdit && photoInputRef.current?.click()}
+                        style={{
+                          width: 64, height: 64, borderRadius: '50%',
+                          overflow: 'hidden', border: '3px solid rgba(255,255,255,0.4)',
+                          cursor: canEdit ? 'pointer' : 'default',
+                          background: 'rgba(255,255,255,0.15)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          flexShrink: 0,
+                        }}
+                      >
+                        {patientProfile.foto_url ? (
+                          <img src={patientProfile.foto_url} alt={patientProfile.nombre_completo} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                        ) : (
+                          <span style={{ fontSize: 28, color: 'rgba(255,255,255,0.7)' }}>
+                            {patientProfile.nombre_completo?.charAt(0).toUpperCase() ?? '?'}
+                          </span>
+                        )}
+                      </div>
+                      {canEdit && (
+                        <div
+                          onClick={() => photoInputRef.current?.click()}
+                          style={{
+                            position: 'absolute', bottom: 0, right: 0,
+                            width: 22, height: 22, borderRadius: '50%',
+                            background: photoUploading ? '#9CA3AF' : '#E9826E',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            fontSize: 11, cursor: 'pointer', border: '2px solid white',
+                          }}
+                        >
+                          {photoUploading ? '⏳' : '📷'}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Name + date */}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: 'white', margin: 0, lineHeight: 1.2 }}>
                         {patientProfile.nombre_completo}
                       </p>
                       {patientProfile.fecha_nacimiento && (
@@ -698,6 +768,7 @@ export default function Directory() {
                         </p>
                       )}
                     </div>
+
                     {canEdit && (
                       <Link
                         to="/paciente/perfil"
