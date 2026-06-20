@@ -2675,14 +2675,16 @@ export default function Dashboard() {
       const blob = await getCroppedBlob(heroCropSrc, heroCroppedAreaPixels)
       URL.revokeObjectURL(heroCropSrc)
       setHeroCropSrc(null)
-      const path = `${ownerId}/avatar.jpg`
+      const patientId = patientProfile?.id
+      if (!patientId) throw new Error('No patient profile id')
+      const path = `${patientId}/photo.jpg`
       const { error: upErr } = await supabase.storage
         .from('patient-photos')
         .upload(path, blob, { upsert: true, contentType: 'image/jpeg' })
       if (upErr) throw upErr
       const { data: { publicUrl } } = supabase.storage.from('patient-photos').getPublicUrl(path)
-      await supabase.from('patient_profiles').update({ foto_url: publicUrl }).eq('owner_id', ownerId)
-      setPatientProfile(prev => prev ? { ...prev, foto_url: publicUrl } : prev)
+      await supabase.from('patient_profiles').update({ photo_url: publicUrl }).eq('id', patientId)
+      setPatientProfile(prev => prev ? { ...prev, photo_url: publicUrl } : prev)
     } catch (err) {
       console.error('Hero photo upload failed:', err)
     } finally {
@@ -3139,7 +3141,7 @@ export default function Dashboard() {
         {/* ═══ MAIN CONTENT ═══ */}
         <div style={{ padding: '16px 16px 0', display: 'flex', flexDirection: 'column', gap: 24, paddingBottom: 104 }}>
           {(() => {
-            const heroPhoto = patientProfile?.foto_url || profile?.photo_url || null
+            const heroPhoto = patientProfile?.photo_url || patientProfile?.foto_url || profile?.photo_url || null
             const patientName = patientProfile?.nombre_completo || profile?.name || 'Agregar paciente'
             const isCritical     = hasActiveSOS || (_isRetrasado && _retrasadoMins != null && _retrasadoMins >= 720)
             const isPendingToday = !isCritical && (pendingCount > 0 || _isRetrasado)
