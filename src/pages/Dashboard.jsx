@@ -3143,7 +3143,7 @@ export default function Dashboard() {
             return (
               <>
                 {/* ══════════════════════════════════════════
-                    HERO — composición unificada
+                    HERO — foto paciente se funde con imagen flores
                     ══════════════════════════════════════════ */}
                 <div style={{
                   position: 'relative',
@@ -3152,77 +3152,97 @@ export default function Dashboard() {
                   borderRadius: 24,
                   overflow: 'hidden',
                   flexShrink: 0,
-                  background: '#FAF7F1',
+                  background: 'linear-gradient(135deg, #0B4F4A, #143C32)',
                 }}>
-                  {/* Foto paciente — 70% izquierda */}
+                  {/* 1. Imagen de flores — fondo completo */}
                   <img
-                    src={heroBg}
+                    src={HERO_IMAGES[heroSlideIndex]}
                     alt=""
                     style={{
-                      position: 'absolute',
-                      top: 0, left: 0, bottom: 0,
-                      width: '70%',
-                      height: '100%',
-                      objectFit: 'cover',
-                      objectPosition: 'left center',
+                      position: 'absolute', inset: 0,
+                      width: '100%', height: '100%',
+                      objectFit: 'cover', objectPosition: 'left center',
                       display: 'block',
                       opacity: heroFading ? 0 : 1,
                       transition: 'opacity 0.6s ease',
                     }}
                   />
 
-                  {/* Fade crema — foto se disuelve en área de info */}
+                  {/* 2. Foto del paciente — izquierda, se funde con mask */}
+                  {profilePhoto && (
+                    <div style={{
+                      position: 'absolute', top: 0, left: 0, bottom: 0,
+                      width: '60%',
+                      zIndex: 1,
+                    }}>
+                      <img
+                        src={profilePhoto}
+                        alt=""
+                        style={{
+                          width: '100%', height: '100%',
+                          objectFit: 'cover', objectPosition: 'center top',
+                          display: 'block',
+                          maskImage: 'linear-gradient(to right, black 40%, transparent 100%)',
+                          WebkitMaskImage: 'linear-gradient(to right, black 40%, transparent 100%)',
+                        }}
+                      />
+                    </div>
+                  )}
+
+                  {/* 3. Overlay gradiente unificador */}
                   <div style={{
-                    position: 'absolute',
-                    inset: 0,
-                    background: 'linear-gradient(90deg, rgba(248,244,237,0) 0%, rgba(248,244,237,0.15) 45%, rgba(248,244,237,0.50) 60%, rgba(248,244,237,0.85) 80%, rgba(248,244,237,1) 100%)',
+                    position: 'absolute', inset: 0, zIndex: 2,
+                    background: 'linear-gradient(to right, rgba(11,79,74,0.15) 0%, transparent 40%, rgba(248,244,237,0.7) 65%, rgba(248,244,237,0.95) 100%)',
                     pointerEvents: 'none',
-                    zIndex: 1,
                   }} />
 
-                  {/* Área de información — derecha, sin tarjeta, texto sobre crema */}
+                  {/* 4. Glass panel derecho — datos del paciente */}
                   <div
                     onClick={() => navigate('/paciente/perfil')}
                     style={{
-                      position: 'absolute', top: 0, right: 0, bottom: 0,
+                      position: 'absolute', top: 16, right: 16, bottom: 16,
                       width: '50%',
-                      zIndex: 2, cursor: 'pointer',
-                      display: 'flex', flexDirection: 'column',
-                      justifyContent: 'center',
-                      padding: '0 20px 0 0',
+                      background: 'rgba(255,255,255,0.55)',
+                      backdropFilter: 'blur(20px)',
+                      WebkitBackdropFilter: 'blur(20px)',
+                      borderRadius: 20,
+                      border: '1px solid rgba(255,255,255,0.4)',
+                      boxShadow: '0 8px 32px rgba(0,0,0,0.08)',
+                      padding: '14px 14px',
+                      display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+                      zIndex: 3, cursor: 'pointer', overflow: 'hidden',
                     }}
                   >
-                    <p style={{ margin: '0 0 3px', fontSize: 12, fontWeight: 500, color: '#6D7B74' }}>
-                      {timeGreeting} {timeIcon}
-                    </p>
-                    <p style={{ margin: '0 0 10px', fontSize: 32, fontWeight: 700, color: '#143C32', fontFamily: 'Georgia, serif', lineHeight: 1.05 }}>
-                      {patientName.split(' ')[0]}
-                    </p>
-                    <span style={{
-                      display: 'inline-flex', alignItems: 'center', gap: 5,
-                      padding: '4px 10px', borderRadius: 999,
-                      background: statusBg, fontSize: 10, fontWeight: 600, color: statusColor,
-                      alignSelf: 'flex-start',
-                    }}>
-                      <span style={{ width: 6, height: 6, borderRadius: '50%', background: dotColor, flexShrink: 0 }} />
-                      {statusLabel}
-                    </span>
-                    <div onClick={e => { e.stopPropagation(); setShowFamilySwitcher(true) }} style={{ marginTop: 10 }}>
-                      {lastUpdatedAgo && (
-                        <p style={{ margin: '0 0 5px', fontSize: 10, color: '#6D7B74' }}>⏱ {lastUpdatedAgo}</p>
-                      )}
+                    <div>
+                      <p style={{ margin: '0 0 2px', fontSize: 10, fontWeight: 500, color: '#6D7B74' }}>
+                        {timeGreeting}, {firstName} {timeIcon}
+                      </p>
+                      <p style={{ margin: '0 0 8px', fontSize: 22, fontWeight: 700, color: '#143C32', fontFamily: 'Georgia, serif', lineHeight: 1.1 }}>
+                        {patientName.split(' ')[0]}
+                      </p>
+                      <span style={{
+                        display: 'inline-flex', alignItems: 'center', gap: 5,
+                        padding: '4px 9px', borderRadius: 999,
+                        background: statusBg, fontSize: 10, fontWeight: 600, color: statusColor,
+                      }}>
+                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: dotColor }} />
+                        {statusLabel}
+                      </span>
+                    </div>
+                    <div onClick={e => { e.stopPropagation(); setShowFamilySwitcher(true) }}>
+                      {lastUpdatedAgo && <p style={{ margin: '0 0 5px', fontSize: 9, color: '#6D7B74' }}>⏱ {lastUpdatedAgo}</p>}
                       <div style={{ display: 'flex', alignItems: 'center', marginBottom: 3 }}>
                         {familyMembers.slice(0, 3).map((m, i) => {
                           const nm = m.full_name?.trim() || m.email?.split('@')[0] || '?'
-                          const avatarColors = ['#2F6B4F', '#D99A18', '#7A659C']
+                          const colors = ['#2F6B4F', '#D99A18', '#7A659C']
                           return (
                             <div key={m.id} style={{
                               width: 22, height: 22, borderRadius: '50%',
-                              background: avatarColors[i % avatarColors.length],
-                              border: '2px solid rgba(248,244,237,0.9)',
+                              background: colors[i % 3],
+                              border: '2px solid rgba(255,255,255,0.8)',
                               display: 'flex', alignItems: 'center', justifyContent: 'center',
                               fontSize: 9, fontWeight: 700, color: 'white',
-                              marginLeft: i > 0 ? -6 : 0, zIndex: 10 - i, position: 'relative',
+                              marginLeft: i > 0 ? -6 : 0, position: 'relative', zIndex: 10 - i,
                             }}>
                               {nm.charAt(0).toUpperCase()}
                             </div>
