@@ -3518,7 +3518,7 @@ export default function Dashboard() {
                             onClick={e => e.stopPropagation()}
                           >
                             <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(20,60,50,0.15)', margin: '0 auto 20px' }} />
-                            <p style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 700, color: '#143C32', fontFamily: 'Georgia, serif' }}>Todas las herramientas</p>
+                            <p style={{ margin: '0 0 16px', fontSize: 14, fontWeight: 600, color: '#143C32' }}>Todas las herramientas</p>
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
                               {allTools.map(({ Icon, label, onClick, circleBg, iconColor }) => (
                                 <button
