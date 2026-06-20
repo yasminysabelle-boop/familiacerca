@@ -23,6 +23,8 @@ import VideoCallScheduleModal from '../components/VideoCallScheduleModal'
 import { getLocation, mapsUrl } from '../lib/gps'
 import { track } from '../lib/analytics'
 
+const HERO_IMAGES = ['/hero-1.jpg']
+
 // Mood lookup — handles both stored text values and emoji values
 const MOOD_MAP = {
   good:    { emoji: '😊', color: '#22C55E' },
@@ -1774,6 +1776,8 @@ export default function Dashboard() {
   const [medsList, setMedsList]  = useState([])
   const [totalStock, setTotalStock] = useState(0)
   const [showAllTools, setShowAllTools] = useState(false)
+  const [heroSlideIndex, setHeroSlideIndex] = useState(0)
+  const [heroFading, setHeroFading] = useState(false)
   const [showSOS, setShowSOS] = useState(false)
   const [sosSent, setSosSent] = useState(false)
   const [sosConfirming, setSosConfirming] = useState(false)
@@ -1941,6 +1945,18 @@ export default function Dashboard() {
     window.addEventListener('patientProfileUpdated', onPatientUpdated)
     return () => window.removeEventListener('patientProfileUpdated', onPatientUpdated)
   }, [ownerId])
+
+  useEffect(() => {
+    if (HERO_IMAGES.length <= 1) return
+    const id = setInterval(() => {
+      setHeroFading(true)
+      setTimeout(() => {
+        setHeroSlideIndex(i => (i + 1) % HERO_IMAGES.length)
+        setHeroFading(false)
+      }, 600)
+    }, 7000)
+    return () => clearInterval(id)
+  }, [])
 
   useEffect(() => {
     if (!ownerId) return
@@ -3084,6 +3100,8 @@ export default function Dashboard() {
             const profilePhoto = patientProfile?.photo_url || patientProfile?.foto_url || profile?.photo_url || null
             const coverPosX = patientProfile?.cover_position_x ?? 50
             const coverPosY = patientProfile?.cover_position_y ?? 50
+            const defaultHero = HERO_IMAGES[heroSlideIndex]
+            const heroBg = coverPhoto || defaultHero
             const patientName = patientProfile?.nombre_completo || profile?.name || 'Agregar paciente'
             const isCritical     = hasActiveSOS || (_isRetrasado && _retrasadoMins != null && _retrasadoMins >= 720)
             const isPendingToday = !isCritical && (pendingCount > 0 || _isRetrasado)
@@ -3126,140 +3144,128 @@ export default function Dashboard() {
                   borderRadius: 24,
                   overflow: 'hidden',
                   flexShrink: 0,
-                  background: 'linear-gradient(135deg, #0B4F4A 0%, #143C32 100%)',
+                  background: '#F8F4ED',
                 }}>
-                  {coverPhoto ? (
-                    <img
-                      src={coverPhoto}
-                      alt=""
-                      style={{
-                        position: 'absolute', inset: 0,
-                        width: '100%', height: '100%',
-                        objectFit: 'cover',
-                        objectPosition: `${coverPosX}% ${coverPosY}%`,
-                        display: 'block',
-                      }}
-                    />
-                  ) : (
-                    <div style={{
-                      position: 'absolute', inset: 0,
-                      background: 'linear-gradient(135deg, #0B4F4A 0%, #143C32 50%, #1A3A2A 100%)',
-                    }}>
-                      <div style={{
-                        position: 'absolute', top: -40, left: -40,
-                        width: 200, height: 200, borderRadius: '50%',
-                        background: 'rgba(255,255,255,0.04)',
-                      }} />
-                      <div style={{
-                        position: 'absolute', bottom: -30, right: -30,
-                        width: 160, height: 160, borderRadius: '50%',
-                        background: 'rgba(233,130,110,0.08)',
-                      }} />
-                      <div style={{
-                        position: 'absolute', top: '40%', left: '10%',
-                        width: 80, height: 80, borderRadius: '50%',
-                        background: 'rgba(217,154,24,0.06)',
-                      }} />
-                    </div>
-                  )}
-                  {/* Gradient overlay — on top of photo, below glass panel */}
+                  {/* Imagen izquierda con fade */}
+                  <img
+                    src={heroBg}
+                    alt=""
+                    style={{
+                      position: 'absolute',
+                      top: 0, left: 0, bottom: 0,
+                      width: '65%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      objectPosition: 'left center',
+                      display: 'block',
+                      opacity: heroFading ? 0 : 1,
+                      transition: 'opacity 0.6s ease',
+                    }}
+                  />
+
+                  {/* Overlay gradiente que funde imagen con panel */}
                   <div style={{
-                    position: 'absolute', inset: 0,
-                    background: 'linear-gradient(90deg, rgba(10,40,32,0.20) 0%, rgba(10,40,32,0.10) 40%, rgba(248,245,239,0.75) 100%)',
-                    pointerEvents: 'none', zIndex: 1,
+                    position: 'absolute',
+                    top: 0, left: 0, bottom: 0,
+                    width: '75%',
+                    background: 'linear-gradient(to right, transparent 50%, #F8F4ED 100%)',
+                    pointerEvents: 'none',
+                    zIndex: 1,
                   }} />
 
-                  {/* Glass panel — floating on top of photo */}
+                  {/* Glass panel — derecho, foto paciente arriba */}
                   <div
                     onClick={() => navigate('/paciente/perfil')}
                     style={{
-                      position: 'absolute', top: 12, right: 12, bottom: 12,
-                      width: '54%',
-                      background: 'rgba(255,255,255,0.55)',
+                      position: 'absolute', top: 0, right: 0, bottom: 0,
+                      width: '58%',
+                      background: 'rgba(255,255,255,0.72)',
                       backdropFilter: 'blur(20px)',
                       WebkitBackdropFilter: 'blur(20px)',
-                      borderRadius: 20,
-                      border: '1px solid rgba(255,255,255,0.45)',
-                      boxShadow: '0 20px 50px rgba(20,35,30,0.15)',
-                      padding: 16,
-                      display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+                      borderRadius: '0 24px 24px 0',
+                      borderLeft: 'none',
+                      borderTop: 'none',
+                      borderBottom: 'none',
+                      borderRight: 'none',
+                      boxShadow: 'none',
+                      padding: 0,
+                      display: 'flex', flexDirection: 'column',
                       zIndex: 3, cursor: 'pointer', overflow: 'hidden',
                     }}
                   >
-                    {/* Top — greeting + name + status */}
-                    <div>
-                      {profilePhoto && (
+                    {/* Foto del paciente — rectángulo arriba */}
+                    <div style={{ width: '100%', height: 130, flexShrink: 0, overflow: 'hidden', position: 'relative' }}>
+                      {profilePhoto ? (
+                        <img
+                          src={profilePhoto}
+                          alt=""
+                          style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }}
+                        />
+                      ) : (
                         <div style={{
-                          width: 40, height: 40, borderRadius: '50%',
-                          overflow: 'hidden', border: '2px solid rgba(255,255,255,0.6)',
-                          marginBottom: 8,
+                          width: '100%', height: '100%',
+                          background: 'linear-gradient(135deg, #0B4F4A, #143C32)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontSize: 40, color: 'white', fontWeight: 700,
                         }}>
-                          <img src={profilePhoto} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          {(patientName.charAt(0) || '?').toUpperCase()}
                         </div>
                       )}
-                      <p style={{ margin: '0 0 5px', fontSize: 11, fontWeight: 500, color: '#6D7B74', lineHeight: 1.3 }}>
-                        {timeGreeting}, {firstName} {timeIcon}
-                      </p>
-                      <p style={{ margin: '0 0 8px', fontSize: 26, fontWeight: 700, color: '#143C32', fontFamily: 'Georgia, serif', lineHeight: 1.05, letterSpacing: '-0.02em' }}>
-                        {patientName.split(' ')[0]}
-                      </p>
-                      <span style={{
+                      {/* Status pill sobre la foto */}
+                      <div style={{
+                        position: 'absolute', bottom: 8, left: 8,
                         display: 'inline-flex', alignItems: 'center', gap: 5,
                         padding: '4px 9px', borderRadius: 999,
-                        background: statusBg, fontSize: 12, fontWeight: 600, color: statusColor,
+                        background: statusBg,
+                        fontSize: 11, fontWeight: 600, color: statusColor,
+                        backdropFilter: 'blur(8px)',
                       }}>
                         <span style={{ width: 6, height: 6, borderRadius: '50%', background: dotColor, flexShrink: 0 }} />
                         {statusLabel}
-                      </span>
+                      </div>
                     </div>
 
-                    {/* Bottom — last updated + family avatars */}
-                    <div>
-                      {lastUpdatedAgo && (
-                        <p style={{ margin: '0 0 8px', fontSize: 10, color: '#6D7B74', fontWeight: 400, lineHeight: 1.35 }}>
-                          ⏱ Última actualización · {lastUpdatedAgo}
+                    {/* Datos debajo de la foto */}
+                    <div style={{ padding: '12px 14px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                      <div>
+                        <p style={{ margin: '0 0 2px', fontSize: 11, fontWeight: 500, color: '#6D7B74', lineHeight: 1.3 }}>
+                          {timeGreeting}, {firstName} {timeIcon}
                         </p>
-                      )}
+                        <p style={{ margin: 0, fontSize: 22, fontWeight: 700, color: '#143C32', fontFamily: 'Georgia, serif', lineHeight: 1.1, letterSpacing: '-0.02em' }}>
+                          {patientName.split(' ')[0]}
+                        </p>
+                      </div>
                       <div
                         onClick={e => { e.stopPropagation(); setShowFamilySwitcher(true) }}
                         style={{ display: 'flex', flexDirection: 'column', gap: 4 }}
                       >
+                        {lastUpdatedAgo && (
+                          <p style={{ margin: '0 0 4px', fontSize: 10, color: '#6D7B74' }}>
+                            ⏱ {lastUpdatedAgo}
+                          </p>
+                        )}
                         <div style={{ display: 'flex', alignItems: 'center' }}>
                           {familyMembers.slice(0, 4).map((m, i) => {
                             const nm = m.full_name?.trim() || m.email?.split('@')[0] || '?'
                             const avatarColors = ['#2F6B4F', '#D99A18', '#7A659C', '#E58B73']
                             return (
                               <div key={m.id} style={{
-                                width: 24, height: 24, borderRadius: '50%',
+                                width: 22, height: 22, borderRadius: '50%',
                                 background: avatarColors[i % avatarColors.length],
-                                border: '2px solid rgba(255,255,255,0.9)',
+                                border: '2px solid white',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                fontSize: 10, fontWeight: 700, color: 'white',
-                                marginLeft: i > 0 ? -6 : 0, position: 'relative', zIndex: 10 - i,
+                                fontSize: 9, fontWeight: 700, color: 'white',
+                                marginLeft: i > 0 ? -6 : 0, zIndex: 10 - i, position: 'relative',
                               }}>
                                 {nm.charAt(0).toUpperCase()}
                               </div>
                             )
                           })}
-                          {familyMembers.length > 4 && (
-                            <div style={{
-                              width: 24, height: 24, borderRadius: '50%',
-                              background: 'rgba(20,60,50,0.15)',
-                              border: '2px solid rgba(255,255,255,0.9)',
-                              display: 'flex', alignItems: 'center', justifyContent: 'center',
-                              fontSize: 9, fontWeight: 700, color: '#143C32',
-                              marginLeft: -6, zIndex: 6,
-                            }}>
-                              +{familyMembers.length - 4}
-                            </div>
-                          )}
                         </div>
-                        {familyMembers.length > 0 ? (
+                        {familyMembers.length > 0 && (
                           <p style={{ margin: 0, fontSize: 10, color: '#6D7B74', fontWeight: 500 }}>
                             {familyCount} persona{familyCount !== 1 ? 's' : ''} cuidando juntas
                           </p>
-                        ) : (
-                          <p style={{ margin: 0, fontSize: 10, color: '#6D7B74' }}>Invita a tu familia →</p>
                         )}
                       </div>
                     </div>
