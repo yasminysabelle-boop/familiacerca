@@ -18,7 +18,6 @@ import { usePullToRefresh } from '../hooks/usePullToRefresh'
 import { detectMedicationWindow, getMiloSuggestion, WINDOW_OPTIONS } from '../utils/medicationDatabase'
 import Layout from '../components/Layout'
 import MedicationListTab from '../components/MedicationListTab'
-import MedicationHistorialTab from '../components/MedicationHistorialTab'
 import MedicationStockList from './medications/MedicationStockList'
 import MedicationRecetasTab from '../components/MedicationRecetasTab'
 
@@ -381,8 +380,10 @@ export default function Medications() {
     } else {
       setStockForm(emptyStock)
     }
-    setEditId(med.id); setAddStep('form')
-    setSaveError(null); setShowForm(true)
+    setEditId(med.id)
+    setAddStep('form')
+    setSaveError(null)
+    setShowForm(true)
   }
 
   function closeForm() {
@@ -848,7 +849,7 @@ export default function Medications() {
                 WebkitTapHighlightColor: 'transparent',
               }}
             >
-              {tab === 'hoy' ? '💊 Hoy' : tab === 'todos' ? '📋 Historial' : tab === 'stock' ? '📦 Inventario' : '📄 Recetas'}
+              {tab === 'hoy' ? '💊 Hoy' : tab === 'todos' ? '💊 Lista' : tab === 'stock' ? '📦 Inventario' : '📄 Recetas'}
             </button>
           ))}
         </div>
