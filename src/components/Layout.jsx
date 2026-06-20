@@ -137,19 +137,17 @@ export default function Layout({ children }) {
             </h1>
           </div>
         ) : (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <img
-                src="/logo-icon.png"
-                alt="FamiliaCerca"
-                style={{ width: 28, height: 28, objectFit: 'contain', flexShrink: 0 }}
-                onError={e => { e.currentTarget.style.display = 'none' }}
-              />
-              <span style={{ fontFamily: 'Georgia, serif', fontSize: 17, fontWeight: 700, lineHeight: 1 }}>
-                <span style={{ color: '#1E2D26' }}>Familia</span>
-                <span style={{ color: '#E58B73' }}>Cerca</span>
-              </span>
-            </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <img
+              src="/logo-icon.png"
+              alt=""
+              style={{ width: 32, height: 32, objectFit: 'contain', flexShrink: 0 }}
+              onError={e => { e.currentTarget.style.display = 'none' }}
+            />
+            <span style={{ fontFamily: 'Georgia, serif', fontSize: 17, fontWeight: 700, lineHeight: 1 }}>
+              <span style={{ color: '#1E2D26' }}>Familia</span>
+              <span style={{ color: '#E58B73' }}>Cerca</span>
+            </span>
           </div>
         )}
 
