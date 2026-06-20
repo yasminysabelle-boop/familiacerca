@@ -1147,6 +1147,7 @@ export default function Medications() {
               medications={medications}
               stockByMedId={stockByMedId}
               isAdmin={isAdmin}
+              isCuidador={memberRole === 'cuidador'}
               onEditMed={openEdit}
               onDeleteMed={handleDelete}
             />

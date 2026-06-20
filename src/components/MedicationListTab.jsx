@@ -32,6 +32,7 @@ export default function MedicationListTab({
   medications = [],
   stockByMedId = {},
   isAdmin = false,
+  isCuidador = false,
   onEditMed,
   onDeleteMed,
 }) {
