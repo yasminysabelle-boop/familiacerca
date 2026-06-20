@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
+import Cropper from 'react-easy-crop'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { supabase } from '../lib/supabase'
@@ -356,6 +357,49 @@ export default function Directory() {
   const [confirmDialog, setConfirmDialog] = useState(null)
   const [photoUploading, setPhotoUploading] = useState(false)
   const photoInputRef = useRef(null)
+  const [cropSrc, setCropSrc] = useState(null)
+  const [crop, setCrop] = useState({ x: 0, y: 0 })
+  const [zoom, setZoom] = useState(1)
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null)
+
+  const onCropComplete = useCallback((_, pixels) => setCroppedAreaPixels(pixels), [])
+
+  async function getCroppedBlob(imageSrc, pixelCrop) {
+    const image = await new Promise((resolve, reject) => {
+      const img = new Image()
+      img.onload = () => resolve(img)
+      img.onerror = reject
+      img.src = imageSrc
+    })
+    const canvas = document.createElement('canvas')
+    canvas.width = pixelCrop.width
+    canvas.height = pixelCrop.height
+    const ctx = canvas.getContext('2d')
+    ctx.drawImage(image, pixelCrop.x, pixelCrop.y, pixelCrop.width, pixelCrop.height, 0, 0, pixelCrop.width, pixelCrop.height)
+    return new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.92))
+  }
+
+  function openCropModal(file) {
+    const url = URL.createObjectURL(file)
+    setCropSrc(url)
+    setCrop({ x: 0, y: 0 })
+    setZoom(1)
+    setCroppedAreaPixels(null)
+  }
+
+  async function handleCropConfirm() {
+    if (!cropSrc || !croppedAreaPixels) return
+    const blob = await getCroppedBlob(cropSrc, croppedAreaPixels)
+    URL.revokeObjectURL(cropSrc)
+    setCropSrc(null)
+    await uploadPatientPhoto(blob)
+  }
+
+  function handleCropCancel() {
+    URL.revokeObjectURL(cropSrc)
+    setCropSrc(null)
+    if (photoInputRef.current) photoInputRef.current.value = ''
+  }
 
   async function uploadPatientPhoto(file) {
     if (!file || !patientProfile?.id) return
@@ -719,7 +763,7 @@ export default function Directory() {
                         type="file"
                         accept="image/*"
                         style={{ display: 'none' }}
-                        onChange={e => { const f = e.target.files?.[0]; if (f) uploadPatientPhoto(f) }}
+                        onChange={e => { const f = e.target.files?.[0]; if (f) openCropModal(f) }}
                       />
                       <div
                         onClick={() => canEdit && photoInputRef.current?.click()}
@@ -1044,6 +1088,58 @@ export default function Directory() {
             </div>
           </button>
         </SheetModal>
+      )}
+
+      {/* ── Photo crop modal ─────────────────────────────────────── */}
+      {cropSrc && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 600,
+          background: '#000', display: 'flex', flexDirection: 'column',
+        }}>
+          {/* Cropper area */}
+          <div style={{ position: 'relative', flex: 1 }}>
+            <Cropper
+              image={cropSrc}
+              crop={crop}
+              zoom={zoom}
+              aspect={3 / 2}
+              onCropChange={setCrop}
+              onZoomChange={setZoom}
+              onCropComplete={onCropComplete}
+            />
+          </div>
+
+          {/* Bottom controls */}
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            gap: 16, padding: '20px 24px',
+            paddingBottom: 'calc(20px + env(safe-area-inset-bottom))',
+            background: 'rgba(0,0,0,0.85)',
+          }}>
+            <button
+              onClick={handleCropCancel}
+              style={{
+                background: 'none', border: 'none', cursor: 'pointer',
+                fontSize: 15, fontWeight: 600, color: '#6D7B74', padding: '12px 20px',
+              }}
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={handleCropConfirm}
+              disabled={photoUploading}
+              style={{
+                background: photoUploading ? '#9CA3AF' : '#0B4F4A',
+                border: 'none', borderRadius: 999, cursor: photoUploading ? 'default' : 'pointer',
+                fontSize: 15, fontWeight: 700, color: 'white',
+                padding: '12px 32px',
+                opacity: photoUploading ? 0.7 : 1,
+              }}
+            >
+              {photoUploading ? 'Subiendo…' : 'Usar foto'}
+            </button>
+          </div>
+        </div>
       )}
     </Layout>
   )
