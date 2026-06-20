@@ -140,18 +140,15 @@ export default function Layout({ children }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <img
               src="/logo.png"
-              width={32} height={32}
+              width={36} height={36}
               alt="FC"
-              style={{ borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
+              style={{ width: 36, height: 36, objectFit: 'contain', flexShrink: 0 }}
               onError={e => { e.currentTarget.style.display = 'none' }}
             />
-            <h1 style={{
-              fontSize: 15, fontWeight: 700, color: 'white',
-              fontFamily: 'Georgia, serif', margin: 0,
-              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-            }}>
-              {PAGE_TITLES[location.pathname] ?? 'FamiliaCerca'}
-            </h1>
+            <span style={{ fontFamily: 'Georgia, serif', fontSize: 20, fontWeight: 700, lineHeight: 1 }}>
+              <span style={{ color: '#1E2D26' }}>Familia</span>
+              <span style={{ color: '#E58B73' }}>Cerca</span>
+            </span>
           </div>
         )}
 
