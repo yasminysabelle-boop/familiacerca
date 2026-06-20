@@ -3147,7 +3147,10 @@ export default function Dashboard() {
         {/* ═══ MAIN CONTENT ═══ */}
         <div style={{ padding: '16px 16px 0', display: 'flex', flexDirection: 'column', gap: 24, paddingBottom: 104 }}>
           {(() => {
-            const heroPhoto = patientProfile?.photo_url || patientProfile?.foto_url || profile?.photo_url || null
+            const rawHeroPhoto = patientProfile?.photo_url || patientProfile?.foto_url || profile?.photo_url || null
+            const heroPhoto = rawHeroPhoto
+              ? (rawHeroPhoto.includes('?t=') ? rawHeroPhoto : `${rawHeroPhoto}?t=${Date.now()}`)
+              : null
             const patientName = patientProfile?.nombre_completo || profile?.name || 'Agregar paciente'
             const isCritical     = hasActiveSOS || (_isRetrasado && _retrasadoMins != null && _retrasadoMins >= 720)
             const isPendingToday = !isCritical && (pendingCount > 0 || _isRetrasado)

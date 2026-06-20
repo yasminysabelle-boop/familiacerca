@@ -216,6 +216,7 @@ export default function PatientProfile() {
       const { data:{ publicUrl } } = supabase.storage
         .from('patient-photos').getPublicUrl(path)
       set('foto_url', publicUrl)
+      window.dispatchEvent(new Event('patientProfileUpdated'))
     }
     setUploading(false)
   }
