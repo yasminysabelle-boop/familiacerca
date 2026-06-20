@@ -24,7 +24,7 @@ const COGNITIVO  = ['Orientado','Confusión leve','Demencia','Alzheimer']
 const DISPOSITIVOS = ['Lentes','Audífono','Dentadura','Prótesis','Pañal']
 
 const EMPTY = {
-  foto_url:'', nombre_completo:'', fecha_nacimiento:'', sexo:'',
+  foto_url:'', cover_photo_url:'', nombre_completo:'', fecha_nacimiento:'', sexo:'',
   tipo_sangre:'', diagnostico_principal:'', alergias_detalle:[],
   contacto_emergencia_nombre:'', contacto_emergencia_telefono:'',
   medico_tratante:'', especialidad_medico:'', telefono_medico:'',
@@ -216,6 +216,8 @@ export default function PatientProfile() {
       const { data:{ publicUrl } } = supabase.storage
         .from('patient-photos').getPublicUrl(path)
       set('foto_url', publicUrl)
+      set('cover_photo_url', publicUrl)
+      window.dispatchEvent(new Event('patientProfileUpdated'))
     }
     setUploading(false)
   }
@@ -259,7 +261,7 @@ export default function PatientProfile() {
     const arr = v => Array.isArray(v) ? v : []
     const payload = {
       owner_id:ownerId, created_by:user.id,
-      foto_url: n(form.foto_url), nombre_completo: n(form.nombre_completo),
+      foto_url: n(form.foto_url), cover_photo_url: n(form.cover_photo_url), nombre_completo: n(form.nombre_completo),
       fecha_nacimiento: n(form.fecha_nacimiento), sexo: n(form.sexo),
       tipo_sangre: n(form.tipo_sangre), diagnostico_principal: n(form.diagnostico_principal),
       alergias_detalle: arr(form.alergias_detalle),

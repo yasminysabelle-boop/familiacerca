@@ -1,5 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import Cropper from 'react-easy-crop'
+import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Link, useSearchParams, useNavigate as useNav } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
@@ -1774,14 +1773,7 @@ export default function Dashboard() {
   const [medTotal, setMedTotal] = useState(0)
   const [medsList, setMedsList]  = useState([])
   const [totalStock, setTotalStock] = useState(0)
-  const [heroUploading, setHeroUploading] = useState(false)
   const [showAllTools, setShowAllTools] = useState(false)
-  const heroPhotoInputRef = useRef(null)
-  const [heroCropSrc, setHeroCropSrc] = useState(null)
-  const [heroCrop, setHeroCrop] = useState({ x: 0, y: 0 })
-  const [heroZoom, setHeroZoom] = useState(1)
-  const [heroCroppedAreaPixels, setHeroCroppedAreaPixels] = useState(null)
-  const onHeroCropComplete = useCallback((_, pixels) => setHeroCroppedAreaPixels(pixels), [])
   const [showSOS, setShowSOS] = useState(false)
   const [sosSent, setSosSent] = useState(false)
   const [sosConfirming, setSosConfirming] = useState(false)
@@ -2646,64 +2638,6 @@ export default function Dashboard() {
       })
   }, [ownerId])
 
-  function handleHeroPhotoUpload(e) {
-    const file = e.target.files?.[0]
-    if (!file || !ownerId) return
-    const url = URL.createObjectURL(file)
-    setHeroCropSrc(url)
-    setHeroCrop({ x: 0, y: 0 })
-    setHeroZoom(1)
-    setHeroCroppedAreaPixels(null)
-  }
-
-  async function getCroppedBlob(imageSrc, pixelCrop) {
-    const image = await new Promise((resolve, reject) => {
-      const img = new Image()
-      img.onload = () => resolve(img)
-      img.onerror = reject
-      img.src = imageSrc
-    })
-    const canvas = document.createElement('canvas')
-    canvas.width = pixelCrop.width
-    canvas.height = pixelCrop.height
-    const ctx = canvas.getContext('2d')
-    ctx.drawImage(image, pixelCrop.x, pixelCrop.y, pixelCrop.width, pixelCrop.height, 0, 0, pixelCrop.width, pixelCrop.height)
-    return new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.92))
-  }
-
-  async function handleHeroCropConfirm() {
-    if (!heroCropSrc || !heroCroppedAreaPixels) return
-    setHeroUploading(true)
-    try {
-      const blob = await getCroppedBlob(heroCropSrc, heroCroppedAreaPixels)
-      URL.revokeObjectURL(heroCropSrc)
-      setHeroCropSrc(null)
-      const patientId = patientProfile?.id
-      if (!patientId) throw new Error('No patient profile id')
-      const path = `${patientId}/cover.jpg`
-      const { error: upErr } = await supabase.storage
-        .from('patient-photos')
-        .upload(path, blob, { upsert: true, contentType: 'image/jpeg' })
-      if (upErr) throw upErr
-      const { data: { publicUrl } } = supabase.storage.from('patient-photos').getPublicUrl(path)
-      await supabase.from('patient_profiles').update({ cover_photo_url: publicUrl }).eq('id', patientId)
-      const bustedUrl = `${publicUrl}?t=${Date.now()}`
-      setPatientProfile(prev => prev ? { ...prev, cover_photo_url: bustedUrl } : prev)
-      window.dispatchEvent(new Event('patientProfileUpdated'))
-    } catch (err) {
-      console.error('Hero photo upload failed:', err)
-    } finally {
-      setHeroUploading(false)
-      if (heroPhotoInputRef.current) heroPhotoInputRef.current.value = ''
-    }
-  }
-
-  function handleHeroCropCancel() {
-    URL.revokeObjectURL(heroCropSrc)
-    setHeroCropSrc(null)
-    if (heroPhotoInputRef.current) heroPhotoInputRef.current.value = ''
-  }
-
   async function handleInstantCall() {
     if (!ownerId || startingInstantCall) return
     setStartingInstantCall(true)
@@ -3228,35 +3162,12 @@ export default function Dashboard() {
                       }} />
                     </div>
                   )}
-                  {/* Hidden file input */}
-                  <input ref={heroPhotoInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleHeroPhotoUpload} />
-
                   {/* Gradient overlay — on top of photo, below glass panel */}
                   <div style={{
                     position: 'absolute', inset: 0,
                     background: 'linear-gradient(90deg, rgba(10,40,32,0.20) 0%, rgba(10,40,32,0.10) 40%, rgba(248,245,239,0.75) 100%)',
                     pointerEvents: 'none', zIndex: 1,
                   }} />
-
-                  {/* Cover photo button — top left */}
-                  <button
-                    onClick={() => heroPhotoInputRef.current?.click()}
-                    disabled={heroUploading}
-                    style={{
-                      position: 'absolute', top: 12, left: 12,
-                      background: 'rgba(0,0,0,0.45)',
-                      border: '1px solid rgba(255,255,255,0.2)',
-                      borderRadius: 20, padding: '6px 12px',
-                      display: 'flex', alignItems: 'center', gap: 6,
-                      cursor: heroUploading ? 'default' : 'pointer',
-                      WebkitTapHighlightColor: 'transparent', zIndex: 4,
-                    }}
-                  >
-                    <span style={{ fontSize: 13 }}>🖼</span>
-                    <span style={{ fontSize: 11, fontWeight: 600, color: 'white' }}>
-                      {heroUploading ? 'Subiendo…' : 'Cambiar portada'}
-                    </span>
-                  </button>
 
                   {/* Glass panel — floating on top of photo */}
                   <div
@@ -4063,54 +3974,6 @@ export default function Dashboard() {
         document.body
       )}
 
-      {/* ── Hero photo crop modal ─────────────────────────────────────────── */}
-      {heroCropSrc && (
-        <div style={{
-          position: 'fixed', inset: 0, zIndex: 600,
-          background: '#000', display: 'flex', flexDirection: 'column',
-        }}>
-          <div style={{ position: 'relative', flex: 1 }}>
-            <Cropper
-              image={heroCropSrc}
-              crop={heroCrop}
-              zoom={heroZoom}
-              aspect={3 / 2}
-              onCropChange={setHeroCrop}
-              onZoomChange={setHeroZoom}
-              onCropComplete={onHeroCropComplete}
-            />
-          </div>
-          <div style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            gap: 16, padding: '20px 24px',
-            paddingBottom: 'calc(20px + env(safe-area-inset-bottom))',
-            background: 'rgba(0,0,0,0.85)',
-          }}>
-            <button
-              onClick={handleHeroCropCancel}
-              style={{
-                background: 'none', border: 'none', cursor: 'pointer',
-                fontSize: 15, fontWeight: 600, color: '#6D7B74', padding: '12px 20px',
-              }}
-            >
-              Cancelar
-            </button>
-            <button
-              onClick={handleHeroCropConfirm}
-              disabled={heroUploading}
-              style={{
-                background: heroUploading ? '#9CA3AF' : '#0B4F4A',
-                border: 'none', borderRadius: 999, cursor: heroUploading ? 'default' : 'pointer',
-                fontSize: 15, fontWeight: 700, color: 'white',
-                padding: '12px 32px',
-                opacity: heroUploading ? 0.7 : 1,
-              }}
-            >
-              {heroUploading ? 'Subiendo…' : 'Usar foto'}
-            </button>
-          </div>
-        </div>
-      )}
     </Layout>
   )
 }
