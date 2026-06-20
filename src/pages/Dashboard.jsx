@@ -3173,89 +3173,83 @@ export default function Dashboard() {
                     zIndex: 1,
                   }} />
 
-                  {/* Glass panel — derecho, foto paciente arriba */}
+                  {/* Glass panel — foto paciente como fondo completo */}
                   <div
                     onClick={() => navigate('/paciente/perfil')}
                     style={{
                       position: 'absolute', top: 0, right: 0, bottom: 0,
-                      width: '58%',
-                      background: 'rgba(255,255,255,0.72)',
-                      backdropFilter: 'blur(20px)',
-                      WebkitBackdropFilter: 'blur(20px)',
+                      width: '56%',
                       borderRadius: '0 24px 24px 0',
-                      borderLeft: 'none',
-                      borderTop: 'none',
-                      borderBottom: 'none',
-                      borderRight: 'none',
-                      boxShadow: 'none',
-                      padding: 0,
-                      display: 'flex', flexDirection: 'column',
                       zIndex: 3, cursor: 'pointer', overflow: 'hidden',
                     }}
                   >
-                    {/* Foto del paciente — rectángulo arriba */}
-                    <div style={{ width: '100%', height: 130, flexShrink: 0, overflow: 'hidden', position: 'relative' }}>
-                      {profilePhoto ? (
-                        <img
-                          src={profilePhoto}
-                          alt=""
-                          style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }}
-                        />
-                      ) : (
-                        <div style={{
+                    {/* Foto paciente como fondo completo del panel */}
+                    {profilePhoto ? (
+                      <img
+                        src={profilePhoto}
+                        alt=""
+                        style={{
+                          position: 'absolute', inset: 0,
                           width: '100%', height: '100%',
-                          background: 'linear-gradient(135deg, #0B4F4A, #143C32)',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          fontSize: 40, color: 'white', fontWeight: 700,
-                        }}>
-                          {(patientName.charAt(0) || '?').toUpperCase()}
-                        </div>
-                      )}
-                      {/* Status pill sobre la foto */}
+                          objectFit: 'cover', objectPosition: 'center top',
+                          display: 'block',
+                        }}
+                      />
+                    ) : (
                       <div style={{
-                        position: 'absolute', bottom: 8, left: 8,
+                        position: 'absolute', inset: 0,
+                        background: 'linear-gradient(135deg, #0B4F4A, #143C32)',
+                      }} />
+                    )}
+
+                    {/* Glass blur en mitad inferior */}
+                    <div style={{
+                      position: 'absolute', left: 0, right: 0, bottom: 0,
+                      height: '55%',
+                      background: 'linear-gradient(to bottom, transparent 0%, rgba(20,60,50,0.75) 100%)',
+                      backdropFilter: 'blur(2px)',
+                      WebkitBackdropFilter: 'blur(2px)',
+                      pointerEvents: 'none',
+                    }} />
+
+                    {/* Datos pegados abajo */}
+                    <div style={{
+                      position: 'absolute', left: 0, right: 0, bottom: 0,
+                      padding: '12px 14px',
+                      zIndex: 2,
+                    }}>
+                      <p style={{ margin: '0 0 1px', fontSize: 10, fontWeight: 500, color: 'rgba(255,255,255,0.75)' }}>
+                        {timeGreeting}, {firstName} {timeIcon}
+                      </p>
+                      <p style={{ margin: '0 0 6px', fontSize: 22, fontWeight: 700, color: 'white', fontFamily: 'Georgia, serif', lineHeight: 1.1 }}>
+                        {patientName.split(' ')[0]}
+                      </p>
+                      <span style={{
                         display: 'inline-flex', alignItems: 'center', gap: 5,
                         padding: '4px 9px', borderRadius: 999,
                         background: statusBg,
-                        fontSize: 11, fontWeight: 600, color: statusColor,
-                        backdropFilter: 'blur(8px)',
+                        fontSize: 10, fontWeight: 600, color: statusColor,
+                        marginBottom: 8,
                       }}>
                         <span style={{ width: 6, height: 6, borderRadius: '50%', background: dotColor, flexShrink: 0 }} />
                         {statusLabel}
-                      </div>
-                    </div>
-
-                    {/* Datos debajo de la foto */}
-                    <div style={{ padding: '12px 14px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                      <div>
-                        <p style={{ margin: '0 0 2px', fontSize: 11, fontWeight: 500, color: '#6D7B74', lineHeight: 1.3 }}>
-                          {timeGreeting}, {firstName} {timeIcon}
-                        </p>
-                        <p style={{ margin: 0, fontSize: 22, fontWeight: 700, color: '#143C32', fontFamily: 'Georgia, serif', lineHeight: 1.1, letterSpacing: '-0.02em' }}>
-                          {patientName.split(' ')[0]}
-                        </p>
-                      </div>
+                      </span>
                       <div
                         onClick={e => { e.stopPropagation(); setShowFamilySwitcher(true) }}
-                        style={{ display: 'flex', flexDirection: 'column', gap: 4 }}
+                        style={{ display: 'flex', alignItems: 'center', gap: 6 }}
                       >
-                        {lastUpdatedAgo && (
-                          <p style={{ margin: '0 0 4px', fontSize: 10, color: '#6D7B74' }}>
-                            ⏱ {lastUpdatedAgo}
-                          </p>
-                        )}
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                          {familyMembers.slice(0, 4).map((m, i) => {
+                        <div style={{ display: 'flex' }}>
+                          {familyMembers.slice(0, 3).map((m, i) => {
                             const nm = m.full_name?.trim() || m.email?.split('@')[0] || '?'
-                            const avatarColors = ['#2F6B4F', '#D99A18', '#7A659C', '#E58B73']
+                            const avatarColors = ['#2F6B4F', '#D99A18', '#7A659C']
                             return (
                               <div key={m.id} style={{
-                                width: 22, height: 22, borderRadius: '50%',
+                                width: 20, height: 20, borderRadius: '50%',
                                 background: avatarColors[i % avatarColors.length],
-                                border: '2px solid white',
+                                border: '1.5px solid rgba(255,255,255,0.7)',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                fontSize: 9, fontWeight: 700, color: 'white',
-                                marginLeft: i > 0 ? -6 : 0, zIndex: 10 - i, position: 'relative',
+                                fontSize: 8, fontWeight: 700, color: 'white',
+                                marginLeft: i > 0 ? -5 : 0, zIndex: 10 - i, position: 'relative',
                               }}>
                                 {nm.charAt(0).toUpperCase()}
                               </div>
@@ -3263,8 +3257,8 @@ export default function Dashboard() {
                           })}
                         </div>
                         {familyMembers.length > 0 && (
-                          <p style={{ margin: 0, fontSize: 10, color: '#6D7B74', fontWeight: 500 }}>
-                            {familyCount} persona{familyCount !== 1 ? 's' : ''} cuidando juntas
+                          <p style={{ margin: 0, fontSize: 10, color: 'rgba(255,255,255,0.75)', fontWeight: 500 }}>
+                            {familyCount} cuidando juntas
                           </p>
                         )}
                       </div>
