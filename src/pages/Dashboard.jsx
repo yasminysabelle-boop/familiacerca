@@ -2661,6 +2661,7 @@ export default function Dashboard() {
       const img = new Image()
       img.onload = () => resolve(img)
       img.onerror = reject
+      img.crossOrigin = 'anonymous'
       img.src = imageSrc
     })
     const canvas = document.createElement('canvas')
@@ -4033,6 +4034,25 @@ export default function Dashboard() {
               onZoomChange={setHeroZoom}
               onCropComplete={onHeroCropComplete}
             />
+          </div>
+          <div style={{
+            padding: '0 24px 12px',
+            background: 'rgba(0,0,0,0.85)',
+            display: 'flex', alignItems: 'center', gap: 12,
+          }}>
+            <span style={{ fontSize: 16 }}>🔍</span>
+            <input
+              type="range"
+              min={1}
+              max={3}
+              step={0.05}
+              value={heroZoom}
+              onChange={e => setHeroZoom(Number(e.target.value))}
+              style={{ flex: 1, accentColor: '#0B4F4A' }}
+            />
+            <span style={{ fontSize: 12, color: 'white', minWidth: 32 }}>
+              {Math.round(heroZoom * 100)}%
+            </span>
           </div>
           <div style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center',
