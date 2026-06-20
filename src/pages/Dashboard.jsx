@@ -3108,7 +3108,7 @@ export default function Dashboard() {
             const isCritical     = hasActiveSOS || (_isRetrasado && _retrasadoMins != null && _retrasadoMins >= 720)
             const isPendingToday = !isCritical && (pendingCount > 0 || _isRetrasado)
             const statusEmoji = isCritical ? '🔴' : isPendingToday ? '🟡' : '🟢'
-            const statusLabel = isCritical ? 'Requiere atención urgente' : isPendingToday ? 'Requiere atención' : 'Todo bajo control'
+            const statusLabel = isCritical ? 'Requiere atención' : isPendingToday ? 'Requiere atención' : 'Todo bajo control'
             const statusBg     = isCritical ? 'rgba(254,226,226,0.95)' : isPendingToday ? 'rgba(254,243,199,0.95)' : 'rgba(220,252,231,0.95)'
             const statusColor  = isCritical ? '#991B1B' : isPendingToday ? '#78350F' : '#14532D'
             const statusBorder = isCritical ? 'rgba(252,165,165,0.6)' : isPendingToday ? 'rgba(253,224,71,0.6)' : 'rgba(134,239,172,0.6)'
