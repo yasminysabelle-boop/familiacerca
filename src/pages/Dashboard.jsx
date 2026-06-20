@@ -3187,11 +3187,20 @@ export default function Dashboard() {
                   borderRadius: 24,
                   overflow: 'hidden',
                   flexShrink: 0,
-                  ...(heroPhoto
-                    ? { backgroundImage: `url(${heroPhoto})`, backgroundSize: 'cover', backgroundPosition: 'center 25%' }
-                    : { background: 'linear-gradient(135deg, #0B4F4A 0%, #143C32 100%)' }
-                  ),
+                  background: 'linear-gradient(135deg, #0B4F4A 0%, #143C32 100%)',
                 }}>
+                  {heroPhoto && (
+                    <img
+                      src={heroPhoto}
+                      alt=""
+                      style={{
+                        position: 'absolute', inset: 0,
+                        width: '100%', height: '100%',
+                        objectFit: 'cover', objectPosition: 'left center',
+                        display: 'block',
+                      }}
+                    />
+                  )}
                   {/* Hidden file input */}
                   <input ref={heroPhotoInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleHeroPhotoUpload} />
 

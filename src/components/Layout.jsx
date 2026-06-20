@@ -278,11 +278,11 @@ export default function Layout({ children }) {
             </button>
           </div>
 
-          {/* Notas médicas */}
-          <Link to="/diario-medico" style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, textDecoration: 'none' }}>
-            <span style={{ fontSize: 22, lineHeight: 1 }}>📓</span>
-            <span style={{ fontSize: 10, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: location.pathname === '/diario-medico' ? '#3D6B54' : '#9FAF9A' }}>Notas</span>
-          </Link>
+          {/* Medicamentos */}
+          <button onClick={() => navigate('/medications')} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, background: 'none', border: 'none', cursor: 'pointer', padding: 0, WebkitTapHighlightColor: 'transparent' }}>
+            <span style={{ fontSize: 22, lineHeight: 1 }}>💊</span>
+            <span style={{ fontSize: 10, fontWeight: 700, color: location.pathname === '/medications' ? '#3D6B54' : '#9FAF9A' }}>Medicamentos</span>
+          </button>
 
           {/* Mi cuenta */}
           <Link to="/ajustes" style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, textDecoration: 'none' }}>

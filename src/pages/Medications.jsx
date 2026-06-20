@@ -1142,11 +1142,12 @@ export default function Medications() {
 
         {activeTab === 'todos' && (
           <div style={{ padding: '0 0 96px' }}>
-            <MedicationHistorialTab
+            <MedicationListTab
               medications={medications}
-              logsByMedId={logsByMedId}
-              omissionsByMedId={omissionsByMedId}
-              loading={loading}
+              stockByMedId={stockByMedId}
+              isAdmin={isAdmin}
+              onEditMed={openEdit}
+              onDeleteMed={handleDelete}
             />
           </div>
         )}
