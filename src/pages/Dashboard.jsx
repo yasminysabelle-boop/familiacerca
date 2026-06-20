@@ -2680,14 +2680,16 @@ export default function Dashboard() {
       setHeroCropSrc(null)
       const patientId = patientProfile?.id
       if (!patientId) throw new Error('No patient profile id')
-      const path = `${patientId}/photo.jpg`
+      const path = `${patientId}/cover.jpg`
       const { error: upErr } = await supabase.storage
         .from('patient-photos')
         .upload(path, blob, { upsert: true, contentType: 'image/jpeg' })
       if (upErr) throw upErr
       const { data: { publicUrl } } = supabase.storage.from('patient-photos').getPublicUrl(path)
-      await supabase.from('patient_profiles').update({ photo_url: publicUrl }).eq('id', patientId)
-      setPatientProfile(prev => prev ? { ...prev, photo_url: publicUrl } : prev)
+      await supabase.from('patient_profiles').update({ cover_photo_url: publicUrl }).eq('id', patientId)
+      const bustedUrl = `${publicUrl}?t=${Date.now()}`
+      setPatientProfile(prev => prev ? { ...prev, cover_photo_url: bustedUrl } : prev)
+      window.dispatchEvent(new Event('patientProfileUpdated'))
     } catch (err) {
       console.error('Hero photo upload failed:', err)
     } finally {
@@ -3144,7 +3146,10 @@ export default function Dashboard() {
         {/* ═══ MAIN CONTENT ═══ */}
         <div style={{ padding: '16px 16px 0', display: 'flex', flexDirection: 'column', gap: 24, paddingBottom: 104 }}>
           {(() => {
-            const heroPhoto = patientProfile?.photo_url || patientProfile?.foto_url || profile?.photo_url || null
+            const coverPhoto = patientProfile?.cover_photo_url || null
+            const profilePhoto = patientProfile?.photo_url || patientProfile?.foto_url || profile?.photo_url || null
+            const coverPosX = patientProfile?.cover_position_x ?? 50
+            const coverPosY = patientProfile?.cover_position_y ?? 50
             const patientName = patientProfile?.nombre_completo || profile?.name || 'Agregar paciente'
             const isCritical     = hasActiveSOS || (_isRetrasado && _retrasadoMins != null && _retrasadoMins >= 720)
             const isPendingToday = !isCritical && (pendingCount > 0 || _isRetrasado)
@@ -3189,17 +3194,39 @@ export default function Dashboard() {
                   flexShrink: 0,
                   background: 'linear-gradient(135deg, #0B4F4A 0%, #143C32 100%)',
                 }}>
-                  {heroPhoto && (
+                  {coverPhoto ? (
                     <img
-                      src={heroPhoto}
+                      src={coverPhoto}
                       alt=""
                       style={{
                         position: 'absolute', inset: 0,
                         width: '100%', height: '100%',
-                        objectFit: 'cover', objectPosition: 'left center',
+                        objectFit: 'cover',
+                        objectPosition: `${coverPosX}% ${coverPosY}%`,
                         display: 'block',
                       }}
                     />
+                  ) : (
+                    <div style={{
+                      position: 'absolute', inset: 0,
+                      background: 'linear-gradient(135deg, #0B4F4A 0%, #143C32 50%, #1A3A2A 100%)',
+                    }}>
+                      <div style={{
+                        position: 'absolute', top: -40, left: -40,
+                        width: 200, height: 200, borderRadius: '50%',
+                        background: 'rgba(255,255,255,0.04)',
+                      }} />
+                      <div style={{
+                        position: 'absolute', bottom: -30, right: -30,
+                        width: 160, height: 160, borderRadius: '50%',
+                        background: 'rgba(233,130,110,0.08)',
+                      }} />
+                      <div style={{
+                        position: 'absolute', top: '40%', left: '10%',
+                        width: 80, height: 80, borderRadius: '50%',
+                        background: 'rgba(217,154,24,0.06)',
+                      }} />
+                    </div>
                   )}
                   {/* Hidden file input */}
                   <input ref={heroPhotoInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleHeroPhotoUpload} />
@@ -3211,21 +3238,24 @@ export default function Dashboard() {
                     pointerEvents: 'none', zIndex: 1,
                   }} />
 
-                  {/* Camera button — top left */}
+                  {/* Cover photo button — top left */}
                   <button
                     onClick={() => heroPhotoInputRef.current?.click()}
                     disabled={heroUploading}
                     style={{
                       position: 'absolute', top: 12, left: 12,
-                      background: 'rgba(0,0,0,0.28)',
-                      border: 'none', borderRadius: '50%',
-                      width: 34, height: 34,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      background: 'rgba(0,0,0,0.45)',
+                      border: '1px solid rgba(255,255,255,0.2)',
+                      borderRadius: 20, padding: '6px 12px',
+                      display: 'flex', alignItems: 'center', gap: 6,
                       cursor: heroUploading ? 'default' : 'pointer',
                       WebkitTapHighlightColor: 'transparent', zIndex: 4,
                     }}
                   >
-                    <span style={{ fontSize: 14 }}>{heroUploading ? '⏳' : '📷'}</span>
+                    <span style={{ fontSize: 13 }}>🖼</span>
+                    <span style={{ fontSize: 11, fontWeight: 600, color: 'white' }}>
+                      {heroUploading ? 'Subiendo…' : 'Cambiar portada'}
+                    </span>
                   </button>
 
                   {/* Glass panel — floating on top of photo */}
@@ -3247,6 +3277,15 @@ export default function Dashboard() {
                   >
                     {/* Top — greeting + name + status */}
                     <div>
+                      {profilePhoto && (
+                        <div style={{
+                          width: 40, height: 40, borderRadius: '50%',
+                          overflow: 'hidden', border: '2px solid rgba(255,255,255,0.6)',
+                          marginBottom: 8,
+                        }}>
+                          <img src={profilePhoto} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        </div>
+                      )}
                       <p style={{ margin: '0 0 5px', fontSize: 11, fontWeight: 500, color: '#6D7B74', lineHeight: 1.3 }}>
                         {timeGreeting}, {firstName} {timeIcon}
                       </p>
