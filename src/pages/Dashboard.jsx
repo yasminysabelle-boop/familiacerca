@@ -9,7 +9,7 @@ import Layout from '../components/Layout'
 import { SkeletonDashSummary, SkeletonCard } from '../components/SkeletonLoader'
 import SuccessAnimation, { useSuccessAnimation } from '../components/SuccessAnimation'
 import { usePullToRefresh } from '../hooks/usePullToRefresh'
-import { AlertTriangle, CheckIcon, User, XIcon, Pill, ClipboardCheck, Chat, Calendar, Receipt, Users, Camera, Clock, BookOpen, MessageCircle, Video } from '../components/Icons'
+import { AlertTriangle, CheckIcon, User, XIcon, Pill, ClipboardCheck, Chat, Calendar, Receipt, Users, Camera, Clock, BookOpen, MessageCircle, Video, Hospital, Image } from '../components/Icons'
 import { geminiGenerate } from '../lib/gemini'
 import { CARE_ITEMS } from '../lib/careItems'
 import TrialBanner from '../components/TrialBanner'
@@ -3440,7 +3440,7 @@ export default function Dashboard() {
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                           flexShrink: 0,
                         }}>
-                          <Icon size={20} color={iconColor} strokeWidth={1.8} />
+                          <Icon size={22} color={iconColor} strokeWidth={2} />
                         </span>
                         <span style={{ fontSize: 12, fontWeight: 500, color: '#16231F', lineHeight: 1.2, textAlign: 'center' }}>{label}</span>
                       </button>
@@ -3469,7 +3469,12 @@ export default function Dashboard() {
                     { emoji: '🐾', label: 'Milo & Luna',      onClick: () => setShowCompanion(true) },
                     { emoji: '👤', label: 'Mi cuenta',        onClick: () => navigate('/ajustes') },
                   ]
-                  const visibleTools = allTools.slice(0, 4)
+                  const featuredTools = [
+                    { Icon: Users,    label: 'Equipo',   onClick: () => navigate('/familia'),          circleBg: '#EFF6F0', iconColor: '#143C32' },
+                    { Icon: Hospital, label: 'Hospital', onClick: () => setShowHospitalModal(true),    circleBg: '#FEF0ED', iconColor: '#E9826E' },
+                    { Icon: Calendar, label: 'Citas',    onClick: () => navigate('/calendar'),         circleBg: '#FFF8EC', iconColor: '#D99A18' },
+                    { Icon: Image,    label: 'Álbum',    onClick: () => navigate('/album'),            circleBg: '#EFF6F0', iconColor: '#143C32' },
+                  ]
                   return (
                     <div>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
@@ -3477,10 +3482,27 @@ export default function Dashboard() {
                         <button onClick={() => setShowMoreTools(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: '#E9826E', fontWeight: 700, padding: 0, WebkitTapHighlightColor: 'transparent' }}>Ver todas →</button>
                       </div>
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
-                        {visibleTools.map((c, i) => (
-                          <button key={i} onClick={c.onClick} style={{ background: 'white', borderRadius: 18, padding: '14px 6px', border: 'none', cursor: 'pointer', width: '100%', minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, WebkitTapHighlightColor: 'transparent', boxSizing: 'border-box', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
-                            <span style={{ fontSize: 24 }}>{c.emoji}</span>
-                            <p style={{ margin: 0, fontSize: 9, color: '#143C32', lineHeight: 1.3, textAlign: 'center', fontWeight: 600 }}>{c.label}</p>
+                        {featuredTools.map(({ Icon, label, onClick, circleBg, iconColor }) => (
+                          <button
+                            key={label} onClick={onClick}
+                            style={{
+                              background: 'white', border: 'none',
+                              borderRadius: 16, padding: '12px 8px', cursor: 'pointer',
+                              width: '100%', minWidth: 0, boxSizing: 'border-box',
+                              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
+                              boxShadow: '0 4px 12px rgba(20,35,30,0.08)',
+                              WebkitTapHighlightColor: 'transparent',
+                            }}
+                          >
+                            <span style={{
+                              width: 44, height: 44, borderRadius: '50%',
+                              background: circleBg,
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              flexShrink: 0,
+                            }}>
+                              <Icon size={22} color={iconColor} strokeWidth={2} />
+                            </span>
+                            <p style={{ margin: 0, fontSize: 12, fontWeight: 500, color: '#16231F', lineHeight: 1.3, textAlign: 'center' }}>{label}</p>
                           </button>
                         ))}
                       </div>

@@ -72,6 +72,15 @@ export function Video({ size, color, strokeWidth }) {
   )
 }
 
+export function Hospital({ size, color, strokeWidth }) {
+  return (
+    <Svg size={size} color={color} strokeWidth={strokeWidth}>
+      <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+      <path d="M12 8v8M8 12h8" />
+    </Svg>
+  )
+}
+
 export function Menu({ size, color, strokeWidth }) {
   return (
     <Svg size={size} color={color} strokeWidth={strokeWidth}>
