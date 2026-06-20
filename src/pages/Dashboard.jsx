@@ -3518,9 +3518,13 @@ export default function Dashboard() {
                             onClick={e => e.stopPropagation()}
                           >
                             <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(20,60,50,0.15)', margin: '0 auto 20px' }} />
-                            <p style={{ margin: '0 0 16px', fontSize: 14, fontWeight: 600, color: '#143C32' }}>Todas las herramientas</p>
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
-                              {allTools.map(({ Icon, label, onClick, circleBg, iconColor }) => (
+                            <p style={{ margin: '0 0 16px', fontSize: 18, fontWeight: 700, color: '#143C32' }}>Todas las herramientas</p>
+                            {(() => {
+                              const cols = 4
+                              const remainder = allTools.length % cols
+                              const fullRows = allTools.slice(0, allTools.length - (remainder || cols))
+                              const lastRow  = remainder ? allTools.slice(-remainder) : allTools.slice(-cols)
+                              const renderCard = ({ Icon, label, onClick, circleBg, iconColor }) => (
                                 <button
                                   key={label}
                                   onClick={() => { setShowMoreTools(false); onClick() }}
@@ -3543,8 +3547,20 @@ export default function Dashboard() {
                                   </span>
                                   <p style={{ margin: 0, fontSize: 12, fontWeight: 500, color: '#16231F', lineHeight: 1.3, textAlign: 'center' }}>{label}</p>
                                 </button>
-                              ))}
-                            </div>
+                              )
+                              return (
+                                <>
+                                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
+                                    {fullRows.map(renderCard)}
+                                  </div>
+                                  {lastRow.length > 0 && (
+                                    <div style={{ display: 'grid', gridTemplateColumns: `repeat(${lastRow.length}, 1fr)`, gap: 10, marginTop: 10, maxWidth: `${(lastRow.length / cols) * 100}%`, margin: '10px auto 0' }}>
+                                      {lastRow.map(renderCard)}
+                                    </div>
+                                  )}
+                                </>
+                              )
+                            })()}
                           </div>
                         </div>
                       )}
