@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
+import Cropper from 'react-easy-crop'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
@@ -97,6 +98,14 @@ export default function Settings() {
   const [testingPush, setTestingPush] = useState(false)
   const [testResult, setTestResult] = useState(null)
   const [cancelStep, setCancelStep] = useState(0) // 0=closed 1=milo 2=reason
+  const [profileUploading, setProfileUploading] = useState(false)
+  const profilePhotoInputRef = useRef(null)
+  const [profileCropSrc, setProfileCropSrc] = useState(null)
+  const [profileCrop, setProfileCrop] = useState({ x: 0, y: 0 })
+  const [profileZoom, setProfileZoom] = useState(1)
+  const [profileCroppedAreaPixels, setProfileCroppedAreaPixels] = useState(null)
+  const [profilePhotoUrl, setProfilePhotoUrl] = useState(user?.user_metadata?.avatar_url ?? null)
+  const onProfileCropComplete = useCallback((_, pixels) => setProfileCroppedAreaPixels(pixels), [])
   const [cancelReason, setCancelReason] = useState(null)
   const [cancelLoading, setCancelLoading] = useState(false)
   const [cancelDone, setCancelDone] = useState(false)
@@ -127,6 +136,60 @@ export default function Settings() {
   function handleLocationToggle(val) {
     setLocationEnabled(val)
     setLocationOn(val)
+  }
+
+  function handleProfilePhotoSelect(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const url = URL.createObjectURL(file)
+    setProfileCropSrc(url)
+    setProfileCrop({ x: 0, y: 0 })
+    setProfileZoom(1)
+    setProfileCroppedAreaPixels(null)
+  }
+
+  async function getCroppedBlob(imageSrc, pixelCrop) {
+    const image = await new Promise((resolve, reject) => {
+      const img = new Image()
+      img.onload = () => resolve(img)
+      img.onerror = reject
+      img.src = imageSrc
+    })
+    const canvas = document.createElement('canvas')
+    canvas.width = pixelCrop.width
+    canvas.height = pixelCrop.height
+    const ctx = canvas.getContext('2d')
+    ctx.drawImage(image, pixelCrop.x, pixelCrop.y, pixelCrop.width, pixelCrop.height, 0, 0, pixelCrop.width, pixelCrop.height)
+    return new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.92))
+  }
+
+  async function handleProfileCropConfirm() {
+    if (!profileCropSrc || !profileCroppedAreaPixels || !user?.id) return
+    setProfileUploading(true)
+    try {
+      const blob = await getCroppedBlob(profileCropSrc, profileCroppedAreaPixels)
+      URL.revokeObjectURL(profileCropSrc)
+      setProfileCropSrc(null)
+      const path = `profile/${user.id}/avatar.jpg`
+      const { error: upErr } = await supabase.storage
+        .from('patient-photos')
+        .upload(path, blob, { upsert: true, contentType: 'image/jpeg' })
+      if (upErr) throw upErr
+      const { data: { publicUrl } } = supabase.storage.from('patient-photos').getPublicUrl(path)
+      await supabase.auth.updateUser({ data: { avatar_url: publicUrl } })
+      setProfilePhotoUrl(publicUrl)
+    } catch (err) {
+      console.error('Profile photo upload failed:', err)
+    } finally {
+      setProfileUploading(false)
+      if (profilePhotoInputRef.current) profilePhotoInputRef.current.value = ''
+    }
+  }
+
+  function handleProfileCropCancel() {
+    URL.revokeObjectURL(profileCropSrc)
+    setProfileCropSrc(null)
+    if (profilePhotoInputRef.current) profilePhotoInputRef.current.value = ''
   }
 
   function openCancelFlow() {
@@ -198,15 +261,38 @@ export default function Settings() {
           borderRadius: 20, padding: '20px 20px', marginBottom: 16,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-            <div style={{
-              width: 52, height: 52, borderRadius: '50%',
-              background: 'rgba(255,255,255,0.15)', flexShrink: 0,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 22, fontWeight: 700, color: 'white',
-              border: '2px solid rgba(255,255,255,0.25)',
-            }}>
-              {user?.user_metadata?.full_name?.charAt(0)?.toUpperCase() ?? user?.email?.charAt(0)?.toUpperCase() ?? '?'}
-            </div>
+            <button
+              onClick={() => profilePhotoInputRef.current?.click()}
+              disabled={profileUploading}
+              style={{
+                width: 52, height: 52, borderRadius: '50%', flexShrink: 0,
+                background: profilePhotoUrl ? 'transparent' : 'rgba(255,255,255,0.15)',
+                border: '2px solid rgba(255,255,255,0.25)',
+                padding: 0, cursor: 'pointer', position: 'relative', overflow: 'hidden',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 22, fontWeight: 700, color: 'white',
+              }}
+            >
+              {profilePhotoUrl
+                ? <img src={profilePhotoUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                : (user?.user_metadata?.full_name?.charAt(0)?.toUpperCase() ?? user?.email?.charAt(0)?.toUpperCase() ?? '?')
+              }
+              <div style={{
+                position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.35)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                opacity: profileUploading ? 1 : 0,
+                transition: 'opacity 0.2s',
+              }}>
+                <span style={{ fontSize: 14 }}>{profileUploading ? '⏳' : '📷'}</span>
+              </div>
+            </button>
+            <input
+              ref={profilePhotoInputRef}
+              type="file"
+              accept="image/*"
+              style={{ display: 'none' }}
+              onChange={handleProfilePhotoSelect}
+            />
             <div style={{ minWidth: 0 }}>
               <p style={{ color: 'white', fontSize: 16, fontWeight: 700, fontFamily: 'Georgia, serif', margin: 0 }}>
                 {user?.user_metadata?.full_name ?? 'Mi cuenta'}
@@ -730,6 +816,55 @@ export default function Settings() {
               </>
             )}
 
+          </div>
+        </div>
+      )}
+
+      {/* ── Profile photo crop modal ──────────────────────────────────── */}
+      {profileCropSrc && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 600,
+          background: '#000', display: 'flex', flexDirection: 'column',
+        }}>
+          <div style={{ position: 'relative', flex: 1 }}>
+            <Cropper
+              image={profileCropSrc}
+              crop={profileCrop}
+              zoom={profileZoom}
+              aspect={3 / 2}
+              onCropChange={setProfileCrop}
+              onZoomChange={setProfileZoom}
+              onCropComplete={onProfileCropComplete}
+            />
+          </div>
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            gap: 16, padding: '20px 24px',
+            paddingBottom: 'calc(20px + env(safe-area-inset-bottom))',
+            background: 'rgba(0,0,0,0.85)',
+          }}>
+            <button
+              onClick={handleProfileCropCancel}
+              style={{
+                background: 'none', border: 'none', cursor: 'pointer',
+                fontSize: 15, fontWeight: 600, color: '#6D7B74', padding: '12px 20px',
+              }}
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={handleProfileCropConfirm}
+              disabled={profileUploading}
+              style={{
+                background: profileUploading ? '#9CA3AF' : '#0B4F4A',
+                border: 'none', borderRadius: 999, cursor: profileUploading ? 'default' : 'pointer',
+                fontSize: 15, fontWeight: 700, color: 'white',
+                padding: '12px 32px',
+                opacity: profileUploading ? 0.7 : 1,
+              }}
+            >
+              {profileUploading ? 'Subiendo…' : 'Usar foto'}
+            </button>
           </div>
         </div>
       )}
