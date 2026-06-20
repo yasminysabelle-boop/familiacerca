@@ -1939,7 +1939,10 @@ export default function Dashboard() {
       if (!ownerId) return
       supabase.from('patient_profiles').select('*').eq('owner_id', ownerId).maybeSingle()
         .then(({ data: pp }) => {
-          setPatientProfile(pp ?? null)
+          const withBuster = pp?.photo_url
+            ? { ...pp, photo_url: `${pp.photo_url}?t=${Date.now()}` }
+            : pp
+          setPatientProfile(withBuster ?? null)
           setPatientProfileIncomplete(!pp?.nombre_completo)
         })
     }

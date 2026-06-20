@@ -408,15 +408,17 @@ export default function Directory() {
       const path = `${patientProfile.id}/photo.jpg`
       const { error: upErr } = await supabase.storage
         .from('patient-photos')
-        .upload(path, file, { upsert: true, contentType: file.type })
+        .upload(path, file, { upsert: true, contentType: 'image/jpeg' })
       if (upErr) throw upErr
       const { data: { publicUrl } } = supabase.storage.from('patient-photos').getPublicUrl(path)
       const { error: updErr } = await supabase
         .from('patient_profiles')
-        .update({ foto_url: publicUrl })
+        .update({ photo_url: publicUrl })
         .eq('id', patientProfile.id)
       if (updErr) throw updErr
-      setPatientProfile(prev => ({ ...prev, foto_url: publicUrl }))
+      console.log('photo_url updated:', publicUrl)
+      setPatientProfile(prev => ({ ...prev, photo_url: `${publicUrl}?t=${Date.now()}` }))
+      window.dispatchEvent(new CustomEvent('patientProfileUpdated'))
     } catch (e) {
       console.error('Photo upload failed', e)
     } finally {
