@@ -38,6 +38,20 @@ export default function HospitalDashboard({ onManageMode, onSOS, onVideoCall }) 
       padding: '12px 16px 32px', display: 'flex', flexDirection: 'column', gap: 14,
     }}>
 
+      {/* Logo header */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, paddingBottom: 2 }}>
+        <img
+          src="/logo-icon.png"
+          alt=""
+          style={{ width: 40, height: 40, objectFit: 'contain', flexShrink: 0 }}
+          onError={e => { e.currentTarget.style.display = 'none' }}
+        />
+        <span style={{ fontFamily: 'Georgia, serif', fontSize: 19, fontWeight: 700, lineHeight: 1 }}>
+          <span style={{ color: '#1E2D26' }}>Familia</span>
+          <span style={{ color: '#E58B73' }}>Cerca</span>
+        </span>
+      </div>
+
       {/* 1. Banner rojo con estado global */}
       <HospitalBanner onManage={onManageMode} />
 
