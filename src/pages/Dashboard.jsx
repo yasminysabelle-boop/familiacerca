@@ -3357,14 +3357,14 @@ export default function Dashboard() {
                       </button>
                     </div>
                   ) : (
-                    <div style={{ marginLeft: -16, marginRight: -16, paddingLeft: 16, paddingRight: 16, overflowX: 'auto', display: 'flex', gap: 12, scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch', paddingBottom: 4 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
                       {recentPhotos.map((photo, i) => (
-                        <div key={photo.id} onClick={() => setSelectedEvent(photo)} style={{ cursor: 'pointer', flexShrink: 0 }}>
-                          <div style={{ position: 'relative', width: 140, height: 100, borderRadius: 16, overflow: 'hidden', boxShadow: '0 8px 20px rgba(20,35,30,0.12)' }}>
-                            <img src={photo.fileUrl} alt={photo.caption ?? ''} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                            {i === 0 && <span style={{ position: 'absolute', top: 8, right: 8, fontSize: 16, color: '#E9826E', filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.4))' }}>♥</span>}
+                        <div key={photo.id} onClick={() => setSelectedEvent(photo)} style={{ cursor: 'pointer' }}>
+                          <div style={{ position: 'relative', width: '100%', paddingBottom: '75%', borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(20,35,30,0.10)' }}>
+                            <img src={photo.fileUrl} alt={photo.caption ?? ''} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                            {i === 0 && <span style={{ position: 'absolute', top: 6, right: 6, fontSize: 14, color: '#E9826E' }}>♥</span>}
                           </div>
-                          {photo.caption && <p style={{ margin: '6px 0 2px', fontSize: 11, color: '#20312C', fontWeight: 500, maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{photo.caption}</p>}
+                          {photo.caption && <p style={{ margin: '4px 0 1px', fontSize: 11, color: '#20312C', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{photo.caption}</p>}
                           <p style={{ margin: 0, fontSize: 10, color: '#B0A898' }}>{timeAgo(new Date(photo.timestamp))}</p>
                         </div>
                       ))}
