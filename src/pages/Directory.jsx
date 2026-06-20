@@ -390,11 +390,34 @@ export default function Directory() {
   }
 
   async function handleCropConfirm() {
-    if (!cropSrc || !croppedAreaPixelsRef.current) return
-    const blob = await getCroppedBlob(cropSrc, croppedAreaPixelsRef.current)
-    URL.revokeObjectURL(cropSrc)
-    setCropSrc(null)
-    await uploadPatientPhoto(blob)
+    console.log('1. handleCropConfirm called')
+    console.log('2. cropSrc:', cropSrc)
+    console.log('3. croppedAreaPixelsRef.current:', croppedAreaPixelsRef.current)
+
+    if (!croppedAreaPixelsRef.current) {
+      console.log('ERROR: croppedAreaPixelsRef is null')
+      return
+    }
+
+    try {
+      console.log('4. calling getCroppedBlob')
+      const blob = await getCroppedBlob(cropSrc, croppedAreaPixelsRef.current)
+      console.log('5. blob result:', blob)
+
+      if (!blob) {
+        console.log('ERROR: blob is null')
+        return
+      }
+
+      URL.revokeObjectURL(cropSrc)
+      setCropSrc(null)
+
+      console.log('6. calling uploadPatientPhoto')
+      await uploadPatientPhoto(blob)
+      console.log('7. upload complete')
+    } catch (err) {
+      console.error('ERROR in handleCropConfirm:', err)
+    }
   }
 
   function handleCropCancel() {
