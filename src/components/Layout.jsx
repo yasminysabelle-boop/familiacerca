@@ -19,7 +19,7 @@ const PAGE_TITLES = {
   '/diario-voz':     'Memorias de voz',
   '/familia':        'Mi Familia',
   '/medications':    'Medicamentos',
-  '/historial':      'Registros de cuidado',
+  '/historial':      'Historial clínico',
   '/diario-medico':  'Notas Médicas IA',
   '/calendar':       'Citas médicas',
   '/notes':          'Notas',

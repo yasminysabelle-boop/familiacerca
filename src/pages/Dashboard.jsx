@@ -3514,10 +3514,10 @@ export default function Dashboard() {
                     { Icon: User,          label: 'Mi cuenta',     onClick: () => navigate('/ajustes'),                circleBg: '#EFF6F0', iconColor: '#143C32' },
                   ]
                   const featuredTools = [
-                    { Icon: Users,    label: 'Equipo',   onClick: () => navigate('/familia'),          circleBg: '#EFF6F0', iconColor: '#143C32' },
-                    { Icon: Building2, label: 'Hospital', onClick: () => setShowHospitalModal(true),   circleBg: '#FEF0ED', iconColor: '#E9826E' },
-                    { Icon: Calendar, label: 'Citas',    onClick: () => navigate('/calendar'),         circleBg: '#FFF8EC', iconColor: '#D99A18' },
-                    { Icon: Image,    label: 'Álbum',    onClick: () => navigate('/album'),            circleBg: '#EFF6F0', iconColor: '#143C32' },
+                    { Icon: Users,         label: 'Equipo',    onClick: () => navigate('/familia'),        circleBg: '#EFF6F0', iconColor: '#143C32' },
+                    { Icon: Building2,     label: 'Hospital',  onClick: () => setShowHospitalModal(true),  circleBg: '#FEF0ED', iconColor: '#E9826E' },
+                    { Icon: Calendar,      label: 'Citas',     onClick: () => navigate('/calendar'),       circleBg: '#FFF8EC', iconColor: '#D99A18' },
+                    { Icon: ClipboardList, label: 'Historial', onClick: () => navigate('/historial'),      circleBg: '#FFF8EC', iconColor: '#D99A18' },
                   ]
                   return (
                     <div>

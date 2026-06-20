@@ -845,7 +845,7 @@ export default function Medications() {
                 WebkitTapHighlightColor: 'transparent',
               }}
             >
-              {tab === 'hoy' ? '💊 Hoy' : tab === 'todos' ? '📋 Historial' : tab === 'stock' ? '📦 Inventario' : '📄 Recetas'}
+              {tab === 'hoy' ? '💊 Hoy' : tab === 'todos' ? '💊 Lista' : tab === 'stock' ? '📦 Inventario' : '📄 Recetas'}
             </button>
           ))}
         </div>
