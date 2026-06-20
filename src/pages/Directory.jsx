@@ -360,9 +360,11 @@ export default function Directory() {
   const [cropSrc, setCropSrc] = useState(null)
   const [crop, setCrop] = useState({ x: 0, y: 0 })
   const [zoom, setZoom] = useState(1)
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null)
+  const croppedAreaPixelsRef = useRef(null)
 
-  const onCropComplete = useCallback((_, pixels) => setCroppedAreaPixels(pixels), [])
+  const onCropComplete = useCallback((_, croppedAreaPixels) => {
+    croppedAreaPixelsRef.current = croppedAreaPixels
+  }, [])
 
   async function getCroppedBlob(imageSrc, pixelCrop) {
     const image = await new Promise((resolve, reject) => {
@@ -384,12 +386,12 @@ export default function Directory() {
     setCropSrc(url)
     setCrop({ x: 0, y: 0 })
     setZoom(1)
-    setCroppedAreaPixels(null)
+    croppedAreaPixelsRef.current = null
   }
 
   async function handleCropConfirm() {
-    if (!cropSrc || !croppedAreaPixels) return
-    const blob = await getCroppedBlob(cropSrc, croppedAreaPixels)
+    if (!cropSrc || !croppedAreaPixelsRef.current) return
+    const blob = await getCroppedBlob(cropSrc, croppedAreaPixelsRef.current)
     URL.revokeObjectURL(cropSrc)
     setCropSrc(null)
     await uploadPatientPhoto(blob)
@@ -1109,6 +1111,22 @@ export default function Directory() {
               onZoomChange={setZoom}
               onCropComplete={onCropComplete}
             />
+          </div>
+
+          {/* Zoom slider */}
+          <div style={{ padding: '12px 24px 0', background: 'rgba(0,0,0,0.85)' }}>
+            <input
+              type="range"
+              min={1}
+              max={3}
+              step={0.1}
+              value={zoom}
+              onChange={(e) => setZoom(Number(e.target.value))}
+              style={{ width: '100%', accentColor: '#0B4F4A', marginTop: '12px' }}
+            />
+            <p style={{ color: 'white', fontSize: '12px', textAlign: 'center', margin: '4px 0 0' }}>
+              Pellizca o desliza para ajustar
+            </p>
           </div>
 
           {/* Bottom controls */}
