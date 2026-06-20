@@ -23,8 +23,6 @@ import VideoCallScheduleModal from '../components/VideoCallScheduleModal'
 import { getLocation, mapsUrl } from '../lib/gps'
 import { track } from '../lib/analytics'
 
-const HERO_IMAGES = ['/hero-1.png']
-
 // Mood lookup — handles both stored text values and emoji values
 const MOOD_MAP = {
   good:    { emoji: '😊', color: '#22C55E' },
@@ -1776,8 +1774,6 @@ export default function Dashboard() {
   const [medsList, setMedsList]  = useState([])
   const [totalStock, setTotalStock] = useState(0)
   const [showAllTools, setShowAllTools] = useState(false)
-  const [heroSlideIndex, setHeroSlideIndex] = useState(0)
-  const [heroFading, setHeroFading] = useState(false)
   const [showSOS, setShowSOS] = useState(false)
   const [sosSent, setSosSent] = useState(false)
   const [sosConfirming, setSosConfirming] = useState(false)
@@ -1945,18 +1941,6 @@ export default function Dashboard() {
     window.addEventListener('patientProfileUpdated', onPatientUpdated)
     return () => window.removeEventListener('patientProfileUpdated', onPatientUpdated)
   }, [ownerId])
-
-  useEffect(() => {
-    if (HERO_IMAGES.length <= 1) return
-    const id = setInterval(() => {
-      setHeroFading(true)
-      setTimeout(() => {
-        setHeroSlideIndex(i => (i + 1) % HERO_IMAGES.length)
-        setHeroFading(false)
-      }, 600)
-    }, 7000)
-    return () => clearInterval(id)
-  }, [])
 
   useEffect(() => {
     if (!ownerId) return
@@ -3104,12 +3088,7 @@ export default function Dashboard() {
         {/* ═══ MAIN CONTENT ═══ */}
         <div style={{ padding: '16px 16px 0', display: 'flex', flexDirection: 'column', gap: 24, paddingBottom: 104 }}>
           {(() => {
-            const coverPhoto = patientProfile?.cover_photo_url || null
             const profilePhoto = patientProfile?.photo_url || patientProfile?.foto_url || profile?.photo_url || null
-            const coverPosX = patientProfile?.cover_position_x ?? 50
-            const coverPosY = patientProfile?.cover_position_y ?? 50
-            const defaultHero = HERO_IMAGES[heroSlideIndex]
-            const heroBg = coverPhoto || defaultHero
             const patientName = patientProfile?.nombre_completo || profile?.name || 'Agregar paciente'
             const isCritical     = hasActiveSOS || (_isRetrasado && _retrasadoMins != null && _retrasadoMins >= 720)
             const isPendingToday = !isCritical && (pendingCount > 0 || _isRetrasado)
@@ -3143,106 +3122,94 @@ export default function Dashboard() {
             return (
               <>
                 {/* ══════════════════════════════════════════
-                    HERO — foto paciente se funde con imagen flores
+                    HERO — foto paciente full, degradado natural, datos integrados
                     ══════════════════════════════════════════ */}
-                <div style={{
-                  position: 'relative',
-                  height: 240,
-                  width: '100%',
-                  borderRadius: 24,
-                  overflow: 'hidden',
-                  flexShrink: 0,
-                  background: 'linear-gradient(135deg, #0B4F4A, #143C32)',
-                }}>
-                  {/* 1. Imagen de flores — fondo completo */}
-                  <img
-                    src={HERO_IMAGES[heroSlideIndex]}
-                    alt=""
-                    style={{
-                      position: 'absolute', inset: 0,
-                      width: '100%', height: '100%',
-                      objectFit: 'cover', objectPosition: 'left center',
-                      display: 'block',
-                      opacity: heroFading ? 0 : 1,
-                      transition: 'opacity 0.6s ease',
-                    }}
-                  />
-
-                  {/* 2. Foto del paciente — izquierda, se funde con mask */}
-                  {profilePhoto && (
+                <div
+                  style={{
+                    position: 'relative',
+                    height: 300,
+                    width: '100%',
+                    borderRadius: 24,
+                    overflow: 'hidden',
+                    flexShrink: 0,
+                    background: '#1A3A2A',
+                    cursor: 'pointer',
+                  }}
+                  onClick={() => navigate('/paciente/perfil')}
+                >
+                  {/* 1. Foto del paciente — ocupa TODO el hero */}
+                  {profilePhoto ? (
+                    <img
+                      src={profilePhoto}
+                      alt=""
+                      style={{
+                        position: 'absolute', inset: 0,
+                        width: '100%', height: '100%',
+                        objectFit: 'cover',
+                        objectPosition: 'center top',
+                        display: 'block',
+                      }}
+                    />
+                  ) : (
                     <div style={{
-                      position: 'absolute', top: 0, left: 0, bottom: 0,
-                      width: '60%',
-                      zIndex: 1,
+                      position: 'absolute', inset: 0,
+                      background: 'linear-gradient(135deg, #0B4F4A 0%, #143C32 100%)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 64, color: 'rgba(255,255,255,0.3)', fontWeight: 700, fontFamily: 'Georgia, serif',
                     }}>
-                      <img
-                        src={profilePhoto}
-                        alt=""
-                        style={{
-                          width: '100%', height: '100%',
-                          objectFit: 'cover', objectPosition: 'center top',
-                          display: 'block',
-                          maskImage: 'linear-gradient(to right, black 40%, transparent 100%)',
-                          WebkitMaskImage: 'linear-gradient(to right, black 40%, transparent 100%)',
-                        }}
-                      />
+                      {(patientName.charAt(0) || '?').toUpperCase()}
                     </div>
                   )}
 
-                  {/* 3. Overlay gradiente unificador */}
+                  {/* 2. Degradado suave — de transparente arriba a crema abajo */}
                   <div style={{
-                    position: 'absolute', inset: 0, zIndex: 2,
-                    background: 'linear-gradient(to right, rgba(11,79,74,0.15) 0%, transparent 40%, rgba(248,244,237,0.7) 65%, rgba(248,244,237,0.95) 100%)',
+                    position: 'absolute', inset: 0,
+                    background: 'linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.08) 30%, rgba(20,60,50,0.45) 60%, rgba(20,60,50,0.82) 100%)',
                     pointerEvents: 'none',
                   }} />
 
-                  {/* 4. Glass panel derecho — datos del paciente */}
-                  <div
-                    onClick={() => navigate('/paciente/perfil')}
-                    style={{
-                      position: 'absolute', top: 16, right: 16, bottom: 16,
-                      width: '50%',
-                      background: 'rgba(255,255,255,0.55)',
-                      backdropFilter: 'blur(20px)',
-                      WebkitBackdropFilter: 'blur(20px)',
-                      borderRadius: 20,
-                      border: '1px solid rgba(255,255,255,0.4)',
-                      boxShadow: '0 8px 32px rgba(0,0,0,0.08)',
-                      padding: '14px 14px',
-                      display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
-                      zIndex: 3, cursor: 'pointer', overflow: 'hidden',
-                    }}
-                  >
-                    <div>
-                      <p style={{ margin: '0 0 2px', fontSize: 10, fontWeight: 500, color: '#6D7B74' }}>
-                        {timeGreeting}, {firstName} {timeIcon}
-                      </p>
-                      <p style={{ margin: '0 0 8px', fontSize: 22, fontWeight: 700, color: '#143C32', fontFamily: 'Georgia, serif', lineHeight: 1.1 }}>
-                        {patientName.split(' ')[0]}
-                      </p>
+                  {/* 3. Información directamente encima del degradado */}
+                  <div style={{
+                    position: 'absolute', bottom: 0, left: 0, right: 0,
+                    padding: '0 20px 20px',
+                    zIndex: 2,
+                  }}>
+                    <p style={{ margin: '0 0 4px', fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.7)' }}>
+                      {timeGreeting}, {firstName} {timeIcon}
+                    </p>
+                    <p style={{ margin: '0 0 8px', fontSize: 30, fontWeight: 700, color: 'white', fontFamily: 'Georgia, serif', lineHeight: 1.05, letterSpacing: '-0.02em' }}>
+                      {patientName.split(' ')[0]}
+                    </p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                       <span style={{
                         display: 'inline-flex', alignItems: 'center', gap: 5,
-                        padding: '4px 9px', borderRadius: 999,
-                        background: statusBg, fontSize: 10, fontWeight: 600, color: statusColor,
+                        padding: '4px 10px', borderRadius: 999,
+                        background: statusBg,
+                        fontSize: 11, fontWeight: 600, color: statusColor,
                       }}>
                         <span style={{ width: 6, height: 6, borderRadius: '50%', background: dotColor }} />
                         {statusLabel}
                       </span>
+                      {lastUpdatedAgo && (
+                        <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)' }}>⏱ {lastUpdatedAgo}</span>
+                      )}
                     </div>
-                    <div onClick={e => { e.stopPropagation(); setShowFamilySwitcher(true) }}>
-                      {lastUpdatedAgo && <p style={{ margin: '0 0 5px', fontSize: 9, color: '#6D7B74' }}>⏱ {lastUpdatedAgo}</p>}
-                      <div style={{ display: 'flex', alignItems: 'center', marginBottom: 3 }}>
-                        {familyMembers.slice(0, 3).map((m, i) => {
+                    <div
+                      onClick={e => { e.stopPropagation(); setShowFamilySwitcher(true) }}
+                      style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10 }}
+                    >
+                      <div style={{ display: 'flex' }}>
+                        {familyMembers.slice(0, 4).map((m, i) => {
                           const nm = m.full_name?.trim() || m.email?.split('@')[0] || '?'
-                          const colors = ['#2F6B4F', '#D99A18', '#7A659C']
+                          const colors = ['#2F6B4F', '#D99A18', '#7A659C', '#E58B73']
                           return (
                             <div key={m.id} style={{
-                              width: 22, height: 22, borderRadius: '50%',
-                              background: colors[i % 3],
-                              border: '2px solid rgba(255,255,255,0.8)',
+                              width: 24, height: 24, borderRadius: '50%',
+                              background: colors[i % 4],
+                              border: '2px solid rgba(255,255,255,0.6)',
                               display: 'flex', alignItems: 'center', justifyContent: 'center',
                               fontSize: 9, fontWeight: 700, color: 'white',
-                              marginLeft: i > 0 ? -6 : 0, position: 'relative', zIndex: 10 - i,
+                              marginLeft: i > 0 ? -7 : 0, position: 'relative', zIndex: 10 - i,
                             }}>
                               {nm.charAt(0).toUpperCase()}
                             </div>
@@ -3250,7 +3217,7 @@ export default function Dashboard() {
                         })}
                       </div>
                       {familyMembers.length > 0 && (
-                        <p style={{ margin: 0, fontSize: 10, color: '#6D7B74', fontWeight: 500 }}>
+                        <p style={{ margin: 0, fontSize: 10, color: 'rgba(255,255,255,0.7)', fontWeight: 500 }}>
                           {familyCount} persona{familyCount !== 1 ? 's' : ''} cuidando juntas
                         </p>
                       )}
