@@ -9,7 +9,7 @@ import Layout from '../components/Layout'
 import { SkeletonDashSummary, SkeletonCard } from '../components/SkeletonLoader'
 import SuccessAnimation, { useSuccessAnimation } from '../components/SuccessAnimation'
 import { usePullToRefresh } from '../hooks/usePullToRefresh'
-import { AlertTriangle, CheckIcon, User, XIcon, Pill, ClipboardCheck, Chat, Calendar, Receipt, Users, Camera, Clock, BookOpen } from '../components/Icons'
+import { AlertTriangle, CheckIcon, User, XIcon, Pill, ClipboardCheck, Chat, Calendar, Receipt, Users, Camera, Clock, BookOpen, MessageCircle, Video } from '../components/Icons'
 import { geminiGenerate } from '../lib/gemini'
 import { CARE_ITEMS } from '../lib/careItems'
 import TrialBanner from '../components/TrialBanner'
@@ -3417,24 +3417,32 @@ export default function Dashboard() {
                     ACCIONES RÁPIDAS
                     ════════════════════════════════════ */}
                 <div>
-                  <p style={{ margin: '0 0 12px', fontSize: 11, fontWeight: 700, color: '#9AA89E', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Acciones rápidas</p>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4 }}>
+                  <p style={{ margin: '0 0 12px', fontSize: 14, fontWeight: 600, color: '#143C32' }}>Acciones rápidas</p>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
                     {[
-                      { icon: '💬', label: 'Chat',         onClick: () => navigate('/chat'),           color: '#143C32' },
-                      { icon: '📹', label: 'Videollamada', onClick: () => navigate('/videollamada'),   color: '#143C32' },
-                      { icon: '🚨', label: 'Emergencia',   onClick: prepareSOS,                        color: '#E9826E' },
-                    ].map(({ icon, label, onClick, color }) => (
+                      { Icon: MessageCircle, label: 'Chat',         onClick: () => navigate('/chat'),         circleBg: '#EFF6F0', iconColor: '#143C32' },
+                      { Icon: Video,         label: 'Videollamada', onClick: () => navigate('/videollamada'), circleBg: '#EFF6F0', iconColor: '#143C32' },
+                      { Icon: AlertTriangle, label: 'Emergencia',   onClick: prepareSOS,                      circleBg: '#FEF0ED', iconColor: '#E9826E' },
+                    ].map(({ Icon, label, onClick, circleBg, iconColor }) => (
                       <button
                         key={label} onClick={onClick}
                         style={{
-                          background: 'none', border: 'none',
-                          padding: '10px 4px', cursor: 'pointer',
-                          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+                          background: 'white', border: 'none',
+                          borderRadius: 16, padding: '12px 8px', cursor: 'pointer',
+                          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
+                          boxShadow: '0 4px 12px rgba(20,35,30,0.08)',
                           WebkitTapHighlightColor: 'transparent',
                         }}
                       >
-                        <span style={{ fontSize: 32, lineHeight: 1 }}>{icon}</span>
-                        <span style={{ fontSize: 11, fontWeight: 700, color, lineHeight: 1.2, textAlign: 'center' }}>{label}</span>
+                        <span style={{
+                          width: 44, height: 44, borderRadius: '50%',
+                          background: circleBg,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          flexShrink: 0,
+                        }}>
+                          <Icon size={20} color={iconColor} strokeWidth={1.8} />
+                        </span>
+                        <span style={{ fontSize: 12, fontWeight: 500, color: '#16231F', lineHeight: 1.2, textAlign: 'center' }}>{label}</span>
                       </button>
                     ))}
                   </div>
