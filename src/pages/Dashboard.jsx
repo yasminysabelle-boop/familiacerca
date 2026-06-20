@@ -3164,20 +3164,20 @@ export default function Dashboard() {
                   {/* 2. Degradado suave — de transparente arriba a crema abajo */}
                   <div style={{
                     position: 'absolute', inset: 0,
-                    background: 'linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.08) 30%, rgba(20,60,50,0.45) 60%, rgba(20,60,50,0.82) 100%)',
+                    background: 'linear-gradient(to bottom, rgba(0,0,0,0.02) 0%, transparent 25%, rgba(10,30,25,0.3) 55%, rgba(10,30,25,0.72) 100%)',
                     pointerEvents: 'none',
                   }} />
 
                   {/* 3. Información directamente encima del degradado */}
                   <div style={{
                     position: 'absolute', bottom: 0, left: 0, right: 0,
-                    padding: '0 20px 20px',
+                    padding: '0 20px 24px',
                     zIndex: 2,
                   }}>
                     <p style={{ margin: '0 0 4px', fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.7)' }}>
                       {timeGreeting}, {firstName} {timeIcon}
                     </p>
-                    <p style={{ margin: '0 0 8px', fontSize: 30, fontWeight: 700, color: 'white', fontFamily: 'Georgia, serif', lineHeight: 1.05, letterSpacing: '-0.02em' }}>
+                    <p style={{ margin: '0 0 8px', fontSize: 30, fontWeight: 700, color: 'white', fontFamily: 'Georgia, serif', lineHeight: 1.05, letterSpacing: '-0.02em', textShadow: '0 2px 16px rgba(0,0,0,0.3)' }}>
                       {patientName.split(' ')[0]}
                     </p>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
@@ -3290,8 +3290,14 @@ export default function Dashboard() {
                     <p style={{ color: '#B0A898', fontSize: 13, margin: 0, textAlign: 'center', padding: '8px 0' }}>Cargando...</p>
                   ) : actividadHoy.length === 0 ? (
                     <div style={{ padding: '6px 0 2px' }}>
-                      <p style={{ color: '#B0A898', fontSize: 13, margin: '0 0 4px', fontWeight: 500 }}>Aún no hay actividad hoy</p>
-                      <p style={{ color: '#C5BDB2', fontSize: 12, margin: 0, lineHeight: 1.5 }}>Cuando alguien confirme una dosis, suba una foto o envíe un mensaje, aparecerá aquí.</p>
+                      <p style={{ color: '#B0A898', fontSize: 13, margin: '0 0 4px', fontWeight: 500 }}>
+                        Aún no hay actividad hoy
+                      </p>
+                      <p style={{ color: '#C5BDB2', fontSize: 12, margin: 0, lineHeight: 1.6 }}>
+                        Cuando alguien confirme un medicamento,<br/>
+                        suba una foto o haga una videollamada,<br/>
+                        aparecerá aquí.
+                      </p>
                     </div>
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
