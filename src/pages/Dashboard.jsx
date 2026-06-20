@@ -3103,8 +3103,6 @@ export default function Dashboard() {
           {(() => {
             const heroPhoto = patientProfile?.foto_url || profile?.photo_url || null
             const patientName = patientProfile?.nombre_completo || profile?.name || 'Agregar paciente'
-            const _totalRoutines = 4
-            const _doneRoutines = Math.min(Object.values(careLogsToday).filter(Boolean).length, _totalRoutines)
             const isCritical     = hasActiveSOS || (_isRetrasado && _retrasadoMins != null && _retrasadoMins >= 720)
             const isPendingToday = !isCritical && (pendingCount > 0 || _isRetrasado)
             const statusEmoji = isCritical ? '🔴' : isPendingToday ? '🟡' : '🟢'

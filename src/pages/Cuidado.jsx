@@ -99,10 +99,12 @@ export default function Cuidado() {
   }, [blockedMsg])
 
   async function fetchData() {
+    setCareLogs({})
     setLoading(true)
+    const fetchDate = toLocalDate()
     try {
       const [{ data: careRows }, { data: scheduleRows }] = await Promise.all([
-        supabase.from('daily_care_logs').select('*').eq('user_id', ownerId).eq('log_date', today),
+        supabase.from('daily_care_logs').select('*').eq('user_id', ownerId).eq('log_date', fetchDate),
         supabase.from('care_item_schedules').select('item_key,scheduled_time').eq('user_id', ownerId),
       ])
       const cmap = {}
@@ -123,6 +125,7 @@ export default function Cuidado() {
 
   async function toggleCareItem(item) {
     if (isFamiliar || careToggling) return
+    const today = toLocalDate()
     const existing = careLogs[item.key]
 
     if (!existing) {
