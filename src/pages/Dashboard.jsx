@@ -2687,7 +2687,9 @@ export default function Dashboard() {
       if (upErr) throw upErr
       const { data: { publicUrl } } = supabase.storage.from('patient-photos').getPublicUrl(path)
       await supabase.from('patient_profiles').update({ photo_url: publicUrl }).eq('id', patientId)
-      setPatientProfile(prev => prev ? { ...prev, photo_url: publicUrl } : prev)
+      const bustedUrl = `${publicUrl}?t=${Date.now()}`
+      setPatientProfile(prev => prev ? { ...prev, photo_url: bustedUrl } : prev)
+      window.dispatchEvent(new Event('patientProfileUpdated'))
     } catch (err) {
       console.error('Hero photo upload failed:', err)
     } finally {
@@ -3188,7 +3190,7 @@ export default function Dashboard() {
                   overflow: 'hidden',
                   flexShrink: 0,
                   ...(heroPhoto
-                    ? { backgroundImage: `url(${heroPhoto})`, backgroundSize: 'cover', backgroundPosition: 'center 25%' }
+                    ? { backgroundImage: `url(${heroPhoto})`, backgroundSize: 'cover', backgroundPosition: 'left center' }
                     : { background: 'linear-gradient(135deg, #0B4F4A 0%, #143C32 100%)' }
                   ),
                 }}>
@@ -4026,7 +4028,7 @@ export default function Dashboard() {
               image={heroCropSrc}
               crop={heroCrop}
               zoom={heroZoom}
-              aspect={3 / 2}
+              aspect={9 / 16}
               onCropChange={setHeroCrop}
               onZoomChange={setHeroZoom}
               onCropComplete={onHeroCropComplete}
