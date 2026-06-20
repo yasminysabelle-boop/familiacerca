@@ -2972,14 +2972,14 @@ export default function Dashboard() {
         {/* ═══ HEADER ═══ */}
         <div style={{ background: '#FAF7F1', height: 56, padding: '0 16px', borderBottom: '1px solid rgba(20,60,50,0.06)', display: 'flex', alignItems: 'center' }}>
           {/* Left: Logo */}
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 4 }}>
             <img
               src="/logo-icon.png" alt=""
-              style={{ width: 40, height: 40, objectFit: 'contain', flexShrink: 0 }}
+              style={{ width: 36, height: 36, objectFit: 'contain', flexShrink: 0, display: 'block' }}
               onError={e => { e.currentTarget.style.display = 'none' }}
             />
-            <span style={{ fontFamily: 'Georgia, serif', fontSize: 19, fontWeight: 700, lineHeight: 1 }}>
-              <span style={{ color: '#1E2D26' }}>Familia</span>
+            <span style={{ fontFamily: 'Georgia, serif', fontSize: 16, fontWeight: 700, lineHeight: 1, letterSpacing: '-0.3px' }}>
+              <span style={{ color: '#143C32' }}>Familia</span>
               <span style={{ color: '#E58B73' }}>Cerca</span>
             </span>
           </div>
