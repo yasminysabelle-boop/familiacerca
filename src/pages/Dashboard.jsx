@@ -2973,7 +2973,7 @@ export default function Dashboard() {
         <div style={{ background: '#FAF7F1', height: 56, padding: '0 16px', borderBottom: '1px solid rgba(20,60,50,0.06)', display: 'flex', alignItems: 'center' }}>
           {/* Left: Logo */}
           <img
-            src="/Logo.png"
+            src="/logo.png"
             alt="FamiliaCerca"
             style={{ height: 44, width: 'auto', objectFit: 'contain', flexShrink: 0 }}
           />

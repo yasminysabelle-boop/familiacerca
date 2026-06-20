@@ -138,7 +138,7 @@ export default function Layout({ children }) {
           </div>
         ) : (
           <img
-            src="/Logo.png"
+            src="/logo.png"
             alt="FamiliaCerca"
             style={{ height: 44, width: 'auto', objectFit: 'contain', flexShrink: 0 }}
           />
