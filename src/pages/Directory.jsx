@@ -778,8 +778,8 @@ export default function Directory() {
                           flexShrink: 0,
                         }}
                       >
-                        {patientProfile.foto_url ? (
-                          <img src={patientProfile.foto_url} alt={patientProfile.nombre_completo} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                        {(patientProfile.photo_url || patientProfile.foto_url) ? (
+                          <img src={patientProfile.photo_url || patientProfile.foto_url} alt={patientProfile.nombre_completo} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                         ) : (
                           <span style={{ fontSize: 28, color: 'rgba(255,255,255,0.7)' }}>
                             {patientProfile.nombre_completo?.charAt(0).toUpperCase() ?? '?'}
