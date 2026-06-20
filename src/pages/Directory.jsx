@@ -427,15 +427,22 @@ export default function Directory() {
   }
 
   async function uploadPatientPhoto(file) {
-    if (!file || !patientProfile?.id) return
+    console.log('uploadPatientPhoto called — file:', file, 'size:', file?.size, 'type:', file?.type, 'patientId:', patientProfile?.id)
+    if (!file || !patientProfile?.id) {
+      console.log('uploadPatientPhoto: early return — missing file or patientId')
+      return
+    }
     setPhotoUploading(true)
     try {
       const path = `${patientProfile.id}/photo.jpg`
-      const { error: upErr } = await supabase.storage
+      console.log('uploading to bucket=patient-photos path=', path)
+      const { data: upData, error: upErr } = await supabase.storage
         .from('patient-photos')
         .upload(path, file, { upsert: true, contentType: 'image/jpeg' })
+      console.log('upload result — data:', upData, 'error:', upErr, 'status:', upErr?.status, 'message:', upErr?.message)
       if (upErr) throw upErr
       const { data: { publicUrl } } = supabase.storage.from('patient-photos').getPublicUrl(path)
+      console.log('publicUrl:', publicUrl)
       const { error: updErr } = await supabase
         .from('patient_profiles')
         .update({ photo_url: publicUrl })
@@ -445,7 +452,7 @@ export default function Directory() {
       setPatientProfile(prev => ({ ...prev, photo_url: `${publicUrl}?t=${Date.now()}` }))
       window.dispatchEvent(new CustomEvent('patientProfileUpdated'))
     } catch (e) {
-      console.error('Photo upload failed', e)
+      console.error('Photo upload failed — full error:', e, JSON.stringify(e))
     } finally {
       setPhotoUploading(false)
     }
