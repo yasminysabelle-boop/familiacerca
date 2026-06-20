@@ -265,18 +265,11 @@ export default function Layout({ children }) {
             <span style={{ fontSize: 10, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: location.pathname === '/chat' ? '#3D6B54' : '#9FAF9A' }}>Chat</span>
           </Link>
 
-          {/* Center + */}
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <button onClick={() => setShowQuickActions(true)} style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              width: 52, height: 52, borderRadius: '50%',
-              background: '#0B4F4A', boxShadow: '0 2px 12px rgba(11,79,74,0.35)',
-              marginTop: -20, border: 'none', cursor: 'pointer', flexShrink: 0,
-              WebkitTapHighlightColor: 'transparent',
-            }}>
-              <span style={{ fontSize: 26, color: 'white', lineHeight: 1, fontWeight: 300 }}>+</span>
-            </button>
-          </div>
+          {/* Historial */}
+          <Link to="/historial" style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, textDecoration: 'none' }}>
+            <span style={{ fontSize: 22, lineHeight: 1 }}>📋</span>
+            <span style={{ fontSize: 10, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: location.pathname === '/historial' ? '#3D6B54' : '#9FAF9A' }}>Historial</span>
+          </Link>
 
           {/* Medicamentos */}
           <button onClick={() => navigate('/medications')} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, background: 'none', border: 'none', cursor: 'pointer', padding: 0, WebkitTapHighlightColor: 'transparent' }}>
