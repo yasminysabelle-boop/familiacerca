@@ -752,51 +752,54 @@ export default function Medications() {
     .sort((a, b) => new Date(b.confirmed_at) - new Date(a.confirmed_at))[0] ?? null
 
   // Auto-mark medications past their clinical window as missed.
-  // Auto-mark desactivado: el cuidador debe registrar manualmente
-  // useEffect(() => {
-  //   if (loading || !ownerId || !retrasadosMedIds) return
-  //   const toMark = retrasadosMeds.filter(med => !autoMarkedRef.current.has(med.id))
-  //   if (toMark.length === 0) return
-  //   const todayLocal = getTodayPR()
-  //   for (const med of toMark) {
-  //     autoMarkedRef.current.add(med.id)
-  //     const scheduledTime = firstTimeMed(med)
-  //     let scheduledAt = null
-  //     if (scheduledTime) {
-  //       const [hh, mm] = scheduledTime.split(':').map(Number)
-  //       const d = new Date(); d.setHours(hh, mm, 0, 0); scheduledAt = d.toISOString()
-  //     }
-  //     const existingLogs = logsByMedId[med.id]?.[todayLocal] ?? []
-  //     if (existingLogs.some(l => l.status === 'confirmed' || l.status === 'missed')) continue
-  //     Promise.all([
-  //       supabase.from('medication_omissions').insert({
-  //         medication_id: med.id, owner_id: ownerId, scheduled_at: scheduledAt,
-  //         reason: 'Venció la ventana clínica (automático)',
-  //         omitted_by: user.id,
-  //         omitted_by_name: 'Sistema automático',
-  //       }),
-  //       supabase.from('medication_logs').upsert({
-  //         medication_id: med.id, user_id: ownerId, status: 'missed',
-  //         log_date: todayLocal, confirmed_by_name: 'Sistema automático',
-  //         confirmed_at: new Date().toISOString(), scheduled_at: scheduledAt,
-  //       }, { onConflict: 'medication_id,log_date,user_id', ignoreDuplicates: true }),
-  //     ]).then(() => {
-  //       if (!mountedRef.current) return
-  //       setLogsByMedId(prev => {
-  //         const next = { ...prev }
-  //         if (!next[med.id]) next[med.id] = {}
-  //         if (!next[med.id][todayLocal]) next[med.id][todayLocal] = []
-  //         if (!next[med.id][todayLocal].some(l => l.status === 'missed' || l.status === 'confirmed')) {
-  //           next[med.id][todayLocal].push({
-  //             medication_id: med.id, log_date: todayLocal, status: 'missed',
-  //             confirmed_at: new Date().toISOString(), confirmed_by_name: 'Sistema automático',
-  //           })
-  //         }
-  //         return next
-  //       })
-  //     })
-  //   }
-  // }, [loading, ownerId, retrasadosMedIds])
+  // Dep key is the sorted ID string so the effect fires whenever the SET changes,
+  // even when count stays the same (e.g. med A confirmed → med C enters window).
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (loading || !ownerId || !retrasadosMedIds) return
+    const toMark = retrasadosMeds.filter(med => !autoMarkedRef.current.has(med.id))
+    if (toMark.length === 0) return
+    const todayLocal = getTodayPR()
+    for (const med of toMark) {
+      autoMarkedRef.current.add(med.id)
+      const scheduledTime = firstTimeMed(med)
+      let scheduledAt = null
+      if (scheduledTime) {
+        const [hh, mm] = scheduledTime.split(':').map(Number)
+        const d = new Date(); d.setHours(hh, mm, 0, 0); scheduledAt = d.toISOString()
+      }
+      // Skip if state already has a log for today — avoids duplicate on remount
+      const existingLogs = logsByMedId[med.id]?.[todayLocal] ?? []
+      if (existingLogs.some(l => l.status === 'confirmed' || l.status === 'missed')) continue
+      Promise.all([
+        supabase.from('medication_omissions').insert({
+          medication_id: med.id, owner_id: ownerId, scheduled_at: scheduledAt,
+          reason: 'Venció la ventana clínica (automático)',
+          omitted_by: user.id,         // D3: required field — was missing
+          omitted_by_name: 'Sistema automático',
+        }),
+        supabase.from('medication_logs').upsert({
+          medication_id: med.id, user_id: ownerId, status: 'missed',
+          log_date: todayLocal, confirmed_by_name: 'Sistema automático',
+          confirmed_at: new Date().toISOString(), scheduled_at: scheduledAt,
+        }, { onConflict: 'medication_id,log_date,user_id', ignoreDuplicates: true }),
+      ]).then(() => {
+        if (!mountedRef.current) return  // D2: component unmounted before promise resolved
+        setLogsByMedId(prev => {
+          const next = { ...prev }
+          if (!next[med.id]) next[med.id] = {}
+          if (!next[med.id][todayLocal]) next[med.id][todayLocal] = []
+          if (!next[med.id][todayLocal].some(l => l.status === 'missed' || l.status === 'confirmed')) {
+            next[med.id][todayLocal].push({
+              medication_id: med.id, log_date: todayLocal, status: 'missed',
+              confirmed_at: new Date().toISOString(), confirmed_by_name: 'Sistema automático',
+            })
+          }
+          return next
+        })
+      })
+    }
+  }, [loading, ownerId, retrasadosMedIds])
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
@@ -845,7 +848,7 @@ export default function Medications() {
                 WebkitTapHighlightColor: 'transparent',
               }}
             >
-              {tab === 'hoy' ? '💊 Hoy' : tab === 'todos' ? '💊 Lista' : tab === 'stock' ? '📦 Inventario' : '📄 Recetas'}
+              {tab === 'hoy' ? '💊 Hoy' : tab === 'todos' ? '📋 Historial' : tab === 'stock' ? '📦 Inventario' : '📄 Recetas'}
             </button>
           ))}
         </div>
@@ -1139,12 +1142,11 @@ export default function Medications() {
 
         {activeTab === 'todos' && (
           <div style={{ padding: '0 0 96px' }}>
-            <MedicationListTab
+            <MedicationHistorialTab
               medications={medications}
-              stockByMedId={stockByMedId}
-              isAdmin={isAdmin}
-              onEditMed={openEdit}
-              onDeleteMed={handleDelete}
+              logsByMedId={logsByMedId}
+              omissionsByMedId={omissionsByMedId}
+              loading={loading}
             />
           </div>
         )}

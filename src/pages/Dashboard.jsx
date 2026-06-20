@@ -2661,7 +2661,6 @@ export default function Dashboard() {
       const img = new Image()
       img.onload = () => resolve(img)
       img.onerror = reject
-      img.crossOrigin = 'anonymous'
       img.src = imageSrc
     })
     const canvas = document.createElement('canvas')
@@ -2688,9 +2687,7 @@ export default function Dashboard() {
       if (upErr) throw upErr
       const { data: { publicUrl } } = supabase.storage.from('patient-photos').getPublicUrl(path)
       await supabase.from('patient_profiles').update({ photo_url: publicUrl }).eq('id', patientId)
-      const bustedUrl = `${publicUrl}?t=${Date.now()}`
-      setPatientProfile(prev => prev ? { ...prev, photo_url: bustedUrl } : prev)
-      window.dispatchEvent(new Event('patientProfileUpdated'))
+      setPatientProfile(prev => prev ? { ...prev, photo_url: publicUrl } : prev)
     } catch (err) {
       console.error('Hero photo upload failed:', err)
     } finally {
@@ -3147,10 +3144,7 @@ export default function Dashboard() {
         {/* ═══ MAIN CONTENT ═══ */}
         <div style={{ padding: '16px 16px 0', display: 'flex', flexDirection: 'column', gap: 24, paddingBottom: 104 }}>
           {(() => {
-            const rawHeroPhoto = patientProfile?.photo_url || patientProfile?.foto_url || profile?.photo_url || null
-            const heroPhoto = rawHeroPhoto
-              ? (rawHeroPhoto.includes('?t=') ? rawHeroPhoto : `${rawHeroPhoto}?t=${Date.now()}`)
-              : null
+            const heroPhoto = patientProfile?.photo_url || patientProfile?.foto_url || profile?.photo_url || null
             const patientName = patientProfile?.nombre_completo || profile?.name || 'Agregar paciente'
             const isCritical     = hasActiveSOS || (_isRetrasado && _retrasadoMins != null && _retrasadoMins >= 720)
             const isPendingToday = !isCritical && (pendingCount > 0 || _isRetrasado)
@@ -3194,7 +3188,7 @@ export default function Dashboard() {
                   overflow: 'hidden',
                   flexShrink: 0,
                   ...(heroPhoto
-                    ? { backgroundImage: `url(${heroPhoto})`, backgroundSize: 'cover', backgroundPosition: 'left center' }
+                    ? { backgroundImage: `url(${heroPhoto})`, backgroundSize: 'cover', backgroundPosition: 'center 25%' }
                     : { background: 'linear-gradient(135deg, #0B4F4A 0%, #143C32 100%)' }
                   ),
                 }}>
@@ -3517,10 +3511,10 @@ export default function Dashboard() {
                     { Icon: User,          label: 'Mi cuenta',     onClick: () => navigate('/ajustes'),                circleBg: '#EFF6F0', iconColor: '#143C32' },
                   ]
                   const featuredTools = [
-                    { Icon: Users,         label: 'Equipo',    onClick: () => navigate('/familia'),        circleBg: '#EFF6F0', iconColor: '#143C32' },
-                    { Icon: Building2,     label: 'Hospital',  onClick: () => setShowHospitalModal(true),  circleBg: '#FEF0ED', iconColor: '#E9826E' },
-                    { Icon: Calendar,      label: 'Citas',     onClick: () => navigate('/calendar'),       circleBg: '#FFF8EC', iconColor: '#D99A18' },
-                    { Icon: ClipboardList, label: 'Historial', onClick: () => navigate('/historial'),      circleBg: '#FFF8EC', iconColor: '#D99A18' },
+                    { Icon: Users,    label: 'Equipo',   onClick: () => navigate('/familia'),          circleBg: '#EFF6F0', iconColor: '#143C32' },
+                    { Icon: Building2, label: 'Hospital', onClick: () => setShowHospitalModal(true),   circleBg: '#FEF0ED', iconColor: '#E9826E' },
+                    { Icon: Calendar, label: 'Citas',    onClick: () => navigate('/calendar'),         circleBg: '#FFF8EC', iconColor: '#D99A18' },
+                    { Icon: Image,    label: 'Álbum',    onClick: () => navigate('/album'),            circleBg: '#EFF6F0', iconColor: '#143C32' },
                   ]
                   return (
                     <div>
@@ -4032,30 +4026,11 @@ export default function Dashboard() {
               image={heroCropSrc}
               crop={heroCrop}
               zoom={heroZoom}
-              aspect={9 / 16}
+              aspect={3 / 2}
               onCropChange={setHeroCrop}
               onZoomChange={setHeroZoom}
               onCropComplete={onHeroCropComplete}
             />
-          </div>
-          <div style={{
-            padding: '0 24px 12px',
-            background: 'rgba(0,0,0,0.85)',
-            display: 'flex', alignItems: 'center', gap: 12,
-          }}>
-            <span style={{ fontSize: 16 }}>🔍</span>
-            <input
-              type="range"
-              min={1}
-              max={3}
-              step={0.05}
-              value={heroZoom}
-              onChange={e => setHeroZoom(Number(e.target.value))}
-              style={{ flex: 1, accentColor: '#0B4F4A' }}
-            />
-            <span style={{ fontSize: 12, color: 'white', minWidth: 32 }}>
-              {Math.round(heroZoom * 100)}%
-            </span>
           </div>
           <div style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center',

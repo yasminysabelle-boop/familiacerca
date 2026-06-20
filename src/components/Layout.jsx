@@ -19,7 +19,7 @@ const PAGE_TITLES = {
   '/diario-voz':     'Memorias de voz',
   '/familia':        'Mi Familia',
   '/medications':    'Medicamentos',
-  '/historial':      'Historial clínico',
+  '/historial':      'Registros de cuidado',
   '/diario-medico':  'Notas Médicas IA',
   '/calendar':       'Citas médicas',
   '/notes':          'Notas',
@@ -278,10 +278,10 @@ export default function Layout({ children }) {
             </button>
           </div>
 
-          {/* Medicamentos */}
-          <Link to="/medications" style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, textDecoration: 'none' }}>
-            <span style={{ fontSize: 22, lineHeight: 1 }}>💊</span>
-            <span style={{ fontSize: 10, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: location.pathname === '/medications' ? '#3D6B54' : '#9FAF9A' }}>Medicamentos</span>
+          {/* Notas médicas */}
+          <Link to="/diario-medico" style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2, textDecoration: 'none' }}>
+            <span style={{ fontSize: 22, lineHeight: 1 }}>📓</span>
+            <span style={{ fontSize: 10, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: location.pathname === '/diario-medico' ? '#3D6B54' : '#9FAF9A' }}>Notas</span>
           </Link>
 
           {/* Mi cuenta */}

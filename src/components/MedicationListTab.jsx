@@ -102,7 +102,7 @@ export default function MedicationListTab({
                       backgroundColor: stockDotColor, flexShrink: 0, display: 'inline-block',
                     }} />
                   )}
-                  <span style={{ fontSize: 15, fontWeight: 700, color: '#1A1A1A', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+                  <span style={{ fontSize: 15, fontWeight: 700, color: '#1A1A1A' }}>
                     💊 {med.name}
                   </span>
                 </div>
