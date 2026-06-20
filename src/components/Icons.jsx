@@ -391,3 +391,70 @@ export function MoreVertical({ size, color, strokeWidth }) {
     </Svg>
   )
 }
+
+export function Building2({ size, color, strokeWidth }) {
+  return (
+    <Svg size={size} color={color} strokeWidth={strokeWidth}>
+      <path d="M6 22V4a2 2 0 012-2h8a2 2 0 012 2v18z" />
+      <path d="M6 12H4a2 2 0 00-2 2v6a2 2 0 002 2h2" />
+      <path d="M18 9h2a2 2 0 012 2v9a2 2 0 01-2 2h-2" />
+      <path d="M10 6h4M10 10h4M10 14h4M10 18h4" />
+    </Svg>
+  )
+}
+
+export function Thermometer({ size, color, strokeWidth }) {
+  return (
+    <Svg size={size} color={color} strokeWidth={strokeWidth}>
+      <path d="M14 14.76V3.5a2.5 2.5 0 00-5 0v11.26a4.5 4.5 0 105 0z" />
+    </Svg>
+  )
+}
+
+export function ClipboardList({ size, color, strokeWidth }) {
+  return (
+    <Svg size={size} color={color} strokeWidth={strokeWidth}>
+      <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
+      <rect x="9" y="3" width="6" height="4" rx="2" />
+      <path d="M9 12h6M9 16h4" />
+    </Svg>
+  )
+}
+
+export function CheckSquare({ size, color, strokeWidth }) {
+  return (
+    <Svg size={size} color={color} strokeWidth={strokeWidth}>
+      <polyline points="9 11 12 14 22 4" />
+      <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+    </Svg>
+  )
+}
+
+export function Stethoscope({ size, color, strokeWidth }) {
+  return (
+    <Svg size={size} color={color} strokeWidth={strokeWidth}>
+      <path d="M4.8 2.3A.3.3 0 105 2H4a2 2 0 00-2 2v5a6 6 0 006 6 6 6 0 006-6V4a2 2 0 00-2-2h-1a.2.2 0 10.3.3" />
+      <path d="M8 15v1a6 6 0 006 6v0a6 6 0 006-6v-4" />
+      <circle cx="20" cy="10" r="2" />
+    </Svg>
+  )
+}
+
+export function DollarSign({ size, color, strokeWidth }) {
+  return (
+    <Svg size={size} color={color} strokeWidth={strokeWidth}>
+      <line x1="12" y1="1" x2="12" y2="23" />
+      <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
+    </Svg>
+  )
+}
+
+export function Sparkles({ size, color, strokeWidth }) {
+  return (
+    <Svg size={size} color={color} strokeWidth={strokeWidth}>
+      <path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5z" />
+      <path d="M5 3l.75 2.25L8 6l-2.25.75L5 9l-.75-2.25L2 6l2.25-.75z" />
+      <path d="M19 15l.75 2.25L22 18l-2.25.75L19 21l-.75-2.25L16 18l2.25-.75z" />
+    </Svg>
+  )
+}

@@ -9,7 +9,7 @@ import Layout from '../components/Layout'
 import { SkeletonDashSummary, SkeletonCard } from '../components/SkeletonLoader'
 import SuccessAnimation, { useSuccessAnimation } from '../components/SuccessAnimation'
 import { usePullToRefresh } from '../hooks/usePullToRefresh'
-import { AlertTriangle, CheckIcon, User, XIcon, Pill, ClipboardCheck, Chat, Calendar, Receipt, Users, Camera, Clock, BookOpen, MessageCircle, Video, Hospital, Image } from '../components/Icons'
+import { AlertTriangle, CheckIcon, User, XIcon, Pill, ClipboardCheck, Chat, Calendar, Receipt, Users, Camera, Clock, BookOpen, MessageCircle, Video, Hospital, Image, Building2, Thermometer, ClipboardList, CheckSquare, Stethoscope, DollarSign, Sparkles, Heart } from '../components/Icons'
 import { geminiGenerate } from '../lib/gemini'
 import { CARE_ITEMS } from '../lib/careItems'
 import TrialBanner from '../components/TrialBanner'
@@ -3453,25 +3453,25 @@ export default function Dashboard() {
                     ════════════════════════════════════ */}
                 {(() => {
                   const allTools = [
-                    { emoji: '👥', label: 'Equipo',           onClick: () => navigate('/familia') },
-                    { emoji: '🏥', label: 'Hospital',         onClick: () => setShowHospitalModal(true) },
-                    { emoji: '📅', label: 'Citas',            onClick: () => navigate('/calendar') },
-                    { emoji: '🖼️', label: 'Álbum',           onClick: () => navigate('/album') },
-                    { emoji: '🎥', label: 'Videollamada',     onClick: () => setShowVideoCallModal(true) },
-                    { emoji: '💬', label: 'Chat',             onClick: () => navigate('/chat') },
-                    { emoji: '📋', label: 'Síntomas',         onClick: () => navigate('/registros') },
-                    { emoji: '📊', label: 'Historial',        onClick: () => navigate('/historial') },
-                    { emoji: '✅', label: 'Rutinas',          onClick: () => navigate('/cuidado') },
-                    { emoji: '📝', label: 'Notas médicas',    onClick: () => navigate('/diario-medico') },
-                    { emoji: '📓', label: 'Notas familia',    onClick: () => navigate('/paciente/notas-familia') },
-                    { emoji: '💰', label: 'Gastos',           onClick: () => navigate('/gastos') },
-                    { emoji: '📋', label: 'Directorio',       onClick: () => navigate('/directorio') },
-                    { emoji: '🐾', label: 'Milo & Luna',      onClick: () => setShowCompanion(true) },
-                    { emoji: '👤', label: 'Mi cuenta',        onClick: () => navigate('/ajustes') },
+                    { Icon: Users,         label: 'Equipo',        onClick: () => navigate('/familia'),                circleBg: '#EFF6F0', iconColor: '#143C32' },
+                    { Icon: Building2,     label: 'Hospital',      onClick: () => setShowHospitalModal(true),          circleBg: '#FEF0ED', iconColor: '#E9826E' },
+                    { Icon: Calendar,      label: 'Citas',         onClick: () => navigate('/calendar'),               circleBg: '#FFF8EC', iconColor: '#D99A18' },
+                    { Icon: Image,         label: 'Álbum',         onClick: () => navigate('/album'),                  circleBg: '#FEF0ED', iconColor: '#E9826E' },
+                    { Icon: Video,         label: 'Videollamada',  onClick: () => setShowVideoCallModal(true),         circleBg: '#EFF6F0', iconColor: '#143C32' },
+                    { Icon: MessageCircle, label: 'Chat',          onClick: () => navigate('/chat'),                   circleBg: '#EFF6F0', iconColor: '#143C32' },
+                    { Icon: Thermometer,   label: 'Síntomas',      onClick: () => navigate('/registros'),              circleBg: '#FEF0ED', iconColor: '#E9826E' },
+                    { Icon: ClipboardList, label: 'Historial',     onClick: () => navigate('/historial'),              circleBg: '#EFF6F0', iconColor: '#143C32' },
+                    { Icon: CheckSquare,   label: 'Rutinas',       onClick: () => navigate('/cuidado'),                circleBg: '#FFF8EC', iconColor: '#D99A18' },
+                    { Icon: Stethoscope,   label: 'Notas médicas', onClick: () => navigate('/diario-medico'),          circleBg: '#EFF6F0', iconColor: '#143C32' },
+                    { Icon: Heart,         label: 'Notas familia', onClick: () => navigate('/paciente/notas-familia'), circleBg: '#FEF0ED', iconColor: '#E9826E' },
+                    { Icon: DollarSign,    label: 'Gastos',        onClick: () => navigate('/gastos'),                 circleBg: '#FFF8EC', iconColor: '#D99A18' },
+                    { Icon: BookOpen,      label: 'Directorio',    onClick: () => navigate('/directorio'),             circleBg: '#EFF6F0', iconColor: '#143C32' },
+                    { Icon: Sparkles,      label: 'Milo & Luna',   onClick: () => setShowCompanion(true),              circleBg: '#FEF0ED', iconColor: '#E9826E' },
+                    { Icon: User,          label: 'Mi cuenta',     onClick: () => navigate('/ajustes'),                circleBg: '#EFF6F0', iconColor: '#143C32' },
                   ]
                   const featuredTools = [
                     { Icon: Users,    label: 'Equipo',   onClick: () => navigate('/familia'),          circleBg: '#EFF6F0', iconColor: '#143C32' },
-                    { Icon: Hospital, label: 'Hospital', onClick: () => setShowHospitalModal(true),    circleBg: '#FEF0ED', iconColor: '#E9826E' },
+                    { Icon: Building2, label: 'Hospital', onClick: () => setShowHospitalModal(true),   circleBg: '#FEF0ED', iconColor: '#E9826E' },
                     { Icon: Calendar, label: 'Citas',    onClick: () => navigate('/calendar'),         circleBg: '#FFF8EC', iconColor: '#D99A18' },
                     { Icon: Image,    label: 'Álbum',    onClick: () => navigate('/album'),            circleBg: '#EFF6F0', iconColor: '#143C32' },
                   ]
@@ -3520,10 +3520,28 @@ export default function Dashboard() {
                             <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(20,60,50,0.15)', margin: '0 auto 20px' }} />
                             <p style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 700, color: '#143C32', fontFamily: 'Georgia, serif' }}>Todas las herramientas</p>
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
-                              {allTools.map((c, i) => (
-                                <button key={i} onClick={() => { setShowMoreTools(false); c.onClick() }} style={{ background: 'white', borderRadius: 18, padding: '14px 6px', border: 'none', cursor: 'pointer', width: '100%', minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, WebkitTapHighlightColor: 'transparent', boxSizing: 'border-box', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
-                                  <span style={{ fontSize: 24 }}>{c.emoji}</span>
-                                  <p style={{ margin: 0, fontSize: 9, color: '#143C32', lineHeight: 1.3, textAlign: 'center', fontWeight: 600 }}>{c.label}</p>
+                              {allTools.map(({ Icon, label, onClick, circleBg, iconColor }) => (
+                                <button
+                                  key={label}
+                                  onClick={() => { setShowMoreTools(false); onClick() }}
+                                  style={{
+                                    background: 'white', border: 'none',
+                                    borderRadius: 16, padding: '12px 8px', cursor: 'pointer',
+                                    width: '100%', minWidth: 0, boxSizing: 'border-box',
+                                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
+                                    boxShadow: '0 4px 12px rgba(20,35,30,0.08)',
+                                    WebkitTapHighlightColor: 'transparent',
+                                  }}
+                                >
+                                  <span style={{
+                                    width: 44, height: 44, borderRadius: '50%',
+                                    background: circleBg,
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    flexShrink: 0,
+                                  }}>
+                                    <Icon size={22} color={iconColor} strokeWidth={2} />
+                                  </span>
+                                  <p style={{ margin: 0, fontSize: 12, fontWeight: 500, color: '#16231F', lineHeight: 1.3, textAlign: 'center' }}>{label}</p>
                                 </button>
                               ))}
                             </div>
