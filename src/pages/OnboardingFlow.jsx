@@ -203,28 +203,38 @@ export default function OnboardingFlow() {
   // ── Guardar perfil (Paso 3) ──────────────────────────────────────────
   async function handleSaveProfile() {
     if (!patientName.trim() || !birthDate) return
+    console.log('[ONB-1] inicio submit', { userId: user?.id, patientName, birthDate })
     setSaving(true); setError('')
     try {
       let photoUrl = null
       if (photoFile) {
+        console.log('[ONB-2] antes de subir foto')
         const path = `${user.id}/profile.jpg`
         const { error: upErr } = await supabase.storage.from('care-photos').upload(path, photoFile, { upsert: true })
         if (!upErr) {
           const { data: { publicUrl } } = supabase.storage.from('care-photos').getPublicUrl(path)
           photoUrl = publicUrl
         }
+        console.log('[ONB-3] foto subida', { photoUrl, upErr })
       }
+      console.log('[ONB-4] antes de care_profiles')
       const { error: e1 } = await supabase.from('care_profiles').upsert(
         { user_id: user.id, name: patientName.trim(), photo_url: photoUrl },
         { onConflict: 'user_id' }
       )
+      console.log('[ONB-5] care_profiles respuesta', { e1 })
       if (e1) throw e1
-      await supabase.from('patient_profiles').upsert(
+      console.log('[ONB-6] antes de patient_profiles')
+      const { error: e2 } = await supabase.from('patient_profiles').upsert(
         { owner_id: user.id, nombre_completo: patientName.trim(), fecha_nacimiento: birthDate, ...(photoUrl ? { foto_url: photoUrl } : {}) },
         { onConflict: 'owner_id' }
       )
+      console.log('[ONB-7] patient_profiles respuesta', { e2 })
+      if (e2) throw e2
+      console.log('[ONB-8] avanzando a paso 4')
       setStep(4)
-    } catch {
+    } catch (e) {
+      console.error('[ONB-ERR]', e)
       setError('No se pudo guardar. Intenta de nuevo.')
     } finally {
       setSaving(false)
