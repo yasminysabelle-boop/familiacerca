@@ -296,7 +296,7 @@ export default function Chat() {
       <div style={{
         display: 'flex', flexDirection: 'column',
         height: '100%', overflow: 'hidden',
-        background: '#F7F3ED',
+        background: '#F8F4ED',
       }}>
 
         {/* Barra de mensajes fijados */}
@@ -332,7 +332,7 @@ export default function Chat() {
 
         {/* Category filter bar */}
         <div style={{
-          background: 'white', borderBottom: '1px solid #EDE5D8',
+          background: '#F8F4ED', borderBottom: '1px solid rgba(20,60,50,0.06)',
           padding: '8px 12px', flexShrink: 0,
           display: 'flex', gap: 6, overflowX: 'auto',
           scrollbarWidth: 'none',
@@ -342,9 +342,10 @@ export default function Chat() {
               key={cat.id}
               onClick={() => setActiveCategory(cat.id)}
               style={{
-                padding: '5px 12px', borderRadius: 20, border: 'none',
-                background: activeCategory === cat.id ? cat.color : '#F3F4F6',
-                color: activeCategory === cat.id ? 'white' : '#374151',
+                padding: '5px 12px', borderRadius: 20,
+                border: activeCategory === cat.id ? 'none' : '1.5px solid #EDE5D8',
+                background: activeCategory === cat.id ? '#E9826E' : 'transparent',
+                color: activeCategory === cat.id ? '#143C32' : '#6B7280',
                 fontSize: 12, fontWeight: 600, cursor: 'pointer',
                 flexShrink: 0, whiteSpace: 'nowrap',
                 transition: 'background 0.15s, color 0.15s',
@@ -414,8 +415,8 @@ export default function Chat() {
               }}>
                 <div style={{ flex: 1, height: 1, background: '#EDE5D8' }} />
                 <span style={{
-                  fontSize: 11, fontWeight: 600, color: '#9CA3AF',
-                  background: '#F7F3ED', padding: '0 4px',
+                  fontSize: 11, fontWeight: 600, color: '#6B7280',
+                  background: '#F8F4ED', padding: '0 4px',
                 }}>
                   {date}
                 </span>
@@ -489,14 +490,12 @@ export default function Chat() {
                           borderRadius: mine
                             ? '18px 18px 4px 18px'
                             : '18px 18px 18px 4px',
-                          background: mine
-                            ? 'linear-gradient(135deg, #0d6b63, #3A6347)'
-                            : 'white',
-                          color: mine ? 'white' : '#1A1A1A',
+                          background: mine ? '#143C32' : 'white',
+                          color: mine ? 'white' : '#143C32',
                           fontSize: 14,
                           lineHeight: 1.45,
                           boxShadow: mine
-                            ? '0 2px 8px rgba(13,107,99,0.25)'
+                            ? '0 2px 8px rgba(20,60,50,0.22)'
                             : '0 1px 4px rgba(0,0,0,0.08)',
                           border: mine ? 'none' : '1px solid #EDE5D8',
                           wordBreak: 'break-word',
@@ -541,9 +540,8 @@ export default function Chat() {
 
         {/* Input area */}
         <div style={{
-          padding: '10px 16px 16px',
-          background: 'white',
-          borderTop: '1px solid #EDE5D8',
+          padding: '8px 12px 16px',
+          background: '#F8F4ED',
           flexShrink: 0,
         }}>
           {/* Error / recording status */}
@@ -620,72 +618,82 @@ export default function Chat() {
             </div>
           )}
 
-          {/* Compact category picker */}
-          <div style={{ display: 'flex', gap: 5, marginBottom: 8, overflowX: 'auto', scrollbarWidth: 'none' }}>
-            {CATEGORIES.filter(c => c.id !== 'all').map(cat => (
-              <button
-                key={cat.id}
-                type="button"
-                onClick={() => setMsgCategory(cat.id)}
+          {/* Floating card wrapping picker + form */}
+          <div style={{
+            background: 'white', borderRadius: 20,
+            boxShadow: '0 2px 16px rgba(20,60,50,0.10)',
+            padding: '10px 12px 10px',
+          }}>
+            {/* Compact category picker */}
+            <div style={{ display: 'flex', gap: 5, marginBottom: 8, overflowX: 'auto', scrollbarWidth: 'none' }}>
+              {CATEGORIES.filter(c => c.id !== 'all').map(cat => (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => setMsgCategory(cat.id)}
+                  style={{
+                    padding: '3px 10px', borderRadius: 16,
+                    border: msgCategory === cat.id ? 'none' : '1.5px solid #EDE5D8',
+                    background: msgCategory === cat.id ? '#E9826E' : 'transparent',
+                    color: msgCategory === cat.id ? '#143C32' : '#6B7280',
+                    fontSize: 11, fontWeight: 600, cursor: 'pointer',
+                    flexShrink: 0, whiteSpace: 'nowrap',
+                    transition: 'all 0.15s',
+                  }}
+                >
+                  {cat.emoji} {cat.label}
+                </button>
+              ))}
+            </div>
+
+            <form onSubmit={handleSend} style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
+              <textarea
+                ref={inputRef}
+                value={input}
+                onChange={e => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Escribe un mensaje..."
+                rows={1}
                 style={{
-                  padding: '3px 10px', borderRadius: 16, border: '1.5px solid',
-                  borderColor: msgCategory === cat.id ? cat.color : '#EDE5D8',
-                  background: msgCategory === cat.id ? cat.color : 'transparent',
-                  color: msgCategory === cat.id ? 'white' : '#9CA3AF',
-                  fontSize: 11, fontWeight: 600, cursor: 'pointer',
-                  flexShrink: 0, whiteSpace: 'nowrap',
-                  transition: 'all 0.15s',
+                  flex: 1, padding: '10px 14px',
+                  border: '1.5px solid #EDE5D8', borderRadius: 16,
+                  fontSize: 14, outline: 'none', resize: 'none',
+                  background: 'white', lineHeight: 1.45,
+                  fontFamily: 'inherit',
+                  transition: 'border-color 0.15s',
+                }}
+                onFocus={e => { e.target.style.borderColor = '#143C32' }}
+                onBlur={e => { e.target.style.borderColor = '#EDE5D8' }}
+              />
+              <MicButton recording={recording} onStart={start} onStop={stop} />
+              <button
+                type="button"
+                onClick={() => { setShowAi(v => !v); setAiResponse('') }}
+                style={{
+                  width: 40, height: 40, borderRadius: '50%', border: 'none',
+                  background: showAi ? '#EDE9FE' : 'rgba(20,60,50,0.06)',
+                  cursor: 'pointer', flexShrink: 0,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 18, transition: 'background 0.15s',
+                }}
+                aria-label="Asistente familiar IA"
+              >
+                ✨
+              </button>
+              <LoadingButton
+                type="submit"
+                loading={sending}
+                disabled={!input.trim() || !canEdit}
+                loadingText="..."
+                style={{
+                  padding: '10px 18px', borderRadius: 16, fontSize: 13, flexShrink: 0,
+                  background: '#143C32', boxShadow: sending || !input.trim() ? 'none' : '0 4px 14px rgba(20,60,50,0.25)',
                 }}
               >
-                {cat.emoji} {cat.label}
-              </button>
-            ))}
+                Enviar
+              </LoadingButton>
+            </form>
           </div>
-
-          <form onSubmit={handleSend} style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
-            <textarea
-              ref={inputRef}
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Escribe un mensaje..."
-              rows={1}
-              style={{
-                flex: 1, padding: '10px 14px',
-                border: '1.5px solid #EDE5D8', borderRadius: 20,
-                fontSize: 14, outline: 'none', resize: 'none',
-                background: '#FDFAF7', lineHeight: 1.45,
-                fontFamily: 'inherit',
-                transition: 'border-color 0.15s',
-              }}
-              onFocus={e => { e.target.style.borderColor = '#0d6b63' }}
-              onBlur={e => { e.target.style.borderColor = '#EDE5D8' }}
-            />
-            <MicButton recording={recording} onStart={start} onStop={stop} />
-            <button
-              type="button"
-              onClick={() => { setShowAi(v => !v); setAiResponse('') }}
-              style={{
-                width: 40, height: 40, borderRadius: '50%', border: 'none',
-                background: showAi ? '#EDE9FE' : '#F3F4F6',
-                cursor: 'pointer', flexShrink: 0,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 18, transition: 'background 0.15s',
-              }}
-              aria-label="Asistente familiar IA"
-            >
-              ✨
-            </button>
-            <LoadingButton
-              type="submit"
-              loading={sending}
-              disabled={!input.trim() || !canEdit}
-              loadingText="..."
-              style={{ padding: '10px 18px', borderRadius: 20, fontSize: 13, flexShrink: 0 }}
-            >
-              Enviar
-            </LoadingButton>
-          </form>
         </div>
       </div>
     </Layout>

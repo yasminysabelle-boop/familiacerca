@@ -62,6 +62,7 @@ export default function Layout({ children }) {
   const navBg   = dark ? 'rgba(28,18,8,0.97)' : '#0B4F4A'
   const hdrBg   = dark ? 'rgba(28,18,8,0.95)' : '#0B4F4A'
   const border  = dark ? '#1E3A28' : 'rgba(255,255,255,0.08)'
+  const isLightHeader = location.pathname === '/chat'
 
   const hospitalBarHeight = isHospitalMode ? 40 : 0
 
@@ -97,17 +98,24 @@ export default function Layout({ children }) {
           position: 'fixed', top: hospitalBarHeight, left: 0, right: 0, zIndex: 40,
           height: 'calc(56px + env(safe-area-inset-top))',
           paddingTop: 'env(safe-area-inset-top)',
-          background: hdrBg,
+          background: isLightHeader ? '#FAF7F1' : hdrBg,
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
-          borderBottom: `1px solid ${border}`,
-          boxShadow: '0 1px 12px rgba(0,0,0,0.05)',
+          borderBottom: isLightHeader ? '1px solid rgba(20,60,50,0.08)' : `1px solid ${border}`,
+          boxShadow: isLightHeader ? '0 1px 8px rgba(20,60,50,0.06)' : '0 1px 12px rgba(0,0,0,0.05)',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           padding: '0 16px',
         }}
       >
         {isHome ? (
           <Logo showWordmark size={32} />
+        ) : isLightHeader ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <img src="/logo.png" alt="FamiliaCerca" style={{ height: 28, width: 'auto', objectFit: 'contain', flexShrink: 0 }} />
+            <span style={{ fontSize: 16, fontWeight: 700, color: '#143C32', fontFamily: 'Georgia, serif' }}>
+              {PAGE_TITLES[location.pathname] ?? 'Chat familiar'}
+            </span>
+          </div>
         ) : isSecondary ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
             <button
@@ -151,14 +159,17 @@ export default function Layout({ children }) {
               <img
                 src={userAvatar} alt="Mi cuenta"
                 style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover',
-                  border: '2px solid rgba(255,255,255,0.3)' }}
+                  border: isLightHeader ? '2px solid rgba(20,60,50,0.18)' : '2px solid rgba(255,255,255,0.3)' }}
               />
             ) : (
               <div style={{
                 width: 32, height: 32, borderRadius: '50%',
-                background: 'rgba(255,255,255,0.18)', border: '2px solid rgba(255,255,255,0.25)',
+                background: isLightHeader ? 'rgba(20,60,50,0.08)' : 'rgba(255,255,255,0.18)',
+                border: isLightHeader ? '2px solid rgba(20,60,50,0.15)' : '2px solid rgba(255,255,255,0.25)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 13, fontWeight: 700, color: 'white', fontFamily: 'Inter, system-ui, sans-serif',
+                fontSize: 13, fontWeight: 700,
+                color: isLightHeader ? '#143C32' : 'white',
+                fontFamily: 'Inter, system-ui, sans-serif',
               }}>
                 {userInitial}
               </div>
