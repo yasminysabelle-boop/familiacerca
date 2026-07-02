@@ -78,15 +78,19 @@ function PageSkeleton() {
   )
 }
 
-function ConnectingScreen({ onRetry }) {
+function ConnectingScreen({ onRetry, hasError }) {
   return (
     <div style={{
       minHeight: '100dvh', background: '#F8F4ED',
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12,
     }}>
       <img src="/logo.png" alt="FamiliaCerca" style={{ width: 72, objectFit: 'contain', marginBottom: 4 }} />
-      <p style={{ fontSize: 17, fontWeight: 700, color: '#143C32', margin: 0, fontFamily: 'Georgia, serif' }}>Conectando…</p>
-      <p style={{ fontSize: 13, color: '#9AA89E', margin: 0 }}>Verificando tu cuenta</p>
+      <p style={{ fontSize: 17, fontWeight: 700, color: '#143C32', margin: 0, fontFamily: 'Georgia, serif' }}>
+        {hasError ? 'No pudimos conectar' : 'Conectando…'}
+      </p>
+      <p style={{ fontSize: 13, color: '#9AA89E', margin: 0 }}>
+        {hasError ? 'Verifica tu conexión a internet' : 'Verificando tu cuenta'}
+      </p>
       <button
         onClick={onRetry}
         style={{ marginTop: 8, padding: '10px 24px', borderRadius: 12, border: 'none', background: '#143C32', color: 'white', fontWeight: 600, fontSize: 13, cursor: 'pointer' }}
@@ -99,13 +103,13 @@ function ConnectingScreen({ onRetry }) {
 
 export default function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
-  const { profile, loading: familyLoading, profileResolved, refresh } = useFamily()
+  const { profile, loading: familyLoading, profileResolved, connectError, refresh } = useFamily()
 
   if (loading || (user && familyLoading)) return <PageSkeleton />
   if (!user) return <Navigate to="/login" replace />
 
-  // Timeout fired before DB responded — don't assume "no profile", show retry instead
-  if (!profileResolved) return <ConnectingScreen onRetry={refresh} />
+  // DB hasn't responded yet (or query timed out) — don't assume "no profile"
+  if (!profileResolved) return <ConnectingScreen onRetry={refresh} hasError={connectError} />
 
   const onboardingDone = !!localStorage.getItem('fc_patient_onboarding_done')
     || !!user?.user_metadata?.onboarding_completed

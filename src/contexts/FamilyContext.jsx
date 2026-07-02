@@ -11,6 +11,7 @@ export function FamilyProvider({ children }) {
   const [loading, setLoading] = useState(true)
   const [needsSelector, setNeedsSelector] = useState(false)
   const [profileResolved, setProfileResolved] = useState(false)
+  const [connectError, setConnectError] = useState(false)
   const loadFamiliesRef = useRef(null)
   const fallbackTimerRef = useRef(null)
 
@@ -36,6 +37,9 @@ export function FamilyProvider({ children }) {
   async function loadFamilies() {
     setLoading(true)
     setProfileResolved(false)
+    setConnectError(false)
+    console.log('[CTX-1] loadFamilies inicio', { userId: user?.id })
+
     fallbackTimerRef.current = setTimeout(() => {
       // Timeout — queries haven't responded yet. Set loading=false so the UI
       // unblocks, but profileResolved stays false so ProtectedRoute shows
@@ -48,12 +52,26 @@ export function FamilyProvider({ children }) {
       // profileResolved intentionally NOT set here
     }, 8000)
 
+    let isQueryTimeout = false
     try {
-      const [{ data: ownData }, { data: memberships }, { data: ownPatient }] = await Promise.all([
+      console.log('[CTX-2] antes de queries', { userId: user.id })
+
+      const queryPromise = Promise.all([
         supabase.from('care_profiles').select('*').eq('user_id', user.id).maybeSingle(),
         supabase.from('family_members').select('user_id, role').eq('member_user_id', user.id).neq('user_id', user.id),
         supabase.from('patient_profiles').select('nombre_completo').eq('owner_id', user.id).maybeSingle(),
       ])
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('query-timeout:10000')), 10000)
+      )
+
+      const [ownResult, membershipResult, ownPatientResult] =
+        await Promise.race([queryPromise, timeoutPromise])
+
+      const { data: ownData, error: ownErr } = ownResult
+      const { data: memberships } = membershipResult
+      const { data: ownPatient } = ownPatientResult
+      console.log('[CTX-3] care_profiles respuesta', { ownData, ownErr, memberships })
 
       const built = []
 
@@ -166,15 +184,22 @@ export function FamilyProvider({ children }) {
         setNeedsSelector(built.length > 1)
       }
     } catch (err) {
-      console.error(err)
-      const fallback = [{ ownerId: user.id, patientName: null, patientPhotoUrl: null, role: null, profile: null }]
-      setFamilies(fallback)
-      setActiveOwnerId(user.id)
-      setNeedsSelector(false)
+      if (err.message?.startsWith('query-timeout:')) {
+        isQueryTimeout = true
+        setConnectError(true)
+        console.warn('[CTX-ERR] queries sin respuesta después de 10s — mostrando error en ConnectingScreen')
+      } else {
+        console.error('[CTX-ERR]', err)
+        const fallback = [{ ownerId: user.id, patientName: null, patientPhotoUrl: null, role: null, profile: null }]
+        setFamilies(fallback)
+        setActiveOwnerId(user.id)
+        setNeedsSelector(false)
+      }
     } finally {
       clearTimeout(fallbackTimerRef.current)
       setLoading(false)
-      setProfileResolved(true) // DB responded (with data or error) — now we know definitively
+      console.log('[CTX-4] finally', { isQueryTimeout })
+      if (!isQueryTimeout) setProfileResolved(true)
     }
   }
 
@@ -206,6 +231,7 @@ export function FamilyProvider({ children }) {
       memberRole,
       loading,
       profileResolved,
+      connectError,
       refresh: loadFamilies,
 
       families,
