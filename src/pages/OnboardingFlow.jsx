@@ -313,8 +313,13 @@ export default function OnboardingFlow() {
     try { await navigator.clipboard.writeText(inviteLink); setCopied(true); setTimeout(() => setCopied(false), 2500) } catch { }
   }
 
-  function finish() {
+  async function finish() {
     localStorage.setItem('fc_patient_onboarding_done', '1')
+    try {
+      await supabase.auth.updateUser({ data: { onboarding_completed: true } })
+    } catch (e) {
+      console.warn('[ONB] flag servidor no guardado, se reintentará en próximo login', e)
+    }
     refresh?.()
     window.location.href = '/dashboard'
   }

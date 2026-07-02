@@ -78,14 +78,37 @@ function PageSkeleton() {
   )
 }
 
+function ConnectingScreen({ onRetry }) {
+  return (
+    <div style={{
+      minHeight: '100dvh', background: '#F8F4ED',
+      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12,
+    }}>
+      <img src="/logo.png" alt="FamiliaCerca" style={{ width: 72, objectFit: 'contain', marginBottom: 4 }} />
+      <p style={{ fontSize: 17, fontWeight: 700, color: '#143C32', margin: 0, fontFamily: 'Georgia, serif' }}>Conectando…</p>
+      <p style={{ fontSize: 13, color: '#9AA89E', margin: 0 }}>Verificando tu cuenta</p>
+      <button
+        onClick={onRetry}
+        style={{ marginTop: 8, padding: '10px 24px', borderRadius: 12, border: 'none', background: '#143C32', color: 'white', fontWeight: 600, fontSize: 13, cursor: 'pointer' }}
+      >
+        Reintentar
+      </button>
+    </div>
+  )
+}
+
 export default function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
-  const { profile, loading: familyLoading } = useFamily()
+  const { profile, loading: familyLoading, profileResolved, refresh } = useFamily()
 
   if (loading || (user && familyLoading)) return <PageSkeleton />
   if (!user) return <Navigate to="/login" replace />
 
+  // Timeout fired before DB responded — don't assume "no profile", show retry instead
+  if (!profileResolved) return <ConnectingScreen onRetry={refresh} />
+
   const onboardingDone = !!localStorage.getItem('fc_patient_onboarding_done')
+    || !!user?.user_metadata?.onboarding_completed
   if (!profile && !onboardingDone) return <OnboardingFlow />
 
   return children

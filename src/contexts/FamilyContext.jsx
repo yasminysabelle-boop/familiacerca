@@ -10,6 +10,7 @@ export function FamilyProvider({ children }) {
   const [activeOwnerId, setActiveOwnerId] = useState(null)
   const [loading, setLoading] = useState(true)
   const [needsSelector, setNeedsSelector] = useState(false)
+  const [profileResolved, setProfileResolved] = useState(false)
   const loadFamiliesRef = useRef(null)
   const fallbackTimerRef = useRef(null)
 
@@ -34,12 +35,17 @@ export function FamilyProvider({ children }) {
 
   async function loadFamilies() {
     setLoading(true)
+    setProfileResolved(false)
     fallbackTimerRef.current = setTimeout(() => {
+      // Timeout — queries haven't responded yet. Set loading=false so the UI
+      // unblocks, but profileResolved stays false so ProtectedRoute shows
+      // ConnectingScreen instead of OnboardingFlow.
       const fallback = [{ ownerId: user.id, patientName: null, patientPhotoUrl: null, role: null, profile: null }]
       setFamilies(fallback)
       setActiveOwnerId(user.id)
       setNeedsSelector(false)
       setLoading(false)
+      // profileResolved intentionally NOT set here
     }, 8000)
 
     try {
@@ -168,6 +174,7 @@ export function FamilyProvider({ children }) {
     } finally {
       clearTimeout(fallbackTimerRef.current)
       setLoading(false)
+      setProfileResolved(true) // DB responded (with data or error) — now we know definitively
     }
   }
 
@@ -198,6 +205,7 @@ export function FamilyProvider({ children }) {
       profile,
       memberRole,
       loading,
+      profileResolved,
       refresh: loadFamilies,
 
       families,
