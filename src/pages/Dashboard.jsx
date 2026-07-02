@@ -2975,7 +2975,7 @@ export default function Dashboard() {
           <img
             src="/logo.png"
             alt="FamiliaCerca"
-            style={{ height: 88, width: 'auto', objectFit: 'contain', flexShrink: 0 }}
+            style={{ height: 38, width: 'auto', objectFit: 'contain', flexShrink: 0 }}
           />
           {/* Center: Patient selector */}
           <button
