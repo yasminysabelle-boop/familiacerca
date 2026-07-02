@@ -2610,18 +2610,51 @@ export default function Dashboard() {
   useEffect(() => {
     if (!ownerId) return
     async function checkRenewalAlerts() {
-      const in7 = new Date(); in7.setDate(in7.getDate() + 7)
       const { data: stocks } = await supabase
         .from('medication_stock')
-        .select('medication_id, estimated_end_date, pills_remaining')
+        .select('medication_id, pills_remaining, total_pills, doses_per_day, estimated_end_date')
         .eq('user_id', ownerId)
-        .lte('estimated_end_date', in7.toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' }))
       if (!stocks?.length) { setRenewalAlerts([]); return }
+
       const { data: meds } = await supabase
-        .from('medications').select('id, name, dosage').in('id', stocks.map(s => s.medication_id))
-      setRenewalAlerts((meds ?? []).map(m => ({
-        ...m, stock: stocks.find(s => s.medication_id === m.id),
-      })))
+        .from('medications').select('id, name, dosage')
+        .in('id', stocks.map(s => s.medication_id))
+
+      const sevenAgoKey = (() => {
+        const d = new Date(); d.setDate(d.getDate() - 7)
+        return d.toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' })
+      })()
+      const todayKey = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' })
+
+      const { data: recentLogs } = await supabase
+        .from('medication_logs')
+        .select('medication_id')
+        .eq('user_id', ownerId)
+        .gte('log_date', sevenAgoKey)
+        .eq('status', 'confirmed')
+      const recentLogIds = new Set((recentLogs ?? []).map(l => l.medication_id))
+
+      const SEVERITY = { exhausted: 0, critical: 1, warning: 2, silent: 3 }
+      const alerts = []
+      for (const m of (meds ?? [])) {
+        const stock = stocks.find(s => s.medication_id === m.id)
+        if (!stock) continue
+        const pills = stock.pills_remaining ?? 0
+        const dpd = Math.max(0.5, parseFloat(stock.doses_per_day) || 1)
+        const daysLeft = Math.floor(pills / dpd)
+        const endDatePast = stock.estimated_end_date && stock.estimated_end_date < todayKey
+
+        let kind
+        if (pills === 0)                                       kind = 'exhausted'
+        else if (daysLeft <= 3)                               kind = 'critical'
+        else if (daysLeft <= 7)                               kind = 'warning'
+        else if (endDatePast && !recentLogIds.has(m.id))     kind = 'silent'
+        else                                                   continue
+
+        alerts.push({ ...m, stock, kind, daysLeft, pills })
+      }
+      alerts.sort((a, b) => SEVERITY[a.kind] - SEVERITY[b.kind])
+      setRenewalAlerts(alerts)
     }
     checkRenewalAlerts()
   }, [ownerId])
@@ -3061,20 +3094,34 @@ export default function Dashboard() {
           </div>
         )}
         {renewalAlerts.map(med => {
-          const days = med.stock?.estimated_end_date
-            ? Math.ceil((new Date(med.stock.estimated_end_date + 'T12:00:00') - new Date()) / (1000 * 60 * 60 * 24))
-            : null
-          const urgent = days != null && days <= 3
+          const { kind, daysLeft, pills } = med
+          const medName = med.name?.trim() ?? med.name
+          const patientFirst = (patientProfile?.nombre_completo || activePatientName || 'el paciente').split(' ')[0]
+          const urgent = kind === 'exhausted' || kind === 'critical'
+          const title =
+            kind === 'exhausted' ? `${medName} se agotó` :
+            kind === 'critical'  ? `${medName} por agotarse — quedan ${pills} pastilla${pills === 1 ? '' : 's'} (~${daysLeft} día${daysLeft === 1 ? '' : 's'})` :
+            kind === 'warning'   ? `${medName}: renovar pronto — quedan ${pills} pastillas` :
+            `¿${patientFirst} está tomando ${medName}? No hay registros recientes`
+          const subtitle =
+            kind === 'silent'
+              ? `Fecha estimada vencida · ${pills} pastillas disponibles`
+              : `${pills} pastilla${pills === 1 ? '' : 's'} · toca para renovar`
+          const borderColor = urgent ? '#FCA5A5' : '#FDE68A'
+          const bgColor     = urgent ? '#FEF2F2' : '#FFFBEB'
+          const textColor   = urgent ? '#DC2626' : '#7A5A18'
+          const btnBg       = urgent ? '#DC2626' : '#C9882A'
+          const emoji       = urgent ? '🚨' : kind === 'warning' ? '🔔' : '🟡'
           return (
-            <div key={med.id} style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '12px 16px 0', padding: '12px 14px', borderRadius: 14, border: `1.5px solid ${urgent ? '#FCA5A5' : '#FDE68A'}`, background: urgent ? '#FEF2F2' : '#FFFBEB' }}>
-              <span style={{ fontSize: 20, flexShrink: 0 }}>{urgent ? '🚨' : '🔔'}</span>
+            <div key={med.id} style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '12px 16px 0', padding: '12px 14px', borderRadius: 14, border: `1.5px solid ${borderColor}`, background: bgColor }}>
+              <span style={{ fontSize: 20, flexShrink: 0 }}>{emoji}</span>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ fontSize: 13, fontWeight: 700, color: urgent ? '#DC2626' : '#7A5A18', margin: 0, lineHeight: 1.3 }}>
-                  {days <= 0 ? `${med.name} se agotó` : `${med.name} — ${days === 1 ? 'mañana se acaba' : `${days} días restantes`}`}
-                </p>
-                <p style={{ fontSize: 11, color: '#9CA3AF', margin: '2px 0 0' }}>{med.stock?.pills_remaining} pastillas · toca para renovar</p>
+                <p style={{ fontSize: 13, fontWeight: 700, color: textColor, margin: 0, lineHeight: 1.3 }}>{title}</p>
+                <p style={{ fontSize: 11, color: '#9CA3AF', margin: '2px 0 0' }}>{subtitle}</p>
               </div>
-              <button onClick={() => navigate('/medications')} style={{ padding: '6px 12px', borderRadius: 10, border: 'none', flexShrink: 0, background: urgent ? '#DC2626' : '#C9882A', color: 'white', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>Renovar</button>
+              <button onClick={() => navigate('/medications')} style={{ padding: '6px 12px', borderRadius: 10, border: 'none', flexShrink: 0, background: btnBg, color: 'white', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>
+                {kind === 'silent' ? 'Ver' : 'Renovar'}
+              </button>
             </div>
           )
         })}

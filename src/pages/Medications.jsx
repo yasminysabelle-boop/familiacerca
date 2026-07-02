@@ -647,10 +647,16 @@ export default function Medications() {
     const stock = stockByMedId[med.id]
     if (stock) {
       const qty = Number(med.quantity_per_dose ?? 1)
+      const newRemaining = Math.max(0, stock.pills_remaining - qty)
+      const dpd = Math.max(0.5, parseFloat(stock.doses_per_day) || 1)
+      const daysLeft = Math.floor(newRemaining / dpd)
+      const endDate = daysLeft > 0
+        ? new Date(Date.now() + daysLeft * 86400000).toISOString().split('T')[0]
+        : new Date().toISOString().split('T')[0]
       await supabase.from('medication_stock')
-        .update({ pills_remaining: Math.max(0, stock.pills_remaining - qty), updated_at: new Date().toISOString() })
+        .update({ pills_remaining: newRemaining, estimated_end_date: endDate, updated_at: new Date().toISOString() })
         .eq('medication_id', med.id).eq('user_id', ownerId)
-      setStockByMedId(prev => ({ ...prev, [med.id]: { ...prev[med.id], pills_remaining: Math.max(0, stock.pills_remaining - qty) } }))
+      setStockByMedId(prev => ({ ...prev, [med.id]: { ...prev[med.id], pills_remaining: newRemaining, estimated_end_date: endDate } }))
     }
     setLogsByMedId(prev => {
       const next = { ...prev }
