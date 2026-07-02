@@ -171,53 +171,34 @@ function AppShell() {
 }
 
 function Splash({ fading }) {
-  const { user } = useAuth()
-  const displayName = user?.user_metadata?.full_name ?? 'FamiliaCerca'
   return (
     <div
       style={{
         position: 'fixed', inset: 0, zIndex: 9999,
-        background: 'linear-gradient(160deg, #0d6b63 0%, #2D6A4F 60%, #1A4A32 100%)',
+        background: '#F8F4ED',
         opacity: fading ? 0 : 1,
         transition: 'opacity 0.5s ease-out',
         pointerEvents: fading ? 'none' : 'all',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}
     >
-      {/* Soft glow ring behind logo */}
-      <div style={{
-        position: 'absolute',
-        width: 220, height: 220, borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 70%)',
-      }} />
-
       <div className="animate-splash-in" style={{
         display: 'flex', flexDirection: 'column', alignItems: 'center',
       }}>
-        {/* FC circle logo */}
-        <svg width={88} height={88} viewBox="0 0 40 40" fill="none" aria-hidden="true"
-          style={{ filter: 'drop-shadow(0 8px 24px rgba(0,0,0,0.25))' }}>
-          <circle cx="20" cy="20" r="20" fill="rgba(255,255,255,0.15)" />
-          <circle cx="20" cy="20" r="17.5" fill="white" />
-          <text x="20" y="19.5" textAnchor="middle" dominantBaseline="middle"
-            fill="#0d6b63" fontSize="14" fontWeight="800"
-            fontFamily="Georgia, serif" letterSpacing="-0.5">FC</text>
-          <text x="20" y="31" textAnchor="middle" dominantBaseline="middle"
-            fill="#0d6b63" fillOpacity="0.72" fontSize="10">♥</text>
-        </svg>
+        <img src="/logo.png" alt="FamiliaCerca" style={{ width: 100, height: 100, objectFit: 'contain' }} />
 
         <div className="animate-splash-tag" style={{ textAlign: 'center', marginTop: 22 }}>
           <p style={{
-            color: 'white',
+            color: '#143C32',
             fontFamily: 'Georgia, serif',
             fontSize: 32, fontWeight: 700,
             letterSpacing: '-0.5px', lineHeight: 1,
             margin: 0,
           }}>
-            {displayName}
+            FamiliaCerca
           </p>
           <p style={{
-            color: 'rgba(255,255,255,0.78)',
+            color: '#6B7280',
             fontSize: 16, fontWeight: 400,
             letterSpacing: '0.06em',
             margin: '12px 0 0',
