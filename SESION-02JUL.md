@@ -74,6 +74,29 @@ También se agregó captura de error de `patient_profiles` (`e2`) y `throw e2` �
 
 ---
 
+## Migración visual (pantallas al lenguaje crema del dashboard)
+
+**Tokens de referencia:** crema `#F8F4ED`, primario `#143C32`, secundario `#6B7280`, acento coral `#E9826E`.
+
+| Pantalla | Estado | Commit |
+|----------|--------|--------|
+| Chat (`/chat`) | ✅ Migrado | `ed8e21d` |
+| Hoy / Medicamentos | ⬜ Pendiente | — |
+| Familia | ⬜ Pendiente | — |
+| Historial | ⬜ Pendiente | — |
+| Más opciones | ⬜ Pendiente | — |
+
+**Patrón de header migrado:** `Layout.jsx` usa `isLightHeader` por pathname — expandir la condición al migrar cada pantalla.
+
+### Pendiente de decisión de marca — Panel AI en Chat
+
+El panel del asistente IA (`showAi`) usa paleta purple (`#5B21B6`, `#7C5CBF`, `#C4B5FD`, `#DDD6FE`) que **no existe en la paleta oficial** de FamiliaCerca (verde/coral/crema/gold). Opciones:
+- **Integrar al sistema**: reemplazar purple por coral `#E9826E` o verde `#143C32` con acento dorado
+- **Justificar como excepción**: AI = feature especial → purple como señal visual de "modo IA" (patrón común en producto)
+- **Posponer**: dejarlo igual hasta definir la identidad de la feature AI
+
+---
+
 ## Notas técnicas
 
 - `patient_profiles` **no tiene archivo SQL de migración** — fue creada directamente en el dashboard de Supabase. Sus políticas RLS (INSERT/SELECT/UPDATE) existen en producción pero no están versionadas en `supabase/*.sql`
