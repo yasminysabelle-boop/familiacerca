@@ -28,7 +28,6 @@ export default function WelcomeSlides({ onDone }) {
     const dy = Math.abs(touchStartY.current - e.changedTouches[0].clientY)
     touchStartX.current = null
     touchStartY.current = null
-    // Only respond to predominantly horizontal swipes
     if (dy > Math.abs(dx) || Math.abs(dx) < 40) return
     if (dx > 0) goNext()
     else goPrev()
@@ -37,8 +36,6 @@ export default function WelcomeSlides({ onDone }) {
   function handleRegister() { onDone(); window.location.href = '/register' }
   function handleLogin()    { onDone(); window.location.href = '/login' }
   function handleSkip()     { onDone(); window.location.href = '/login' }
-
-  const isLightSlide = slide === 1
 
   return (
     <div
@@ -63,7 +60,7 @@ export default function WelcomeSlides({ onDone }) {
           display: 'flex', flexDirection: 'column',
           alignItems: 'center', justifyContent: 'center',
         }}>
-          <div style={{ textAlign: 'center', padding: '0 36px' }}>
+          <div style={{ textAlign: 'center', padding: '0 36px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <div style={{ marginBottom: 26 }}>
               <Logo size={84} />
             </div>
@@ -99,25 +96,30 @@ export default function WelcomeSlides({ onDone }) {
         {/* ── Slide 2: Funciones ── */}
         <div style={{
           width: '100vw', height: '100%', flexShrink: 0,
-          background: '#F7F3ED',
+          background: '#F8F4ED',
           display: 'flex', flexDirection: 'column',
           overflow: 'hidden',
         }}>
-          {/* Header */}
+          {/* Membrete superior */}
           <div style={{
-            background: 'linear-gradient(135deg, #0d6b63 0%, #3A6347 100%)',
-            padding: 'calc(env(safe-area-inset-top) + 52px) 28px 32px',
+            paddingTop: 'calc(env(safe-area-inset-top) + 48px)',
+            paddingBottom: 24,
+            paddingLeft: 28, paddingRight: 28,
+            display: 'flex', flexDirection: 'column', alignItems: 'center',
             textAlign: 'center',
             flexShrink: 0,
           }}>
+            <div style={{ marginBottom: 18 }}>
+              <Logo size={40} />
+            </div>
             <p style={{
-              color: 'rgba(255,255,255,0.72)', fontSize: 12, margin: '0 0 8px',
+              color: '#6B7280', fontSize: 11, margin: '0 0 8px',
               letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 700,
             }}>
               Todo en un solo lugar
             </p>
             <h2 style={{
-              color: 'white',
+              color: '#143C32',
               fontFamily: 'Georgia, serif',
               fontSize: 28, fontWeight: 700,
               margin: 0, lineHeight: 1.25,
@@ -129,7 +131,7 @@ export default function WelcomeSlides({ onDone }) {
           {/* Features grid */}
           <div style={{
             flex: 1, overflowY: 'auto',
-            padding: '20px 16px 140px',
+            padding: '4px 16px 140px',
             display: 'grid',
             gridTemplateColumns: '1fr 1fr',
             gap: 10,
@@ -159,36 +161,32 @@ export default function WelcomeSlides({ onDone }) {
         {/* ── Slide 3: CTA ── */}
         <div style={{
           width: '100vw', height: '100%', flexShrink: 0,
-          background: 'linear-gradient(160deg, #0d6b63 0%, #2D6A4F 58%, #1A4A32 100%)',
-          position: 'relative',
+          background: '#F8F4ED',
           display: 'flex', flexDirection: 'column',
           alignItems: 'center', justifyContent: 'center',
           padding: '0 28px',
           textAlign: 'center',
         }}>
-          {/* Glow */}
-          <div style={{
-            position: 'absolute',
-            width: 320, height: 320, borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(255,255,255,0.09) 0%, transparent 70%)',
-            pointerEvents: 'none',
-          }} />
+          <div style={{ width: '100%', maxWidth: 380, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            {/* Membrete */}
+            <div style={{ marginBottom: 28 }}>
+              <Logo size={40} />
+            </div>
 
-          <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: 380 }}>
             {/* Badge */}
             <div style={{
               display: 'inline-flex', alignItems: 'center', gap: 7,
-              background: 'rgba(255,255,255,0.15)',
-              border: '1px solid rgba(255,255,255,0.28)',
+              background: 'white',
+              border: '1.5px solid #EDE5D8',
               borderRadius: 50, padding: '7px 18px',
-              marginBottom: 26,
+              marginBottom: 24,
             }}>
               <span style={{ fontSize: 16 }}>🎁</span>
-              <span style={{ color: 'white', fontSize: 14, fontWeight: 700 }}>14 días gratis</span>
+              <span style={{ color: '#143C32', fontSize: 14, fontWeight: 700 }}>14 días gratis</span>
             </div>
 
             <h2 style={{
-              color: 'white',
+              color: '#143C32',
               fontFamily: 'Georgia, serif',
               fontSize: 36, fontWeight: 700,
               margin: '0 0 14px', lineHeight: 1.15,
@@ -196,9 +194,9 @@ export default function WelcomeSlides({ onDone }) {
               Empieza hoy<br />sin costo
             </h2>
             <p style={{
-              color: 'rgba(255,255,255,0.70)',
+              color: '#6B7280',
               fontSize: 15, lineHeight: 1.65,
-              margin: '0 0 44px',
+              margin: '0 0 40px',
             }}>
               Sin tarjeta de crédito.<br />Sin contratos. Cancela cuando quieras.
             </p>
@@ -209,11 +207,11 @@ export default function WelcomeSlides({ onDone }) {
               style={{
                 width: '100%', padding: '18px',
                 borderRadius: 16,
-                background: 'white',
-                color: '#0d6b63',
+                background: '#143C32',
+                color: 'white',
                 fontSize: 17, fontWeight: 800,
                 border: 'none', cursor: 'pointer',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.22)',
+                boxShadow: '0 4px 20px rgba(20,60,50,0.18)',
                 marginBottom: 14,
                 letterSpacing: '-0.2px',
               }}
@@ -227,9 +225,9 @@ export default function WelcomeSlides({ onDone }) {
               style={{
                 width: '100%', padding: '15px',
                 borderRadius: 16,
-                background: 'rgba(255,255,255,0.11)',
-                border: '1.5px solid rgba(255,255,255,0.22)',
-                color: 'rgba(255,255,255,0.82)',
+                background: 'transparent',
+                border: '1.5px solid #143C32',
+                color: '#143C32',
                 fontSize: 15, fontWeight: 600,
                 cursor: 'pointer',
               }}
@@ -240,7 +238,7 @@ export default function WelcomeSlides({ onDone }) {
         </div>
       </div>
 
-      {/* ── Skip button (hidden on slide 3, which has its own CTAs) ── */}
+      {/* ── Skip button (solo slides 1 y 2) ── */}
       {slide < 2 && (
         <button
           onClick={handleSkip}
@@ -249,24 +247,20 @@ export default function WelcomeSlides({ onDone }) {
             top: 'calc(env(safe-area-inset-top) + 16px)',
             right: 20,
             zIndex: 10,
-            background: 'rgba(255,255,255,0.18)',
-            border: '1px solid rgba(255,255,255,0.28)',
+            background: 'rgba(0,0,0,0.06)',
+            border: '1px solid #EDE5D8',
             borderRadius: 20,
-            color: slide === 1 ? '#6B7280' : 'white',
+            color: '#6B7280',
             fontSize: 13, fontWeight: 600,
             padding: '6px 15px',
             cursor: 'pointer',
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
-            background: slide === 1 ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.18)',
-            border: slide === 1 ? '1px solid #EDE5D8' : '1px solid rgba(255,255,255,0.28)',
           }}
         >
           Omitir
         </button>
       )}
 
-      {/* ── Dots + Siguiente (hidden on slide 3) ── */}
+      {/* ── Dots + Siguiente (oculto en slide 3 que tiene sus propios CTAs) ── */}
       {slide < 2 && (
         <div style={{
           position: 'absolute',
@@ -289,10 +283,8 @@ export default function WelcomeSlides({ onDone }) {
                   borderRadius: 4,
                   padding: 0, border: 'none', cursor: 'pointer',
                   transition: 'all 0.3s',
-                  background: isLightSlide
-                    ? (i === slide ? '#0d6b63' : '#D4B8A8')
-                    : (i === slide ? 'white' : 'rgba(255,255,255,0.38)'),
-                  boxShadow: isLightSlide ? 'none' : '0 1px 4px rgba(0,0,0,0.2)',
+                  background: i === slide ? '#E9826E' : '#D4C9BB',
+                  boxShadow: 'none',
                 }}
               />
             ))}
@@ -305,13 +297,11 @@ export default function WelcomeSlides({ onDone }) {
               pointerEvents: 'auto',
               padding: '15px 48px',
               borderRadius: 50,
-              background: isLightSlide
-                ? 'linear-gradient(135deg, #0d6b63, #3A6347)'
-                : 'white',
-              color: isLightSlide ? 'white' : '#0d6b63',
+              background: '#143C32',
+              color: 'white',
               fontSize: 16, fontWeight: 700,
               border: 'none', cursor: 'pointer',
-              boxShadow: '0 6px 28px rgba(0,0,0,0.18)',
+              boxShadow: '0 4px 20px rgba(20,60,50,0.18)',
               letterSpacing: '-0.2px',
             }}
           >
