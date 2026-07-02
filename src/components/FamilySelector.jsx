@@ -1,6 +1,7 @@
 import { useNavigate, Navigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
+import Logo from './Logo'
 
 export default function FamilySelector() {
   const { user } = useAuth()
@@ -18,16 +19,7 @@ export default function FamilySelector() {
       padding: '60px 20px 40px',
       overflowY: 'auto',
     }}>
-      {/* FC Logo */}
-      <svg width={64} height={64} viewBox="0 0 40 40" fill="none" aria-hidden="true" style={{ flexShrink: 0 }}>
-        <circle cx="20" cy="20" r="20" fill="#0d6b63" />
-        <circle cx="20" cy="20" r="17.5" fill="white" />
-        <text x="20" y="19.5" textAnchor="middle" dominantBaseline="middle"
-          fill="#0d6b63" fontSize="14" fontWeight="800"
-          fontFamily="Georgia, serif" letterSpacing="-0.5">FC</text>
-        <text x="20" y="31" textAnchor="middle" dominantBaseline="middle"
-          fill="#0d6b63" fillOpacity="0.72" fontSize="10">♥</text>
-      </svg>
+      <Logo size={64} />
 
       <p style={{
         fontFamily: "'Cormorant Garamond', Georgia, serif",

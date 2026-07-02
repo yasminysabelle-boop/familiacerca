@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import imgFamilia from '../assets/images/splash-familia.png'
+import Logo from './Logo'
 
 const FEATURES = [
   { icon: '💊', title: 'Medicamentos', desc: 'Control diario de dosis y horarios' },
@@ -59,53 +59,26 @@ export default function WelcomeSlides({ onDone }) {
         {/* ── Slide 1: Bienvenida ── */}
         <div style={{
           width: '100vw', height: '100%', flexShrink: 0,
-          position: 'relative', overflow: 'hidden',
+          background: '#F8F4ED',
           display: 'flex', flexDirection: 'column',
           alignItems: 'center', justifyContent: 'center',
         }}>
-          <img src={imgFamilia} alt="" aria-hidden="true" style={{
-            position: 'absolute', inset: 0,
-            width: '100%', height: '100%',
-            objectFit: 'cover', objectPosition: 'center 20%',
-          }} />
-          {/* Gradient overlay */}
-          <div style={{
-            position: 'absolute', inset: 0,
-            background: 'linear-gradient(to bottom, rgba(20,8,0,0.4) 0%, rgba(20,8,0,0.72) 100%)',
-          }} />
-          {/* Soft glow ring */}
-          <div style={{
-            position: 'absolute',
-            width: 260, height: 260, borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(13,107,99,0.25) 0%, transparent 70%)',
-          }} />
-
-          <div style={{ position: 'relative', zIndex: 1, textAlign: 'center', padding: '0 36px' }}>
-            {/* Logo */}
-            <svg width={84} height={84} viewBox="0 0 40 40" fill="none" aria-hidden="true"
-              style={{ marginBottom: 26, filter: 'drop-shadow(0 6px 20px rgba(0,0,0,0.35))' }}>
-              <circle cx="20" cy="20" r="20" fill="rgba(255,255,255,0.15)" />
-              <circle cx="20" cy="20" r="17.5" fill="white" />
-              <text x="20" y="19.5" textAnchor="middle" dominantBaseline="middle"
-                fill="#0d6b63" fontSize="14" fontWeight="800"
-                fontFamily="Georgia, serif" letterSpacing="-0.5">FC</text>
-              <text x="20" y="31" textAnchor="middle" dominantBaseline="middle"
-                fill="#0d6b63" fillOpacity="0.72" fontSize="10">♥</text>
-            </svg>
-
+          <div style={{ textAlign: 'center', padding: '0 36px' }}>
+            <div style={{ marginBottom: 26 }}>
+              <Logo size={84} />
+            </div>
             <h1 style={{
-              color: 'white',
+              color: '#143C32',
               fontFamily: 'Georgia, serif',
               fontSize: 40, fontWeight: 700,
               margin: '0 0 10px',
               lineHeight: 1.1,
               letterSpacing: '-0.5px',
-              textShadow: '0 2px 16px rgba(0,0,0,0.4)',
             }}>
               FamiliaCerca
             </h1>
             <p style={{
-              color: 'rgba(255,255,255,0.90)',
+              color: '#6B7280',
               fontSize: 21, fontWeight: 500,
               letterSpacing: '0.04em',
               margin: '0 0 18px',
@@ -114,7 +87,7 @@ export default function WelcomeSlides({ onDone }) {
               Cuidado con amor
             </p>
             <p style={{
-              color: 'rgba(255,255,255,0.68)',
+              color: '#9AA89E',
               fontSize: 15, lineHeight: 1.65,
               margin: 0, maxWidth: 290,
             }}>

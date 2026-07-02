@@ -65,16 +65,10 @@ export default function PWAInstallBanner() {
         {/* Logo */}
         <div style={{
           width: 40, height: 40, borderRadius: 10, flexShrink: 0,
-          background: 'rgba(255,255,255,0.15)',
+          background: 'white',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
-          <svg width={24} height={24} viewBox="0 0 40 40" fill="none">
-            <circle cx="20" cy="20" r="18" fill="white" fillOpacity="0.15" />
-            <text x="20" y="19" textAnchor="middle" dominantBaseline="middle"
-              fill="white" fontSize="13" fontWeight="800" fontFamily="Georgia,serif">FC</text>
-            <text x="20" y="30" textAnchor="middle" dominantBaseline="middle"
-              fill="white" fillOpacity="0.75" fontSize="9">♥</text>
-          </svg>
+          <img src="/logo.png" alt="FamiliaCerca" width={28} height={28} style={{ objectFit: 'contain', display: 'block' }} />
         </div>
 
         {/* Text */}
