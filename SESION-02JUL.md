@@ -83,7 +83,7 @@ También se agregó captura de error de `patient_profiles` (`e2`) y `throw e2` �
 | Chat (`/chat`) | ✅ Migrado | `ed8e21d` |
 | Hoy / Medicamentos | ⬜ Pendiente | — |
 | Familia | ⬜ Pendiente | — |
-| Historial | ⬜ Pendiente | — |
+| Historial (`/historial`) | ✅ Migrado | `7d6fb81` |
 | Más opciones | ⬜ Pendiente | — |
 
 **Patrón de header migrado:** `Layout.jsx` usa `isLightHeader` por pathname — expandir la condición al migrar cada pantalla.
