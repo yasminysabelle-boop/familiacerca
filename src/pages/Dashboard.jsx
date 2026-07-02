@@ -9,7 +9,7 @@ import Layout from '../components/Layout'
 import { SkeletonDashSummary, SkeletonCard } from '../components/SkeletonLoader'
 import SuccessAnimation, { useSuccessAnimation } from '../components/SuccessAnimation'
 import { usePullToRefresh } from '../hooks/usePullToRefresh'
-import { AlertTriangle, CheckIcon, User, XIcon, Pill, ClipboardCheck, Chat, Calendar, Receipt, Users, Camera, Clock, BookOpen, MessageCircle, Video, Hospital, Image, Building2, Thermometer, ClipboardList, CheckSquare, Stethoscope, DollarSign, Sparkles, Heart, Phone } from '../components/Icons'
+import { AlertTriangle, CheckIcon, User, XIcon, Pill, ClipboardCheck, Chat, Calendar, Receipt, Users, Camera, Clock, BookOpen, MessageCircle, Video, Hospital, Image, Building2, Thermometer, ClipboardList, CheckSquare, Stethoscope, DollarSign, Sparkles, Heart } from '../components/Icons'
 import { geminiGenerate } from '../lib/gemini'
 import { CARE_ITEMS } from '../lib/careItems'
 import TrialBanner from '../components/TrialBanner'
@@ -3377,9 +3377,8 @@ export default function Dashboard() {
                     ════════════════════════════════════ */}
                 <div>
                   <p style={{ margin: '0 0 12px', fontSize: 14, fontWeight: 600, color: '#143C32' }}>Acciones rápidas</p>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
                     {[
-                      { Icon: Phone,         label: 'Llamar',       onClick: () => navigate('/chat'),         circleBg: '#EFF6F0', iconColor: '#143C32' },
                       { Icon: MessageCircle, label: 'Chat',         onClick: () => navigate('/chat'),         circleBg: '#EFF6F0', iconColor: '#143C32' },
                       { Icon: Video,         label: 'Videollamada', onClick: () => navigate('/videollamada'), circleBg: '#EFF6F0', iconColor: '#143C32' },
                       { Icon: AlertTriangle, label: 'Emergencia',   onClick: prepareSOS,                      circleBg: '#FEF0ED', iconColor: '#E9826E' },
