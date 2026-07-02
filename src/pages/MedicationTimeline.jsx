@@ -108,7 +108,7 @@ function EventMetadata({ type, meta }) {
 
   if (type === 'care_routine' || type === 'care_routine_missed') {
     return (
-      <p style={{ fontSize: 12, color: '#0d6b63', fontWeight: 600, margin: '4px 0 0' }}>
+      <p style={{ fontSize: 12, color: '#143C32', fontWeight: 600, margin: '4px 0 0' }}>
         {careItemIcon(meta.item_key)} {careItemLabel(meta.item_key)}
         {meta.log_date ? <span style={{ color: '#9CA3AF', fontWeight: 400 }}> · {meta.log_date}</span> : null}
       </p>
@@ -138,8 +138,9 @@ function EventMetadata({ type, meta }) {
     const text = meta.doctor_notes ?? meta.content
     return text ? (
       <p style={{
-        fontSize: 12, color: '#374151', margin: '6px 0 0',
-        background: '#F5F3FF', borderRadius: 8, padding: '8px 10px',
+        fontSize: 12, color: '#143C32', margin: '6px 0 0',
+        background: '#F8F4ED', border: '1px solid #EDE5D8',
+        borderRadius: 8, padding: '8px 10px',
         lineHeight: 1.5, fontStyle: 'italic',
       }}>
         "{text}"
@@ -264,14 +265,14 @@ function EventCard({ event, onClick }) {
           }}>
             {cfg.label}
           </span>
-          <span style={{ fontSize: 11, color: '#9CA3AF', marginLeft: 'auto', flexShrink: 0 }}>
+          <span style={{ fontSize: 11, color: '#6B7280', marginLeft: 'auto', flexShrink: 0 }}>
             {time}
           </span>
         </div>
 
         {/* Description */}
         <p style={{
-          fontSize: 14, fontWeight: 600, color: '#1A1A1A',
+          fontSize: 14, fontWeight: 600, color: '#143C32',
           margin: 0, lineHeight: 1.3,
           overflow: 'hidden', textOverflow: 'ellipsis',
           display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
@@ -283,7 +284,7 @@ function EventCard({ event, onClick }) {
 
         {/* Actor */}
         {event.actor_name && (
-          <p style={{ fontSize: 11, color: '#9CA3AF', margin: '3px 0 0' }}>
+          <p style={{ fontSize: 11, color: '#6B7280', margin: '3px 0 0' }}>
             por {event.actor_name.split(' ')[0]}
           </p>
         )}
@@ -403,13 +404,13 @@ export default function MedicationTimeline() {
               style={{
                 flexShrink: 0,
                 padding: '7px 14px',
-                borderRadius: 20, border: 'none',
+                borderRadius: 20,
+                border: filterType === opt.id ? 'none' : '1.5px solid #EDE5D8',
                 fontSize: 12, fontWeight: 700,
                 cursor: 'pointer',
                 transition: 'all 0.15s',
-                background: filterType === opt.id ? '#0B4F4A' : '#F3F4F6',
-                color: filterType === opt.id ? 'white' : '#6B7280',
-                boxShadow: filterType === opt.id ? '0 2px 8px rgba(11,79,74,0.25)' : 'none',
+                background: filterType === opt.id ? '#E9826E' : 'transparent',
+                color: filterType === opt.id ? '#143C32' : '#6B7280',
               }}
             >
               {opt.icon} {opt.label}
@@ -425,13 +426,13 @@ export default function MedicationTimeline() {
               onClick={() => setPeriod(opt.id)}
               style={{
                 flex: 1, padding: '9px 0',
-                borderRadius: 20, border: 'none',
+                borderRadius: 20,
+                border: period === opt.id ? 'none' : '1.5px solid #EDE5D8',
                 fontSize: 12, fontWeight: 700,
                 cursor: 'pointer',
                 transition: 'all 0.15s',
-                background: period === opt.id ? '#0B4F4A' : '#F3F4F6',
-                color: period === opt.id ? 'white' : '#6B7280',
-                boxShadow: period === opt.id ? '0 2px 8px rgba(11,79,74,0.25)' : 'none',
+                background: period === opt.id ? '#E9826E' : 'transparent',
+                color: period === opt.id ? '#143C32' : '#6B7280',
               }}
             >
               {opt.label}
@@ -450,7 +451,7 @@ export default function MedicationTimeline() {
               style={{
                 width: '100%', padding: '10px 14px',
                 borderRadius: 12, border: '1.5px solid #EDE5D8',
-                fontSize: 14, fontWeight: 600, color: customDate ? '#1E2D26' : '#9CA3AF',
+                fontSize: 14, fontWeight: 600, color: customDate ? '#143C32' : '#9CA3AF',
                 background: 'white', boxSizing: 'border-box',
                 fontFamily: 'inherit', outline: 'none',
               }}
@@ -489,7 +490,7 @@ export default function MedicationTimeline() {
               onClick={fetchLog}
               style={{
                 padding: '10px 24px', borderRadius: 12, border: 'none',
-                background: '#0d6b63', color: 'white', fontWeight: 700,
+                background: '#143C32', color: 'white', fontWeight: 700,
                 fontSize: 13, cursor: 'pointer',
               }}
             >
@@ -519,7 +520,7 @@ export default function MedicationTimeline() {
               return (
                 <div key={dateKey} style={{
                   background: 'white', borderRadius: 16,
-                  border: `1px solid ${isToday ? '#C8DFC8' : '#EDE5D8'}`,
+                  border: `1px solid ${isToday ? 'rgba(20,60,50,0.15)' : '#EDE5D8'}`,
                   overflow: 'hidden',
                   boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
                 }}>
@@ -529,34 +530,34 @@ export default function MedicationTimeline() {
                     style={{
                       width: '100%', display: 'flex', alignItems: 'center', gap: 10,
                       padding: '12px 16px',
-                      background: isToday ? '#F0FDF4' : '#FDFAF7',
+                      background: isToday ? '#F0F7F4' : '#F8F4ED',
                       border: 'none', cursor: 'pointer',
-                      borderBottom: isExpanded ? `1px solid ${isToday ? '#C8DFC8' : '#EDE5D8'}` : 'none',
+                      borderBottom: isExpanded ? `1px solid ${isToday ? 'rgba(20,60,50,0.10)' : '#EDE5D8'}` : 'none',
                       WebkitTapHighlightColor: 'transparent',
                     }}
                   >
                     <div style={{ flex: 1, textAlign: 'left' }}>
                       <p style={{
                         fontSize: 13, fontWeight: 700,
-                        color: isToday ? '#0B4F4A' : '#374151',
+                        color: '#143C32',
                         margin: 0,
                       }}>
                         {dayLabel(dateKey)}
                         {isToday && (
-                          <span style={{ marginLeft: 7, fontSize: 10, fontWeight: 700, color: '#0d6b63', background: '#C6EDD0', padding: '2px 7px', borderRadius: 6 }}>
+                          <span style={{ marginLeft: 7, fontSize: 10, fontWeight: 700, color: '#143C32', background: 'rgba(20,60,50,0.10)', padding: '2px 7px', borderRadius: 6 }}>
                             Hoy
                           </span>
                         )}
                       </p>
                     </div>
                     <span style={{
-                      fontSize: 10, fontWeight: 700, color: '#9CA3AF',
-                      background: '#F3F4F6', padding: '2px 8px', borderRadius: 10, flexShrink: 0,
+                      fontSize: 10, fontWeight: 700, color: '#6B7280',
+                      background: '#F0EDE6', padding: '2px 8px', borderRadius: 10, flexShrink: 0,
                     }}>
                       {dayEvents.length} evento{dayEvents.length !== 1 ? 's' : ''}
                     </span>
                     <span style={{
-                      fontSize: 16, color: '#9CA3AF', flexShrink: 0,
+                      fontSize: 16, color: '#6B7280', flexShrink: 0,
                       transform: isExpanded ? 'rotate(90deg)' : 'none',
                       transition: 'transform 0.22s ease',
                       display: 'inline-block',
