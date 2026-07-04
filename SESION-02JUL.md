@@ -1,3 +1,35 @@
+# Sesión 4 julio 2026 — Splash, arquitectura, naming, landing y detección de instalación
+
+## Commits de esta sesión (sin pushear — pendientes de confirmación)
+
+| Commit | Descripción |
+|--------|-------------|
+| `ed36333` | feat: splash y apertura crema — manifest, theme-color y animación premium |
+| `6c2fe46` | docs: arquitectura conceptual del producto en CLAUDE.md |
+| `e37dcf0` | feat: renombrar /cuidado a "Rutina diaria" en textos visibles |
+| `1c31ed1` | feat: unificar colores de la Landing con los tokens oficiales |
+| `5c19001` | fix: detectar app instalada con getInstalledRelatedApps y appinstalled |
+
+(Además, en esta misma sesión pero ya pusheados antes de esta tanda: `43d1212` refinamiento visual del dashboard, `246267f` estado global del día.)
+
+## Qué se hizo
+
+**Splash (`ed36333`):** `manifest.json` y `theme-color` de `#ffffff` → `#F8F4ED`; `body` de `index.css` también a crema (evita flash blanco antes de que React monte). Animación del logo: fade+scale 0.85→1 (600ms ease-out) + latido único (scale 1→1.04→1, ease-in-out) + texto escalonado a 150ms, todo en un solo `@keyframes` usando `animation-timing-function` por punto. Respeta `prefers-reduced-motion`. Transición splash→destino verificada como cross-fade real (ya funcionaba), sin cambios.
+
+**Arquitectura conceptual (`6c2fe46`):** nueva sección en CLAUDE.md con las 4 capas del producto (Home/Cuidado/Registro/Hospital) y el principio "la app organiza el cuidado de una persona, no medicamentos".
+
+**Naming (`e37dcf0`):** `/cuidado` ahora se llama "Rutina diaria" en el header (`PAGE_TITLES`, antes vacío por falta de entrada) y en el label del ícono en "Más herramientas". Se dejaron sin tocar a propósito: "Registrar rutina" (acción rápida, es un verbo) y `CareDaySection title="Cuidado"` en Dashboard.jsx:1697 (sección genérica no relacionada con el módulo /cuidado — habría sido un naming cruzado).
+
+**Landing (`1c31ed1`):** unificados ~30 colores distintos a los tokens oficiales (verde `#143C32`, coral `#E9826E`, crema `#F8F4ED`, texto `#6B7280`). Resoluciones aplicadas: `MINT_C`→`#EBF3EE` con texto/checkmarks en la misma familia clara (se verificó contraste real sobre fondos oscuros, no simplemente `#143C32`), `SAND`→snap exacto a `#EDE5D8`, gradiente de círculos numerados mantenido pero derivado del verde oficial (`#143C32 → #1E5245`). Excluidos intencionalmente: mockup de comparación WhatsApp (colores de marca reales, ya comentado en el código) y mockup decorativo de teléfono (hardware genérico, no UI real).
+
+**Detección de instalación (`5c19001`):** nuevo `src/lib/pwaInstall.js` compartido con `getInstalledRelatedApps()` + listener `appinstalled` + flag persistido en `localStorage`. Aplicado a los 3 mecanismos existentes (`usePWAInstall.js`, `useInstallPrompt.js`, `InstallBanner.jsx`); `PWAInstallBanner.jsx` hereda el fix sin cambios propios porque ya consume `usePWAInstall()`.
+
+## Pendiente
+- [ ] Push de cierre de estos 5 commits (esperando confirmación en el cel)
+- [ ] Revisar visualmente la Landing tras el cambio de colores (flattening de verdes: PRIMARY/ACTION/DARK ahora son el mismo `#143C32` — antes tenían 3 tonos distintos para dar profundidad entre secciones)
+
+---
+
 # Sesión 2 julio 2026 — Resumen de cambios y pendientes
 
 ## Commits de esta sesión
