@@ -62,7 +62,7 @@ export default function Layout({ children }) {
   const navBg   = dark ? 'rgba(28,18,8,0.97)' : '#0B4F4A'
   const hdrBg   = dark ? 'rgba(28,18,8,0.95)' : '#0B4F4A'
   const border  = dark ? '#1E3A28' : 'rgba(255,255,255,0.08)'
-  const isLightHeader = location.pathname === '/chat' || location.pathname === '/historial'
+  const isLightHeader = location.pathname === '/chat' || location.pathname === '/historial' || location.pathname === '/videollamada'
 
   const hospitalBarHeight = isHospitalMode ? 40 : 0
 
@@ -182,9 +182,9 @@ export default function Layout({ children }) {
       <main style={{
         position: 'fixed', inset: 0, overflowY: 'auto',
         background: bg,
-        top:           isVideoCall ? 0 : isHome ? `calc(${hospitalBarHeight}px + env(safe-area-inset-top))` : `calc(${hospitalBarHeight}px + 56px + env(safe-area-inset-top))`,
-        bottom:        isVideoCall ? 0 : (isSecondary || isHospitalMode) ? 'env(safe-area-inset-bottom)' : 'calc(64px + env(safe-area-inset-bottom))',
-        paddingBottom: isVideoCall ? 0 : 80,
+        top:           isHome ? `calc(${hospitalBarHeight}px + env(safe-area-inset-top))` : `calc(${hospitalBarHeight}px + 56px + env(safe-area-inset-top))`,
+        bottom:        (isSecondary || isHospitalMode || isVideoCall) ? 'env(safe-area-inset-bottom)' : 'calc(64px + env(safe-area-inset-bottom))',
+        paddingBottom: 80,
       }}>
         <InstallBanner />
         <OfflineBanner />
