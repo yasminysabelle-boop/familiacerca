@@ -275,8 +275,10 @@ export default function Landing() {
       {/* ─────────────── 1. NAV ─────────────── */}
       <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: '#143C32', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(248,244,237,0.10)' }}>
         <div style={{ maxWidth: 1140, margin: '0 auto', padding: '20px 2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display:'flex', alignItems:'center', gap:'0px' }}>
-            <img src="/logo-icon.png" alt="FamiliaCerca" style={{ height:'110px', width:'auto', objectFit:'contain', display:'block', marginRight:'-32px' }} />
+          <div style={{ display:'flex', alignItems:'center', gap:'12px' }}>
+            <div style={{ width: 56, height: 56, borderRadius: '50%', background: '#F8F4ED', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <img src="/logo.png" alt="FamiliaCerca" style={{ width: 40, height: 40, objectFit: 'contain', display: 'block' }} />
+            </div>
             <span style={{ fontFamily:'Georgia,serif', fontWeight:700, margin:0, padding:0 }}>
               <span style={{ color:'#F8F4ED', fontSize:'26px' }}>Familia</span>
               <span style={{ color:'#E9826E', fontSize:'26px' }}>Cerca</span>
@@ -1004,9 +1006,11 @@ export default function Landing() {
         <div style={{ maxWidth: 1140, margin: '0 auto' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 48, marginBottom: 52 }}>
             <div style={{ flex: '0 0 auto', maxWidth: 280 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 0, marginBottom: 16, padding: '4px 0' }}>
-                <img src="/logo-icon.png" alt="FamiliaCerca" style={{ height: '110px', width: 'auto', display: 'block' }} />
-                <span style={{ fontFamily: SERIF, fontWeight: 700, margin: 0, padding: 0, marginLeft: '-12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, padding: '4px 0' }}>
+                <div style={{ width: 56, height: 56, borderRadius: '50%', background: '#F8F4ED', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <img src="/logo.png" alt="FamiliaCerca" style={{ width: 40, height: 40, objectFit: 'contain', display: 'block' }} />
+                </div>
+                <span style={{ fontFamily: SERIF, fontWeight: 700, margin: 0, padding: 0 }}>
                   <span style={{ color: '#F8F4ED', fontSize: 26 }}>Familia</span>
                   <span style={{ color: '#E9826E', fontSize: 26 }}>Cerca</span>
                 </span>

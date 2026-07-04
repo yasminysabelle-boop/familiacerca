@@ -142,7 +142,7 @@ export default function InstallBanner() {
         >
           {/* Header */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 22 }}>
-            <img src="/icon-72.png" alt="FamiliaCerca"
+            <img src="/icon-192.png" alt="FamiliaCerca"
               style={{ width: 44, height: 44, borderRadius: 12, flexShrink: 0 }} />
             <div style={{ flex: 1 }}>
               <p style={{
@@ -227,7 +227,7 @@ export default function InstallBanner() {
       display: 'flex', alignItems: 'center', gap: 12,
       boxShadow: '0 -4px 24px rgba(0,0,0,0.2)',
     }}>
-      <img src="/icon-72.png" alt="" width={40} height={40}
+      <img src="/icon-192.png" alt="" width={40} height={40}
         style={{ borderRadius: 10, flexShrink: 0 }} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <p style={{ fontSize: 13, fontWeight: 700, color: 'white', margin: '0 0 2px' }}>

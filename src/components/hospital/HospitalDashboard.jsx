@@ -41,7 +41,7 @@ export default function HospitalDashboard({ onManageMode, onSOS, onVideoCall }) 
       {/* Logo header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, paddingBottom: 2 }}>
         <img
-          src="/logo-icon.png"
+          src="/logo.png"
           alt=""
           style={{ width: 40, height: 40, objectFit: 'contain', flexShrink: 0 }}
           onError={e => { e.currentTarget.style.display = 'none' }}

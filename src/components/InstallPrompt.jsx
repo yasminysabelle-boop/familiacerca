@@ -17,7 +17,7 @@ export default function InstallPrompt() {
       }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <img src="/icon-72.png" alt="" width={40} height={40} style={{ borderRadius: 10, flexShrink: 0 }} />
+            <img src="/icon-192.png" alt="" width={40} height={40} style={{ borderRadius: 10, flexShrink: 0 }} />
             <div>
               <p style={{ fontSize: 14, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>Instalar FamiliaCerca</p>
               <p style={{ fontSize: 12, color: '#6B7280', margin: '2px 0 0' }}>Accede sin internet · Notificaciones</p>
@@ -53,7 +53,7 @@ export default function InstallPrompt() {
       padding: '14px 16px',
       display: 'flex', alignItems: 'center', gap: 12,
     }}>
-      <img src="/icon-72.png" alt="" width={44} height={44} style={{ borderRadius: 12, flexShrink: 0 }} />
+      <img src="/icon-192.png" alt="" width={44} height={44} style={{ borderRadius: 12, flexShrink: 0 }} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <p style={{ fontSize: 14, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>Instalar FamiliaCerca</p>
         <p style={{ fontSize: 12, color: '#6B7280', margin: '2px 0 0' }}>Acceso rápido · Funciona sin internet</p>
