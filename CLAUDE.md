@@ -48,6 +48,7 @@ Si algo de esto se rompió → corregir antes de entregar.
 - Fondo: crema #F8F4ED · Header claro vía isLightHeader en Layout.jsx
 - Cards: blanco, borderRadius 16-20px, sombra suave
 - Acentos: coral #E9826E (activos/CTAs), verde #143C32 (primarios)
+- GOLD (acento terciario, uso limitado): #D99A18 — solo para warnings suaves y categorización de íconos; nunca para CTAs ni superficies
 - Textos: #143C32 títulos, #6B7280 secundarios
 - Chips: activo coral con texto #143C32, inactivo transparente borde #EDE5D8
 - Colores semánticos (danger/estados de dosis) NO se tocan: son información

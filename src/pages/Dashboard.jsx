@@ -2994,7 +2994,7 @@ export default function Dashboard() {
         onTouchStart={pullStart}
         onTouchMove={pullMove}
         onTouchEnd={pullEnd}
-        style={{ background: '#FAF7F1', minHeight: '100svh', paddingBottom: 80, overflowY: 'auto', width: '100%', maxWidth: '100%', overflowX: 'hidden', boxSizing: 'border-box', margin: '0 auto' }}
+        style={{ background: '#F8F4ED', minHeight: '100svh', paddingBottom: 80, overflowY: 'auto', width: '100%', maxWidth: '100%', overflowX: 'hidden', boxSizing: 'border-box', margin: '0 auto' }}
       >
         <PullIndicator />
         <style>{`
@@ -3003,7 +3003,7 @@ export default function Dashboard() {
         `}</style>
 
         {/* ═══ HEADER ═══ */}
-        <div style={{ background: '#FAF7F1', height: 56, padding: '0 16px', borderBottom: '1px solid rgba(20,60,50,0.06)', display: 'flex', alignItems: 'center' }}>
+        <div style={{ background: '#F8F4ED', height: 56, padding: '0 16px', borderBottom: '1px solid rgba(20,60,50,0.06)', display: 'flex', alignItems: 'center' }}>
           {/* Left: Logo */}
           <img
             src="/logo.png"
@@ -3070,10 +3070,10 @@ export default function Dashboard() {
           </div>
         )}
         {permission !== 'granted' && !notifDismissed && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '12px 16px 0', padding: '10px 14px', background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 14 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '12px 16px 0', padding: '10px 14px', background: 'white', border: '1px solid #EDE5D8', borderRadius: 16, boxShadow: '0 2px 8px rgba(20,35,30,0.05)' }}>
             <span style={{ fontSize: 17, flexShrink: 0 }}>🔔</span>
-            <p style={{ flex: 1, fontSize: 13, color: '#1E40AF', margin: 0, fontWeight: 500, lineHeight: 1.3 }}>Activa las notificaciones para estar al tanto</p>
-            <button onClick={requestAndSubscribe} style={{ padding: '6px 13px', borderRadius: 9, background: '#1D4ED8', color: 'white', fontSize: 12, fontWeight: 700, border: 'none', cursor: 'pointer', flexShrink: 0 }}>Activar</button>
+            <p style={{ flex: 1, fontSize: 13, color: '#143C32', margin: 0, fontWeight: 500, lineHeight: 1.3 }}>Activa las notificaciones para estar al tanto</p>
+            <button onClick={requestAndSubscribe} style={{ padding: '6px 13px', borderRadius: 9, background: '#E9826E', color: 'white', fontSize: 12, fontWeight: 700, border: 'none', cursor: 'pointer', flexShrink: 0 }}>Activar</button>
             <button onClick={dismissNotifBanner} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, flexShrink: 0, display: 'flex' }} aria-label="Cerrar">
               <XIcon size={14} color="#9CA3AF" strokeWidth={2} />
             </button>
@@ -3113,7 +3113,7 @@ export default function Dashboard() {
           const btnBg       = urgent ? '#DC2626' : '#C9882A'
           const emoji       = urgent ? '🚨' : kind === 'warning' ? '🔔' : '🟡'
           return (
-            <div key={med.id} style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '12px 16px 0', padding: '12px 14px', borderRadius: 14, border: `1.5px solid ${borderColor}`, background: bgColor }}>
+            <div key={med.id} style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '12px 16px 0', padding: '12px 14px', borderRadius: 16, border: `1.5px solid ${borderColor}`, background: bgColor, boxShadow: '0 2px 8px rgba(20,35,30,0.05)' }}>
               <span style={{ fontSize: 20, flexShrink: 0 }}>{emoji}</span>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <p style={{ fontSize: 13, fontWeight: 700, color: textColor, margin: 0, lineHeight: 1.3 }}>{title}</p>
@@ -3309,6 +3309,7 @@ export default function Dashboard() {
                         display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 2,
                         WebkitTapHighlightColor: 'transparent',
                         textAlign: 'left', minWidth: 0,
+                        boxShadow: '0 4px 12px rgba(20,35,30,0.08)',
                       }}
                     >
                       <span style={{ fontSize: 18 }}>{emoji}</span>
@@ -3322,7 +3323,7 @@ export default function Dashboard() {
                 {/* ════════════════════════════════════
                     ACTIVIDAD DE HOY
                     ════════════════════════════════════ */}
-                <div style={{ borderRadius: 28, background: 'white', padding: 20, boxShadow: '0 12px 34px rgba(20,35,30,0.07)' }}>
+                <div style={{ borderRadius: 20, background: 'white', padding: 20, boxShadow: '0 12px 34px rgba(20,35,30,0.07)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
                     <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: '#9AA89E', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Actividad de hoy</p>
                     <button onClick={() => navigate('/historial')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: '#E9826E', fontWeight: 700, padding: 0, WebkitTapHighlightColor: 'transparent' }}>Ver todo →</button>
@@ -3520,7 +3521,7 @@ export default function Dashboard() {
                           onClick={() => setShowMoreTools(false)}
                         >
                           <div
-                            style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: '#FAF7F1', borderRadius: '28px 28px 0 0', padding: '20px 20px 90px', maxHeight: '80vh', overflowY: 'auto' }}
+                            style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: '#F8F4ED', borderRadius: '28px 28px 0 0', padding: '20px 20px 90px', maxHeight: '80vh', overflowY: 'auto' }}
                             onClick={e => e.stopPropagation()}
                           >
                             <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(20,60,50,0.15)', margin: '0 auto 20px' }} />
