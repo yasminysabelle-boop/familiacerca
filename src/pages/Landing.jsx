@@ -10,16 +10,16 @@ const PROB_IMG = '/images/problema.jpg'
 const COMO_IMG = '/images/como.jpg'
 const CTA_IMG  = '/images/cta.jpg'
 
-const PRIMARY = '#0B4F4A'
-const ACTION  = '#0d6b63'
+const PRIMARY = '#143C32'
+const ACTION  = '#143C32'
 const CREAM   = '#F8F4ED'
-const SAND    = '#EDE6D8'
-const GOLD    = '#E58B73'
-const CORAL   = '#E45B4C'
-const MINT_C  = '#8FAF9A'
-const DARK    = '#083b37'
+const SAND    = '#EDE5D8'
+const GOLD    = '#E9826E'
+const CORAL   = '#E9826E'
+const MINT_C  = '#EBF3EE'
+const DARK    = '#143C32'
 const WHITE   = '#FFFFFF'
-const BORDER  = 'rgba(13,107,99,0.12)'
+const BORDER  = 'rgba(20,60,50,0.12)'
 
 const SERIF = "'Cormorant Garamond', Georgia, serif"
 const SANS  = "'Inter', system-ui, sans-serif"
@@ -29,10 +29,10 @@ function CTABtn({ to, children, style = {} }) {
     <Link to={to} className="cta-coral" style={{
       display: 'inline-flex', alignItems: 'center', gap: 10,
       padding: '18px 52px', borderRadius: 9999,
-      background: '#E58B73',
+      background: '#E9826E',
       color: 'white', fontWeight: 500, fontSize: 18,
       textDecoration: 'none', fontFamily: SANS, letterSpacing: '0.025em',
-      boxShadow: '0 12px 40px rgba(229,139,115,0.38)',
+      boxShadow: '0 12px 40px rgba(233,130,110,0.38)',
       transition: 'background 0.2s ease',
       ...style,
     }}>
@@ -43,10 +43,10 @@ function CTABtn({ to, children, style = {} }) {
 
 function FAQItem({ q, a, light = false, onTrack }) {
   const [open, setOpen] = useState(false)
-  const textColor   = light ? '#3A5C45' : 'rgba(255,255,255,0.82)'
-  const answerColor = light ? '#6B7E70' : 'rgba(255,255,255,0.50)'
-  const borderColor = light ? 'rgba(13,107,99,0.18)' : `rgba(229,139,115,0.12)`
-  const iconBorder  = light ? 'rgba(13,107,99,0.35)' : `rgba(229,139,115,0.40)`
+  const textColor   = light ? '#143C32' : 'rgba(255,255,255,0.82)'
+  const answerColor = light ? '#6B7280' : 'rgba(255,255,255,0.50)'
+  const borderColor = light ? 'rgba(20,60,50,0.18)' : `rgba(233,130,110,0.12)`
+  const iconBorder  = light ? 'rgba(20,60,50,0.35)' : `rgba(233,130,110,0.40)`
   const toggle = () => {
     const next = !open
     setOpen(next)
@@ -75,7 +75,7 @@ function PriceCard({ name, price, period, highlight, badge, features, cta, annua
   return (
     <div
       className={`price-card-hover${highlight ? ' price-card-highlighted' : ''}`}
-      style={{ flex: '1 1 280px', borderRadius: 24, background: highlight ? ACTION : WHITE, padding: '44px 32px', boxShadow: highlight ? '0 32px 96px rgba(13,107,99,0.35)' : '0 4px 28px rgba(0,0,0,0.07)', border: highlight ? 'none' : `1px solid ${BORDER}`, position: 'relative', display: 'flex', flexDirection: 'column' }}
+      style={{ flex: '1 1 280px', borderRadius: 24, background: highlight ? ACTION : WHITE, padding: '44px 32px', boxShadow: highlight ? '0 32px 96px rgba(20,60,50,0.35)' : '0 4px 28px rgba(0,0,0,0.07)', border: highlight ? 'none' : `1px solid ${BORDER}`, position: 'relative', display: 'flex', flexDirection: 'column' }}
     >
       {badge && (
         <div className={highlight ? 'badge-pulse-anim' : ''} style={{ position: 'absolute', top: -16, left: '50%', transform: 'translateX(-50%)', background: GOLD, color: 'white', fontSize: 10, fontWeight: 500, letterSpacing: '0.12em', padding: '6px 22px', borderRadius: 9999, whiteSpace: 'nowrap', fontFamily: SANS }}>{badge}</div>
@@ -83,20 +83,20 @@ function PriceCard({ name, price, period, highlight, badge, features, cta, annua
       <p style={{ fontSize: 10, fontWeight: 500, color: highlight ? 'rgba(255,255,255,0.55)' : ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 12px', fontFamily: SANS }}>{name}</p>
       <div style={{ marginBottom: 4, display: 'flex', alignItems: 'baseline', gap: 6 }}>
         <span style={{ fontSize: 52, fontWeight: 700, color: highlight ? 'white' : DARK, fontFamily: SERIF, lineHeight: 1 }}>{price === 0 ? 'Gratis' : `$${displayPrice}`}</span>
-        {price > 0 && <span style={{ fontSize: 13, color: highlight ? 'rgba(255,255,255,0.45)' : '#9CA3AF', fontFamily: SANS }}>/mes</span>}
+        {price > 0 && <span style={{ fontSize: 13, color: highlight ? 'rgba(255,255,255,0.45)' : '#6B7280', fontFamily: SANS }}>/mes</span>}
       </div>
       {annual && price > 0 && (
         <div style={{ marginBottom: 4, display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontSize: 12, color: highlight ? 'rgba(255,255,255,0.30)' : '#D1D5DB', textDecoration: 'line-through', fontFamily: SANS }}>${price}/mes</span>
+          <span style={{ fontSize: 12, color: highlight ? 'rgba(255,255,255,0.30)' : '#6B7280', textDecoration: 'line-through', fontFamily: SANS }}>${price}/mes</span>
           <span style={{ fontSize: 11, background: MINT_C, color: DARK, borderRadius: 4, padding: '2px 8px', fontFamily: SANS, fontWeight: 500 }}>-20%</span>
         </div>
       )}
-      <p style={{ fontSize: 13, color: highlight ? 'rgba(255,255,255,0.45)' : '#9CA3AF', margin: '0 0 28px', fontFamily: SANS, fontWeight: 300 }}>{annual && price > 0 ? 'facturado anualmente' : period}</p>
+      <p style={{ fontSize: 13, color: highlight ? 'rgba(255,255,255,0.45)' : '#6B7280', margin: '0 0 28px', fontFamily: SANS, fontWeight: 300 }}>{annual && price > 0 ? 'facturado anualmente' : period}</p>
       <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 32px', display: 'flex', flexDirection: 'column', gap: 12, flex: 1 }}>
         {features.map((f, i) => (
           <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, fontSize: 14, lineHeight: 1.5, fontFamily: SANS, fontWeight: 300 }}>
-            <span style={{ color: f.included ? (highlight ? GOLD : ACTION) : (highlight ? 'rgba(255,255,255,0.20)' : '#D1D5DB'), flexShrink: 0, fontWeight: 500 }}>{f.included ? '✓' : '–'}</span>
-            <span style={{ color: f.included ? (highlight ? 'rgba(255,255,255,0.85)' : '#374151') : (highlight ? 'rgba(255,255,255,0.30)' : '#9CA3AF') }}>{f.text}</span>
+            <span style={{ color: f.included ? (highlight ? GOLD : ACTION) : (highlight ? 'rgba(255,255,255,0.20)' : '#6B7280'), flexShrink: 0, fontWeight: 500 }}>{f.included ? '✓' : '–'}</span>
+            <span style={{ color: f.included ? (highlight ? 'rgba(255,255,255,0.85)' : '#6B7280') : (highlight ? 'rgba(255,255,255,0.30)' : '#6B7280') }}>{f.text}</span>
           </li>
         ))}
       </ul>
@@ -273,13 +273,13 @@ export default function Landing() {
     <div style={{ background: WHITE, color: DARK, overflowX: 'hidden', fontFamily: SANS }}>
 
       {/* ─────────────── 1. NAV ─────────────── */}
-      <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: '#083b37', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(248,244,237,0.10)' }}>
+      <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: '#143C32', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(248,244,237,0.10)' }}>
         <div style={{ maxWidth: 1140, margin: '0 auto', padding: '20px 2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display:'flex', alignItems:'center', gap:'0px' }}>
             <img src="/logo-icon.png" alt="FamiliaCerca" style={{ height:'110px', width:'auto', objectFit:'contain', display:'block', marginRight:'-32px' }} />
             <span style={{ fontFamily:'Georgia,serif', fontWeight:700, margin:0, padding:0 }}>
               <span style={{ color:'#F8F4ED', fontSize:'26px' }}>Familia</span>
-              <span style={{ color:'#E58B73', fontSize:'26px' }}>Cerca</span>
+              <span style={{ color:'#E9826E', fontSize:'26px' }}>Cerca</span>
             </span>
           </div>
 
@@ -303,7 +303,7 @@ export default function Landing() {
         </div>
 
         {mobileMenuOpen && (
-          <div style={{ padding: '12px 32px 24px', display: 'flex', flexDirection: 'column', gap: 2, borderTop: '1px solid rgba(248,244,237,0.10)', background: '#0B4F4A' }}>
+          <div style={{ padding: '12px 32px 24px', display: 'flex', flexDirection: 'column', gap: 2, borderTop: '1px solid rgba(248,244,237,0.10)', background: '#143C32' }}>
             {navLinks.map(l => (
               <a key={l.href} href={l.href} onClick={() => setMobileMenuOpen(false)}
                 style={{ padding: '13px 8px', fontSize: 15, color: 'rgba(248,244,237,0.85)', textDecoration: 'none', fontFamily: SANS }}>
@@ -322,10 +322,10 @@ export default function Landing() {
 
         {/* Left dark panel */}
         <div className="landing-hero-text" style={{ background: PRIMARY, position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: 'clamp(80px,8vw,120px) clamp(32px,5vw,72px)', overflow: 'hidden', textAlign: 'center' }}>
-          <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'radial-gradient(ellipse 70% 55% at 30% 55%, rgba(13,107,99,0.22) 0%, transparent 70%)' }} />
+          <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'radial-gradient(ellipse 70% 55% at 30% 55%, rgba(20,60,50,0.22) 0%, transparent 70%)' }} />
 
           <div style={{ position: 'relative', width: '100%', maxWidth: 520, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <div className="hero-reveal hero-delay-1" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, border: '1px solid rgba(13,107,99,0.40)', borderRadius: 9999, padding: '7px 18px', marginBottom: 36, background: 'rgba(13,107,99,0.14)' }}>
+            <div className="hero-reveal hero-delay-1" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, border: '1px solid rgba(20,60,50,0.40)', borderRadius: 9999, padding: '7px 18px', marginBottom: 36, background: 'rgba(20,60,50,0.14)' }}>
               <span style={{ fontSize: 13 }}>🌿</span>
               <span style={{ fontSize: 12, fontWeight: 500, color: MINT_C, letterSpacing: '0.06em', fontFamily: SANS }}>Cuidado familiar coordinado</span>
             </div>
@@ -339,7 +339,7 @@ export default function Landing() {
               Todos saben qué pasó, qué falta y cómo está tu familiar, sin depender de WhatsApp ni llamadas interminables.
             </p>
 
-            <Link to="/register" className="hero-reveal hero-delay-4 cta-coral" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '18px 48px', borderRadius: 9999, marginBottom: 32, background: '#E58B73', color: WHITE, fontWeight: 600, fontSize: 18, fontFamily: SANS, textDecoration: 'none', letterSpacing: '0.02em', boxShadow: '0 12px 40px rgba(229,139,115,0.45)', transition: 'background 0.2s ease' }}>
+            <Link to="/register" className="hero-reveal hero-delay-4 cta-coral" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '18px 48px', borderRadius: 9999, marginBottom: 32, background: '#E9826E', color: WHITE, fontWeight: 600, fontSize: 18, fontFamily: SANS, textDecoration: 'none', letterSpacing: '0.02em', boxShadow: '0 12px 40px rgba(233,130,110,0.45)', transition: 'background 0.2s ease' }}>
               Comenzar gratis <span style={{ fontSize: 18, opacity: 0.85 }}>→</span>
             </Link>
 
@@ -357,22 +357,22 @@ export default function Landing() {
         {/* Right: photo + floating medication card */}
         <div className="landing-hero-right" style={{ position: 'relative', overflow: 'hidden', minHeight: '100vh' }}>
           <img src={HERO_IMG} alt="Familia cuidando juntos" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }} />
-          <div style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(to right, rgba(11,79,74,0.38) 0%, transparent 30%)', pointerEvents: 'none' }} />
+          <div style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(to right, rgba(20,60,50,0.38) 0%, transparent 30%)', pointerEvents: 'none' }} />
 
           {/* Floating status card */}
           <div className="hero-reveal hero-delay-4" style={{
             position:'absolute', bottom:'2rem', right:'1.5rem',
             background:'#F8F4ED', borderRadius:'24px',
-            padding:'18px 22px', boxShadow:'0 8px 32px rgba(11,79,74,0.15)',
+            padding:'18px 22px', boxShadow:'0 8px 32px rgba(20,60,50,0.15)',
             minWidth:'255px', maxWidth:'285px', zIndex: 4
           }}>
             <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'12px'}}>
-              <div style={{width:38,height:38,borderRadius:'50%',background:'#8FAF9A',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'17px'}}>👵</div>
+              <div style={{width:38,height:38,borderRadius:'50%',background:'#EBF3EE',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'17px'}}>👵</div>
               <div>
-                <div style={{fontWeight:700,fontSize:'14px',color:'#20312C'}}>Deborah</div>
+                <div style={{fontWeight:700,fontSize:'14px',color:'#143C32'}}>Deborah</div>
                 <div style={{display:'flex',alignItems:'center',gap:'5px',marginTop:'2px'}}>
-                  <div style={{width:7,height:7,borderRadius:'50%',background:'#0B4F4A'}}></div>
-                  <span style={{fontSize:'11px',color:'#0B4F4A',fontWeight:600}}>Todo al día</span>
+                  <div style={{width:7,height:7,borderRadius:'50%',background:'#143C32'}}></div>
+                  <span style={{fontSize:'11px',color:'#143C32',fontWeight:600}}>Todo al día</span>
                 </div>
               </div>
             </div>
@@ -383,26 +383,26 @@ export default function Landing() {
             ].map((item,i)=>(
               <div key={i} style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'7px'}}>
                 <span style={{fontSize:'13px'}}>{item.icon}</span>
-                <span style={{fontSize:'11px',color:'#20312C',opacity:0.8}}>{item.text}</span>
-                <span style={{marginLeft:'auto',color:'#0B4F4A',fontSize:'12px',fontWeight:700}}>✓</span>
+                <span style={{fontSize:'11px',color:'#143C32',opacity:0.8}}>{item.text}</span>
+                <span style={{marginLeft:'auto',color:'#143C32',fontSize:'12px',fontWeight:700}}>✓</span>
               </div>
             ))}
-            <div style={{borderTop:'1px solid rgba(11,79,74,0.1)',marginTop:'8px',paddingTop:'8px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-              <span style={{fontSize:'10px',color:'#20312C',opacity:0.6}}>Actualizado por Rosa</span>
-              <span style={{fontSize:'10px',color:'#E58B73',fontWeight:600}}>Hace 15 min</span>
+            <div style={{borderTop:'1px solid rgba(20,60,50,0.1)',marginTop:'8px',paddingTop:'8px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+              <span style={{fontSize:'10px',color:'#143C32',opacity:0.6}}>Actualizado por Rosa</span>
+              <span style={{fontSize:'10px',color:'#E9826E',fontWeight:600}}>Hace 15 min</span>
             </div>
           </div>
         </div>
       </section>
 
       {/* ─────────────── 3. MARQUEE 1 ─────────────── */}
-      <section style={{ background: DARK, padding: '20px 0', overflow: 'hidden', borderTop: `1px solid rgba(229,139,115,0.08)` }}>
+      <section style={{ background: DARK, padding: '20px 0', overflow: 'hidden', borderTop: `1px solid rgba(233,130,110,0.08)` }}>
         <div className="marquee-container">
           <div className="marquee-track">
             {[...marqueePain, ...marqueePain].map((item, i) => (
               <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '0 32px', whiteSpace: 'nowrap', fontSize: 14, color: GOLD, fontFamily: SANS, fontWeight: 400 }}>
                 {item}
-                <span style={{ color: `rgba(229,139,115,0.30)`, fontSize: 18, lineHeight: 1 }}>·</span>
+                <span style={{ color: `rgba(233,130,110,0.30)`, fontSize: 18, lineHeight: 1 }}>·</span>
               </span>
             ))}
           </div>
@@ -417,11 +417,11 @@ export default function Landing() {
               <div key={`s${i}`} style={{ textAlign: 'center', padding: '0 48px' }}>
                 <div style={{ fontSize: 28, marginBottom: 10 }}>{s.icon}</div>
                 <p style={{ margin: 0, fontFamily: SERIF, fontSize: 'clamp(36px, 4.5vw, 62px)', fontWeight: 700, color: ACTION, lineHeight: 1 }}>{s.val}</p>
-                <p style={{ margin: '10px 0 0', fontSize: 15, fontFamily: SANS, fontWeight: 300, color: '#7A6E62', letterSpacing: '0.02em' }}>{s.label}</p>
+                <p style={{ margin: '10px 0 0', fontSize: 15, fontFamily: SANS, fontWeight: 300, color: '#6B7280', letterSpacing: '0.02em' }}>{s.label}</p>
               </div>
             )
             const div = i < statItems.length - 1 ? (
-              <div key={`d${i}`} className="landing-divider" style={{ width: 1, height: 88, background: `linear-gradient(to bottom, transparent, rgba(13,107,99,0.22), transparent)`, flexShrink: 0 }} />
+              <div key={`d${i}`} className="landing-divider" style={{ width: 1, height: 88, background: `linear-gradient(to bottom, transparent, rgba(20,60,50,0.22), transparent)`, flexShrink: 0 }} />
             ) : null
             return div ? [el, div] : [el]
           })}
@@ -455,7 +455,7 @@ export default function Landing() {
                   </div>
                 ))}
               </div>
-              <div style={{ background: 'rgba(143,175,154,0.08)', border: `1px solid rgba(143,175,154,0.22)`, borderRadius: 16, padding: '20px 18px' }}>
+              <div style={{ background: 'rgba(235,246,238,0.08)', border: `1px solid rgba(235,246,238,0.22)`, borderRadius: 16, padding: '20px 18px' }}>
                 <p style={{ margin: '0 0 16px', fontSize: 10, fontWeight: 600, color: MINT_C, fontFamily: SANS, letterSpacing: '0.10em', textTransform: 'uppercase' }}>Con FamiliaCerca</p>
                 {[
                   'Todos ven lo mismo',
@@ -483,7 +483,7 @@ export default function Landing() {
             <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(32px,4vw,56px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.1, margin: '0 0 18px' }}>
               WhatsApp es para conversar. FamiliaCerca es para cuidar.
             </h2>
-            <p style={{ fontSize: 17, color: '#6B7E70', lineHeight: 1.75, maxWidth: 520, margin: '0 auto', fontFamily: SANS, fontWeight: 300 }}>
+            <p style={{ fontSize: 17, color: '#6B7280', lineHeight: 1.75, maxWidth: 520, margin: '0 auto', fontFamily: SANS, fontWeight: 300 }}>
               Cuando una persona depende de varios familiares o cuidadores, los mensajes se pierden, las tareas se duplican y la información desaparece. FamiliaCerca mantiene todo organizado en un solo lugar.
             </p>
           </div>
@@ -530,20 +530,20 @@ export default function Landing() {
             </div>
 
             {/* FamiliaCerca: calm panel */}
-            <div className="reveal reveal-delay-1" style={{ borderRadius: 24, overflow: 'hidden', boxShadow: `0 12px 48px rgba(11,79,74,0.14)`, border: `2px solid ${ACTION}` }}>
+            <div className="reveal reveal-delay-1" style={{ borderRadius: 24, overflow: 'hidden', boxShadow: `0 12px 48px rgba(20,60,50,0.14)`, border: `2px solid ${ACTION}` }}>
               <div style={{ background: PRIMARY, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
                 <img src="/icon-192.png" alt="FC" style={{ width: 38, height: 38, borderRadius: 10, objectFit: 'cover' }} />
                 <div>
                   <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: WHITE, fontFamily: SANS }}>FamiliaCerca</p>
                   <p style={{ margin: 0, fontSize: 11, color: MINT_C, fontFamily: SANS }}>Medicamentos · Todo en orden</p>
                 </div>
-                <div style={{ marginLeft: 'auto', background: 'rgba(143,175,154,0.18)', borderRadius: 9999, padding: '4px 12px' }}>
+                <div style={{ marginLeft: 'auto', background: 'rgba(235,246,238,0.18)', borderRadius: 9999, padding: '4px 12px' }}>
                   <span style={{ color: MINT_C, fontSize: 11, fontWeight: 600 }}>✓ Al día</span>
                 </div>
               </div>
               <div style={{ background: SAND, padding: '14px', display: 'flex', flexDirection: 'column', gap: 10, minHeight: 380 }}>
                 {/* Confirmed med card */}
-                <div style={{ background: WHITE, borderRadius: 14, padding: '14px 16px', border: `1px solid rgba(13,107,99,0.15)` }}>
+                <div style={{ background: WHITE, borderRadius: 14, padding: '14px 16px', border: `1px solid rgba(20,60,50,0.15)` }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
                     <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: PRIMARY, fontFamily: SANS }}>💊 Medicamentos del día</p>
                     <span style={{ fontSize: 10, color: ACTION, background: MINT_C, borderRadius: 9999, padding: '2px 10px', fontFamily: SANS, fontWeight: 600 }}>2/3 ✓</span>
@@ -557,28 +557,28 @@ export default function Landing() {
                       <div style={{ width: 16, height: 16, borderRadius: '50%', background: item.done ? ACTION : 'transparent', border: `1.5px solid ${item.done ? ACTION : 'rgba(0,0,0,0.15)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                         {item.done && <span style={{ color: WHITE, fontSize: 7 }}>✓</span>}
                       </div>
-                      <span style={{ fontSize: 11, fontFamily: SANS, color: item.done ? '#9CA3AF' : PRIMARY, textDecoration: item.done ? 'line-through' : 'none', flex: 1 }}>{item.med}</span>
+                      <span style={{ fontSize: 11, fontFamily: SANS, color: item.done ? '#6B7280' : PRIMARY, textDecoration: item.done ? 'line-through' : 'none', flex: 1 }}>{item.med}</span>
                       <span style={{ fontSize: 9, color: item.done ? ACTION : CORAL, fontFamily: SANS, fontWeight: 500 }}>{item.who}</span>
                     </div>
                   ))}
                 </div>
                 {/* Confirmation with photo */}
-                <div style={{ background: WHITE, borderRadius: 14, padding: '12px 16px', border: `1px solid rgba(13,107,99,0.15)` }}>
+                <div style={{ background: WHITE, borderRadius: 14, padding: '12px 16px', border: `1px solid rgba(20,60,50,0.15)` }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <div style={{ width: 40, height: 40, borderRadius: 10, background: MINT_C, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>📷</div>
                     <div>
                       <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: PRIMARY, fontFamily: SANS }}>Jorge confirmó con foto</p>
-                      <p style={{ margin: 0, fontSize: 10, color: '#9CA3AF', fontFamily: SANS }}>Atenolol 25mg · hoy 8:03 AM · ✓ Verificado</p>
+                      <p style={{ margin: 0, fontSize: 10, color: '#6B7280', fontFamily: SANS }}>Atenolol 25mg · hoy 8:03 AM · ✓ Verificado</p>
                     </div>
                   </div>
                 </div>
                 {/* Alert card */}
-                <div style={{ background: 'rgba(228,91,76,0.07)', borderRadius: 14, padding: '12px 16px', border: `1px solid rgba(228,91,76,0.22)` }}>
+                <div style={{ background: 'rgba(233,130,110,0.07)', borderRadius: 14, padding: '12px 16px', border: `1px solid rgba(233,130,110,0.22)` }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <span style={{ fontSize: 18 }}>🔔</span>
                     <div>
                       <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: CORAL, fontFamily: SANS }}>Alerta: Losartán pendiente a las 8pm</p>
-                      <p style={{ margin: 0, fontSize: 10, color: '#9CA3AF', fontFamily: SANS }}>Notificado a 3 cuidadores · Ventana ±1 hora</p>
+                      <p style={{ margin: 0, fontSize: 10, color: '#6B7280', fontFamily: SANS }}>Notificado a 3 cuidadores · Ventana ±1 hora</p>
                     </div>
                   </div>
                 </div>
@@ -606,10 +606,10 @@ export default function Landing() {
               { icon: '📋', title: 'Historial completo', desc: 'Nada se pierde entre mensajes o llamadas.' },
               { icon: '🚨', title: 'Respuesta rápida', desc: 'Alertas automáticas cuando algo requiere atención.' },
             ].map((b, i) => (
-              <div key={b.title} className={`reveal reveal-delay-${i}`} style={{ background: WHITE, borderRadius: 20, border: `1px solid ${BORDER}`, padding: '36px 28px', boxShadow: '0 4px 20px rgba(13,107,99,0.06)' }}>
+              <div key={b.title} className={`reveal reveal-delay-${i}`} style={{ background: WHITE, borderRadius: 20, border: `1px solid ${BORDER}`, padding: '36px 28px', boxShadow: '0 4px 20px rgba(20,60,50,0.06)' }}>
                 <div style={{ fontSize: 36, marginBottom: 16 }}>{b.icon}</div>
                 <h3 style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 600, color: PRIMARY, margin: '0 0 10px', lineHeight: 1.2 }}>{b.title}</h3>
-                <p style={{ fontSize: 16, color: '#6B7E70', lineHeight: 1.75, margin: 0, fontFamily: SANS, fontWeight: 300 }}>{b.desc}</p>
+                <p style={{ fontSize: 16, color: '#6B7280', lineHeight: 1.75, margin: 0, fontFamily: SANS, fontWeight: 300 }}>{b.desc}</p>
               </div>
             ))}
           </div>
@@ -618,14 +618,14 @@ export default function Landing() {
 
       {/* ─────────────── 7. FEATURES ─────────────── */}
       <section id="funciones" style={{ padding: '128px 32px', background: CREAM, position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: 800, height: 400, pointerEvents: 'none', background: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(13,107,99,0.05) 0%, transparent 70%)' }} />
+        <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: 800, height: 400, pointerEvents: 'none', background: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(20,60,50,0.05) 0%, transparent 70%)' }} />
         <div style={{ maxWidth: 1140, margin: '0 auto', position: 'relative' }}>
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 80 }}>
             <p style={{ fontSize: 11, fontWeight: 500, color: ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>Funciones</p>
             <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(32px,4vw,60px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.1, margin: '0 0 20px' }}>
               Todo lo que necesitas en un solo lugar
             </h2>
-            <p style={{ fontSize: 18, color: '#6B7E70', lineHeight: 1.78, maxWidth: 540, margin: '0 auto', fontFamily: SANS, fontWeight: 300 }}>
+            <p style={{ fontSize: 18, color: '#6B7280', lineHeight: 1.78, maxWidth: 540, margin: '0 auto', fontFamily: SANS, fontWeight: 300 }}>
               FamiliaCerca coordina a toda la familia para que ningún detalle del cuidado quede sin atender.
             </p>
           </div>
@@ -634,23 +634,23 @@ export default function Landing() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 24, marginBottom: 24 }}>
 
             {/* Card 1: Medicamentos */}
-            <div className="feature-hero-card reveal" style={{ background: WHITE, borderRadius: 22, border: `1px solid rgba(13,107,99,0.18)`, padding: '36px 30px', boxShadow: '0 4px 24px rgba(13,107,99,0.07)', minHeight: 420, position: 'relative' }}>
-              <div style={{ width: 60, height: 60, borderRadius: 16, background: `rgba(11,79,74,0.07)`, border: '1px solid rgba(11,79,74,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, marginBottom: 18 }}>📊</div>
-              <div style={{ display: 'inline-flex', padding: '4px 12px', borderRadius: 9999, border: `1px solid rgba(229,139,115,0.30)`, marginBottom: 12, background: 'rgba(229,139,115,0.07)' }}>
+            <div className="feature-hero-card reveal" style={{ background: WHITE, borderRadius: 22, border: `1px solid rgba(20,60,50,0.18)`, padding: '36px 30px', boxShadow: '0 4px 24px rgba(20,60,50,0.07)', minHeight: 420, position: 'relative' }}>
+              <div style={{ width: 60, height: 60, borderRadius: 16, background: `rgba(20,60,50,0.07)`, border: '1px solid rgba(20,60,50,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, marginBottom: 18 }}>📊</div>
+              <div style={{ display: 'inline-flex', padding: '4px 12px', borderRadius: 9999, border: `1px solid rgba(233,130,110,0.30)`, marginBottom: 12, background: 'rgba(233,130,110,0.07)' }}>
                 <span style={{ fontSize: 10, fontWeight: 500, color: GOLD, letterSpacing: '0.08em', fontFamily: SANS }}>Lo más importante</span>
               </div>
               <h3 style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 600, color: PRIMARY, margin: '0 0 10px', lineHeight: 1.2 }}>Estado del paciente en tiempo real</h3>
-              <p style={{ fontSize: 17, color: '#6B7E70', lineHeight: 1.75, margin: '0 0 20px', fontFamily: SANS, fontWeight: 300 }}>
+              <p style={{ fontSize: 17, color: '#6B7280', lineHeight: 1.75, margin: '0 0 20px', fontFamily: SANS, fontWeight: 300 }}>
                 Lo primero que todos quieren saber. Estado actual, medicamentos pendientes, última actualización y quién la realizó.
               </p>
-              <div style={{ background: SAND, borderRadius: 12, padding: '12px 14px', border: `1px solid rgba(13,107,99,0.10)` }}>
+              <div style={{ background: SAND, borderRadius: 12, padding: '12px 14px', border: `1px solid rgba(20,60,50,0.10)` }}>
                 {[
                   { label: 'Atenolol 25mg · 8am', done: true, alert: false },
                   { label: 'Metformina 500mg · 1pm', done: true, alert: false },
                   { label: 'Losartán 50mg · 8pm', done: false, alert: true },
                 ].map((item, i, arr) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '7px 0', borderBottom: i < arr.length - 1 ? `1px solid rgba(13,107,99,0.08)` : 'none' }}>
-                    <span style={{ width: 17, height: 17, borderRadius: '50%', background: item.done ? ACTION : 'transparent', border: `1.5px solid ${item.done ? ACTION : item.alert ? CORAL : 'rgba(13,107,99,0.25)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '7px 0', borderBottom: i < arr.length - 1 ? `1px solid rgba(20,60,50,0.08)` : 'none' }}>
+                    <span style={{ width: 17, height: 17, borderRadius: '50%', background: item.done ? ACTION : 'transparent', border: `1.5px solid ${item.done ? ACTION : item.alert ? CORAL : 'rgba(20,60,50,0.25)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                       {item.done && <span style={{ color: WHITE, fontSize: 8 }}>✓</span>}
                     </span>
                     <span style={{ fontSize: 11, fontFamily: SANS, color: item.done ? '#9BA89F' : item.alert ? CORAL : PRIMARY, textDecoration: item.done ? 'line-through' : 'none', fontWeight: item.alert ? 500 : 300 }}>{item.label}</span>
@@ -661,23 +661,23 @@ export default function Landing() {
             </div>
 
             {/* Card 2: Chat categorizado */}
-            <div className="feature-hero-card reveal reveal-delay-1" style={{ background: WHITE, borderRadius: 22, border: `1px solid rgba(13,107,99,0.18)`, padding: '36px 30px', boxShadow: '0 4px 24px rgba(13,107,99,0.07)', minHeight: 420, position: 'relative' }}>
-              <div style={{ width: 60, height: 60, borderRadius: 16, background: `rgba(11,79,74,0.07)`, border: '1px solid rgba(11,79,74,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, marginBottom: 18 }}>💊</div>
-              <div style={{ display: 'inline-flex', padding: '4px 12px', borderRadius: 9999, border: `1px solid rgba(229,139,115,0.30)`, marginBottom: 12, background: 'rgba(229,139,115,0.07)' }}>
+            <div className="feature-hero-card reveal reveal-delay-1" style={{ background: WHITE, borderRadius: 22, border: `1px solid rgba(20,60,50,0.18)`, padding: '36px 30px', boxShadow: '0 4px 24px rgba(20,60,50,0.07)', minHeight: 420, position: 'relative' }}>
+              <div style={{ width: 60, height: 60, borderRadius: 16, background: `rgba(20,60,50,0.07)`, border: '1px solid rgba(20,60,50,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, marginBottom: 18 }}>💊</div>
+              <div style={{ display: 'inline-flex', padding: '4px 12px', borderRadius: 9999, border: `1px solid rgba(233,130,110,0.30)`, marginBottom: 12, background: 'rgba(233,130,110,0.07)' }}>
                 <span style={{ fontSize: 10, fontWeight: 500, color: GOLD, letterSpacing: '0.08em', fontFamily: SANS }}>Sin olvidos ni doble dosis</span>
               </div>
               <h3 style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 600, color: PRIMARY, margin: '0 0 10px', lineHeight: 1.2 }}>Medicamentos coordinados</h3>
-              <p style={{ fontSize: 17, color: '#6B7E70', lineHeight: 1.75, margin: '0 0 20px', fontFamily: SANS, fontWeight: 300 }}>
+              <p style={{ fontSize: 17, color: '#6B7280', lineHeight: 1.75, margin: '0 0 20px', fontFamily: SANS, fontWeight: 300 }}>
                 Evita olvidos y dobles dosis con confirmación en tiempo real.
               </p>
-              <div style={{ background: SAND, borderRadius: 12, padding: '12px', border: `1px solid rgba(13,107,99,0.10)`, display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <div style={{ background: SAND, borderRadius: 12, padding: '12px', border: `1px solid rgba(20,60,50,0.10)`, display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {[
                   { from: 'María', msg: '🏥 Cita con cardiólogo mañana 3pm', mine: false, tag: '#médico' },
                   { from: 'Yo', msg: '✅ Ya le di el Atenolol, está bien', mine: true, tag: '#medicamentos' },
                   { from: 'Carlos', msg: '🚨 Llamó diciendo que se siente mal', mine: false, tag: '#urgente' },
                 ].map((b, i) => (
                   <div key={i} style={{ display: 'flex', justifyContent: b.mine ? 'flex-end' : 'flex-start' }}>
-                    <div style={{ maxWidth: '85%', padding: '7px 11px', borderRadius: 11, background: b.mine ? ACTION : WHITE, border: b.mine ? 'none' : `1px solid rgba(13,107,99,0.14)` }}>
+                    <div style={{ maxWidth: '85%', padding: '7px 11px', borderRadius: 11, background: b.mine ? ACTION : WHITE, border: b.mine ? 'none' : `1px solid rgba(20,60,50,0.14)` }}>
                       {!b.mine && <p style={{ margin: '0 0 2px', fontSize: 9, color: GOLD, fontFamily: SANS, fontWeight: 600 }}>{b.from}</p>}
                       <p style={{ margin: 0, fontSize: 11, color: b.mine ? WHITE : PRIMARY, fontFamily: SANS, lineHeight: 1.4 }}>{b.msg}</p>
                       <p style={{ margin: '2px 0 0', fontSize: 8, color: b.mine ? 'rgba(255,255,255,0.50)' : ACTION, fontFamily: SANS }}>{b.tag}</p>
@@ -688,26 +688,26 @@ export default function Landing() {
             </div>
 
             {/* Card 3: Registros médicos + PDF */}
-            <div className="feature-hero-card reveal reveal-delay-2" style={{ background: WHITE, borderRadius: 22, border: `1px solid rgba(13,107,99,0.18)`, padding: '36px 30px', boxShadow: '0 4px 24px rgba(13,107,99,0.07)', minHeight: 420, position: 'relative' }}>
-              <div style={{ width: 60, height: 60, borderRadius: 16, background: `rgba(11,79,74,0.07)`, border: '1px solid rgba(11,79,74,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, marginBottom: 18 }}>💬</div>
-              <div style={{ display: 'inline-flex', padding: '4px 12px', borderRadius: 9999, border: `1px solid rgba(229,139,115,0.30)`, marginBottom: 12, background: 'rgba(229,139,115,0.07)' }}>
+            <div className="feature-hero-card reveal reveal-delay-2" style={{ background: WHITE, borderRadius: 22, border: `1px solid rgba(20,60,50,0.18)`, padding: '36px 30px', boxShadow: '0 4px 24px rgba(20,60,50,0.07)', minHeight: 420, position: 'relative' }}>
+              <div style={{ width: 60, height: 60, borderRadius: 16, background: `rgba(20,60,50,0.07)`, border: '1px solid rgba(20,60,50,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, marginBottom: 18 }}>💬</div>
+              <div style={{ display: 'inline-flex', padding: '4px 12px', borderRadius: 9999, border: `1px solid rgba(233,130,110,0.30)`, marginBottom: 12, background: 'rgba(233,130,110,0.07)' }}>
                 <span style={{ fontSize: 10, fontWeight: 500, color: GOLD, letterSpacing: '0.08em', fontFamily: SANS }}>Por categorías</span>
               </div>
               <h3 style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 600, color: PRIMARY, margin: '0 0 10px', lineHeight: 1.2 }}>Chat organizado por categorías</h3>
-              <p style={{ fontSize: 17, color: '#6B7E70', lineHeight: 1.75, margin: '0 0 20px', fontFamily: SANS, fontWeight: 300 }}>
+              <p style={{ fontSize: 17, color: '#6B7280', lineHeight: 1.75, margin: '0 0 20px', fontFamily: SANS, fontWeight: 300 }}>
                 No más mensajes perdidos. Cada conversación en su lugar.
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {[
-                  { icon: '🏥', label: 'Visita cardiólogo', date: '28 may', color: `rgba(11,79,74,0.07)` },
-                  { icon: '⚠️', label: 'Incidente: caída leve', date: '25 may', color: 'rgba(228,91,76,0.07)' },
-                  { icon: '💉', label: 'Análisis de sangre', date: '20 may', color: `rgba(11,79,74,0.07)` },
-                  { icon: '📄', label: 'Exportar a PDF →', date: '', color: `rgba(229,139,115,0.09)`, action: true },
+                  { icon: '🏥', label: 'Visita cardiólogo', date: '28 may', color: `rgba(20,60,50,0.07)` },
+                  { icon: '⚠️', label: 'Incidente: caída leve', date: '25 may', color: 'rgba(233,130,110,0.07)' },
+                  { icon: '💉', label: 'Análisis de sangre', date: '20 may', color: `rgba(20,60,50,0.07)` },
+                  { icon: '📄', label: 'Exportar a PDF →', date: '', color: `rgba(233,130,110,0.09)`, action: true },
                 ].map((item, i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 12px', background: item.color, borderRadius: 10, border: `1px solid rgba(13,107,99,0.08)` }}>
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 12px', background: item.color, borderRadius: 10, border: `1px solid rgba(20,60,50,0.08)` }}>
                     <span style={{ fontSize: 15 }}>{item.icon}</span>
                     <span style={{ fontSize: 11, fontFamily: SANS, color: item.action ? GOLD : PRIMARY, fontWeight: item.action ? 600 : 300, flex: 1 }}>{item.label}</span>
-                    {item.date && <span style={{ fontSize: 10, color: '#9CA3AF', fontFamily: SANS }}>{item.date}</span>}
+                    {item.date && <span style={{ fontSize: 10, color: '#6B7280', fontFamily: SANS }}>{item.date}</span>}
                   </div>
                 ))}
               </div>
@@ -721,11 +721,11 @@ export default function Landing() {
               { icon: '🆘', title: 'Botón SOS', desc: 'Un toque y todos reciben la alerta al instante.' },
               { icon: '🗓️', title: 'Citas médicas', desc: 'Estados, adjuntos y recordatorio automático.' },
             ].map((f, i) => (
-              <div key={f.title} className={`reveal reveal-delay-${i}`} style={{ background: WHITE, borderRadius: 16, border: `1px solid rgba(13,107,99,0.16)`, padding: '26px 24px', display: 'flex', gap: 16, alignItems: 'flex-start', boxShadow: '0 2px 12px rgba(13,107,99,0.05)' }}>
-                <div style={{ width: 46, height: 46, borderRadius: 12, background: `rgba(11,79,74,0.07)`, border: `1px solid rgba(11,79,74,0.12)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>{f.icon}</div>
+              <div key={f.title} className={`reveal reveal-delay-${i}`} style={{ background: WHITE, borderRadius: 16, border: `1px solid rgba(20,60,50,0.16)`, padding: '26px 24px', display: 'flex', gap: 16, alignItems: 'flex-start', boxShadow: '0 2px 12px rgba(20,60,50,0.05)' }}>
+                <div style={{ width: 46, height: 46, borderRadius: 12, background: `rgba(20,60,50,0.07)`, border: `1px solid rgba(20,60,50,0.12)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>{f.icon}</div>
                 <div>
                   <h3 style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 600, color: PRIMARY, margin: '0 0 6px' }}>{f.title}</h3>
-                  <p style={{ fontSize: 16, color: '#6B7E70', lineHeight: 1.7, margin: 0, fontFamily: SANS, fontWeight: 300 }}>{f.desc}</p>
+                  <p style={{ fontSize: 16, color: '#6B7280', lineHeight: 1.7, margin: 0, fontFamily: SANS, fontWeight: 300 }}>{f.desc}</p>
                 </div>
               </div>
             ))}
@@ -742,7 +742,7 @@ export default function Landing() {
               Listo en 3 minutos, funciona para siempre
             </h2>
             <div style={{ display: 'flex', flexDirection: 'column', position: 'relative' }}>
-              <div className="como-line" style={{ position: 'absolute', left: 39, top: 64, bottom: 64, width: 2, background: `linear-gradient(to bottom, ${ACTION}, rgba(13,107,99,0.08))` }} />
+              <div className="como-line" style={{ position: 'absolute', left: 39, top: 64, bottom: 64, width: 2, background: `linear-gradient(to bottom, ${ACTION}, rgba(20,60,50,0.08))` }} />
               {[
                 { n: '1', title: 'Crea tu cuenta gratis', desc: 'Sin tarjeta de crédito, sin descarga en tienda de apps.' },
                 { n: '2', title: 'Agrega a tu familiar y los cuidadores', desc: 'Cada uno con su propio acceso y rol.' },
@@ -751,11 +751,11 @@ export default function Landing() {
               ].map((s, i, arr) => (
                 <div key={s.n} className={`reveal reveal-delay-${i}`} style={{ display: 'flex', gap: 24, marginBottom: i < arr.length - 1 ? 32 : 0 }}>
                   <div style={{ flexShrink: 0, zIndex: 1 }}>
-                    <div style={{ width: 80, height: 80, borderRadius: '50%', background: `linear-gradient(135deg, ${ACTION} 0%, #095248 100%)`, color: WHITE, fontWeight: 700, fontSize: 28, fontFamily: SERIF, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 12px 40px rgba(13,107,99,0.28)' }}>{s.n}</div>
+                    <div style={{ width: 80, height: 80, borderRadius: '50%', background: `linear-gradient(135deg, ${ACTION} 0%, #1E5245 100%)`, color: WHITE, fontWeight: 700, fontSize: 28, fontFamily: SERIF, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 12px 40px rgba(20,60,50,0.28)' }}>{s.n}</div>
                   </div>
                   <div style={{ paddingTop: 22 }}>
                     <h3 style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 600, color: PRIMARY, margin: '0 0 8px' }}>{s.title}</h3>
-                    <p style={{ fontSize: 17, color: '#6B7E70', lineHeight: 1.78, margin: 0, fontFamily: SANS, fontWeight: 300 }}>{s.desc}</p>
+                    <p style={{ fontSize: 17, color: '#6B7280', lineHeight: 1.78, margin: 0, fontFamily: SANS, fontWeight: 300 }}>{s.desc}</p>
                   </div>
                 </div>
               ))}
@@ -765,19 +765,19 @@ export default function Landing() {
             </div>
           </div>
           <div style={{ flex: '1 1 360px', display: 'flex', justifyContent: 'center' }} className="como-img">
-            <img src={COMO_IMG} alt="Cómo funciona FamiliaCerca" style={{ width: '100%', borderRadius: 24, boxShadow: `0 16px 64px rgba(13,107,99,0.16)`, border: `1px solid rgba(13,107,99,0.10)` }} />
+            <img src={COMO_IMG} alt="Cómo funciona FamiliaCerca" style={{ width: '100%', borderRadius: 24, boxShadow: `0 16px 64px rgba(20,60,50,0.16)`, border: `1px solid rgba(20,60,50,0.10)` }} />
           </div>
         </div>
       </section>
 
       {/* ─────────────── 9. MARQUEE 2 ─────────────── */}
-      <section style={{ background: DARK, padding: '20px 0', overflow: 'hidden', borderTop: `1px solid rgba(229,139,115,0.08)`, borderBottom: `1px solid rgba(229,139,115,0.08)` }}>
+      <section style={{ background: DARK, padding: '20px 0', overflow: 'hidden', borderTop: `1px solid rgba(233,130,110,0.08)`, borderBottom: `1px solid rgba(233,130,110,0.08)` }}>
         <div className="marquee-container">
           <div className="marquee-track marquee-track-reverse">
             {[...marqueeFeatures, ...marqueeFeatures].map((item, i) => (
               <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '0 32px', whiteSpace: 'nowrap', fontSize: 14, color: GOLD, fontFamily: SANS, fontWeight: 400 }}>
                 {item}
-                <span style={{ color: `rgba(229,139,115,0.28)`, fontSize: 18, lineHeight: 1 }}>·</span>
+                <span style={{ color: `rgba(233,130,110,0.28)`, fontSize: 18, lineHeight: 1 }}>·</span>
               </span>
             ))}
           </div>
@@ -818,20 +818,20 @@ export default function Landing() {
               { name: 'Jorge M.',    initial: 'J', role: 'Esposo cuidador',         location: 'Nueva York, NY',         headline: 'Ahora todos estamos tranquilos',                          text: 'Mi esposa tiene Alzheimer y el checklist diario me salvó. Puedo registrar cada comida, cada baño, cada medicamento. Por fin duermo tranquilo sabiendo que nada se me escapa.' },
               { name: 'Lucía R.',    initial: 'L', role: 'Hija única',              location: 'Chicago, Illinois',      headline: 'Mi mamá está mejor atendida y nosotros más organizados', text: 'Cuido sola a mis dos padres mayores desde hace 3 años. FamiliaCerca me ayuda a organizarme y el botón SOS me da tranquilidad cuando no estoy en casa. No sé cómo lo hacía antes.' },
             ].map((t, i) => (
-              <div key={t.name} className={`reveal reveal-delay-${i % 3}`} style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 20, border: `1px solid rgba(13,107,99,0.28)`, padding: '32px 28px', boxShadow: '0 4px 24px rgba(0,0,0,0.18)', display: 'flex', flexDirection: 'column' }}>
+              <div key={t.name} className={`reveal reveal-delay-${i % 3}`} style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 20, border: `1px solid rgba(20,60,50,0.28)`, padding: '32px 28px', boxShadow: '0 4px 24px rgba(0,0,0,0.18)', display: 'flex', flexDirection: 'column' }}>
                 <div style={{ display: 'flex', gap: 3, marginBottom: 14 }}>
                   {[1,2,3,4,5].map(s => <span key={s} style={{ color: GOLD, fontSize: 13 }}>★</span>)}
                 </div>
                 <p style={{ fontSize: 17, fontWeight: 600, color: WHITE, fontFamily: SERIF, margin: '0 0 12px', lineHeight: 1.3 }}>{t.headline}</p>
                 <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.72)', lineHeight: 1.85, margin: '0 0 24px', fontFamily: SANS, fontWeight: 300, fontStyle: 'italic', flex: 1 }}>"{t.text}"</p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div style={{ width: 46, height: 46, borderRadius: '50%', background: ACTION, border: `1px solid rgba(13,107,99,0.60)`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <div style={{ width: 46, height: 46, borderRadius: '50%', background: ACTION, border: `1px solid rgba(20,60,50,0.60)`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                     <span style={{ fontFamily: SERIF, fontSize: 20, fontWeight: 700, color: WHITE }}>{t.initial}</span>
                   </div>
                   <div>
                     <p style={{ margin: 0, fontSize: 14, fontWeight: 500, color: WHITE, fontFamily: SANS }}>{t.name}</p>
                     <p style={{ margin: '2px 0 6px', fontSize: 14, color: 'rgba(255,255,255,0.38)', fontFamily: SANS, fontWeight: 300 }}>{t.role}</p>
-                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: `rgba(229,139,115,0.10)`, borderRadius: 9999, padding: '2px 10px' }}>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: `rgba(233,130,110,0.10)`, borderRadius: 9999, padding: '2px 10px' }}>
                       <span style={{ fontSize: 10 }}>📍</span>
                       <span style={{ fontSize: 12, color: GOLD, fontFamily: SANS, fontWeight: 300 }}>{t.location}</span>
                     </div>
@@ -844,7 +844,7 @@ export default function Landing() {
       </section>
 
       {/* ─────────────── EMOTIONAL QUOTE 2 ─────────────── */}
-      <section style={{ padding: '128px 32px', background: '#0B4F4A' }}>
+      <section style={{ padding: '128px 32px', background: '#143C32' }}>
         <div style={{ maxWidth: 860, margin: '0 auto', textAlign: 'center' }}>
           <div style={{ fontFamily: SERIF, fontSize: 110, color: GOLD, lineHeight: 0.7, marginBottom: 20, opacity: 0.22 }}>"</div>
           <blockquote className="reveal" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(28px,3.8vw,54px)', fontWeight: 500, color: CREAM, lineHeight: 1.45, margin: '0 0 36px' }}>
@@ -862,12 +862,12 @@ export default function Landing() {
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 52 }}>
             <p style={{ fontSize: 11, fontWeight: 500, color: ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>Precios</p>
             <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(32px,4vw,60px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.1, margin: '0 0 16px' }}>Simple y transparente</h2>
-            <p style={{ fontSize: 18, color: '#6B5848', lineHeight: 1.75, maxWidth: 460, margin: '0 auto 36px', fontFamily: SANS, fontWeight: 300 }}>
+            <p style={{ fontSize: 18, color: '#6B7280', lineHeight: 1.75, maxWidth: 460, margin: '0 auto 36px', fontFamily: SANS, fontWeight: 300 }}>
               Empieza gratis, actualiza cuando lo necesites. Sin contratos ni sorpresas.
             </p>
             <div style={{ display: 'inline-flex', background: WHITE, borderRadius: 9999, padding: 4, border: `1px solid ${BORDER}`, boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
-              <button onClick={() => setAnnual(false)} style={{ padding: '10px 28px', borderRadius: 9999, border: 'none', cursor: 'pointer', background: !annual ? ACTION : 'transparent', color: !annual ? WHITE : '#6B5848', fontSize: 14, fontFamily: SANS, fontWeight: 500, transition: 'background 0.2s, color 0.2s' }}>Mensual</button>
-              <button onClick={() => setAnnual(true)} style={{ padding: '10px 28px', borderRadius: 9999, border: 'none', cursor: 'pointer', background: annual ? ACTION : 'transparent', color: annual ? WHITE : '#6B5848', fontSize: 14, fontFamily: SANS, fontWeight: 500, transition: 'background 0.2s, color 0.2s', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <button onClick={() => setAnnual(false)} style={{ padding: '10px 28px', borderRadius: 9999, border: 'none', cursor: 'pointer', background: !annual ? ACTION : 'transparent', color: !annual ? WHITE : '#6B7280', fontSize: 14, fontFamily: SANS, fontWeight: 500, transition: 'background 0.2s, color 0.2s' }}>Mensual</button>
+              <button onClick={() => setAnnual(true)} style={{ padding: '10px 28px', borderRadius: 9999, border: 'none', cursor: 'pointer', background: annual ? ACTION : 'transparent', color: annual ? WHITE : '#6B7280', fontSize: 14, fontFamily: SANS, fontWeight: 500, transition: 'background 0.2s, color 0.2s', display: 'flex', alignItems: 'center', gap: 8 }}>
                 Anual
                 <span style={{ background: MINT_C, color: PRIMARY, fontSize: 11, padding: '2px 8px', borderRadius: 9999, fontWeight: 600 }}>-20%</span>
               </button>
@@ -937,7 +937,7 @@ export default function Landing() {
                 <p style={{ margin: '0 0 24px', fontSize: 9, color: 'rgba(255,255,255,0.18)', fontFamily: SANS }}>sábado, 23 mayo</p>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, width: '100%' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-                    <div style={{ width: 44, height: 44, borderRadius: 12, overflow: 'hidden', boxShadow: '0 6px 20px rgba(13,107,99,0.50)', flexShrink: 0 }}>
+                    <div style={{ width: 44, height: 44, borderRadius: 12, overflow: 'hidden', boxShadow: '0 6px 20px rgba(20,60,50,0.50)', flexShrink: 0 }}>
                       <img src="/icon-192.png" alt="FamiliaCerca" style={{ width: 44, height: 44, display: 'block' }} />
                     </div>
                     <span style={{ fontSize: 8, color: WHITE, fontFamily: SANS, textAlign: 'center', lineHeight: 1.2 }}>Familia Cerca</span>
@@ -976,8 +976,8 @@ export default function Landing() {
       {/* ─────────────── 14. CTA FINAL ─────────────── */}
       <section style={{ position: 'relative', padding: '160px 32px', overflow: 'hidden', minHeight: 560, display: 'flex', alignItems: 'center' }}>
         <img src={CTA_IMG} alt="" aria-hidden="true" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(11,79,74,0.88)' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(11,79,74,0.65) 0%, transparent 55%)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(20,60,50,0.88)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(20,60,50,0.65) 0%, transparent 55%)' }} />
         <div style={{ position: 'relative', zIndex: 1, maxWidth: 1140, margin: '0 auto', width: '100%' }}>
           <div style={{ maxWidth: 680 }}>
             <p style={{ fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 20px', fontFamily: SANS }}>Empieza hoy</p>
@@ -1000,7 +1000,7 @@ export default function Landing() {
       </section>
 
       {/* ─────────────── 15. FOOTER ─────────────── */}
-      <footer style={{ background: DARK, padding: '64px 32px 48px', borderTop: `1px solid rgba(229,139,115,0.10)` }}>
+      <footer style={{ background: DARK, padding: '64px 32px 48px', borderTop: `1px solid rgba(233,130,110,0.10)` }}>
         <div style={{ maxWidth: 1140, margin: '0 auto' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 48, marginBottom: 52 }}>
             <div style={{ flex: '0 0 auto', maxWidth: 280 }}>
@@ -1008,7 +1008,7 @@ export default function Landing() {
                 <img src="/logo-icon.png" alt="FamiliaCerca" style={{ height: '110px', width: 'auto', display: 'block' }} />
                 <span style={{ fontFamily: SERIF, fontWeight: 700, margin: 0, padding: 0, marginLeft: '-12px' }}>
                   <span style={{ color: '#F8F4ED', fontSize: 26 }}>Familia</span>
-                  <span style={{ color: '#E58B73', fontSize: 26 }}>Cerca</span>
+                  <span style={{ color: '#E9826E', fontSize: 26 }}>Cerca</span>
                 </span>
               </div>
               <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.32)', lineHeight: 1.7, fontFamily: SANS, fontWeight: 300, margin: '0 0 24px' }}>
@@ -1022,7 +1022,7 @@ export default function Landing() {
                 ].map(s => (
                   <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label}
                     style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.09)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.40)', textDecoration: 'none' }}
-                    onMouseEnter={e => { e.currentTarget.style.color = GOLD; e.currentTarget.style.background = `rgba(229,139,115,0.10)` }}
+                    onMouseEnter={e => { e.currentTarget.style.color = GOLD; e.currentTarget.style.background = `rgba(233,130,110,0.10)` }}
                     onMouseLeave={e => { e.currentTarget.style.color = 'rgba(255,255,255,0.40)'; e.currentTarget.style.background = 'rgba(255,255,255,0.06)' }}
                   >{s.icon}</a>
                 ))}
@@ -1127,9 +1127,9 @@ export default function Landing() {
         .marquee-track:hover, .marquee-track-reverse:hover { animation-play-state: paused; }
 
         .feature-hero-card { transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s ease; }
-        .feature-hero-card:hover { transform: translateY(-8px) !important; box-shadow: 0 28px 80px rgba(13,107,99,0.12) !important; }
+        .feature-hero-card:hover { transform: translateY(-8px) !important; box-shadow: 0 28px 80px rgba(20,60,50,0.12) !important; }
 
-        @keyframes badge-pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(229,139,115,0.55); } 70% { box-shadow: 0 0 0 10px rgba(229,139,115,0); } 100% { box-shadow: 0 0 0 0 rgba(229,139,115,0); } }
+        @keyframes badge-pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(233,130,110,0.55); } 70% { box-shadow: 0 0 0 10px rgba(233,130,110,0); } 100% { box-shadow: 0 0 0 0 rgba(233,130,110,0); } }
         .badge-pulse-anim { animation: badge-pulse-ring 2s cubic-bezier(0.66,0,0,1) infinite; }
 
         .price-card-hover { transition: transform 0.25s ease, box-shadow 0.25s ease; }
@@ -1141,16 +1141,16 @@ export default function Landing() {
         .como-line { transform-origin: top; animation: grow-line 1s ease-out 0.6s both; }
 
         .faq-dark-item { transition: background 0.18s ease; border-radius: 8px; }
-        .faq-dark-item:hover { background: rgba(229,139,115,0.04); }
+        .faq-dark-item:hover { background: rgba(233,130,110,0.04); }
         .faq-light-item { transition: background 0.18s ease; border-radius: 8px; }
-        .faq-light-item:hover { background: rgba(13,107,99,0.05); }
+        .faq-light-item:hover { background: rgba(20,60,50,0.05); }
 
         .cta-coral { transition: background 0.2s ease !important; }
-        .cta-coral:hover { background: #d4785f !important; }
+        .cta-coral:hover { background: #D86F5A !important; }
         .btn-outlined-teal { transition: background 0.2s ease, color 0.2s ease; }
-        .btn-outlined-teal:hover { background: #0B4F4A !important; color: white !important; }
+        .btn-outlined-teal:hover { background: #143C32 !important; color: white !important; }
         .btn-nav-cream { transition: background 0.2s ease, color 0.2s ease; }
-        .btn-nav-cream:hover { background: #F8F4ED !important; color: #0B4F4A !important; }
+        .btn-nav-cream:hover { background: #F8F4ED !important; color: #143C32 !important; }
 
         @media (max-width: 768px) {
           .landing-desktop-nav { display: none !important; }
