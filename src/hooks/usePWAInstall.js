@@ -1,12 +1,8 @@
 import { useState, useEffect } from 'react'
+import { isKnownInstalled, checkRelatedApps, listenForInstalledEvent } from '../lib/pwaInstall'
 
 const DISMISS_KEY = 'pwa_install_dismissed_at'
 const DISMISS_MS  = 7 * 24 * 60 * 60 * 1000
-
-function isStandaloneMode() {
-  return window.matchMedia('(display-mode: standalone)').matches ||
-    window.navigator.standalone === true
-}
 
 function isIOSDevice() {
   return /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream
@@ -26,18 +22,21 @@ function wasDismissedRecently() {
 }
 
 export function usePWAInstall() {
-  const [installed, setInstalled] = useState(isStandaloneMode)
+  const [installed, setInstalled] = useState(isKnownInstalled)
   const [prompt, setPrompt] = useState(null)
   const [dismissed, setDismissed] = useState(wasDismissedRecently)
 
   useEffect(() => {
     if (installed) return
 
+    checkRelatedApps().then(found => { if (found) setInstalled(true) })
+    const stopListening = listenForInstalledEvent(() => setInstalled(true))
+
     // Use prompt captured by the inline script in index.html before React mounts
     if (window.__pwaPrompt) {
       setPrompt(window.__pwaPrompt)
       window.__pwaPrompt = null
-      return
+      return stopListening
     }
 
     function handler(e) {
@@ -45,7 +44,7 @@ export function usePWAInstall() {
       setPrompt(e)
     }
     window.addEventListener('beforeinstallprompt', handler)
-    return () => window.removeEventListener('beforeinstallprompt', handler)
+    return () => { window.removeEventListener('beforeinstallprompt', handler); stopListening() }
   }, [installed])
 
   async function install() {

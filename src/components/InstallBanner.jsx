@@ -1,13 +1,9 @@
 import { useState, useEffect } from 'react'
+import { isKnownInstalled, checkRelatedApps, listenForInstalledEvent } from '../lib/pwaInstall'
 
 const DISMISS_KEY = 'pwa_install_dismissed_at'
 const DISMISS_MS  = 7 * 24 * 60 * 60 * 1000   // 7 days
 const SHOW_DELAY  = 10_000                       // 10 seconds
-
-function isStandalone() {
-  return window.matchMedia('(display-mode: standalone)').matches ||
-    window.navigator.standalone === true
-}
 
 function wasDismissed() {
   const ts = localStorage.getItem(DISMISS_KEY)
@@ -58,14 +54,16 @@ export default function InstallBanner() {
   const [success,  setSuccess]  = useState(false)
 
   useEffect(() => {
-    if (isStandalone() || wasDismissed()) return
+    if (isKnownInstalled() || wasDismissed()) return
     if (device === 'desktop') return
 
     let timer
+    const stopListening = listenForInstalledEvent(() => { setVisible(false); clearTimeout(timer) })
+    checkRelatedApps().then(found => { if (found) { setVisible(false); clearTimeout(timer) } })
 
     if (device === 'ios') {
       timer = setTimeout(() => setVisible(true), SHOW_DELAY)
-      return () => clearTimeout(timer)
+      return () => { clearTimeout(timer); stopListening() }
     }
 
     // Android — use prompt captured before React mounted
@@ -73,7 +71,7 @@ export default function InstallBanner() {
     if (saved) {
       window.__pwaPrompt = null
       timer = setTimeout(() => { setPrompt(saved); setVisible(true) }, SHOW_DELAY)
-      return () => clearTimeout(timer)
+      return () => { clearTimeout(timer); stopListening() }
     }
 
     function onPrompt(e) {
@@ -81,7 +79,7 @@ export default function InstallBanner() {
       timer = setTimeout(() => { setPrompt(e); setVisible(true) }, SHOW_DELAY)
     }
     window.addEventListener('beforeinstallprompt', onPrompt)
-    return () => { window.removeEventListener('beforeinstallprompt', onPrompt); clearTimeout(timer) }
+    return () => { window.removeEventListener('beforeinstallprompt', onPrompt); clearTimeout(timer); stopListening() }
   }, [device])
 
   function dismiss() {

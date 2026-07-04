@@ -1,16 +1,10 @@
 import { useEffect, useState } from 'react'
+import { isKnownInstalled, checkRelatedApps, listenForInstalledEvent } from '../lib/pwaInstall'
 
 const DISMISSED_KEY = 'fc_install_dismissed_until'
 
 function isIOS() {
   return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream
-}
-
-function isStandalone() {
-  return (
-    window.matchMedia('(display-mode: standalone)').matches ||
-    window.navigator.standalone === true
-  )
 }
 
 function isDismissed() {
@@ -22,10 +16,13 @@ function isDismissed() {
 export function useInstallPrompt() {
   const [prompt, setPrompt] = useState(() => window.__pwaPrompt ?? null)
   const [showIOS, setShowIOS] = useState(false)
-  const [hidden, setHidden] = useState(() => isStandalone() || isDismissed())
+  const [hidden, setHidden] = useState(() => isKnownInstalled() || isDismissed())
 
   useEffect(() => {
     if (hidden) return
+
+    checkRelatedApps().then(found => { if (found) setHidden(true) })
+    const stopListening = listenForInstalledEvent(() => setHidden(true))
 
     // Android/Desktop: catch deferred prompt if it fires after React mounts
     function onBeforeInstall(e) {
@@ -35,11 +32,11 @@ export function useInstallPrompt() {
     window.addEventListener('beforeinstallprompt', onBeforeInstall)
 
     // iOS: no beforeinstallprompt — show manual instructions
-    if (isIOS() && !isStandalone()) {
+    if (isIOS() && !isKnownInstalled()) {
       setShowIOS(true)
     }
 
-    return () => window.removeEventListener('beforeinstallprompt', onBeforeInstall)
+    return () => { window.removeEventListener('beforeinstallprompt', onBeforeInstall); stopListening() }
   }, [hidden])
 
   function dismiss(days = 30) {
