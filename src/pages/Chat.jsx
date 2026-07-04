@@ -662,7 +662,7 @@ export default function Chat() {
                   fontFamily: 'inherit',
                   transition: 'border-color 0.15s',
                 }}
-                onFocus={e => { e.target.style.borderColor = '#143C32' }}
+                onFocus={e => { e.target.style.borderColor = '#0d6b63' }}
                 onBlur={e => { e.target.style.borderColor = '#EDE5D8' }}
               />
               <MicButton recording={recording} onStart={start} onStop={stop} />
@@ -687,7 +687,7 @@ export default function Chat() {
                 loadingText="..."
                 style={{
                   padding: '10px 18px', borderRadius: 16, fontSize: 13, flexShrink: 0,
-                  background: '#143C32', boxShadow: sending || !input.trim() ? 'none' : '0 4px 14px rgba(20,60,50,0.25)',
+                  background: '#0d6b63', boxShadow: sending || !input.trim() ? 'none' : '0 4px 14px rgba(13,107,99,0.25)',
                 }}
               >
                 Enviar

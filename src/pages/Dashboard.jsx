@@ -3310,7 +3310,7 @@ export default function Dashboard() {
                       bg: '#F0F0FA',
                       title: 'Inventario',
                       number: totalStock,
-                      numberColor: '#143C32',
+                      numberColor: '#0d6b63',
                       label: 'dosis disp.',
                       onClick: () => navigate('/medications'),
                     },
@@ -3319,7 +3319,7 @@ export default function Dashboard() {
                       bg: '#FFF3F0',
                       title: 'Recetas',
                       number: medTotal,
-                      numberColor: '#143C32',
+                      numberColor: '#0d6b63',
                       label: `activa${medTotal !== 1 ? 's' : ''}`,
                       onClick: () => navigate('/medications'),
                     },
@@ -3454,8 +3454,8 @@ export default function Dashboard() {
                   <p style={{ margin: '0 0 12px', fontSize: 14, fontWeight: 600, color: '#143C32' }}>Acciones rápidas</p>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
                     {[
-                      { Icon: MessageCircle, label: 'Chat',         onClick: () => navigate('/chat'),         circleBg: '#EFF6F0', iconColor: '#143C32' },
-                      { Icon: Video,         label: 'Videollamada', onClick: () => navigate('/videollamada'), circleBg: '#EFF6F0', iconColor: '#143C32' },
+                      { Icon: MessageCircle, label: 'Chat',         onClick: () => navigate('/chat'),         circleBg: '#EFF6F0', iconColor: '#0d6b63' },
+                      { Icon: Video,         label: 'Videollamada', onClick: () => navigate('/videollamada'), circleBg: '#EFF6F0', iconColor: '#0d6b63' },
                       { Icon: AlertTriangle, label: 'Emergencia',   onClick: prepareSOS,                      circleBg: '#FEF0ED', iconColor: '#E9826E' },
                     ].map(({ Icon, label, onClick, circleBg, iconColor }) => (
                       <button
@@ -3487,27 +3487,27 @@ export default function Dashboard() {
                     ════════════════════════════════════ */}
                 {(() => {
                   const allTools = [
-                    { Icon: Users,         label: 'Equipo',        onClick: () => navigate('/familia'),                circleBg: '#EFF6F0', iconColor: '#143C32' },
+                    { Icon: Users,         label: 'Equipo',        onClick: () => navigate('/familia'),                circleBg: '#EFF6F0', iconColor: '#0d6b63' },
                     { Icon: Building2,     label: 'Hospital',      onClick: () => setShowHospitalModal(true),          circleBg: '#FEF0ED', iconColor: '#E9826E' },
                     { Icon: Calendar,      label: 'Citas',         onClick: () => navigate('/calendar'),               circleBg: '#FFF8EC', iconColor: '#D99A18' },
                     { Icon: Image,         label: 'Álbum',         onClick: () => navigate('/album'),                  circleBg: '#FEF0ED', iconColor: '#E9826E' },
-                    { Icon: Video,         label: 'Videollamada',  onClick: () => setShowVideoCallModal(true),         circleBg: '#EFF6F0', iconColor: '#143C32' },
-                    { Icon: MessageCircle, label: 'Chat',          onClick: () => navigate('/chat'),                   circleBg: '#EFF6F0', iconColor: '#143C32' },
+                    { Icon: Video,         label: 'Videollamada',  onClick: () => setShowVideoCallModal(true),         circleBg: '#EFF6F0', iconColor: '#0d6b63' },
+                    { Icon: MessageCircle, label: 'Chat',          onClick: () => navigate('/chat'),                   circleBg: '#EFF6F0', iconColor: '#0d6b63' },
                     { Icon: Thermometer,   label: 'Síntomas',      onClick: () => navigate('/registros'),              circleBg: '#FEF0ED', iconColor: '#E9826E' },
-                    { Icon: ClipboardList, label: 'Historial',     onClick: () => navigate('/historial'),              circleBg: '#EFF6F0', iconColor: '#143C32' },
+                    { Icon: ClipboardList, label: 'Historial',     onClick: () => navigate('/historial'),              circleBg: '#EFF6F0', iconColor: '#0d6b63' },
                     { Icon: CheckSquare,   label: 'Rutina diaria', onClick: () => navigate('/cuidado'),                circleBg: '#FFF8EC', iconColor: '#D99A18' },
-                    { Icon: Stethoscope,   label: 'Notas médicas', onClick: () => navigate('/diario-medico'),          circleBg: '#EFF6F0', iconColor: '#143C32' },
+                    { Icon: Stethoscope,   label: 'Notas médicas', onClick: () => navigate('/diario-medico'),          circleBg: '#EFF6F0', iconColor: '#0d6b63' },
                     { Icon: Heart,         label: 'Notas familia', onClick: () => navigate('/paciente/notas-familia'), circleBg: '#FEF0ED', iconColor: '#E9826E' },
                     { Icon: DollarSign,    label: 'Gastos',        onClick: () => navigate('/gastos'),                 circleBg: '#FFF8EC', iconColor: '#D99A18' },
-                    { Icon: BookOpen,      label: 'Directorio',    onClick: () => navigate('/directorio'),             circleBg: '#EFF6F0', iconColor: '#143C32' },
+                    { Icon: BookOpen,      label: 'Directorio',    onClick: () => navigate('/directorio'),             circleBg: '#EFF6F0', iconColor: '#0d6b63' },
                     { Icon: Sparkles,      label: 'Milo & Luna',   onClick: () => setShowCompanion(true),              circleBg: '#FEF0ED', iconColor: '#E9826E' },
-                    { Icon: User,          label: 'Mi cuenta',     onClick: () => navigate('/ajustes'),                circleBg: '#EFF6F0', iconColor: '#143C32' },
+                    { Icon: User,          label: 'Mi cuenta',     onClick: () => navigate('/ajustes'),                circleBg: '#EFF6F0', iconColor: '#0d6b63' },
                   ]
                   const featuredTools = [
-                    { Icon: Users,    label: 'Equipo',   onClick: () => navigate('/familia'),          circleBg: '#EFF6F0', iconColor: '#143C32' },
+                    { Icon: Users,    label: 'Equipo',   onClick: () => navigate('/familia'),          circleBg: '#EFF6F0', iconColor: '#0d6b63' },
                     { Icon: Building2, label: 'Hospital', onClick: () => setShowHospitalModal(true),   circleBg: '#FEF0ED', iconColor: '#E9826E' },
                     { Icon: Calendar, label: 'Citas',    onClick: () => navigate('/calendar'),         circleBg: '#FFF8EC', iconColor: '#D99A18' },
-                    { Icon: Image,    label: 'Álbum',    onClick: () => navigate('/album'),            circleBg: '#EFF6F0', iconColor: '#143C32' },
+                    { Icon: Image,    label: 'Álbum',    onClick: () => navigate('/album'),            circleBg: '#EFF6F0', iconColor: '#0d6b63' },
                   ]
                   return (
                     <div>

@@ -47,7 +47,9 @@ Si algo de esto se rompió → corregir antes de entregar.
 ## Design tokens (fuente de verdad)
 - Fondo: crema #F8F4ED · Header claro vía isLightHeader en Layout.jsx
 - Cards: blanco, borderRadius 16-20px, sombra suave
-- Acentos: coral #E9826E (activos/CTAs), verde #143C32 (primarios)
+- Acentos: coral #E9826E (activos/CTAs)
+- VERDE VIVO (protagonista, acción): #0d6b63 — botones primarios, links, CTAs, estados activos, cifras, iconos de acción, degradados
+- VERDE PETRÓLEO (estructura): #143C32 — títulos, texto, wordmark, fondos oscuros (nav/paneles) donde el contraste manda
 - GOLD (acento terciario, uso limitado): #D99A18 — solo para warnings suaves y categorización de íconos; nunca para CTAs ni superficies
 - Textos: #143C32 títulos, #6B7280 secundarios
 - Chips: activo coral con texto #143C32, inactivo transparente borde #EDE5D8

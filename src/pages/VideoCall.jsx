@@ -220,7 +220,7 @@ export default function VideoCall() {
                 disabled={startingInstant}
                 style={{
                   padding: '16px 40px', borderRadius: 16, border: 'none',
-                  background: startingInstant ? '#C9C2B4' : '#143C32',
+                  background: startingInstant ? '#C9C2B4' : '#0d6b63',
                   color: 'white', fontWeight: 800, fontSize: 16,
                   cursor: startingInstant ? 'default' : 'pointer',
                   display: 'flex', alignItems: 'center', gap: 10,
@@ -262,7 +262,7 @@ export default function VideoCall() {
                     onClick={() => setSchedSuccess(null)}
                     style={{
                       padding: '12px 28px', borderRadius: 14, border: '1.5px solid #EDE5D8',
-                      background: 'transparent', color: '#143C32',
+                      background: 'transparent', color: '#0d6b63',
                       fontWeight: 700, fontSize: 14, cursor: 'pointer',
                     }}
                   >
@@ -336,7 +336,7 @@ export default function VideoCall() {
                     disabled={!schedDate || !schedTime || scheduling}
                     style={{
                       padding: '15px', borderRadius: 16, border: 'none',
-                      background: schedDate && schedTime && !scheduling ? '#143C32' : '#E5DED2',
+                      background: schedDate && schedTime && !scheduling ? '#0d6b63' : '#E5DED2',
                       color: schedDate && schedTime && !scheduling ? 'white' : '#9CA3AF',
                       fontWeight: 800, fontSize: 15,
                       cursor: schedDate && schedTime && !scheduling ? 'pointer' : 'default',
@@ -409,7 +409,7 @@ export default function VideoCall() {
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           flexDirection: 'column', gap: 16, padding: '48px 24px',
         }}>
-          <div style={{ width: 40, height: 40, borderRadius: '50%', border: '3px solid #EDE5D8', borderTopColor: '#143C32', animation: 'spin 0.8s linear infinite' }} />
+          <div style={{ width: 40, height: 40, borderRadius: '50%', border: '3px solid #EDE5D8', borderTopColor: '#0d6b63', animation: 'spin 0.8s linear infinite' }} />
           <p style={{ color: '#143C32', fontSize: 15, fontWeight: 600 }}>Conectando...</p>
           <style>{SPIN_KEYFRAMES}</style>
         </div>
@@ -433,7 +433,7 @@ export default function VideoCall() {
             onClick={() => navigate('/dashboard')}
             style={{
               padding: '12px 28px', borderRadius: 12, border: 'none',
-              background: '#143C32', color: 'white', fontWeight: 700,
+              background: '#0d6b63', color: 'white', fontWeight: 700,
               fontSize: 14, cursor: 'pointer',
             }}
           >
@@ -465,7 +465,7 @@ export default function VideoCall() {
             onClick={() => navigate('/dashboard')}
             style={{
               padding: '12px 28px', borderRadius: 12, border: 'none',
-              background: '#143C32', color: 'white', fontWeight: 700,
+              background: '#0d6b63', color: 'white', fontWeight: 700,
               fontSize: 14, cursor: 'pointer',
             }}
           >
@@ -520,7 +520,7 @@ export default function VideoCall() {
               <p style={{ margin: 0, color: '#6B7280', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                 La sala abre en
               </p>
-              <p style={{ margin: '6px 0 0', color: '#143C32', fontSize: 32, fontWeight: 800 }}>
+              <p style={{ margin: '6px 0 0', color: '#0d6b63', fontSize: 32, fontWeight: 800 }}>
                 {minutesUntil} min
               </p>
               <p style={{ margin: '4px 0 0', color: '#6B7280', fontSize: 12 }}>
@@ -543,7 +543,7 @@ export default function VideoCall() {
                   </p>
                   <button
                     onClick={requestPermissionsAndJoin}
-                    style={{ padding: '8px 18px', borderRadius: 10, border: 'none', background: '#143C32', color: 'white', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}
+                    style={{ padding: '8px 18px', borderRadius: 10, border: 'none', background: '#0d6b63', color: 'white', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}
                   >
                     Intentar de nuevo
                   </button>
@@ -555,7 +555,7 @@ export default function VideoCall() {
                 disabled={permStatus === 'requesting'}
                 style={{
                   padding: '16px 40px', borderRadius: 16, border: 'none',
-                  background: permStatus === 'requesting' ? '#C9C2B4' : '#143C32',
+                  background: permStatus === 'requesting' ? '#C9C2B4' : '#0d6b63',
                   color: 'white', fontWeight: 800, fontSize: 16,
                   cursor: permStatus === 'requesting' ? 'default' : 'pointer',
                   display: 'flex', alignItems: 'center', gap: 10,

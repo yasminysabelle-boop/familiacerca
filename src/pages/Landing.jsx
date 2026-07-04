@@ -11,7 +11,7 @@ const COMO_IMG = '/images/como.jpg'
 const CTA_IMG  = '/images/cta.jpg'
 
 const PRIMARY = '#143C32'
-const ACTION  = '#143C32'
+const ACTION  = '#0d6b63'
 const CREAM   = '#F8F4ED'
 const SAND    = '#EDE5D8'
 const GOLD    = '#E9826E'
@@ -19,7 +19,7 @@ const CORAL   = '#E9826E'
 const MINT_C  = '#EBF3EE'
 const DARK    = '#143C32'
 const WHITE   = '#FFFFFF'
-const BORDER  = 'rgba(20,60,50,0.12)'
+const BORDER  = 'rgba(13,107,99,0.12)'
 
 const SERIF = "'Cormorant Garamond', Georgia, serif"
 const SANS  = "'Inter', system-ui, sans-serif"
@@ -45,8 +45,8 @@ function FAQItem({ q, a, light = false, onTrack }) {
   const [open, setOpen] = useState(false)
   const textColor   = light ? '#143C32' : 'rgba(255,255,255,0.82)'
   const answerColor = light ? '#6B7280' : 'rgba(255,255,255,0.50)'
-  const borderColor = light ? 'rgba(20,60,50,0.18)' : `rgba(233,130,110,0.12)`
-  const iconBorder  = light ? 'rgba(20,60,50,0.35)' : `rgba(233,130,110,0.40)`
+  const borderColor = light ? 'rgba(13,107,99,0.18)' : `rgba(233,130,110,0.12)`
+  const iconBorder  = light ? 'rgba(13,107,99,0.35)' : `rgba(233,130,110,0.40)`
   const toggle = () => {
     const next = !open
     setOpen(next)
@@ -75,7 +75,7 @@ function PriceCard({ name, price, period, highlight, badge, features, cta, annua
   return (
     <div
       className={`price-card-hover${highlight ? ' price-card-highlighted' : ''}`}
-      style={{ flex: '1 1 280px', borderRadius: 24, background: highlight ? ACTION : WHITE, padding: '44px 32px', boxShadow: highlight ? '0 32px 96px rgba(20,60,50,0.35)' : '0 4px 28px rgba(0,0,0,0.07)', border: highlight ? 'none' : `1px solid ${BORDER}`, position: 'relative', display: 'flex', flexDirection: 'column' }}
+      style={{ flex: '1 1 280px', borderRadius: 24, background: highlight ? ACTION : WHITE, padding: '44px 32px', boxShadow: highlight ? '0 32px 96px rgba(13,107,99,0.35)' : '0 4px 28px rgba(0,0,0,0.07)', border: highlight ? 'none' : `1px solid ${BORDER}`, position: 'relative', display: 'flex', flexDirection: 'column' }}
     >
       {badge && (
         <div className={highlight ? 'badge-pulse-anim' : ''} style={{ position: 'absolute', top: -16, left: '50%', transform: 'translateX(-50%)', background: GOLD, color: 'white', fontSize: 10, fontWeight: 500, letterSpacing: '0.12em', padding: '6px 22px', borderRadius: 9999, whiteSpace: 'nowrap', fontFamily: SANS }}>{badge}</div>
@@ -322,10 +322,10 @@ export default function Landing() {
 
         {/* Left dark panel */}
         <div className="landing-hero-text" style={{ background: PRIMARY, position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: 'clamp(80px,8vw,120px) clamp(32px,5vw,72px)', overflow: 'hidden', textAlign: 'center' }}>
-          <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'radial-gradient(ellipse 70% 55% at 30% 55%, rgba(20,60,50,0.22) 0%, transparent 70%)' }} />
+          <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'radial-gradient(ellipse 70% 55% at 30% 55%, rgba(13,107,99,0.22) 0%, transparent 70%)' }} />
 
           <div style={{ position: 'relative', width: '100%', maxWidth: 520, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <div className="hero-reveal hero-delay-1" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, border: '1px solid rgba(20,60,50,0.40)', borderRadius: 9999, padding: '7px 18px', marginBottom: 36, background: 'rgba(20,60,50,0.14)' }}>
+            <div className="hero-reveal hero-delay-1" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, border: '1px solid rgba(13,107,99,0.40)', borderRadius: 9999, padding: '7px 18px', marginBottom: 36, background: 'rgba(13,107,99,0.14)' }}>
               <span style={{ fontSize: 13 }}>🌿</span>
               <span style={{ fontSize: 12, fontWeight: 500, color: MINT_C, letterSpacing: '0.06em', fontFamily: SANS }}>Cuidado familiar coordinado</span>
             </div>
@@ -421,7 +421,7 @@ export default function Landing() {
               </div>
             )
             const div = i < statItems.length - 1 ? (
-              <div key={`d${i}`} className="landing-divider" style={{ width: 1, height: 88, background: `linear-gradient(to bottom, transparent, rgba(20,60,50,0.22), transparent)`, flexShrink: 0 }} />
+              <div key={`d${i}`} className="landing-divider" style={{ width: 1, height: 88, background: `linear-gradient(to bottom, transparent, rgba(13,107,99,0.22), transparent)`, flexShrink: 0 }} />
             ) : null
             return div ? [el, div] : [el]
           })}
@@ -543,7 +543,7 @@ export default function Landing() {
               </div>
               <div style={{ background: SAND, padding: '14px', display: 'flex', flexDirection: 'column', gap: 10, minHeight: 380 }}>
                 {/* Confirmed med card */}
-                <div style={{ background: WHITE, borderRadius: 14, padding: '14px 16px', border: `1px solid rgba(20,60,50,0.15)` }}>
+                <div style={{ background: WHITE, borderRadius: 14, padding: '14px 16px', border: `1px solid rgba(13,107,99,0.15)` }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
                     <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: PRIMARY, fontFamily: SANS }}>💊 Medicamentos del día</p>
                     <span style={{ fontSize: 10, color: ACTION, background: MINT_C, borderRadius: 9999, padding: '2px 10px', fontFamily: SANS, fontWeight: 600 }}>2/3 ✓</span>
@@ -563,7 +563,7 @@ export default function Landing() {
                   ))}
                 </div>
                 {/* Confirmation with photo */}
-                <div style={{ background: WHITE, borderRadius: 14, padding: '12px 16px', border: `1px solid rgba(20,60,50,0.15)` }}>
+                <div style={{ background: WHITE, borderRadius: 14, padding: '12px 16px', border: `1px solid rgba(13,107,99,0.15)` }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <div style={{ width: 40, height: 40, borderRadius: 10, background: MINT_C, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>📷</div>
                     <div>
@@ -606,7 +606,7 @@ export default function Landing() {
               { icon: '📋', title: 'Historial completo', desc: 'Nada se pierde entre mensajes o llamadas.' },
               { icon: '🚨', title: 'Respuesta rápida', desc: 'Alertas automáticas cuando algo requiere atención.' },
             ].map((b, i) => (
-              <div key={b.title} className={`reveal reveal-delay-${i}`} style={{ background: WHITE, borderRadius: 20, border: `1px solid ${BORDER}`, padding: '36px 28px', boxShadow: '0 4px 20px rgba(20,60,50,0.06)' }}>
+              <div key={b.title} className={`reveal reveal-delay-${i}`} style={{ background: WHITE, borderRadius: 20, border: `1px solid ${BORDER}`, padding: '36px 28px', boxShadow: '0 4px 20px rgba(13,107,99,0.06)' }}>
                 <div style={{ fontSize: 36, marginBottom: 16 }}>{b.icon}</div>
                 <h3 style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 600, color: PRIMARY, margin: '0 0 10px', lineHeight: 1.2 }}>{b.title}</h3>
                 <p style={{ fontSize: 16, color: '#6B7280', lineHeight: 1.75, margin: 0, fontFamily: SANS, fontWeight: 300 }}>{b.desc}</p>
@@ -618,7 +618,7 @@ export default function Landing() {
 
       {/* ─────────────── 7. FEATURES ─────────────── */}
       <section id="funciones" style={{ padding: '128px 32px', background: CREAM, position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: 800, height: 400, pointerEvents: 'none', background: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(20,60,50,0.05) 0%, transparent 70%)' }} />
+        <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: 800, height: 400, pointerEvents: 'none', background: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(13,107,99,0.05) 0%, transparent 70%)' }} />
         <div style={{ maxWidth: 1140, margin: '0 auto', position: 'relative' }}>
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 80 }}>
             <p style={{ fontSize: 11, fontWeight: 500, color: ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>Funciones</p>
@@ -634,7 +634,7 @@ export default function Landing() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 24, marginBottom: 24 }}>
 
             {/* Card 1: Medicamentos */}
-            <div className="feature-hero-card reveal" style={{ background: WHITE, borderRadius: 22, border: `1px solid rgba(20,60,50,0.18)`, padding: '36px 30px', boxShadow: '0 4px 24px rgba(20,60,50,0.07)', minHeight: 420, position: 'relative' }}>
+            <div className="feature-hero-card reveal" style={{ background: WHITE, borderRadius: 22, border: `1px solid rgba(13,107,99,0.18)`, padding: '36px 30px', boxShadow: '0 4px 24px rgba(13,107,99,0.07)', minHeight: 420, position: 'relative' }}>
               <div style={{ width: 60, height: 60, borderRadius: 16, background: `rgba(20,60,50,0.07)`, border: '1px solid rgba(20,60,50,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, marginBottom: 18 }}>📊</div>
               <div style={{ display: 'inline-flex', padding: '4px 12px', borderRadius: 9999, border: `1px solid rgba(233,130,110,0.30)`, marginBottom: 12, background: 'rgba(233,130,110,0.07)' }}>
                 <span style={{ fontSize: 10, fontWeight: 500, color: GOLD, letterSpacing: '0.08em', fontFamily: SANS }}>Lo más importante</span>
@@ -643,14 +643,14 @@ export default function Landing() {
               <p style={{ fontSize: 17, color: '#6B7280', lineHeight: 1.75, margin: '0 0 20px', fontFamily: SANS, fontWeight: 300 }}>
                 Lo primero que todos quieren saber. Estado actual, medicamentos pendientes, última actualización y quién la realizó.
               </p>
-              <div style={{ background: SAND, borderRadius: 12, padding: '12px 14px', border: `1px solid rgba(20,60,50,0.10)` }}>
+              <div style={{ background: SAND, borderRadius: 12, padding: '12px 14px', border: `1px solid rgba(13,107,99,0.10)` }}>
                 {[
                   { label: 'Atenolol 25mg · 8am', done: true, alert: false },
                   { label: 'Metformina 500mg · 1pm', done: true, alert: false },
                   { label: 'Losartán 50mg · 8pm', done: false, alert: true },
                 ].map((item, i, arr) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '7px 0', borderBottom: i < arr.length - 1 ? `1px solid rgba(20,60,50,0.08)` : 'none' }}>
-                    <span style={{ width: 17, height: 17, borderRadius: '50%', background: item.done ? ACTION : 'transparent', border: `1.5px solid ${item.done ? ACTION : item.alert ? CORAL : 'rgba(20,60,50,0.25)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '7px 0', borderBottom: i < arr.length - 1 ? `1px solid rgba(13,107,99,0.08)` : 'none' }}>
+                    <span style={{ width: 17, height: 17, borderRadius: '50%', background: item.done ? ACTION : 'transparent', border: `1.5px solid ${item.done ? ACTION : item.alert ? CORAL : 'rgba(13,107,99,0.25)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                       {item.done && <span style={{ color: WHITE, fontSize: 8 }}>✓</span>}
                     </span>
                     <span style={{ fontSize: 11, fontFamily: SANS, color: item.done ? '#9BA89F' : item.alert ? CORAL : PRIMARY, textDecoration: item.done ? 'line-through' : 'none', fontWeight: item.alert ? 500 : 300 }}>{item.label}</span>
@@ -661,7 +661,7 @@ export default function Landing() {
             </div>
 
             {/* Card 2: Chat categorizado */}
-            <div className="feature-hero-card reveal reveal-delay-1" style={{ background: WHITE, borderRadius: 22, border: `1px solid rgba(20,60,50,0.18)`, padding: '36px 30px', boxShadow: '0 4px 24px rgba(20,60,50,0.07)', minHeight: 420, position: 'relative' }}>
+            <div className="feature-hero-card reveal reveal-delay-1" style={{ background: WHITE, borderRadius: 22, border: `1px solid rgba(13,107,99,0.18)`, padding: '36px 30px', boxShadow: '0 4px 24px rgba(13,107,99,0.07)', minHeight: 420, position: 'relative' }}>
               <div style={{ width: 60, height: 60, borderRadius: 16, background: `rgba(20,60,50,0.07)`, border: '1px solid rgba(20,60,50,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, marginBottom: 18 }}>💊</div>
               <div style={{ display: 'inline-flex', padding: '4px 12px', borderRadius: 9999, border: `1px solid rgba(233,130,110,0.30)`, marginBottom: 12, background: 'rgba(233,130,110,0.07)' }}>
                 <span style={{ fontSize: 10, fontWeight: 500, color: GOLD, letterSpacing: '0.08em', fontFamily: SANS }}>Sin olvidos ni doble dosis</span>
@@ -670,14 +670,14 @@ export default function Landing() {
               <p style={{ fontSize: 17, color: '#6B7280', lineHeight: 1.75, margin: '0 0 20px', fontFamily: SANS, fontWeight: 300 }}>
                 Evita olvidos y dobles dosis con confirmación en tiempo real.
               </p>
-              <div style={{ background: SAND, borderRadius: 12, padding: '12px', border: `1px solid rgba(20,60,50,0.10)`, display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <div style={{ background: SAND, borderRadius: 12, padding: '12px', border: `1px solid rgba(13,107,99,0.10)`, display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {[
                   { from: 'María', msg: '🏥 Cita con cardiólogo mañana 3pm', mine: false, tag: '#médico' },
                   { from: 'Yo', msg: '✅ Ya le di el Atenolol, está bien', mine: true, tag: '#medicamentos' },
                   { from: 'Carlos', msg: '🚨 Llamó diciendo que se siente mal', mine: false, tag: '#urgente' },
                 ].map((b, i) => (
                   <div key={i} style={{ display: 'flex', justifyContent: b.mine ? 'flex-end' : 'flex-start' }}>
-                    <div style={{ maxWidth: '85%', padding: '7px 11px', borderRadius: 11, background: b.mine ? ACTION : WHITE, border: b.mine ? 'none' : `1px solid rgba(20,60,50,0.14)` }}>
+                    <div style={{ maxWidth: '85%', padding: '7px 11px', borderRadius: 11, background: b.mine ? ACTION : WHITE, border: b.mine ? 'none' : `1px solid rgba(13,107,99,0.14)` }}>
                       {!b.mine && <p style={{ margin: '0 0 2px', fontSize: 9, color: GOLD, fontFamily: SANS, fontWeight: 600 }}>{b.from}</p>}
                       <p style={{ margin: 0, fontSize: 11, color: b.mine ? WHITE : PRIMARY, fontFamily: SANS, lineHeight: 1.4 }}>{b.msg}</p>
                       <p style={{ margin: '2px 0 0', fontSize: 8, color: b.mine ? 'rgba(255,255,255,0.50)' : ACTION, fontFamily: SANS }}>{b.tag}</p>
@@ -688,7 +688,7 @@ export default function Landing() {
             </div>
 
             {/* Card 3: Registros médicos + PDF */}
-            <div className="feature-hero-card reveal reveal-delay-2" style={{ background: WHITE, borderRadius: 22, border: `1px solid rgba(20,60,50,0.18)`, padding: '36px 30px', boxShadow: '0 4px 24px rgba(20,60,50,0.07)', minHeight: 420, position: 'relative' }}>
+            <div className="feature-hero-card reveal reveal-delay-2" style={{ background: WHITE, borderRadius: 22, border: `1px solid rgba(13,107,99,0.18)`, padding: '36px 30px', boxShadow: '0 4px 24px rgba(13,107,99,0.07)', minHeight: 420, position: 'relative' }}>
               <div style={{ width: 60, height: 60, borderRadius: 16, background: `rgba(20,60,50,0.07)`, border: '1px solid rgba(20,60,50,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, marginBottom: 18 }}>💬</div>
               <div style={{ display: 'inline-flex', padding: '4px 12px', borderRadius: 9999, border: `1px solid rgba(233,130,110,0.30)`, marginBottom: 12, background: 'rgba(233,130,110,0.07)' }}>
                 <span style={{ fontSize: 10, fontWeight: 500, color: GOLD, letterSpacing: '0.08em', fontFamily: SANS }}>Por categorías</span>
@@ -704,7 +704,7 @@ export default function Landing() {
                   { icon: '💉', label: 'Análisis de sangre', date: '20 may', color: `rgba(20,60,50,0.07)` },
                   { icon: '📄', label: 'Exportar a PDF →', date: '', color: `rgba(233,130,110,0.09)`, action: true },
                 ].map((item, i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 12px', background: item.color, borderRadius: 10, border: `1px solid rgba(20,60,50,0.08)` }}>
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 12px', background: item.color, borderRadius: 10, border: `1px solid rgba(13,107,99,0.08)` }}>
                     <span style={{ fontSize: 15 }}>{item.icon}</span>
                     <span style={{ fontSize: 11, fontFamily: SANS, color: item.action ? GOLD : PRIMARY, fontWeight: item.action ? 600 : 300, flex: 1 }}>{item.label}</span>
                     {item.date && <span style={{ fontSize: 10, color: '#6B7280', fontFamily: SANS }}>{item.date}</span>}
@@ -721,7 +721,7 @@ export default function Landing() {
               { icon: '🆘', title: 'Botón SOS', desc: 'Un toque y todos reciben la alerta al instante.' },
               { icon: '🗓️', title: 'Citas médicas', desc: 'Estados, adjuntos y recordatorio automático.' },
             ].map((f, i) => (
-              <div key={f.title} className={`reveal reveal-delay-${i}`} style={{ background: WHITE, borderRadius: 16, border: `1px solid rgba(20,60,50,0.16)`, padding: '26px 24px', display: 'flex', gap: 16, alignItems: 'flex-start', boxShadow: '0 2px 12px rgba(20,60,50,0.05)' }}>
+              <div key={f.title} className={`reveal reveal-delay-${i}`} style={{ background: WHITE, borderRadius: 16, border: `1px solid rgba(13,107,99,0.16)`, padding: '26px 24px', display: 'flex', gap: 16, alignItems: 'flex-start', boxShadow: '0 2px 12px rgba(13,107,99,0.05)' }}>
                 <div style={{ width: 46, height: 46, borderRadius: 12, background: `rgba(20,60,50,0.07)`, border: `1px solid rgba(20,60,50,0.12)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>{f.icon}</div>
                 <div>
                   <h3 style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 600, color: PRIMARY, margin: '0 0 6px' }}>{f.title}</h3>
@@ -742,7 +742,7 @@ export default function Landing() {
               Listo en 3 minutos, funciona para siempre
             </h2>
             <div style={{ display: 'flex', flexDirection: 'column', position: 'relative' }}>
-              <div className="como-line" style={{ position: 'absolute', left: 39, top: 64, bottom: 64, width: 2, background: `linear-gradient(to bottom, ${ACTION}, rgba(20,60,50,0.08))` }} />
+              <div className="como-line" style={{ position: 'absolute', left: 39, top: 64, bottom: 64, width: 2, background: `linear-gradient(to bottom, ${ACTION}, rgba(13,107,99,0.08))` }} />
               {[
                 { n: '1', title: 'Crea tu cuenta gratis', desc: 'Sin tarjeta de crédito, sin descarga en tienda de apps.' },
                 { n: '2', title: 'Agrega a tu familiar y los cuidadores', desc: 'Cada uno con su propio acceso y rol.' },
@@ -751,7 +751,7 @@ export default function Landing() {
               ].map((s, i, arr) => (
                 <div key={s.n} className={`reveal reveal-delay-${i}`} style={{ display: 'flex', gap: 24, marginBottom: i < arr.length - 1 ? 32 : 0 }}>
                   <div style={{ flexShrink: 0, zIndex: 1 }}>
-                    <div style={{ width: 80, height: 80, borderRadius: '50%', background: `linear-gradient(135deg, ${ACTION} 0%, #1E5245 100%)`, color: WHITE, fontWeight: 700, fontSize: 28, fontFamily: SERIF, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 12px 40px rgba(20,60,50,0.28)' }}>{s.n}</div>
+                    <div style={{ width: 80, height: 80, borderRadius: '50%', background: `linear-gradient(135deg, ${ACTION} 0%, #143C32 100%)`, color: WHITE, fontWeight: 700, fontSize: 28, fontFamily: SERIF, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 12px 40px rgba(13,107,99,0.28)' }}>{s.n}</div>
                   </div>
                   <div style={{ paddingTop: 22 }}>
                     <h3 style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 600, color: PRIMARY, margin: '0 0 8px' }}>{s.title}</h3>
@@ -765,7 +765,7 @@ export default function Landing() {
             </div>
           </div>
           <div style={{ flex: '1 1 360px', display: 'flex', justifyContent: 'center' }} className="como-img">
-            <img src={COMO_IMG} alt="Cómo funciona FamiliaCerca" style={{ width: '100%', borderRadius: 24, boxShadow: `0 16px 64px rgba(20,60,50,0.16)`, border: `1px solid rgba(20,60,50,0.10)` }} />
+            <img src={COMO_IMG} alt="Cómo funciona FamiliaCerca" style={{ width: '100%', borderRadius: 24, boxShadow: `0 16px 64px rgba(13,107,99,0.16)`, border: `1px solid rgba(13,107,99,0.10)` }} />
           </div>
         </div>
       </section>
@@ -818,14 +818,14 @@ export default function Landing() {
               { name: 'Jorge M.',    initial: 'J', role: 'Esposo cuidador',         location: 'Nueva York, NY',         headline: 'Ahora todos estamos tranquilos',                          text: 'Mi esposa tiene Alzheimer y el checklist diario me salvó. Puedo registrar cada comida, cada baño, cada medicamento. Por fin duermo tranquilo sabiendo que nada se me escapa.' },
               { name: 'Lucía R.',    initial: 'L', role: 'Hija única',              location: 'Chicago, Illinois',      headline: 'Mi mamá está mejor atendida y nosotros más organizados', text: 'Cuido sola a mis dos padres mayores desde hace 3 años. FamiliaCerca me ayuda a organizarme y el botón SOS me da tranquilidad cuando no estoy en casa. No sé cómo lo hacía antes.' },
             ].map((t, i) => (
-              <div key={t.name} className={`reveal reveal-delay-${i % 3}`} style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 20, border: `1px solid rgba(20,60,50,0.28)`, padding: '32px 28px', boxShadow: '0 4px 24px rgba(0,0,0,0.18)', display: 'flex', flexDirection: 'column' }}>
+              <div key={t.name} className={`reveal reveal-delay-${i % 3}`} style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 20, border: `1px solid rgba(13,107,99,0.28)`, padding: '32px 28px', boxShadow: '0 4px 24px rgba(0,0,0,0.18)', display: 'flex', flexDirection: 'column' }}>
                 <div style={{ display: 'flex', gap: 3, marginBottom: 14 }}>
                   {[1,2,3,4,5].map(s => <span key={s} style={{ color: GOLD, fontSize: 13 }}>★</span>)}
                 </div>
                 <p style={{ fontSize: 17, fontWeight: 600, color: WHITE, fontFamily: SERIF, margin: '0 0 12px', lineHeight: 1.3 }}>{t.headline}</p>
                 <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.72)', lineHeight: 1.85, margin: '0 0 24px', fontFamily: SANS, fontWeight: 300, fontStyle: 'italic', flex: 1 }}>"{t.text}"</p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div style={{ width: 46, height: 46, borderRadius: '50%', background: ACTION, border: `1px solid rgba(20,60,50,0.60)`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <div style={{ width: 46, height: 46, borderRadius: '50%', background: ACTION, border: `1px solid rgba(13,107,99,0.60)`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                     <span style={{ fontFamily: SERIF, fontSize: 20, fontWeight: 700, color: WHITE }}>{t.initial}</span>
                   </div>
                   <div>
@@ -937,7 +937,7 @@ export default function Landing() {
                 <p style={{ margin: '0 0 24px', fontSize: 9, color: 'rgba(255,255,255,0.18)', fontFamily: SANS }}>sábado, 23 mayo</p>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, width: '100%' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-                    <div style={{ width: 44, height: 44, borderRadius: 12, overflow: 'hidden', boxShadow: '0 6px 20px rgba(20,60,50,0.50)', flexShrink: 0 }}>
+                    <div style={{ width: 44, height: 44, borderRadius: 12, overflow: 'hidden', boxShadow: '0 6px 20px rgba(13,107,99,0.50)', flexShrink: 0 }}>
                       <img src="/icon-192.png" alt="FamiliaCerca" style={{ width: 44, height: 44, display: 'block' }} />
                     </div>
                     <span style={{ fontSize: 8, color: WHITE, fontFamily: SANS, textAlign: 'center', lineHeight: 1.2 }}>Familia Cerca</span>
@@ -1127,7 +1127,7 @@ export default function Landing() {
         .marquee-track:hover, .marquee-track-reverse:hover { animation-play-state: paused; }
 
         .feature-hero-card { transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s ease; }
-        .feature-hero-card:hover { transform: translateY(-8px) !important; box-shadow: 0 28px 80px rgba(20,60,50,0.12) !important; }
+        .feature-hero-card:hover { transform: translateY(-8px) !important; box-shadow: 0 28px 80px rgba(13,107,99,0.12) !important; }
 
         @keyframes badge-pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(233,130,110,0.55); } 70% { box-shadow: 0 0 0 10px rgba(233,130,110,0); } 100% { box-shadow: 0 0 0 0 rgba(233,130,110,0); } }
         .badge-pulse-anim { animation: badge-pulse-ring 2s cubic-bezier(0.66,0,0,1) infinite; }
@@ -1143,7 +1143,7 @@ export default function Landing() {
         .faq-dark-item { transition: background 0.18s ease; border-radius: 8px; }
         .faq-dark-item:hover { background: rgba(233,130,110,0.04); }
         .faq-light-item { transition: background 0.18s ease; border-radius: 8px; }
-        .faq-light-item:hover { background: rgba(20,60,50,0.05); }
+        .faq-light-item:hover { background: rgba(13,107,99,0.05); }
 
         .cta-coral { transition: background 0.2s ease !important; }
         .cta-coral:hover { background: #D86F5A !important; }

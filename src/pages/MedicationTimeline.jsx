@@ -490,7 +490,7 @@ export default function MedicationTimeline() {
               onClick={fetchLog}
               style={{
                 padding: '10px 24px', borderRadius: 12, border: 'none',
-                background: '#143C32', color: 'white', fontWeight: 700,
+                background: '#0d6b63', color: 'white', fontWeight: 700,
                 fontSize: 13, cursor: 'pointer',
               }}
             >
