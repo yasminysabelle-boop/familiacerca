@@ -3061,6 +3061,33 @@ export default function Dashboard() {
             </div>
         </div>
 
+        {/* ═══ ESTADO GLOBAL DEL DÍA ═══ */}
+        {(() => {
+          const alertKinds = renewalAlerts.map(a => a.kind)
+          const hasCriticalAlert = alertKinds.some(k => k === 'exhausted' || k === 'critical')
+          const hasWarningAlert  = alertKinds.some(k => k === 'warning' || k === 'silent')
+          const isCriticalDay = hasActiveSOS || hasCriticalAlert || (_isRetrasado && _retrasadoMins != null && _retrasadoMins >= 720)
+          const isWarningDay  = !isCriticalDay && (hasWarningAlert || pendingCount > 0 || _isRetrasado)
+          const dayStatus = isCriticalDay ? 'critical' : isWarningDay ? 'warning' : 'ok'
+          const statusPatientFirst = (patientProfile?.nombre_completo || activePatientName || 'tu familiar').split(' ')[0]
+          const STATUS_COPY = {
+            ok:       { emoji: '🟢', text: `Hoy es un día tranquilo para ${statusPatientFirst}` },
+            warning:  { emoji: '🟡', text: `${statusPatientFirst} requiere atención moderada hoy` },
+            critical: { emoji: '🔴', text: `${statusPatientFirst} necesita atención hoy` },
+          }
+          const { emoji, text } = STATUS_COPY[dayStatus]
+          return (
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 8,
+              margin: '10px 16px 0', padding: '8px 14px',
+              borderRadius: 999, background: 'rgba(20,60,50,0.05)',
+            }}>
+              <span style={{ fontSize: 13, flexShrink: 0 }}>{emoji}</span>
+              <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#143C32' }}>{text}</p>
+            </div>
+          )
+        })()}
+
         {/* Banners */}
         <TrialBanner />
         {notifActivated && (
