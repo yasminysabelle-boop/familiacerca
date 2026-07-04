@@ -30,6 +30,7 @@ const PAGE_TITLES = {
   '/gastos':         'Cuentas Claras',
   '/directorio':     'Directorio',
   '/permisos':       'Permisos',
+  '/cuidado':        'Rutina diaria',
   '/roles':          'Permisos de acceso',
   '/ajustes':        'Mi Cuenta',
   '/pricing':        'Planes',

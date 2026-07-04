@@ -3495,7 +3495,7 @@ export default function Dashboard() {
                     { Icon: MessageCircle, label: 'Chat',          onClick: () => navigate('/chat'),                   circleBg: '#EFF6F0', iconColor: '#143C32' },
                     { Icon: Thermometer,   label: 'Síntomas',      onClick: () => navigate('/registros'),              circleBg: '#FEF0ED', iconColor: '#E9826E' },
                     { Icon: ClipboardList, label: 'Historial',     onClick: () => navigate('/historial'),              circleBg: '#EFF6F0', iconColor: '#143C32' },
-                    { Icon: CheckSquare,   label: 'Rutinas',       onClick: () => navigate('/cuidado'),                circleBg: '#FFF8EC', iconColor: '#D99A18' },
+                    { Icon: CheckSquare,   label: 'Rutina diaria', onClick: () => navigate('/cuidado'),                circleBg: '#FFF8EC', iconColor: '#D99A18' },
                     { Icon: Stethoscope,   label: 'Notas médicas', onClick: () => navigate('/diario-medico'),          circleBg: '#EFF6F0', iconColor: '#143C32' },
                     { Icon: Heart,         label: 'Notas familia', onClick: () => navigate('/paciente/notas-familia'), circleBg: '#FEF0ED', iconColor: '#E9826E' },
                     { Icon: DollarSign,    label: 'Gastos',        onClick: () => navigate('/gastos'),                 circleBg: '#FFF8EC', iconColor: '#D99A18' },
