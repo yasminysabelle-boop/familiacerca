@@ -54,6 +54,19 @@ Si algo de esto se rompió → corregir antes de entregar.
 - Colores semánticos (danger/estados de dosis) NO se tocan: son información
 - Referencias de migración: Chat ed8e21d, Historial 7d6fb81, VideoCall a09b5e1
 
+## Arquitectura conceptual del producto
+
+Principio: "La app no organiza medicamentos. Organiza el cuidado de una persona."
+Posicionamiento: "FamiliaCerca reduce la incertidumbre de cuidar a un ser querido."
+
+Cuatro capas:
+- 💚 **HOME** (emocional): responder "¿cómo está hoy?" en 3 segundos
+- 🟡 **CUIDADO** (operativo): Medicamentos (Hoy/Lista/Inventario/Recetas), Rutina diaria (/cuidado: Hoy/Horarios), Citas, Alertas, Chat/Video
+- 🔵 **REGISTRO** (técnico): logs, historial, evidencias — invisible
+- 🏥 **HOSPITAL** (excepción): solo en hospitalización
+
+Regla: cada sección responde UNA pregunta.
+
 ## Proceso
 - Toda migración de pantalla: mostrar plan ANTES de aplicar
 - El hero del Dashboard está CERRADO — no rediseñar
