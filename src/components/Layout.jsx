@@ -63,7 +63,7 @@ export default function Layout({ children }) {
   const navBg   = dark ? 'rgba(28,18,8,0.97)' : '#0B4F4A'
   const hdrBg   = dark ? 'rgba(28,18,8,0.95)' : '#0B4F4A'
   const border  = dark ? '#1E3A28' : 'rgba(255,255,255,0.08)'
-  const isLightHeader = location.pathname === '/chat' || location.pathname === '/historial' || location.pathname === '/videollamada'
+  const isLightHeader = location.pathname === '/chat' || location.pathname === '/historial' || location.pathname === '/videollamada' || location.pathname === '/medications'
 
   const hospitalBarHeight = isHospitalMode ? 40 : 0
 

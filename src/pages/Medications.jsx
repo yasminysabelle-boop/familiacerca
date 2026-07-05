@@ -813,44 +813,37 @@ export default function Medications() {
     <Layout>
       {showPaywall && <PaywallModal onClose={() => setShowPaywall(false)} patientName={profile?.name?.split(' ')[0]} />}
 
-      {/* Header — fuera del scroll */}
-      <div style={{ padding: '16px 16px 0', maxWidth: 600 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-          <div>
-            <h2 style={{ fontFamily: 'Georgia, serif', fontSize: 20, fontWeight: 700, color: '#1A1A1A', marginBottom: 2 }}>
-              Medicamentos
-            </h2>
-            <p style={{ fontSize: 12, color: '#9CA3AF' }}>Registro de medicamentos del familiar</p>
-          </div>
-          {isAdmin && (
-            <button
-              onClick={openAdd}
-              style={{
-                width: 40, height: 40, borderRadius: 12,
-                background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
-                border: 'none', cursor: 'pointer',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                boxShadow: '0 4px 12px rgba(13,107,99,0.3)',
-              }}
-            >
-              <Plus size={20} color="white" strokeWidth={2.5} />
-            </button>
-          )}
+      {/* Fila delgada de acción — fuera del scroll (sin título propio, el Layout ya lo muestra) */}
+      {isAdmin && (
+        <div style={{ padding: '16px 16px 0', maxWidth: 600, display: 'flex', justifyContent: 'flex-end' }}>
+          <button
+            onClick={openAdd}
+            style={{
+              width: 40, height: 40, borderRadius: 12,
+              background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
+              border: 'none', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 4px 12px rgba(13,107,99,0.3)',
+            }}
+          >
+            <Plus size={20} color="white" strokeWidth={2.5} />
+          </button>
         </div>
-      </div>
+      )}
 
-      {/* Tab bar — fuera del scroll, siempre visible */}
-      <div style={{ padding: '0 16px', maxWidth: 600 }}>
-        <div style={{ display: 'flex', background: '#f5f5f5', borderRadius: '8px 8px 0 0', overflow: 'hidden' }}>
+      {/* Tab bar — pills sueltos, fuera del scroll, siempre visible */}
+      <div style={{ padding: '16px 16px 0', maxWidth: 600 }}>
+        <div style={{ display: 'flex', gap: 8 }}>
           {['hoy', 'todos', 'stock', 'recetas'].map(tab => (
             <button key={tab} onClick={() => setActiveTab(tab)}
               style={{
-                flex: 1, padding: '10px 0', border: 'none', cursor: 'pointer',
-                background: activeTab === tab ? '#0B4F4A' : 'transparent',
-                color: activeTab === tab ? 'white' : '#666',
-                fontWeight: activeTab === tab ? 600 : 400,
+                flex: 1, padding: '10px 0', cursor: 'pointer',
+                borderRadius: 999,
+                border: activeTab === tab ? 'none' : '1.5px solid #EDE5D8',
+                background: activeTab === tab ? '#143C32' : 'transparent',
+                color: activeTab === tab ? 'white' : '#6B7280',
+                fontWeight: 700,
                 fontSize: 11,
-                borderRadius: tab === 'hoy' ? '8px 0 0 0' : tab === 'recetas' ? '0 8px 0 0' : 0,
                 transition: 'all 0.2s',
                 WebkitTapHighlightColor: 'transparent',
               }}
@@ -883,7 +876,7 @@ export default function Medications() {
               <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', marginBottom: 1 }}>Recordatorios de medicamentos</p>
               <p style={{ fontSize: 11, color: '#9CA3AF' }}>Activa las notificaciones para no olvidar ninguna dosis.</p>
             </div>
-            <button onClick={requestAndSubscribe} style={{ padding: '7px 14px', borderRadius: 10, background: 'linear-gradient(135deg, #0d6b63, #3A6347)', color: 'white', fontWeight: 700, fontSize: 12, border: 'none', cursor: 'pointer', flexShrink: 0 }}>
+            <button onClick={requestAndSubscribe} style={{ padding: '7px 16px', borderRadius: 999, background: '#E9826E', color: 'white', fontWeight: 700, fontSize: 12, border: 'none', cursor: 'pointer', flexShrink: 0 }}>
               Activar
             </button>
           </div>
@@ -903,7 +896,7 @@ export default function Medications() {
             onAction={isAdmin ? openAdd : undefined}
           />
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16, paddingBottom: 16 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 22, paddingBottom: 16 }}>
 
             {/* ── Avatares de participantes hoy ── */}
             {todayContributors.length > 0 && (
@@ -938,15 +931,16 @@ export default function Medications() {
                     const firstT = times.length ? [...times].sort()[0] : null
                     const sCfg = MED_STATUS[calcMedStatus(firstT, med.time_window_minutes ?? 60)]
                     return (
-                      <div key={med.id} style={{ background: 'white', borderRadius: 16, border: '1px solid #EDE5D8', borderLeft: '4px solid #0d6b63', padding: '14px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+                      <div key={med.id} style={{ background: 'white', borderRadius: 16, border: '1px solid #EDE5D8', borderLeft: '4px solid #0d6b63', padding: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: times.length ? 8 : 0 }}>
+                          <span style={{ width: 40, height: 40, borderRadius: '50%', background: '#EFF6F0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>💊</span>
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <p style={{ fontSize: 15, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>
-                              💊 {med.name}{med.dosage ? <span style={{ fontWeight: 400, color: '#6B7280', fontSize: 13 }}> · {med.dosage}</span> : null}
+                              {med.name}{med.dosage ? <span style={{ fontWeight: 400, color: '#6B7280', fontSize: 13 }}> · {med.dosage}</span> : null}
                             </p>
                           </div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-                            <span style={{ fontSize: 11, fontWeight: 700, color: sCfg.color, background: sCfg.bg, border: `1px solid ${sCfg.border}`, padding: '3px 8px', borderRadius: 6 }}>
+                            <span style={{ fontSize: 11, fontWeight: 700, color: sCfg.color, background: sCfg.bg, border: `1px solid ${sCfg.border}`, padding: '3px 10px', borderRadius: 999 }}>
                               {sCfg.dot} {sCfg.label}
                             </span>
                             {isAdmin && (
@@ -963,7 +957,7 @@ export default function Medications() {
                           </div>
                         )}
                         {!isFamiliar && (
-                          <button onClick={() => { setAdminModal(med); setAdminPhotoBlob(null); setAdminPhotoPreview(null); setAdminError('') }} style={{ width: '100%', padding: '10px', borderRadius: 12, border: 'none', background: 'linear-gradient(135deg, #0d6b63, #3A6347)', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer', boxShadow: '0 4px 12px rgba(13,107,99,0.25)' }}>
+                          <button onClick={() => { setAdminModal(med); setAdminPhotoBlob(null); setAdminPhotoPreview(null); setAdminError('') }} style={{ width: '100%', padding: '10px', borderRadius: 999, border: 'none', background: '#E9826E', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer', boxShadow: '0 4px 12px rgba(233,130,110,0.35)' }}>
                             ✅ Administrar
                           </button>
                         )}
@@ -1051,7 +1045,7 @@ export default function Medications() {
               }
               return (
                 <div style={{ padding: '20px 16px', background: '#F0FDF4', borderRadius: 16, border: '1px solid #BBF7D0' }}>
-                  <p style={{ fontSize: 16, fontWeight: 700, color: '#15803D', margin: 0, textAlign: 'center' }}>✅ ¡Todo administrado hoy!</p>
+                  <p style={{ fontSize: 16, fontWeight: 700, color: '#15803D', margin: 0, textAlign: 'center' }}>✓ ¡Todo en orden hoy! {patientFirst} recibió sus cuidados</p>
                   <p style={{ fontSize: 13, color: '#0d6b63', margin: '6px 0 0', textAlign: 'center' }}>{mainMsg}</p>
                   {lastTime && lastBy && (
                     <p style={{ fontSize: 11, color: '#6B7280', margin: '6px 0 0', textAlign: 'center' }}>
@@ -1081,10 +1075,14 @@ export default function Medications() {
                       const omissionData  = omissionsByMedId[med.id]?.[today]
                       const stockDoc      = stockByMedId[med.id]
                       return (
-                        <div key={med.id} style={{ background: isAutoMissed ? '#FEF2F2' : isOmitted ? '#FFFBEB' : '#F0FDF4', borderRadius: 14, border: isAutoMissed ? '1px solid #FCA5A5' : isOmitted ? '1px solid #FDE68A' : '1px solid #BBF7D0', borderLeft: isAutoMissed ? '4px solid #DC2626' : isOmitted ? '4px solid #D97706' : '4px solid #22C55E', padding: '12px 14px' }}>
+                        <div key={med.id} style={{ background: isAutoMissed ? '#FEF2F2' : isOmitted ? '#FFFBEB' : '#F0FDF4', borderRadius: 16, border: isAutoMissed ? '1px solid #FCA5A5' : isOmitted ? '1px solid #FDE68A' : '1px solid #BBF7D0', borderLeft: isAutoMissed ? '4px solid #DC2626' : isOmitted ? '4px solid #D97706' : '4px solid #22C55E', padding: '16px' }}>
                           {/* Header row */}
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                            <span style={{ fontSize: 16, flexShrink: 0 }}>{isAutoMissed ? '❌' : isOmitted ? '⚠️' : '✅'}</span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                            <span style={{
+                              width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
+                              background: isAutoMissed ? '#FCA5A5' : isOmitted ? '#FDE68A' : '#BBF7D0',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14,
+                            }}>{isAutoMissed ? '❌' : isOmitted ? '⚠️' : '✅'}</span>
                             <p style={{ fontSize: 14, fontWeight: 700, color: isAutoMissed ? '#991B1B' : isOmitted ? '#92400E' : '#15803D', margin: 0, flex: 1 }}>
                               {med.name}{med.dosage ? <span style={{ fontWeight: 400, color: '#6B7280', fontSize: 12 }}> · {med.dosage}</span> : null}
                             </p>
@@ -1095,7 +1093,7 @@ export default function Medications() {
                             )}
                           </div>
                           {/* Detail rows */}
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, paddingLeft: 24 }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, paddingLeft: 42 }}>
                             {scheduledTime && <span style={{ fontSize: 11, color: '#6B7280' }}>📅 Programado: {scheduledTime}</span>}
                             {confTime && <span style={{ fontSize: 11, color: '#0d6b63', fontWeight: 600 }}>🕐 {isOmitted ? 'Registrado:' : 'Administrado:'} {confTime}</span>}
                             {byName && !isAutoMissed && <span style={{ fontSize: 11, color: '#6B7280' }}>👤 Por: {byName}</span>}
@@ -1142,6 +1140,13 @@ export default function Medications() {
                 )}
               </div>
             )}
+
+            {/* Mensaje emocional de cierre */}
+            <div style={{ padding: '16px', background: '#F8F4ED', borderRadius: 16, border: '1px solid #EDE5D8' }}>
+              <p style={{ fontSize: 13, color: '#143C32', margin: 0, textAlign: 'center', lineHeight: 1.5 }}>
+                Cada pequeño cuidado cuenta. Gracias por estar pendiente de {profile?.name?.split(' ')[0] ?? 'tu familiar'}.
+              </p>
+            </div>
           </div>
         )}
 
@@ -1669,7 +1674,7 @@ export default function Medications() {
             <button
               onClick={handleAdministrar}
               disabled={adminSaving}
-              style={{ width: '100%', padding: '16px', borderRadius: 16, border: 'none', background: adminSaving ? '#C0CCC5' : 'linear-gradient(135deg, #22C55E, #16A34A)', color: 'white', fontWeight: 800, fontSize: 16, cursor: adminSaving ? 'not-allowed' : 'pointer', boxShadow: adminSaving ? 'none' : '0 6px 20px rgba(34,197,94,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+              style={{ width: '100%', padding: '16px', borderRadius: 999, border: 'none', background: adminSaving ? '#C0CCC5' : '#E9826E', color: 'white', fontWeight: 800, fontSize: 16, cursor: adminSaving ? 'not-allowed' : 'pointer', boxShadow: adminSaving ? 'none' : '0 6px 20px rgba(233,130,110,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
             >
               {adminSaving
                 ? <><div style={{ width: 18, height: 18, borderRadius: '50%', border: '2.5px solid rgba(255,255,255,0.4)', borderTopColor: 'white', animation: 'spin 0.7s linear infinite' }} /> Guardando...</>
