@@ -431,24 +431,26 @@ export default function Landing() {
       {/* ─────────────── 5. PROBLEM SPLIT ─────────────── */}
       <section style={{ overflow: 'hidden' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }} className="landing-problema-grid">
-          <div style={{ position: 'relative', minHeight: 700, overflow: 'hidden' }} className="landing-problema-img">
-            {/* Aro concéntrico coral decorativo — 15% más grande que la foto, mismo centro */}
+          <div style={{ position: 'relative', minHeight: 700, zIndex: 2 }} className="landing-problema-img">
+            {/* Aro coral — offset abajo-derecha, como sombra de color, detrás de la foto */}
             <div aria-hidden="true" className="landing-problema-ring" style={{
-              position: 'absolute', top: '50%', left: -179,
-              width: 598, height: 598, transform: 'translateY(-50%)',
-              borderRadius: '50%', border: `2px solid ${CORAL}`,
-              pointerEvents: 'none', zIndex: 0,
+              position: 'absolute', top: 'calc(50% + 14px)', right: -194,
+              width: 650, height: 650, transform: 'translateY(-50%)',
+              borderRadius: '50%', border: `5px solid ${CORAL}`,
+              pointerEvents: 'none', zIndex: 1,
             }} />
-            {/* Foto circular — sangra por el borde izquierdo */}
+            {/* Foto circular completa — montada sobre el bloque verde, ~28% invade */}
             <div className="landing-problema-photo" style={{
-              position: 'absolute', top: '50%', left: -140,
-              width: 520, height: 520, transform: 'translateY(-50%)',
-              borderRadius: '50%', overflow: 'hidden', zIndex: 1,
+              position: 'absolute', top: '50%', right: -180,
+              width: 650, height: 650, transform: 'translateY(-50%)',
+              borderRadius: '50%', overflow: 'hidden',
+              border: '8px solid white', boxSizing: 'border-box',
+              zIndex: 2,
             }}>
               <img src={PROB_IMG} alt="El reto del cuidado familiar" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }} />
             </div>
           </div>
-          <div style={{ position: 'relative', overflow: 'hidden', background: PRIMARY, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 'clamp(56px,8vw,96px) clamp(36px,6vw,80px)' }}>
+          <div style={{ position: 'relative', overflow: 'hidden', background: PRIMARY, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 'clamp(56px,8vw,96px) clamp(36px,6vw,80px) clamp(56px,8vw,96px) calc(clamp(36px,6vw,80px) + 150px)' }}>
             {/* Cuarto de círculo melocotón decorativo — anclado a la esquina inferior derecha, detrás del contenido */}
             <div aria-hidden="true" style={{
               position: 'absolute', right: -240, bottom: -240,
@@ -1179,9 +1181,9 @@ export default function Landing() {
           .landing-hero-right { display: none !important; }
           .landing-hero-text { padding: 80px 24px 64px !important; min-height: auto !important; }
           .landing-problema-grid { grid-template-columns: 1fr !important; }
-          .landing-problema-img { min-height: 300px !important; }
-          .landing-problema-photo { width: 300px !important; height: 300px !important; left: 50% !important; top: -70px !important; transform: translateX(-50%) !important; }
-          .landing-problema-ring { width: 345px !important; height: 345px !important; left: 50% !important; top: -92px !important; transform: translateX(-50%) !important; }
+          .landing-problema-img { min-height: 200px !important; }
+          .landing-problema-photo { width: 320px !important; height: 320px !important; right: auto !important; left: 50% !important; top: auto !important; bottom: -90px !important; transform: translateX(-50%) !important; }
+          .landing-problema-ring { width: 320px !important; height: 320px !important; right: auto !important; left: calc(50% + 10px) !important; top: auto !important; bottom: -100px !important; transform: translateX(-50%) !important; }
           .como-grid { flex-direction: column !important; gap: 52px !important; }
           .como-img { display: none !important; }
           .testimonios-grid { grid-template-columns: 1fr !important; }
