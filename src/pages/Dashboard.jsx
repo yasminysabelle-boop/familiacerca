@@ -3448,8 +3448,11 @@ export default function Dashboard() {
                 </div>
 
                 {/* ════════════════════════════════════
-                    ACCIONES RÁPIDAS
+                    PANEL CANVAS — Acciones rápidas + Más herramientas
+                    (piloto — envuelve ambas secciones en un panel coral suave)
                     ════════════════════════════════════ */}
+                <div style={{ background: '#FBEAE4', borderRadius: 36, padding: '22px 20px', display: 'flex', flexDirection: 'column', gap: 24 }}>
+
                 <div>
                   <p style={{ margin: '0 0 12px', fontSize: 14, fontWeight: 600, color: '#143C32' }}>Acciones rápidas</p>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
@@ -3512,7 +3515,7 @@ export default function Dashboard() {
                   return (
                     <div>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-                        <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: '#9AA89E', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Más herramientas</p>
+                        <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: '#143C32', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Más herramientas</p>
                         <button onClick={() => setShowMoreTools(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: '#E9826E', fontWeight: 700, padding: 0, WebkitTapHighlightColor: 'transparent' }}>Ver todas →</button>
                       </div>
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
@@ -3601,6 +3604,8 @@ export default function Dashboard() {
                     </div>
                   )
                 })()}
+
+                </div>
               </>
             )
           })()}
