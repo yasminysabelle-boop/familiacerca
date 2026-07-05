@@ -1021,12 +1021,9 @@ export default function Landing() {
       </section>
 
       {/* ─────────────── 14. CTA FINAL ─────────────── */}
-      <section style={{ position: 'relative', padding: '160px 32px', overflow: 'hidden', minHeight: 560, display: 'flex', alignItems: 'center' }}>
-        <img src={CTA_IMG} alt="" aria-hidden="true" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(20,60,50,0.88)' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(20,60,50,0.65) 0%, transparent 55%)' }} />
-        <div style={{ position: 'relative', zIndex: 1, maxWidth: 1140, margin: '0 auto', width: '100%' }}>
-          <div style={{ maxWidth: 680 }}>
+      <section style={{ position: 'relative', padding: 'clamp(96px,10vw,160px) 32px', background: PRIMARY }}>
+        <div style={{ maxWidth: 1140, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 72, flexWrap: 'wrap' }} className="cta-final-grid">
+          <div style={{ flex: '1 1 420px', maxWidth: 680 }}>
             <p style={{ fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 20px', fontFamily: SANS }}>Empieza hoy</p>
             <h2 className="reveal" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(44px,6vw,84px)', fontWeight: 700, color: WHITE, lineHeight: 1.02, margin: '0 0 24px' }}>
               Empieza a cuidar mejor, juntos.
@@ -1041,6 +1038,18 @@ export default function Landing() {
               <a href="#funciones" style={{ padding: '20px 36px', borderRadius: 9999, border: '1.5px solid rgba(255,255,255,0.22)', background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.78)', fontWeight: 400, fontSize: 15, textDecoration: 'none', fontFamily: SANS, display: 'inline-flex', alignItems: 'center', gap: 9 }}>
                 <span style={{ fontSize: 11 }}>▶</span> Ver funciones
               </a>
+            </div>
+          </div>
+          <div style={{ flex: '1 1 320px', display: 'flex', justifyContent: 'center' }} className="cta-final-img">
+            {/* Wrapper con capa melocotón desfasada detrás — misma fórmula editorial que el resto de la landing */}
+            <div className="cta-final-photo-wrap" style={{ position: 'relative', width: '100%', maxWidth: 420, aspectRatio: '4 / 5' }}>
+              <div aria-hidden="true" className="cta-final-peach" style={{
+                position: 'absolute', inset: 0, transform: 'translate(20px, 20px)',
+                background: '#FBEAE4', borderRadius: 20, zIndex: 1,
+              }} />
+              <div style={{ position: 'relative', width: '100%', height: '100%', borderRadius: 20, overflow: 'hidden', zIndex: 2, boxShadow: '0 20px 60px rgba(0,0,0,0.28)' }}>
+                <img src={CTA_IMG} alt="Manos cuidando con cariño" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }} />
+              </div>
             </div>
           </div>
         </div>
@@ -1216,6 +1225,8 @@ export default function Landing() {
           .como-peach { transform: translate(10px, 10px) !important; }
           .testimonios-grid { grid-template-columns: 1fr !important; }
           .whatsapp-comparison-grid { grid-template-columns: 1fr !important; }
+          .cta-final-grid { flex-direction: column !important; gap: 40px !important; }
+          .cta-final-peach { transform: translate(10px, 10px) !important; }
         }
         @media (max-width: 640px) {
           .landing-divider { display: none !important; }
