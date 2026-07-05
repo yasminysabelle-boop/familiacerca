@@ -452,26 +452,21 @@ export default function Landing() {
       {/* ─────────────── 5. PROBLEM SPLIT ─────────────── */}
       <section style={{ position: 'relative', zIndex: 5 }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }} className="landing-problema-grid">
-          <div style={{ position: 'relative', minHeight: 700, zIndex: 2 }} className="landing-problema-img">
-            {/* Medialuna coral sólida — 8% más grande que la foto, offset abajo-derecha, detrás de la foto, acompaña el derrame */}
-            <div aria-hidden="true" className="landing-problema-ring" style={{
-              position: 'absolute', bottom: -185, right: -203,
-              width: 767, height: 767,
-              borderRadius: '50%', background: CORAL,
-              pointerEvents: 'none', zIndex: 1,
-            }} />
-            {/* Foto circular completa — ~20% invade el bloque verde, ~17.5% se derrama sobre la sección siguiente */}
-            <div className="landing-problema-photo" style={{
-              position: 'absolute', bottom: -124, right: -142,
-              width: 710, height: 710,
-              borderRadius: '50%', overflow: 'hidden',
-              border: '8px solid white', boxSizing: 'border-box',
-              zIndex: 2,
-            }}>
-              <img src={PROB_IMG} alt="El reto del cuidado familiar" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }} />
+          <div style={{ position: 'relative', minHeight: 700, zIndex: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'clamp(40px,5vw,64px)' }} className="landing-problema-img">
+            {/* Wrapper de la foto — rectángulo editorial con capa coral desfasada detrás (coral,
+                no melocotón, porque el fondo de esta sección es petróleo y el melocotón se perdería).
+                marginBottom negativo = solape moderado sobre la sección siguiente (WhatsApp). */}
+            <div className="landing-problema-photo-wrap" style={{ position: 'relative', width: '100%', maxWidth: 560, aspectRatio: '4 / 5', marginBottom: -50 }}>
+              <div aria-hidden="true" className="landing-problema-coral" style={{
+                position: 'absolute', inset: 0, transform: 'translate(20px, 20px)',
+                background: CORAL, borderRadius: 20, zIndex: 1,
+              }} />
+              <div className="landing-problema-photo" style={{ position: 'relative', width: '100%', height: '100%', borderRadius: 20, overflow: 'hidden', zIndex: 2 }}>
+                <img src={PROB_IMG} alt="El reto del cuidado familiar" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }} />
+              </div>
             </div>
           </div>
-          <div style={{ position: 'relative', overflow: 'hidden', background: PRIMARY, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 'clamp(56px,8vw,96px) clamp(36px,6vw,80px) clamp(56px,8vw,96px) calc(clamp(36px,6vw,80px) + 150px)', borderTopLeftRadius: 155, borderBottomLeftRadius: 155 }}>
+          <div style={{ position: 'relative', overflow: 'hidden', background: PRIMARY, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 'clamp(56px,8vw,96px) clamp(36px,6vw,80px) clamp(56px,8vw,96px) clamp(36px,6vw,80px)' }}>
             {/* Cuarto de círculo melocotón decorativo — anclado a la esquina inferior derecha, detrás del contenido */}
             <div aria-hidden="true" style={{
               position: 'absolute', right: -240, bottom: -240,
@@ -519,7 +514,7 @@ export default function Landing() {
       </section>
 
       {/* ─────────────── 6. WHATSAPP COMPARISON ─────────────── */}
-      <section style={{ background: CREAM, padding: '320px 32px 120px', overflow: 'hidden' }}>
+      <section style={{ background: CREAM, padding: '160px 32px 120px', overflow: 'hidden' }}>
         <div style={{ maxWidth: 1140, margin: '0 auto' }}>
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 72 }}>
             <p style={{ fontSize: 11, fontWeight: 500, color: ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>El caos conocido</p>
@@ -1204,9 +1199,9 @@ export default function Landing() {
           .landing-hero-peach { transform: translate(10px, 10px) !important; }
           .landing-hero-text { padding: 80px 24px 64px !important; min-height: auto !important; }
           .landing-problema-grid { grid-template-columns: 1fr !important; }
-          .landing-problema-img { min-height: 200px !important; }
-          .landing-problema-photo { width: 320px !important; height: 320px !important; right: auto !important; left: 50% !important; top: auto !important; bottom: -90px !important; transform: translateX(-50%) !important; }
-          .landing-problema-ring { width: 346px !important; height: 346px !important; right: auto !important; left: calc(50% + 16px) !important; top: auto !important; bottom: -119px !important; transform: translateX(-50%) !important; }
+          .landing-problema-img { min-height: auto !important; padding: 32px 24px 48px !important; }
+          .landing-problema-photo-wrap { margin-bottom: 0 !important; }
+          .landing-problema-coral { transform: translate(10px, 10px) !important; }
           .como-grid { flex-direction: column !important; gap: 52px !important; }
           .como-img { display: none !important; }
           .testimonios-grid { grid-template-columns: 1fr !important; }
