@@ -772,7 +772,7 @@ export default function Landing() {
       </section>
 
       {/* ─────────────── 8. HOW IT WORKS ─────────────── */}
-      <section id="como" style={{ padding: '128px 32px', background: SAND }}>
+      <section id="como" style={{ position: 'relative', padding: '128px 32px', background: SAND, zIndex: 5 }}>
         <div style={{ maxWidth: 1140, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 88, flexWrap: 'wrap' }} className="como-grid">
           <div style={{ flex: '1 1 360px' }}>
             <p style={{ fontSize: 11, fontWeight: 500, color: ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 18px', fontFamily: SANS }}>Cómo funciona</p>
@@ -803,7 +803,16 @@ export default function Landing() {
             </div>
           </div>
           <div style={{ flex: '1 1 360px', display: 'flex', justifyContent: 'center' }} className="como-img">
-            <img src={COMO_IMG} alt="Cómo funciona FamiliaCerca" style={{ width: '100%', borderRadius: 24, boxShadow: `0 16px 64px rgba(13,107,99,0.16)`, border: `1px solid rgba(13,107,99,0.10)` }} />
+            {/* Wrapper con capa melocotón desfasada detrás + solape moderado hacia Marquee 2 */}
+            <div className="como-photo-wrap" style={{ position: 'relative', width: '100%', maxWidth: 460, aspectRatio: '4 / 5', marginBottom: -40 }}>
+              <div aria-hidden="true" className="como-peach" style={{
+                position: 'absolute', inset: 0, transform: 'translate(20px, 20px)',
+                background: '#FBEAE4', borderRadius: 20, zIndex: 1,
+              }} />
+              <div style={{ position: 'relative', width: '100%', height: '100%', borderRadius: 20, overflow: 'hidden', zIndex: 2, boxShadow: '0 16px 64px rgba(13,107,99,0.16)' }}>
+                <img src={COMO_IMG} alt="Cómo funciona FamiliaCerca" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -1203,7 +1212,8 @@ export default function Landing() {
           .landing-problema-photo-wrap { margin-bottom: 0 !important; }
           .landing-problema-coral { transform: translate(10px, 10px) !important; }
           .como-grid { flex-direction: column !important; gap: 52px !important; }
-          .como-img { display: none !important; }
+          .como-photo-wrap { margin-bottom: 0 !important; }
+          .como-peach { transform: translate(10px, 10px) !important; }
           .testimonios-grid { grid-template-columns: 1fr !important; }
           .whatsapp-comparison-grid { grid-template-columns: 1fr !important; }
         }
