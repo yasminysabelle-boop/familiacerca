@@ -354,73 +354,64 @@ export default function Landing() {
           </div>
         </div>
 
-        {/* Right: photo + floating medication card.
-            Estructura en 2 capas para poder derramar hacia el marquee sin perder la curva "D":
-            - EXTERIOR (.landing-hero-right): solo posicionamiento/tamaño, overflow:visible.
-              Ensanchado 130px hacia la izquierda (antes 110, +18%) para el bulge hacia el verde.
-            - INTERIOR (nuevo div): dibuja la curva "D" con overflow:hidden + los 2 border-radius
-              grandes (50% de altura cada uno, se encuentran en el centro = un arco convexo
-              continuo). Se extiende 90px más abajo que el exterior (bottom:-90) — ese es el
-              derrame que se monta sobre el marquee. Espejo del círculo de El Problema.
-            El anillo coral vive en el EXTERIOR (no en el interior), así que también queda
-            libre para cruzar — ya no necesita el parche del cuarto-de-círculo en el marquee. */}
+        {/* Right: fondo petróleo (igual que el panel izquierdo) + foto-tarjeta rectangular con
+            capa trasera melocotón desfasada + tarjeta de Deborah anclada a la foto.
+            Lenguaje editorial: bloques rectangulares desfasados, no geometría circular. */}
         <div className="landing-hero-right" style={{
-          position: 'relative', overflow: 'visible', minHeight: '100vh',
-          width: 'calc(100% + 130px)', marginLeft: -130,
-          zIndex: 2,
+          background: PRIMARY, position: 'relative', overflow: 'visible', minHeight: '100vh',
+          display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
+          padding: 'clamp(40px,5vw,80px)', zIndex: 2,
         }}>
-          <div style={{
-            position: 'absolute', top: 0, left: 0, right: 0, bottom: -90,
-            overflow: 'hidden',
-            borderTopLeftRadius: '130px 50%', borderBottomLeftRadius: '130px 50%',
+          {/* Wrapper de la foto — su marginBottom negativo es el solape sobre el marquee */}
+          <div className="landing-hero-photo-wrap" style={{
+            position: 'relative', width: '100%', maxWidth: 520, aspectRatio: '4 / 5',
+            marginBottom: -50,
           }}>
-            <img src={HERO_IMG} alt="Familia cuidando juntos" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }} />
-            <div style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(to right, rgba(20,60,50,0.38) 0%, transparent 30%)', pointerEvents: 'none' }} />
-          </div>
+            {/* Capa trasera melocotón — sombra de color, desplazada en diagonal */}
+            <div aria-hidden="true" className="landing-hero-peach" style={{
+              position: 'absolute', inset: 0, transform: 'translate(20px, 20px)',
+              background: '#FBEAE4', borderRadius: 20, zIndex: 1,
+            }} />
+            {/* Foto */}
+            <div style={{ position: 'relative', width: '100%', height: '100%', borderRadius: 20, overflow: 'hidden', zIndex: 2 }}>
+              <img src={HERO_IMG} alt="Familia cuidando juntos" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }} />
+              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(20,60,50,0.28) 0%, transparent 30%)', pointerEvents: 'none' }} />
+            </div>
 
-          {/* Medialuna eco — arco coral delgado, acompaña el derrame de la foto cruzando hacia el marquee */}
-          <div aria-hidden="true" style={{
-            position: 'absolute', right: -216, bottom: -216,
-            width: 432, height: 432, borderRadius: '50%',
-            border: `35px solid ${CORAL}`,
-            pointerEvents: 'none', zIndex: 2,
-          }} />
-        </div>
-
-        {/* Tarjeta de Deborah — hija directa de la sección para poder pisar la frontera curva.
-            Centrada en el PICO del nuevo arco (50% - 110px de bulge - 135px de mitad del ancho
-            de la tarjeta), a la altura media donde la curva es más pronunciada. Oculta en móvil
-            vía CSS para conservar el comportamiento actual. */}
-        <div className="hero-reveal hero-delay-4 landing-hero-card" style={{
-          position: 'absolute', left: 'calc(50% - 245px)', top: '50%',
-          background: '#F8F4ED', borderRadius: '24px',
-          padding: '18px 22px', boxShadow: '0 8px 32px rgba(20,60,50,0.15)',
-          minWidth: '255px', maxWidth: '285px', transform: 'translateY(-50%)', zIndex: 6,
-        }}>
-          <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'12px'}}>
-            <div style={{width:38,height:38,borderRadius:'50%',background:'#EBF3EE',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'17px'}}>👵</div>
-            <div>
-              <div style={{fontWeight:700,fontSize:'14px',color:'#143C32'}}>Deborah</div>
-              <div style={{display:'flex',alignItems:'center',gap:'5px',marginTop:'2px'}}>
-                <div style={{width:7,height:7,borderRadius:'50%',background:'#143C32'}}></div>
-                <span style={{fontSize:'11px',color:'#143C32',fontWeight:600}}>Todo al día</span>
+            {/* Tarjeta de Deborah — montada sobre la esquina inferior-izquierda de la foto,
+                anclada a la foto (no al texto), sombra difusa */}
+            <div className="hero-reveal hero-delay-4 landing-hero-card" style={{
+              position: 'absolute', left: -20, bottom: -20, zIndex: 3,
+              background: '#F8F4ED', borderRadius: '20px',
+              padding: '18px 22px', boxShadow: '0 20px 50px rgba(20,60,50,0.18)',
+              minWidth: '255px', maxWidth: '285px',
+            }}>
+              <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'12px'}}>
+                <div style={{width:38,height:38,borderRadius:'50%',background:'#EBF3EE',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'17px'}}>👵</div>
+                <div>
+                  <div style={{fontWeight:700,fontSize:'14px',color:'#143C32'}}>Deborah</div>
+                  <div style={{display:'flex',alignItems:'center',gap:'5px',marginTop:'2px'}}>
+                    <div style={{width:7,height:7,borderRadius:'50%',background:'#143C32'}}></div>
+                    <span style={{fontSize:'11px',color:'#143C32',fontWeight:600}}>Todo al día</span>
+                  </div>
+                </div>
+              </div>
+              {[
+                {icon:'💊',text:'Medicamentos completados'},
+                {icon:'🕙',text:'Última actualización 10:45 AM'},
+                {icon:'👨‍👩‍👧',text:'4 familiares informados'},
+              ].map((item,i)=>(
+                <div key={i} style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'7px'}}>
+                  <span style={{fontSize:'13px'}}>{item.icon}</span>
+                  <span style={{fontSize:'11px',color:'#143C32',opacity:0.8}}>{item.text}</span>
+                  <span style={{marginLeft:'auto',color:'#143C32',fontSize:'12px',fontWeight:700}}>✓</span>
+                </div>
+              ))}
+              <div style={{borderTop:'1px solid rgba(20,60,50,0.1)',marginTop:'8px',paddingTop:'8px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                <span style={{fontSize:'10px',color:'#143C32',opacity:0.6}}>Actualizado por Rosa</span>
+                <span style={{fontSize:'10px',color:'#E9826E',fontWeight:600}}>Hace 15 min</span>
               </div>
             </div>
-          </div>
-          {[
-            {icon:'💊',text:'Medicamentos completados'},
-            {icon:'🕙',text:'Última actualización 10:45 AM'},
-            {icon:'👨‍👩‍👧',text:'4 familiares informados'},
-          ].map((item,i)=>(
-            <div key={i} style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'7px'}}>
-              <span style={{fontSize:'13px'}}>{item.icon}</span>
-              <span style={{fontSize:'11px',color:'#143C32',opacity:0.8}}>{item.text}</span>
-              <span style={{marginLeft:'auto',color:'#143C32',fontSize:'12px',fontWeight:700}}>✓</span>
-            </div>
-          ))}
-          <div style={{borderTop:'1px solid rgba(20,60,50,0.1)',marginTop:'8px',paddingTop:'8px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-            <span style={{fontSize:'10px',color:'#143C32',opacity:0.6}}>Actualizado por Rosa</span>
-            <span style={{fontSize:'10px',color:'#E9826E',fontWeight:600}}>Hace 15 min</span>
           </div>
         </div>
       </section>
@@ -1215,8 +1206,9 @@ export default function Landing() {
           .landing-desktop-nav { display: none !important; }
           .landing-hamburger { display: flex !important; }
           .landing-hero-grid { grid-template-columns: 1fr !important; min-height: auto !important; }
-          .landing-hero-right { display: none !important; }
-          .landing-hero-card { display: none !important; }
+          .landing-hero-right { min-height: auto !important; padding: 32px 24px 48px !important; }
+          .landing-hero-photo-wrap { margin-bottom: 0 !important; }
+          .landing-hero-peach { transform: translate(10px, 10px) !important; }
           .landing-hero-text { padding: 80px 24px 64px !important; min-height: auto !important; }
           .landing-problema-grid { grid-template-columns: 1fr !important; }
           .landing-problema-img { min-height: 200px !important; }
