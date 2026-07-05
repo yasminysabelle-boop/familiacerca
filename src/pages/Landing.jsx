@@ -354,24 +354,20 @@ export default function Landing() {
           </div>
         </div>
 
-        {/* Right: photo + floating medication card */}
-        <div className="landing-hero-right" style={{ position: 'relative', overflow: 'hidden', minHeight: '100vh' }}>
+        {/* Right: photo + floating medication card.
+            Panel ensanchado 110px hacia la izquierda (width+marginLeft negativo) y con las
+            2 esquinas izquierdas redondeadas al 50% de la altura cada una — juntas forman
+            un solo arco convexo continuo que nace recto arriba/abajo y bombea hacia el verde
+            en el centro. Espejo del círculo de El Problema (allá mira a la derecha, acá a la
+            izquierda). El verde no se toca — vive detrás/al lado, la foto se monta encima. */}
+        <div className="landing-hero-right" style={{
+          position: 'relative', overflow: 'hidden', minHeight: '100vh',
+          width: 'calc(100% + 110px)', marginLeft: -110,
+          borderTopLeftRadius: '110px 50%', borderBottomLeftRadius: '110px 50%',
+          zIndex: 2,
+        }}>
           <img src={HERO_IMG} alt="Familia cuidando juntos" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }} />
           <div style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(to right, rgba(20,60,50,0.38) 0%, transparent 30%)', pointerEvents: 'none' }} />
-
-          {/* Frontera curva — el verde invade la foto, mismo lenguaje que el círculo de El Problema.
-              Dos rectángulos angostos con una esquina redondeada al 100% cada uno: juntos forman
-              un arco continuo (radio = 50% de la altura del hero) que nace recto arriba/abajo. */}
-          <div aria-hidden="true" style={{
-            position: 'absolute', left: 0, top: 0, bottom: '50%', width: 110,
-            background: PRIMARY, borderBottomRightRadius: '110px 100%',
-            pointerEvents: 'none', zIndex: 2,
-          }} />
-          <div aria-hidden="true" style={{
-            position: 'absolute', left: 0, top: '50%', bottom: 0, width: 110,
-            background: PRIMARY, borderTopRightRadius: '110px 100%',
-            pointerEvents: 'none', zIndex: 2,
-          }} />
 
           {/* Medialuna eco — arco coral delgado asomando de la esquina inferior derecha de la foto */}
           <div aria-hidden="true" style={{
@@ -382,12 +378,12 @@ export default function Landing() {
           }} />
         </div>
 
-        {/* Tarjeta de Deborah — reubicada como hija directa de la sección para que pueda
-            pisar la frontera curva (mitad verde, mitad foto). Oculta en móvil vía CSS
-            para conservar el comportamiento actual (antes vivía dentro de .landing-hero-right,
-            que ya se oculta en móvil). */}
+        {/* Tarjeta de Deborah — hija directa de la sección para poder pisar la frontera curva.
+            Centrada en el PICO del nuevo arco (50% - 110px de bulge - 135px de mitad del ancho
+            de la tarjeta), a la altura media donde la curva es más pronunciada. Oculta en móvil
+            vía CSS para conservar el comportamiento actual. */}
         <div className="hero-reveal hero-delay-4 landing-hero-card" style={{
-          position: 'absolute', left: 'calc(50% - 135px)', top: '50%',
+          position: 'absolute', left: 'calc(50% - 245px)', top: '50%',
           background: '#F8F4ED', borderRadius: '24px',
           padding: '18px 22px', boxShadow: '0 8px 32px rgba(20,60,50,0.15)',
           minWidth: '255px', maxWidth: '285px', transform: 'translateY(-50%)', zIndex: 6,
