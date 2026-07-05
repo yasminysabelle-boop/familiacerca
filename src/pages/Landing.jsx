@@ -318,7 +318,7 @@ export default function Landing() {
       </nav>
 
       {/* ─────────────── 2. HERO ─────────────── */}
-      <section style={{ position: 'relative', minHeight: '100vh', display: 'grid', gridTemplateColumns: '1fr 1fr', overflow: 'hidden' }} className="landing-hero-grid">
+      <section style={{ minHeight: '100vh', display: 'grid', gridTemplateColumns: '1fr 1fr', overflow: 'hidden' }} className="landing-hero-grid">
 
         {/* Left dark panel */}
         <div className="landing-hero-text" style={{ background: PRIMARY, position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: 'clamp(80px,8vw,120px) clamp(32px,5vw,72px)', overflow: 'hidden', textAlign: 'center' }}>
@@ -354,64 +354,43 @@ export default function Landing() {
           </div>
         </div>
 
-        {/* Right: photo + floating medication card.
-            Panel ensanchado 110px hacia la izquierda (width+marginLeft negativo) y con las
-            2 esquinas izquierdas redondeadas al 50% de la altura cada una — juntas forman
-            un solo arco convexo continuo que nace recto arriba/abajo y bombea hacia el verde
-            en el centro. Espejo del círculo de El Problema (allá mira a la derecha, acá a la
-            izquierda). El verde no se toca — vive detrás/al lado, la foto se monta encima. */}
-        <div className="landing-hero-right" style={{
-          position: 'relative', overflow: 'hidden', minHeight: '100vh',
-          width: 'calc(100% + 110px)', marginLeft: -110,
-          borderTopLeftRadius: '110px 50%', borderBottomLeftRadius: '110px 50%',
-          zIndex: 2,
-        }}>
+        {/* Right: photo + floating medication card */}
+        <div className="landing-hero-right" style={{ position: 'relative', overflow: 'hidden', minHeight: '100vh' }}>
           <img src={HERO_IMG} alt="Familia cuidando juntos" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }} />
           <div style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(to right, rgba(20,60,50,0.38) 0%, transparent 30%)', pointerEvents: 'none' }} />
 
-          {/* Medialuna eco — arco coral delgado asomando de la esquina inferior derecha de la foto */}
-          <div aria-hidden="true" style={{
-            position: 'absolute', right: -180, bottom: -180,
-            width: 360, height: 360, borderRadius: '50%',
-            border: `35px solid ${CORAL}`,
-            pointerEvents: 'none', zIndex: 2,
-          }} />
-        </div>
-
-        {/* Tarjeta de Deborah — hija directa de la sección para poder pisar la frontera curva.
-            Centrada en el PICO del nuevo arco (50% - 110px de bulge - 135px de mitad del ancho
-            de la tarjeta), a la altura media donde la curva es más pronunciada. Oculta en móvil
-            vía CSS para conservar el comportamiento actual. */}
-        <div className="hero-reveal hero-delay-4 landing-hero-card" style={{
-          position: 'absolute', left: 'calc(50% - 245px)', top: '50%',
-          background: '#F8F4ED', borderRadius: '24px',
-          padding: '18px 22px', boxShadow: '0 8px 32px rgba(20,60,50,0.15)',
-          minWidth: '255px', maxWidth: '285px', transform: 'translateY(-50%)', zIndex: 6,
-        }}>
-          <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'12px'}}>
-            <div style={{width:38,height:38,borderRadius:'50%',background:'#EBF3EE',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'17px'}}>👵</div>
-            <div>
-              <div style={{fontWeight:700,fontSize:'14px',color:'#143C32'}}>Deborah</div>
-              <div style={{display:'flex',alignItems:'center',gap:'5px',marginTop:'2px'}}>
-                <div style={{width:7,height:7,borderRadius:'50%',background:'#143C32'}}></div>
-                <span style={{fontSize:'11px',color:'#143C32',fontWeight:600}}>Todo al día</span>
+          {/* Floating status card */}
+          <div className="hero-reveal hero-delay-4" style={{
+            position:'absolute', bottom:'2rem', right:'1.5rem',
+            background:'#F8F4ED', borderRadius:'24px',
+            padding:'18px 22px', boxShadow:'0 8px 32px rgba(20,60,50,0.15)',
+            minWidth:'255px', maxWidth:'285px', zIndex: 4
+          }}>
+            <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'12px'}}>
+              <div style={{width:38,height:38,borderRadius:'50%',background:'#EBF3EE',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'17px'}}>👵</div>
+              <div>
+                <div style={{fontWeight:700,fontSize:'14px',color:'#143C32'}}>Deborah</div>
+                <div style={{display:'flex',alignItems:'center',gap:'5px',marginTop:'2px'}}>
+                  <div style={{width:7,height:7,borderRadius:'50%',background:'#143C32'}}></div>
+                  <span style={{fontSize:'11px',color:'#143C32',fontWeight:600}}>Todo al día</span>
+                </div>
               </div>
             </div>
-          </div>
-          {[
-            {icon:'💊',text:'Medicamentos completados'},
-            {icon:'🕙',text:'Última actualización 10:45 AM'},
-            {icon:'👨‍👩‍👧',text:'4 familiares informados'},
-          ].map((item,i)=>(
-            <div key={i} style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'7px'}}>
-              <span style={{fontSize:'13px'}}>{item.icon}</span>
-              <span style={{fontSize:'11px',color:'#143C32',opacity:0.8}}>{item.text}</span>
-              <span style={{marginLeft:'auto',color:'#143C32',fontSize:'12px',fontWeight:700}}>✓</span>
+            {[
+              {icon:'💊',text:'Medicamentos completados'},
+              {icon:'🕙',text:'Última actualización 10:45 AM'},
+              {icon:'👨‍👩‍👧',text:'4 familiares informados'},
+            ].map((item,i)=>(
+              <div key={i} style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'7px'}}>
+                <span style={{fontSize:'13px'}}>{item.icon}</span>
+                <span style={{fontSize:'11px',color:'#143C32',opacity:0.8}}>{item.text}</span>
+                <span style={{marginLeft:'auto',color:'#143C32',fontSize:'12px',fontWeight:700}}>✓</span>
+              </div>
+            ))}
+            <div style={{borderTop:'1px solid rgba(20,60,50,0.1)',marginTop:'8px',paddingTop:'8px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+              <span style={{fontSize:'10px',color:'#143C32',opacity:0.6}}>Actualizado por Rosa</span>
+              <span style={{fontSize:'10px',color:'#E9826E',fontWeight:600}}>Hace 15 min</span>
             </div>
-          ))}
-          <div style={{borderTop:'1px solid rgba(20,60,50,0.1)',marginTop:'8px',paddingTop:'8px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-            <span style={{fontSize:'10px',color:'#143C32',opacity:0.6}}>Actualizado por Rosa</span>
-            <span style={{fontSize:'10px',color:'#E9826E',fontWeight:600}}>Hace 15 min</span>
           </div>
         </div>
       </section>
@@ -1200,7 +1179,6 @@ export default function Landing() {
           .landing-hamburger { display: flex !important; }
           .landing-hero-grid { grid-template-columns: 1fr !important; min-height: auto !important; }
           .landing-hero-right { display: none !important; }
-          .landing-hero-card { display: none !important; }
           .landing-hero-text { padding: 80px 24px 64px !important; min-height: auto !important; }
           .landing-problema-grid { grid-template-columns: 1fr !important; }
           .landing-problema-img { min-height: 200px !important; }
