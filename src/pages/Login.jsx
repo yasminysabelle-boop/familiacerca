@@ -141,6 +141,17 @@ export default function Login() {
         }}
       />
 
+      {/* Forma orgánica decorativa — petróleo, esquina superior izquierda, asoma sutil detrás de la foto */}
+      <div style={{
+        position: 'absolute', top: -60, left: -60,
+        width: 220, height: 220,
+        background: '#143C32',
+        borderRadius: '0 55% 45% 60%',
+        opacity: 0.45,
+        pointerEvents: 'none',
+        zIndex: 0,
+      }} />
+
       {/* Gradient */}
       <div style={{
         position: 'absolute', inset: 0,
@@ -157,6 +168,16 @@ export default function Login() {
       </div>
 
       <div style={{ flex: 1 }} />
+
+      {/* Forma orgánica decorativa — coral suave, esquina inferior derecha, detrás de la card */}
+      <div style={{
+        position: 'absolute', bottom: -50, right: -50,
+        width: 240, height: 240,
+        background: '#FBEAE4',
+        borderRadius: '55% 45% 0 60%',
+        pointerEvents: 'none',
+        zIndex: 0,
+      }} />
 
       {/* Card */}
       <div style={{
@@ -213,8 +234,8 @@ export default function Login() {
                     disabled={loading}
                     style={{
                       marginTop: 4, width: '100%', padding: '14px',
-                      background: loading ? '#C0CCC5' : 'linear-gradient(135deg, #0d6b63, #3A6347)',
-                      color: 'white', fontWeight: 700, fontSize: 14, borderRadius: 16,
+                      background: loading ? '#C0CCC5' : '#0d6b63',
+                      color: 'white', fontWeight: 700, fontSize: 14, borderRadius: 999,
                       border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
                       boxShadow: loading ? 'none' : '0 6px 20px rgba(13,107,99,0.35)',
                       transition: 'all 0.15s',
@@ -251,8 +272,8 @@ export default function Login() {
                 <button
                   onClick={() => { setMode('login'); setResetSent(false) }}
                   style={{
-                    marginTop: 20, padding: '12px 28px', borderRadius: 14,
-                    background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
+                    marginTop: 20, padding: '12px 28px', borderRadius: 999,
+                    background: '#0d6b63',
                     color: 'white', fontWeight: 700, fontSize: 14, border: 'none', cursor: 'pointer',
                   }}
                 >
@@ -286,8 +307,8 @@ export default function Login() {
                     type="submit" disabled={loading}
                     style={{
                       marginTop: 4, width: '100%', padding: '14px',
-                      background: loading ? '#C0CCC5' : 'linear-gradient(135deg, #0d6b63, #3A6347)',
-                      color: 'white', fontWeight: 700, fontSize: 14, borderRadius: 16,
+                      background: loading ? '#C0CCC5' : '#0d6b63',
+                      color: 'white', fontWeight: 700, fontSize: 14, borderRadius: 999,
                       border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
                       boxShadow: loading ? 'none' : '0 6px 20px rgba(13,107,99,0.35)',
                       transition: 'all 0.15s',
@@ -375,8 +396,8 @@ export default function Login() {
                 type="submit" disabled={loading}
                 style={{
                   marginTop: 4, width: '100%', padding: '14px',
-                  background: loading ? '#C0CCC5' : 'linear-gradient(135deg, #0d6b63, #3A6347)',
-                  color: 'white', fontWeight: 700, fontSize: 14, borderRadius: 16,
+                  background: loading ? '#C0CCC5' : '#0d6b63',
+                  color: 'white', fontWeight: 700, fontSize: 14, borderRadius: 999,
                   border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
                   boxShadow: loading ? 'none' : '0 6px 20px rgba(13,107,99,0.35)',
                   transition: 'all 0.15s',
@@ -388,7 +409,7 @@ export default function Login() {
 
             <p style={{ marginTop: 20, textAlign: 'center', fontSize: 13, color: '#6B7280' }}>
               ¿No tienes cuenta?{' '}
-              <Link to="/register" style={{ color: '#0d6b63', fontWeight: 700, textDecoration: 'none' }}>
+              <Link to="/register" style={{ color: '#E9826E', fontWeight: 600, textDecoration: 'none' }}>
                 Regístrate gratis
               </Link>
             </p>
