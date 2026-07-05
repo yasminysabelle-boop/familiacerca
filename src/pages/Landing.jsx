@@ -318,7 +318,7 @@ export default function Landing() {
       </nav>
 
       {/* ─────────────── 2. HERO ─────────────── */}
-      <section style={{ position: 'relative', minHeight: '100vh', display: 'grid', gridTemplateColumns: '1fr 1fr', overflow: 'hidden' }} className="landing-hero-grid">
+      <section style={{ position: 'relative', minHeight: '100vh', display: 'grid', gridTemplateColumns: '1fr 1fr', zIndex: 5 }} className="landing-hero-grid">
 
         {/* Left dark panel */}
         <div className="landing-hero-text" style={{ background: PRIMARY, position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: 'clamp(80px,8vw,120px) clamp(32px,5vw,72px)', overflow: 'hidden', textAlign: 'center' }}>
@@ -355,24 +355,30 @@ export default function Landing() {
         </div>
 
         {/* Right: photo + floating medication card.
-            Panel ensanchado 110px hacia la izquierda (width+marginLeft negativo) y con las
-            2 esquinas izquierdas redondeadas al 50% de la altura cada una — juntas forman
-            un solo arco convexo continuo que nace recto arriba/abajo y bombea hacia el verde
-            en el centro. Espejo del círculo de El Problema (allá mira a la derecha, acá a la
-            izquierda). El verde no se toca — vive detrás/al lado, la foto se monta encima. */}
+            Estructura en 2 capas para poder derramar hacia el marquee sin perder la curva "D":
+            - EXTERIOR (.landing-hero-right): solo posicionamiento/tamaño, overflow:visible.
+              Ensanchado 130px hacia la izquierda (antes 110, +18%) para el bulge hacia el verde.
+            - INTERIOR (nuevo div): dibuja la curva "D" con overflow:hidden + los 2 border-radius
+              grandes (50% de altura cada uno, se encuentran en el centro = un arco convexo
+              continuo). Se extiende 90px más abajo que el exterior (bottom:-90) — ese es el
+              derrame que se monta sobre el marquee. Espejo del círculo de El Problema.
+            El anillo coral vive en el EXTERIOR (no en el interior), así que también queda
+            libre para cruzar — ya no necesita el parche del cuarto-de-círculo en el marquee. */}
         <div className="landing-hero-right" style={{
-          position: 'relative', overflow: 'hidden', minHeight: '100vh',
-          width: 'calc(100% + 110px)', marginLeft: -110,
-          borderTopLeftRadius: '110px 50%', borderBottomLeftRadius: '110px 50%',
+          position: 'relative', overflow: 'visible', minHeight: '100vh',
+          width: 'calc(100% + 130px)', marginLeft: -130,
           zIndex: 2,
         }}>
-          <img src={HERO_IMG} alt="Familia cuidando juntos" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }} />
-          <div style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(to right, rgba(20,60,50,0.38) 0%, transparent 30%)', pointerEvents: 'none' }} />
+          <div style={{
+            position: 'absolute', top: 0, left: 0, right: 0, bottom: -90,
+            overflow: 'hidden',
+            borderTopLeftRadius: '130px 50%', borderBottomLeftRadius: '130px 50%',
+          }}>
+            <img src={HERO_IMG} alt="Familia cuidando juntos" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }} />
+            <div style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(to right, rgba(20,60,50,0.38) 0%, transparent 30%)', pointerEvents: 'none' }} />
+          </div>
 
-          {/* Medialuna eco — arco coral delgado asomando de la esquina inferior derecha de la foto.
-              +20% de tamaño, centrada en la misma esquina. No puede cruzar hacia el marquee
-              porque overflow:hidden aquí es necesario para recortar la curva de la foto —
-              el "cruce" se resuelve con el cuarto de círculo en la esquina del marquee de abajo. */}
+          {/* Medialuna eco — arco coral delgado, acompaña el derrame de la foto cruzando hacia el marquee */}
           <div aria-hidden="true" style={{
             position: 'absolute', right: -216, bottom: -216,
             width: 432, height: 432, borderRadius: '50%',
