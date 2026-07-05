@@ -756,7 +756,7 @@ export default function Landing() {
       </section>
 
       {/* ─────────────── 8. HOW IT WORKS ─────────────── */}
-      <section id="como" style={{ padding: '128px 32px', background: SAND }}>
+      <section id="como" style={{ padding: '128px 32px', background: CREAM }}>
         <div style={{ maxWidth: 1140, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 88, flexWrap: 'wrap' }} className="como-grid">
           <div style={{ flex: '1 1 360px' }}>
             <p style={{ fontSize: 11, fontWeight: 500, color: ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 18px', fontFamily: SANS }}>Cómo funciona</p>
@@ -787,7 +787,26 @@ export default function Landing() {
             </div>
           </div>
           <div style={{ flex: '1 1 360px', display: 'flex', justifyContent: 'center' }} className="como-img">
-            <img src={COMO_IMG} alt="Cómo funciona FamiliaCerca" style={{ width: '100%', borderRadius: 24, boxShadow: `0 16px 64px rgba(13,107,99,0.16)`, border: `1px solid rgba(13,107,99,0.10)` }} />
+            {/* Misma fórmula que El Problema (círculo + medialuna coral desfasada), espejada y
+                contenida: sin derrame de sección, tamaño moderado — el timeline es el protagonista. */}
+            <div className="como-photo-wrap" style={{ position: 'relative', width: '100%', maxWidth: 420, aspectRatio: '1 / 1' }}>
+              {/* Medialuna coral — 8% más grande, desfasada hacia abajo-izquierda (espejo:
+                  en El Problema el desfase va abajo-derecha) */}
+              <div aria-hidden="true" className="como-ring" style={{
+                position: 'absolute', bottom: '-10%', left: '-10%',
+                width: '108%', height: '108%', borderRadius: '50%',
+                background: CORAL, pointerEvents: 'none', zIndex: 1,
+              }} />
+              {/* Foto circular con anillo blanco — mismo tratamiento que El Problema */}
+              <div className="como-photo" style={{
+                position: 'relative', width: '100%', height: '100%',
+                borderRadius: '50%', overflow: 'hidden',
+                border: '8px solid white', boxSizing: 'border-box',
+                zIndex: 2,
+              }}>
+                <img src={COMO_IMG} alt="Cómo funciona FamiliaCerca" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -1185,7 +1204,8 @@ export default function Landing() {
           .landing-problema-photo { width: 320px !important; height: 320px !important; right: auto !important; left: 50% !important; top: auto !important; bottom: -90px !important; transform: translateX(-50%) !important; }
           .landing-problema-ring { width: 346px !important; height: 346px !important; right: auto !important; left: calc(50% + 16px) !important; top: auto !important; bottom: -119px !important; transform: translateX(-50%) !important; }
           .como-grid { flex-direction: column !important; gap: 52px !important; }
-          .como-img { display: none !important; }
+          .como-photo-wrap { max-width: 280px !important; }
+          .como-ring { bottom: -6% !important; left: -6% !important; }
           .testimonios-grid { grid-template-columns: 1fr !important; }
           .whatsapp-comparison-grid { grid-template-columns: 1fr !important; }
         }
