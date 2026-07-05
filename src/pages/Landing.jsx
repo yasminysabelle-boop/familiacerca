@@ -418,13 +418,6 @@ export default function Landing() {
 
       {/* ─────────────── 3. MARQUEE 1 ─────────────── */}
       <section style={{ position: 'relative', background: DARK, padding: '20px 0', overflow: 'hidden', borderTop: `1px solid rgba(233,130,110,0.08)` }}>
-        {/* Cuarto de círculo coral — asoma en la esquina superior derecha, hace de "cruce"
-            con el anillo del hero que no puede atravesar su propio overflow:hidden */}
-        <div aria-hidden="true" style={{
-          position: 'absolute', right: -60, top: -60,
-          width: 120, height: 120, borderRadius: '50%',
-          background: CORAL, pointerEvents: 'none', zIndex: 0,
-        }} />
         <div className="marquee-container">
           <div className="marquee-track">
             {[...marqueePain, ...marqueePain].map((item, i) => (
