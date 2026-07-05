@@ -270,7 +270,7 @@ export default function Landing() {
   ]
 
   return (
-    <div style={{ background: WHITE, color: DARK, overflowX: 'hidden', fontFamily: SANS }}>
+    <div style={{ background: CREAM, color: DARK, overflowX: 'hidden', fontFamily: SANS }}>
 
       {/* ─────────────── 1. NAV ─────────────── */}
       <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: '#F8F4ED', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(20,60,50,0.08)', boxShadow: '0 1px 8px rgba(20,60,50,0.06)' }}>
@@ -432,11 +432,11 @@ export default function Landing() {
       <section style={{ overflow: 'hidden' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }} className="landing-problema-grid">
           <div style={{ position: 'relative', minHeight: 700, zIndex: 2 }} className="landing-problema-img">
-            {/* Aro coral — offset abajo-derecha, como sombra de color, detrás de la foto */}
+            {/* Medialuna coral sólida — 8% más grande que la foto, offset abajo-derecha, detrás de la foto */}
             <div aria-hidden="true" className="landing-problema-ring" style={{
-              position: 'absolute', top: 'calc(50% + 14px)', right: -194,
-              width: 650, height: 650, transform: 'translateY(-50%)',
-              borderRadius: '50%', border: `5px solid ${CORAL}`,
+              position: 'absolute', top: 'calc(50% + 32px)', right: -238,
+              width: 702, height: 702, transform: 'translateY(-50%)',
+              borderRadius: '50%', background: CORAL,
               pointerEvents: 'none', zIndex: 1,
             }} />
             {/* Foto circular completa — montada sobre el bloque verde, ~28% invade */}
@@ -1183,7 +1183,7 @@ export default function Landing() {
           .landing-problema-grid { grid-template-columns: 1fr !important; }
           .landing-problema-img { min-height: 200px !important; }
           .landing-problema-photo { width: 320px !important; height: 320px !important; right: auto !important; left: 50% !important; top: auto !important; bottom: -90px !important; transform: translateX(-50%) !important; }
-          .landing-problema-ring { width: 320px !important; height: 320px !important; right: auto !important; left: calc(50% + 10px) !important; top: auto !important; bottom: -100px !important; transform: translateX(-50%) !important; }
+          .landing-problema-ring { width: 346px !important; height: 346px !important; right: auto !important; left: calc(50% + 16px) !important; top: auto !important; bottom: -119px !important; transform: translateX(-50%) !important; }
           .como-grid { flex-direction: column !important; gap: 52px !important; }
           .como-img { display: none !important; }
           .testimonios-grid { grid-template-columns: 1fr !important; }
