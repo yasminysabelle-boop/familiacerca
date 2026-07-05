@@ -431,8 +431,8 @@ export default function Landing() {
       </section>
 
       {/* ─────────────── 4. STATS ─────────────── */}
-      <section ref={statsRef} style={{ background: CREAM, padding: '72px 32px', borderBottom: `1px solid ${BORDER}` }}>
-        <div style={{ maxWidth: 1140, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', gap: 0 }}>
+      <section ref={statsRef} style={{ background: CREAM, padding: '112px 32px' }}>
+        <div style={{ maxWidth: 1140, margin: '0 auto', background: '#FBEAE4', borderRadius: 32, padding: 'clamp(48px,6vw,64px) clamp(24px,4vw,48px)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', gap: 0 }}>
           {statItems.flatMap((s, i) => {
             const el = (
               <div key={`s${i}`} style={{ textAlign: 'center', padding: '0 48px' }}>
