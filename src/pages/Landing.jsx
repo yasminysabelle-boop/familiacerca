@@ -756,7 +756,7 @@ export default function Landing() {
       </section>
 
       {/* ─────────────── 8. HOW IT WORKS ─────────────── */}
-      <section id="como" style={{ padding: '128px 32px', background: CREAM }}>
+      <section id="como" style={{ padding: '176px 32px', background: CREAM }}>
         <div style={{ maxWidth: 1140, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 88, flexWrap: 'wrap' }} className="como-grid">
           <div style={{ flex: '1 1 360px' }}>
             <p style={{ fontSize: 11, fontWeight: 500, color: ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 18px', fontFamily: SANS }}>Cómo funciona</p>
@@ -789,7 +789,7 @@ export default function Landing() {
           <div style={{ flex: '1 1 360px', display: 'flex', justifyContent: 'center' }} className="como-img">
             {/* Misma fórmula que El Problema (círculo + medialuna coral desfasada), espejada y
                 contenida: sin derrame de sección, tamaño moderado — el timeline es el protagonista. */}
-            <div className="como-photo-wrap" style={{ position: 'relative', width: '100%', maxWidth: 420, aspectRatio: '1 / 1' }}>
+            <div className="como-photo-wrap" style={{ position: 'relative', width: '100%', maxWidth: 590, aspectRatio: '1 / 1' }}>
               {/* Medialuna coral — 8% más grande, desfasada hacia abajo-izquierda (espejo:
                   en El Problema el desfase va abajo-derecha) */}
               <div aria-hidden="true" className="como-ring" style={{
@@ -804,7 +804,7 @@ export default function Landing() {
                 border: '8px solid white', boxSizing: 'border-box',
                 zIndex: 2,
               }}>
-                <img src={COMO_IMG} alt="Cómo funciona FamiliaCerca" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                <img src={COMO_IMG} alt="Cómo funciona FamiliaCerca" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 60%', display: 'block' }} />
               </div>
             </div>
           </div>
