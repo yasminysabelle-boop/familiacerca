@@ -369,10 +369,13 @@ export default function Landing() {
           <img src={HERO_IMG} alt="Familia cuidando juntos" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }} />
           <div style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(to right, rgba(20,60,50,0.38) 0%, transparent 30%)', pointerEvents: 'none' }} />
 
-          {/* Medialuna eco — arco coral delgado asomando de la esquina inferior derecha de la foto */}
+          {/* Medialuna eco — arco coral delgado asomando de la esquina inferior derecha de la foto.
+              +20% de tamaño, centrada en la misma esquina. No puede cruzar hacia el marquee
+              porque overflow:hidden aquí es necesario para recortar la curva de la foto —
+              el "cruce" se resuelve con el cuarto de círculo en la esquina del marquee de abajo. */}
           <div aria-hidden="true" style={{
-            position: 'absolute', right: -180, bottom: -180,
-            width: 360, height: 360, borderRadius: '50%',
+            position: 'absolute', right: -216, bottom: -216,
+            width: 432, height: 432, borderRadius: '50%',
             border: `35px solid ${CORAL}`,
             pointerEvents: 'none', zIndex: 2,
           }} />
@@ -417,7 +420,14 @@ export default function Landing() {
       </section>
 
       {/* ─────────────── 3. MARQUEE 1 ─────────────── */}
-      <section style={{ background: DARK, padding: '20px 0', overflow: 'hidden', borderTop: `1px solid rgba(233,130,110,0.08)` }}>
+      <section style={{ position: 'relative', background: DARK, padding: '20px 0', overflow: 'hidden', borderTop: `1px solid rgba(233,130,110,0.08)` }}>
+        {/* Cuarto de círculo coral — asoma en la esquina superior derecha, hace de "cruce"
+            con el anillo del hero que no puede atravesar su propio overflow:hidden */}
+        <div aria-hidden="true" style={{
+          position: 'absolute', right: -60, top: -60,
+          width: 120, height: 120, borderRadius: '50%',
+          background: CORAL, pointerEvents: 'none', zIndex: 0,
+        }} />
         <div className="marquee-container">
           <div className="marquee-track">
             {[...marqueePain, ...marqueePain].map((item, i) => (
@@ -471,7 +481,7 @@ export default function Landing() {
               <img src={PROB_IMG} alt="El reto del cuidado familiar" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }} />
             </div>
           </div>
-          <div style={{ position: 'relative', overflow: 'hidden', background: PRIMARY, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 'clamp(56px,8vw,96px) clamp(36px,6vw,80px) clamp(56px,8vw,96px) calc(clamp(36px,6vw,80px) + 150px)' }}>
+          <div style={{ position: 'relative', overflow: 'hidden', background: PRIMARY, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 'clamp(56px,8vw,96px) clamp(36px,6vw,80px) clamp(56px,8vw,96px) calc(clamp(36px,6vw,80px) + 150px)', borderTopLeftRadius: 155, borderBottomLeftRadius: 155 }}>
             {/* Cuarto de círculo melocotón decorativo — anclado a la esquina inferior derecha, detrás del contenido */}
             <div aria-hidden="true" style={{
               position: 'absolute', right: -240, bottom: -240,
