@@ -318,27 +318,10 @@ export default function Landing() {
       </nav>
 
       {/* ─────────────── 2. HERO ─────────────── */}
-      <section style={{ position: 'relative', minHeight: '100vh', overflow: 'visible', zIndex: 5 }} className="landing-hero-grid">
+      <section style={{ position: 'relative', minHeight: '100vh', display: 'grid', gridTemplateColumns: '1fr 1fr', overflow: 'hidden' }} className="landing-hero-grid">
 
-        {/* Fondo partido 60/40 — capa independiente detrás de todo el contenido */}
-        <div aria-hidden="true" style={{ position: 'absolute', inset: 0, background: PRIMARY, zIndex: 0 }} />
-        <div aria-hidden="true" className="landing-hero-cream-zone" style={{ position: 'absolute', top: 0, bottom: 0, right: 0, width: '40%', background: CREAM, zIndex: 0 }} />
-
-        {/* Textura decorativa 1 — rama de hojas, esquina superior derecha sobre la zona crema */}
-        <svg aria-hidden="true" className="landing-hero-texture-branch" width="100" height="120" viewBox="0 0 100 120" fill="none" style={{ position: 'absolute', top: 40, right: 48, zIndex: 1, opacity: 0.55, pointerEvents: 'none' }}>
-          <path d="M50 112 C 50 82, 50 48, 55 10" stroke={PRIMARY} strokeWidth="1.75" strokeLinecap="round" />
-          <path d="M52 86 C 40 79, 30 66, 28 51" stroke={PRIMARY} strokeWidth="1.75" strokeLinecap="round" />
-          <path d="M53 60 C 65 54, 75 42, 78 28" stroke={PRIMARY} strokeWidth="1.75" strokeLinecap="round" />
-          <path d="M51 35 C 42 28, 36 18, 34 8" stroke={PRIMARY} strokeWidth="1.75" strokeLinecap="round" />
-        </svg>
-
-        {/* Textura decorativa 2 — pequeño corazón de línea cerca del CTA, sobre la zona verde */}
-        <svg aria-hidden="true" className="landing-hero-texture-heart" width="46" height="42" viewBox="0 0 46 42" fill="none" style={{ position: 'absolute', left: 'calc(50% + 190px)', bottom: '38%', zIndex: 1, opacity: 0.6, pointerEvents: 'none' }}>
-          <path d="M23 38 C 8 26, 3 14, 12 7 C 17 3, 22 5, 23 12 C 24 5, 29 3, 34 7 C 43 14, 38 26, 23 38Z" stroke={CORAL} strokeWidth="1.75" strokeLinejoin="round" />
-        </svg>
-
-        {/* Texto — confinado al 60% verde para que el corte del fondo nunca lo toque */}
-        <div className="landing-hero-text" style={{ position: 'relative', zIndex: 2, width: '60%', minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: 'clamp(80px,8vw,120px) clamp(32px,5vw,72px)', overflow: 'hidden', textAlign: 'center' }}>
+        {/* Left dark panel */}
+        <div className="landing-hero-text" style={{ background: PRIMARY, position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: 'clamp(80px,8vw,120px) clamp(32px,5vw,72px)', overflow: 'hidden', textAlign: 'center' }}>
           <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'radial-gradient(ellipse 70% 55% at 30% 55%, rgba(13,107,99,0.22) 0%, transparent 70%)' }} />
 
           <div style={{ position: 'relative', width: '100%', maxWidth: 520, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -371,63 +354,70 @@ export default function Landing() {
           </div>
         </div>
 
-        {/* Foto protagonista — posicionada libremente (no en el grid) para poder cruzar el
-            corte 60/40. Capas del collage: fondo partido → melocotón → foto → Deborah. */}
-        <div className="landing-hero-photo-wrap" style={{
-          position: 'absolute', top: 'clamp(28px,4vw,56px)', bottom: -50, right: '8vw',
-          width: '47vw', maxWidth: 720, zIndex: 3,
+        {/* Right: photo + floating medication card.
+            Panel ensanchado 110px hacia la izquierda (width+marginLeft negativo) y con las
+            2 esquinas izquierdas redondeadas al 50% de la altura cada una — juntas forman
+            un solo arco convexo continuo que nace recto arriba/abajo y bombea hacia el verde
+            en el centro. Espejo del círculo de El Problema (allá mira a la derecha, acá a la
+            izquierda). El verde no se toca — vive detrás/al lado, la foto se monta encima. */}
+        <div className="landing-hero-right" style={{
+          position: 'relative', overflow: 'hidden', minHeight: '100vh',
+          width: 'calc(100% + 110px)', marginLeft: -110,
+          borderTopLeftRadius: '110px 50%', borderBottomLeftRadius: '110px 50%',
+          zIndex: 2,
         }}>
-          {/* Bloque melocotón — 66% del tamaño de la foto, claramente desfasado en diagonal,
-              asoma por la esquina inferior-izquierda (misma esquina donde pisa Deborah) */}
-          <div aria-hidden="true" className="landing-hero-peach" style={{
-            position: 'absolute', left: -45, bottom: -45, width: '66%', height: '66%',
-            background: '#FBEAE4', borderRadius: 20, zIndex: 1,
-          }} />
-          {/* Foto */}
-          <div style={{ position: 'relative', width: '100%', height: '100%', borderRadius: 20, overflow: 'hidden', zIndex: 2 }}>
-            <img src={HERO_IMG} alt="Familia cuidando juntos" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }} />
-            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(20,60,50,0.28) 0%, transparent 30%)', pointerEvents: 'none' }} />
-          </div>
+          <img src={HERO_IMG} alt="Familia cuidando juntos" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }} />
+          <div style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(to right, rgba(20,60,50,0.38) 0%, transparent 30%)', pointerEvents: 'none' }} />
 
-          {/* Tarjeta de Deborah — montada sobre la esquina inferior-izquierda de la foto,
-              pisando también el bloque melocotón (capa extra del collage), sombra difusa */}
-          <div className="hero-reveal hero-delay-4 landing-hero-card" style={{
-            position: 'absolute', left: -20, bottom: -20, zIndex: 3,
-            background: '#F8F4ED', borderRadius: '20px',
-            padding: '18px 22px', boxShadow: '0 20px 50px rgba(20,60,50,0.18)',
-            minWidth: '255px', maxWidth: '285px',
-          }}>
-            <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'12px'}}>
-              <div style={{width:38,height:38,borderRadius:'50%',background:'#EBF3EE',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'17px'}}>👵</div>
-              <div>
-                <div style={{fontWeight:700,fontSize:'14px',color:'#143C32'}}>Deborah</div>
-                <div style={{display:'flex',alignItems:'center',gap:'5px',marginTop:'2px'}}>
-                  <div style={{width:7,height:7,borderRadius:'50%',background:'#143C32'}}></div>
-                  <span style={{fontSize:'11px',color:'#143C32',fontWeight:600}}>Todo al día</span>
-                </div>
+          {/* Medialuna eco — arco coral delgado asomando de la esquina inferior derecha de la foto */}
+          <div aria-hidden="true" style={{
+            position: 'absolute', right: -180, bottom: -180,
+            width: 360, height: 360, borderRadius: '50%',
+            border: `35px solid ${CORAL}`,
+            pointerEvents: 'none', zIndex: 2,
+          }} />
+        </div>
+
+        {/* Tarjeta de Deborah — hija directa de la sección para poder pisar la frontera curva.
+            Centrada en el PICO del nuevo arco (50% - 110px de bulge - 135px de mitad del ancho
+            de la tarjeta), a la altura media donde la curva es más pronunciada. Oculta en móvil
+            vía CSS para conservar el comportamiento actual. */}
+        <div className="hero-reveal hero-delay-4 landing-hero-card" style={{
+          position: 'absolute', left: 'calc(50% - 245px)', top: '50%',
+          background: '#F8F4ED', borderRadius: '24px',
+          padding: '18px 22px', boxShadow: '0 8px 32px rgba(20,60,50,0.15)',
+          minWidth: '255px', maxWidth: '285px', transform: 'translateY(-50%)', zIndex: 6,
+        }}>
+          <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'12px'}}>
+            <div style={{width:38,height:38,borderRadius:'50%',background:'#EBF3EE',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'17px'}}>👵</div>
+            <div>
+              <div style={{fontWeight:700,fontSize:'14px',color:'#143C32'}}>Deborah</div>
+              <div style={{display:'flex',alignItems:'center',gap:'5px',marginTop:'2px'}}>
+                <div style={{width:7,height:7,borderRadius:'50%',background:'#143C32'}}></div>
+                <span style={{fontSize:'11px',color:'#143C32',fontWeight:600}}>Todo al día</span>
               </div>
             </div>
-            {[
-              {icon:'💊',text:'Medicamentos completados'},
-              {icon:'🕙',text:'Última actualización 10:45 AM'},
-              {icon:'👨‍👩‍👧',text:'4 familiares informados'},
-            ].map((item,i)=>(
-              <div key={i} style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'7px'}}>
-                <span style={{fontSize:'13px'}}>{item.icon}</span>
-                <span style={{fontSize:'11px',color:'#143C32',opacity:0.8}}>{item.text}</span>
-                <span style={{marginLeft:'auto',color:'#143C32',fontSize:'12px',fontWeight:700}}>✓</span>
-              </div>
-            ))}
-            <div style={{borderTop:'1px solid rgba(20,60,50,0.1)',marginTop:'8px',paddingTop:'8px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-              <span style={{fontSize:'10px',color:'#143C32',opacity:0.6}}>Actualizado por Rosa</span>
-              <span style={{fontSize:'10px',color:'#E9826E',fontWeight:600}}>Hace 15 min</span>
+          </div>
+          {[
+            {icon:'💊',text:'Medicamentos completados'},
+            {icon:'🕙',text:'Última actualización 10:45 AM'},
+            {icon:'👨‍👩‍👧',text:'4 familiares informados'},
+          ].map((item,i)=>(
+            <div key={i} style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'7px'}}>
+              <span style={{fontSize:'13px'}}>{item.icon}</span>
+              <span style={{fontSize:'11px',color:'#143C32',opacity:0.8}}>{item.text}</span>
+              <span style={{marginLeft:'auto',color:'#143C32',fontSize:'12px',fontWeight:700}}>✓</span>
             </div>
+          ))}
+          <div style={{borderTop:'1px solid rgba(20,60,50,0.1)',marginTop:'8px',paddingTop:'8px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+            <span style={{fontSize:'10px',color:'#143C32',opacity:0.6}}>Actualizado por Rosa</span>
+            <span style={{fontSize:'10px',color:'#E9826E',fontWeight:600}}>Hace 15 min</span>
           </div>
         </div>
       </section>
 
       {/* ─────────────── 3. MARQUEE 1 ─────────────── */}
-      <section style={{ position: 'relative', background: DARK, padding: '20px 0', overflow: 'hidden', borderTop: `1px solid rgba(233,130,110,0.08)` }}>
+      <section style={{ background: DARK, padding: '20px 0', overflow: 'hidden', borderTop: `1px solid rgba(233,130,110,0.08)` }}>
         <div className="marquee-container">
           <div className="marquee-track">
             {[...marqueePain, ...marqueePain].map((item, i) => (
@@ -441,8 +431,8 @@ export default function Landing() {
       </section>
 
       {/* ─────────────── 4. STATS ─────────────── */}
-      <section ref={statsRef} style={{ background: CREAM, padding: '112px 32px' }}>
-        <div style={{ maxWidth: 1140, margin: '0 auto', background: '#FBEAE4', borderRadius: 32, padding: 'clamp(48px,6vw,64px) clamp(24px,4vw,48px)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', gap: 0 }}>
+      <section ref={statsRef} style={{ background: CREAM, padding: '72px 32px', borderBottom: `1px solid ${BORDER}` }}>
+        <div style={{ maxWidth: 1140, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', gap: 0 }}>
           {statItems.flatMap((s, i) => {
             const el = (
               <div key={`s${i}`} style={{ textAlign: 'center', padding: '0 48px' }}>
@@ -462,21 +452,26 @@ export default function Landing() {
       {/* ─────────────── 5. PROBLEM SPLIT ─────────────── */}
       <section style={{ position: 'relative', zIndex: 5 }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }} className="landing-problema-grid">
-          <div style={{ position: 'relative', minHeight: 700, zIndex: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'clamp(40px,5vw,64px)' }} className="landing-problema-img">
-            {/* Wrapper de la foto — rectángulo editorial con capa coral desfasada detrás (coral,
-                no melocotón, porque el fondo de esta sección es petróleo y el melocotón se perdería).
-                marginBottom negativo = solape moderado sobre la sección siguiente (WhatsApp). */}
-            <div className="landing-problema-photo-wrap" style={{ position: 'relative', width: '100%', maxWidth: 560, aspectRatio: '4 / 5', marginBottom: -50 }}>
-              <div aria-hidden="true" className="landing-problema-coral" style={{
-                position: 'absolute', inset: 0, transform: 'translate(20px, 20px)',
-                background: CORAL, borderRadius: 20, zIndex: 1,
-              }} />
-              <div className="landing-problema-photo" style={{ position: 'relative', width: '100%', height: '100%', borderRadius: 20, overflow: 'hidden', zIndex: 2 }}>
-                <img src={PROB_IMG} alt="El reto del cuidado familiar" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }} />
-              </div>
+          <div style={{ position: 'relative', minHeight: 700, zIndex: 2 }} className="landing-problema-img">
+            {/* Medialuna coral sólida — 8% más grande que la foto, offset abajo-derecha, detrás de la foto, acompaña el derrame */}
+            <div aria-hidden="true" className="landing-problema-ring" style={{
+              position: 'absolute', bottom: -185, right: -203,
+              width: 767, height: 767,
+              borderRadius: '50%', background: CORAL,
+              pointerEvents: 'none', zIndex: 1,
+            }} />
+            {/* Foto circular completa — ~20% invade el bloque verde, ~17.5% se derrama sobre la sección siguiente */}
+            <div className="landing-problema-photo" style={{
+              position: 'absolute', bottom: -124, right: -142,
+              width: 710, height: 710,
+              borderRadius: '50%', overflow: 'hidden',
+              border: '8px solid white', boxSizing: 'border-box',
+              zIndex: 2,
+            }}>
+              <img src={PROB_IMG} alt="El reto del cuidado familiar" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }} />
             </div>
           </div>
-          <div style={{ position: 'relative', overflow: 'hidden', background: PRIMARY, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 'clamp(56px,8vw,96px) clamp(36px,6vw,80px) clamp(56px,8vw,96px) clamp(36px,6vw,80px)' }}>
+          <div style={{ position: 'relative', overflow: 'hidden', background: PRIMARY, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 'clamp(56px,8vw,96px) clamp(36px,6vw,80px) clamp(56px,8vw,96px) calc(clamp(36px,6vw,80px) + 150px)' }}>
             {/* Cuarto de círculo melocotón decorativo — anclado a la esquina inferior derecha, detrás del contenido */}
             <div aria-hidden="true" style={{
               position: 'absolute', right: -240, bottom: -240,
@@ -524,7 +519,7 @@ export default function Landing() {
       </section>
 
       {/* ─────────────── 6. WHATSAPP COMPARISON ─────────────── */}
-      <section style={{ background: CREAM, padding: '160px 32px 120px', overflow: 'hidden' }}>
+      <section style={{ background: CREAM, padding: '320px 32px 120px', overflow: 'hidden' }}>
         <div style={{ maxWidth: 1140, margin: '0 auto' }}>
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 72 }}>
             <p style={{ fontSize: 11, fontWeight: 500, color: ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>El caos conocido</p>
@@ -782,7 +777,7 @@ export default function Landing() {
       </section>
 
       {/* ─────────────── 8. HOW IT WORKS ─────────────── */}
-      <section id="como" style={{ position: 'relative', padding: '128px 32px', background: SAND, zIndex: 5 }}>
+      <section id="como" style={{ padding: '128px 32px', background: SAND }}>
         <div style={{ maxWidth: 1140, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 88, flexWrap: 'wrap' }} className="como-grid">
           <div style={{ flex: '1 1 360px' }}>
             <p style={{ fontSize: 11, fontWeight: 500, color: ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 18px', fontFamily: SANS }}>Cómo funciona</p>
@@ -813,16 +808,7 @@ export default function Landing() {
             </div>
           </div>
           <div style={{ flex: '1 1 360px', display: 'flex', justifyContent: 'center' }} className="como-img">
-            {/* Wrapper con capa melocotón desfasada detrás + solape moderado hacia Marquee 2 */}
-            <div className="como-photo-wrap" style={{ position: 'relative', width: '100%', maxWidth: 460, aspectRatio: '4 / 5', marginBottom: -40 }}>
-              <div aria-hidden="true" className="como-peach" style={{
-                position: 'absolute', inset: 0, transform: 'translate(20px, 20px)',
-                background: '#FBEAE4', borderRadius: 20, zIndex: 1,
-              }} />
-              <div style={{ position: 'relative', width: '100%', height: '100%', borderRadius: 20, overflow: 'hidden', zIndex: 2, boxShadow: '0 16px 64px rgba(13,107,99,0.16)' }}>
-                <img src={COMO_IMG} alt="Cómo funciona FamiliaCerca" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-              </div>
-            </div>
+            <img src={COMO_IMG} alt="Cómo funciona FamiliaCerca" style={{ width: '100%', borderRadius: 24, boxShadow: `0 16px 64px rgba(13,107,99,0.16)`, border: `1px solid rgba(13,107,99,0.10)` }} />
           </div>
         </div>
       </section>
@@ -1031,9 +1017,12 @@ export default function Landing() {
       </section>
 
       {/* ─────────────── 14. CTA FINAL ─────────────── */}
-      <section style={{ position: 'relative', padding: 'clamp(96px,10vw,160px) 32px', background: PRIMARY }}>
-        <div style={{ maxWidth: 1140, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 72, flexWrap: 'wrap' }} className="cta-final-grid">
-          <div style={{ flex: '1 1 420px', maxWidth: 680 }}>
+      <section style={{ position: 'relative', padding: '160px 32px', overflow: 'hidden', minHeight: 560, display: 'flex', alignItems: 'center' }}>
+        <img src={CTA_IMG} alt="" aria-hidden="true" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(20,60,50,0.88)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(20,60,50,0.65) 0%, transparent 55%)' }} />
+        <div style={{ position: 'relative', zIndex: 1, maxWidth: 1140, margin: '0 auto', width: '100%' }}>
+          <div style={{ maxWidth: 680 }}>
             <p style={{ fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 20px', fontFamily: SANS }}>Empieza hoy</p>
             <h2 className="reveal" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(44px,6vw,84px)', fontWeight: 700, color: WHITE, lineHeight: 1.02, margin: '0 0 24px' }}>
               Empieza a cuidar mejor, juntos.
@@ -1048,18 +1037,6 @@ export default function Landing() {
               <a href="#funciones" style={{ padding: '20px 36px', borderRadius: 9999, border: '1.5px solid rgba(255,255,255,0.22)', background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.78)', fontWeight: 400, fontSize: 15, textDecoration: 'none', fontFamily: SANS, display: 'inline-flex', alignItems: 'center', gap: 9 }}>
                 <span style={{ fontSize: 11 }}>▶</span> Ver funciones
               </a>
-            </div>
-          </div>
-          <div style={{ flex: '1 1 320px', display: 'flex', justifyContent: 'center' }} className="cta-final-img">
-            {/* Wrapper con capa melocotón desfasada detrás — misma fórmula editorial que el resto de la landing */}
-            <div className="cta-final-photo-wrap" style={{ position: 'relative', width: '100%', maxWidth: 420, aspectRatio: '4 / 5' }}>
-              <div aria-hidden="true" className="cta-final-peach" style={{
-                position: 'absolute', inset: 0, transform: 'translate(20px, 20px)',
-                background: '#FBEAE4', borderRadius: 20, zIndex: 1,
-              }} />
-              <div style={{ position: 'relative', width: '100%', height: '100%', borderRadius: 20, overflow: 'hidden', zIndex: 2, boxShadow: '0 20px 60px rgba(0,0,0,0.28)' }}>
-                <img src={CTA_IMG} alt="Manos cuidando con cariño" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }} />
-              </div>
             </div>
           </div>
         </div>
@@ -1221,24 +1198,18 @@ export default function Landing() {
         @media (max-width: 768px) {
           .landing-desktop-nav { display: none !important; }
           .landing-hamburger { display: flex !important; }
-          .landing-hero-grid { min-height: auto !important; }
-          .landing-hero-cream-zone { display: none !important; }
-          .landing-hero-texture-branch { display: none !important; }
-          .landing-hero-texture-heart { top: 16px !important; right: 16px !important; left: auto !important; bottom: auto !important; }
-          .landing-hero-text { width: 100% !important; padding: 80px 24px 64px !important; min-height: auto !important; }
-          .landing-hero-photo-wrap { position: relative !important; top: auto !important; bottom: auto !important; right: auto !important; left: auto !important; width: calc(100% - 48px) !important; max-width: 100% !important; aspect-ratio: 4 / 5 !important; margin: 0 auto 24px !important; }
-          .landing-hero-peach { transform: translate(10px, 10px) !important; }
+          .landing-hero-grid { grid-template-columns: 1fr !important; min-height: auto !important; }
+          .landing-hero-right { display: none !important; }
+          .landing-hero-card { display: none !important; }
+          .landing-hero-text { padding: 80px 24px 64px !important; min-height: auto !important; }
           .landing-problema-grid { grid-template-columns: 1fr !important; }
-          .landing-problema-img { min-height: auto !important; padding: 32px 24px 48px !important; }
-          .landing-problema-photo-wrap { margin-bottom: 0 !important; }
-          .landing-problema-coral { transform: translate(10px, 10px) !important; }
+          .landing-problema-img { min-height: 200px !important; }
+          .landing-problema-photo { width: 320px !important; height: 320px !important; right: auto !important; left: 50% !important; top: auto !important; bottom: -90px !important; transform: translateX(-50%) !important; }
+          .landing-problema-ring { width: 346px !important; height: 346px !important; right: auto !important; left: calc(50% + 16px) !important; top: auto !important; bottom: -119px !important; transform: translateX(-50%) !important; }
           .como-grid { flex-direction: column !important; gap: 52px !important; }
-          .como-photo-wrap { margin-bottom: 0 !important; }
-          .como-peach { transform: translate(10px, 10px) !important; }
+          .como-img { display: none !important; }
           .testimonios-grid { grid-template-columns: 1fr !important; }
           .whatsapp-comparison-grid { grid-template-columns: 1fr !important; }
-          .cta-final-grid { flex-direction: column !important; gap: 40px !important; }
-          .cta-final-peach { transform: translate(10px, 10px) !important; }
         }
         @media (max-width: 640px) {
           .landing-divider { display: none !important; }
