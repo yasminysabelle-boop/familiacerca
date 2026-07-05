@@ -449,35 +449,6 @@ export default function Landing() {
             }}>
               <img src={PROB_IMG} alt="El reto del cuidado familiar" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }} />
             </div>
-
-            {/* Mini-card secundaria — asoma detrás/debajo de la principal, ligeramente rotada */}
-            <div aria-hidden="true" className="landing-problema-card-secondary" style={{
-              position: 'absolute', right: 410, bottom: 34, zIndex: 3,
-              width: 220, background: 'white', borderRadius: 16,
-              padding: '12px 14px', boxShadow: '0 6px 20px rgba(20,60,50,0.10)',
-              transform: 'rotate(-2deg)',
-              display: 'flex', alignItems: 'center', gap: 8,
-            }}>
-              <span style={{ width: 30, height: 30, borderRadius: '50%', background: '#F0EDE6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, flexShrink: 0 }}>👵</span>
-              <p style={{ margin: 0, fontSize: 11, color: '#6B7280', fontFamily: SANS, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                <strong style={{ color: PRIMARY }}>Tía Rosa:</strong> ¿alguien fue a la farmacia?
-              </p>
-            </div>
-
-            {/* Mini-card flotante estilo notificación — montada sobre el borde inferior-izquierdo de la foto */}
-            <div className="reveal landing-problema-card-main" style={{
-              position: 'absolute', right: 430, bottom: 50, zIndex: 4,
-              width: 280, background: 'white', borderRadius: 16,
-              padding: '14px 16px', boxShadow: '0 8px 28px rgba(20,60,50,0.14)',
-              display: 'flex', alignItems: 'center', gap: 10,
-            }}>
-              <span style={{ width: 38, height: 38, borderRadius: '50%', background: '#EFF6F0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>💬</span>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: PRIMARY, fontFamily: SANS }}>Familia</p>
-                <p style={{ margin: '2px 0 0', fontSize: 12, color: '#6B7280', fontFamily: SANS, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>¿Ya le diste la pastilla a mamá?</p>
-              </div>
-              <span style={{ background: '#DC2626', color: 'white', fontSize: 11, fontWeight: 700, borderRadius: 999, minWidth: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 6px', flexShrink: 0 }}>47</span>
-            </div>
           </div>
           <div style={{ position: 'relative', overflow: 'hidden', background: PRIMARY, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 'clamp(56px,8vw,96px) clamp(36px,6vw,80px) clamp(56px,8vw,96px) calc(clamp(36px,6vw,80px) + 150px)' }}>
             {/* Cuarto de círculo melocotón decorativo — anclado a la esquina inferior derecha, detrás del contenido */}
@@ -1213,8 +1184,6 @@ export default function Landing() {
           .landing-problema-img { min-height: 200px !important; }
           .landing-problema-photo { width: 320px !important; height: 320px !important; right: auto !important; left: 50% !important; top: auto !important; bottom: -90px !important; transform: translateX(-50%) !important; }
           .landing-problema-ring { width: 346px !important; height: 346px !important; right: auto !important; left: calc(50% + 16px) !important; top: auto !important; bottom: -119px !important; transform: translateX(-50%) !important; }
-          .landing-problema-card-secondary { display: none !important; }
-          .landing-problema-card-main { right: auto !important; left: 50% !important; bottom: 6px !important; transform: translateX(-50%) !important; width: 260px !important; }
           .como-grid { flex-direction: column !important; gap: 52px !important; }
           .como-img { display: none !important; }
           .testimonios-grid { grid-template-columns: 1fr !important; }
