@@ -429,20 +429,20 @@ export default function Landing() {
       </section>
 
       {/* ─────────────── 5. PROBLEM SPLIT ─────────────── */}
-      <section style={{ overflow: 'hidden' }}>
+      <section style={{ position: 'relative', zIndex: 5 }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }} className="landing-problema-grid">
           <div style={{ position: 'relative', minHeight: 700, zIndex: 2 }} className="landing-problema-img">
-            {/* Medialuna coral sólida — 8% más grande que la foto, offset abajo-derecha, detrás de la foto */}
+            {/* Medialuna coral sólida — 8% más grande que la foto, offset abajo-derecha, detrás de la foto, acompaña el derrame */}
             <div aria-hidden="true" className="landing-problema-ring" style={{
-              position: 'absolute', top: 'calc(50% + 32px)', right: -238,
-              width: 702, height: 702, transform: 'translateY(-50%)',
+              position: 'absolute', bottom: -185, right: -203,
+              width: 767, height: 767,
               borderRadius: '50%', background: CORAL,
               pointerEvents: 'none', zIndex: 1,
             }} />
-            {/* Foto circular completa — montada sobre el bloque verde, ~28% invade */}
+            {/* Foto circular completa — ~20% invade el bloque verde, ~17.5% se derrama sobre la sección siguiente */}
             <div className="landing-problema-photo" style={{
-              position: 'absolute', top: '50%', right: -180,
-              width: 650, height: 650, transform: 'translateY(-50%)',
+              position: 'absolute', bottom: -124, right: -142,
+              width: 710, height: 710,
               borderRadius: '50%', overflow: 'hidden',
               border: '8px solid white', boxSizing: 'border-box',
               zIndex: 2,
@@ -498,7 +498,7 @@ export default function Landing() {
       </section>
 
       {/* ─────────────── 6. WHATSAPP COMPARISON ─────────────── */}
-      <section style={{ background: CREAM, padding: '120px 32px', overflow: 'hidden' }}>
+      <section style={{ background: CREAM, padding: '320px 32px 120px', overflow: 'hidden' }}>
         <div style={{ maxWidth: 1140, margin: '0 auto' }}>
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 72 }}>
             <p style={{ fontSize: 11, fontWeight: 500, color: ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>El caos conocido</p>
