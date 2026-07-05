@@ -432,9 +432,29 @@ export default function Landing() {
       <section style={{ overflow: 'hidden' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }} className="landing-problema-grid">
           <div style={{ position: 'relative', minHeight: 700, overflow: 'hidden' }} className="landing-problema-img">
-            <img src={PROB_IMG} alt="El reto del cuidado familiar" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }} />
+            {/* Aro concéntrico coral decorativo — 15% más grande que la foto, mismo centro */}
+            <div aria-hidden="true" className="landing-problema-ring" style={{
+              position: 'absolute', top: '50%', left: -179,
+              width: 598, height: 598, transform: 'translateY(-50%)',
+              borderRadius: '50%', border: `2px solid ${CORAL}`,
+              pointerEvents: 'none', zIndex: 0,
+            }} />
+            {/* Foto circular — sangra por el borde izquierdo */}
+            <div className="landing-problema-photo" style={{
+              position: 'absolute', top: '50%', left: -140,
+              width: 520, height: 520, transform: 'translateY(-50%)',
+              borderRadius: '50%', overflow: 'hidden', zIndex: 1,
+            }}>
+              <img src={PROB_IMG} alt="El reto del cuidado familiar" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }} />
+            </div>
           </div>
-          <div style={{ background: PRIMARY, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 'clamp(56px,8vw,96px) clamp(36px,6vw,80px)' }}>
+          <div style={{ position: 'relative', overflow: 'hidden', background: PRIMARY, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 'clamp(56px,8vw,96px) clamp(36px,6vw,80px)' }}>
+            {/* Cuarto de círculo melocotón decorativo — anclado a la esquina inferior derecha, detrás del contenido */}
+            <div aria-hidden="true" style={{
+              position: 'absolute', right: -240, bottom: -240,
+              width: 480, height: 480, borderRadius: '50%',
+              background: '#FBEAE4', pointerEvents: 'none', zIndex: -1,
+            }} />
             <p style={{ fontSize: 11, fontWeight: 500, color: GOLD, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 20px', fontFamily: SANS }}>El problema</p>
             <h2 className="reveal" style={{ fontFamily: SERIF, fontSize: 'clamp(32px,3.5vw,52px)', fontWeight: 600, color: WHITE, lineHeight: 1.12, margin: '0 0 36px' }}>
               El problema no es cuidar a tu familiar. El problema es que nadie sabe qué está pasando.
@@ -1160,6 +1180,8 @@ export default function Landing() {
           .landing-hero-text { padding: 80px 24px 64px !important; min-height: auto !important; }
           .landing-problema-grid { grid-template-columns: 1fr !important; }
           .landing-problema-img { min-height: 300px !important; }
+          .landing-problema-photo { width: 300px !important; height: 300px !important; left: 50% !important; top: -70px !important; transform: translateX(-50%) !important; }
+          .landing-problema-ring { width: 345px !important; height: 345px !important; left: 50% !important; top: -92px !important; transform: translateX(-50%) !important; }
           .como-grid { flex-direction: column !important; gap: 52px !important; }
           .como-img { display: none !important; }
           .testimonios-grid { grid-template-columns: 1fr !important; }
