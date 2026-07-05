@@ -24,6 +24,19 @@ const BORDER  = 'rgba(13,107,99,0.12)'
 const SERIF = "'Cormorant Garamond', Georgia, serif"
 const SANS  = "'Inter', system-ui, sans-serif"
 
+// Divisor de onda decorativo entre dos secciones — `from` es el color de fondo
+// de la sección anterior (para que no se note costura), `to` es el color con
+// el que se rellena la curva (anticipa la sección siguiente).
+function WaveDivider({ from, to, flip = false }) {
+  return (
+    <div aria-hidden="true" style={{ background: from, lineHeight: 0, pointerEvents: 'none' }}>
+      <svg viewBox="0 0 1440 80" preserveAspectRatio="none" style={{ width: '100%', height: 70, display: 'block', transform: flip ? 'scaleY(-1)' : 'none' }}>
+        <path d="M0,32 C240,80 480,0 720,24 C960,48 1200,8 1440,40 L1440,80 L0,80 Z" fill={to} />
+      </svg>
+    </div>
+  )
+}
+
 function CTABtn({ to, children, style = {} }) {
   return (
     <Link to={to} className="cta-coral" style={{
@@ -270,7 +283,7 @@ export default function Landing() {
   ]
 
   return (
-    <div style={{ background: WHITE, color: DARK, overflowX: 'hidden', fontFamily: SANS }}>
+    <div style={{ background: CREAM, color: DARK, overflowX: 'hidden', fontFamily: SANS }}>
 
       {/* ─────────────── 1. NAV ─────────────── */}
       <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: '#F8F4ED', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(20,60,50,0.08)', boxShadow: '0 1px 8px rgba(20,60,50,0.06)' }}>
@@ -409,9 +422,12 @@ export default function Landing() {
         </div>
       </section>
 
+      <WaveDivider from={DARK} to={CREAM} />
+
       {/* ─────────────── 4. STATS ─────────────── */}
-      <section ref={statsRef} style={{ background: CREAM, padding: '72px 32px', borderBottom: `1px solid ${BORDER}` }}>
-        <div style={{ maxWidth: 1140, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', gap: 0 }}>
+      <section ref={statsRef} style={{ background: CREAM, padding: '72px 32px', borderBottom: `1px solid ${BORDER}`, position: 'relative', overflow: 'hidden' }}>
+        <div aria-hidden="true" style={{ position: 'absolute', top: -40, left: -40, width: 220, height: 220, background: PRIMARY, opacity: 0.06, borderRadius: '0 55% 45% 60%', pointerEvents: 'none' }} />
+        <div style={{ maxWidth: 1140, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', gap: 0, position: 'relative' }}>
           {statItems.flatMap((s, i) => {
             const el = (
               <div key={`s${i}`} style={{ textAlign: 'center', padding: '0 48px' }}>
@@ -433,6 +449,7 @@ export default function Landing() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }} className="landing-problema-grid">
           <div style={{ position: 'relative', minHeight: 700, overflow: 'hidden' }} className="landing-problema-img">
             <img src={PROB_IMG} alt="El reto del cuidado familiar" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }} />
+            <div aria-hidden="true" style={{ position: 'absolute', inset: 0, background: `linear-gradient(to bottom, transparent 70%, ${PRIMARY} 100%)`, pointerEvents: 'none' }} />
           </div>
           <div style={{ background: PRIMARY, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 'clamp(56px,8vw,96px) clamp(36px,6vw,80px)' }}>
             <p style={{ fontSize: 11, fontWeight: 500, color: GOLD, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 20px', fontFamily: SANS }}>El problema</p>
@@ -474,6 +491,8 @@ export default function Landing() {
           </div>
         </div>
       </section>
+
+      <WaveDivider from={PRIMARY} to={CREAM} />
 
       {/* ─────────────── 6. WHATSAPP COMPARISON ─────────────── */}
       <section style={{ background: CREAM, padding: '120px 32px', overflow: 'hidden' }}>
@@ -765,13 +784,18 @@ export default function Landing() {
             </div>
           </div>
           <div style={{ flex: '1 1 360px', display: 'flex', justifyContent: 'center' }} className="como-img">
-            <img src={COMO_IMG} alt="Cómo funciona FamiliaCerca" style={{ width: '100%', borderRadius: 24, boxShadow: `0 16px 64px rgba(13,107,99,0.16)`, border: `1px solid rgba(13,107,99,0.10)` }} />
+            <div style={{ position: 'relative', width: '100%', borderRadius: 24, overflow: 'hidden', boxShadow: `0 16px 64px rgba(13,107,99,0.16)`, border: `1px solid rgba(13,107,99,0.10)` }}>
+              <img src={COMO_IMG} alt="Cómo funciona FamiliaCerca" style={{ width: '100%', display: 'block' }} />
+              <div aria-hidden="true" style={{ position: 'absolute', inset: 0, background: `linear-gradient(to bottom, transparent 72%, ${SAND} 100%)`, pointerEvents: 'none' }} />
+            </div>
           </div>
         </div>
       </section>
 
+      <WaveDivider from={SAND} to={DARK} />
+
       {/* ─────────────── 9. MARQUEE 2 ─────────────── */}
-      <section style={{ background: DARK, padding: '20px 0', overflow: 'hidden', borderTop: `1px solid rgba(233,130,110,0.08)`, borderBottom: `1px solid rgba(233,130,110,0.08)` }}>
+      <section style={{ background: DARK, padding: '20px 0', overflow: 'hidden', borderTop: `1px solid rgba(233,130,110,0.08)`, borderBottom: `1px solid rgba(233,130,110,0.08)`, borderRadius: '56px 56px 0 0' }}>
         <div className="marquee-container">
           <div className="marquee-track marquee-track-reverse">
             {[...marqueeFeatures, ...marqueeFeatures].map((item, i) => (
@@ -856,6 +880,8 @@ export default function Landing() {
         </div>
       </section>
 
+      <WaveDivider from="#143C32" to={CREAM} />
+
       {/* ─────────────── 11. PRECIOS ─────────────── */}
       <section id="precios" style={{ padding: '128px 32px', background: CREAM }}>
         <div style={{ maxWidth: 1140, margin: '0 auto' }}>
@@ -873,8 +899,10 @@ export default function Landing() {
               </button>
             </div>
           </div>
-          <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', alignItems: 'flex-start', justifyContent: 'center' }}>
-            {plans.map(p => <PriceCard key={p.name} {...p} annual={annual} onTrack={track} />)}
+          <div style={{ background: '#FBEAE4', borderRadius: 36, padding: '24px 20px' }}>
+            <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', alignItems: 'flex-start', justifyContent: 'center' }}>
+              {plans.map(p => <PriceCard key={p.name} {...p} annual={annual} onTrack={track} />)}
+            </div>
           </div>
           <div className="reveal" style={{ textAlign: 'center', marginTop: 52 }}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 14, background: WHITE, borderRadius: 18, padding: '18px 30px', border: `1px solid ${BORDER}`, boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}>
@@ -885,8 +913,10 @@ export default function Landing() {
         </div>
       </section>
 
+      <WaveDivider from={CREAM} to={PRIMARY} />
+
       {/* ─────────────── 12. PWA ─────────────── */}
-      <section style={{ padding: '128px 32px', background: PRIMARY }}>
+      <section style={{ padding: '128px 32px', background: PRIMARY, borderRadius: '56px 56px 0 0' }}>
         <div style={{ maxWidth: 980, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 72, flexWrap: 'wrap' }}>
           <div style={{ flex: '1 1 300px' }}>
             <p style={{ fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 18px', fontFamily: SANS }}>Sin App Store</p>
@@ -960,9 +990,12 @@ export default function Landing() {
         </div>
       </section>
 
+      <WaveDivider from={PRIMARY} to={CREAM} />
+
       {/* ─────────────── 13. FAQ ─────────────── */}
-      <section id="faq" style={{ padding: '128px 32px', background: CREAM }}>
-        <div style={{ maxWidth: 740, margin: '0 auto' }}>
+      <section id="faq" style={{ padding: '128px 32px', background: CREAM, position: 'relative', overflow: 'hidden' }}>
+        <div aria-hidden="true" style={{ position: 'absolute', bottom: -50, right: -50, width: 240, height: 240, background: CORAL, opacity: 0.06, borderRadius: '55% 45% 0 60%', pointerEvents: 'none' }} />
+        <div style={{ maxWidth: 740, margin: '0 auto', position: 'relative' }}>
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 72 }}>
             <p style={{ fontSize: 11, fontWeight: 500, color: ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>Preguntas frecuentes</p>
             <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(32px,4vw,60px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.1, margin: 0 }}>
@@ -978,6 +1011,7 @@ export default function Landing() {
         <img src={CTA_IMG} alt="" aria-hidden="true" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(20,60,50,0.88)' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(20,60,50,0.65) 0%, transparent 55%)' }} />
+        <div aria-hidden="true" style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 90, background: `linear-gradient(to bottom, ${CREAM} 0%, transparent 100%)`, opacity: 0.5, pointerEvents: 'none' }} />
         <div style={{ position: 'relative', zIndex: 1, maxWidth: 1140, margin: '0 auto', width: '100%' }}>
           <div style={{ maxWidth: 680 }}>
             <p style={{ fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 20px', fontFamily: SANS }}>Empieza hoy</p>
@@ -998,6 +1032,8 @@ export default function Landing() {
           </div>
         </div>
       </section>
+
+      <WaveDivider from={PRIMARY} to={CREAM} />
 
       {/* ─────────────── 15. FOOTER ─────────────── */}
       <footer style={{ background: '#F8F4ED', padding: '64px 32px 48px', borderTop: `1px solid rgba(20,60,50,0.08)` }}>
