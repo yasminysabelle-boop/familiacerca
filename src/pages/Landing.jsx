@@ -554,13 +554,13 @@ export default function Landing() {
 
             {/* Card 2: Chat categorizado */}
             <div className="feature-hero-card reveal reveal-delay-1" style={{ background: WHITE, borderRadius: 22, border: `1px solid rgba(13,107,99,0.18)`, padding: '36px 30px', boxShadow: '0 4px 24px rgba(13,107,99,0.07)', minHeight: 420, position: 'relative' }}>
-              <div style={{ width: 60, height: 60, borderRadius: 16, background: `rgba(20,60,50,0.07)`, border: '1px solid rgba(20,60,50,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, marginBottom: 18 }}>💊</div>
+              <div style={{ width: 60, height: 60, borderRadius: 16, background: `rgba(20,60,50,0.07)`, border: '1px solid rgba(20,60,50,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, marginBottom: 18 }}>💬</div>
               <div style={{ display: 'inline-flex', padding: '4px 12px', borderRadius: 9999, border: `1px solid rgba(233,130,110,0.30)`, marginBottom: 12, background: 'rgba(233,130,110,0.07)' }}>
-                <span style={{ fontSize: 10, fontWeight: 500, color: GOLD, letterSpacing: '0.08em', fontFamily: SANS }}>Sin olvidos ni doble dosis</span>
+                <span style={{ fontSize: 10, fontWeight: 500, color: GOLD, letterSpacing: '0.08em', fontFamily: SANS }}>Sin mensajes perdidos</span>
               </div>
-              <h3 style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 600, color: PRIMARY, margin: '0 0 10px', lineHeight: 1.2 }}>Medicamentos coordinados</h3>
+              <h3 style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 600, color: PRIMARY, margin: '0 0 10px', lineHeight: 1.2 }}>Chat familiar organizado</h3>
               <p style={{ fontSize: 17, color: '#6B7280', lineHeight: 1.75, margin: '0 0 20px', fontFamily: SANS, fontWeight: 300 }}>
-                Evita olvidos y dobles dosis con confirmación en tiempo real.
+                Cada conversación en su categoría — medicamentos, citas, urgencias — para que nada se pierda entre mensajes.
               </p>
               <div style={{ background: SAND, borderRadius: 12, padding: '12px', border: `1px solid rgba(13,107,99,0.10)`, display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {[
@@ -581,13 +581,13 @@ export default function Landing() {
 
             {/* Card 3: Registros médicos + PDF */}
             <div className="feature-hero-card reveal reveal-delay-2" style={{ background: WHITE, borderRadius: 22, border: `1px solid rgba(13,107,99,0.18)`, padding: '36px 30px', boxShadow: '0 4px 24px rgba(13,107,99,0.07)', minHeight: 420, position: 'relative' }}>
-              <div style={{ width: 60, height: 60, borderRadius: 16, background: `rgba(20,60,50,0.07)`, border: '1px solid rgba(20,60,50,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, marginBottom: 18 }}>💬</div>
+              <div style={{ width: 60, height: 60, borderRadius: 16, background: `rgba(20,60,50,0.07)`, border: '1px solid rgba(20,60,50,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, marginBottom: 18 }}>📋</div>
               <div style={{ display: 'inline-flex', padding: '4px 12px', borderRadius: 9999, border: `1px solid rgba(233,130,110,0.30)`, marginBottom: 12, background: 'rgba(233,130,110,0.07)' }}>
-                <span style={{ fontSize: 10, fontWeight: 500, color: GOLD, letterSpacing: '0.08em', fontFamily: SANS }}>Por categorías</span>
+                <span style={{ fontSize: 10, fontWeight: 500, color: GOLD, letterSpacing: '0.08em', fontFamily: SANS }}>Listo para el doctor</span>
               </div>
-              <h3 style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 600, color: PRIMARY, margin: '0 0 10px', lineHeight: 1.2 }}>Chat organizado por categorías</h3>
+              <h3 style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 600, color: PRIMARY, margin: '0 0 10px', lineHeight: 1.2 }}>Historial médico y exportación</h3>
               <p style={{ fontSize: 17, color: '#6B7280', lineHeight: 1.75, margin: '0 0 20px', fontFamily: SANS, fontWeight: 300 }}>
-                No más mensajes perdidos. Cada conversación en su lugar.
+                Visitas, incidentes y análisis organizados, exportables en PDF para cualquier consulta.
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {[
@@ -609,9 +609,9 @@ export default function Landing() {
           {/* 3 small secondary cards */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 18 }}>
             {[
-              { icon: '📋', title: 'Historial único del cuidado', desc: 'Todo registrado y exportable para el médico.' },
+              { icon: '🎙️', title: 'Álbum de recuerdos y notas de voz', desc: 'Fotos y notas de voz que construyen la memoria de tu familiar.' },
               { icon: '🆘', title: 'Botón SOS', desc: 'Un toque y todos reciben la alerta al instante.' },
-              { icon: '🗓️', title: 'Citas médicas', desc: 'Estados, adjuntos y recordatorio automático.' },
+              { icon: '🗓️', title: 'Rutinas y citas médicas', desc: 'Checklist diario y citas con recordatorio automático — y el apoyo de Milo & Luna IA cuando lo necesites.' },
             ].map((f, i) => (
               <div key={f.title} className={`reveal reveal-delay-${i}`} style={{ background: WHITE, borderRadius: 16, border: `1px solid rgba(13,107,99,0.16)`, padding: '26px 24px', display: 'flex', gap: 16, alignItems: 'flex-start', boxShadow: '0 2px 12px rgba(13,107,99,0.05)' }}>
                 <div style={{ width: 46, height: 46, borderRadius: 12, background: `rgba(20,60,50,0.07)`, border: `1px solid rgba(20,60,50,0.12)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>{f.icon}</div>
