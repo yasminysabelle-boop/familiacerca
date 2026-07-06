@@ -9,6 +9,7 @@ const HERO_IMG = '/images/hero.jpg'
 const PROB_IMG = '/images/familia-telefonos-noche.webp'
 const COMO_IMG = '/images/como.jpg'
 const CTA_IMG  = '/images/cta.jpg'
+const MILO_LUNA_IMG = '/images/milo-luna.webp'
 
 const PRIMARY = '#143C32'
 const ACTION  = '#0d6b63'
@@ -538,7 +539,7 @@ export default function Landing() {
               </div>
               <h3 style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 600, color: PRIMARY, margin: '0 0 10px', lineHeight: 1.2 }}>Chat familiar organizado</h3>
               <p style={{ fontSize: 17, color: '#6B7280', lineHeight: 1.75, margin: '0 0 20px', fontFamily: SANS, fontWeight: 300 }}>
-                Cada conversación en su categoría — medicamentos, citas, urgencias — para que nada se pierda entre mensajes. Y cuando lo necesites, Milo & Luna IA te acompañan con una conversación aparte.
+                Cada conversación en su categoría — medicamentos, citas, urgencias — para que nada se pierda entre mensajes.
               </p>
               <div style={{ background: SAND, borderRadius: 12, padding: '12px', border: `1px solid rgba(13,107,99,0.10)`, display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {[
@@ -599,6 +600,23 @@ export default function Landing() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─────────────── 7.2. MILO & LUNA ─────────────── */}
+      <section style={{ background: PRIMARY, padding: '128px 32px' }}>
+        <div style={{ maxWidth: 1140, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 64, flexWrap: 'wrap' }}>
+          <div style={{ flex: '0 0 auto' }}>
+            <img src={MILO_LUNA_IMG} alt="Milo y Luna, compañeros con inteligencia artificial de FamiliaCerca" style={{ width: 220, borderRadius: 20, display: 'block', boxShadow: '0 20px 60px rgba(0,0,0,0.30)' }} />
+          </div>
+          <div style={{ flex: '1 1 420px', maxWidth: 560, textAlign: 'center' }} className="reveal">
+            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(30px,3.6vw,52px)', fontWeight: 600, color: CREAM, lineHeight: 1.15, margin: '0 0 20px' }}>
+              Tu familia nunca está sola
+            </h2>
+            <p style={{ fontSize: 18, color: 'rgba(248,244,237,0.72)', lineHeight: 1.8, margin: 0, fontFamily: SANS, fontWeight: 300 }}>
+              Milo y Luna, los compañeros con inteligencia artificial de FamiliaCerca, ayudan a detectar cambios, recordar información y acompañar el cuidado — día y noche.
+            </p>
           </div>
         </div>
       </section>
