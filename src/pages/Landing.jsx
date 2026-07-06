@@ -318,24 +318,73 @@ export default function Landing() {
       </nav>
 
       {/* ─────────────── 2. HERO ─────────────── */}
-      <section style={{ minHeight: '100vh', display: 'grid', gridTemplateColumns: '1fr 1fr', overflow: 'hidden' }} className="landing-hero-grid">
+      <section style={{ minHeight: '100vh', display: 'grid', gridTemplateColumns: '9fr 11fr', alignItems: 'center', gap: 'clamp(48px,6vw,96px)', background: CREAM, padding: '0 clamp(32px,5vw,72px)' }} className="landing-hero-grid">
 
-        {/* Left dark panel */}
-        <div className="landing-hero-text" style={{ background: PRIMARY, position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: 'clamp(80px,8vw,120px) clamp(32px,5vw,72px)', overflow: 'hidden', textAlign: 'center' }}>
-          <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'radial-gradient(ellipse 70% 55% at 30% 55%, rgba(13,107,99,0.22) 0%, transparent 70%)' }} />
-
-          <div style={{ position: 'relative', width: '100%', maxWidth: 520, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <div className="hero-reveal hero-delay-1" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, border: '1px solid rgba(13,107,99,0.40)', borderRadius: 9999, padding: '7px 18px', marginBottom: 36, background: 'rgba(13,107,99,0.14)' }}>
-              <span style={{ fontSize: 13 }}>🌿</span>
-              <span style={{ fontSize: 12, fontWeight: 500, color: MINT_C, letterSpacing: '0.06em', fontFamily: SANS }}>Cuidado familiar coordinado</span>
+        {/* Left: foto enmarcada estilo "cuadro" — marco de línea fina petróleo desfasado
+            arriba-izquierda, fondo melocotón muy sutil detrás, tarjeta Deborah en la esquina
+            opuesta (abajo-derecha) para no competir con el marco ni tapar rostros. */}
+        <div className="landing-hero-photo" style={{ display: 'flex', justifyContent: 'center' }}>
+          <div className="landing-hero-photo-wrap" style={{ position: 'relative', width: '100%', maxWidth: 460, aspectRatio: '4 / 5' }}>
+            {/* Fondo melocotón sutil */}
+            <div aria-hidden="true" className="landing-hero-peach" style={{
+              position: 'absolute', inset: 0, transform: 'translate(-14px, -14px)',
+              background: '#FBEAE4', opacity: 0.6, borderRadius: 6, zIndex: 0,
+            }} />
+            {/* Marco de línea fina, vacío, desfasado */}
+            <div aria-hidden="true" className="landing-hero-frame" style={{
+              position: 'absolute', inset: 0, transform: 'translate(-14px, -14px)',
+              border: '1.75px solid #143C32', borderRadius: 6, zIndex: 1,
+            }} />
+            {/* Foto */}
+            <div style={{ position: 'relative', width: '100%', height: '100%', borderRadius: 6, overflow: 'hidden', zIndex: 2, boxShadow: '0 8px 24px rgba(20,60,50,0.08)' }}>
+              <img src={HERO_IMG} alt="Familia cuidando juntos" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }} />
             </div>
 
-            <h1 className="hero-reveal hero-delay-2" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(40px, 5.5vw, 78px)', fontWeight: 700, color: WHITE, lineHeight: 1.08, margin: '0 0 28px', letterSpacing: '-1px', textAlign: 'center' }}>
+            {/* Tarjeta de Deborah — esquina inferior-derecha, capa flotante */}
+            <div className="hero-reveal hero-delay-4 landing-hero-card" style={{
+              position: 'absolute', right: -20, bottom: -20, zIndex: 3,
+              background: '#F8F4ED', borderRadius: '20px',
+              padding: '18px 22px', boxShadow: '0 12px 32px rgba(20,60,50,0.16)',
+              minWidth: '255px', maxWidth: '285px',
+            }}>
+              <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'12px'}}>
+                <div style={{width:38,height:38,borderRadius:'50%',background:'#EBF3EE',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'17px'}}>👵</div>
+                <div>
+                  <div style={{fontWeight:700,fontSize:'14px',color:'#143C32'}}>Deborah</div>
+                  <div style={{display:'flex',alignItems:'center',gap:'5px',marginTop:'2px'}}>
+                    <div style={{width:7,height:7,borderRadius:'50%',background:'#143C32'}}></div>
+                    <span style={{fontSize:'11px',color:'#143C32',fontWeight:600}}>Todo al día</span>
+                  </div>
+                </div>
+              </div>
+              {[
+                {icon:'💊',text:'Medicamentos completados'},
+                {icon:'🕙',text:'Última actualización 10:45 AM'},
+                {icon:'👨‍👩‍👧',text:'4 familiares informados'},
+              ].map((item,i)=>(
+                <div key={i} style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'7px'}}>
+                  <span style={{fontSize:'13px'}}>{item.icon}</span>
+                  <span style={{fontSize:'11px',color:'#143C32',opacity:0.8}}>{item.text}</span>
+                  <span style={{marginLeft:'auto',color:'#143C32',fontSize:'12px',fontWeight:700}}>✓</span>
+                </div>
+              ))}
+              <div style={{borderTop:'1px solid rgba(20,60,50,0.1)',marginTop:'8px',paddingTop:'8px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                <span style={{fontSize:'10px',color:'#143C32',opacity:0.6}}>Actualizado por Rosa</span>
+                <span style={{fontSize:'10px',color:'#E9826E',fontWeight:600}}>Hace 15 min</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right: texto sobre crema */}
+        <div className="landing-hero-text" style={{ position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: 'clamp(48px,6vw,80px) 0', textAlign: 'center' }}>
+          <div style={{ position: 'relative', width: '100%', maxWidth: 520, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <h1 className="hero-reveal hero-delay-2" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(40px, 5.5vw, 78px)', fontWeight: 700, color: PRIMARY, lineHeight: 1.08, margin: '0 0 28px', letterSpacing: '-1px', textAlign: 'center' }}>
               Cuida a quien amas,{' '}
               <span style={{ color: GOLD }}>sin perder ningún detalle.</span>
             </h1>
 
-            <p className="hero-reveal hero-delay-3" style={{ fontSize: 'clamp(16px, 1.8vw, 19px)', color: 'rgba(255,255,255,0.60)', lineHeight: 1.80, margin: '0 0 48px', fontFamily: SANS, fontWeight: 300, textAlign: 'center' }}>
+            <p className="hero-reveal hero-delay-3" style={{ fontSize: 'clamp(16px, 1.8vw, 19px)', color: 'rgba(20,60,50,0.75)', lineHeight: 1.80, margin: '0 0 48px', fontFamily: SANS, fontWeight: 300, textAlign: 'center' }}>
               Todos saben qué pasó, qué falta y cómo está tu familiar, sin depender de WhatsApp ni llamadas interminables.
             </p>
 
@@ -346,50 +395,10 @@ export default function Landing() {
             <div className="hero-reveal hero-delay-5" style={{ display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap', justifyContent: 'center' }}>
               {['Gratis para empezar', 'Sin tarjeta de crédito', 'Funciona en iPhone y Android'].map(t => (
                 <div key={t} style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-                  <span style={{ fontSize: 12, color: MINT_C, fontWeight: 600 }}>✓</span>
-                  <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.40)', fontWeight: 300, fontFamily: SANS }}>{t}</span>
+                  <span style={{ fontSize: 12, color: 'rgba(20,60,50,0.7)', fontWeight: 600 }}>✓</span>
+                  <span style={{ fontSize: 13, color: 'rgba(20,60,50,0.55)', fontWeight: 300, fontFamily: SANS }}>{t}</span>
                 </div>
               ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Right: photo + floating medication card */}
-        <div className="landing-hero-right" style={{ position: 'relative', overflow: 'hidden', minHeight: '100vh' }}>
-          <img src={HERO_IMG} alt="Familia cuidando juntos" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }} />
-          <div style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(to right, rgba(20,60,50,0.38) 0%, transparent 30%)', pointerEvents: 'none' }} />
-
-          {/* Floating status card */}
-          <div className="hero-reveal hero-delay-4" style={{
-            position:'absolute', bottom:'2rem', right:'1.5rem',
-            background:'#F8F4ED', borderRadius:'24px',
-            padding:'18px 22px', boxShadow:'0 8px 32px rgba(20,60,50,0.15)',
-            minWidth:'255px', maxWidth:'285px', zIndex: 4
-          }}>
-            <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'12px'}}>
-              <div style={{width:38,height:38,borderRadius:'50%',background:'#EBF3EE',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'17px'}}>👵</div>
-              <div>
-                <div style={{fontWeight:700,fontSize:'14px',color:'#143C32'}}>Deborah</div>
-                <div style={{display:'flex',alignItems:'center',gap:'5px',marginTop:'2px'}}>
-                  <div style={{width:7,height:7,borderRadius:'50%',background:'#143C32'}}></div>
-                  <span style={{fontSize:'11px',color:'#143C32',fontWeight:600}}>Todo al día</span>
-                </div>
-              </div>
-            </div>
-            {[
-              {icon:'💊',text:'Medicamentos completados'},
-              {icon:'🕙',text:'Última actualización 10:45 AM'},
-              {icon:'👨‍👩‍👧',text:'4 familiares informados'},
-            ].map((item,i)=>(
-              <div key={i} style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'7px'}}>
-                <span style={{fontSize:'13px'}}>{item.icon}</span>
-                <span style={{fontSize:'11px',color:'#143C32',opacity:0.8}}>{item.text}</span>
-                <span style={{marginLeft:'auto',color:'#143C32',fontSize:'12px',fontWeight:700}}>✓</span>
-              </div>
-            ))}
-            <div style={{borderTop:'1px solid rgba(20,60,50,0.1)',marginTop:'8px',paddingTop:'8px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-              <span style={{fontSize:'10px',color:'#143C32',opacity:0.6}}>Actualizado por Rosa</span>
-              <span style={{fontSize:'10px',color:'#E9826E',fontWeight:600}}>Hace 15 min</span>
             </div>
           </div>
         </div>
@@ -1155,9 +1164,9 @@ export default function Landing() {
         @media (max-width: 768px) {
           .landing-desktop-nav { display: none !important; }
           .landing-hamburger { display: flex !important; }
-          .landing-hero-grid { grid-template-columns: 1fr !important; min-height: auto !important; }
-          .landing-hero-right { display: none !important; }
-          .landing-hero-text { padding: 80px 24px 64px !important; min-height: auto !important; }
+          .landing-hero-grid { grid-template-columns: 1fr !important; min-height: auto !important; padding: 0 24px !important; gap: 40px !important; }
+          .landing-hero-peach, .landing-hero-frame { transform: translate(-8px, -8px) !important; }
+          .landing-hero-text { padding: 24px 0 64px !important; min-height: auto !important; }
           .landing-problema-grid { grid-template-columns: 1fr !important; }
           .landing-problema-img { min-height: 300px !important; }
           .como-grid { flex-direction: column !important; gap: 52px !important; }
