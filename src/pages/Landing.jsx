@@ -330,26 +330,31 @@ export default function Landing() {
               <span style={{ fontSize: 12, fontWeight: 500, color: MINT_C, letterSpacing: '0.06em', fontFamily: SANS }}>Cuidado familiar coordinado</span>
             </div>
 
-            <h1 className="hero-reveal hero-delay-2" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(40px, 5.5vw, 78px)', fontWeight: 700, color: WHITE, lineHeight: 1.08, margin: '0 0 28px', letterSpacing: '-1px', textAlign: 'center' }}>
+            <h1 className="hero-reveal hero-delay-2" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(40px, 5.5vw, 78px)', fontWeight: 700, color: WHITE, lineHeight: 1.08, margin: '0 0 20px', letterSpacing: '-1px', textAlign: 'center' }}>
               Cuida a quien amas,{' '}
               <span style={{ color: GOLD }}>sin perder ningún detalle.</span>
             </h1>
 
-            <p className="hero-reveal hero-delay-3" style={{ fontSize: 'clamp(16px, 1.8vw, 19px)', color: 'rgba(255,255,255,0.60)', lineHeight: 1.80, margin: '0 0 48px', fontFamily: SANS, fontWeight: 300, textAlign: 'center' }}>
-              Todos saben qué pasó, qué falta y cómo está tu familiar, sin depender de WhatsApp ni llamadas interminables.
+            <p className="hero-reveal hero-delay-3" style={{ fontSize: 'clamp(15px, 1.6vw, 18px)', color: 'rgba(255,255,255,0.55)', lineHeight: 1.6, margin: '0 0 14px', fontFamily: SANS, fontWeight: 300, textAlign: 'center' }}>
+              La información del cuidado se pierde entre chats, llamadas y suposiciones.
+            </p>
+
+            <p className="hero-reveal hero-delay-3" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(24px, 3.2vw, 38px)', fontWeight: 600, color: GOLD, lineHeight: 1.25, margin: '0 0 40px' }}>
+              ¿Ya se lo dieron?
             </p>
 
             <Link to="/register" className="hero-reveal hero-delay-4 cta-coral" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '18px 48px', borderRadius: 9999, marginBottom: 32, background: '#E9826E', color: WHITE, fontWeight: 600, fontSize: 18, fontFamily: SANS, textDecoration: 'none', letterSpacing: '0.02em', boxShadow: '0 12px 40px rgba(233,130,110,0.45)', transition: 'background 0.2s ease' }}>
-              Comenzar gratis <span style={{ fontSize: 18, opacity: 0.85 }}>→</span>
+              Empezar gratis <span style={{ fontSize: 18, opacity: 0.85 }}>→</span>
             </Link>
 
-            <div className="hero-reveal hero-delay-5" style={{ display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap', justifyContent: 'center' }}>
-              {['Gratis para empezar', 'Sin tarjeta de crédito', 'Funciona en iPhone y Android'].map(t => (
-                <div key={t} style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-                  <span style={{ fontSize: 12, color: MINT_C, fontWeight: 600 }}>✓</span>
-                  <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.40)', fontWeight: 300, fontFamily: SANS }}>{t}</span>
-                </div>
-              ))}
+            <div className="hero-reveal hero-delay-5" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.40)', fontWeight: 300, fontFamily: SANS }}>
+                <span style={{ color: MINT_C, fontWeight: 600 }}>✓</span> Sin tarjeta{' '}
+                <span style={{ color: 'rgba(255,255,255,0.25)' }}>·</span>{' '}
+                <span style={{ color: MINT_C, fontWeight: 600 }}>✓</span> iPhone y Android{' '}
+                <span style={{ color: 'rgba(255,255,255,0.25)' }}>·</span>{' '}
+                <span style={{ color: MINT_C, fontWeight: 600 }}>✓</span> Sin app store
+              </span>
             </div>
           </div>
         </div>
@@ -436,162 +441,36 @@ export default function Landing() {
           </div>
           <div style={{ background: PRIMARY, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 'clamp(56px,8vw,96px) clamp(36px,6vw,80px)' }}>
             <p style={{ fontSize: 11, fontWeight: 500, color: GOLD, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 20px', fontFamily: SANS }}>El problema</p>
-            <h2 className="reveal" style={{ fontFamily: SERIF, fontSize: 'clamp(32px,3.5vw,52px)', fontWeight: 600, color: WHITE, lineHeight: 1.12, margin: '0 0 36px' }}>
+            <h2 className="reveal" style={{ fontFamily: SERIF, fontSize: 'clamp(32px,3.5vw,52px)', fontWeight: 600, color: WHITE, lineHeight: 1.12, margin: '0 0 44px' }}>
               El problema no es cuidar a tu familiar. El problema es que nadie sabe qué está pasando.
             </h2>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-              <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: '20px 18px' }}>
-                <p style={{ margin: '0 0 16px', fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.35)', fontFamily: SANS, letterSpacing: '0.10em', textTransform: 'uppercase' }}>Cuando el cuidado se coordina por WhatsApp:</p>
-                {[
-                  'Se olvidan medicamentos',
-                  'Nadie encuentra la información',
-                  'Se repiten tareas',
-                  'Hay discusiones entre familiares',
-                  'Nadie tiene una visión completa',
-                ].map(t => (
-                  <div key={t} style={{ display: 'flex', alignItems: 'flex-start', gap: 9, marginBottom: 10 }}>
-                    <span style={{ color: CORAL, fontWeight: 700, fontSize: 13, flexShrink: 0, marginTop: 1 }}>✕</span>
-                    <span style={{ fontSize: 15, color: 'rgba(255,255,255,0.55)', fontFamily: SANS, fontWeight: 300, lineHeight: 1.5 }}>{t}</span>
-                  </div>
-                ))}
-              </div>
-              <div style={{ background: 'rgba(235,246,238,0.08)', border: `1px solid rgba(235,246,238,0.22)`, borderRadius: 16, padding: '20px 18px' }}>
-                <p style={{ margin: '0 0 16px', fontSize: 10, fontWeight: 600, color: MINT_C, fontFamily: SANS, letterSpacing: '0.10em', textTransform: 'uppercase' }}>Con FamiliaCerca</p>
-                {[
-                  'Todos ven lo mismo',
-                  'Todo queda registrado',
-                  'Las alertas llegan a tiempo',
-                  'Cada cuidador sabe qué hacer',
-                  'El historial siempre está disponible',
-                ].map(t => (
-                  <div key={t} style={{ display: 'flex', alignItems: 'flex-start', gap: 9, marginBottom: 10 }}>
-                    <span style={{ color: MINT_C, fontWeight: 700, fontSize: 13, flexShrink: 0, marginTop: 1 }}>✓</span>
-                    <span style={{ fontSize: 15, color: 'rgba(255,255,255,0.82)', fontFamily: SANS, fontWeight: 300, lineHeight: 1.5 }}>{t}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      {/* ─────────────── 6. WHATSAPP COMPARISON ─────────────── */}
-      <section style={{ background: CREAM, padding: '120px 32px', overflow: 'hidden' }}>
-        <div style={{ maxWidth: 1140, margin: '0 auto' }}>
-          <div className="reveal" style={{ textAlign: 'center', marginBottom: 72 }}>
-            <p style={{ fontSize: 11, fontWeight: 500, color: ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>El caos conocido</p>
-            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(32px,4vw,56px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.1, margin: '0 0 18px' }}>
-              WhatsApp es para conversar. FamiliaCerca es para cuidar.
-            </h2>
-            <p style={{ fontSize: 17, color: '#6B7280', lineHeight: 1.75, maxWidth: 520, margin: '0 auto', fontFamily: SANS, fontWeight: 300 }}>
-              Cuando una persona depende de varios familiares o cuidadores, los mensajes se pierden, las tareas se duplican y la información desaparece. FamiliaCerca mantiene todo organizado en un solo lugar.
+            <div className="reveal" style={{ display: 'flex', flexDirection: 'column', gap: 30 }}>
+              <div>
+                <p style={{ margin: '0 0 6px', fontFamily: SERIF, fontSize: 15, fontWeight: 600, color: GOLD, letterSpacing: '0.04em' }}>8:30 PM</p>
+                <p style={{ margin: 0, fontSize: 18, color: 'rgba(255,255,255,0.82)', fontFamily: SANS, fontWeight: 400, lineHeight: 1.6 }}>
+                  Tu mamá necesita su medicación.
+                </p>
+              </div>
+              <div>
+                <p style={{ margin: '0 0 6px', fontFamily: SERIF, fontSize: 15, fontWeight: 600, color: GOLD, letterSpacing: '0.04em' }}>02</p>
+                <p style={{ margin: 0, fontSize: 17, color: 'rgba(255,255,255,0.62)', fontFamily: SANS, fontWeight: 300, lineHeight: 1.7 }}>
+                  Un hermano cree que ya se la dieron. Otro no está seguro. El cuidador no respondió el WhatsApp.
+                </p>
+              </div>
+              <p style={{ margin: 0, fontSize: 17, color: 'rgba(255,255,255,0.62)', fontFamily: SANS, fontWeight: 300, lineHeight: 1.7 }}>
+                El historial está perdido entre mensajes. La responsabilidad se diluye. Y tú cargas con la duda.
+              </p>
+            </div>
+
+            <p className="reveal" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(24px,2.8vw,34px)', fontWeight: 600, color: GOLD, lineHeight: 1.3, margin: '40px 0 0' }}>
+              Esto no es falta de amor. Es falta de sistema.
             </p>
           </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 28 }} className="whatsapp-comparison-grid">
-
-            {/* WhatsApp: chaos panel — authentic WhatsApp colors intentional for contrast */}
-            <div className="reveal" style={{ borderRadius: 24, overflow: 'hidden', boxShadow: '0 12px 48px rgba(0,0,0,0.12)', border: '1px solid rgba(0,0,0,0.06)' }}>
-              <div style={{ background: '#075E54', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div style={{ width: 38, height: 38, borderRadius: '50%', background: '#128C7E', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>👨‍👩‍👧</div>
-                <div>
-                  <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: WHITE, fontFamily: SANS }}>
-                    <span style={{ color: '#25D366' }}>WhatsApp</span> — Familia
-                  </p>
-                  <p style={{ margin: 0, fontSize: 11, color: 'rgba(255,255,255,0.65)', fontFamily: SANS }}>8 participantes · 247 mensajes sin leer</p>
-                </div>
-                <div style={{ marginLeft: 'auto', background: '#25D366', borderRadius: 9999, width: 26, height: 26, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <span style={{ color: WHITE, fontSize: 10, fontWeight: 700 }}>247</span>
-                </div>
-              </div>
-              <div style={{ background: '#E5DDD5', padding: '14px', display: 'flex', flexDirection: 'column', gap: 8, minHeight: 380 }}>
-                {[
-                  { from: 'Mamá 📱', msg: '¿alguien le dio el medicamento a papá??', mine: false, time: '9:14' },
-                  { from: 'Jorge', msg: 'yo no sé, pensé que tú lo hacías 🤷', mine: false, time: '9:15' },
-                  { from: 'Tía Rosa', msg: 'esperen estoy buscando el mensaje de ayer', mine: false, time: '9:16' },
-                  { from: 'Mamá 📱', msg: 'AQUÍ DICE QUE SÍ SE LO DIERON pero no estoy segura', mine: false, time: '9:17' },
-                  { from: 'Yo', msg: 'no encuentro nada, hay 200 mensajes', mine: true, time: '9:18' },
-                  { from: 'Tía Rosa', msg: '😰 mejor daselo de nuevo?', mine: false, time: '9:19' },
-                  { from: 'Jorge', msg: 'NO no se puede dar doble dosis!! 🚫', mine: false, time: '9:19' },
-                  { from: 'Mamá 📱', msg: 'ay dios mío qué hacemos', mine: false, time: '9:20' },
-                ].map((b, i) => (
-                  <div key={i} style={{ display: 'flex', justifyContent: b.mine ? 'flex-end' : 'flex-start' }}>
-                    <div style={{ maxWidth: '78%', padding: '8px 12px', borderRadius: b.mine ? '14px 14px 4px 14px' : '14px 14px 14px 4px', background: b.mine ? '#DCF8C6' : WHITE, position: 'relative' }}>
-                      {!b.mine && <p style={{ margin: '0 0 2px', fontSize: 10, fontWeight: 600, color: '#128C7E', fontFamily: SANS }}>{b.from}</p>}
-                      <p style={{ margin: 0, fontSize: 12, color: '#303030', fontFamily: SANS, lineHeight: 1.4 }}>{b.msg}</p>
-                      <p style={{ margin: '3px 0 0', fontSize: 9, color: '#9CA3AF', fontFamily: SANS, textAlign: 'right' }}>{b.time}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div style={{ background: '#F0F0F0', padding: '12px 16px', textAlign: 'center' }}>
-                <p style={{ margin: 0, fontSize: 12, color: CORAL, fontFamily: SANS, fontWeight: 500 }}>✕ Sin registro · Sin confirmación · Sin claridad</p>
-              </div>
-            </div>
-
-            {/* FamiliaCerca: calm panel */}
-            <div className="reveal reveal-delay-1" style={{ borderRadius: 24, overflow: 'hidden', boxShadow: `0 12px 48px rgba(20,60,50,0.14)`, border: `2px solid ${ACTION}` }}>
-              <div style={{ background: PRIMARY, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
-                <img src="/icon-192.png" alt="FC" style={{ width: 38, height: 38, borderRadius: 10, objectFit: 'cover' }} />
-                <div>
-                  <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: WHITE, fontFamily: SANS }}>FamiliaCerca</p>
-                  <p style={{ margin: 0, fontSize: 11, color: MINT_C, fontFamily: SANS }}>Medicamentos · Todo en orden</p>
-                </div>
-                <div style={{ marginLeft: 'auto', background: 'rgba(235,246,238,0.18)', borderRadius: 9999, padding: '4px 12px' }}>
-                  <span style={{ color: MINT_C, fontSize: 11, fontWeight: 600 }}>✓ Al día</span>
-                </div>
-              </div>
-              <div style={{ background: SAND, padding: '14px', display: 'flex', flexDirection: 'column', gap: 10, minHeight: 380 }}>
-                {/* Confirmed med card */}
-                <div style={{ background: WHITE, borderRadius: 14, padding: '14px 16px', border: `1px solid rgba(13,107,99,0.15)` }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                    <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: PRIMARY, fontFamily: SANS }}>💊 Medicamentos del día</p>
-                    <span style={{ fontSize: 10, color: ACTION, background: MINT_C, borderRadius: 9999, padding: '2px 10px', fontFamily: SANS, fontWeight: 600 }}>2/3 ✓</span>
-                  </div>
-                  {[
-                    { med: 'Atenolol 25mg · 8am', who: 'Jorge', done: true },
-                    { med: 'Metformina · 1pm', who: 'Tía Rosa', done: true },
-                    { med: 'Losartán · 8pm', who: 'Pendiente', done: false },
-                  ].map((item, i) => (
-                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '5px 0', borderBottom: i < 2 ? '1px solid rgba(0,0,0,0.05)' : 'none' }}>
-                      <div style={{ width: 16, height: 16, borderRadius: '50%', background: item.done ? ACTION : 'transparent', border: `1.5px solid ${item.done ? ACTION : 'rgba(0,0,0,0.15)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                        {item.done && <span style={{ color: WHITE, fontSize: 7 }}>✓</span>}
-                      </div>
-                      <span style={{ fontSize: 11, fontFamily: SANS, color: item.done ? '#6B7280' : PRIMARY, textDecoration: item.done ? 'line-through' : 'none', flex: 1 }}>{item.med}</span>
-                      <span style={{ fontSize: 9, color: item.done ? ACTION : CORAL, fontFamily: SANS, fontWeight: 500 }}>{item.who}</span>
-                    </div>
-                  ))}
-                </div>
-                {/* Confirmation with photo */}
-                <div style={{ background: WHITE, borderRadius: 14, padding: '12px 16px', border: `1px solid rgba(13,107,99,0.15)` }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <div style={{ width: 40, height: 40, borderRadius: 10, background: MINT_C, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>📷</div>
-                    <div>
-                      <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: PRIMARY, fontFamily: SANS }}>Jorge confirmó con foto</p>
-                      <p style={{ margin: 0, fontSize: 10, color: '#6B7280', fontFamily: SANS }}>Atenolol 25mg · hoy 8:03 AM · ✓ Verificado</p>
-                    </div>
-                  </div>
-                </div>
-                {/* Alert card */}
-                <div style={{ background: 'rgba(233,130,110,0.07)', borderRadius: 14, padding: '12px 16px', border: `1px solid rgba(233,130,110,0.22)` }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <span style={{ fontSize: 18 }}>🔔</span>
-                    <div>
-                      <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: CORAL, fontFamily: SANS }}>Alerta: Losartán pendiente a las 8pm</p>
-                      <p style={{ margin: 0, fontSize: 10, color: '#6B7280', fontFamily: SANS }}>Notificado a 3 cuidadores · Ventana ±1 hora</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div style={{ background: MINT_C, padding: '12px 16px', textAlign: 'center' }}>
-                <p style={{ margin: 0, fontSize: 12, color: PRIMARY, fontFamily: SANS, fontWeight: 600 }}>✓ Registro claro · Foto de prueba · Todos informados</p>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 
-      {/* ─────────────── BENEFITS ─────────────── */}
+      {/* ─────────────── 6. BENEFITS ─────────────── */}
       <section style={{ background: SAND, padding: '96px 32px' }}>
         <div style={{ maxWidth: 1140, margin: '0 auto' }}>
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 64 }}>
@@ -733,7 +612,166 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ─────────────── 8. HOW IT WORKS ─────────────── */}
+      {/* ─────────────── 7.5. CREDIBILIDAD ─────────────── */}
+      <section style={{ background: '#FBEAE4', padding: '96px 32px' }}>
+        <div style={{ maxWidth: 640, margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+          {/* TODO: reemplazar por un testimonio real destacado cuando esté disponible */}
+          <div className="reveal" style={{
+            background: '#F8F4ED', borderRadius: '28px',
+            padding: '28px 32px', boxShadow: '0 20px 60px rgba(20,60,50,0.18)',
+            width: '100%', maxWidth: 380, marginBottom: 40
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+              <div style={{ width: 46, height: 46, borderRadius: '50%', background: '#EBF3EE', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '21px' }}>👵</div>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: '16px', color: '#143C32' }}>Deborah</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
+                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#143C32' }}></div>
+                  <span style={{ fontSize: '12px', color: '#143C32', fontWeight: 600 }}>Todo al día</span>
+                </div>
+              </div>
+            </div>
+            {[
+              { icon: '💊', text: 'Medicamentos completados' },
+              { icon: '🕙', text: 'Última actualización 10:45 AM' },
+              { icon: '👨‍👩‍👧', text: '4 familiares informados' },
+            ].map((item, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '9px' }}>
+                <span style={{ fontSize: '15px' }}>{item.icon}</span>
+                <span style={{ fontSize: '13px', color: '#143C32', opacity: 0.8 }}>{item.text}</span>
+                <span style={{ marginLeft: 'auto', color: '#143C32', fontSize: '13px', fontWeight: 700 }}>✓</span>
+              </div>
+            ))}
+            <div style={{ borderTop: '1px solid rgba(20,60,50,0.1)', marginTop: '10px', paddingTop: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: '11px', color: '#143C32', opacity: 0.6 }}>Actualizado por Rosa</span>
+              <span style={{ fontSize: '11px', color: '#E9826E', fontWeight: 600 }}>Hace 15 min</span>
+            </div>
+          </div>
+
+          <p className="reveal" style={{ fontFamily: SERIF, fontSize: 'clamp(22px,2.6vw,30px)', fontWeight: 500, color: PRIMARY, lineHeight: 1.4, margin: 0 }}>
+            Cada toma confirmada. Cada familiar informado. En tiempo real.
+          </p>
+        </div>
+      </section>
+
+      {/* ─────────────── 8. WHATSAPP COMPARISON (de esto a esto) ─────────────── */}
+      <section style={{ background: CREAM, padding: '120px 32px', overflow: 'hidden' }}>
+        <div style={{ maxWidth: 1140, margin: '0 auto' }}>
+          <div className="reveal" style={{ textAlign: 'center', marginBottom: 72 }}>
+            <p style={{ fontSize: 11, fontWeight: 500, color: ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>El caos conocido</p>
+            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(32px,4vw,56px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.1, margin: '0 0 18px' }}>
+              WhatsApp es para conversar. FamiliaCerca es para cuidar.
+            </h2>
+            <p style={{ fontSize: 17, color: '#6B7280', lineHeight: 1.75, maxWidth: 520, margin: '0 auto', fontFamily: SANS, fontWeight: 300 }}>
+              Cuando una persona depende de varios familiares o cuidadores, los mensajes se pierden, las tareas se duplican y la información desaparece. FamiliaCerca mantiene todo organizado en un solo lugar.
+            </p>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 28 }} className="whatsapp-comparison-grid">
+
+            {/* WhatsApp: chaos panel — authentic WhatsApp colors intentional for contrast */}
+            <div className="reveal" style={{ borderRadius: 24, overflow: 'hidden', boxShadow: '0 12px 48px rgba(0,0,0,0.12)', border: '1px solid rgba(0,0,0,0.06)' }}>
+              <div style={{ background: '#075E54', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ width: 38, height: 38, borderRadius: '50%', background: '#128C7E', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>👨‍👩‍👧</div>
+                <div>
+                  <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: WHITE, fontFamily: SANS }}>
+                    <span style={{ color: '#25D366' }}>WhatsApp</span> — Familia
+                  </p>
+                  <p style={{ margin: 0, fontSize: 11, color: 'rgba(255,255,255,0.65)', fontFamily: SANS }}>8 participantes · 247 mensajes sin leer</p>
+                </div>
+                <div style={{ marginLeft: 'auto', background: '#25D366', borderRadius: 9999, width: 26, height: 26, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <span style={{ color: WHITE, fontSize: 10, fontWeight: 700 }}>247</span>
+                </div>
+              </div>
+              <div style={{ background: '#E5DDD5', padding: '14px', display: 'flex', flexDirection: 'column', gap: 8, minHeight: 380 }}>
+                {[
+                  { from: 'Mamá 📱', msg: '¿alguien le dio el medicamento a papá??', mine: false, time: '9:14' },
+                  { from: 'Jorge', msg: 'yo no sé, pensé que tú lo hacías 🤷', mine: false, time: '9:15' },
+                  { from: 'Tía Rosa', msg: 'esperen estoy buscando el mensaje de ayer', mine: false, time: '9:16' },
+                  { from: 'Mamá 📱', msg: 'AQUÍ DICE QUE SÍ SE LO DIERON pero no estoy segura', mine: false, time: '9:17' },
+                  { from: 'Yo', msg: 'no encuentro nada, hay 200 mensajes', mine: true, time: '9:18' },
+                  { from: 'Tía Rosa', msg: '😰 mejor daselo de nuevo?', mine: false, time: '9:19' },
+                  { from: 'Jorge', msg: 'NO no se puede dar doble dosis!! 🚫', mine: false, time: '9:19' },
+                  { from: 'Mamá 📱', msg: 'ay dios mío qué hacemos', mine: false, time: '9:20' },
+                ].map((b, i) => (
+                  <div key={i} style={{ display: 'flex', justifyContent: b.mine ? 'flex-end' : 'flex-start' }}>
+                    <div style={{ maxWidth: '78%', padding: '8px 12px', borderRadius: b.mine ? '14px 14px 4px 14px' : '14px 14px 14px 4px', background: b.mine ? '#DCF8C6' : WHITE, position: 'relative' }}>
+                      {!b.mine && <p style={{ margin: '0 0 2px', fontSize: 10, fontWeight: 600, color: '#128C7E', fontFamily: SANS }}>{b.from}</p>}
+                      <p style={{ margin: 0, fontSize: 12, color: '#303030', fontFamily: SANS, lineHeight: 1.4 }}>{b.msg}</p>
+                      <p style={{ margin: '3px 0 0', fontSize: 9, color: '#9CA3AF', fontFamily: SANS, textAlign: 'right' }}>{b.time}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div style={{ background: '#F0F0F0', padding: '12px 16px', textAlign: 'center' }}>
+                <p style={{ margin: 0, fontSize: 12, color: CORAL, fontFamily: SANS, fontWeight: 500 }}>✕ Sin registro · Sin confirmación · Sin claridad</p>
+              </div>
+            </div>
+
+            {/* FamiliaCerca: calm panel */}
+            <div className="reveal reveal-delay-1" style={{ borderRadius: 24, overflow: 'hidden', boxShadow: `0 12px 48px rgba(20,60,50,0.14)`, border: `2px solid ${ACTION}` }}>
+              <div style={{ background: PRIMARY, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
+                <img src="/icon-192.png" alt="FC" style={{ width: 38, height: 38, borderRadius: 10, objectFit: 'cover' }} />
+                <div>
+                  <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: WHITE, fontFamily: SANS }}>FamiliaCerca</p>
+                  <p style={{ margin: 0, fontSize: 11, color: MINT_C, fontFamily: SANS }}>Medicamentos · Todo en orden</p>
+                </div>
+                <div style={{ marginLeft: 'auto', background: 'rgba(235,246,238,0.18)', borderRadius: 9999, padding: '4px 12px' }}>
+                  <span style={{ color: MINT_C, fontSize: 11, fontWeight: 600 }}>✓ Al día</span>
+                </div>
+              </div>
+              <div style={{ background: SAND, padding: '14px', display: 'flex', flexDirection: 'column', gap: 10, minHeight: 380 }}>
+                {/* Confirmed med card */}
+                <div style={{ background: WHITE, borderRadius: 14, padding: '14px 16px', border: `1px solid rgba(13,107,99,0.15)` }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                    <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: PRIMARY, fontFamily: SANS }}>💊 Medicamentos del día</p>
+                    <span style={{ fontSize: 10, color: ACTION, background: MINT_C, borderRadius: 9999, padding: '2px 10px', fontFamily: SANS, fontWeight: 600 }}>2/3 ✓</span>
+                  </div>
+                  {[
+                    { med: 'Atenolol 25mg · 8am', who: 'Jorge', done: true },
+                    { med: 'Metformina · 1pm', who: 'Tía Rosa', done: true },
+                    { med: 'Losartán · 8pm', who: 'Pendiente', done: false },
+                  ].map((item, i) => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '5px 0', borderBottom: i < 2 ? '1px solid rgba(0,0,0,0.05)' : 'none' }}>
+                      <div style={{ width: 16, height: 16, borderRadius: '50%', background: item.done ? ACTION : 'transparent', border: `1.5px solid ${item.done ? ACTION : 'rgba(0,0,0,0.15)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        {item.done && <span style={{ color: WHITE, fontSize: 7 }}>✓</span>}
+                      </div>
+                      <span style={{ fontSize: 11, fontFamily: SANS, color: item.done ? '#6B7280' : PRIMARY, textDecoration: item.done ? 'line-through' : 'none', flex: 1 }}>{item.med}</span>
+                      <span style={{ fontSize: 9, color: item.done ? ACTION : CORAL, fontFamily: SANS, fontWeight: 500 }}>{item.who}</span>
+                    </div>
+                  ))}
+                </div>
+                {/* Confirmation with photo */}
+                <div style={{ background: WHITE, borderRadius: 14, padding: '12px 16px', border: `1px solid rgba(13,107,99,0.15)` }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ width: 40, height: 40, borderRadius: 10, background: MINT_C, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>📷</div>
+                    <div>
+                      <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: PRIMARY, fontFamily: SANS }}>Jorge confirmó con foto</p>
+                      <p style={{ margin: 0, fontSize: 10, color: '#6B7280', fontFamily: SANS }}>Atenolol 25mg · hoy 8:03 AM · ✓ Verificado</p>
+                    </div>
+                  </div>
+                </div>
+                {/* Alert card */}
+                <div style={{ background: 'rgba(233,130,110,0.07)', borderRadius: 14, padding: '12px 16px', border: `1px solid rgba(233,130,110,0.22)` }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <span style={{ fontSize: 18 }}>🔔</span>
+                    <div>
+                      <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: CORAL, fontFamily: SANS }}>Alerta: Losartán pendiente a las 8pm</p>
+                      <p style={{ margin: 0, fontSize: 10, color: '#6B7280', fontFamily: SANS }}>Notificado a 3 cuidadores · Ventana ±1 hora</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div style={{ background: MINT_C, padding: '12px 16px', textAlign: 'center' }}>
+                <p style={{ margin: 0, fontSize: 12, color: PRIMARY, fontFamily: SANS, fontWeight: 600 }}>✓ Registro claro · Foto de prueba · Todos informados</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      {/* ─────────────── 9. HOW IT WORKS ─────────────── */}
       <section id="como" style={{ padding: '128px 32px', background: SAND }}>
         <div style={{ maxWidth: 1140, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 88, flexWrap: 'wrap' }} className="como-grid">
           <div style={{ flex: '1 1 360px' }}>
@@ -770,7 +808,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ─────────────── 9. MARQUEE 2 ─────────────── */}
+      {/* ─────────────── 10. MARQUEE 2 ─────────────── */}
       <section style={{ background: DARK, padding: '20px 0', overflow: 'hidden', borderTop: `1px solid rgba(233,130,110,0.08)`, borderBottom: `1px solid rgba(233,130,110,0.08)` }}>
         <div className="marquee-container">
           <div className="marquee-track marquee-track-reverse">
@@ -800,7 +838,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ─────────────── 10. TESTIMONIOS ─────────────── */}
+      {/* ─────────────── 11. TESTIMONIOS ─────────────── */}
       <section style={{ padding: '128px 32px', background: CREAM }}>
         <div style={{ maxWidth: 1140, margin: '0 auto' }}>
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 72 }}>
@@ -856,7 +894,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ─────────────── 11. PRECIOS ─────────────── */}
+      {/* ─────────────── 12. PRECIOS ─────────────── */}
       <section id="precios" style={{ padding: '128px 32px', background: CREAM }}>
         <div style={{ maxWidth: 1140, margin: '0 auto' }}>
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 52 }}>
@@ -885,7 +923,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ─────────────── 12. PWA ─────────────── */}
+      {/* ─────────────── 13. PWA ─────────────── */}
       <section style={{ padding: '128px 32px', background: PRIMARY }}>
         <div style={{ maxWidth: 980, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 72, flexWrap: 'wrap' }}>
           <div style={{ flex: '1 1 300px' }}>
@@ -960,7 +998,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ─────────────── 13. FAQ ─────────────── */}
+      {/* ─────────────── 14. FAQ ─────────────── */}
       <section id="faq" style={{ padding: '128px 32px', background: CREAM }}>
         <div style={{ maxWidth: 740, margin: '0 auto' }}>
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 72 }}>
@@ -973,7 +1011,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ─────────────── 14. CTA FINAL ─────────────── */}
+      {/* ─────────────── 15. CTA FINAL ─────────────── */}
       <section style={{ position: 'relative', padding: '160px 32px', overflow: 'hidden', minHeight: 560, display: 'flex', alignItems: 'center' }}>
         <img src={CTA_IMG} alt="" aria-hidden="true" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(20,60,50,0.88)' }} />
@@ -999,7 +1037,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ─────────────── 15. FOOTER ─────────────── */}
+      {/* ─────────────── 16. FOOTER ─────────────── */}
       <footer style={{ background: '#F8F4ED', padding: '64px 32px 48px', borderTop: `1px solid rgba(20,60,50,0.08)` }}>
         <div style={{ maxWidth: 1140, margin: '0 auto' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 48, marginBottom: 52 }}>
@@ -1077,7 +1115,7 @@ export default function Landing() {
 
       <InstallBanner />
 
-      {/* ─────────────── 16. STICKY BAR ─────────────── */}
+      {/* ─────────────── 17. STICKY BAR ─────────────── */}
       <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 9000, background: ACTION, padding: '14px 24px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, boxShadow: '0 -4px 24px rgba(0,0,0,0.22)', opacity: showBar && !dismissed ? 1 : 0, transform: showBar && !dismissed ? 'translateY(0)' : 'translateY(100%)', transition: 'opacity 0.35s ease, transform 0.35s cubic-bezier(0.16,1,0.3,1)', pointerEvents: showBar && !dismissed ? 'all' : 'none' }}>
         {canPrompt && !installed ? (
           <button
