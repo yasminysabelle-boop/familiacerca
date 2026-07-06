@@ -71,7 +71,7 @@ function FAQItem({ q, a, light = false, onTrack }) {
   )
 }
 
-function PriceCard({ name, price, period, highlight, badge, features, cta, annual, trackId, onTrack }) {
+function PriceCard({ name, price, period, highlight, badge, features, cta, annual, trackId, onTrack, tagline }) {
   const displayPrice = annual && price > 0 ? (price * 0.8).toFixed(2) : price
   return (
     <div
@@ -82,6 +82,7 @@ function PriceCard({ name, price, period, highlight, badge, features, cta, annua
         <div className={highlight ? 'badge-pulse-anim' : ''} style={{ position: 'absolute', top: -16, left: '50%', transform: 'translateX(-50%)', background: GOLD, color: 'white', fontSize: 10, fontWeight: 500, letterSpacing: '0.12em', padding: '6px 22px', borderRadius: 9999, whiteSpace: 'nowrap', fontFamily: SANS }}>{badge}</div>
       )}
       <p style={{ fontSize: 10, fontWeight: 500, color: highlight ? 'rgba(255,255,255,0.55)' : ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 12px', fontFamily: SANS }}>{name}</p>
+      {tagline && <p style={{ fontSize: 14, color: highlight ? 'rgba(255,255,255,0.65)' : '#6B7280', margin: '0 0 16px', fontFamily: SANS, fontWeight: 400, lineHeight: 1.4 }}>{tagline}</p>}
       <div style={{ marginBottom: 4, display: 'flex', alignItems: 'baseline', gap: 6 }}>
         <span style={{ fontSize: 52, fontWeight: 700, color: highlight ? 'white' : DARK, fontFamily: SERIF, lineHeight: 1 }}>{price === 0 ? 'Gratis' : `$${displayPrice}`}</span>
         {price > 0 && <span style={{ fontSize: 13, color: highlight ? 'rgba(255,255,255,0.45)' : '#6B7280', fontFamily: SANS }}>/mes</span>}
@@ -185,7 +186,7 @@ export default function Landing() {
   const plans = [
     {
       name: 'Gratis', price: 0, period: 'Para siempre sin costo', highlight: false,
-      trackId: 'gratis',
+      trackId: 'gratis', tagline: 'Empieza a coordinar',
       features: [
         { text: 'Hasta 2 cuidadores', included: true },
         { text: 'Medicamentos ilimitados', included: true },
@@ -203,7 +204,7 @@ export default function Landing() {
     },
     {
       name: 'Familiar', price: 12.99, period: 'Hasta 6 cuidadores',
-      highlight: true, badge: 'Más popular', trackId: 'familiar',
+      highlight: true, badge: 'Más popular', trackId: 'familiar', tagline: 'Para familias que necesitan más tranquilidad',
       features: [
         { text: 'Hasta 6 cuidadores', included: true },
         { text: 'Todo del plan Gratis', included: true },
@@ -221,7 +222,7 @@ export default function Landing() {
     },
     {
       name: 'Cuidado Total', price: 24.99, period: 'Cuidadores ilimitados', highlight: false,
-      trackId: 'total',
+      trackId: 'total', tagline: 'Para familias que necesitan más tranquilidad',
       features: [
         { text: 'Cuidadores ilimitados', included: true },
         { text: 'Todo del plan Familiar', included: true },
@@ -768,7 +769,7 @@ export default function Landing() {
           <div style={{ flex: '1 1 360px' }}>
             <p style={{ fontSize: 11, fontWeight: 500, color: ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 18px', fontFamily: SANS }}>Cómo funciona</p>
             <h2 className="reveal" style={{ fontFamily: SERIF, fontSize: 'clamp(32px,4vw,56px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.12, margin: '0 0 52px' }}>
-              Listo en 3 minutos, funciona para siempre
+              Listo en 3 minutos. Diseñado para acompañarte todos los días.
             </h2>
             <div style={{ display: 'flex', flexDirection: 'column', position: 'relative' }}>
               <div className="como-line" style={{ position: 'absolute', left: 39, top: 64, bottom: 64, width: 2, background: `linear-gradient(to bottom, ${ACTION}, rgba(13,107,99,0.08))` }} />
