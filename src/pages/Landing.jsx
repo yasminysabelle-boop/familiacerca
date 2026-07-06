@@ -804,20 +804,20 @@ export default function Landing() {
           <div className="para-quien-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 32 }}>
             {[
               {
-                text: 'Cuidas a tus padres o abuelos',
-                icon: <svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke={WHITE} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 11l9-8 9 8" /><path d="M5 10v10h14V10" /><path d="M9 20v-6h6v6" /></svg>,
-              },
-              {
-                text: 'Tu familiar vive con una condición crónica',
-                icon: <svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke={WHITE} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12h4l2-6 4 12 2-6h6" /></svg>,
-              },
-              {
                 text: 'Eres el cuidador principal y cargas con todo',
                 icon: <svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke={WHITE} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="3.2" /><path d="M5 21c0-4.5 3-7 7-7s7 2.5 7 7" /></svg>,
               },
               {
                 text: 'Tu familia está repartida en distintas ciudades o países',
                 icon: <svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke={WHITE} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 10-14 0c0 5.5 7 12 7 12z" /><circle cx="12" cy="9" r="2.4" /></svg>,
+              },
+              {
+                text: 'Cuidas a tus padres o abuelos',
+                icon: <svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke={WHITE} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 11l9-8 9 8" /><path d="M5 10v10h14V10" /><path d="M9 20v-6h6v6" /></svg>,
+              },
+              {
+                text: 'Tu familiar vive con una condición crónica',
+                icon: <svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke={WHITE} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12h4l2-6 4 12 2-6h6" /></svg>,
               },
             ].map((item, i) => (
               <div key={item.text} className={`para-quien-card reveal reveal-delay-${i % 3}`} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 18, background: '#FBEAE4', borderRadius: 16, padding: 'clamp(28px,3vw,36px) 20px' }}>
