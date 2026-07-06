@@ -560,7 +560,7 @@ export default function Landing() {
               </div>
               <h3 style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 600, color: PRIMARY, margin: '0 0 10px', lineHeight: 1.2 }}>Chat familiar organizado</h3>
               <p style={{ fontSize: 17, color: '#6B7280', lineHeight: 1.75, margin: '0 0 20px', fontFamily: SANS, fontWeight: 300 }}>
-                Cada conversación en su categoría — medicamentos, citas, urgencias — para que nada se pierda entre mensajes.
+                Cada conversación en su categoría — medicamentos, citas, urgencias — para que nada se pierda entre mensajes. Y cuando lo necesites, Milo & Luna IA te acompañan con una conversación aparte.
               </p>
               <div style={{ background: SAND, borderRadius: 12, padding: '12px', border: `1px solid rgba(13,107,99,0.10)`, display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {[
@@ -611,7 +611,7 @@ export default function Landing() {
             {[
               { icon: '🎙️', title: 'Álbum de recuerdos y notas de voz', desc: 'Fotos y notas de voz que construyen la memoria de tu familiar.' },
               { icon: '🆘', title: 'Botón SOS', desc: 'Un toque y todos reciben la alerta al instante.' },
-              { icon: '🗓️', title: 'Rutinas y citas médicas', desc: 'Checklist diario y citas con recordatorio automático — y el apoyo de Milo & Luna IA cuando lo necesites.' },
+              { icon: '🗓️', title: 'Rutinas y citas médicas', desc: 'Checklist diario y citas con recordatorio automático.' },
             ].map((f, i) => (
               <div key={f.title} className={`reveal reveal-delay-${i}`} style={{ background: WHITE, borderRadius: 16, border: `1px solid rgba(13,107,99,0.16)`, padding: '26px 24px', display: 'flex', gap: 16, alignItems: 'flex-start', boxShadow: '0 2px 12px rgba(13,107,99,0.05)' }}>
                 <div style={{ width: 46, height: 46, borderRadius: 12, background: `rgba(20,60,50,0.07)`, border: `1px solid rgba(20,60,50,0.12)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>{f.icon}</div>
@@ -907,7 +907,7 @@ export default function Landing() {
         <div style={{ maxWidth: 860, margin: '0 auto', textAlign: 'center' }}>
           <div style={{ fontFamily: SERIF, fontSize: 110, color: GOLD, lineHeight: 0.7, marginBottom: 20, opacity: 0.22 }}>"</div>
           <blockquote className="reveal" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(28px,3.8vw,54px)', fontWeight: 500, color: CREAM, lineHeight: 1.45, margin: '0 0 36px' }}>
-            Porque un día te vas a arrepentir de no haber registrado este momento.
+            No tienes que cargar con todo en la memoria. FamiliaCerca recuerda por ti.
           </blockquote>
           <p className="reveal reveal-delay-1" style={{ fontSize: 18, color: 'rgba(245,240,232,0.62)', lineHeight: 1.80, maxWidth: 640, margin: '0 auto', fontFamily: SANS, fontWeight: 300 }}>
             Los medicamentos importan. Las citas importan. Las rutinas importan. Pero los recuerdos también. Cada actualización construye la historia de cuidado de la persona que amas.
