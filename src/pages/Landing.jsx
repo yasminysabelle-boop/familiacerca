@@ -5,6 +5,9 @@ import { usePWAInstall } from '../hooks/usePWAInstall'
 import InstallBanner from '../components/InstallBanner'
 import CompanionChat from '../components/CompanionChat'
 
+// Variante del acento coral del semicírculo del hero — cambiar a false para comparar sin él
+const SHOW_HERO_CORAL_ARC = true
+
 const HERO_IMG = '/images/hero.jpg'
 const PROB_IMG = '/images/problema.jpg'
 const COMO_IMG = '/images/como.jpg'
@@ -318,10 +321,10 @@ export default function Landing() {
       </nav>
 
       {/* ─────────────── 2. HERO ─────────────── */}
-      <section style={{ minHeight: '100vh', display: 'grid', gridTemplateColumns: '1fr 1fr', overflow: 'hidden' }} className="landing-hero-grid">
+      <section style={{ position: 'relative', minHeight: '100vh' }} className="landing-hero-grid">
 
-        {/* Left dark panel */}
-        <div className="landing-hero-text" style={{ background: PRIMARY, position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: 'clamp(80px,8vw,120px) clamp(32px,5vw,72px)', overflow: 'hidden', textAlign: 'center' }}>
+        {/* Left dark panel — compactado a 45% para dejar aire al semicírculo */}
+        <div className="landing-hero-text" style={{ background: PRIMARY, position: 'relative', width: '45%', minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: 'clamp(80px,8vw,120px) clamp(32px,5vw,72px)', overflow: 'hidden', textAlign: 'center' }}>
           <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'radial-gradient(ellipse 70% 55% at 30% 55%, rgba(13,107,99,0.22) 0%, transparent 70%)' }} />
 
           <div style={{ position: 'relative', width: '100%', maxWidth: 520, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -354,9 +357,30 @@ export default function Landing() {
           </div>
         </div>
 
-        {/* Right: photo + floating medication card */}
-        <div className="landing-hero-right" style={{ position: 'relative', overflow: 'hidden', minHeight: '100vh' }}>
-          <img src={HERO_IMG} alt="Familia cuidando juntos" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }} />
+        {/* Medialuna coral opcional — traza el mismo arco por fuera, mismo radio (50vh),
+            ancho +24px para un grosor de borde uniforme en todo el arco. Para desactivarla,
+            cambiar SHOW_HERO_CORAL_ARC a false arriba en el componente. */}
+        {SHOW_HERO_CORAL_ARC && (
+          <div aria-hidden="true" className="landing-hero-arc-accent" style={{
+            position: 'absolute', top: 0, right: 0, bottom: 0,
+            width: 'calc(22vw + 24px + 50vh)',
+            borderTopLeftRadius: '50vh', borderBottomLeftRadius: '50vh',
+            background: CORAL, zIndex: 1, pointerEvents: 'none',
+          }} />
+        )}
+
+        {/* Right: foto full-bleed contra arriba/derecha/abajo, borde izquierdo = semicírculo
+            matemáticamente perfecto. Radio = altura del hero / 2 = 50vh (vh es una longitud
+            física, por eso Rx=Ry=50vh da un círculo real, no una elipse tipo "D"). El ancho
+            "de descanso" (22vw) + el radio (50vh) = ancho total en el punto más ancho (~50-55vw
+            en viewports típicos). */}
+        <div className="landing-hero-right" style={{
+          position: 'absolute', top: 0, right: 0, bottom: 0,
+          width: 'calc(22vw + 50vh)',
+          borderTopLeftRadius: '50vh', borderBottomLeftRadius: '50vh',
+          overflow: 'hidden', zIndex: 2,
+        }}>
+          <img src={HERO_IMG} alt="Familia cuidando juntos" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: '80% 40%', display: 'block' }} />
           <div style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(to right, rgba(20,60,50,0.38) 0%, transparent 30%)', pointerEvents: 'none' }} />
 
           {/* Floating status card */}
@@ -1193,12 +1217,20 @@ export default function Landing() {
         .btn-nav-cream { transition: background 0.2s ease, color 0.2s ease; }
         .btn-nav-cream:hover { background: #143C32 !important; color: #F8F4ED !important; }
 
+        @media (min-width: 769px) and (max-width: 1240px) {
+          /* Semicírculo desktop angosto — mismo radio (arco intacto), menos ancho de descanso
+             para que la panza no se acerque al texto (verificado: a 1024px con el ancho
+             desktop normal, la panza queda a ~5px del CTA; con 14vw baja a ~87px de aire). */
+          .landing-hero-right { width: calc(14vw + 50vh) !important; }
+          .landing-hero-arc-accent { width: calc(14vw + 24px + 50vh) !important; }
+        }
         @media (max-width: 768px) {
           .landing-desktop-nav { display: none !important; }
           .landing-hamburger { display: flex !important; }
-          .landing-hero-grid { grid-template-columns: 1fr !important; min-height: auto !important; }
-          .landing-hero-right { display: none !important; }
-          .landing-hero-text { padding: 80px 24px 64px !important; min-height: auto !important; }
+          .landing-hero-grid { min-height: auto !important; }
+          .landing-hero-right { position: relative !important; top: auto !important; right: auto !important; bottom: auto !important; width: 100% !important; aspect-ratio: 4 / 5 !important; border-radius: 20px !important; margin-top: 32px !important; }
+          .landing-hero-arc-accent { display: none !important; }
+          .landing-hero-text { width: 100% !important; padding: 80px 24px 64px !important; min-height: auto !important; }
           .landing-problema-grid { grid-template-columns: 1fr !important; }
           .landing-problema-img { min-height: 200px !important; }
           .landing-problema-photo { width: 320px !important; height: 320px !important; right: auto !important; left: 50% !important; top: auto !important; bottom: -90px !important; transform: translateX(-50%) !important; }
