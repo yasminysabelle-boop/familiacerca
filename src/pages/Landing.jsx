@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { usePWAInstall } from '../hooks/usePWAInstall'
@@ -112,11 +112,8 @@ export default function Landing() {
   const [pwaInstallClicked, setPwaInstallClicked] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [annual, setAnnual] = useState(false)
-  const [counts, setCounts] = useState([0, 0, 0, 0])
   const [showBar, setShowBar] = useState(false)
   const [dismissed, setDismissed] = useState(false)
-  const statsRef = useRef(null)
-  const hasAnimatedStats = useRef(false)
 
   useEffect(() => {
     if (document.getElementById('landing-gfonts')) return
@@ -137,28 +134,6 @@ export default function Landing() {
   }, [])
 
   useEffect(() => {
-    const el = statsRef.current
-    if (!el) return
-    const targets = [500, 98, 3, 0]
-    const io = new IntersectionObserver(entries => {
-      if (!entries[0].isIntersecting || hasAnimatedStats.current) return
-      hasAnimatedStats.current = true
-      io.disconnect()
-      const t0 = Date.now()
-      const dur = 1800
-      const tick = () => {
-        const p = Math.min((Date.now() - t0) / dur, 1)
-        const ease = 1 - Math.pow(1 - p, 3)
-        setCounts(targets.map(t => Math.round(t * ease)))
-        if (p < 1) requestAnimationFrame(tick)
-      }
-      requestAnimationFrame(tick)
-    }, { threshold: 0.4 })
-    io.observe(el)
-    return () => io.disconnect()
-  }, [])
-
-  useEffect(() => {
     const onScroll = () => setShowBar(window.scrollY > 150)
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
@@ -174,11 +149,11 @@ export default function Landing() {
     { label: 'Preguntas', href: '#faq' },
   ]
 
+  // Restaurar métricas reales cuando existan datos de producción
   const statItems = [
-    { icon: '👨‍👩‍👧', val: `${counts[0]}+`, label: 'familias cuidando' },
-    { icon: '💊', val: `${counts[1]}%`, label: 'medicamentos a tiempo' },
-    { icon: '⚡', val: `${counts[2]} min`, label: 'para estar listo' },
-    { icon: '🔒', val: '0', label: 'contratos ni trampas' },
+    { icon: '⚡', val: '3 minutos', label: 'para empezar' },
+    { icon: '🔒', val: 'Sin tarjeta', label: 'de crédito' },
+    { icon: '👨‍👩‍👧', val: 'Tu familia', label: 'conectada en un solo lugar' },
   ]
 
   const marqueePain = [
@@ -415,7 +390,7 @@ export default function Landing() {
       </section>
 
       {/* ─────────────── 4. STATS ─────────────── */}
-      <section ref={statsRef} style={{ background: CREAM, padding: '72px 32px', borderBottom: `1px solid ${BORDER}` }}>
+      <section style={{ background: CREAM, padding: '72px 32px', borderBottom: `1px solid ${BORDER}` }}>
         <div style={{ maxWidth: 1140, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', gap: 0 }}>
           {statItems.flatMap((s, i) => {
             const el = (
