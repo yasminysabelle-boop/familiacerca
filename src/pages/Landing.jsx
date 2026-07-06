@@ -448,6 +448,9 @@ export default function Landing() {
       {/* ─────────────── 5.5. LA SOLUCIÓN ─────────────── */}
       <section style={{ background: CREAM, padding: 'clamp(96px,14vw,168px) 32px' }}>
         <div className="reveal" style={{ maxWidth: 640, margin: '0 auto', textAlign: 'center' }}>
+          <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(22px,2.6vw,32px)', fontWeight: 600, color: CORAL, lineHeight: 1.35, margin: '0 0 48px' }}>
+            La solución no es más mensajes. Es tener un sistema.
+          </p>
           <p style={{ fontFamily: SERIF, fontWeight: 700, margin: '0 0 28px', padding: 0 }}>
             <span style={{ color: PRIMARY, fontSize: 'clamp(30px,3.6vw,44px)' }}>Familia</span>
             <span style={{ color: CORAL, fontSize: 'clamp(30px,3.6vw,44px)' }}>Cerca</span>
