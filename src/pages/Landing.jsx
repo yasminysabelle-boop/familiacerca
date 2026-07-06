@@ -222,7 +222,7 @@ export default function Landing() {
     },
     {
       name: 'Cuidado Total', price: 24.99, period: 'Cuidadores ilimitados', highlight: false,
-      trackId: 'total', tagline: 'Para familias que necesitan más tranquilidad',
+      trackId: 'total', tagline: 'Para el cuidado más completo, sin límites.',
       features: [
         { text: 'Cuidadores ilimitados', included: true },
         { text: 'Todo del plan Familiar', included: true },
@@ -243,7 +243,7 @@ export default function Landing() {
     { q: '¿Cuántas personas pueden usar la misma cuenta familiar?', a: 'El plan Gratis permite hasta 2 miembros. El plan Familiar soporta hasta 6 cuidadores y el plan Cuidado Total es ilimitado. Todos ven actualizaciones en tiempo real.' },
     { q: '¿Funciona sin conexión a internet?', a: 'FamiliaCerca es una PWA (app web progresiva). Una vez instalada, muchas funciones como el checklist del día y los medicamentos están disponibles sin conexión. Los cambios se sincronizan cuando vuelve la señal.' },
     { q: '¿Cómo se instala en el celular si no está en la App Store?', a: 'En iPhone: abre la página en Safari, toca el botón de compartir (cuadro con flecha) y selecciona "Agregar a inicio". En Android: toca el menú de tres puntos del navegador y selecciona "Instalar aplicación".' },
-    { q: '¿Mis datos médicos están protegidos?', a: 'Sí. Todos los datos se almacenan cifrados en Supabase (infraestructura nivel empresarial). Solo los miembros de tu familia que tú invites tienen acceso. Nunca vendemos ni compartimos información con terceros.' },
+    { q: '¿Mis datos médicos están protegidos?', a: 'Sí. Tus datos se almacenan cifrados en infraestructura de nivel empresarial — la misma tecnología que usan bancos y hospitales. Solo los familiares que tú invites tienen acceso. Nunca vendemos ni compartimos tu información.' },
     { q: '¿Puedo cancelar mi suscripción en cualquier momento?', a: 'Por supuesto. Puedes cancelar desde Ajustes > Suscripción en cualquier momento. No hay penalizaciones ni contratos. Tu plan baja a Gratis al terminar el período pagado.' },
   ]
 
@@ -261,8 +261,8 @@ export default function Landing() {
 
       {/* ─────────────── 1. NAV ─────────────── */}
       <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: '#F8F4ED', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(20,60,50,0.08)', boxShadow: '0 1px 8px rgba(20,60,50,0.06)' }}>
-        <div style={{ maxWidth: 1140, margin: '0 auto', padding: '20px 2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display:'flex', alignItems:'center', gap:'12px' }}>
+        <div style={{ maxWidth: 1140, margin: '0 auto', padding: '20px 2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24 }}>
+          <div style={{ display:'flex', alignItems:'center', gap:'12px', flexShrink: 0 }}>
             <img src="/logo.png" alt="FamiliaCerca" style={{ width: 44, height: 44, objectFit: 'contain', display: 'block' }} />
             <span style={{ fontFamily:'Georgia,serif', fontWeight:700, margin:0, padding:0 }}>
               <span style={{ color:'#143C32', fontSize:'26px' }}>Familia</span>
@@ -403,20 +403,14 @@ export default function Landing() {
 
       {/* ─────────────── 4. STATS ─────────────── */}
       <section style={{ background: CREAM, padding: '72px 32px', borderBottom: `1px solid ${BORDER}` }}>
-        <div style={{ maxWidth: 1140, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', gap: 0 }}>
-          {statItems.flatMap((s, i) => {
-            const el = (
-              <div key={`s${i}`} style={{ textAlign: 'center', padding: '0 48px' }}>
-                <div style={{ fontSize: 28, marginBottom: 10 }}>{s.icon}</div>
-                <p style={{ margin: 0, fontFamily: SERIF, fontSize: 'clamp(36px, 4.5vw, 62px)', fontWeight: 700, color: ACTION, lineHeight: 1 }}>{s.val}</p>
-                <p style={{ margin: '10px 0 0', fontSize: 15, fontFamily: SANS, fontWeight: 300, color: '#6B7280', letterSpacing: '0.02em' }}>{s.label}</p>
-              </div>
-            )
-            const div = i < statItems.length - 1 ? (
-              <div key={`d${i}`} className="landing-divider" style={{ width: 1, height: 88, background: `linear-gradient(to bottom, transparent, rgba(13,107,99,0.22), transparent)`, flexShrink: 0 }} />
-            ) : null
-            return div ? [el, div] : [el]
-          })}
+        <div className="stats-grid" style={{ maxWidth: 1140, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 0 }}>
+          {statItems.map((s, i) => (
+            <div key={i} className="stats-grid-cell" style={{ textAlign: 'center', padding: '0 32px', borderLeft: i > 0 ? '1px solid rgba(13,107,99,0.22)' : 'none' }}>
+              <div style={{ fontSize: 28, marginBottom: 10 }}>{s.icon}</div>
+              <p style={{ margin: 0, fontFamily: SERIF, fontSize: 'clamp(30px, 3.6vw, 50px)', fontWeight: 700, color: ACTION, lineHeight: 1.1 }}>{s.val}</p>
+              <p style={{ margin: '10px 0 0', fontSize: 15, fontFamily: SANS, fontWeight: 300, color: '#6B7280', letterSpacing: '0.02em' }}>{s.label}</p>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -440,14 +434,17 @@ export default function Landing() {
                 </p>
               </div>
               <div>
-                <p style={{ margin: '0 0 6px', fontFamily: SERIF, fontSize: 15, fontWeight: 600, color: GOLD, letterSpacing: '0.04em' }}>02</p>
+                <p style={{ margin: '0 0 6px', fontFamily: SERIF, fontSize: 15, fontWeight: 600, color: GOLD, letterSpacing: '0.04em' }}>8:47 PM</p>
                 <p style={{ margin: 0, fontSize: 17, color: 'rgba(255,255,255,0.62)', fontFamily: SANS, fontWeight: 300, lineHeight: 1.7 }}>
                   Un hermano cree que ya se la dieron. Otro no está seguro. El cuidador no respondió el WhatsApp.
                 </p>
               </div>
-              <p style={{ margin: 0, fontSize: 17, color: 'rgba(255,255,255,0.62)', fontFamily: SANS, fontWeight: 300, lineHeight: 1.7 }}>
-                El historial está perdido entre mensajes. La responsabilidad se diluye. Y tú cargas con la duda.
-              </p>
+              <div>
+                <p style={{ margin: '0 0 6px', fontFamily: SERIF, fontSize: 15, fontWeight: 600, color: GOLD, letterSpacing: '0.04em' }}>9:12 PM</p>
+                <p style={{ margin: 0, fontSize: 17, color: 'rgba(255,255,255,0.62)', fontFamily: SANS, fontWeight: 300, lineHeight: 1.7 }}>
+                  El historial está perdido entre mensajes. La responsabilidad se diluye. Y tú cargas con la duda.
+                </p>
+              </div>
             </div>
 
             <p className="reveal" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(24px,2.8vw,34px)', fontWeight: 600, color: GOLD, lineHeight: 1.3, margin: '40px 0 0' }}>
@@ -513,7 +510,7 @@ export default function Landing() {
           </div>
 
           {/* 3 large hero cards */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 24, marginBottom: 24 }}>
+          <div className="feature-hero-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24, marginBottom: 24 }}>
 
             {/* Card 1: Medicamentos */}
             <div className="feature-hero-card reveal" style={{ background: WHITE, borderRadius: 22, border: `1px solid rgba(13,107,99,0.18)`, padding: '36px 30px', boxShadow: '0 4px 24px rgba(13,107,99,0.07)', minHeight: 420, position: 'relative' }}>
@@ -570,28 +567,32 @@ export default function Landing() {
             </div>
 
             {/* Card 3: Registros médicos + PDF */}
-            <div className="feature-hero-card reveal reveal-delay-2" style={{ background: WHITE, borderRadius: 22, border: `1px solid rgba(13,107,99,0.18)`, padding: '36px 30px', boxShadow: '0 4px 24px rgba(13,107,99,0.07)', minHeight: 420, position: 'relative' }}>
-              <div style={{ width: 60, height: 60, borderRadius: 16, background: `rgba(20,60,50,0.07)`, border: '1px solid rgba(20,60,50,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, marginBottom: 18 }}>📋</div>
-              <div style={{ display: 'inline-flex', padding: '4px 12px', borderRadius: 9999, border: `1px solid rgba(233,130,110,0.30)`, marginBottom: 12, background: 'rgba(233,130,110,0.07)' }}>
-                <span style={{ fontSize: 10, fontWeight: 500, color: GOLD, letterSpacing: '0.08em', fontFamily: SANS }}>Listo para el doctor</span>
-              </div>
-              <h3 style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 600, color: PRIMARY, margin: '0 0 10px', lineHeight: 1.2 }}>Historial médico y exportación</h3>
-              <p style={{ fontSize: 17, color: '#6B7280', lineHeight: 1.75, margin: '0 0 20px', fontFamily: SANS, fontWeight: 300 }}>
-                Visitas, incidentes y análisis organizados, exportables en PDF para cualquier consulta.
-              </p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {[
-                  { icon: '🏥', label: 'Visita cardiólogo', date: '28 may', color: `rgba(20,60,50,0.07)` },
-                  { icon: '⚠️', label: 'Incidente: caída leve', date: '25 may', color: 'rgba(233,130,110,0.07)' },
-                  { icon: '💉', label: 'Análisis de sangre', date: '20 may', color: `rgba(20,60,50,0.07)` },
-                  { icon: '📄', label: 'Exportar a PDF →', date: '', color: `rgba(233,130,110,0.09)`, action: true },
-                ].map((item, i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 12px', background: item.color, borderRadius: 10, border: `1px solid rgba(13,107,99,0.08)` }}>
-                    <span style={{ fontSize: 15 }}>{item.icon}</span>
-                    <span style={{ fontSize: 11, fontFamily: SANS, color: item.action ? GOLD : PRIMARY, fontWeight: item.action ? 600 : 300, flex: 1 }}>{item.label}</span>
-                    {item.date && <span style={{ fontSize: 10, color: '#6B7280', fontFamily: SANS }}>{item.date}</span>}
+            <div className="feature-hero-card feature-hero-card--span reveal reveal-delay-2" style={{ background: WHITE, borderRadius: 22, border: `1px solid rgba(13,107,99,0.18)`, padding: '36px 30px', boxShadow: '0 4px 24px rgba(13,107,99,0.07)', minHeight: 420, position: 'relative' }}>
+              <div className="feature-hero-span-content">
+                <div className="feature-hero-span-text">
+                  <div style={{ width: 60, height: 60, borderRadius: 16, background: `rgba(20,60,50,0.07)`, border: '1px solid rgba(20,60,50,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, marginBottom: 18 }}>📋</div>
+                  <div style={{ display: 'inline-flex', padding: '4px 12px', borderRadius: 9999, border: `1px solid rgba(233,130,110,0.30)`, marginBottom: 12, background: 'rgba(233,130,110,0.07)' }}>
+                    <span style={{ fontSize: 10, fontWeight: 500, color: GOLD, letterSpacing: '0.08em', fontFamily: SANS }}>Listo para el doctor</span>
                   </div>
-                ))}
+                  <h3 style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 600, color: PRIMARY, margin: '0 0 10px', lineHeight: 1.2 }}>Historial médico y exportación</h3>
+                  <p style={{ fontSize: 17, color: '#6B7280', lineHeight: 1.75, margin: '0 0 20px', fontFamily: SANS, fontWeight: 300 }}>
+                    Visitas, incidentes y análisis organizados, exportables en PDF para cualquier consulta.
+                  </p>
+                </div>
+                <div className="feature-hero-span-mockup" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {[
+                    { icon: '🏥', label: 'Visita cardiólogo', date: '28 may', color: `rgba(20,60,50,0.07)` },
+                    { icon: '⚠️', label: 'Incidente: caída leve', date: '25 may', color: 'rgba(233,130,110,0.07)' },
+                    { icon: '💉', label: 'Análisis de sangre', date: '20 may', color: `rgba(20,60,50,0.07)` },
+                    { icon: '📄', label: 'Exportar a PDF →', date: '', color: `rgba(233,130,110,0.09)`, action: true },
+                  ].map((item, i) => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 12px', background: item.color, borderRadius: 10, border: `1px solid rgba(13,107,99,0.08)` }}>
+                      <span style={{ fontSize: 15 }}>{item.icon}</span>
+                      <span style={{ fontSize: 11, fontFamily: SANS, color: item.action ? GOLD : PRIMARY, fontWeight: item.action ? 600 : 300, flex: 1 }}>{item.label}</span>
+                      {item.date && <span style={{ fontSize: 10, color: '#6B7280', fontFamily: SANS }}>{item.date}</span>}
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -854,12 +855,9 @@ export default function Landing() {
       <section style={{ padding: '128px 32px', background: DARK }}>
         <div style={{ maxWidth: 860, margin: '0 auto', textAlign: 'center' }}>
           <div style={{ fontFamily: SERIF, fontSize: 110, color: GOLD, lineHeight: 0.7, marginBottom: 20, opacity: 0.28 }}>"</div>
-          <blockquote className="reveal" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(28px,3.8vw,54px)', fontWeight: 500, color: GOLD, lineHeight: 1.45, margin: '0 0 24px' }}>
-            Porque un día te vas a arrepentir de no haber registrado este momento.
+          <blockquote className="reveal" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(28px,3.8vw,54px)', fontWeight: 500, color: GOLD, lineHeight: 1.45, margin: '0 0 40px' }}>
+            Un día vas a querer volver a este momento. FamiliaCerca lo guarda por ti.
           </blockquote>
-          <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.28)', fontFamily: SANS, fontWeight: 300, letterSpacing: '0.04em', margin: '0 0 40px' }}>
-            — Cada familia que usa FamiliaCerca
-          </p>
           <CTABtn to="/register">
             Empezar gratis <span style={{ fontSize: 17, opacity: 0.8 }}>→</span>
           </CTABtn>
@@ -1049,7 +1047,7 @@ export default function Landing() {
               Empieza a cuidar mejor, juntos.
             </h2>
             <p style={{ fontSize: 18, color: 'rgba(255,255,255,0.62)', lineHeight: 1.80, margin: '0 0 48px', fontFamily: SANS, fontWeight: 300 }}>
-              Únete a las familias que ya dejaron atrás el caos de WhatsApp y ahora coordinan el cuidado de sus seres queridos desde un solo lugar.
+              Deja atrás el caos de WhatsApp. En 3 minutos tu familia tiene un solo lugar para coordinar el cuidado — gratis, sin tarjeta.
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14 }}>
               <Link to="/register" style={{ padding: '20px 52px', borderRadius: 9999, background: WHITE, color: ACTION, fontWeight: 500, fontSize: 18, textDecoration: 'none', fontFamily: SANS, letterSpacing: '0.02em', boxShadow: '0 16px 56px rgba(0,0,0,0.28)', display: 'inline-flex', alignItems: 'center', gap: 10 }}>
@@ -1236,9 +1234,19 @@ export default function Landing() {
           .como-img { display: none !important; }
           .testimonios-grid { grid-template-columns: 1fr !important; }
           .whatsapp-comparison-grid { grid-template-columns: 1fr !important; }
+          .stats-grid { grid-template-columns: 1fr !important; }
+          .stats-grid-cell { border-left: none !important; border-top: 1px solid rgba(13,107,99,0.22); padding: 24px 16px !important; }
+          .stats-grid-cell:first-child { border-top: none; }
+          .feature-hero-grid { grid-template-columns: 1fr !important; }
+        }
+        @media (max-width: 1040px) and (min-width: 769px) {
+          .feature-hero-grid { grid-template-columns: repeat(2, 1fr) !important; }
+          .feature-hero-grid > *:last-child { grid-column: span 2; min-height: unset !important; }
+          .feature-hero-span-content { display: flex; gap: 32px; align-items: flex-start; }
+          .feature-hero-span-text { flex: 1 1 45%; }
+          .feature-hero-span-mockup { flex: 1 1 55%; }
         }
         @media (max-width: 640px) {
-          .landing-divider { display: none !important; }
           .para-quien-grid { grid-template-columns: 1fr !important; }
         }
         @media (prefers-reduced-motion: reduce) {
