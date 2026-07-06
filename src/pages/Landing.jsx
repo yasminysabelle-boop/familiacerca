@@ -794,35 +794,35 @@ export default function Landing() {
       </section>
 
       {/* ─────────────── 9.5. PARA QUIÉN ES ─────────────── */}
-      <section style={{ background: WHITE, padding: '112px 32px' }}>
-        <div style={{ maxWidth: 900, margin: '0 auto' }}>
+      <section style={{ background: CREAM, padding: '112px 32px' }}>
+        <div style={{ maxWidth: 1140, margin: '0 auto' }}>
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 56 }}>
             <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(30px,3.6vw,52px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.15, margin: 0 }}>
               FamiliaCerca es para ti si…
             </h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 28 }}>
+          <div className="para-quien-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 32 }}>
             {[
               {
                 text: 'Cuidas a tus padres o abuelos',
-                icon: <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke={PRIMARY} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 11l9-8 9 8" /><path d="M5 10v10h14V10" /><path d="M9 20v-6h6v6" /></svg>,
+                icon: <svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke={WHITE} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 11l9-8 9 8" /><path d="M5 10v10h14V10" /><path d="M9 20v-6h6v6" /></svg>,
               },
               {
                 text: 'Tu familiar vive con una condición crónica',
-                icon: <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke={PRIMARY} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12h4l2-6 4 12 2-6h6" /></svg>,
+                icon: <svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke={WHITE} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12h4l2-6 4 12 2-6h6" /></svg>,
               },
               {
                 text: 'Eres el cuidador principal y cargas con todo',
-                icon: <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke={PRIMARY} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="3.2" /><path d="M5 21c0-4.5 3-7 7-7s7 2.5 7 7" /></svg>,
+                icon: <svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke={WHITE} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="3.2" /><path d="M5 21c0-4.5 3-7 7-7s7 2.5 7 7" /></svg>,
               },
               {
                 text: 'Tu familia está repartida en distintas ciudades o países',
-                icon: <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke={PRIMARY} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 10-14 0c0 5.5 7 12 7 12z" /><circle cx="12" cy="9" r="2.4" /></svg>,
+                icon: <svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke={WHITE} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 10-14 0c0 5.5 7 12 7 12z" /><circle cx="12" cy="9" r="2.4" /></svg>,
               },
             ].map((item, i) => (
-              <div key={item.text} className={`reveal reveal-delay-${i % 3}`} style={{ display: 'flex', alignItems: 'center', gap: 16, background: CREAM, borderRadius: 16, border: `1px solid ${BORDER}`, padding: '22px 24px' }}>
-                <div style={{ width: 46, height: 46, borderRadius: 12, background: 'rgba(20,60,50,0.07)', border: '1px solid rgba(20,60,50,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{item.icon}</div>
-                <p style={{ fontSize: 16, color: PRIMARY, lineHeight: 1.5, margin: 0, fontFamily: SANS, fontWeight: 400 }}>{item.text}</p>
+              <div key={item.text} className={`para-quien-card reveal reveal-delay-${i % 3}`} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 18, background: '#FBEAE4', borderRadius: 16, padding: 'clamp(28px,3vw,36px) 20px' }}>
+                <div style={{ width: 52, height: 52, borderRadius: 14, background: i < 2 ? ACTION : CORAL, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{item.icon}</div>
+                <p style={{ fontSize: 16, color: PRIMARY, lineHeight: 1.5, margin: 0, fontFamily: SANS, fontWeight: 500 }}>{item.text}</p>
               </div>
             ))}
           </div>
@@ -1188,6 +1188,9 @@ export default function Landing() {
         .feature-hero-card { transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s ease; }
         .feature-hero-card:hover { transform: translateY(-8px) !important; box-shadow: 0 28px 80px rgba(13,107,99,0.12) !important; }
 
+        .para-quien-card { transition: transform 0.25s ease, box-shadow 0.25s ease; }
+        .para-quien-card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(20,60,50,0.12); }
+
         @keyframes badge-pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(233,130,110,0.55); } 70% { box-shadow: 0 0 0 10px rgba(233,130,110,0); } 100% { box-shadow: 0 0 0 0 rgba(233,130,110,0); } }
         .badge-pulse-anim { animation: badge-pulse-ring 2s cubic-bezier(0.66,0,0,1) infinite; }
 
@@ -1211,6 +1214,9 @@ export default function Landing() {
         .btn-nav-cream { transition: background 0.2s ease, color 0.2s ease; }
         .btn-nav-cream:hover { background: #143C32 !important; color: #F8F4ED !important; }
 
+        @media (max-width: 1024px) {
+          .para-quien-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        }
         @media (max-width: 768px) {
           .landing-desktop-nav { display: none !important; }
           .landing-hamburger { display: flex !important; }
@@ -1226,6 +1232,7 @@ export default function Landing() {
         }
         @media (max-width: 640px) {
           .landing-divider { display: none !important; }
+          .para-quien-grid { grid-template-columns: 1fr !important; }
         }
         @media (prefers-reduced-motion: reduce) {
           .reveal, .hero-reveal, .marquee-track, .feature-hero-card, .badge-pulse-anim, .como-line {
