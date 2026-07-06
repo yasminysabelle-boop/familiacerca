@@ -821,6 +821,42 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* ─────────────── 9.5. PARA QUIÉN ES ─────────────── */}
+      <section style={{ background: WHITE, padding: '112px 32px' }}>
+        <div style={{ maxWidth: 900, margin: '0 auto' }}>
+          <div className="reveal" style={{ textAlign: 'center', marginBottom: 56 }}>
+            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(30px,3.6vw,52px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.15, margin: 0 }}>
+              FamiliaCerca es para ti si…
+            </h2>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 28 }}>
+            {[
+              {
+                text: 'Cuidas a tus padres o abuelos',
+                icon: <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke={PRIMARY} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 11l9-8 9 8" /><path d="M5 10v10h14V10" /><path d="M9 20v-6h6v6" /></svg>,
+              },
+              {
+                text: 'Tu familiar vive con una condición crónica',
+                icon: <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke={PRIMARY} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12h4l2-6 4 12 2-6h6" /></svg>,
+              },
+              {
+                text: 'Eres el cuidador principal y cargas con todo',
+                icon: <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke={PRIMARY} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="3.2" /><path d="M5 21c0-4.5 3-7 7-7s7 2.5 7 7" /></svg>,
+              },
+              {
+                text: 'Tu familia está repartida en distintas ciudades o países',
+                icon: <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke={PRIMARY} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 21s7-6.5 7-12a7 7 0 10-14 0c0 5.5 7 12 7 12z" /><circle cx="12" cy="9" r="2.4" /></svg>,
+              },
+            ].map((item, i) => (
+              <div key={item.text} className={`reveal reveal-delay-${i % 3}`} style={{ display: 'flex', alignItems: 'center', gap: 16, background: CREAM, borderRadius: 16, border: `1px solid ${BORDER}`, padding: '22px 24px' }}>
+                <div style={{ width: 46, height: 46, borderRadius: 12, background: 'rgba(20,60,50,0.07)', border: '1px solid rgba(20,60,50,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{item.icon}</div>
+                <p style={{ fontSize: 16, color: PRIMARY, lineHeight: 1.5, margin: 0, fontFamily: SANS, fontWeight: 400 }}>{item.text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ─────────────── 10. MARQUEE 2 ─────────────── */}
       <section style={{ background: DARK, padding: '20px 0', overflow: 'hidden', borderTop: `1px solid rgba(233,130,110,0.08)`, borderBottom: `1px solid rgba(233,130,110,0.08)` }}>
         <div className="marquee-container">
