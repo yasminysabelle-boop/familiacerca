@@ -6,7 +6,7 @@ import InstallBanner from '../components/InstallBanner'
 import CompanionChat from '../components/CompanionChat'
 
 const HERO_IMG = '/images/hero.jpg'
-const PROB_IMG = '/images/problema.jpg'
+const PROB_IMG = '/images/familia-telefonos-noche.webp'
 const COMO_IMG = '/images/como.jpg'
 const CTA_IMG  = '/images/cta.jpg'
 
