@@ -115,6 +115,7 @@ export default function Landing() {
   const [annual, setAnnual] = useState(false)
   const [showBar, setShowBar] = useState(false)
   const [dismissed, setDismissed] = useState(false)
+  const [showAllTestimonials, setShowAllTestimonials] = useState(false)
 
   useEffect(() => {
     if (document.getElementById('landing-gfonts')) return
@@ -243,6 +244,15 @@ export default function Landing() {
     { q: '¿Cómo se instala en el celular si no está en la App Store?', a: 'En iPhone: abre la página en Safari, toca el botón de compartir (cuadro con flecha) y selecciona "Agregar a inicio". En Android: toca el menú de tres puntos del navegador y selecciona "Instalar aplicación".' },
     { q: '¿Mis datos médicos están protegidos?', a: 'Sí. Todos los datos se almacenan cifrados en Supabase (infraestructura nivel empresarial). Solo los miembros de tu familia que tú invites tienen acceso. Nunca vendemos ni compartimos información con terceros.' },
     { q: '¿Puedo cancelar mi suscripción en cualquier momento?', a: 'Por supuesto. Puedes cancelar desde Ajustes > Suscripción en cualquier momento. No hay penalizaciones ni contratos. Tu plan baja a Gratis al terminar el período pagado.' },
+  ]
+
+  const testimonials = [
+    { name: 'María G.',    initial: 'M', role: 'Hija cuidadora',         location: 'Houston, Texas',          headline: 'Se acabaron las discusiones familiares',                text: 'Antes mi hermano y yo nos peleábamos porque ninguno sabía si mamá ya había tomado su pastilla. Ahora con FamiliaCerca todos vemos lo mismo. ¡Nos salvó la convivencia familiar!' },
+    { name: 'Roberto S.',  initial: 'R', role: 'Hijo mayor',              location: 'Los Ángeles, California', headline: 'Por fin tenemos evidencia de todo',                      text: 'La función de foto de prueba fue un cambio total. Ahora tenemos evidencia de cada medicamento y podemos mostrársela al cardiólogo. El doctor quedó impresionado con el registro.' },
+    { name: 'Carmen L.',   initial: 'C', role: 'Enfermera, uso personal', location: 'Miami, Florida',         headline: 'La foto de confirmación cambió nuestra dinámica',        text: 'Llevo 15 años como enfermera y nunca había visto una app tan práctica para el cuidado en casa. La recomiendo a todas las familias de mis pacientes.' },
+    { name: 'Patricia V.', initial: 'P', role: 'Coordinadora familiar',   location: 'San Juan, Puerto Rico',  headline: 'Antes nadie sabía quién había dado la medicina',          text: 'Somos 4 hermanos en distintos estados cuidando a nuestro papá. FamiliaCerca nos unió. Cada uno sabe qué le toca y cuándo. Ya no hay excusas ni confusiones.' },
+    { name: 'Jorge M.',    initial: 'J', role: 'Esposo cuidador',         location: 'Nueva York, NY',         headline: 'Ahora todos estamos tranquilos',                          text: 'Mi esposa tiene Alzheimer y el checklist diario me salvó. Puedo registrar cada comida, cada baño, cada medicamento. Por fin duermo tranquilo sabiendo que nada se me escapa.' },
+    { name: 'Lucía R.',    initial: 'L', role: 'Hija única',              location: 'Chicago, Illinois',      headline: 'Mi mamá está mejor atendida y nosotros más organizados', text: 'Cuido sola a mis dos padres mayores desde hace 3 años. FamiliaCerca me ayuda a organizarme y el botón SOS me da tranquilidad cuando no estoy en casa. No sé cómo lo hacía antes.' },
   ]
 
   return (
@@ -865,15 +875,8 @@ export default function Landing() {
             </h2>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }} className="testimonios-grid">
-            {[
-              { name: 'María G.',    initial: 'M', role: 'Hija cuidadora',         location: 'Houston, Texas',          headline: 'Se acabaron las discusiones familiares',                text: 'Antes mi hermano y yo nos peleábamos porque ninguno sabía si mamá ya había tomado su pastilla. Ahora con FamiliaCerca todos vemos lo mismo. ¡Nos salvó la convivencia familiar!' },
-              { name: 'Roberto S.',  initial: 'R', role: 'Hijo mayor',              location: 'Los Ángeles, California', headline: 'Por fin tenemos evidencia de todo',                      text: 'La función de foto de prueba fue un cambio total. Ahora tenemos evidencia de cada medicamento y podemos mostrársela al cardiólogo. El doctor quedó impresionado con el registro.' },
-              { name: 'Carmen L.',   initial: 'C', role: 'Enfermera, uso personal', location: 'Miami, Florida',         headline: 'La foto de confirmación cambió nuestra dinámica',        text: 'Llevo 15 años como enfermera y nunca había visto una app tan práctica para el cuidado en casa. La recomiendo a todas las familias de mis pacientes.' },
-              { name: 'Patricia V.', initial: 'P', role: 'Coordinadora familiar',   location: 'San Juan, Puerto Rico',  headline: 'Antes nadie sabía quién había dado la medicina',          text: 'Somos 4 hermanos en distintos estados cuidando a nuestro papá. FamiliaCerca nos unió. Cada uno sabe qué le toca y cuándo. Ya no hay excusas ni confusiones.' },
-              { name: 'Jorge M.',    initial: 'J', role: 'Esposo cuidador',         location: 'Nueva York, NY',         headline: 'Ahora todos estamos tranquilos',                          text: 'Mi esposa tiene Alzheimer y el checklist diario me salvó. Puedo registrar cada comida, cada baño, cada medicamento. Por fin duermo tranquilo sabiendo que nada se me escapa.' },
-              { name: 'Lucía R.',    initial: 'L', role: 'Hija única',              location: 'Chicago, Illinois',      headline: 'Mi mamá está mejor atendida y nosotros más organizados', text: 'Cuido sola a mis dos padres mayores desde hace 3 años. FamiliaCerca me ayuda a organizarme y el botón SOS me da tranquilidad cuando no estoy en casa. No sé cómo lo hacía antes.' },
-            ].map((t, i) => (
-              <div key={t.name} className={`reveal reveal-delay-${i % 3}`} style={{ background: PRIMARY, borderRadius: 20, border: `1px solid rgba(13,107,99,0.28)`, padding: '32px 28px', boxShadow: '0 12px 32px rgba(20,60,50,0.12)', display: 'flex', flexDirection: 'column' }}>
+            {(showAllTestimonials ? testimonials : testimonials.slice(0, 3)).map((t, i) => (
+              <div key={t.name} className={i >= 3 ? 'testimonios-expand' : `reveal reveal-delay-${i % 3}`} style={{ background: PRIMARY, borderRadius: 20, border: `1px solid rgba(13,107,99,0.28)`, padding: '32px 28px', boxShadow: '0 12px 32px rgba(20,60,50,0.12)', display: 'flex', flexDirection: 'column' }}>
                 <div style={{ display: 'flex', gap: 3, marginBottom: 14 }}>
                   {[1,2,3,4,5].map(s => <span key={s} style={{ color: CORAL, fontSize: 13 }}>★</span>)}
                 </div>
@@ -894,6 +897,11 @@ export default function Landing() {
                 </div>
               </div>
             ))}
+          </div>
+          <div style={{ textAlign: 'center', marginTop: 48 }}>
+            <button onClick={() => setShowAllTestimonials(v => !v)} style={{ padding: '14px 32px', borderRadius: 9999, border: `1.5px solid ${ACTION}`, background: 'transparent', color: ACTION, fontWeight: 500, fontSize: 15, fontFamily: SANS, cursor: 'pointer', letterSpacing: '0.02em' }}>
+              {showAllTestimonials ? 'Ver menos historias' : 'Ver más historias'}
+            </button>
           </div>
         </div>
       </section>
@@ -1186,6 +1194,8 @@ export default function Landing() {
 
         .para-quien-card { transition: transform 0.25s ease, box-shadow 0.25s ease; }
         .para-quien-card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(20,60,50,0.12); }
+
+        .testimonios-expand { animation: fadeInUp 0.5s cubic-bezier(0.16,1,0.3,1) both; }
 
         @keyframes badge-pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(233,130,110,0.55); } 70% { box-shadow: 0 0 0 10px rgba(233,130,110,0); } 100% { box-shadow: 0 0 0 0 rgba(233,130,110,0); } }
         .badge-pulse-anim { animation: badge-pulse-ring 2s cubic-bezier(0.66,0,0,1) infinite; }
