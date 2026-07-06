@@ -5,9 +5,6 @@ import { usePWAInstall } from '../hooks/usePWAInstall'
 import InstallBanner from '../components/InstallBanner'
 import CompanionChat from '../components/CompanionChat'
 
-// Variante del acento coral del semicírculo del hero — cambiar a false para comparar sin él
-const SHOW_HERO_CORAL_ARC = true
-
 const HERO_IMG = '/images/hero.jpg'
 const PROB_IMG = '/images/problema.jpg'
 const COMO_IMG = '/images/como.jpg'
@@ -273,7 +270,7 @@ export default function Landing() {
   ]
 
   return (
-    <div style={{ background: CREAM, color: DARK, overflowX: 'hidden', fontFamily: SANS }}>
+    <div style={{ background: WHITE, color: DARK, overflowX: 'hidden', fontFamily: SANS }}>
 
       {/* ─────────────── 1. NAV ─────────────── */}
       <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: '#F8F4ED', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(20,60,50,0.08)', boxShadow: '0 1px 8px rgba(20,60,50,0.06)' }}>
@@ -321,10 +318,10 @@ export default function Landing() {
       </nav>
 
       {/* ─────────────── 2. HERO ─────────────── */}
-      <section style={{ position: 'relative', minHeight: '100vh' }} className="landing-hero-grid">
+      <section style={{ minHeight: '100vh', display: 'grid', gridTemplateColumns: '1fr 1fr', overflow: 'hidden' }} className="landing-hero-grid">
 
-        {/* Left dark panel — compactado a 45% para dejar aire al semicírculo */}
-        <div className="landing-hero-text" style={{ background: PRIMARY, position: 'relative', width: '45%', minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: 'clamp(80px,8vw,120px) clamp(32px,5vw,72px)', overflow: 'hidden', textAlign: 'center' }}>
+        {/* Left dark panel */}
+        <div className="landing-hero-text" style={{ background: PRIMARY, position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: 'clamp(80px,8vw,120px) clamp(32px,5vw,72px)', overflow: 'hidden', textAlign: 'center' }}>
           <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'radial-gradient(ellipse 70% 55% at 30% 55%, rgba(13,107,99,0.22) 0%, transparent 70%)' }} />
 
           <div style={{ position: 'relative', width: '100%', maxWidth: 520, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -357,30 +354,9 @@ export default function Landing() {
           </div>
         </div>
 
-        {/* Medialuna coral opcional — traza el mismo arco por fuera, mismo radio (50vh),
-            ancho +24px para un grosor de borde uniforme en todo el arco. Para desactivarla,
-            cambiar SHOW_HERO_CORAL_ARC a false arriba en el componente. */}
-        {SHOW_HERO_CORAL_ARC && (
-          <div aria-hidden="true" className="landing-hero-arc-accent" style={{
-            position: 'absolute', top: 0, right: 0, bottom: 0,
-            width: 'calc(22vw + 24px + 50vh)',
-            borderTopLeftRadius: '50vh', borderBottomLeftRadius: '50vh',
-            background: CORAL, zIndex: 1, pointerEvents: 'none',
-          }} />
-        )}
-
-        {/* Right: foto full-bleed contra arriba/derecha/abajo, borde izquierdo = semicírculo
-            matemáticamente perfecto. Radio = altura del hero / 2 = 50vh (vh es una longitud
-            física, por eso Rx=Ry=50vh da un círculo real, no una elipse tipo "D"). El ancho
-            "de descanso" (22vw) + el radio (50vh) = ancho total en el punto más ancho (~50-55vw
-            en viewports típicos). */}
-        <div className="landing-hero-right" style={{
-          position: 'absolute', top: 0, right: 0, bottom: 0,
-          width: 'calc(22vw + 50vh)',
-          borderTopLeftRadius: '50vh', borderBottomLeftRadius: '50vh',
-          overflow: 'hidden', zIndex: 2,
-        }}>
-          <img src={HERO_IMG} alt="Familia cuidando juntos" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: '80% 40%', display: 'block' }} />
+        {/* Right: photo + floating medication card */}
+        <div className="landing-hero-right" style={{ position: 'relative', overflow: 'hidden', minHeight: '100vh' }}>
+          <img src={HERO_IMG} alt="Familia cuidando juntos" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }} />
           <div style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(to right, rgba(20,60,50,0.38) 0%, transparent 30%)', pointerEvents: 'none' }} />
 
           {/* Floating status card */}
@@ -453,34 +429,12 @@ export default function Landing() {
       </section>
 
       {/* ─────────────── 5. PROBLEM SPLIT ─────────────── */}
-      <section style={{ position: 'relative', zIndex: 5 }}>
+      <section style={{ overflow: 'hidden' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }} className="landing-problema-grid">
-          <div style={{ position: 'relative', minHeight: 700, zIndex: 2 }} className="landing-problema-img">
-            {/* Medialuna coral sólida — 8% más grande que la foto, offset abajo-derecha, detrás de la foto, acompaña el derrame */}
-            <div aria-hidden="true" className="landing-problema-ring" style={{
-              position: 'absolute', bottom: -185, right: -203,
-              width: 767, height: 767,
-              borderRadius: '50%', background: CORAL,
-              pointerEvents: 'none', zIndex: 1,
-            }} />
-            {/* Foto circular completa — ~20% invade el bloque verde, ~17.5% se derrama sobre la sección siguiente */}
-            <div className="landing-problema-photo" style={{
-              position: 'absolute', bottom: -124, right: -142,
-              width: 710, height: 710,
-              borderRadius: '50%', overflow: 'hidden',
-              border: '8px solid white', boxSizing: 'border-box',
-              zIndex: 2,
-            }}>
-              <img src={PROB_IMG} alt="El reto del cuidado familiar" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }} />
-            </div>
+          <div style={{ position: 'relative', minHeight: 700, overflow: 'hidden' }} className="landing-problema-img">
+            <img src={PROB_IMG} alt="El reto del cuidado familiar" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }} />
           </div>
-          <div style={{ position: 'relative', overflow: 'hidden', background: PRIMARY, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 'clamp(56px,8vw,96px) clamp(36px,6vw,80px) clamp(56px,8vw,96px) calc(clamp(36px,6vw,80px) + 150px)' }}>
-            {/* Cuarto de círculo melocotón decorativo — anclado a la esquina inferior derecha, detrás del contenido */}
-            <div aria-hidden="true" style={{
-              position: 'absolute', right: -240, bottom: -240,
-              width: 480, height: 480, borderRadius: '50%',
-              background: '#FBEAE4', pointerEvents: 'none', zIndex: -1,
-            }} />
+          <div style={{ background: PRIMARY, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 'clamp(56px,8vw,96px) clamp(36px,6vw,80px)' }}>
             <p style={{ fontSize: 11, fontWeight: 500, color: GOLD, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 20px', fontFamily: SANS }}>El problema</p>
             <h2 className="reveal" style={{ fontFamily: SERIF, fontSize: 'clamp(32px,3.5vw,52px)', fontWeight: 600, color: WHITE, lineHeight: 1.12, margin: '0 0 36px' }}>
               El problema no es cuidar a tu familiar. El problema es que nadie sabe qué está pasando.
@@ -522,7 +476,7 @@ export default function Landing() {
       </section>
 
       {/* ─────────────── 6. WHATSAPP COMPARISON ─────────────── */}
-      <section style={{ background: CREAM, padding: '320px 32px 120px', overflow: 'hidden' }}>
+      <section style={{ background: CREAM, padding: '120px 32px', overflow: 'hidden' }}>
         <div style={{ maxWidth: 1140, margin: '0 auto' }}>
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 72 }}>
             <p style={{ fontSize: 11, fontWeight: 500, color: ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>El caos conocido</p>
@@ -780,7 +734,7 @@ export default function Landing() {
       </section>
 
       {/* ─────────────── 8. HOW IT WORKS ─────────────── */}
-      <section id="como" style={{ padding: '176px 32px', background: CREAM }}>
+      <section id="como" style={{ padding: '128px 32px', background: SAND }}>
         <div style={{ maxWidth: 1140, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 88, flexWrap: 'wrap' }} className="como-grid">
           <div style={{ flex: '1 1 360px' }}>
             <p style={{ fontSize: 11, fontWeight: 500, color: ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 18px', fontFamily: SANS }}>Cómo funciona</p>
@@ -811,26 +765,7 @@ export default function Landing() {
             </div>
           </div>
           <div style={{ flex: '1 1 360px', display: 'flex', justifyContent: 'center' }} className="como-img">
-            {/* Misma fórmula que El Problema (círculo + medialuna coral desfasada), espejada y
-                contenida: sin derrame de sección, tamaño moderado — el timeline es el protagonista. */}
-            <div className="como-photo-wrap" style={{ position: 'relative', width: '100%', maxWidth: 590, aspectRatio: '1 / 1' }}>
-              {/* Medialuna coral — 8% más grande, desfasada hacia abajo-izquierda (espejo:
-                  en El Problema el desfase va abajo-derecha) */}
-              <div aria-hidden="true" className="como-ring" style={{
-                position: 'absolute', bottom: '-10%', left: '-10%',
-                width: '108%', height: '108%', borderRadius: '50%',
-                background: CORAL, pointerEvents: 'none', zIndex: 1,
-              }} />
-              {/* Foto circular con anillo blanco — mismo tratamiento que El Problema */}
-              <div className="como-photo" style={{
-                position: 'relative', width: '100%', height: '100%',
-                borderRadius: '50%', overflow: 'hidden',
-                border: '8px solid white', boxSizing: 'border-box',
-                zIndex: 2,
-              }}>
-                <img src={COMO_IMG} alt="Cómo funciona FamiliaCerca" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 60%', display: 'block' }} />
-              </div>
-            </div>
+            <img src={COMO_IMG} alt="Cómo funciona FamiliaCerca" style={{ width: '100%', borderRadius: 24, boxShadow: `0 16px 64px rgba(13,107,99,0.16)`, border: `1px solid rgba(13,107,99,0.10)` }} />
           </div>
         </div>
       </section>
@@ -1217,27 +1152,16 @@ export default function Landing() {
         .btn-nav-cream { transition: background 0.2s ease, color 0.2s ease; }
         .btn-nav-cream:hover { background: #143C32 !important; color: #F8F4ED !important; }
 
-        @media (min-width: 769px) and (max-width: 1240px) {
-          /* Semicírculo desktop angosto — mismo radio (arco intacto), menos ancho de descanso
-             para que la panza no se acerque al texto (verificado: a 1024px con el ancho
-             desktop normal, la panza queda a ~5px del CTA; con 14vw baja a ~87px de aire). */
-          .landing-hero-right { width: calc(14vw + 50vh) !important; }
-          .landing-hero-arc-accent { width: calc(14vw + 24px + 50vh) !important; }
-        }
         @media (max-width: 768px) {
           .landing-desktop-nav { display: none !important; }
           .landing-hamburger { display: flex !important; }
-          .landing-hero-grid { min-height: auto !important; }
-          .landing-hero-right { position: relative !important; top: auto !important; right: auto !important; bottom: auto !important; width: 100% !important; aspect-ratio: 4 / 5 !important; border-radius: 20px !important; margin-top: 32px !important; }
-          .landing-hero-arc-accent { display: none !important; }
-          .landing-hero-text { width: 100% !important; padding: 80px 24px 64px !important; min-height: auto !important; }
+          .landing-hero-grid { grid-template-columns: 1fr !important; min-height: auto !important; }
+          .landing-hero-right { display: none !important; }
+          .landing-hero-text { padding: 80px 24px 64px !important; min-height: auto !important; }
           .landing-problema-grid { grid-template-columns: 1fr !important; }
-          .landing-problema-img { min-height: 200px !important; }
-          .landing-problema-photo { width: 320px !important; height: 320px !important; right: auto !important; left: 50% !important; top: auto !important; bottom: -90px !important; transform: translateX(-50%) !important; }
-          .landing-problema-ring { width: 346px !important; height: 346px !important; right: auto !important; left: calc(50% + 16px) !important; top: auto !important; bottom: -119px !important; transform: translateX(-50%) !important; }
+          .landing-problema-img { min-height: 300px !important; }
           .como-grid { flex-direction: column !important; gap: 52px !important; }
-          .como-photo-wrap { max-width: 280px !important; }
-          .como-ring { bottom: -6% !important; left: -6% !important; }
+          .como-img { display: none !important; }
           .testimonios-grid { grid-template-columns: 1fr !important; }
           .whatsapp-comparison-grid { grid-template-columns: 1fr !important; }
         }
