@@ -310,12 +310,12 @@ export default function Landing() {
               <span style={{ color: GOLD }}>sin perder ningún detalle.</span>
             </h1>
 
-            <p className="hero-reveal hero-delay-3" style={{ fontSize: 'clamp(15px, 1.6vw, 18px)', color: 'rgba(255,255,255,0.55)', lineHeight: 1.6, margin: '0 0 14px', fontFamily: SANS, fontWeight: 300, textAlign: 'center' }}>
-              La información del cuidado se pierde entre chats, llamadas y suposiciones.
+            <p className="hero-reveal hero-delay-3" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(24px, 3.2vw, 38px)', fontWeight: 600, color: GOLD, lineHeight: 1.25, margin: '0 0 20px' }}>
+              ¿Ya se lo dieron?
             </p>
 
-            <p className="hero-reveal hero-delay-3" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(24px, 3.2vw, 38px)', fontWeight: 600, color: GOLD, lineHeight: 1.25, margin: '0 0 40px' }}>
-              ¿Ya se lo dieron?
+            <p className="hero-reveal hero-delay-3" style={{ fontSize: 'clamp(15px, 1.6vw, 18px)', color: 'rgba(255,255,255,0.55)', lineHeight: 1.6, margin: '0 0 40px', fontFamily: SANS, fontWeight: 300, textAlign: 'center' }}>
+              La información del cuidado se pierde entre chats, llamadas y suposiciones.
             </p>
 
             <Link to="/register" className="hero-reveal hero-delay-4 cta-coral" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '18px 48px', borderRadius: 9999, marginBottom: 32, background: '#E9826E', color: WHITE, fontWeight: 600, fontSize: 18, fontFamily: SANS, textDecoration: 'none', letterSpacing: '0.02em', boxShadow: '0 12px 40px rgba(233,130,110,0.45)', transition: 'background 0.2s ease' }}>
