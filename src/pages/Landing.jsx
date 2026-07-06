@@ -628,41 +628,13 @@ export default function Landing() {
       {/* ─────────────── 7.5. CREDIBILIDAD ─────────────── */}
       <section style={{ background: '#FBEAE4', padding: '96px 32px' }}>
         <div style={{ maxWidth: 640, margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-          {/* TODO: reemplazar por un testimonio real destacado cuando esté disponible */}
-          <div className="reveal" style={{
-            background: '#F8F4ED', borderRadius: '28px',
-            padding: '28px 32px', boxShadow: '0 20px 60px rgba(20,60,50,0.18)',
-            width: '100%', maxWidth: 380, marginBottom: 40
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-              <div style={{ width: 46, height: 46, borderRadius: '50%', background: '#EBF3EE', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '21px' }}>👵</div>
-              <div>
-                <div style={{ fontWeight: 700, fontSize: '16px', color: '#143C32' }}>Deborah</div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
-                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#143C32' }}></div>
-                  <span style={{ fontSize: '12px', color: '#143C32', fontWeight: 600 }}>Todo al día</span>
-                </div>
-              </div>
-            </div>
-            {[
-              { icon: '💊', text: 'Medicamentos completados' },
-              { icon: '🕙', text: 'Última actualización 10:45 AM' },
-              { icon: '👨‍👩‍👧', text: '4 familiares informados' },
-            ].map((item, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '9px' }}>
-                <span style={{ fontSize: '15px' }}>{item.icon}</span>
-                <span style={{ fontSize: '13px', color: '#143C32', opacity: 0.8 }}>{item.text}</span>
-                <span style={{ marginLeft: 'auto', color: '#143C32', fontSize: '13px', fontWeight: 700 }}>✓</span>
-              </div>
-            ))}
-            <div style={{ borderTop: '1px solid rgba(20,60,50,0.1)', marginTop: '10px', paddingTop: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: '11px', color: '#143C32', opacity: 0.6 }}>Actualizado por Rosa</span>
-              <span style={{ fontSize: '11px', color: '#E9826E', fontWeight: 600 }}>Hace 15 min</span>
-            </div>
-          </div>
-
-          <p className="reveal" style={{ fontFamily: SERIF, fontSize: 'clamp(22px,2.6vw,30px)', fontWeight: 500, color: PRIMARY, lineHeight: 1.4, margin: 0 }}>
-            Cada toma confirmada. Cada familiar informado. En tiempo real.
+          {/* Slot ampliable con testimonios reales de familias */}
+          <div style={{ fontFamily: SERIF, fontSize: 90, color: PRIMARY, lineHeight: 0.7, marginBottom: 12, opacity: 0.18 }}>"</div>
+          <blockquote className="reveal" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(24px,3vw,38px)', fontWeight: 500, color: PRIMARY, lineHeight: 1.45, margin: '0 0 28px' }}>
+            Antes era imposible coordinarnos. Ahora todos sabemos qué está pasando sin preguntar.
+          </blockquote>
+          <p className="reveal reveal-delay-1" style={{ fontSize: 15, color: 'rgba(20,60,50,0.62)', fontFamily: SANS, fontWeight: 400, lineHeight: 1.65, maxWidth: 460, margin: 0 }}>
+            — Ysabelle, fundadora de FamiliaCerca. Creó la app después de años coordinando el cuidado de su familia por WhatsApp.
           </p>
         </div>
       </section>
