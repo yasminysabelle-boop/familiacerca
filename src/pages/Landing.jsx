@@ -470,6 +470,19 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* ─────────────── 5.5. LA SOLUCIÓN ─────────────── */}
+      <section style={{ background: CREAM, padding: 'clamp(96px,14vw,168px) 32px' }}>
+        <div className="reveal" style={{ maxWidth: 640, margin: '0 auto', textAlign: 'center' }}>
+          <p style={{ fontFamily: SERIF, fontWeight: 700, margin: '0 0 28px', padding: 0 }}>
+            <span style={{ color: PRIMARY, fontSize: 'clamp(30px,3.6vw,44px)' }}>Familia</span>
+            <span style={{ color: CORAL, fontSize: 'clamp(30px,3.6vw,44px)' }}>Cerca</span>
+          </p>
+          <p style={{ fontSize: 'clamp(18px,2vw,22px)', color: '#6B7280', lineHeight: 1.8, margin: 0, fontFamily: SANS, fontWeight: 300 }}>
+            Un sistema que convierte el cuidado familiar en algo claro, coordinado y en tiempo real. Cada persona sabe qué pasó. Cada acción queda registrada. Toda la familia ve lo mismo.
+          </p>
+        </div>
+      </section>
+
       {/* ─────────────── 6. BENEFITS ─────────────── */}
       <section style={{ background: SAND, padding: '96px 32px' }}>
         <div style={{ maxWidth: 1140, margin: '0 auto' }}>
