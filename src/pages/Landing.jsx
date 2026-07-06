@@ -240,7 +240,7 @@ export default function Landing() {
         { text: 'Historial 90 días', included: true },
         { text: 'PDF export + Álbum memorias', included: true },
       ],
-      cta: 'Comenzar prueba gratis',
+      cta: 'Empezar gratis',
     },
     {
       name: 'Cuidado Total', price: 24.99, period: 'Cuidadores ilimitados', highlight: false,
@@ -256,7 +256,7 @@ export default function Landing() {
         { text: 'Soporte prioritario', included: true },
         { text: 'Acceso anticipado a funciones', included: true },
       ],
-      cta: 'Comenzar prueba gratis',
+      cta: 'Empezar gratis',
     },
   ]
 
@@ -784,7 +784,7 @@ export default function Landing() {
               ))}
             </div>
             <div style={{ marginTop: 52 }}>
-              <CTABtn to="/register">Empezar ahora — es gratis</CTABtn>
+              <CTABtn to="/register">Empezar gratis</CTABtn>
             </div>
           </div>
           <div style={{ flex: '1 1 360px', display: 'flex', justifyContent: 'center' }} className="como-img">
@@ -854,7 +854,7 @@ export default function Landing() {
             — Cada familia que usa FamiliaCerca
           </p>
           <CTABtn to="/register">
-            Empezar a registrar hoy <span style={{ fontSize: 17, opacity: 0.8 }}>→</span>
+            Empezar gratis <span style={{ fontSize: 17, opacity: 0.8 }}>→</span>
           </CTABtn>
         </div>
       </section>
@@ -1048,7 +1048,7 @@ export default function Landing() {
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14 }}>
               <Link to="/register" style={{ padding: '20px 52px', borderRadius: 9999, background: WHITE, color: ACTION, fontWeight: 500, fontSize: 18, textDecoration: 'none', fontFamily: SANS, letterSpacing: '0.02em', boxShadow: '0 16px 56px rgba(0,0,0,0.28)', display: 'inline-flex', alignItems: 'center', gap: 10 }}>
-                Crear cuenta gratis →
+                Empezar gratis →
               </Link>
               <a href="#funciones" style={{ padding: '20px 36px', borderRadius: 9999, border: '1.5px solid rgba(255,255,255,0.22)', background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.78)', fontWeight: 400, fontSize: 15, textDecoration: 'none', fontFamily: SANS, display: 'inline-flex', alignItems: 'center', gap: 9 }}>
                 <span style={{ fontSize: 11 }}>▶</span> Ver funciones
