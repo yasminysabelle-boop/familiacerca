@@ -39,14 +39,14 @@ export default function CareCard({
         position: 'relative',
         borderRadius: 24,
         overflow: 'hidden',
-        background: `linear-gradient(135deg, ${TEAL} 0%, ${TEAL_LIGHT} 100%)`,
+        background: `linear-gradient(135deg, ${TEAL_LIGHT} 0%, ${TEAL} 100%)`,
         padding: '28px 24px',
         cursor: onClick ? 'pointer' : 'default',
         WebkitTapHighlightColor: 'transparent',
       }}
     >
       {/* Marca de agua — corazón grande y sutil */}
-      <div style={{ position: 'absolute', top: -44, right: -44, opacity: 0.12, pointerEvents: 'none' }}>
+      <div style={{ position: 'absolute', top: -44, right: -44, opacity: 0.22, pointerEvents: 'none' }}>
         <Heart size={200} color="white" filled />
       </div>
 
@@ -54,7 +54,7 @@ export default function CareCard({
         {/* Foto circular + nombre */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           <div style={{
-            width: 64, height: 64, borderRadius: '50%', flexShrink: 0,
+            width: 96, height: 96, borderRadius: '22px', flexShrink: 0,
             border: '3px solid rgba(255,255,255,0.85)',
             overflow: 'hidden', background: 'rgba(255,255,255,0.25)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
