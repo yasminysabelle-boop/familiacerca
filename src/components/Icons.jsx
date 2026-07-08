@@ -458,3 +458,23 @@ export function Sparkles({ size, color, strokeWidth }) {
     </Svg>
   )
 }
+
+export function Siren({ size, color, strokeWidth }) {
+  return (
+    <Svg size={size} color={color} strokeWidth={strokeWidth}>
+      <path d="M7 18v-6a5 5 0 0110 0v6" />
+      <path d="M12 2v3" />
+      <path d="M4 18h1" />
+      <path d="M19 18h1" />
+      <path d="M5 21h14" />
+    </Svg>
+  )
+}
+
+export function Zap({ size, color, strokeWidth, filled = false }) {
+  return (
+    <Svg size={size} color={color} strokeWidth={strokeWidth} fill={filled ? color : 'none'}>
+      <path d="M13 2 3 14h7l-1 8 10-12h-7z" />
+    </Svg>
+  )
+}

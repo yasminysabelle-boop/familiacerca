@@ -10,7 +10,7 @@ import CareCard from '../components/CareCard'
 import { SkeletonDashSummary, SkeletonCard } from '../components/SkeletonLoader'
 import SuccessAnimation, { useSuccessAnimation } from '../components/SuccessAnimation'
 import { usePullToRefresh } from '../hooks/usePullToRefresh'
-import { AlertTriangle, CheckIcon, User, XIcon, Pill, ClipboardCheck, Chat, Calendar, Receipt, Users, Camera, Clock, BookOpen, MessageCircle, Video, Hospital, Image, Building2, Thermometer, ClipboardList, CheckSquare, Stethoscope, DollarSign, Sparkles, Heart } from '../components/Icons'
+import { AlertTriangle, CheckIcon, User, XIcon, Pill, ClipboardCheck, Chat, Calendar, Receipt, Users, Camera, Clock, BookOpen, MessageCircle, Video, Hospital, Image, Building2, Thermometer, ClipboardList, CheckSquare, Stethoscope, DollarSign, Sparkles, Heart, Bell, ChevronRight, Siren, Zap } from '../components/Icons'
 import { geminiGenerate } from '../lib/gemini'
 import { CARE_ITEMS } from '../lib/careItems'
 import TrialBanner from '../components/TrialBanner'
@@ -1746,6 +1746,127 @@ function QuickCard({ emoji, label, subtitle, statusColor, onClick, index, size =
   )
 }
 
+function AttentionCard({ medName, medDosage, medTime, windowLabel, onConfirm }) {
+  return (
+    <section aria-label="Necesita tu atención" style={{ background: '#FBEAE4', borderRadius: 24, overflow: 'hidden', boxShadow: '0 2px 12px rgba(20,35,30,0.05)' }}>
+      <div style={{ padding: '18px 18px 20px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+          <Bell size={18} color="#E9826E" strokeWidth={2} />
+          <h2 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#E9826E' }}>Necesita tu atención</h2>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <span style={{ width: 56, height: 56, borderRadius: '50%', background: 'rgba(233,130,110,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <Pill size={24} color="#E9826E" strokeWidth={2} />
+          </span>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <p style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#334155', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{medName}{medDosage ? ` ${medDosage}` : ''}</p>
+            <p style={{ margin: '4px 0 0', display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 500, color: '#334155' }}>
+              <Clock size={12} color="#7C8698" strokeWidth={2} /> Hoy {medTime}
+            </p>
+            <p style={{ margin: '4px 0 0', display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 500, color: '#E9826E' }}>
+              <AlertTriangle size={12} color="#E9826E" strokeWidth={2} /> Pendiente de confirmar
+            </p>
+          </div>
+          <button onClick={onConfirm} style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 5, borderRadius: 999, background: '#E9826E', padding: '11px 16px', border: 'none', cursor: 'pointer', color: 'white', fontWeight: 700, fontSize: 13, boxShadow: '0 4px 14px rgba(233,130,110,0.35)', WebkitTapHighlightColor: 'transparent' }}>
+            Confirmar <CheckIcon size={14} color="white" strokeWidth={2.5} />
+          </button>
+        </div>
+      </div>
+      {windowLabel && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, borderTop: '1px solid rgba(233,130,110,0.18)', background: 'rgba(255,255,255,0.5)', padding: '11px 18px' }}>
+          <Clock size={13} color="#7C8698" strokeWidth={2} />
+          <span style={{ fontSize: 12, fontWeight: 500, color: '#7C8698' }}>Ventana: {windowLabel}</span>
+        </div>
+      )}
+    </section>
+  )
+}
+
+function RecentActivity({ items, onViewAll, onSelect, firstName }) {
+  return (
+    <section aria-label="Actividad reciente" style={{ borderRadius: 24, background: 'white', padding: 20, boxShadow: '0 12px 34px rgba(20,35,30,0.07)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+        <h2 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 8, fontSize: 15, fontWeight: 700, color: '#334155' }}>
+          <Heart size={18} color="#087F70" strokeWidth={2} /> Actividad reciente
+        </h2>
+        <button onClick={onViewAll} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: '#087F70', fontWeight: 700, padding: 0, WebkitTapHighlightColor: 'transparent' }}>Ver todo</button>
+      </div>
+      {items.length === 0 ? (
+        <div style={{ padding: '6px 0 2px' }}>
+          <p style={{ color: '#7C8698', fontSize: 13, margin: '0 0 4px', fontWeight: 500 }}>Aún no hay actividad reciente</p>
+          <p style={{ color: '#B0A898', fontSize: 12, margin: 0, lineHeight: 1.6 }}>
+            Cuando alguien confirme un medicamento,<br />suba una foto o escriba una nota,<br />aparecerá aquí.
+          </p>
+        </div>
+      ) : (
+        <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {items.map((evt, i) => {
+            const actor = (evt.confirmedBy ?? evt.uploaderName ?? evt.recorderName ?? evt.authorName ?? firstName ?? 'Alguien').split(' ')[0]
+            const HUMAN = {
+              MED_CONFIRMED:     { text: `confirmó ${evt.medName ?? 'medicamento'}`, sub: 'Dosis confirmada' },
+              VOICE_MEMORY:      { text: 'grabó una memoria de voz', sub: '' },
+              PHOTO:             { text: 'subió una foto', sub: '' },
+              NOTE:              { text: 'escribió una nota', sub: '' },
+              EXPENSE:           { text: 'registró un gasto', sub: evt.description ?? '' },
+              APPOINTMENT:       { text: `agregó una cita${evt.appointmentTitle ? `: ${evt.appointmentTitle}` : ''}`, sub: '' },
+              APPOINTMENT_PROOF: { text: 'confirmó una cita', sub: evt.appointmentTitle ?? '' },
+              CARE_LOG:          { text: 'completó una rutina', sub: '' },
+            }
+            const meta = HUMAN[evt.type] ?? { text: 'registró actividad', sub: '' }
+            const isNote = evt.type === 'NOTE'
+            const time = evt.timestamp ? timeAgo(evt.timestamp instanceof Date ? evt.timestamp : new Date(evt.timestamp)) : ''
+            const avatarLetter = actor.charAt(0).toUpperCase()
+            return (
+              <li key={evt.id ?? i} onClick={() => onSelect?.(evt)} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, cursor: onSelect ? 'pointer' : 'default' }}>
+                <span style={{ width: 40, height: 40, borderRadius: '50%', flexShrink: 0, background: 'linear-gradient(135deg, #A8E5D6, #087F70)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: 15 }}>
+                  {avatarLetter}
+                </span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ margin: 0, fontSize: 14, color: '#334155', lineHeight: 1.4 }}>
+                    <span style={{ fontWeight: 700 }}>{actor}</span> {meta.text}
+                  </p>
+                  {meta.sub && (
+                    <p style={{ margin: '2px 0 0', fontSize: 13, fontStyle: isNote ? 'italic' : 'normal', color: '#7C8698', lineHeight: 1.4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{isNote ? `"${meta.sub}"` : meta.sub}</p>
+                  )}
+                  <p style={{ margin: '2px 0 0', fontSize: 11, color: '#7C8698' }}>{time}</p>
+                </div>
+                {isNote ? (
+                  <span style={{ width: 30, height: 30, borderRadius: '50%', flexShrink: 0, background: '#F1F0EE', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Chat size={14} color="#7C8698" strokeWidth={2} />
+                  </span>
+                ) : (
+                  <span style={{ width: 30, height: 30, borderRadius: '50%', flexShrink: 0, background: 'rgba(168,229,214,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <CheckIcon size={14} color="#087F70" strokeWidth={2.5} />
+                  </span>
+                )}
+              </li>
+            )
+          })}
+        </ul>
+      )}
+    </section>
+  )
+}
+
+function PetsCard({ onOpen, patientFirstName }) {
+  return (
+    <section aria-label="Asistente Milo y Luna" style={{ position: 'relative', overflow: 'hidden', borderRadius: 24, background: 'rgba(117,102,216,0.12)', padding: 16, boxShadow: '0 2px 12px rgba(20,35,30,0.05)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <img src="/images/milo-luna.webp" alt="Milo el perro y Luna la gata" style={{ width: 88, height: 88, objectFit: 'contain', flexShrink: 0 }} />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <p style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#7566D8', lineHeight: 1.3 }}>Milo y Luna están aquí para ayudar</p>
+          <p style={{ margin: '4px 0 0', fontSize: 13, color: '#7C8698', lineHeight: 1.4 }}>
+            {patientFirstName ? `¿Necesitas algo sobre el cuidado de ${patientFirstName}?` : '¿Necesitas algo sobre el cuidado de tu familiar?'}
+          </p>
+          <button onClick={onOpen} style={{ marginTop: 10, display: 'inline-flex', alignItems: 'center', gap: 6, borderRadius: 999, background: '#7566D8', padding: '9px 16px', border: 'none', cursor: 'pointer', color: 'white', fontWeight: 700, fontSize: 13, boxShadow: '0 4px 14px rgba(117,102,216,0.35)', WebkitTapHighlightColor: 'transparent' }}>
+            <MessageCircle size={15} color="white" strokeWidth={2} /> Hablar con Milo y Luna
+          </button>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 // ── Main component ─────────────────────────────────────────────────────────────
 
 export default function Dashboard() {
@@ -2054,6 +2175,7 @@ export default function Dashboard() {
     const newCards = {}
     const wk = weekKey()
     const uid = user?.id ?? 'anon'
+    const h = new Date().getHours()
 
     if (h >= 7 && h < 19) {
       const k = `fc_ai_morning_${uid}_${todayKey}`
@@ -2999,7 +3121,7 @@ export default function Dashboard() {
         `}</style>
 
         {/* ═══ HEADER ═══ */}
-        <div style={{ background: '#F8F4ED', height: 56, padding: '0 16px', borderBottom: '1px solid rgba(20,60,50,0.06)', display: 'flex', alignItems: 'center' }}>
+        <div style={{ background: '#F8F4ED', padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
           {/* Left: Logo */}
           <img
             src="/logo.png"
@@ -3011,7 +3133,7 @@ export default function Dashboard() {
             onClick={() => setShowFamilySwitcher(true)}
             style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 5, background: 'rgba(20,60,50,0.06)', border: 'none', borderRadius: 20, padding: '6px 14px', cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}
           >
-            <span style={{ fontSize: 13, fontWeight: 600, color: '#143C32', maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <span style={{ fontSize: 13, fontWeight: 600, color: '#334155', maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {(patientProfile?.nombre_completo || activePatientName || profile?.name || 'Paciente').split(' ')[0]}
             </span>
             <span style={{ fontSize: 10, color: '#6D7B74', lineHeight: 1 }}>▼</span>
@@ -3023,11 +3145,12 @@ export default function Dashboard() {
                 return (
                   <button
                     onClick={() => setShowNotifSheet(true)}
-                    style={{ position: 'relative', background: 'none', border: 'none', cursor: 'pointer', width: 38, height: 38, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', WebkitTapHighlightColor: 'transparent', flexShrink: 0 }}
+                    aria-label={`Notificaciones${totalBadge > 0 ? `, ${totalBadge} sin leer` : ''}`}
+                    style={{ position: 'relative', background: 'white', border: 'none', cursor: 'pointer', width: 44, height: 44, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', WebkitTapHighlightColor: 'transparent', flexShrink: 0, boxShadow: '0 2px 8px rgba(20,35,30,0.08)' }}
                   >
-                    <span style={{ fontSize: 22 }}>🔔</span>
+                    <Bell size={20} color="#334155" strokeWidth={2} />
                     {totalBadge > 0 && (
-                      <span style={{ position: 'absolute', top: 2, right: 2, background: '#D63031', color: 'white', fontSize: 8, fontWeight: 800, borderRadius: '50%', width: 14, height: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1 }}>
+                      <span style={{ position: 'absolute', top: -2, right: -2, background: '#E9826E', color: 'white', fontSize: 11, fontWeight: 700, borderRadius: '50%', width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1 }}>
                         {totalBadge > 9 ? '9+' : totalBadge}
                       </span>
                     )}
@@ -3042,13 +3165,13 @@ export default function Dashboard() {
                   <img
                     src={avatarUrl}
                     alt={firstName}
-                    style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover', border: '2px solid #EDE5D8', flexShrink: 0, cursor: 'pointer' }}
+                    style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover', border: '2px solid white', boxShadow: '0 2px 8px rgba(20,35,30,0.08)', flexShrink: 0, cursor: 'pointer' }}
                     onClick={() => navigate('/ajustes')}
                   />
                 ) : (
                   <div
                     onClick={() => navigate('/ajustes')}
-                    style={{ width: 36, height: 36, borderRadius: '50%', background: 'linear-gradient(135deg, #E58B73, #C9882A)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 700, color: 'white', flexShrink: 0, cursor: 'pointer', border: '2px solid rgba(229,139,115,0.25)' }}
+                    style={{ width: 44, height: 44, borderRadius: '50%', background: 'linear-gradient(135deg, #E58B73, #C9882A)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, fontWeight: 700, color: 'white', flexShrink: 0, cursor: 'pointer', border: '2px solid white', boxShadow: '0 2px 8px rgba(20,35,30,0.08)' }}
                   >
                     {initial}
                   </div>
@@ -3056,33 +3179,6 @@ export default function Dashboard() {
               })()}
             </div>
         </div>
-
-        {/* ═══ ESTADO GLOBAL DEL DÍA ═══ */}
-        {(() => {
-          const alertKinds = renewalAlerts.map(a => a.kind)
-          const hasCriticalAlert = alertKinds.some(k => k === 'exhausted' || k === 'critical')
-          const hasWarningAlert  = alertKinds.some(k => k === 'warning' || k === 'silent')
-          const isCriticalDay = hasActiveSOS || hasCriticalAlert || (_isRetrasado && _retrasadoMins != null && _retrasadoMins >= 720)
-          const isWarningDay  = !isCriticalDay && (hasWarningAlert || pendingCount > 0 || _isRetrasado)
-          const dayStatus = isCriticalDay ? 'critical' : isWarningDay ? 'warning' : 'ok'
-          const statusPatientFirst = (patientProfile?.nombre_completo || activePatientName || 'tu familiar').split(' ')[0]
-          const STATUS_COPY = {
-            ok:       { emoji: '🟢', text: `Hoy es un día tranquilo para ${statusPatientFirst}` },
-            warning:  { emoji: '🟡', text: `${statusPatientFirst} requiere atención moderada hoy` },
-            critical: { emoji: '🔴', text: `${statusPatientFirst} necesita atención hoy` },
-          }
-          const { emoji, text } = STATUS_COPY[dayStatus]
-          return (
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: 8,
-              margin: '10px 16px 0', padding: '8px 14px',
-              borderRadius: 999, background: 'rgba(20,60,50,0.05)',
-            }}>
-              <span style={{ fontSize: 13, flexShrink: 0 }}>{emoji}</span>
-              <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#143C32' }}>{text}</p>
-            </div>
-          )
-        })()}
 
         {/* Banners */}
         <TrialBanner />
@@ -3177,6 +3273,20 @@ export default function Dashboard() {
 
             const PALETTE = ['#0B4F4A', '#C9882A', '#7C3AED', '#E58B73', '#0EA5E9']
 
+            const pendingMedWindowMinutes = nextPendingMed
+              ? (medsList.find(m => m.id === nextPendingMed.medicationId)?.time_window_minutes ?? 60)
+              : null
+            const pendingMedWindowLabel = (nextPendingMed?.medTime && pendingMedWindowMinutes != null) ? (() => {
+              const [ph, pm] = nextPendingMed.medTime.split(':').map(Number)
+              const toHHMM = mins => {
+                const wrapped = ((mins % 1440) + 1440) % 1440
+                return `${String(Math.floor(wrapped / 60)).padStart(2, '0')}:${String(wrapped % 60).padStart(2, '0')}`
+              }
+              const start = toHHMM(ph * 60 + pm - pendingMedWindowMinutes)
+              const end = toHHMM(ph * 60 + pm + pendingMedWindowMinutes)
+              return `${fmtTime(start)} · ${fmtTime(end)}`
+            })() : null
+
             return (
               <>
                 {/* ══════════════════════════════════════════
@@ -3193,159 +3303,27 @@ export default function Dashboard() {
                   onFamilyClick={() => setShowFamilySwitcher(true)}
                 />
 
-                {/* ══ SUMMARY CARDS — 3 columnas premium ══ */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
-                  {[
-                    {
-                      emoji: '💊',
-                      bg: '#EFF6F0',
-                      title: 'Medicamentos',
-                      number: pendingCount,
-                      numberColor: pendingCount > 0 ? '#A66A00' : '#1E7A45',
-                      label: pendingCount > 0 ? `pendiente${pendingCount !== 1 ? 's' : ''}` : 'al día',
-                      onClick: () => navigate('/medications'),
-                    },
-                    {
-                      emoji: '📦',
-                      bg: '#F0F0FA',
-                      title: 'Inventario',
-                      number: totalStock,
-                      numberColor: '#0d6b63',
-                      label: 'dosis disp.',
-                      onClick: () => navigate('/medications'),
-                    },
-                    {
-                      emoji: '📄',
-                      bg: '#FFF3F0',
-                      title: 'Recetas',
-                      number: medTotal,
-                      numberColor: '#0d6b63',
-                      label: `activa${medTotal !== 1 ? 's' : ''}`,
-                      onClick: () => navigate('/medications'),
-                    },
-                  ].map(({ emoji, bg, title, number, numberColor, label, onClick }) => (
-                    <button
-                      key={title}
-                      onClick={onClick}
-                      style={{
-                        background: bg,
-                        borderRadius: 20,
-                        padding: '14px 12px',
-                        border: 'none',
-                        cursor: 'pointer',
-                        display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 2,
-                        WebkitTapHighlightColor: 'transparent',
-                        textAlign: 'left', minWidth: 0,
-                        boxShadow: '0 4px 12px rgba(20,35,30,0.08)',
-                      }}
-                    >
-                      <span style={{ fontSize: 18 }}>{emoji}</span>
-                      <p style={{ margin: '6px 0 2px', fontSize: 28, fontWeight: 700, color: numberColor, lineHeight: 1 }}>{number}</p>
-                      <p style={{ margin: 0, fontSize: 10, fontWeight: 600, color: '#6D7B74', textTransform: 'uppercase', letterSpacing: '0.04em', lineHeight: 1.3 }}>{title}</p>
-                      <p style={{ margin: 0, fontSize: 10, color: '#9AA89E' }}>{label}</p>
-                    </button>
-                  ))}
-                </div>
+                {/* ══ ATENCIÓN — medicamento pendiente (v0: AttentionCard) ══ */}
+                {nextPendingMed && (
+                  <AttentionCard
+                    medName={nextPendingMed.medName}
+                    medDosage={nextPendingMed.medDosage}
+                    medTime={fmtTime(nextPendingMed.medTime)}
+                    windowLabel={pendingMedWindowLabel}
+                    onConfirm={() => handleConfirmMed(nextPendingMed)}
+                  />
+                )}
 
-                {/* ════════════════════════════════════
-                    ACTIVIDAD DE HOY
-                    ════════════════════════════════════ */}
-                <div style={{ borderRadius: 20, background: 'white', padding: 20, boxShadow: '0 12px 34px rgba(20,35,30,0.07)' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-                    <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: '#9AA89E', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Actividad de hoy</p>
-                    <button onClick={() => navigate('/historial')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: '#E9826E', fontWeight: 700, padding: 0, WebkitTapHighlightColor: 'transparent' }}>Ver todo →</button>
-                  </div>
-                  {loading ? (
-                    <p style={{ color: '#B0A898', fontSize: 13, margin: 0, textAlign: 'center', padding: '8px 0' }}>Cargando...</p>
-                  ) : actividadHoy.length === 0 ? (
-                    <div style={{ padding: '6px 0 2px' }}>
-                      <p style={{ color: '#B0A898', fontSize: 13, margin: '0 0 4px', fontWeight: 500 }}>
-                        Aún no hay actividad hoy
-                      </p>
-                      <p style={{ color: '#C5BDB2', fontSize: 12, margin: 0, lineHeight: 1.6 }}>
-                        Cuando alguien confirme un medicamento,<br/>
-                        suba una foto o haga una videollamada,<br/>
-                        aparecerá aquí.
-                      </p>
-                    </div>
-                  ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                      {actividadHoy.map((evt, i) => {
-                        const actor = (evt.confirmedBy ?? evt.uploaderName ?? evt.recorderName ?? evt.authorName ?? firstName ?? 'Cuidador').split(' ')[0]
-                        const HUMAN = {
-                          MED_CONFIRMED:     { color: '#22C55E', icon: '💊', text: `${actor} confirmó ${evt.medName ?? 'medicamento'}`, sub: 'Dosis confirmada' },
-                          VOICE_MEMORY:      { color: '#7C5CBF', icon: '🎙️', text: `${actor} grabó una memoria de voz`, sub: 'Memoria de voz' },
-                          PHOTO:             { color: '#0d6b63', icon: '📸', text: `${actor} subió una foto`, sub: '' },
-                          NOTE:              { color: '#6B7280', icon: '💬', text: `${actor} escribió una nota`, sub: '' },
-                          EXPENSE:           { color: '#C9882A', icon: '💰', text: `${actor} registró un gasto`, sub: evt.description ?? '' },
-                          APPOINTMENT:       { color: '#3B82F6', icon: '📅', text: `Cita: ${evt.appointmentTitle ?? 'médica'}`, sub: '' },
-                          APPOINTMENT_PROOF: { color: '#15803D', icon: '✅', text: `${actor} confirmó cita`, sub: evt.appointmentTitle ?? '' },
-                          SOS_ALERT:         { color: '#D63031', icon: '🚨', text: `${actor} activó alerta SOS`, sub: 'Emergencia familiar' },
-                          CARE_LOG:          { color: '#0B4F4A', icon: '✔️', text: `${actor} completó una rutina`, sub: '' },
-                        }
-                        const meta = HUMAN[evt.type] ?? { color: '#9CA3AF', icon: '•', text: 'Actividad registrada', sub: '' }
-                        const time = evt.timestamp
-                          ? new Date(evt.timestamp).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit', hour12: false })
-                          : '--'
-                        const hasThumb = evt.type === 'PHOTO' && evt.fileUrl
-                        return (
-                          <div
-                            key={evt.id ?? i}
-                            onClick={() => setSelectedEvent(evt)}
-                            style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 0', cursor: 'pointer', borderBottom: i < actividadHoy.length - 1 ? '1px solid rgba(20,35,30,0.06)' : 'none' }}
-                          >
-                            <span style={{ fontSize: 11, color: '#C5BDB2', width: 32, textAlign: 'right', flexShrink: 0, fontWeight: 500, lineHeight: 1 }}>{time}</span>
-                            <span style={{ width: 8, height: 8, borderRadius: '50%', background: meta.color, flexShrink: 0, marginTop: 3 }} />
-                            <div style={{ flex: 1, minWidth: 0 }}>
-                              <p style={{ margin: 0, fontSize: 13, color: '#16231F', fontWeight: 500, lineHeight: 1.35, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{meta.text}</p>
-                              {meta.sub ? <p style={{ margin: '1px 0 0', fontSize: 11, color: '#9AA89E', lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{meta.sub}</p> : null}
-                            </div>
-                            {hasThumb && (
-                              <img src={evt.fileUrl} alt="" style={{ width: 40, height: 40, borderRadius: 10, objectFit: 'cover', flexShrink: 0, border: '1px solid rgba(20,35,30,0.08)' }} />
-                            )}
-                          </div>
-                        )
-                      })}
-                    </div>
-                  )}
-                </div>
+                {/* ══ ACTIVIDAD RECIENTE (v0: RecentActivity) ══ */}
+                <RecentActivity
+                  items={loading ? [] : recentActivityItems}
+                  onViewAll={() => navigate('/historial')}
+                  onSelect={setSelectedEvent}
+                  firstName={firstName}
+                />
 
-                {/* ════════════════════════════════════
-                    MOMENTOS RECIENTES
-                    ════════════════════════════════════ */}
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-                    <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: '#9AA89E', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Momentos recientes</p>
-                    <button onClick={() => navigate('/album')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: '#E9826E', fontWeight: 700, padding: 0, WebkitTapHighlightColor: 'transparent' }}>Ver todos →</button>
-                  </div>
-                  {recentPhotos.length === 0 ? (
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', background: 'rgba(255,255,255,0.8)', borderRadius: 20, border: '1px solid rgba(20,35,30,0.05)' }}>
-                      <div>
-                        <p style={{ margin: '0 0 3px', fontSize: 13, fontWeight: 600, color: '#16231F' }}>📸 Sin momentos hoy</p>
-                        <p style={{ margin: 0, fontSize: 12, color: '#9AA89E', lineHeight: 1.4 }}>Captura una foto o nota de voz<br />para guardar recuerdos.</p>
-                      </div>
-                      <button
-                        onClick={() => navigate('/album')}
-                        style={{ background: '#E9826E', border: 'none', borderRadius: 999, padding: '9px 16px', cursor: 'pointer', fontSize: 12, fontWeight: 700, color: 'white', flexShrink: 0, WebkitTapHighlightColor: 'transparent', boxShadow: '0 4px 14px rgba(233,130,110,0.38)' }}
-                      >
-                        Capturar
-                      </button>
-                    </div>
-                  ) : (
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
-                      {recentPhotos.map((photo, i) => (
-                        <div key={photo.id} onClick={() => setSelectedEvent(photo)} style={{ cursor: 'pointer' }}>
-                          <div style={{ position: 'relative', width: '100%', paddingBottom: '75%', borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 12px rgba(20,35,30,0.10)' }}>
-                            <img src={photo.fileUrl} alt={photo.caption ?? ''} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                            {i === 0 && <span style={{ position: 'absolute', top: 6, right: 6, fontSize: 14, color: '#E9826E' }}>♥</span>}
-                          </div>
-                          {photo.caption && <p style={{ margin: '4px 0 1px', fontSize: 11, color: '#20312C', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{photo.caption}</p>}
-                          <p style={{ margin: 0, fontSize: 10, color: '#B0A898' }}>{timeAgo(new Date(photo.timestamp))}</p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                {/* ══ MILO Y LUNA (v0: PetsCard) ══ */}
+                <PetsCard onOpen={() => setShowCompanion(true)} patientFirstName={patientName.split(' ')[0]} />
 
                 {/* ════════════════════════════════════
                     PANEL CANVAS — Acciones rápidas + Más herramientas
@@ -3354,32 +3332,35 @@ export default function Dashboard() {
                 <div style={{ background: '#FBEAE4', borderRadius: 36, padding: '22px 20px', display: 'flex', flexDirection: 'column', gap: 24 }}>
 
                 <div>
-                  <p style={{ margin: '0 0 12px', fontSize: 14, fontWeight: 600, color: '#143C32' }}>Acciones rápidas</p>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+                  <p style={{ margin: '0 0 12px', display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 600, color: '#334155' }}>
+                    <Zap size={16} color="#087F70" filled /> Acciones rápidas
+                  </p>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
                     {[
-                      { Icon: MessageCircle, label: 'Chat',         onClick: () => navigate('/chat'),         circleBg: '#EFF6F0', iconColor: '#0d6b63' },
-                      { Icon: Video,         label: 'Videollamada', onClick: () => navigate('/videollamada'), circleBg: '#EFF6F0', iconColor: '#0d6b63' },
-                      { Icon: AlertTriangle, label: 'Emergencia',   onClick: prepareSOS,                      circleBg: '#FEF0ED', iconColor: '#E9826E' },
+                      { Icon: Pill,          label: 'Medicamentos', onClick: () => navigate('/medications'),  circleBg: '#EFF6F0', iconColor: '#087F70' },
+                      { Icon: Siren,         label: 'Emergencia',   onClick: prepareSOS,                      circleBg: 'rgba(217,83,79,0.12)', iconColor: '#D9534F' },
+                      { Icon: MessageCircle, label: 'Chat familiar', onClick: () => navigate('/chat'),        circleBg: '#EFF6F0', iconColor: '#087F70' },
+                      { Icon: Video,         label: 'Videollamada', onClick: () => navigate('/videollamada'), circleBg: '#EFF6F0', iconColor: '#087F70' },
                     ].map(({ Icon, label, onClick, circleBg, iconColor }) => (
                       <button
                         key={label} onClick={onClick}
                         style={{
                           background: 'white', border: 'none',
-                          borderRadius: 16, padding: '12px 8px', cursor: 'pointer',
+                          borderRadius: 16, padding: '12px 6px', cursor: 'pointer',
                           display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
                           boxShadow: '0 4px 12px rgba(20,35,30,0.08)',
                           WebkitTapHighlightColor: 'transparent',
                         }}
                       >
                         <span style={{
-                          width: 44, height: 44, borderRadius: '50%',
+                          width: 40, height: 40, borderRadius: '50%',
                           background: circleBg,
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                           flexShrink: 0,
                         }}>
-                          <Icon size={22} color={iconColor} strokeWidth={2} />
+                          <Icon size={20} color={iconColor} strokeWidth={2} />
                         </span>
-                        <span style={{ fontSize: 12, fontWeight: 500, color: '#16231F', lineHeight: 1.2, textAlign: 'center' }}>{label}</span>
+                        <span style={{ fontSize: 11, fontWeight: 500, color: '#334155', lineHeight: 1.2, textAlign: 'center' }}>{label}</span>
                       </button>
                     ))}
                   </div>
