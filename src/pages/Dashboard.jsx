@@ -6,6 +6,7 @@ import { useFamily } from '../contexts/FamilyContext'
 import { useSubscription } from '../contexts/SubscriptionContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
+import CareCard from '../components/CareCard'
 import { SkeletonDashSummary, SkeletonCard } from '../components/SkeletonLoader'
 import SuccessAnimation, { useSuccessAnimation } from '../components/SuccessAnimation'
 import { usePullToRefresh } from '../hooks/usePullToRefresh'
@@ -1848,10 +1849,6 @@ export default function Dashboard() {
   const nowMinutes = now.getHours() * 60 + now.getMinutes()
   const isSundayEvening = now.getDay() === 0 && now.getHours() >= 17
 
-  const h = now.getHours()
-  const timeGreeting = h < 12 ? 'Buenos días' : h < 19 ? 'Buenas tardes' : 'Buenas noches'
-  const timeIcon = h < 12 ? '☀️' : h < 19 ? '🌤️' : '🌙'
-
   useEffect(() => {
     if (user && ownerId) fetchTimeline()
   }, [user, ownerId])
@@ -2802,7 +2799,6 @@ export default function Dashboard() {
     .filter(e => ['MED_CONFIRMED', 'VOICE_MEMORY', 'PHOTO', 'NOTE', 'EXPENSE'].includes(e.type))
     .sort((a, b) => b.timestamp - a.timestamp)[0] ?? null
   const lastUpdatedBy = lastActivity?.confirmedBy?.split(' ')[0] || lastActivity?.recorderName?.split(' ')[0] || lastActivity?.uploaderName?.split(' ')[0] || null
-  const lastUpdatedAgo = timeAgo(lastActivity?.timestamp ?? null)
 
   // Last voice/photo memory across any day
   const lastMemory = sections.flatMap(s => s.events).find(e => e.type === 'VOICE_MEMORY' || e.type === 'PHOTO') ?? null
@@ -3160,12 +3156,6 @@ export default function Dashboard() {
             const patientName = patientProfile?.nombre_completo || profile?.name || 'Agregar paciente'
             const isCritical     = hasActiveSOS || (_isRetrasado && _retrasadoMins != null && _retrasadoMins >= 720)
             const isPendingToday = !isCritical && (pendingCount > 0 || _isRetrasado)
-            const statusEmoji = isCritical ? '🔴' : isPendingToday ? '🟡' : '🟢'
-            const statusLabel = isCritical ? 'Requiere atención' : isPendingToday ? 'Requiere atención' : 'Todo bajo control'
-            const statusBg     = isCritical ? 'rgba(254,226,226,0.95)' : isPendingToday ? 'rgba(254,243,199,0.95)' : 'rgba(220,252,231,0.95)'
-            const statusColor  = isCritical ? '#991B1B' : isPendingToday ? '#78350F' : '#14532D'
-            const statusBorder = isCritical ? 'rgba(252,165,165,0.6)' : isPendingToday ? 'rgba(253,224,71,0.6)' : 'rgba(134,239,172,0.6)'
-            const dotColor     = isCritical ? '#EF4444' : isPendingToday ? '#F59E0B' : '#22C55E'
 
             const momentoHoy = (todaySection?.events ?? [])
               .filter(e => e.type === 'PHOTO' || e.type === 'VOICE_MEMORY')
@@ -3190,108 +3180,18 @@ export default function Dashboard() {
             return (
               <>
                 {/* ══════════════════════════════════════════
-                    HERO — foto paciente full, degradado natural, datos integrados
+                    HERO — CareCard (paleta app: teal/coral emergencia/gold — ver CLAUDE.md)
                     ══════════════════════════════════════════ */}
-                <div
-                  style={{
-                    position: 'relative',
-                    height: 300,
-                    width: '100%',
-                    borderRadius: 24,
-                    overflow: 'hidden',
-                    flexShrink: 0,
-                    background: '#1A3A2A',
-                    cursor: 'pointer',
-                  }}
+                <CareCard
+                  name={patientName.split(' ')[0]}
+                  photoUrl={profilePhoto}
+                  status={isCritical ? 'critical' : isPendingToday ? 'warning' : 'ok'}
+                  medsUpToDate={pendingCount === 0}
+                  routineUpToDate={actividadHoy.some(e => e.type === 'CARE_LOG')}
+                  familyCount={familyCount}
                   onClick={() => navigate('/paciente/perfil')}
-                >
-                  {/* 1. Foto del paciente — ocupa TODO el hero */}
-                  {profilePhoto ? (
-                    <img
-                      src={profilePhoto}
-                      alt=""
-                      style={{
-                        position: 'absolute', inset: 0,
-                        width: '100%', height: '100%',
-                        objectFit: 'cover',
-                        objectPosition: 'center top',
-                        display: 'block',
-                      }}
-                    />
-                  ) : (
-                    <div style={{
-                      position: 'absolute', inset: 0,
-                      background: 'linear-gradient(135deg, #0B4F4A 0%, #143C32 100%)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 64, color: 'rgba(255,255,255,0.3)', fontWeight: 700, fontFamily: 'Georgia, serif',
-                    }}>
-                      {(patientName.charAt(0) || '?').toUpperCase()}
-                    </div>
-                  )}
-
-                  {/* 2. Degradado suave — de transparente arriba a crema abajo */}
-                  <div style={{
-                    position: 'absolute', inset: 0,
-                    background: 'linear-gradient(to bottom, rgba(0,0,0,0.02) 0%, transparent 25%, rgba(10,30,25,0.3) 55%, rgba(10,30,25,0.72) 100%)',
-                    pointerEvents: 'none',
-                  }} />
-
-                  {/* 3. Información directamente encima del degradado */}
-                  <div style={{
-                    position: 'absolute', bottom: 0, left: 0, right: 0,
-                    padding: '0 20px 24px',
-                    zIndex: 2,
-                  }}>
-                    <p style={{ margin: '0 0 4px', fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.7)' }}>
-                      {timeGreeting}, {firstName} {timeIcon}
-                    </p>
-                    <p style={{ margin: '0 0 8px', fontSize: 30, fontWeight: 700, color: 'white', fontFamily: 'Georgia, serif', lineHeight: 1.05, letterSpacing: '-0.02em', textShadow: '0 2px 16px rgba(0,0,0,0.3)' }}>
-                      {patientName.split(' ')[0]}
-                    </p>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-                      <span style={{
-                        display: 'inline-flex', alignItems: 'center', gap: 5,
-                        padding: '4px 10px', borderRadius: 999,
-                        background: statusBg,
-                        fontSize: 11, fontWeight: 600, color: statusColor,
-                      }}>
-                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: dotColor }} />
-                        {statusLabel}
-                      </span>
-                      {lastUpdatedAgo && (
-                        <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)' }}>⏱ {lastUpdatedAgo}</span>
-                      )}
-                    </div>
-                    <div
-                      onClick={e => { e.stopPropagation(); setShowFamilySwitcher(true) }}
-                      style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10 }}
-                    >
-                      <div style={{ display: 'flex' }}>
-                        {familyMembers.slice(0, 4).map((m, i) => {
-                          const nm = m.full_name?.trim() || m.email?.split('@')[0] || '?'
-                          const colors = ['#2F6B4F', '#D99A18', '#7A659C', '#E58B73']
-                          return (
-                            <div key={m.id} style={{
-                              width: 24, height: 24, borderRadius: '50%',
-                              background: colors[i % 4],
-                              border: '2px solid rgba(255,255,255,0.6)',
-                              display: 'flex', alignItems: 'center', justifyContent: 'center',
-                              fontSize: 9, fontWeight: 700, color: 'white',
-                              marginLeft: i > 0 ? -7 : 0, position: 'relative', zIndex: 10 - i,
-                            }}>
-                              {nm.charAt(0).toUpperCase()}
-                            </div>
-                          )
-                        })}
-                      </div>
-                      {familyMembers.length > 0 && (
-                        <p style={{ margin: 0, fontSize: 10, color: 'rgba(255,255,255,0.7)', fontWeight: 500 }}>
-                          {familyCount} persona{familyCount !== 1 ? 's' : ''} cuidando juntas
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </div>
+                  onFamilyClick={() => setShowFamilySwitcher(true)}
+                />
 
                 {/* ══ SUMMARY CARDS — 3 columnas premium ══ */}
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>

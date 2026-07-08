@@ -45,16 +45,28 @@ arquitectura de componentes.
 Si algo de esto se rompió → corregir antes de entregar.
 
 ## Design tokens (fuente de verdad)
-- Fondo: crema #F8F4ED · Header claro vía isLightHeader en Layout.jsx
-- Cards: blanco, borderRadius 16-20px, sombra suave
-- Acentos: coral #E9826E (activos/CTAs)
-- VERDE VIVO (protagonista, acción): #0d6b63 — botones primarios, links, CTAs, estados activos, cifras, iconos de acción, degradados
-- VERDE PETRÓLEO (estructura): #143C32 — títulos, texto, wordmark, fondos oscuros (nav/paneles) donde el contraste manda
-- GOLD (acento terciario, uso limitado): #D99A18 — solo para warnings suaves y categorización de íconos; nunca para CTAs ni superficies
-- Textos: #143C32 títulos, #6B7280 secundarios
-- Chips: activo coral con texto #143C32, inactivo transparente borde #EDE5D8
+
+⚠️ **REBRAND paleta app (2026-07-08):** paleta reemplazada de forma
+permanente. **Verde petróleo `#143C32` queda DESCONTINUADO — no usar en
+ningún lugar nuevo.** Motivo: rebrand aprobado para darle a la app
+(Dashboard) una identidad propia — más cálida, humana y menos
+"corporativa" — distinta de la paleta anterior. Verde vivo `#0d6b63`
+también queda superado: su rol de color protagonista/acción lo hereda el
+teal principal.
+
+- Fondo: crema `#F8F4ED` (sin cambio) · Header claro vía isLightHeader en Layout.jsx
+- Cards: blanco, borderRadius 16-24px, sombra suave
+- **Teal principal `#087F70`** — cuidado/confianza, estado "todo bien", botones primarios, CTAs, estados activos, iconos de acción, degradados
+- **Teal claro `#A8E5D6`** — degradados (siempre en pareja con teal principal), fondos suaves
+- **Coral acción `#E9826E`** (sin cambio) — marca/amor, alertas moderadas
+- **Coral emergencia `#D9534F`** (NUEVO) — urgencia real; distinto del coral de acción, solo para estados críticos genuinos (ej. "Requiere seguimiento")
+- Melocotón `#FBEAE4` (sin cambio) — fondo de atención suave
+- Gold `#D99A18` (sin cambio, acento terciario, uso limitado) — recuerdos/momentos especiales, warnings suaves, categorización de íconos; nunca para CTAs ni superficies
+- **Morado IA `#7566D8`** (NUEVO, EXCLUSIVO) — solo Milo/Luna e "Inteligencia FamiliaCerca"; NO usar en estados, alertas ni navegación
+- Textos: `#334155` gris texto (reemplaza a petróleo como color de texto/títulos), `#6B7280` secundarios (sin cambio)
+- Chips: activo coral con texto `#334155`, inactivo transparente borde `#EDE5D8`
 - Colores semánticos (danger/estados de dosis) NO se tocan: son información
-- Referencias de migración: Chat ed8e21d, Historial 7d6fb81, VideoCall a09b5e1
+- Referencias de migración: Chat ed8e21d, Historial 7d6fb81, VideoCall a09b5e1, CareCard/rebrand app 2026-07-08
 
 ## Arquitectura conceptual del producto
 
