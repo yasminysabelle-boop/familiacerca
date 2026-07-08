@@ -56,13 +56,13 @@ export default function CareCard({
           <div style={{
             width: 96, height: 96, borderRadius: '22px', flexShrink: 0,
             border: '3px solid rgba(255,255,255,0.85)',
-            overflow: 'hidden', background: 'rgba(255,255,255,0.25)',
+            overflow: 'hidden', background: photoUrl ? 'rgba(255,255,255,0.25)' : 'rgba(8,127,112,0.90)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
             {photoUrl ? (
               <img src={photoUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
             ) : (
-              <span style={{ fontFamily: SERIF, fontSize: 26, fontWeight: 700, color: 'white' }}>
+              <span style={{ fontFamily: SERIF, fontSize: 44, fontWeight: 700, color: '#FFFFFF', lineHeight: 1 }}>
                 {(name?.charAt(0) || '?').toUpperCase()}
               </span>
             )}
