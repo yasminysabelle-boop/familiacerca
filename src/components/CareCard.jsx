@@ -39,7 +39,7 @@ export default function CareCard({
         position: 'relative',
         borderRadius: 24,
         overflow: 'hidden',
-        background: `linear-gradient(135deg, ${TEAL_LIGHT} 0%, ${TEAL} 100%)`,
+        background: 'linear-gradient(148deg, #12A18C 0%, #0A8072 46%, #055C51 100%)',
         padding: '28px 24px',
         cursor: onClick ? 'pointer' : 'default',
         WebkitTapHighlightColor: 'transparent',
