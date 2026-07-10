@@ -1,17 +1,37 @@
-import { Heart } from './Icons'
+import { Heart, Pill, Calendar, Users } from './Icons'
 
 const TEAL            = '#087F70'
 const TEAL_LIGHT       = '#A8E5D6'
 const CORAL_EMERGENCY  = '#D9534F'
+const CORAL_HEART      = '#F5836E'
 const GOLD             = '#D99A18'
 
 const SERIF = "'Fraunces', Georgia, serif"
 const SANS  = "'Plus Jakarta Sans', system-ui, sans-serif"
 
 const STATUS = {
-  ok:       { emoji: '✅', label: 'Todo bajo control',    color: TEAL },
-  warning:  { emoji: '🟡', label: 'Atención necesaria',   color: GOLD },
-  critical: { emoji: '🔴', label: 'Requiere seguimiento', color: CORAL_EMERGENCY },
+  ok:       { label: 'Todo bajo control',    dot: '#7BE0A0', glow: 'rgba(123,224,160,.28)' },
+  warning:  { label: 'Atención necesaria',   dot: '#FBBF24', glow: 'rgba(251,191,36,.28)' },
+  critical: { label: 'Requiere seguimiento', dot: CORAL_EMERGENCY, glow: 'rgba(217,83,79,.28)' },
+}
+
+function StatItem({ icon, label, sub, last = false, onClick }) {
+  return (
+    <>
+      <div
+        onClick={onClick}
+        style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 5, cursor: onClick ? 'pointer' : 'default' }}
+      >
+        <span style={{ flex: 'none', width: 28, height: 28, borderRadius: '50%', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          {icon}
+        </span>
+        <span style={{ minWidth: 0, color: '#fff', fontSize: 10, fontWeight: 600, lineHeight: 1.25, letterSpacing: '-0.01em', fontFamily: SANS }}>
+          {label}<br /><span style={{ fontWeight: 400, color: 'rgba(255,255,255,0.8)' }}>{sub}</span>
+        </span>
+      </div>
+      {!last && <div style={{ flex: 'none', width: 1, height: 32, background: 'rgba(255,255,255,0.16)', margin: '0 3px' }} />}
+    </>
+  )
 }
 
 // CareCard — tarjeta genérica de familiar/paciente (paleta de marca app)
@@ -37,25 +57,33 @@ export default function CareCard({
       onClick={onClick}
       style={{
         position: 'relative',
-        borderRadius: 24,
+        borderRadius: 30,
         overflow: 'hidden',
         background: 'linear-gradient(148deg, #12A18C 0%, #0A8072 46%, #055C51 100%)',
-        padding: '28px 24px',
+        boxShadow: '0 22px 44px -18px rgba(6,90,80,0.6)',
+        padding: '24px 18px 20px',
         cursor: onClick ? 'pointer' : 'default',
         WebkitTapHighlightColor: 'transparent',
       }}
     >
       {/* Marca de agua — corazón grande y sutil */}
-      <div style={{ position: 'absolute', top: -44, right: -44, opacity: 0.22, pointerEvents: 'none' }}>
-        <Heart size={200} color="white" filled />
+      <div style={{ position: 'absolute', top: -40, right: -40, opacity: 0.14, pointerEvents: 'none' }}>
+        <Heart size={220} color="white" filled />
       </div>
+      {/* Menú de puntos decorativo */}
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff" style={{ position: 'absolute', right: 18, top: 20, opacity: 0.5 }}>
+        <circle cx="8" cy="6" r="1.7" /><circle cx="16" cy="6" r="1.7" />
+        <circle cx="8" cy="12" r="1.7" /><circle cx="16" cy="12" r="1.7" />
+        <circle cx="8" cy="18" r="1.7" /><circle cx="16" cy="18" r="1.7" />
+      </svg>
 
-      <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', gap: 18 }}>
+      <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', gap: 0 }}>
         {/* Foto circular + nombre */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+        <div style={{ display: 'flex', gap: 18 }}>
           <div style={{
-            width: 96, height: 96, borderRadius: '22px', flexShrink: 0,
-            border: '3px solid rgba(255,255,255,0.85)',
+            flex: 'none', width: 106, height: 106, borderRadius: '50%',
+            border: '3px solid rgba(255,255,255,0.55)',
+            boxShadow: '0 8px 20px rgba(0,0,0,0.22)',
             overflow: 'hidden', background: photoUrl ? 'rgba(255,255,255,0.25)' : 'rgba(8,127,112,0.90)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
@@ -67,42 +95,47 @@ export default function CareCard({
               </span>
             )}
           </div>
-          <div style={{ minWidth: 0 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <h2 style={{ margin: 0, fontFamily: SERIF, fontSize: 26, fontWeight: 700, color: 'white', lineHeight: 1.1 }}>
+          <div style={{ flex: 1, minWidth: 0, paddingTop: 2 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+              <h2 style={{ margin: 0, fontFamily: SERIF, fontSize: 31, fontWeight: 600, color: 'white', letterSpacing: '-0.01em', lineHeight: 1 }}>
                 {name}
               </h2>
-              <Heart size={18} color="white" filled />
+              <Heart size={24} color={CORAL_HEART} filled />
             </div>
-            <p style={{ margin: '4px 0 0', fontFamily: SANS, fontSize: 13, color: 'rgba(255,255,255,0.88)', lineHeight: 1.4 }}>
+            <p style={{ margin: '9px 0 0', fontFamily: SANS, fontSize: 16, fontWeight: 500, color: 'rgba(255,255,255,0.94)', lineHeight: 1.32, maxWidth: 200 }}>
               {moodText || defaultMood}
             </p>
+            <span style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8, width: 'fit-content',
+              marginTop: 13, padding: '6px 13px 6px 10px', borderRadius: 999, background: 'rgba(255,255,255,0.14)',
+            }}>
+              <span style={{ width: 11, height: 11, borderRadius: '50%', background: s.dot, boxShadow: `0 0 0 4px ${s.glow}` }} />
+              <span style={{ fontFamily: SANS, color: '#fff', fontSize: 14, fontWeight: 600 }}>{s.label}</span>
+            </span>
           </div>
         </div>
 
-        {/* Estado emocional — texto humano, no porcentaje */}
-        <span style={{
-          display: 'inline-flex', alignItems: 'center', gap: 6, width: 'fit-content',
-          padding: '5px 12px', borderRadius: 999, background: 'rgba(255,255,255,0.92)',
-          fontFamily: SANS, fontSize: 12, fontWeight: 700, color: s.color,
-        }}>
-          <span>{s.emoji}</span> {s.label}
-        </span>
+        <div style={{ height: 1, background: 'rgba(255,255,255,0.16)', margin: '20px 0 16px' }} />
 
-        {/* Checklist */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
-          <p style={{ margin: 0, fontFamily: SANS, fontSize: 13, color: 'white', display: 'flex', alignItems: 'center', gap: 7 }}>
-            <span style={{ opacity: medsUpToDate ? 1 : 0.45 }}>✓</span> Medicamentos al día
-          </p>
-          <p style={{ margin: 0, fontFamily: SANS, fontSize: 13, color: 'white', display: 'flex', alignItems: 'center', gap: 7 }}>
-            <span style={{ opacity: routineUpToDate ? 1 : 0.45 }}>✓</span> Rutina al día
-          </p>
-          <p
+        {/* 3 stats en columnas */}
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <StatItem
+            icon={<Pill size={16} color={TEAL} strokeWidth={2} />}
+            label="Medicamentos"
+            sub={medsUpToDate ? 'al día' : 'pendiente'}
+          />
+          <StatItem
+            icon={<Calendar size={15} color={TEAL} strokeWidth={2} />}
+            label="Rutina"
+            sub={routineUpToDate ? 'al día' : 'pendiente'}
+          />
+          <StatItem
+            icon={<Users size={16} color={TEAL} strokeWidth={1.9} />}
+            label="Familia"
+            sub={familyCount > 0 ? `${familyCount} conectado${familyCount === 1 ? '' : 's'}` : 'sin conectar'}
             onClick={onFamilyClick ? (e) => { e.stopPropagation(); onFamilyClick() } : undefined}
-            style={{ margin: 0, fontFamily: SANS, fontSize: 13, color: 'white', display: 'flex', alignItems: 'center', gap: 7, cursor: onFamilyClick ? 'pointer' : 'inherit', width: 'fit-content' }}
-          >
-            <span>👥</span> {familyCount} familiar{familyCount === 1 ? '' : 'es'} conectado{familyCount === 1 ? '' : 's'}
-          </p>
+            last
+          />
         </div>
       </div>
     </div>

@@ -251,7 +251,7 @@ export default function Layout({ children }) {
         }}>
           {/* Inicio */}
           <Link to="/dashboard" style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, textDecoration: 'none' }}>
-            <span style={{ width: 36, height: 36, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: location.pathname === '/dashboard' ? '#087F70' : 'transparent' }}>
+            <span style={{ width: location.pathname === '/dashboard' ? 52 : 36, height: 32, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: location.pathname === '/dashboard' ? '#087F70' : 'transparent', transition: 'width 0.15s ease' }}>
               <Home size={18} color={location.pathname === '/dashboard' ? 'white' : '#7C8698'} strokeWidth={2} />
             </span>
             <span style={{ fontSize: 10, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: location.pathname === '/dashboard' ? '#087F70' : '#7C8698' }}>Inicio</span>
@@ -259,7 +259,7 @@ export default function Layout({ children }) {
 
           {/* Chat */}
           <Link to="/chat" style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, textDecoration: 'none' }}>
-            <span style={{ position: 'relative', width: 36, height: 36, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: location.pathname === '/chat' ? '#087F70' : 'transparent' }}>
+            <span style={{ position: 'relative', width: location.pathname === '/chat' ? 52 : 36, height: 32, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: location.pathname === '/chat' ? '#087F70' : 'transparent', transition: 'width 0.15s ease' }}>
               <Chat size={18} color={location.pathname === '/chat' ? 'white' : '#7C8698'} strokeWidth={2} />
               {familyBadge > 0 && (
                 <span style={{ position: 'absolute', top: 0, right: 0, width: 7, height: 7, borderRadius: '50%', background: '#D99A18', display: 'block' }} />
@@ -270,7 +270,7 @@ export default function Layout({ children }) {
 
           {/* Historial */}
           <Link to="/historial" style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, textDecoration: 'none' }}>
-            <span style={{ width: 36, height: 36, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: location.pathname === '/historial' ? '#087F70' : 'transparent' }}>
+            <span style={{ width: location.pathname === '/historial' ? 52 : 36, height: 32, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: location.pathname === '/historial' ? '#087F70' : 'transparent', transition: 'width 0.15s ease' }}>
               <ClipboardList size={18} color={location.pathname === '/historial' ? 'white' : '#7C8698'} strokeWidth={2} />
             </span>
             <span style={{ fontSize: 10, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: location.pathname === '/historial' ? '#087F70' : '#7C8698' }}>Historial</span>
@@ -278,7 +278,7 @@ export default function Layout({ children }) {
 
           {/* Medicamentos */}
           <button onClick={() => navigate('/medications')} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, background: 'none', border: 'none', cursor: 'pointer', padding: 0, WebkitTapHighlightColor: 'transparent' }}>
-            <span style={{ width: 36, height: 36, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: location.pathname === '/medications' ? '#087F70' : 'transparent' }}>
+            <span style={{ width: location.pathname === '/medications' ? 52 : 36, height: 32, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: location.pathname === '/medications' ? '#087F70' : 'transparent', transition: 'width 0.15s ease' }}>
               <Pill size={18} color={location.pathname === '/medications' ? 'white' : '#7C8698'} strokeWidth={2} />
             </span>
             <span style={{ fontSize: 10, fontWeight: 700, color: location.pathname === '/medications' ? '#087F70' : '#7C8698' }}>Medicamentos</span>
@@ -286,7 +286,7 @@ export default function Layout({ children }) {
 
           {/* Mi cuenta */}
           <Link to="/ajustes" style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, textDecoration: 'none' }}>
-            <span style={{ width: 36, height: 36, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: location.pathname === '/ajustes' ? '#087F70' : 'transparent' }}>
+            <span style={{ width: location.pathname === '/ajustes' ? 52 : 36, height: 32, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: location.pathname === '/ajustes' ? '#087F70' : 'transparent', transition: 'width 0.15s ease' }}>
               <User size={18} color={location.pathname === '/ajustes' ? 'white' : '#7C8698'} strokeWidth={2} />
             </span>
             <span style={{ fontSize: 10, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: location.pathname === '/ajustes' ? '#087F70' : '#7C8698' }}>Mi cuenta</span>

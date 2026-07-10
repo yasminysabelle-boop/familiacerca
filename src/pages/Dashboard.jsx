@@ -1748,34 +1748,35 @@ function QuickCard({ emoji, label, subtitle, statusColor, onClick, index, size =
 
 function AttentionCard({ medName, medDosage, medTime, windowLabel, onConfirm }) {
   return (
-    <section aria-label="Necesita tu atención" style={{ background: '#FBEAE4', borderRadius: 24, overflow: 'hidden', boxShadow: '0 2px 12px rgba(20,35,30,0.05)' }}>
+    <section aria-label="Necesita tu atención" style={{ background: '#FBEAE4', borderRadius: 26, overflow: 'hidden', boxShadow: '0 8px 24px -12px rgba(233,130,110,0.45)' }}>
       <div style={{ padding: '18px 18px 20px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-          <Bell size={18} color="#E9826E" strokeWidth={2} />
-          <h2 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#E9826E' }}>Necesita tu atención</h2>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 16 }}>
+          <Bell size={19} color="#E9826E" strokeWidth={2} />
+          <h2 style={{ margin: 0, fontFamily: "'Fraunces', Georgia, serif", fontSize: 18, fontWeight: 600, color: '#E9826E' }}>Necesita tu atención</h2>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <span style={{ width: 56, height: 56, borderRadius: '50%', background: 'rgba(233,130,110,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <Pill size={24} color="#E9826E" strokeWidth={2} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <span style={{ width: 70, height: 70, borderRadius: '50%', background: 'rgba(233,130,110,0.16)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <Pill size={34} color="#E9826E" strokeWidth={1.8} />
           </span>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <p style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#334155', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{medName}{medDosage ? ` ${medDosage}` : ''}</p>
-            <p style={{ margin: '4px 0 0', display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 500, color: '#334155' }}>
-              <Clock size={12} color="#7C8698" strokeWidth={2} /> Hoy {medTime}
+            <p style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#334155', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{medName}{medDosage ? ` ${medDosage}` : ''}</p>
+            <p style={{ margin: '6px 0 0', display: 'flex', alignItems: 'center', gap: 6, fontSize: 14, fontWeight: 600, color: '#64748B' }}>
+              <Clock size={15} color="#64748B" strokeWidth={2} /> Hoy {medTime}
             </p>
-            <p style={{ margin: '4px 0 0', display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 500, color: '#E9826E' }}>
-              <AlertTriangle size={12} color="#E9826E" strokeWidth={2} /> Pendiente de confirmar
+            <p style={{ margin: '5px 0 0', display: 'flex', alignItems: 'center', gap: 6, fontSize: 13.5, fontWeight: 600, color: '#E9826E' }}>
+              <AlertTriangle size={13} color="#E9826E" strokeWidth={2.4} /> Pendiente de confirmar
             </p>
           </div>
-          <button onClick={onConfirm} style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 5, borderRadius: 999, background: '#E9826E', padding: '11px 16px', border: 'none', cursor: 'pointer', color: 'white', fontWeight: 700, fontSize: 13, boxShadow: '0 4px 14px rgba(233,130,110,0.35)', WebkitTapHighlightColor: 'transparent' }}>
-            Confirmar <CheckIcon size={14} color="white" strokeWidth={2.5} />
+          <button onClick={onConfirm} style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 7, borderRadius: 15, background: '#E9826E', padding: '13px 17px', border: 'none', cursor: 'pointer', color: 'white', fontWeight: 700, fontSize: 14.5, boxShadow: '0 8px 18px -6px rgba(233,130,110,0.7)', WebkitTapHighlightColor: 'transparent' }}>
+            Confirmar <CheckIcon size={17} color="white" strokeWidth={2.6} />
           </button>
         </div>
       </div>
       {windowLabel && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, borderTop: '1px solid rgba(233,130,110,0.18)', background: 'rgba(255,255,255,0.5)', padding: '11px 18px' }}>
-          <Clock size={13} color="#7C8698" strokeWidth={2} />
-          <span style={{ fontSize: 12, fontWeight: 500, color: '#7C8698' }}>Ventana: {windowLabel}</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, borderTop: '1px solid rgba(233,130,110,0.25)', padding: '13px 18px' }}>
+          <Calendar size={15} color="#64748B" strokeWidth={1.9} />
+          <span style={{ flex: 1, fontSize: 13.5, fontWeight: 600, color: '#64748B' }}>Ventana: {windowLabel}</span>
+          <ChevronRight size={18} color="#C9A597" strokeWidth={2.2} />
         </div>
       )}
     </section>
@@ -1784,12 +1785,12 @@ function AttentionCard({ medName, medDosage, medTime, windowLabel, onConfirm }) 
 
 function RecentActivity({ items, onViewAll, onSelect, firstName }) {
   return (
-    <section aria-label="Actividad reciente" style={{ borderRadius: 24, background: 'white', padding: 20, boxShadow: '0 12px 34px rgba(20,35,30,0.07)' }}>
+    <section aria-label="Actividad reciente" style={{ borderRadius: 26, background: 'white', padding: 20, boxShadow: '0 6px 24px -12px rgba(51,65,85,0.18)' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-        <h2 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 8, fontSize: 15, fontWeight: 700, color: '#334155' }}>
-          <Heart size={18} color="#087F70" strokeWidth={2} /> Actividad reciente
+        <h2 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 9, fontFamily: "'Fraunces', Georgia, serif", fontSize: 18, fontWeight: 600, color: '#334155' }}>
+          <Heart size={19} color="#087F70" strokeWidth={2} /> Actividad reciente
         </h2>
-        <button onClick={onViewAll} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: '#087F70', fontWeight: 700, padding: 0, WebkitTapHighlightColor: 'transparent' }}>Ver todo</button>
+        <button onClick={onViewAll} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, color: '#087F70', fontWeight: 700, padding: 0, WebkitTapHighlightColor: 'transparent' }}>Ver todo</button>
       </div>
       {items.length === 0 ? (
         <div style={{ padding: '6px 0 2px' }}>
@@ -1799,7 +1800,7 @@ function RecentActivity({ items, onViewAll, onSelect, firstName }) {
           </p>
         </div>
       ) : (
-        <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column' }}>
           {items.map((evt, i) => {
             const actor = (evt.confirmedBy ?? evt.uploaderName ?? evt.recorderName ?? evt.authorName ?? firstName ?? 'Alguien').split(' ')[0]
             const HUMAN = {
@@ -1816,27 +1817,29 @@ function RecentActivity({ items, onViewAll, onSelect, firstName }) {
             const isNote = evt.type === 'NOTE'
             const time = evt.timestamp ? timeAgo(evt.timestamp instanceof Date ? evt.timestamp : new Date(evt.timestamp)) : ''
             const avatarLetter = actor.charAt(0).toUpperCase()
+            const isFirst = i === 0
+            const isLast = i === items.length - 1
             return (
-              <li key={evt.id ?? i} onClick={() => onSelect?.(evt)} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, cursor: onSelect ? 'pointer' : 'default' }}>
-                <span style={{ width: 40, height: 40, borderRadius: '50%', flexShrink: 0, background: 'linear-gradient(135deg, #A8E5D6, #087F70)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: 15 }}>
+              <li key={evt.id ?? i} onClick={() => onSelect?.(evt)} style={{ display: 'flex', alignItems: 'flex-start', gap: 13, padding: `${isFirst ? 0 : 13}px 0 ${isLast ? 0 : 13}px`, borderBottom: isLast ? 'none' : '1px solid #EEF2F6', cursor: onSelect ? 'pointer' : 'default' }}>
+                <span style={{ width: 44, height: 44, borderRadius: '50%', flexShrink: 0, background: 'linear-gradient(135deg, #A8E5D6, #087F70)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: 16 }}>
                   {avatarLetter}
                 </span>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ margin: 0, fontSize: 14, color: '#334155', lineHeight: 1.4 }}>
+                  <p style={{ margin: 0, fontSize: 15, color: '#334155', lineHeight: 1.3 }}>
                     <span style={{ fontWeight: 700 }}>{actor}</span> {meta.text}
                   </p>
                   {meta.sub && (
-                    <p style={{ margin: '2px 0 0', fontSize: 13, fontStyle: isNote ? 'italic' : 'normal', color: '#7C8698', lineHeight: 1.4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{isNote ? `"${meta.sub}"` : meta.sub}</p>
+                    <p style={{ margin: '3px 0 0', fontSize: 14, fontStyle: isNote ? 'italic' : 'normal', color: isNote ? '#475569' : '#94A3B8', lineHeight: 1.4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{isNote ? `"${meta.sub}"` : meta.sub}</p>
                   )}
-                  <p style={{ margin: '2px 0 0', fontSize: 11, color: '#7C8698' }}>{time}</p>
+                  <p style={{ margin: '3px 0 0', fontSize: 13, color: '#94A3B8', fontWeight: 600 }}>{time}</p>
                 </div>
                 {isNote ? (
-                  <span style={{ width: 30, height: 30, borderRadius: '50%', flexShrink: 0, background: '#F1F0EE', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Chat size={14} color="#7C8698" strokeWidth={2} />
+                  <span style={{ width: 32, height: 32, borderRadius: '50%', flexShrink: 0, background: '#EEF2F6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Chat size={16} color="#94A3B8" strokeWidth={1.9} />
                   </span>
                 ) : (
-                  <span style={{ width: 30, height: 30, borderRadius: '50%', flexShrink: 0, background: 'rgba(168,229,214,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <CheckIcon size={14} color="#087F70" strokeWidth={2.5} />
+                  <span style={{ width: 32, height: 32, borderRadius: '50%', flexShrink: 0, background: '#E3F4EF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <CheckIcon size={16} color="#087F70" strokeWidth={2.6} />
                   </span>
                 )}
               </li>
@@ -1850,18 +1853,21 @@ function RecentActivity({ items, onViewAll, onSelect, firstName }) {
 
 function PetsCard({ onOpen, patientFirstName }) {
   return (
-    <section aria-label="Asistente Milo y Luna" style={{ position: 'relative', overflow: 'hidden', borderRadius: 24, background: 'rgba(117,102,216,0.12)', padding: 16, boxShadow: '0 2px 12px rgba(20,35,30,0.05)' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <img src="/images/milo-luna.webp" alt="Milo el perro y Luna la gata" style={{ width: 88, height: 88, objectFit: 'contain', flexShrink: 0 }} />
+    <section aria-label="Asistente Milo y Luna" onClick={onOpen} style={{ position: 'relative', overflow: 'hidden', borderRadius: 26, background: '#EAE7FA', padding: '16px 18px', boxShadow: '0 8px 24px -12px rgba(117,102,216,0.4)', cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+        <div style={{ flex: 'none', width: 74, height: 66, borderRadius: 16, overflow: 'hidden', background: '#DDD8F5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <img src="/images/milo-luna.webp" alt="Milo el perro y Luna la gata" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#7566D8', lineHeight: 1.3 }}>Milo y Luna están aquí para ayudar</p>
-          <p style={{ margin: '4px 0 0', fontSize: 13, color: '#7C8698', lineHeight: 1.4 }}>
+          <p style={{ margin: 0, fontFamily: "'Fraunces', Georgia, serif", fontSize: 16, fontWeight: 600, color: '#5B4FC0', lineHeight: 1.2 }}>Milo y Luna están aquí para ayudar</p>
+          <p style={{ margin: '4px 0 0', fontSize: 13.5, color: '#6E64A8', lineHeight: 1.3 }}>
             {patientFirstName ? `¿Necesitas algo sobre el cuidado de ${patientFirstName}?` : '¿Necesitas algo sobre el cuidado de tu familiar?'}
           </p>
-          <button onClick={onOpen} style={{ marginTop: 10, display: 'inline-flex', alignItems: 'center', gap: 6, borderRadius: 999, background: '#7566D8', padding: '9px 16px', border: 'none', cursor: 'pointer', color: 'white', fontWeight: 700, fontSize: 13, boxShadow: '0 4px 14px rgba(117,102,216,0.35)', WebkitTapHighlightColor: 'transparent' }}>
-            <MessageCircle size={15} color="white" strokeWidth={2} /> Hablar con Milo y Luna
+          <button onClick={(e) => { e.stopPropagation(); onOpen() }} style={{ marginTop: 11, display: 'inline-flex', alignItems: 'center', gap: 8, borderRadius: 999, background: '#7566D8', padding: '10px 16px', border: 'none', cursor: 'pointer', color: 'white', fontWeight: 700, fontSize: 13.5, boxShadow: '0 8px 16px -6px rgba(117,102,216,0.6)', WebkitTapHighlightColor: 'transparent' }}>
+            <MessageCircle size={16} color="white" strokeWidth={2} /> Hablar con Milo y Luna
           </button>
         </div>
+        <ChevronRight size={20} color="#8E82D6" strokeWidth={2.2} />
       </div>
     </section>
   )
@@ -3326,41 +3332,38 @@ export default function Dashboard() {
                 <PetsCard onOpen={() => setShowCompanion(true)} patientFirstName={patientName.split(' ')[0]} />
 
                 {/* ════════════════════════════════════
-                    PANEL CANVAS — Acciones rápidas + Más herramientas
-                    (piloto — envuelve ambas secciones en un panel coral suave)
+                    ACCIONES RÁPIDAS + MÁS HERRAMIENTAS — directo sobre el fondo crema
                     ════════════════════════════════════ */}
-                <div style={{ background: '#FBEAE4', borderRadius: 36, padding: '22px 20px', display: 'flex', flexDirection: 'column', gap: 24 }}>
-
                 <div>
-                  <p style={{ margin: '0 0 12px', display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 600, color: '#334155' }}>
-                    <Zap size={16} color="#087F70" filled /> Acciones rápidas
+                  <p style={{ margin: '0 0 14px', display: 'flex', alignItems: 'center', gap: 9, fontFamily: "'Fraunces', Georgia, serif", fontSize: 18, fontWeight: 600, color: '#334155' }}>
+                    <Zap size={18} color="#087F70" filled /> Acciones rápidas
                   </p>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 11 }}>
                     {[
-                      { Icon: Pill,          label: 'Medicamentos', onClick: () => navigate('/medications'),  circleBg: '#EFF6F0', iconColor: '#087F70' },
-                      { Icon: Siren,         label: 'Emergencia',   onClick: prepareSOS,                      circleBg: 'rgba(217,83,79,0.12)', iconColor: '#D9534F' },
-                      { Icon: MessageCircle, label: 'Chat familiar', onClick: () => navigate('/chat'),        circleBg: '#EFF6F0', iconColor: '#087F70' },
-                      { Icon: Video,         label: 'Videollamada', onClick: () => navigate('/videollamada'), circleBg: '#EFF6F0', iconColor: '#087F70' },
-                    ].map(({ Icon, label, onClick, circleBg, iconColor }) => (
+                      { Icon: Pill,          label: 'Medicamentos', onClick: () => navigate('/medications'),  circleBg: '#E3F4EF', iconColor: '#087F70', bold: false },
+                      { Icon: Siren,         label: 'Emergencia',   onClick: prepareSOS,                      circleBg: 'rgba(217,83,79,0.12)', iconColor: '#D9534F', bold: true },
+                      { Icon: MessageCircle, label: 'Chat familiar', onClick: () => navigate('/chat'),        circleBg: '#E3F4EF', iconColor: '#087F70', bold: false },
+                      { Icon: Video,         label: 'Videollamada', onClick: () => navigate('/videollamada'), circleBg: '#E3F4EF', iconColor: '#087F70', bold: false },
+                    ].map(({ Icon, label, onClick, circleBg, iconColor, bold }) => (
                       <button
                         key={label} onClick={onClick}
                         style={{
-                          background: 'white', border: 'none',
-                          borderRadius: 16, padding: '12px 6px', cursor: 'pointer',
-                          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
-                          boxShadow: '0 4px 12px rgba(20,35,30,0.08)',
+                          background: 'white', border: '1px solid rgba(51,65,85,0.05)',
+                          borderRadius: 20, padding: '15px 6px 12px', cursor: 'pointer',
+                          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 9,
+                          boxShadow: '0 5px 18px -10px rgba(51,65,85,0.18)',
                           WebkitTapHighlightColor: 'transparent',
                         }}
                       >
                         <span style={{
-                          width: 40, height: 40, borderRadius: '50%',
+                          width: 44, height: 44, borderRadius: 14,
                           background: circleBg,
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                           flexShrink: 0,
                         }}>
-                          <Icon size={20} color={iconColor} strokeWidth={2} />
+                          <Icon size={23} color={iconColor} strokeWidth={1.9} />
                         </span>
-                        <span style={{ fontSize: 11, fontWeight: 500, color: '#334155', lineHeight: 1.2, textAlign: 'center' }}>{label}</span>
+                        <span style={{ fontSize: 11, fontWeight: bold ? 700 : 600, color: bold ? '#334155' : '#475569', lineHeight: 1.2, textAlign: 'center' }}>{label}</span>
                       </button>
                     ))}
                   </div>
@@ -3395,32 +3398,32 @@ export default function Dashboard() {
                   ]
                   return (
                     <div>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-                        <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: '#143C32', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Más herramientas</p>
-                        <button onClick={() => setShowMoreTools(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: '#E9826E', fontWeight: 700, padding: 0, WebkitTapHighlightColor: 'transparent' }}>Ver todas →</button>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+                        <p style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 9, fontFamily: "'Fraunces', Georgia, serif", fontSize: 18, fontWeight: 600, color: '#334155' }}>Más herramientas</p>
+                        <button onClick={() => setShowMoreTools(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, color: '#087F70', fontWeight: 700, padding: 0, WebkitTapHighlightColor: 'transparent' }}>Ver todas</button>
                       </div>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 11 }}>
                         {featuredTools.map(({ Icon, label, onClick, circleBg, iconColor }) => (
                           <button
                             key={label} onClick={onClick}
                             style={{
-                              background: 'white', border: 'none',
-                              borderRadius: 16, padding: '12px 8px', cursor: 'pointer',
+                              background: 'white', border: '1px solid rgba(51,65,85,0.05)',
+                              borderRadius: 20, padding: '15px 6px 12px', cursor: 'pointer',
                               width: '100%', minWidth: 0, boxSizing: 'border-box',
-                              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
-                              boxShadow: '0 4px 12px rgba(20,35,30,0.08)',
+                              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 9,
+                              boxShadow: '0 5px 18px -10px rgba(51,65,85,0.18)',
                               WebkitTapHighlightColor: 'transparent',
                             }}
                           >
                             <span style={{
-                              width: 44, height: 44, borderRadius: '50%',
+                              width: 44, height: 44, borderRadius: 14,
                               background: circleBg,
                               display: 'flex', alignItems: 'center', justifyContent: 'center',
                               flexShrink: 0,
                             }}>
-                              <Icon size={22} color={iconColor} strokeWidth={2} />
+                              <Icon size={22} color={iconColor} strokeWidth={1.9} />
                             </span>
-                            <p style={{ margin: 0, fontSize: 12, fontWeight: 500, color: '#16231F', lineHeight: 1.3, textAlign: 'center' }}>{label}</p>
+                            <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: '#475569', lineHeight: 1.3, textAlign: 'center' }}>{label}</p>
                           </button>
                         ))}
                       </div>
@@ -3436,7 +3439,7 @@ export default function Dashboard() {
                             onClick={e => e.stopPropagation()}
                           >
                             <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(20,60,50,0.15)', margin: '0 auto 20px' }} />
-                            <p style={{ margin: '0 0 16px', fontSize: 18, fontWeight: 700, color: '#143C32' }}>Todas las herramientas</p>
+                            <p style={{ margin: '0 0 16px', fontFamily: "'Fraunces', Georgia, serif", fontSize: 18, fontWeight: 600, color: '#334155' }}>Todas las herramientas</p>
                             {(() => {
                               const cols = 4
                               const remainder = allTools.length % cols
@@ -3447,23 +3450,23 @@ export default function Dashboard() {
                                   key={label}
                                   onClick={() => { setShowMoreTools(false); onClick() }}
                                   style={{
-                                    background: 'white', border: 'none',
-                                    borderRadius: 16, padding: '12px 8px', cursor: 'pointer',
+                                    background: 'white', border: '1px solid rgba(51,65,85,0.05)',
+                                    borderRadius: 20, padding: '15px 6px 12px', cursor: 'pointer',
                                     width: '100%', minWidth: 0, boxSizing: 'border-box',
-                                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
-                                    boxShadow: '0 4px 12px rgba(20,35,30,0.08)',
+                                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 9,
+                                    boxShadow: '0 5px 18px -10px rgba(51,65,85,0.18)',
                                     WebkitTapHighlightColor: 'transparent',
                                   }}
                                 >
                                   <span style={{
-                                    width: 44, height: 44, borderRadius: '50%',
+                                    width: 44, height: 44, borderRadius: 14,
                                     background: circleBg,
                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                                     flexShrink: 0,
                                   }}>
-                                    <Icon size={22} color={iconColor} strokeWidth={2} />
+                                    <Icon size={22} color={iconColor} strokeWidth={1.9} />
                                   </span>
-                                  <p style={{ margin: 0, fontSize: 12, fontWeight: 500, color: '#16231F', lineHeight: 1.3, textAlign: 'center' }}>{label}</p>
+                                  <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: '#475569', lineHeight: 1.3, textAlign: 'center' }}>{label}</p>
                                 </button>
                               )
                               return (
@@ -3485,8 +3488,6 @@ export default function Dashboard() {
                     </div>
                   )
                 })()}
-
-                </div>
               </>
             )
           })()}
