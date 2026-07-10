@@ -66,10 +66,12 @@ export default function CareCard({
         WebkitTapHighlightColor: 'transparent',
       }}
     >
-      {/* Marca de agua — corazón grande y sutil */}
-      <div style={{ position: 'absolute', top: -40, right: -40, opacity: 0.14, pointerEvents: 'none' }}>
-        <Heart size={220} color="white" filled />
-      </div>
+      {/* Marca de agua — logo FamiliaCerca (corazón + 2 personas) */}
+      <svg width="230" height="230" viewBox="0 0 100 100" style={{ position: 'absolute', right: -38, top: 6, opacity: 0.12, pointerEvents: 'none' }} fill="#fff">
+        <path d="M50 88C22 68 8 54 8 34 8 22 17 13 29 13c8 0 15 5 21 13 6-8 13-13 21-13 12 0 21 9 21 21 0 20-14 34-42 54Z" />
+        <circle cx="40" cy="40" r="7" fill="#055C51" /><path d="M28 62c0-8 5-13 12-13s12 5 12 13Z" fill="#055C51" />
+        <circle cx="60" cy="45" r="5.5" fill="#0A8072" /><path d="M50 62c0-7 4-11 10-11s10 4 10 11Z" fill="#0A8072" />
+      </svg>
       {/* Menú de puntos decorativo */}
       <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff" style={{ position: 'absolute', right: 18, top: 20, opacity: 0.5 }}>
         <circle cx="8" cy="6" r="1.7" /><circle cx="16" cy="6" r="1.7" />
