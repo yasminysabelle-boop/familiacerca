@@ -10,7 +10,7 @@ import CareCard from '../components/CareCard'
 import { SkeletonDashSummary, SkeletonCard } from '../components/SkeletonLoader'
 import SuccessAnimation, { useSuccessAnimation } from '../components/SuccessAnimation'
 import { usePullToRefresh } from '../hooks/usePullToRefresh'
-import { AlertTriangle, CheckIcon, User, XIcon, Pill, ClipboardCheck, Chat, Calendar, Receipt, Users, Camera, Clock, BookOpen, MessageCircle, Video, Hospital, Image, Building2, Thermometer, ClipboardList, CheckSquare, Stethoscope, DollarSign, Sparkles, Heart, Bell, ChevronRight, Siren, Zap } from '../components/Icons'
+import { AlertTriangle, CheckIcon, User, XIcon, Pill, ClipboardCheck, Chat, Calendar, Receipt, Users, Camera, Clock, MessageCircle, Video, Hospital, Image, Building2, Heart, Bell, ChevronRight, Siren, Zap } from '../components/Icons'
 import { geminiGenerate } from '../lib/gemini'
 import { CARE_ITEMS } from '../lib/careItems'
 import TrialBanner from '../components/TrialBanner'
@@ -1934,7 +1934,6 @@ export default function Dashboard() {
   // Initialized to today's key so today is expanded; past days start collapsed
   const [expandedDays, setExpandedDays] = useState(() => new Set([new Date().toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' })]))
   const [selectedDayTab, setSelectedDayTab] = useState(() => new Date().toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' }))
-  const [showMoreTools, setShowMoreTools] = useState(false)
   const [showCompanion, setShowCompanion] = useState(false)
   const [showFamilySwitcher, setShowFamilySwitcher] = useState(false)
   const [showNotifSheet, setShowNotifSheet] = useState(false)
@@ -1947,6 +1946,14 @@ export default function Dashboard() {
       refreshSub()
       setSearchParams({}, { replace: true })
       setTimeout(() => setCheckoutSuccess(false), 6000)
+    }
+  }, [])
+
+  // Deep-link from "Todo el cuidado" → Modo emergencia: opens the same SOS confirm flow
+  useEffect(() => {
+    if (searchParams.get('sos') === '1') {
+      setSearchParams({}, { replace: true })
+      prepareSOS()
     }
   }, [])
 
@@ -3370,26 +3377,9 @@ export default function Dashboard() {
                 </div>
 
                 {/* ════════════════════════════════════
-                    MÁS HERRAMIENTAS — 4 + Ver todas
+                    TODO EL CUIDADO — 4 destacadas + Ver todas → /mas
                     ════════════════════════════════════ */}
                 {(() => {
-                  const allTools = [
-                    { Icon: Users,         label: 'Equipo',        onClick: () => navigate('/familia'),                circleBg: '#EFF6F0', iconColor: '#0d6b63' },
-                    { Icon: Building2,     label: 'Hospital',      onClick: () => setShowHospitalModal(true),          circleBg: '#FEF0ED', iconColor: '#E9826E' },
-                    { Icon: Calendar,      label: 'Citas',         onClick: () => navigate('/calendar'),               circleBg: '#FFF8EC', iconColor: '#D99A18' },
-                    { Icon: Image,         label: 'Álbum',         onClick: () => navigate('/album'),                  circleBg: '#FEF0ED', iconColor: '#E9826E' },
-                    { Icon: Video,         label: 'Videollamada',  onClick: () => setShowVideoCallModal(true),         circleBg: '#EFF6F0', iconColor: '#0d6b63' },
-                    { Icon: MessageCircle, label: 'Chat',          onClick: () => navigate('/chat'),                   circleBg: '#EFF6F0', iconColor: '#0d6b63' },
-                    { Icon: Thermometer,   label: 'Síntomas',      onClick: () => navigate('/registros'),              circleBg: '#FEF0ED', iconColor: '#E9826E' },
-                    { Icon: ClipboardList, label: 'Historial',     onClick: () => navigate('/historial'),              circleBg: '#EFF6F0', iconColor: '#0d6b63' },
-                    { Icon: CheckSquare,   label: 'Rutina diaria', onClick: () => navigate('/cuidado'),                circleBg: '#FFF8EC', iconColor: '#D99A18' },
-                    { Icon: Stethoscope,   label: 'Notas médicas', onClick: () => navigate('/diario-medico'),          circleBg: '#EFF6F0', iconColor: '#0d6b63' },
-                    { Icon: Heart,         label: 'Notas familia', onClick: () => navigate('/paciente/notas-familia'), circleBg: '#FEF0ED', iconColor: '#E9826E' },
-                    { Icon: DollarSign,    label: 'Gastos',        onClick: () => navigate('/gastos'),                 circleBg: '#FFF8EC', iconColor: '#D99A18' },
-                    { Icon: BookOpen,      label: 'Directorio',    onClick: () => navigate('/directorio'),             circleBg: '#EFF6F0', iconColor: '#0d6b63' },
-                    { Icon: Sparkles,      label: 'Milo & Luna',   onClick: () => setShowCompanion(true),              circleBg: '#FEF0ED', iconColor: '#E9826E' },
-                    { Icon: User,          label: 'Mi cuenta',     onClick: () => navigate('/ajustes'),                circleBg: '#EFF6F0', iconColor: '#0d6b63' },
-                  ]
                   const featuredTools = [
                     { Icon: Users,    label: 'Equipo',   onClick: () => navigate('/familia'),          circleBg: '#EFF6F0', iconColor: '#0d6b63' },
                     { Icon: Building2, label: 'Hospital', onClick: () => setShowHospitalModal(true),   circleBg: '#FEF0ED', iconColor: '#E9826E' },
@@ -3399,8 +3389,8 @@ export default function Dashboard() {
                   return (
                     <div>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-                        <p style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 9, fontFamily: "'Fraunces', Georgia, serif", fontSize: 18, fontWeight: 600, color: '#334155' }}>Más herramientas</p>
-                        <button onClick={() => setShowMoreTools(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, color: '#087F70', fontWeight: 700, padding: 0, WebkitTapHighlightColor: 'transparent' }}>Ver todas</button>
+                        <p style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 9, fontFamily: "'Fraunces', Georgia, serif", fontSize: 18, fontWeight: 600, color: '#334155' }}>Todo el cuidado</p>
+                        <button onClick={() => navigate('/mas')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, color: '#087F70', fontWeight: 700, padding: 0, WebkitTapHighlightColor: 'transparent' }}>Ver todas</button>
                       </div>
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 11 }}>
                         {featuredTools.map(({ Icon, label, onClick, circleBg, iconColor }) => (
@@ -3427,64 +3417,6 @@ export default function Dashboard() {
                           </button>
                         ))}
                       </div>
-
-                      {/* Bottom sheet — todas las herramientas */}
-                      {showMoreTools && (
-                        <div
-                          style={{ position: 'fixed', inset: 0, zIndex: 300, background: 'rgba(10,20,16,0.55)' }}
-                          onClick={() => setShowMoreTools(false)}
-                        >
-                          <div
-                            style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: '#F8F4ED', borderRadius: '28px 28px 0 0', padding: '20px 20px 90px', maxHeight: '80vh', overflowY: 'auto' }}
-                            onClick={e => e.stopPropagation()}
-                          >
-                            <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(20,60,50,0.15)', margin: '0 auto 20px' }} />
-                            <p style={{ margin: '0 0 16px', fontFamily: "'Fraunces', Georgia, serif", fontSize: 18, fontWeight: 600, color: '#334155' }}>Todas las herramientas</p>
-                            {(() => {
-                              const cols = 4
-                              const remainder = allTools.length % cols
-                              const fullRows = allTools.slice(0, allTools.length - (remainder || cols))
-                              const lastRow  = remainder ? allTools.slice(-remainder) : allTools.slice(-cols)
-                              const renderCard = ({ Icon, label, onClick, circleBg, iconColor }) => (
-                                <button
-                                  key={label}
-                                  onClick={() => { setShowMoreTools(false); onClick() }}
-                                  style={{
-                                    background: 'white', border: '1px solid rgba(51,65,85,0.05)',
-                                    borderRadius: 20, padding: '15px 6px 12px', cursor: 'pointer',
-                                    width: '100%', minWidth: 0, boxSizing: 'border-box',
-                                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 9,
-                                    boxShadow: '0 5px 18px -10px rgba(51,65,85,0.18)',
-                                    WebkitTapHighlightColor: 'transparent',
-                                  }}
-                                >
-                                  <span style={{
-                                    width: 44, height: 44, borderRadius: 14,
-                                    background: circleBg,
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    flexShrink: 0,
-                                  }}>
-                                    <Icon size={22} color={iconColor} strokeWidth={1.9} />
-                                  </span>
-                                  <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: '#475569', lineHeight: 1.3, textAlign: 'center' }}>{label}</p>
-                                </button>
-                              )
-                              return (
-                                <>
-                                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
-                                    {fullRows.map(renderCard)}
-                                  </div>
-                                  {lastRow.length > 0 && (
-                                    <div style={{ display: 'grid', gridTemplateColumns: `repeat(${lastRow.length}, 1fr)`, gap: 10, marginTop: 10, maxWidth: `${(lastRow.length / cols) * 100}%`, margin: '10px auto 0' }}>
-                                      {lastRow.map(renderCard)}
-                                    </div>
-                                  )}
-                                </>
-                              )
-                            })()}
-                          </div>
-                        </div>
-                      )}
                     </div>
                   )
                 })()}

@@ -23,7 +23,7 @@ import Memorias from './pages/Memorias'
 import Hoy from './pages/Hoy'
 import Familia from './pages/Familia'
 import Reports from './pages/Reports'
-import More from './pages/More'
+import TodoElCuidado from './pages/TodoElCuidado'
 import Expenses from './pages/Expenses'
 import TermsOfService from './pages/TermsOfService'
 import PrivacyPolicy from './pages/PrivacyPolicy'
@@ -146,7 +146,7 @@ function AppShell() {
 
         <Route path="/familia"     element={<P><Familia /></P>} />
         <Route path="/reportes"    element={<P><Reports /></P>} />
-        <Route path="/mas"         element={<P><More /></P>} />
+        <Route path="/mas"         element={<P><TodoElCuidado /></P>} />
         <Route path="/gastos"      element={<P><Expenses /></P>} />
         <Route path="/directorio"  element={<P><Directory /></P>} />
         <Route path="/join"          element={<JoinFamily />} />

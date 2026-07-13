@@ -26,7 +26,7 @@ const PAGE_TITLES = {
   '/chat':           'Mensajes',
   '/album':          'Fotos y videos',
   '/reportes':       'Reportes médicos',
-  '/mas':            'Más opciones',
+  '/mas':            'Todo el cuidado',
   '/gastos':         'Cuentas Claras',
   '/directorio':     'Directorio',
   '/permisos':       'Permisos',
@@ -54,6 +54,7 @@ export default function Layout({ children }) {
   const location = useLocation()
   const navigate = useNavigate()
   const isHome      = location.pathname === '/dashboard'
+  const hasOwnHeader = isHome || location.pathname === '/mas'
   const isVideoCall = location.pathname === '/videollamada'
   const isSecondary = !PRIMARY_PAGES.has(location.pathname) && !isVideoCall
 
@@ -93,8 +94,8 @@ export default function Layout({ children }) {
         </Link>
       )}
 
-      {/* Fixed header — hidden on dashboard (Dashboard renders its own compact header) */}
-      {!isHome && <header
+      {/* Fixed header — hidden on dashboard and /mas (each renders its own compact header) */}
+      {!hasOwnHeader && <header
         style={{
           position: 'fixed', top: hospitalBarHeight, left: 0, right: 0, zIndex: 40,
           height: 'calc(56px + env(safe-area-inset-top))',
@@ -183,7 +184,7 @@ export default function Layout({ children }) {
       <main style={{
         position: 'fixed', inset: 0, overflowY: 'auto',
         background: bg,
-        top:           isHome ? `calc(${hospitalBarHeight}px + env(safe-area-inset-top))` : `calc(${hospitalBarHeight}px + 56px + env(safe-area-inset-top))`,
+        top:           hasOwnHeader ? `calc(${hospitalBarHeight}px + env(safe-area-inset-top))` : `calc(${hospitalBarHeight}px + 56px + env(safe-area-inset-top))`,
         bottom:        (isSecondary || isHospitalMode || isVideoCall) ? 'env(safe-area-inset-bottom)' : 'calc(64px + env(safe-area-inset-bottom))',
         paddingBottom: 80,
       }}>
