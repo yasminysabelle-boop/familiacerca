@@ -19,9 +19,11 @@ export default function EvidencePhoto({
   label = 'Agregar foto de evidencia',
   bucket = 'care-photos',
   pathPrefix = 'evidence',
+  alwaysExpanded = false,
+  renderOptions,
 }) {
   const [lightboxOpen, setLightboxOpen] = useState(false)
-  const [showOptions,  setShowOptions]  = useState(false)
+  const [showOptions,  setShowOptions]  = useState(alwaysExpanded)
   const [preview,      setPreview]      = useState(null)
   const [file,         setFile]         = useState(null)
   const [uploading,    setUploading]    = useState(false)
@@ -193,7 +195,7 @@ export default function EvidencePhoto({
             disabled={uploading}
             style={{
               padding: '7px 14px', borderRadius: 8, border: 'none',
-              background: uploading ? '#C0CCC5' : '#0d6b63',
+              background: uploading ? '#C0CCC5' : '#087F70',
               color: 'white', fontSize: 12, fontWeight: 700,
               cursor: uploading ? 'not-allowed' : 'pointer',
             }}
@@ -209,6 +211,9 @@ export default function EvidencePhoto({
   return (
     <>
       {showOptions ? (
+        renderOptions ? (
+          renderOptions({ onCamera: () => cameraRef.current?.click(), onGallery: () => galleryRef.current?.click() })
+        ) : (
         <div style={{ display: 'flex', gap: 6, marginTop: 6 }}>
           <button
             type="button"
@@ -218,7 +223,7 @@ export default function EvidencePhoto({
               justifyContent: 'center', gap: 4,
               padding: '8px', borderRadius: 10,
               border: '1.5px dashed #C0CCC5', background: '#FDF8F4',
-              cursor: 'pointer', fontSize: 12, color: '#0d6b63', fontWeight: 600,
+              cursor: 'pointer', fontSize: 12, color: '#087F70', fontWeight: 600,
             }}
           >
             📷 Tomar foto
@@ -231,23 +236,26 @@ export default function EvidencePhoto({
               justifyContent: 'center', gap: 4,
               padding: '8px', borderRadius: 10,
               border: '1.5px dashed #C0CCC5', background: '#FDF8F4',
-              cursor: 'pointer', fontSize: 12, color: '#0d6b63', fontWeight: 600,
+              cursor: 'pointer', fontSize: 12, color: '#087F70', fontWeight: 600,
             }}
           >
             🖼️ Galería
           </button>
-          <button
-            type="button"
-            onClick={() => setShowOptions(false)}
-            style={{
-              padding: '8px 10px', borderRadius: 10, border: 'none',
-              background: '#F3F4F6', cursor: 'pointer',
-              display: 'flex', alignItems: 'center',
-            }}
-          >
-            <XIcon size={13} color="#9CA3AF" strokeWidth={2} />
-          </button>
+          {!alwaysExpanded && (
+            <button
+              type="button"
+              onClick={() => setShowOptions(false)}
+              style={{
+                padding: '8px 10px', borderRadius: 10, border: 'none',
+                background: '#F3F4F6', cursor: 'pointer',
+                display: 'flex', alignItems: 'center',
+              }}
+            >
+              <XIcon size={13} color="#9CA3AF" strokeWidth={2} />
+            </button>
+          )}
         </div>
+        )
       ) : (
         <button
           type="button"

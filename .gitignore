@@ -28,3 +28,6 @@ dist-ssr
 *.sln
 *.sw?
 src/companions/
+
+# Design reference mockups (Claude Design molds) — not part of the build
+design-refs/

@@ -1,12 +1,15 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { useFamily } from '../../contexts/FamilyContext'
 import { supabase } from '../../lib/supabase'
 import MedicationStockTab from '../../components/MedicationStockTab'
 import { SkeletonMedCard } from '../../components/SkeletonLoader'
 import EmptyState from '../../components/EmptyState'
+import { Pill } from '../../components/Icons'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
+
+const SANS = "'Plus Jakarta Sans', system-ui, sans-serif"
 
 const DOSES_PER_DAY = {
   once_daily: 1, twice_daily: 2, three_daily: 3,
@@ -20,36 +23,10 @@ function daysFromNow(dateStr) {
 }
 
 function fmtDate(dateStr) {
-  if (!dateStr) return '—'
+  if (!dateStr) return null
   return new Date(dateStr + 'T12:00:00').toLocaleDateString('es-MX', {
     day: 'numeric', month: 'short', year: 'numeric',
   })
-}
-
-function stockColor(days) {
-  if (days == null) return '#9CA3AF'
-  if (days <= 1) return '#DC2626'
-  if (days <= 3) return '#D97706'
-  if (days <= 7) return '#C9882A'
-  return '#16A34A'
-}
-function stockBg(days) {
-  if (days == null) return '#F3F4F6'
-  if (days <= 1) return '#FEF2F2'
-  if (days <= 3) return '#FEF3C7'
-  if (days <= 7) return '#FFFBEB'
-  return '#F0FDF4'
-}
-function stockEmoji(days, pills) {
-  if (pills != null) {
-    if (pills <= 3) return '🔴'
-    if (pills <= 7) return '🟡'
-    return '🟢'
-  }
-  if (days == null) return '⚪'
-  if (days <= 3) return '🔴'
-  if (days <= 7) return '🟡'
-  return '🟢'
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -61,25 +38,14 @@ export default function MedicationStockList() {
   const [stockMap, setStockMap] = useState({})
   const [loading, setLoading] = useState(true)
   const [stockTabMed, setStockTabMed] = useState(null)
-
-  // Inline edit state
-  const [inlineEditId, setInlineEditId] = useState(null)
-  const [inlineEditValue, setInlineEditValue] = useState('')
-  const inlineInputRef = useRef(null)
+  const [editingId, setEditingId] = useState(null)
+  const [editingValue, setEditingValue] = useState(0)
 
   const isAdmin = user?.id === ownerId
 
   useEffect(() => {
     if (ownerId) load()
   }, [ownerId])
-
-  // Focus inline input when it appears
-  useEffect(() => {
-    if (inlineEditId && inlineInputRef.current) {
-      inlineInputRef.current.focus()
-      inlineInputRef.current.select()
-    }
-  }, [inlineEditId])
 
   async function load() {
     setLoading(true)
@@ -100,13 +66,11 @@ export default function MedicationStockList() {
     setLoading(false)
   }
 
-  async function saveInlineStock(medId, rawValue) {
-    const newPills = parseInt(rawValue)
+  async function saveStock(medId, newPills) {
     const stock = stockMap[medId]
-    if (!stock || isNaN(newPills) || newPills < 0) { setInlineEditId(null); return }
-
     const med = medications.find(m => m.id === medId)
-    const dosesPerDay = DOSES_PER_DAY[med?.frequency] ?? 1
+    if (!stock || !med) { setEditingId(null); return }
+    const dosesPerDay = DOSES_PER_DAY[med.frequency] ?? 1
     const days = Math.floor(newPills / dosesPerDay)
     const end = new Date(); end.setDate(end.getDate() + days)
     const endDate = days > 0 ? end.toISOString().split('T')[0] : null
@@ -117,32 +81,21 @@ export default function MedicationStockList() {
       updated_at: new Date().toISOString(),
     }).eq('medication_id', medId).eq('user_id', ownerId)
 
-    setStockMap(prev => ({
-      ...prev,
-      [medId]: { ...prev[medId], pills_remaining: newPills, estimated_end_date: endDate },
-    }))
-    setMedications(prev => prev.map(m =>
-      m.id === medId ? { ...m, pills_remaining: newPills } : m
-    ))
-    setInlineEditId(null)
+    setStockMap(prev => ({ ...prev, [medId]: { ...prev[medId], pills_remaining: newPills, estimated_end_date: endDate } }))
+    setMedications(prev => prev.map(m => m.id === medId ? { ...m, pills_remaining: newPills } : m))
+    setEditingId(null)
   }
 
-  // ── Render ─────────────────────────────────────────────────────────────────
   return (
-    <div style={{ padding: '16px 16px 96px', maxWidth: 600 }}>
+    <div style={{ padding: '16px 16px 96px', maxWidth: 600, fontFamily: SANS }}>
 
       {/* Header */}
       <div style={{ marginBottom: 16 }}>
-        <h2 style={{
-          fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700,
-          color: '#1A1A1A', margin: 0,
-        }}>
-          Stock e inventario
+        <h2 style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 600, fontSize: 18, color: '#1E2C3A', margin: 0 }}>
+          Inventario
         </h2>
-        <p style={{ fontSize: 12, color: '#9CA3AF', margin: '2px 0 0' }}>
-          {isAdmin
-            ? 'Toca 📦 para gestionar cada medicamento'
-            : 'Vista de inventario de medicamentos'}
+        <p style={{ fontSize: 13, color: '#6B7A88', margin: '2px 0 0' }}>
+          Así llevamos la cuenta de cuánto queda de cada medicamento.
         </p>
       </div>
 
@@ -154,279 +107,104 @@ export default function MedicationStockList() {
         <EmptyState
           icon="📦"
           title="Sin medicamentos"
-          description="Agrega medicamentos desde la pestaña Todos para ver su stock aquí."
+          description="Agrega medicamentos desde la pestaña Lista para ver su stock aquí."
         />
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           {medications.map(med => {
             const stock = stockMap[med.id]
-            const days = stock ? daysFromNow(stock.estimated_end_date) : null
+            const days  = stock ? daysFromNow(stock.estimated_end_date) : null
             const pills = stock?.pills_remaining ?? null
-            const minStock = med.min_stock ?? 7
-            const isBelowMin = pills != null && pills <= minStock
-            // Use min_stock-aware color: red if below min, yellow if close (2×min), green otherwise
-            const sColor = pills == null ? '#9CA3AF' : pills <= minStock ? '#DC2626' : pills <= minStock * 2 ? '#D97706' : '#16A34A'
-            const sBg    = pills == null ? '#F3F4F6' : pills <= minStock ? '#FEF2F2' : pills <= minStock * 2 ? '#FFFBEB' : '#F0FDF4'
-            const sEmoji = pills == null ? '⚪' : pills <= minStock ? '🔴' : pills <= minStock * 2 ? '🟡' : '🟢'
+            const isAgotado = stock != null && pills != null && pills <= 0
+            const isLow = !isAgotado && stock != null && (days != null ? days <= 7 : pills != null && pills <= (med.min_stock ?? 7))
+            const color   = isAgotado ? '#D9534F' : isLow ? '#C4664F' : '#087F70'
+            const barColor = isAgotado ? '#D9534F' : isLow ? '#E9826E' : '#087F70'
+            const cardBg  = isAgotado ? '#F7DEDD' : isLow ? '#FBEAE4' : '#FFFFFF'
+            const iconBg  = isAgotado ? '#F1C9C6' : isLow ? '#F6D9CC' : '#EAF7F3'
+            const shadow  = isAgotado ? '#D9534F55' : isLow ? '#E9826E44' : '#087F7022'
             const pct = stock?.total_pills > 0
               ? Math.max(0, Math.min(100, Math.round((stock.pills_remaining / stock.total_pills) * 100)))
               : 0
-            const isEditing = inlineEditId === med.id
             const qtyPerDose = Number(med.quantity_per_dose ?? 1)
             const dailyDoses = DOSES_PER_DAY[med.frequency] ?? 1
             const dailyConsumption = qtyPerDose * dailyDoses
+            const isEditing = editingId === med.id
+
+            const statusText = !stock
+              ? null
+              : isAgotado
+                ? 'Se agotó — hay que reponer'
+                : days != null
+                  ? `Alcanza hasta el ${fmtDate(stock.estimated_end_date)}`
+                  : null
 
             return (
-              <div
-                key={med.id}
-                style={{
-                  background: 'white',
-                  borderRadius: 16,
-                  border: isBelowMin ? '1.5px solid #FCA5A5' : '1px solid #EDE5D8',
-                  borderLeft: `4px solid ${sColor}`,
-                  padding: '14px 16px',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-                }}
-              >
-                {/* Top row: name + badge */}
-                <div style={{
-                  display: 'flex', alignItems: 'flex-start',
-                  justifyContent: 'space-between', gap: 10, marginBottom: stock ? 10 : 0,
-                }}>
+              <div key={med.id} style={{ background: cardBg, borderRadius: 20, padding: 16, boxShadow: `0 6px 14px -8px ${shadow}` }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                  <div style={{ width: 44, height: 44, borderRadius: 14, background: iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <Pill size={20} color={color} strokeWidth={1.9} />
+                  </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-                      <span style={{ fontSize: 15, fontWeight: 700, color: '#1A1A1A' }}>
-                        💊 {med.name}
-                      </span>
-                      {med.form && (
-                        <span style={{ fontSize: 10, fontWeight: 600, color: '#0d6b63', background: '#EBF3EE', padding: '2px 7px', borderRadius: 10 }}>
-                          {med.form}
-                        </span>
-                      )}
-                    </div>
-                    {med.dosage && (
-                      <span style={{ fontSize: 12, color: '#9CA3AF' }}>
-                        {med.dosage}
-                      </span>
+                    <div style={{ fontWeight: 700, fontSize: 15.5, color: '#1E2C3A' }}>{med.name}{med.dosage ? ` ${med.dosage}` : ''}</div>
+                    {stock && (
+                      <div style={{ fontSize: 12.5, color: '#6B7A88', marginTop: 2 }}>
+                        {stock.pills_remaining} de {stock.total_pills} dosis · {dailyConsumption % 1 === 0 ? dailyConsumption : dailyConsumption.toFixed(2)} dosis/día
+                      </div>
                     )}
                   </div>
-                  <span style={{
-                    fontSize: 12, fontWeight: 700,
-                    color: sColor, background: sBg,
-                    padding: '4px 10px', borderRadius: 20,
-                    border: `1px solid ${sColor}40`,
-                    flexShrink: 0, whiteSpace: 'nowrap',
-                  }}>
-                    {sEmoji} {pills != null ? `${pills} dosis` : 'Sin stock'}
-                  </span>
                 </div>
 
                 {stock ? (
                   <>
-                    {/* Progress bar */}
-                    <div style={{
-                      height: 6, borderRadius: 3, background: '#F3F4F6',
-                      overflow: 'hidden', marginBottom: 10,
-                    }}>
-                      <div style={{
-                        height: '100%', borderRadius: 3, width: `${pct}%`,
-                        background: pct > 30
-                          ? 'linear-gradient(90deg, #0d6b63, #22C55E)'
-                          : pct > 10
-                            ? 'linear-gradient(90deg, #D97706, #F59E0B)'
-                            : 'linear-gradient(90deg, #DC2626, #EF4444)',
-                        transition: 'width 0.4s ease',
-                      }} />
+                    <div style={{ marginTop: 12, height: 7, borderRadius: 6, background: '#F1EDE3', overflow: 'hidden' }}>
+                      <div style={{ width: `${pct}%`, height: '100%', borderRadius: 6, background: barColor, transition: 'width 0.4s ease' }} />
                     </div>
-
-                    {/* Info grid */}
-                    <div style={{
-                      display: 'grid', gridTemplateColumns: '1fr 1fr',
-                      gap: '6px 16px', marginBottom: 12,
-                    }}>
-                      <div>
-                        <p style={{ fontSize: 10, color: '#9CA3AF', margin: 0 }}>Dosis restantes</p>
-                        <p style={{ fontSize: 13, fontWeight: 700, color: sColor, margin: '1px 0 0' }}>
-                          {stock.pills_remaining} / {stock.total_pills}
-                        </p>
-                      </div>
-                      <div>
-                        <p style={{ fontSize: 10, color: '#9CA3AF', margin: 0 }}>Días restantes</p>
-                        <p style={{ fontSize: 13, fontWeight: 700, color: sColor, margin: '1px 0 0' }}>
-                          {days == null ? '—' : days <= 0 ? 'Agotado' : `${days} día${days !== 1 ? 's' : ''}`}
-                        </p>
-                      </div>
-                      <div>
-                        <p style={{ fontSize: 10, color: '#9CA3AF', margin: 0 }}>Consumo diario</p>
-                        <p style={{ fontSize: 12, fontWeight: 600, color: '#374151', margin: '1px 0 0' }}>
-                          {dailyConsumption % 1 === 0 ? dailyConsumption : dailyConsumption.toFixed(2)} dosis/día
-                        </p>
-                      </div>
-                      <div>
-                        <p style={{ fontSize: 10, color: '#9CA3AF', margin: 0 }}>Se acaba aprox.</p>
-                        <p style={{ fontSize: 12, fontWeight: 600, color: '#374151', margin: '1px 0 0' }}>
-                          {fmtDate(stock.estimated_end_date)}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Min stock alert */}
-                    {isBelowMin && (
-                      <div style={{ background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 10, padding: '8px 12px', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <span>🔴</span>
-                        <p style={{ fontSize: 12, fontWeight: 700, color: '#DC2626', margin: 0 }}>
-                          Stock bajo el mínimo ({minStock} dosis) — renovar pronto
-                        </p>
-                      </div>
+                    {statusText && (
+                      <div style={{ marginTop: 8, fontSize: 12.5, fontWeight: isAgotado ? 700 : 600, color }}>{statusText}</div>
                     )}
 
-                    {/* Urgency alert */}
-                    {days != null && days <= 7 && (
-                      <div style={{
-                        background: sBg, border: `1px solid ${sColor}40`,
-                        borderRadius: 10, padding: '8px 12px',
-                        marginBottom: 10,
-                        display: 'flex', alignItems: 'center', gap: 8,
-                      }}>
-                        <span style={{ fontSize: 14 }}>
-                          {days <= 1 ? '🚨' : days <= 3 ? '⚠️' : '🔔'}
-                        </span>
-                        <p style={{ fontSize: 12, fontWeight: 700, color: sColor, margin: 0 }}>
-                          {days <= 0
-                            ? '¡Medicamento agotado! Renovar urgente'
-                            : days === 1
-                              ? 'Se acaba mañana — renovar hoy'
-                              : `Quedan ${days} días — planificar renovación`}
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Admin actions */}
                     {isAdmin && (
-                      <div style={{
-                        borderTop: '1px solid #F8F4ED', paddingTop: 10,
-                        display: 'flex', flexDirection: 'column', gap: 8,
-                      }}>
-                        {/* Inline edit pills_remaining */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <span style={{ fontSize: 12, color: '#6B7280', flexShrink: 0 }}>
-                            Dosis restantes:
-                          </span>
-                          {isEditing ? (
-                            <div style={{ display: 'flex', gap: 6, flex: 1 }}>
-                              <input
-                                ref={inlineInputRef}
-                                type="number"
-                                inputMode="numeric"
-                                min="0"
-                                value={inlineEditValue}
-                                onChange={e => setInlineEditValue(e.target.value)}
-                                onKeyDown={e => {
-                                  if (e.key === 'Enter') saveInlineStock(med.id, inlineEditValue)
-                                  if (e.key === 'Escape') setInlineEditId(null)
-                                }}
-                                style={{
-                                  flex: 1, padding: '6px 10px',
-                                  borderRadius: 8, border: '1.5px solid #0d6b63',
-                                  fontSize: 13, outline: 'none',
-                                  width: 80,
-                                }}
-                              />
-                              <button
-                                onClick={() => saveInlineStock(med.id, inlineEditValue)}
-                                style={{
-                                  padding: '6px 12px', borderRadius: 8,
-                                  background: '#0d6b63', border: 'none',
-                                  color: 'white', fontWeight: 700,
-                                  fontSize: 12, cursor: 'pointer',
-                                }}
-                              >
-                                ✓
-                              </button>
-                              <button
-                                onClick={() => setInlineEditId(null)}
-                                style={{
-                                  padding: '6px 10px', borderRadius: 8,
-                                  background: '#F3F4F6', border: 'none',
-                                  color: '#6B7280', fontWeight: 700,
-                                  fontSize: 12, cursor: 'pointer',
-                                }}
-                              >
-                                ✕
-                              </button>
-                            </div>
-                          ) : (
-                            <button
-                              onClick={() => {
-                                setInlineEditId(med.id)
-                                setInlineEditValue(String(stock.pills_remaining))
-                              }}
-                              style={{
-                                padding: '5px 10px', borderRadius: 8,
-                                border: '1px solid #EDE5D8', background: '#FDFAF7',
-                                color: '#374151', fontSize: 12, fontWeight: 600,
-                                cursor: 'pointer',
-                                display: 'flex', alignItems: 'center', gap: 5,
-                              }}
-                            >
-                              ✏️ {stock.pills_remaining} dosis — editar
-                            </button>
-                          )}
+                      isEditing ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 12 }}>
+                          <button onClick={() => setEditingValue(v => Math.max(0, v - 1))} style={{ width: 34, height: 34, borderRadius: 11, border: 'none', background: '#FFFFFF', boxShadow: '0 4px 10px -6px #087F7033', fontSize: 18, fontWeight: 700, color: '#334155', cursor: 'pointer' }}>–</button>
+                          <div style={{ minWidth: 34, textAlign: 'center', fontWeight: 700, fontSize: 15, color: '#1E2C3A' }}>{editingValue}</div>
+                          <button onClick={() => setEditingValue(v => Math.min(stock.total_pills || v + 1, v + 1))} style={{ width: 34, height: 34, borderRadius: 11, border: 'none', background: '#FFFFFF', boxShadow: '0 4px 10px -6px #087F7033', fontSize: 18, fontWeight: 700, color: '#334155', cursor: 'pointer' }}>+</button>
+                          <button onClick={() => saveStock(med.id, editingValue)} style={{ marginLeft: 'auto', border: 'none', cursor: 'pointer', padding: '9px 16px', borderRadius: 12, fontSize: 13, fontWeight: 700, fontFamily: SANS, color: '#FFFFFF', background: '#087F70' }}>Guardar</button>
                         </div>
-
-                        {/* Renovar / Ver stock */}
+                      ) : (
                         <button
-                          onClick={() => setStockTabMed(med)}
-                          style={{
-                            width: '100%', padding: '10px',
-                            borderRadius: 12, border: 'none',
-                            background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
-                            color: 'white', fontWeight: 700,
-                            fontSize: 13, cursor: 'pointer',
-                            boxShadow: '0 4px 14px rgba(13,107,99,0.25)',
-                            display: 'flex', alignItems: 'center',
-                            justifyContent: 'center', gap: 6,
-                          }}
+                          onClick={() => { setEditingId(med.id); setEditingValue(stock.pills_remaining) }}
+                          style={{ marginTop: 12, border: 'none', cursor: 'pointer', padding: '9px 16px', borderRadius: 12, fontSize: 13, fontWeight: 700, fontFamily: SANS, color: '#087F70', background: '#FFFFFF', boxShadow: '0 4px 10px -6px #087F7033' }}
                         >
-                          📦 Gestionar stock
+                          Actualizar cantidad
                         </button>
-                      </div>
+                      )
                     )}
 
-                    {/* Familiar/cuidador: solo ver */}
+                    {isAdmin && (
+                      <button
+                        onClick={() => setStockTabMed(med)}
+                        style={{ width: '100%', marginTop: 8, padding: 10, borderRadius: 12, border: 'none', background: 'linear-gradient(148deg,#12A18C 0%,#0A8072 46%,#055C51 100%)', color: 'white', fontWeight: 700, fontSize: 13, cursor: 'pointer', boxShadow: '0 4px 14px rgba(8,127,112,0.25)' }}
+                      >
+                        📦 Gestionar stock
+                      </button>
+                    )}
                     {!isAdmin && (
                       <button
                         onClick={() => setStockTabMed(med)}
-                        style={{
-                          width: '100%', padding: '8px',
-                          borderRadius: 10, border: '1px solid #EDE5D8',
-                          background: '#FDFAF7', color: '#0d6b63',
-                          fontWeight: 600, fontSize: 12, cursor: 'pointer',
-                          marginTop: 2,
-                        }}
+                        style={{ width: '100%', marginTop: 10, padding: 8, borderRadius: 10, border: '1px solid rgba(51,65,85,0.12)', background: '#FDFAF7', color: '#087F70', fontWeight: 600, fontSize: 12, cursor: 'pointer' }}
                       >
                         📦 Ver detalles de stock
                       </button>
                     )}
                   </>
                 ) : (
-                  /* No stock configured */
-                  <div style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                    marginTop: 8,
-                  }}>
-                    <p style={{ fontSize: 12, color: '#9CA3AF', margin: 0 }}>
-                      Stock no configurado
-                    </p>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
+                    <p style={{ fontSize: 12.5, color: '#6B7A88', margin: 0 }}>Stock no configurado</p>
                     {isAdmin && (
                       <button
                         onClick={() => setStockTabMed(med)}
-                        style={{
-                          padding: '6px 14px', borderRadius: 10,
-                          border: '1px solid #0d6b63', background: '#EBF3EE',
-                          color: '#0d6b63', fontWeight: 700,
-                          fontSize: 11, cursor: 'pointer',
-                        }}
+                        style={{ padding: '6px 14px', borderRadius: 10, border: '1px solid #087F70', background: '#EAF7F3', color: '#087F70', fontWeight: 700, fontSize: 11, cursor: 'pointer' }}
                       >
                         + Configurar
                       </button>

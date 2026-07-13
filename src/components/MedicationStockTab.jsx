@@ -3,7 +3,6 @@ import { useAuth } from '../contexts/AuthContext'
 import { useSubscription } from '../contexts/SubscriptionContext'
 import { supabase } from '../lib/supabase'
 import { XIcon } from './Icons'
-import EvidencePhoto from './EvidencePhoto'
 
 const RENEWAL_LABELS = {
   pharmacy:     '🏪 Farmacia',
@@ -36,7 +35,6 @@ export default function MedicationStockTab({ med, ownerId, isFamiliar, onClose }
   const [showRenewModal, setShowRenewModal] = useState(false)
   const [newPillCount, setNewPillCount] = useState('')
   const [renewing, setRenewing] = useState(false)
-  const [docPhotoUrl, setDocPhotoUrl] = useState(null)
   const displayName = user?.user_metadata?.full_name ?? user?.email ?? 'Familiar'
 
   useEffect(() => {
@@ -94,18 +92,6 @@ export default function MedicationStockTab({ med, ownerId, isFamiliar, onClose }
     load()
   }
 
-  async function saveDocPhoto(field, url) {
-    await supabase.from('medication_stock').update({ [field]: url })
-      .eq('medication_id', med.id).eq('user_id', ownerId)
-    setStock(prev => prev ? { ...prev, [field]: url } : prev)
-  }
-
-  async function deleteDocPhoto(field) {
-    await supabase.from('medication_stock').update({ [field]: null })
-      .eq('medication_id', med.id).eq('user_id', ownerId)
-    setStock(prev => prev ? { ...prev, [field]: null } : prev)
-  }
-
   const days = stock ? daysFromNow(stock.estimated_end_date) : null
   const pct  = stock?.total_pills > 0
     ? Math.max(0, Math.min(100, Math.round((stock.pills_remaining / stock.total_pills) * 100)))
@@ -114,8 +100,6 @@ export default function MedicationStockTab({ med, ownerId, isFamiliar, onClose }
     : days <= 1 ? '#DC2626' : days <= 3 ? '#D97706' : days <= 7 ? '#C9882A' : '#16A34A'
   const urgBg = days == null ? '#F3F4F6'
     : days <= 1 ? '#FEF2F2' : days <= 3 ? '#FEF3C7' : days <= 7 ? '#FFFBEB' : '#F0FDF4'
-
-  const btnStyle = { padding: '7px 14px', borderRadius: 10, fontSize: 12, fontWeight: 600, cursor: 'pointer', border: 'none' }
 
   return (
     <div
@@ -145,7 +129,7 @@ export default function MedicationStockTab({ med, ownerId, isFamiliar, onClose }
 
         {loading ? (
           <div style={{ display: 'flex', justifyContent: 'center', padding: 48 }}>
-            <div style={{ width: 28, height: 28, borderRadius: '50%', border: '3px solid #EDE5D8', borderTopColor: '#0d6b63', animation: 'spin 0.8s linear infinite' }} />
+            <div style={{ width: 28, height: 28, borderRadius: '50%', border: '3px solid #EDE5D8', borderTopColor: '#087F70', animation: 'spin 0.8s linear infinite' }} />
           </div>
         ) : !stock ? (
           <div style={{ textAlign: 'center', padding: '32px 0' }}>
@@ -186,7 +170,7 @@ export default function MedicationStockTab({ med, ownerId, isFamiliar, onClose }
                 <div style={{
                   height: '100%', borderRadius: 7, width: `${pct}%`,
                   background: pct > 30
-                    ? 'linear-gradient(90deg, #0d6b63, #22C55E)'
+                    ? 'linear-gradient(90deg, #087F70, #22C55E)'
                     : pct > 10
                       ? 'linear-gradient(90deg, #D97706, #F59E0B)'
                       : 'linear-gradient(90deg, #DC2626, #EF4444)',
@@ -239,102 +223,15 @@ export default function MedicationStockTab({ med, ownerId, isFamiliar, onClose }
               </div>
             )}
 
-            {/* Documents — feature 3 & 7 */}
-            <div style={{ background: 'white', borderRadius: 16, border: '1px solid #EDE5D8', padding: '14px 16px', marginBottom: 14, boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-              <p style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', letterSpacing: '0.08em', textTransform: 'uppercase', margin: '0 0 12px' }}>
-                Documentos
-              </p>
-
-              {/* Prescription */}
-              <div style={{ marginBottom: 12 }}>
-                <p style={{ fontSize: 12, fontWeight: 600, color: '#374151', margin: '0 0 8px' }}>📄 Receta médica</p>
-                {stock.prescription_photo_url ? (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                    <button
-                      onClick={() => setDocPhotoUrl(stock.prescription_photo_url)}
-                      style={{ ...btnStyle, background: '#EFF6FF', color: '#1D4ED8', border: '1px solid #DBEAFE' }}
-                    >
-                      📄 Ver receta
-                    </button>
-                    {isAdmin && (
-                      <>
-                        <EvidencePhoto
-                          onPhotoCapture={url => saveDocPhoto('prescription_photo_url', url)}
-                          bucket="care-photos"
-                          pathPrefix={`${ownerId}/med-docs/${med.id}-rx`}
-                          label="Reemplazar"
-                        />
-                        <button
-                          onClick={() => deleteDocPhoto('prescription_photo_url')}
-                          style={{ ...btnStyle, background: '#FEF2F2', color: '#DC2626', border: '1px solid #FCA5A5', padding: '7px 10px' }}
-                        >
-                          🗑
-                        </button>
-                      </>
-                    )}
-                  </div>
-                ) : isAdmin ? (
-                  <EvidencePhoto
-                    onPhotoCapture={url => saveDocPhoto('prescription_photo_url', url)}
-                    bucket="care-photos"
-                    pathPrefix={`${ownerId}/med-docs/${med.id}-rx`}
-                    label="Subir receta"
-                  />
-                ) : (
-                  <p style={{ fontSize: 12, color: '#9CA3AF', margin: 0 }}>Sin receta guardada</p>
-                )}
-              </div>
-
-              {/* Box photo */}
-              <div>
-                <p style={{ fontSize: 12, fontWeight: 600, color: '#374151', margin: '0 0 8px' }}>📦 Foto de la caja</p>
-                {stock.box_photo_url ? (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                    <button
-                      onClick={() => setDocPhotoUrl(stock.box_photo_url)}
-                      style={{ ...btnStyle, background: '#EEF2FF', color: '#4338CA', border: '1px solid #E0E7FF' }}
-                    >
-                      📦 Ver caja
-                    </button>
-                    {isAdmin && (
-                      <>
-                        <EvidencePhoto
-                          onPhotoCapture={url => saveDocPhoto('box_photo_url', url)}
-                          bucket="care-photos"
-                          pathPrefix={`${ownerId}/med-docs/${med.id}-box`}
-                          label="Reemplazar"
-                        />
-                        <button
-                          onClick={() => deleteDocPhoto('box_photo_url')}
-                          style={{ ...btnStyle, background: '#FEF2F2', color: '#DC2626', border: '1px solid #FCA5A5', padding: '7px 10px' }}
-                        >
-                          🗑
-                        </button>
-                      </>
-                    )}
-                  </div>
-                ) : isAdmin ? (
-                  <EvidencePhoto
-                    onPhotoCapture={url => saveDocPhoto('box_photo_url', url)}
-                    bucket="care-photos"
-                    pathPrefix={`${ownerId}/med-docs/${med.id}-box`}
-                    label="Subir foto de caja"
-                  />
-                ) : (
-                  <p style={{ fontSize: 12, color: '#9CA3AF', margin: 0 }}>Sin foto guardada</p>
-                )}
-              </div>
-            </div>
-
             {/* Renew button */}
             {!isFamiliar && canEdit && (
               <button
                 onClick={() => setShowRenewModal(true)}
                 style={{
                   width: '100%', padding: '14px', borderRadius: 14, border: 'none', marginBottom: 20,
-                  background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
+                  background: 'linear-gradient(148deg,#12A18C 0%,#0A8072 46%,#055C51 100%)',
                   color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer',
-                  boxShadow: '0 6px 20px rgba(13,107,99,0.3)',
+                  boxShadow: '0 6px 20px rgba(8,127,112,0.3)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                 }}
               >
@@ -402,7 +299,7 @@ export default function MedicationStockTab({ med, ownerId, isFamiliar, onClose }
                 disabled={!newPillCount || parseInt(newPillCount) <= 0 || renewing}
                 style={{
                   flex: 2, padding: '12px', borderRadius: 12, border: 'none',
-                  background: (!newPillCount || renewing) ? '#C0CCC5' : 'linear-gradient(135deg, #0d6b63, #3A6347)',
+                  background: (!newPillCount || renewing) ? '#C0CCC5' : 'linear-gradient(148deg,#12A18C 0%,#0A8072 46%,#055C51 100%)',
                   color: 'white', fontWeight: 700, fontSize: 14,
                   cursor: (!newPillCount || renewing) ? 'not-allowed' : 'pointer',
                 }}
@@ -411,22 +308,6 @@ export default function MedicationStockTab({ med, ownerId, isFamiliar, onClose }
               </button>
             </div>
           </div>
-        </div>
-      )}
-
-      {/* Doc photo lightbox */}
-      {docPhotoUrl && (
-        <div
-          style={{ position: 'fixed', inset: 0, zIndex: 350, background: 'rgba(0,0,0,0.92)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
-          onClick={() => setDocPhotoUrl(null)}
-        >
-          <button
-            onClick={() => setDocPhotoUrl(null)}
-            style={{ position: 'absolute', top: 20, right: 20, width: 38, height: 38, borderRadius: '50%', background: 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-          >
-            <XIcon size={18} color="white" strokeWidth={2} />
-          </button>
-          <img src={docPhotoUrl} alt="" style={{ maxWidth: '100%', maxHeight: '88vh', objectFit: 'contain', borderRadius: 12 }} onClick={e => e.stopPropagation()} />
         </div>
       )}
     </div>
