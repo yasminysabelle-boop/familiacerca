@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
 
-if ('serviceWorker' in navigator) {
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
   // Snapshot before any SW registration runs — true only when an existing SW
   // was already controlling this page, i.e. this is a returning session.
   // Used to skip the update banner on first-ever install.
