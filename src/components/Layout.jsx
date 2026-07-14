@@ -14,7 +14,6 @@ import { useBadgeCounts } from '../hooks/useBadgeCounts'
 
 const PAGE_TITLES = {
   '/dashboard':      'Inicio',
-  '/hoy':            'Medicamentos',
   '/memorias':       'Memorias de voz',
   '/diario-voz':     'Memorias de voz',
   '/familia':        'Mi Familia',

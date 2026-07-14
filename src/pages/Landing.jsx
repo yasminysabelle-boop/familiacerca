@@ -143,7 +143,7 @@ export default function Landing() {
   }, [])
 
   if (loading) return null
-  if (user) return <Navigate to="/hoy" replace />
+  if (user) return <Navigate to="/dashboard" replace />
 
   const navLinks = [
     { label: 'Funciones', href: '#funciones' },

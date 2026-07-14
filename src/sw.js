@@ -151,7 +151,7 @@ self.addEventListener('push', event => {
       icon:     '/icon-192.png',
       badge:    '/icon-72.png',
       tag:      data.tag ?? 'fc-notification',
-      data:     { url: data.url ?? '/hoy', ...(data.data ?? {}) },
+      data:     { url: data.url ?? '/medications', ...(data.data ?? {}) },
       requireInteraction: data.requireInteraction ?? false,
       vibrate:  data.vibrate ?? [200],
       actions:  data.actions ?? [],
@@ -162,7 +162,11 @@ self.addEventListener('push', event => {
 self.addEventListener('notificationclick', event => {
   event.notification.close()
   const d = event.notification.data ?? {}
-  const base = d.target_screen ? `/${d.target_screen}` : (d.url ?? '/hoy')
+  const base = d.target_screen ? `/${d.target_screen}` : (d.url ?? '/medications')
+  // NOTE: ?action=<id> is appended for notifications with action buttons, but nothing
+  // in src/ currently reads `searchParams.get('action')` — this is intentionally a no-op
+  // today (verified via full-repo search). Left in place in case a future screen wants
+  // to branch on which notification action button was tapped.
   const target = base + (event.action ? `?action=${event.action}` : '')
 
   event.waitUntil(

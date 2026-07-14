@@ -77,7 +77,7 @@ export default function Login() {
       setError('No se pudo actualizar la contraseña.')
     } else {
       setResetDone(true)
-      setTimeout(() => navigate('/hoy'), 2000)
+      setTimeout(() => navigate('/dashboard'), 2000)
     }
   }
 

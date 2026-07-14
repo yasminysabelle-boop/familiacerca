@@ -5,11 +5,12 @@ import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { useSubscription } from '../contexts/SubscriptionContext'
 import { supabase } from '../lib/supabase'
-import { Plus, XIcon, Pencil, Bell, ChevronLeft, Pill, Camera, FileText, CheckIcon } from '../components/Icons'
+import { Plus, XIcon, Pencil, Bell, ChevronLeft, Pill, Camera, FileText, CheckIcon, MapPin } from '../components/Icons'
 import MedicationDetail from '../components/MedicationDetail'
 import { usePushNotifications } from '../hooks/usePushNotifications'
 import { track } from '../lib/analytics'
 import { getTodayPR } from '../lib/utils'
+import { getLocation, mapsUrl } from '../lib/gps'
 import MedicationStockTab from '../components/MedicationStockTab'
 import EvidencePhoto from '../components/EvidencePhoto'
 import { SkeletonMedCard } from '../components/SkeletonLoader'
@@ -119,6 +120,44 @@ function daysFromNow(dateStr) {
   return Math.ceil((new Date(dateStr + 'T12:00:00') - new Date()) / (1000 * 60 * 60 * 24))
 }
 
+// Sella la foto de evidencia con fecha, hora, nombre de quien confirma y marca de FamiliaCerca.
+async function stampProof(file, confirmerName) {
+  return new Promise(resolve => {
+    const img = new Image()
+    const objUrl = URL.createObjectURL(file)
+    img.onload = () => {
+      const canvas = document.createElement('canvas')
+      canvas.width = img.naturalWidth
+      canvas.height = img.naturalHeight
+      const ctx = canvas.getContext('2d')
+      ctx.drawImage(img, 0, 0)
+      const barH = Math.max(44, Math.round(img.naturalHeight * 0.07))
+      ctx.fillStyle = 'rgba(0,0,0,0.72)'
+      ctx.fillRect(0, img.naturalHeight - barH, img.naturalWidth, barH)
+      const now = new Date()
+      const stamp = `${now.toLocaleDateString('es-US', { day: 'numeric', month: 'long', year: 'numeric' })} · ${now.toLocaleTimeString('es-US', { hour: '2-digit', minute: '2-digit' })} · ${confirmerName} · FamiliaCerca ✓`
+      const fs = Math.max(11, Math.round(img.naturalWidth * 0.022))
+      ctx.fillStyle = 'white'
+      ctx.font = `bold ${fs}px Arial, sans-serif`
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      ctx.fillText(stamp, img.naturalWidth / 2, img.naturalHeight - barH / 2, img.naturalWidth - 16)
+      URL.revokeObjectURL(objUrl)
+      function dataUrlToBlob(dataUrl) {
+        const [, b64] = dataUrl.split(',')
+        const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0))
+        return new Blob([bytes], { type: 'image/jpeg' })
+      }
+      if (typeof canvas.toBlob === 'function') {
+        canvas.toBlob(blob => resolve(blob ?? dataUrlToBlob(canvas.toDataURL('image/jpeg', 0.92))), 'image/jpeg', 0.92)
+      } else {
+        resolve(dataUrlToBlob(canvas.toDataURL('image/jpeg', 0.92)))
+      }
+    }
+    img.src = objUrl
+  })
+}
+
 // ── Styles ────────────────────────────────────────────────────────────────────
 
 const emptyForm  = { name: '', dosage: '', frequency: '', notes: '', form: 'Tableta', quantityPerDose: 1, minStock: 7 }
@@ -171,7 +210,21 @@ export default function Medications() {
   const [adminSaving,        setAdminSaving]        = useState(false)
   const [adminPhotoBlob,     setAdminPhotoBlob]     = useState(null)
   const [adminPhotoPreview,  setAdminPhotoPreview]  = useState(null)
+  const [adminPhotoStamping, setAdminPhotoStamping] = useState(false)
+  const [adminGps,           setAdminGps]           = useState(null)
   const [adminError,         setAdminError]         = useState('')
+  const [adminConfirmWarningMed, setAdminConfirmWarningMed] = useState(null)
+  // Recordatorio de prueba post-confirmación (30 min)
+  const [proofSheet,      setProofSheet]      = useState(null) // { med }
+  const [proofPreview,    setProofPreview]    = useState(null)
+  const [proofBlob,       setProofBlob]       = useState(null)
+  const [proofGps,        setProofGps]        = useState(null)
+  const [proofStamping,   setProofStamping]   = useState(false)
+  const [proofUploading,  setProofUploading]  = useState(false)
+  const [proofError,      setProofError]      = useState('')
+  // Desconfirmar una dosis ya dada
+  const [unconfirmTarget, setUnconfirmTarget] = useState(null) // med
+  const [unconfirming,    setUnconfirming]    = useState(false)
   const [omisionModal,       setOmisionModal]       = useState(null)
   const [omisionReason,      setOmisionReason]      = useState('')
   const [omisionSaving,      setOmisionSaving]      = useState(false)
@@ -580,20 +633,47 @@ export default function Medications() {
     setTimeout(() => setToastMsg(''), 3000)
   }
 
-  function handleAdminFileSelect(e) {
+  async function handleAdminFileSelect(e) {
     const f = e.target.files?.[0]
-    if (!f) return
-    setAdminPhotoBlob(f)
-    const r = new FileReader()
-    r.onload = ev => setAdminPhotoPreview(ev.target.result)
-    r.readAsDataURL(f)
     e.target.value = ''
+    if (!f) return
+    setAdminError('')
+    setAdminPhotoStamping(true)
+    try {
+      const [stamped, loc] = await Promise.all([
+        stampProof(f, displayName),
+        getLocation({ force: true }).catch(() => null),
+      ])
+      setAdminPhotoBlob(stamped)
+      setAdminPhotoPreview(URL.createObjectURL(stamped))
+      setAdminGps(loc)
+    } catch {
+      setAdminError('No se pudo procesar la foto. Intenta de nuevo.')
+    } finally {
+      setAdminPhotoStamping(false)
+    }
   }
   function adminOpenCamera() {
+    if (adminPhotoStamping || adminSaving) return
     adminCameraRef.current?.click()
   }
   function adminOpenGallery() {
+    if (adminPhotoStamping || adminSaving) return
     adminGalleryRef.current?.click()
+  }
+
+  function openAdminModal(med) {
+    setAdminModal(med); setAdminPhotoBlob(null); setAdminPhotoPreview(null)
+    setAdminGps(null); setAdminError('')
+  }
+
+  // El owner/admin ve un aviso intermedio antes de confirmar — pensado para el caso
+  // en que confirma alguien que normalmente no es quien da el medicamento en persona.
+  // Los cuidadores van directo al modal.
+  function handleTapAdministrar(med) {
+    if (isFamiliar) return
+    if (isAdmin) { setAdminConfirmWarningMed(med); return }
+    openAdminModal(med)
   }
 
   async function handleAdministrar() {
@@ -628,22 +708,29 @@ export default function Medications() {
       minutesLate = Math.round((new Date() - d) / 60000)
       givenOnTime = minutesLate <= windowMinutes
     }
+    // GPS: reutiliza la ubicación ya capturada al tomar la foto; si no hay foto,
+    // la captura ahora. Nunca bloquea — en negación de permiso o error resuelve null.
+    const loc = adminGps ?? await getLocation({ force: true }).catch(() => null)
+
     let photoUrl = null
     if (adminPhotoBlob) {
       const path = `${ownerId}/${today}/${med.id}.jpg`
       const { error: sErr } = await supabase.storage.from('confirmations')
-        .upload(path, adminPhotoBlob, { upsert: true, contentType: adminPhotoBlob.type || 'image/jpeg' })
+        .upload(path, adminPhotoBlob, { upsert: true, contentType: 'image/jpeg' })
       if (!sErr) {
         const { data: { publicUrl } } = supabase.storage.from('confirmations').getPublicUrl(path)
         photoUrl = publicUrl
       }
     }
-    const { error: logErr } = await supabase.from('medication_logs').upsert({
+    const logPayload = {
       medication_id: med.id, user_id: ownerId, status: 'confirmed',
       log_date: today, confirmed_by_name: displayName, given_by_name: displayName,
       confirmed_at: confirmedAt, scheduled_at: scheduledAt,
       photo_url: photoUrl, given_on_time: givenOnTime, minutes_late: minutesLate,
-    }, { onConflict: 'medication_id,log_date,user_id' })
+      latitude: loc?.latitude ?? null, longitude: loc?.longitude ?? null, address: loc?.address ?? null,
+    }
+    const { error: logErr } = await supabase.from('medication_logs')
+      .upsert(logPayload, { onConflict: 'medication_id,log_date,user_id' })
     if (logErr) { setAdminSaving(false); setAdminError('No se pudo registrar. Intenta de nuevo.'); return }
     const stock = stockByMedId[med.id]
     if (stock) {
@@ -664,12 +751,109 @@ export default function Medications() {
       if (!next[med.id]) next[med.id] = {}
       if (!next[med.id][today]) next[med.id][today] = []
       next[med.id][today] = next[med.id][today].filter(l => l.status !== 'confirmed')
-      next[med.id][today].push({ medication_id: med.id, log_date: today, status: 'confirmed', confirmed_by_name: displayName, confirmed_at: confirmedAt, photo_url: photoUrl, given_on_time: givenOnTime, minutes_late: minutesLate })
+      next[med.id][today].push({ ...logPayload })
       return next
     })
     track('medication_administered', { medication_name: med.name })
-    setAdminSaving(false); setAdminModal(null); setAdminPhotoBlob(null); setAdminPhotoPreview(null)
+    setAdminSaving(false); setAdminModal(null); setAdminPhotoBlob(null); setAdminPhotoPreview(null); setAdminGps(null)
     showToast('Medicamento registrado correctamente ✅')
+
+    // Recordatorio de prueba: si no se tomó foto, se ofrece el sheet de prueba (30 min)
+    if (!photoUrl) openProofSheet(med)
+  }
+
+  // ── Recordatorio de prueba post-confirmación (30 min) ─────────────────────────
+  function openProofSheet(med) {
+    setProofSheet({ med })
+    setProofPreview(null); setProofBlob(null); setProofGps(null)
+    setProofStamping(false); setProofError('')
+  }
+  function closeProofSheet() {
+    setProofSheet(null)
+    setProofPreview(null); setProofBlob(null); setProofGps(null); setProofError('')
+  }
+  function proofOpenCamera() {
+    if (proofStamping || proofUploading) return
+    const el = document.createElement('input')
+    el.type = 'file'; el.accept = 'image/*'; el.capture = 'environment'
+    el.addEventListener('change', handleProofFile, { once: true })
+    el.click()
+  }
+  function proofOpenGallery() {
+    if (proofStamping || proofUploading) return
+    const el = document.createElement('input')
+    el.type = 'file'; el.accept = 'image/*'
+    el.addEventListener('change', handleProofFile, { once: true })
+    el.click()
+  }
+  async function handleProofFile(e) {
+    const f = e.target.files?.[0]
+    e.target.value = ''
+    if (!f) return
+    setProofError(''); setProofStamping(true)
+    try {
+      const [stamped, loc] = await Promise.all([
+        stampProof(f, displayName),
+        getLocation({ force: true }).catch(() => null),
+      ])
+      setProofBlob(stamped)
+      setProofPreview(URL.createObjectURL(stamped))
+      setProofGps(loc)
+    } catch {
+      setProofError('No se pudo procesar la foto. Intenta de nuevo.')
+    } finally {
+      setProofStamping(false)
+    }
+  }
+  async function submitProofPhoto() {
+    if (!proofBlob || !proofSheet) return
+    setProofUploading(true); setProofError('')
+    try {
+      const medId = proofSheet.med.id
+      const path = `${ownerId}/${today}/${medId}.jpg`
+      const { error: storageError } = await supabase.storage
+        .from('confirmations')
+        .upload(path, proofBlob, { upsert: true, contentType: 'image/jpeg' })
+      if (storageError) throw storageError
+      const { data: { publicUrl } } = supabase.storage.from('confirmations').getPublicUrl(path)
+      const updateFields = {
+        photo_url: publicUrl,
+        ...(proofGps && { latitude: proofGps.latitude, longitude: proofGps.longitude, address: proofGps.address }),
+      }
+      const { error: dbError } = await supabase.from('medication_logs')
+        .update(updateFields)
+        .eq('medication_id', medId).eq('user_id', ownerId).eq('log_date', today)
+      if (dbError) throw dbError
+      setLogsByMedId(prev => {
+        const next = { ...prev }
+        const dayLogs = next[medId]?.[today] ?? []
+        next[medId] = { ...next[medId], [today]: dayLogs.map(l => l.status === 'confirmed' ? { ...l, ...updateFields } : l) }
+        return next
+      })
+      closeProofSheet()
+    } catch (err) {
+      console.error(err)
+      setProofError('No se pudo guardar la foto. Verifica tu conexión e intenta de nuevo.')
+    } finally {
+      setProofUploading(false)
+    }
+  }
+
+  // ── Desconfirmar una dosis ya dada ────────────────────────────────────────────
+  async function handleUnconfirm() {
+    if (!unconfirmTarget || unconfirming) return
+    const med = unconfirmTarget
+    setUnconfirming(true)
+    await supabase.from('medication_logs').delete()
+      .eq('medication_id', med.id).eq('user_id', ownerId).eq('log_date', today)
+    setLogsByMedId(prev => {
+      const next = { ...prev }
+      const dayLogs = next[med.id]?.[today] ?? []
+      next[med.id] = { ...next[med.id], [today]: dayLogs.filter(l => l.status !== 'confirmed') }
+      return next
+    })
+    setUnconfirming(false)
+    setUnconfirmTarget(null)
   }
 
   async function handleOmitir() {
@@ -746,6 +930,13 @@ export default function Medications() {
   const administradosMeds = medications.filter(med =>
     (logsByMedId[med.id]?.[today] ?? []).some(l => l.status === 'confirmed' || l.status === 'missed')
   )
+
+  // Recordatorio de prueba: confirmadas sin foto, dentro de los primeros 30 min
+  const pendingProofMeds = medications.filter(med => {
+    const log = (logsByMedId[med.id]?.[today] ?? []).find(l => l.status === 'confirmed')
+    if (!log || log.photo_url || !log.confirmed_at) return false
+    return (Date.now() - new Date(log.confirmed_at).getTime()) < 30 * 60 * 1000
+  })
 
   // Today's contributors derived from existing logsByMedId state (avatars + personalized banner)
   const todayContributors = [...new Set(
@@ -954,6 +1145,33 @@ export default function Medications() {
               </div>
             )}
 
+            {/* ── Recordatorio amable: agregar foto de prueba (30 min) ── */}
+            {pendingProofMeds.filter(m => m.id !== proofSheet?.med?.id).map(med => {
+              const log = (logsByMedId[med.id]?.[today] ?? []).find(l => l.status === 'confirmed')
+              const minLeft = Math.max(0, 30 - Math.floor((Date.now() - new Date(log.confirmed_at).getTime()) / 60000))
+              return (
+                <button
+                  key={med.id}
+                  onClick={() => openProofSheet(med)}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 10, textAlign: 'left',
+                    background: '#FBEAE4', border: 'none', borderRadius: 16,
+                    padding: '11px 14px', cursor: 'pointer', width: '100%',
+                    boxShadow: '0 4px 12px -8px #E9826E55',
+                  }}
+                >
+                  <span style={{ flexShrink: 0, display: 'flex' }}><Camera size={17} color="#C4664F" strokeWidth={1.9} /></span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ fontSize: 13, fontWeight: 700, color: '#C4664F', margin: 0 }}>
+                      Agrega una foto de prueba — {minLeft} min
+                    </p>
+                    <p style={{ fontSize: 11, color: '#8A5A4A', margin: '2px 0 0' }}>{med.name}</p>
+                  </div>
+                  <span style={{ fontSize: 11, color: '#C4664F', fontWeight: 700, flexShrink: 0 }}>Agregar</span>
+                </button>
+              )
+            })}
+
             {/* ── Franjas: Mañana / Mediodía / Noche / Según necesidad ── */}
             {(() => {
               const tagged = [
@@ -1023,7 +1241,7 @@ export default function Medications() {
                               </div>
                             )}
                             {!isFamiliar && (
-                              <button onClick={() => { setAdminModal(med); setAdminPhotoBlob(null); setAdminPhotoPreview(null); setAdminError('') }} style={{ width: '100%', padding: '10px', borderRadius: 999, border: 'none', background: '#E9826E', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer', boxShadow: '0 4px 12px rgba(233,130,110,0.35)' }}>
+                              <button onClick={() => handleTapAdministrar(med)} style={{ width: '100%', padding: '10px', borderRadius: 999, border: 'none', background: '#E9826E', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer', boxShadow: '0 4px 12px rgba(233,130,110,0.35)' }}>
                                 ✅ Administrar
                               </button>
                             )}
@@ -1094,11 +1312,25 @@ export default function Medications() {
                       return (
                         <div key={med.id} style={{ background: isAutoMissed ? '#FBEAE4' : isOmitted ? '#FFFBEB' : '#EAF7F3', borderRadius: 20, padding: 16, boxShadow: isAutoMissed ? '0 6px 14px -8px #D9534F44' : '0 6px 14px -8px #087F7022' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-                            <span style={{
-                              width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
-                              background: isAutoMissed ? '#F1C9C6' : isOmitted ? '#FDE68A' : '#A8E5D6',
-                              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14,
-                            }}>{isAutoMissed ? '❌' : isOmitted ? '⚠️' : '✅'}</span>
+                            {!isOmitted && !isFamiliar ? (
+                              <button
+                                onClick={() => setUnconfirmTarget(med)}
+                                aria-label="Desmarcar dosis"
+                                style={{
+                                  width: 32, height: 32, borderRadius: '50%', flexShrink: 0, border: 'none', cursor: 'pointer',
+                                  background: '#A8E5D6',
+                                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                }}
+                              >
+                                <CheckIcon size={14} color="#087F70" strokeWidth={2.6} />
+                              </button>
+                            ) : (
+                              <span style={{
+                                width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
+                                background: isAutoMissed ? '#F1C9C6' : '#FDE68A',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14,
+                              }}>{isAutoMissed ? '❌' : '⚠️'}</span>
+                            )}
                             <p style={{ fontSize: 14.5, fontWeight: 700, color: isAutoMissed ? '#D9534F' : isOmitted ? '#92400E' : '#087F70', margin: 0, flex: 1 }}>
                               {med.name}{med.dosage ? <span style={{ fontWeight: 400, color: '#6B7A88', fontSize: 12 }}> · {med.dosage}</span> : null}
                             </p>
@@ -1127,7 +1359,7 @@ export default function Medications() {
                               </span>
                             )}
                             {med.notes && <span style={{ fontSize: 11, color: '#6B7A88' }}>📝 {med.notes}</span>}
-                            {(todayLog?.photo_url || stockDoc?.prescription_photo_url || stockDoc?.box_photo_url) && (
+                            {(todayLog?.photo_url || stockDoc?.prescription_photo_url || stockDoc?.box_photo_url || (todayLog?.latitude && todayLog?.longitude)) && (
                               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 2 }}>
                                 {todayLog?.photo_url && (
                                   <button onClick={() => setPreviewPhotoUrl(todayLog.photo_url)} style={{ padding: '4px 10px', borderRadius: 8, border: '1px solid #A8E5D6', background: 'white', fontSize: 11, fontWeight: 600, color: '#087F70', cursor: 'pointer' }}>
@@ -1143,6 +1375,15 @@ export default function Medications() {
                                   <button onClick={() => setPreviewPhotoUrl(stockDoc.box_photo_url)} style={{ padding: '4px 10px', borderRadius: 8, border: '1px solid #A8E5D6', background: 'white', fontSize: 11, fontWeight: 600, color: '#087F70', cursor: 'pointer' }}>
                                     📦 Ver caja
                                   </button>
+                                )}
+                                {todayLog?.latitude && todayLog?.longitude && (
+                                  <a
+                                    href={mapsUrl(todayLog.latitude, todayLog.longitude)}
+                                    target="_blank" rel="noopener noreferrer"
+                                    style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 8, border: '1px solid #A8E5D6', background: 'white', fontSize: 11, fontWeight: 600, color: '#087F70', textDecoration: 'none' }}
+                                  >
+                                    <MapPin size={11} color="#087F70" strokeWidth={2} /> Ver ubicación
+                                  </a>
                                 )}
                               </div>
                             )}
@@ -1638,7 +1879,7 @@ export default function Medications() {
       {adminModal && (
         <div
           style={{ position: 'fixed', inset: 0, zIndex: 250, background: 'rgba(20,32,29,0.45)', display: 'flex', alignItems: 'flex-end' }}
-          onClick={e => { if (e.target === e.currentTarget && !adminSaving) { setAdminModal(null); setAdminPhotoBlob(null); setAdminPhotoPreview(null) } }}
+          onClick={e => { if (e.target === e.currentTarget && !adminSaving) { setAdminModal(null); setAdminPhotoBlob(null); setAdminPhotoPreview(null); setAdminGps(null) } }}
         >
           <div style={{ width: '100%', maxHeight: '90vh', background: '#F8F4ED', borderRadius: '28px 28px 0 0', padding: '24px 20px 80px', overflowY: 'auto', boxShadow: '0 -12px 30px -12px #08554A55' }}>
             <input ref={adminCameraRef}  type="file" accept="image/*" capture="environment" onChange={handleAdminFileSelect} style={{ display: 'none' }} />
@@ -1653,7 +1894,7 @@ export default function Medications() {
                   {adminModal.dosage && <p style={{ fontSize: 13, color: '#6B7A88', margin: '2px 0 0' }}>{adminModal.dosage}</p>}
                 </div>
               </div>
-              <button onClick={() => { if (!adminSaving) { setAdminModal(null); setAdminPhotoBlob(null); setAdminPhotoPreview(null) } }} style={{ width: 32, height: 32, borderRadius: 11, background: '#FFFFFF', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <button onClick={() => { if (!adminSaving) { setAdminModal(null); setAdminPhotoBlob(null); setAdminPhotoPreview(null); setAdminGps(null) } }} style={{ width: 32, height: 32, borderRadius: 11, background: '#FFFFFF', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <XIcon size={16} color="#6B7A88" strokeWidth={2.2} />
               </button>
             </div>
@@ -1671,20 +1912,32 @@ export default function Medications() {
 
             <p style={{ fontSize: 12, fontWeight: 700, color: '#7D8A9A', letterSpacing: '0.06em', textTransform: 'uppercase', margin: '0 0 8px' }}>Foto de evidencia (opcional)</p>
             <div style={{ borderRadius: 16, overflow: 'hidden', marginBottom: 12, background: 'white', boxShadow: '0 6px 14px -8px #087F7022' }}>
-              {adminPhotoPreview ? (
+              {adminPhotoStamping ? (
+                <div style={{ padding: '28px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+                  <div style={{ width: 22, height: 22, borderRadius: '50%', border: '3px solid #EAF7F3', borderTopColor: '#087F70', animation: 'spin 0.8s linear infinite' }} />
+                  <p style={{ fontSize: 12, color: '#6B7A88', margin: 0 }}>Aplicando sello...</p>
+                </div>
+              ) : adminPhotoPreview ? (
                 <>
                   <img src={adminPhotoPreview} alt="Evidencia" style={{ width: '100%', maxHeight: 180, objectFit: 'cover' }} />
+                  <div style={{ padding: '8px 12px', background: '#EAF7F3', display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ fontSize: 12 }}>🔒</span>
+                    <p style={{ fontSize: 11, fontWeight: 700, color: '#087F70', margin: 0, flex: 1 }}>Sello aplicado</p>
+                  </div>
                   <div style={{ padding: '8px 12px', display: 'flex', gap: 8 }}>
                     <button onClick={adminOpenCamera} style={{ flex: 1, padding: 10, borderRadius: 13, border: 'none', background: '#A8E5D6', color: '#087F70', fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}>Cambiar foto</button>
-                    <button onClick={() => { setAdminPhotoBlob(null); setAdminPhotoPreview(null) }} style={{ flex: 1, padding: 10, borderRadius: 13, border: 'none', background: '#F1EDE3', color: '#5C6B78', fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}>Quitar</button>
+                    <button onClick={() => { setAdminPhotoBlob(null); setAdminPhotoPreview(null); setAdminGps(null) }} style={{ flex: 1, padding: 10, borderRadius: 13, border: 'none', background: '#F1EDE3', color: '#5C6B78', fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}>Quitar</button>
                   </div>
                 </>
               ) : (
-                <div style={{ padding: '18px 16px', display: 'flex', gap: 8 }}>
-                  <button onClick={adminOpenCamera} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: 10, borderRadius: 13, border: 'none', background: '#A8E5D6', color: '#087F70', fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}>
-                    <Camera size={15} color="#087F70" strokeWidth={1.9} /> Tomar foto
-                  </button>
-                  <button onClick={adminOpenGallery} style={{ flex: 1, padding: 10, borderRadius: 13, border: 'none', background: '#F1EDE3', color: '#5C6B78', fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}>Elegir de galería</button>
+                <div style={{ padding: '18px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  <p style={{ fontSize: 11, color: '#6B7A88', margin: 0, textAlign: 'center' }}>Se sellará automáticamente con fecha y hora</p>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button onClick={adminOpenCamera} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: 10, borderRadius: 13, border: 'none', background: '#A8E5D6', color: '#087F70', fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}>
+                      <Camera size={15} color="#087F70" strokeWidth={1.9} /> Tomar foto
+                    </button>
+                    <button onClick={adminOpenGallery} style={{ flex: 1, padding: 10, borderRadius: 13, border: 'none', background: '#F1EDE3', color: '#5C6B78', fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}>Elegir de galería</button>
+                  </div>
                 </div>
               )}
             </div>
@@ -1693,8 +1946,8 @@ export default function Medications() {
 
             <button
               onClick={handleAdministrar}
-              disabled={adminSaving}
-              style={{ width: '100%', padding: 16, borderRadius: 999, border: 'none', background: adminSaving ? '#C0CCC5' : '#E9826E', color: 'white', fontWeight: 800, fontSize: 16, cursor: adminSaving ? 'not-allowed' : 'pointer', boxShadow: adminSaving ? 'none' : '0 8px 18px -6px rgba(233,130,110,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+              disabled={adminSaving || adminPhotoStamping}
+              style={{ width: '100%', padding: 16, borderRadius: 999, border: 'none', background: (adminSaving || adminPhotoStamping) ? '#C0CCC5' : '#E9826E', color: 'white', fontWeight: 800, fontSize: 16, cursor: (adminSaving || adminPhotoStamping) ? 'not-allowed' : 'pointer', boxShadow: (adminSaving || adminPhotoStamping) ? 'none' : '0 8px 18px -6px rgba(233,130,110,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
             >
               {adminSaving
                 ? <><div style={{ width: 18, height: 18, borderRadius: '50%', border: '2.5px solid rgba(255,255,255,0.4)', borderTopColor: 'white', animation: 'spin 0.7s linear infinite' }} /> Guardando...</>
@@ -1703,6 +1956,161 @@ export default function Medications() {
           </div>
         </div>
       )}
+
+      {/* ── Aviso: confirmar como administrador ───────────────────────────── */}
+      {adminConfirmWarningMed && (
+        <div
+          style={{ position: 'fixed', inset: 0, zIndex: 300, background: 'rgba(20,32,29,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 24px' }}
+          onClick={e => { if (e.target === e.currentTarget) setAdminConfirmWarningMed(null) }}
+        >
+          <div style={{ background: 'white', borderRadius: 20, padding: '28px 24px', maxWidth: 340, width: '100%', textAlign: 'center', boxShadow: '0 24px 64px -16px #08554A55' }}>
+            <p style={{ fontFamily: "'Fraunces', Georgia, serif", fontStyle: 'italic', fontSize: 17, fontWeight: 700, color: '#1E2C3A', marginBottom: 10 }}>
+              Confirmar como administrador
+            </p>
+            <p style={{ fontSize: 13, color: '#8A661A', lineHeight: 1.6, marginBottom: 10, background: '#F6E4B8', borderRadius: 14, padding: '10px 14px' }}>
+              Úsalo solo si el cuidador habitual no puede confirmar en este momento.
+            </p>
+            <p style={{ fontSize: 12, color: '#6B7A88', lineHeight: 1.6, marginBottom: 24 }}>
+              Esta acción quedará registrada con tu nombre.
+            </p>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button onClick={() => setAdminConfirmWarningMed(null)} style={{ flex: 1, padding: 12, borderRadius: 12, border: 'none', background: '#F1EDE3', color: '#5C6B78', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>
+                Cancelar
+              </button>
+              <button
+                onClick={() => { const m = adminConfirmWarningMed; setAdminConfirmWarningMed(null); openAdminModal(m) }}
+                style={{ flex: 1, padding: 12, borderRadius: 12, border: 'none', background: '#D99A18', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer', boxShadow: '0 4px 16px rgba(217,154,24,0.35)' }}
+              >
+                Confirmar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Confirmar desmarcar una dosis ya dada ──────────────────────────── */}
+      {unconfirmTarget && (
+        <div
+          style={{ position: 'fixed', inset: 0, zIndex: 300, background: 'rgba(20,32,29,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 24px' }}
+          onClick={e => { if (e.target === e.currentTarget && !unconfirming) setUnconfirmTarget(null) }}
+        >
+          <div style={{ background: 'white', borderRadius: 20, padding: '28px 24px', maxWidth: 340, width: '100%', textAlign: 'center', boxShadow: '0 24px 64px -16px #08554A55' }}>
+            <p style={{ fontFamily: "'Fraunces', Georgia, serif", fontStyle: 'italic', fontSize: 17, fontWeight: 700, color: '#1E2C3A', marginBottom: 8 }}>
+              ¿Desmarcar esta dosis?
+            </p>
+            <p style={{ fontSize: 13, color: '#6B7A88', lineHeight: 1.6, marginBottom: 24 }}>
+              {unconfirmTarget.name} volverá a aparecer como pendiente.
+            </p>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button onClick={() => setUnconfirmTarget(null)} disabled={unconfirming} style={{ flex: 1, padding: 12, borderRadius: 12, border: 'none', background: '#F1EDE3', color: '#5C6B78', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>
+                Cancelar
+              </button>
+              <button
+                onClick={handleUnconfirm}
+                disabled={unconfirming}
+                style={{ flex: 1, padding: 12, borderRadius: 12, border: 'none', background: unconfirming ? '#C0CCC5' : '#C4664F', color: 'white', fontWeight: 700, fontSize: 14, cursor: unconfirming ? 'not-allowed' : 'pointer' }}
+              >
+                {unconfirming ? 'Desmarcando...' : 'Desmarcar'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Sheet: foto de prueba (recordatorio 30 min) ────────────────────── */}
+      {proofSheet && (() => {
+        const dayLogs = logsByMedId[proofSheet.med.id]?.[today] ?? []
+        const confirmedAt = dayLogs.find(l => l.status === 'confirmed')?.confirmed_at
+        const minLeft = confirmedAt
+          ? Math.max(0, 30 - Math.floor((Date.now() - new Date(confirmedAt).getTime()) / 60000))
+          : 30
+        return (
+          <div
+            style={{ position: 'fixed', inset: 0, zIndex: 250, background: 'rgba(20,32,29,0.45)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
+            onClick={e => { if (e.target === e.currentTarget && !proofUploading) closeProofSheet() }}
+          >
+            <div style={{ width: '100%', maxWidth: 480, background: '#F8F4ED', borderRadius: '28px 28px 0 0', padding: '24px 20px 96px', boxShadow: '0 -12px 30px -12px #08554A55' }}>
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 16 }}>
+                <div>
+                  <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 18, fontWeight: 800, color: '#1E2C3A', margin: 0 }}>Foto de prueba</p>
+                  <p style={{ fontSize: 13, color: minLeft <= 5 ? '#C4664F' : '#6B7A88', marginTop: 4 }}>
+                    {proofSheet.med.name} — {minLeft > 0 ? `${minLeft} min restantes` : 'Tiempo agotado'}
+                  </p>
+                </div>
+                <button onClick={closeProofSheet} disabled={proofUploading} style={{ width: 32, height: 32, borderRadius: 11, background: '#FFFFFF', border: 'none', cursor: proofUploading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, opacity: proofUploading ? 0.4 : 1 }}>
+                  <XIcon size={16} color="#6B7A88" strokeWidth={2.2} />
+                </button>
+              </div>
+
+              <div style={{ borderRadius: 16, overflow: 'hidden', marginBottom: 16, background: 'white', boxShadow: '0 6px 14px -8px #087F7022' }}>
+                {proofStamping ? (
+                  <div style={{ padding: '32px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+                    <div style={{ width: 26, height: 26, borderRadius: '50%', border: '3px solid #EAF7F3', borderTopColor: '#087F70', animation: 'spin 0.8s linear infinite' }} />
+                    <p style={{ fontSize: 13, color: '#6B7A88', margin: 0 }}>Aplicando sello...</p>
+                  </div>
+                ) : proofPreview ? (
+                  <>
+                    <img src={proofPreview} alt="Prueba sellada" style={{ width: '100%', maxHeight: 220, objectFit: 'cover' }} />
+                    <div style={{ padding: '10px 14px', background: '#EAF7F3', display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <span style={{ fontSize: 14 }}>🔒</span>
+                      <div style={{ flex: 1 }}>
+                        <p style={{ fontSize: 12, fontWeight: 700, color: '#087F70', margin: 0 }}>Sello aplicado</p>
+                        {proofGps && (
+                          <p style={{ fontSize: 11, color: '#087F70', margin: '2px 0 0' }}>
+                            📍 {proofGps.address ?? `${proofGps.latitude.toFixed(5)}, ${proofGps.longitude.toFixed(5)}`}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: 8, padding: '8px 12px 12px' }}>
+                      <button type="button" onClick={proofOpenCamera} disabled={proofUploading} style={{ flex: 1, padding: '8px 0', borderRadius: 10, border: 'none', background: '#A8E5D6', color: '#087F70', fontSize: 12, fontWeight: 700, cursor: proofUploading ? 'not-allowed' : 'pointer' }}>Tomar foto</button>
+                      <button type="button" onClick={proofOpenGallery} disabled={proofUploading} style={{ flex: 1, padding: '8px 0', borderRadius: 10, border: 'none', background: '#F1EDE3', color: '#5C6B78', fontSize: 12, fontWeight: 700, cursor: proofUploading ? 'not-allowed' : 'pointer' }}>De galería</button>
+                    </div>
+                  </>
+                ) : (
+                  <div style={{ padding: '28px 16px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+                    <span style={{ width: 56, height: 56, borderRadius: '50%', background: '#EAF7F3', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Camera size={24} color="#087F70" strokeWidth={1.8} />
+                    </span>
+                    <p style={{ fontSize: 12, color: '#6B7A88', margin: 0 }}>Se sellará automáticamente con fecha y hora</p>
+                    <div style={{ display: 'flex', gap: 8, width: '100%' }}>
+                      <button type="button" onClick={proofOpenCamera} style={{ flex: 1, padding: '11px 0', borderRadius: 12, border: 'none', background: '#A8E5D6', color: '#087F70', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Tomar foto</button>
+                      <button type="button" onClick={proofOpenGallery} style={{ flex: 1, padding: '11px 0', borderRadius: 12, border: 'none', background: '#F1EDE3', color: '#5C6B78', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Elegir de galería</button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {proofError && (
+                <div style={{ background: '#FBEAE4', borderRadius: 14, padding: '10px 12px', marginBottom: 12 }}>
+                  <p style={{ fontSize: 12, color: '#C4664F', margin: 0 }}>⚠️ {proofError}</p>
+                </div>
+              )}
+
+              <button
+                onClick={submitProofPhoto}
+                disabled={!proofBlob || proofUploading || proofStamping}
+                style={{
+                  width: '100%', padding: 14, marginBottom: 10, borderRadius: 14, border: 'none',
+                  background: proofBlob && !proofUploading ? 'linear-gradient(148deg,#12A18C 0%,#0A8072 46%,#055C51 100%)' : '#C0CCC5',
+                  color: 'white', fontWeight: 700, fontSize: 14,
+                  cursor: proofBlob && !proofUploading ? 'pointer' : 'not-allowed',
+                  boxShadow: proofBlob && !proofUploading ? '0 8px 18px -6px rgba(8,127,112,0.5)' : 'none',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                }}
+              >
+                {proofUploading
+                  ? <><div style={{ width: 16, height: 16, borderRadius: '50%', border: '2.5px solid rgba(255,255,255,0.4)', borderTopColor: 'white', animation: 'spin 0.7s linear infinite' }} /> Guardando...</>
+                  : 'Guardar foto de prueba'}
+              </button>
+
+              <button onClick={closeProofSheet} style={{ width: '100%', padding: 12, background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: '#6B7A88' }}>
+                Omitir por ahora {minLeft > 0 ? `(tienes ${minLeft} min)` : ''}
+              </button>
+            </div>
+          </div>
+        )
+      })()}
 
       {/* ── Modal: Omisión ─────────────────────────────────────────────────── */}
       {omisionModal && (

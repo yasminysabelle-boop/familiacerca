@@ -20,7 +20,6 @@ import Notes from './pages/Notes'
 import Chat from './pages/Chat'
 import MemoryAlbum from './pages/MemoryAlbum'
 import Memorias from './pages/Memorias'
-import Hoy from './pages/Hoy'
 import Familia from './pages/Familia'
 import Reports from './pages/Reports'
 import TodoElCuidado from './pages/TodoElCuidado'
@@ -140,7 +139,6 @@ function AppShell() {
         <Route path="/album"       element={<P><MemoryAlbum /></P>} />
         <Route path="/diario-voz"  element={<P><Memorias /></P>} />
         <Route path="/memorias"    element={<P><Memorias /></P>} />
-        <Route path="/hoy"         element={<P><Hoy /></P>} />
         <Route path="/cuidado"     element={<P><Cuidado /></P>} />
         <Route path="/cuidado/horarios" element={<Navigate to="/cuidado?tab=horarios" replace />} />
 

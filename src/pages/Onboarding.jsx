@@ -82,7 +82,7 @@ export default function Onboarding() {
   // If onboarding already done, skip to hoy
   useEffect(() => {
     if (user?.user_metadata?.onboarding_completed) {
-      navigate('/hoy', { replace: true })
+      navigate('/dashboard', { replace: true })
     }
   }, [user, navigate])
 
@@ -93,7 +93,7 @@ export default function Onboarding() {
       // Fire-and-forget — member redirect must not block on metadata update
       supabase.auth.updateUser({ data: { onboarding_completed: true } })
         .catch(err => console.warn('[Onboarding] member metadata update failed:', err))
-      navigate('/hoy', { replace: true })
+      navigate('/dashboard', { replace: true })
     }
   }, [user, ownerId, familyLoading, navigate])
 
@@ -143,7 +143,7 @@ export default function Onboarding() {
     } catch { /* clipboard unavailable */ }
   }
 
-  async function finish(dest = '/hoy') {
+  async function finish(dest = '/dashboard') {
     const { error } = await supabase.auth.updateUser({ data: { onboarding_completed: true } })
     if (error) {
       console.error('[Onboarding] updateUser failed:', error)
@@ -295,7 +295,7 @@ export default function Onboarding() {
               <button onClick={() => finish('/medications')} style={primaryBtn(false)}>
                 Agregar medicamentos →
               </button>
-              <button onClick={() => finish('/hoy')} style={secondaryBtn}>
+              <button onClick={() => finish('/dashboard')} style={secondaryBtn}>
                 Explorar primero
               </button>
             </div>
@@ -304,7 +304,7 @@ export default function Onboarding() {
 
         {/* Global skip */}
         <button
-          onClick={() => finish('/hoy')}
+          onClick={() => finish('/dashboard')}
           style={{ marginTop: 20, background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', fontSize: 12, cursor: 'pointer', padding: '8px 20px' }}
         >
           Saltar todo
