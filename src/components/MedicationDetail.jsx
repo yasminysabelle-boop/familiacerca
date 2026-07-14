@@ -218,12 +218,12 @@ export default function MedicationDetail({ med, stock, ownerId, isAdmin, onClose
       {/* Confirmar eliminación */}
       {confirmingDelete && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 300, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 24px' }} onClick={e => { if (e.target === e.currentTarget && !deleting) setConfirmingDelete(false) }}>
-          <div style={{ background: 'white', borderRadius: 20, padding: '28px 24px', maxWidth: 340, width: '100%', textAlign: 'center', boxShadow: '0 24px 64px rgba(0,0,0,0.25)' }}>
+          <div style={{ background: 'white', borderRadius: 20, padding: '28px 24px', maxWidth: 340, width: '100%', textAlign: 'center', boxShadow: '0 24px 64px -16px #08554A55' }}>
             <p style={{ fontSize: 36, marginBottom: 12 }}>🗑️</p>
             <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 17, fontWeight: 700, color: '#1E2C3A', marginBottom: 8 }}>¿Eliminar {med.name}?</p>
             <p style={{ fontSize: 13, color: '#6B7A88', lineHeight: 1.6, marginBottom: 24 }}>Esta acción no se puede deshacer. Se eliminarán todos los registros del medicamento.</p>
             <div style={{ display: 'flex', gap: 10 }}>
-              <button onClick={() => setConfirmingDelete(false)} disabled={deleting} style={{ flex: 1, padding: 12, borderRadius: 12, border: '1.5px solid #EDE5D8', background: 'white', color: '#6B7A88', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>Cancelar</button>
+              <button onClick={() => setConfirmingDelete(false)} disabled={deleting} style={{ flex: 1, padding: 12, borderRadius: 12, border: 'none', background: '#F1EDE3', color: '#5C6B78', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>Cancelar</button>
               <button onClick={confirmDelete} disabled={deleting} style={{ flex: 1, padding: 12, borderRadius: 12, border: 'none', background: deleting ? '#C0CCC5' : '#D9534F', color: 'white', fontWeight: 700, fontSize: 14, cursor: deleting ? 'not-allowed' : 'pointer', boxShadow: deleting ? 'none' : '0 4px 16px rgba(217,83,79,0.3)' }}>
                 {deleting ? 'Eliminando...' : 'Eliminar'}
               </button>
