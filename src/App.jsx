@@ -132,6 +132,10 @@ function AppShell() {
         <Route path="/onboarding"  element={<P><Onboarding /></P>} />
         <Route path="/dashboard"   element={<P><Dashboard /></P>} />
         <Route path="/medications" element={<P><Medications /></P>} />
+        {/* Red de seguridad permanente: emails ya enviados (bienvenida, resúmenes) y
+            notificaciones antiguas en dispositivos que no actualizaron el SW todavía
+            siguen apuntando a /hoy. No quitar. */}
+        <Route path="/hoy"         element={<Navigate to="/medications" replace />} />
         <Route path="/historial"   element={<P><MedicationTimeline /></P>} />
         <Route path="/calendar"    element={<P><Calendar /></P>} />
         <Route path="/notes"       element={<P><Notes /></P>} />
