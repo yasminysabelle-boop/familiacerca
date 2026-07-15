@@ -46,7 +46,7 @@ function welcomeEmailHtml(memberName: string, relativeName: string, role: string
       ${featureRows}
     </ul>
     <div style="text-align:center;">
-      <a href="https://app.familiacerca.com/hoy" style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,#C4623A,#A85130);color:white;font-weight:700;font-size:15px;border-radius:12px;text-decoration:none;">
+      <a href="https://app.familiacerca.com/medications" style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,#C4623A,#A85130);color:white;font-weight:700;font-size:15px;border-radius:12px;text-decoration:none;">
         Abrir FamiliaCerca
       </a>
     </div>

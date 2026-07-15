@@ -52,7 +52,7 @@ function summaryEmailHtml(
       </table>
     </div>` : '<p style="color:#9CA3AF;text-align:center;font-size:14px;">No hay medicamentos configurados.</p>'}
     <div style="margin-top:20px;text-align:center;">
-      <a href="https://app.familiacerca.com/hoy" style="display:inline-block;padding:12px 28px;background:#C4623A;color:white;font-weight:700;font-size:14px;border-radius:10px;text-decoration:none;">
+      <a href="https://app.familiacerca.com/medications" style="display:inline-block;padding:12px 28px;background:#C4623A;color:white;font-weight:700;font-size:14px;border-radius:10px;text-decoration:none;">
         Ver detalles en la app
       </a>
     </div>

@@ -137,9 +137,9 @@ Deno.serve(async (req: Request) => {
           JSON.stringify({
             title: `💊 ${med.name} en 10 minutos`,
             body: med.dosage ? `Dosis: ${med.dosage} — prepara la dosis ahora` : 'Prepara la dosis ahora',
-            url: '/hoy',
+            url: '/medications',
             tag: `med-reminder-${med.id}`,
-            data: { family_id: med.user_id, patient_name: patientNameMap.get(med.user_id) ?? 'tu familiar', event_type: 'MED_REMINDER', target_screen: 'hoy' },
+            data: { family_id: med.user_id, patient_name: patientNameMap.get(med.user_id) ?? 'tu familiar', event_type: 'MED_REMINDER', target_screen: 'medications' },
           }),
           { TTL: 86400 }
         )
@@ -201,10 +201,10 @@ Deno.serve(async (req: Request) => {
           JSON.stringify({
             title: `❌ Dosis olvidada — ${med.name}`,
             body: missedBody,
-            url: '/hoy',
+            url: '/medications',
             tag: `missed-${med.id}-${todayPR}`,
             requireInteraction: true,
-            data: { family_id: med.user_id, patient_name: patientNameMap.get(med.user_id) ?? 'tu familiar', event_type: 'MISSED_DOSE', target_screen: 'hoy' },
+            data: { family_id: med.user_id, patient_name: patientNameMap.get(med.user_id) ?? 'tu familiar', event_type: 'MISSED_DOSE', target_screen: 'medications' },
           }),
           { TTL: 86400 }
         )

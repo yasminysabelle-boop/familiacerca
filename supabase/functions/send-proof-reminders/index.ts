@@ -100,9 +100,9 @@ Deno.serve(async (req: Request) => {
           JSON.stringify({
             title: `📷 ${patientName} — falta foto de prueba`,
             body: `${medName} fue dado hace 30 min — agrega la foto de prueba`,
-            url: '/hoy',
+            url: '/medications',
             tag: `proof-missing-${log.id}`,
-            data: { family_id: log.user_id, patient_name: patientName, event_type: 'PROOF_REMINDER', target_screen: 'hoy' },
+            data: { family_id: log.user_id, patient_name: patientName, event_type: 'PROOF_REMINDER', target_screen: 'medications' },
           })
         )
         sentCount++

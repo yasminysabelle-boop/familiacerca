@@ -212,9 +212,9 @@ Deno.serve(async (req: Request) => {
           JSON.stringify({
             title: `⚠️ ${patientName} — tareas pendientes`,
             body: 'Hay actividades de hoy sin completar',
-            url: '/hoy',
+            url: '/medications',
             tag: `evening-push-${today}`,
-            data: { family_id: ownerId, patient_name: patientName, event_type: 'EVENING_REMINDER', target_screen: 'hoy' },
+            data: { family_id: ownerId, patient_name: patientName, event_type: 'EVENING_REMINDER', target_screen: 'medications' },
           })
         )
         sentCount++
