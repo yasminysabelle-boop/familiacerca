@@ -1746,7 +1746,7 @@ function QuickCard({ emoji, label, subtitle, statusColor, onClick, index, size =
   )
 }
 
-function AttentionCard({ medName, medDosage, medTime, windowLabel, onConfirm }) {
+function AttentionCard({ medName, medDosage, medTime, windowLabel, isExpired, onConfirm, onLate }) {
   return (
     <section aria-label="Necesita tu atención" style={{ background: '#FBEAE4', borderRadius: 26, overflow: 'hidden', boxShadow: '0 8px 24px -12px rgba(233,130,110,0.45)' }}>
       <div style={{ padding: '18px 18px 20px' }}>
@@ -1764,11 +1764,13 @@ function AttentionCard({ medName, medDosage, medTime, windowLabel, onConfirm }) 
               <Clock size={15} color="#64748B" strokeWidth={2} /> Hoy {medTime}
             </p>
             <p style={{ margin: '5px 0 0', display: 'flex', alignItems: 'center', gap: 6, fontSize: 13.5, fontWeight: 600, color: '#E9826E' }}>
-              <AlertTriangle size={13} color="#E9826E" strokeWidth={2.4} /> Pendiente de confirmar
+              {isExpired
+                ? <><Clock size={13} color="#E9826E" strokeWidth={2.4} /> ¿Se administró? Puedes registrarlo</>
+                : <><AlertTriangle size={13} color="#E9826E" strokeWidth={2.4} /> Pendiente de confirmar</>}
             </p>
           </div>
-          <button onClick={onConfirm} style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 7, borderRadius: 15, background: '#E9826E', padding: '13px 17px', border: 'none', cursor: 'pointer', color: 'white', fontWeight: 700, fontSize: 14.5, boxShadow: '0 8px 18px -6px rgba(233,130,110,0.7)', WebkitTapHighlightColor: 'transparent' }}>
-            Confirmar <CheckIcon size={17} color="white" strokeWidth={2.6} />
+          <button onClick={isExpired ? onLate : onConfirm} style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 7, borderRadius: 15, background: '#E9826E', padding: '13px 17px', border: 'none', cursor: 'pointer', color: 'white', fontWeight: 700, fontSize: 14.5, boxShadow: '0 8px 18px -6px rgba(233,130,110,0.7)', WebkitTapHighlightColor: 'transparent' }}>
+            {isExpired ? 'Registrar' : 'Confirmar'} <CheckIcon size={17} color="white" strokeWidth={2.6} />
           </button>
         </div>
       </div>
@@ -3299,6 +3301,12 @@ export default function Dashboard() {
               const end = toHHMM(ph * 60 + pm + pendingMedWindowMinutes)
               return `${fmtTime(start)} · ${fmtTime(end)}`
             })() : null
+            // Ventana clínica real (scheduled + time_window_minutes) ya vencida — política A1/B
+            const isPendingMedWindowExpired = (nextPendingMed?.medTime && pendingMedWindowMinutes != null) ? (() => {
+              const [ph, pm] = nextPendingMed.medTime.split(':').map(Number)
+              const nowMins = new Date().getHours() * 60 + new Date().getMinutes()
+              return (nowMins - (ph * 60 + pm)) >= pendingMedWindowMinutes
+            })() : false
 
             return (
               <>
@@ -3323,7 +3331,9 @@ export default function Dashboard() {
                     medDosage={nextPendingMed.medDosage}
                     medTime={fmtTime(nextPendingMed.medTime)}
                     windowLabel={pendingMedWindowLabel}
+                    isExpired={isPendingMedWindowExpired}
                     onConfirm={() => handleConfirmMed(nextPendingMed)}
+                    onLate={() => navigate('/medications')}
                   />
                 )}
 

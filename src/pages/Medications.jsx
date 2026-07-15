@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { useSubscription } from '../contexts/SubscriptionContext'
 import { supabase } from '../lib/supabase'
-import { Plus, XIcon, Pencil, Bell, ChevronLeft, Pill, Camera, FileText, CheckIcon, MapPin, Clock, Heart } from '../components/Icons'
+import { Plus, XIcon, Pencil, Bell, ChevronLeft, Pill, Camera, FileText, CheckIcon, MapPin, Clock, Heart, User } from '../components/Icons'
 import MedicationDetail from '../components/MedicationDetail'
 import { usePushNotifications } from '../hooks/usePushNotifications'
 import { track } from '../lib/analytics'
@@ -1115,13 +1115,17 @@ export default function Medications() {
                 (logsByMedId[med.id]?.[today] ?? []).some(l => l.status === 'confirmed')
               ).length
               const isAllDone = totalPending === 0 && omitidosCount === 0 && confirmedCount > 0
-              const hasUnresolvedOmitted = totalPending === 0 && omitidosCount > 0
+              const hasPending = totalPending > 0
+              const hasOmitidos = omitidosCount > 0
 
               let title, subtitle
               if (isAllDone) {
                 title = `¡${patientFirst} está al día con sus cuidados!`
                 subtitle = 'Cada cuidado que das hoy cuenta. Gracias por estar cerca.'
-              } else if (hasUnresolvedOmitted) {
+              } else if (hasPending && hasOmitidos) {
+                title = `Un paso a la vez con ${patientFirst}`
+                subtitle = `${totalPending === 1 ? 'Queda' : 'Quedan'} ${totalPending} ${totalPending === 1 ? 'cuidado' : 'cuidados'} por confirmar. Hay ${omitidosCount} dosis de hoy sin registrar.`
+              } else if (hasOmitidos) {
                 title = `Hoy hay ${omitidosCount} dosis sin registrar.`
                 subtitle = 'Puedes registrarlas si se administraron.'
               } else {
@@ -1394,15 +1398,19 @@ export default function Medications() {
                           <div style={{ display: 'flex', flexDirection: 'column', gap: 4, paddingLeft: 42 }}>
                             {scheduledTime && (
                               <span style={{ fontSize: 11, color: '#6B7A88', display: 'flex', alignItems: 'center', gap: 4 }}>
-                                {isOmitted ? <Clock size={11} color="#6B7A88" strokeWidth={2} /> : '📅'} Programado: {scheduledTime}
+                                <Clock size={11} color="#6B7A88" strokeWidth={2} /> Programado: {scheduledTime}
                               </span>
                             )}
                             {confTime && (
                               <span style={{ fontSize: 11, color: '#087F70', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
-                                {isOmitted ? <Clock size={11} color="#087F70" strokeWidth={2} /> : '🕐'} {isOmitted ? 'Registrado:' : 'Administrado:'} {confTime}
+                                <Clock size={11} color="#6B7A88" strokeWidth={2} /> {isOmitted ? 'Registrado:' : 'Administrado:'} {confTime}
                               </span>
                             )}
-                            {byName && !isOmitted && <span style={{ fontSize: 11, color: '#6B7A88' }}>👤 Por: {byName}</span>}
+                            {byName && !isOmitted && (
+                              <span style={{ fontSize: 11, color: '#6B7A88', display: 'flex', alignItems: 'center', gap: 4 }}>
+                                <User size={11} color="#6B7A88" strokeWidth={2} /> Por: {byName}
+                              </span>
+                            )}
                             {isOmitted && (
                               <div style={{ background: 'rgba(255,255,255,0.55)', borderRadius: 10, padding: '8px 10px', marginTop: 2 }}>
                                 <p style={{ fontSize: 11.5, color: '#8A5A4A', lineHeight: 1.5, margin: 0, fontWeight: 500 }}>
@@ -1412,10 +1420,10 @@ export default function Medications() {
                               </div>
                             )}
                             {!isOmitted && (
-                              <span style={{ fontSize: 11, fontWeight: 600, color: todayLog?.given_on_time === false ? '#D97706' : '#087F70' }}>
+                              <span style={{ fontSize: 11, fontWeight: 600, color: todayLog?.given_on_time === false ? '#D97706' : '#087F70', display: 'flex', alignItems: 'center', gap: 4 }}>
                                 {todayLog?.given_on_time === false && todayLog?.minutes_late
                                   ? `⚠️ Fuera de ventana (${todayLog.minutes_late} min)`
-                                  : '✅ Administrado a tiempo'}
+                                  : <><CheckIcon size={11} color="#6B7A88" strokeWidth={2.4} /> Administrado a tiempo</>}
                               </span>
                             )}
                             {isOmitted && !isFamiliar && (
@@ -1427,8 +1435,8 @@ export default function Medications() {
                             {(todayLog?.photo_url || stockDoc?.prescription_photo_url || stockDoc?.box_photo_url || (todayLog?.latitude && todayLog?.longitude)) && (
                               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 2 }}>
                                 {todayLog?.photo_url && (
-                                  <button onClick={() => setPreviewPhotoUrl(todayLog.photo_url)} style={{ padding: '4px 10px', borderRadius: 8, border: '1px solid #A8E5D6', background: 'white', fontSize: 11, fontWeight: 600, color: '#087F70', cursor: 'pointer' }}>
-                                    📷 Ver evidencia
+                                  <button onClick={() => setPreviewPhotoUrl(todayLog.photo_url)} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 8, border: '1px solid #A8E5D6', background: 'white', fontSize: 11, fontWeight: 600, color: '#087F70', cursor: 'pointer' }}>
+                                    <Camera size={11} color="#6B7A88" strokeWidth={2} /> Ver evidencia
                                   </button>
                                 )}
                                 {stockDoc?.prescription_photo_url && (
@@ -2060,7 +2068,7 @@ export default function Medications() {
           onClick={e => { if (e.target === e.currentTarget && !unconfirming) setUnconfirmTarget(null) }}
         >
           <div style={{ background: 'white', borderRadius: 20, padding: '28px 24px', maxWidth: 340, width: '100%', textAlign: 'center', boxShadow: '0 24px 64px -16px #08554A55' }}>
-            <p style={{ fontFamily: "'Fraunces', Georgia, serif", fontStyle: 'italic', fontSize: 17, fontWeight: 700, color: '#1E2C3A', marginBottom: 8 }}>
+            <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 17, fontWeight: 800, color: '#1E2C3A', marginBottom: 8 }}>
               ¿Desmarcar esta dosis?
             </p>
             <p style={{ fontSize: 13, color: '#6B7A88', lineHeight: 1.6, marginBottom: 24 }}>
