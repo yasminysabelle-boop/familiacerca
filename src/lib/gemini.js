@@ -1,8 +1,32 @@
 const API_KEY  = import.meta.env.VITE_GEMINI_API_KEY
-const MODEL    = 'gemini-2.0-flash'
+const MODEL    = 'gemini-flash-latest'
 const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`
 
-export async function geminiGenerate() { return null }
+// thinkingBudget:0 — sin esto, el modelo gasta el budget de maxOutputTokens
+// "pensando" internamente y puede devolver texto vacío o cortado a la mitad.
+const NO_THINKING = { thinkingConfig: { thinkingBudget: 0 } }
+
+export async function geminiGenerate(prompt, maxTokens = 300) {
+  if (!API_KEY) { console.error('[Gemini] VITE_GEMINI_API_KEY not set'); return null }
+
+  try {
+    const res = await fetch(`${ENDPOINT}?key=${API_KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: { maxOutputTokens: maxTokens, ...NO_THINKING },
+      }),
+    })
+
+    if (!res.ok) { console.error('[Gemini] API error:', res.status, await res.text()); return null }
+    const data = await res.json()
+    return data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? null
+  } catch (e) {
+    console.error('[Gemini] fetch error:', e)
+    return null
+  }
+}
 
 export async function geminiChat(systemPrompt, history, text, maxTokens = 300) {
   if (!API_KEY) { console.error('[Gemini] VITE_GEMINI_API_KEY not set'); return null }
@@ -20,7 +44,7 @@ export async function geminiChat(systemPrompt, history, text, maxTokens = 300) {
       body: JSON.stringify({
         system_instruction: { parts: [{ text: systemPrompt }] },
         contents,
-        generationConfig: { maxOutputTokens: maxTokens },
+        generationConfig: { maxOutputTokens: maxTokens, ...NO_THINKING },
       }),
     })
 

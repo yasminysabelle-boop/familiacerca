@@ -50,7 +50,6 @@ const RENEWAL_METHODS = [
   { value: 'manual',       label: '✍️ Lo agrego solo' },
 ]
 
-const CLAUDE_PROXY  = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/claude-proxy`  // fallback
 const GEMINI_VISION = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/gemini-vision`
 
 const FORM_MAP = {

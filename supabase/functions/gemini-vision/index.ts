@@ -1,7 +1,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
-const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent';
+const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent';
 const GEMINI_KEY = Deno.env.get('GEMINI_API_KEY') ?? '';
 
 const corsHeaders = {
@@ -55,7 +55,9 @@ Deno.serve(async (req) => {
           { text: prompt },
         ],
       }],
-      generationConfig: { temperature: 0.1, maxOutputTokens: 1024 },
+      // thinkingConfig:{thinkingBudget:0} — sin esto el modelo puede gastar el
+      // budget de tokens "pensando" y devolver el JSON vacío o cortado.
+      generationConfig: { temperature: 0.1, maxOutputTokens: 1024, thinkingConfig: { thinkingBudget: 0 } },
     }),
   });
 
