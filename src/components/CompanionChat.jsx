@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
 import { geminiChat } from '../lib/gemini'
+import { buildCareContext } from '../lib/careContext'
+import { useFamily } from '../contexts/FamilyContext'
 import { FAMILIACERCA_KNOWLEDGE } from '../lib/companionKnowledge'
 import miloLunaImg  from '../assets/companions/milo-luna.png'
 import miloAvatarImg from '../assets/companions/milo-avatar.png'
@@ -54,9 +56,24 @@ const FALLBACKS = {
   luna: 'Te escucho 🌙',
 }
 
+// Reglas innegociables al usar el contexto de cuidado real — solo se agregan
+// cuando el contexto se pudo armar; si falla, Milo/Luna sigue con su prompt
+// genérico de siempre (ver buildSystemPrompt).
+const CONTEXT_RULES = `Reglas para usar el contexto de cuidado (innegociables):
+- Responde SOLO con hechos presentes en el contexto de cuidado. Si el dato no está, di que no tienes ese registro. NUNCA inventes.
+- NUNCA infieras estados de salud, ánimo o causas que no estén registrados textualmente.
+- NUNCA des consejo médico: nada de dosis, interacciones, ni recomendaciones clínicas. Ante preguntas médicas responde que eso debe consultarse con su médico.
+- Tono cálido y familiar, sin culpa ni alarmismo.
+- Respuestas breves: 2-4 oraciones, salvo que pidan detalle.`
+
+const CARE_CONTEXT_TTL_MS = 2 * 60 * 1000
+
 // bottomOffset: px from bottom of viewport for the floating button.
 // Pass 24 on Landing (no nav bar), use default 140 inside Layout (above FAB).
 export default function CompanionChat({ bottomOffset = 140, externalOpen = false, onExternalClose }) {
+  const { ownerId } = useFamily()
+  const careContextRef = useRef({ text: null, fetchedAt: 0 })
+
   const [companion,  setCompanion]  = useState(() => {
     // migrate from old key
     const old = localStorage.getItem('fc_companion')
@@ -114,6 +131,24 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
     setMessages([{ role: 'companion', text: GREETINGS[choice] }])
   }
 
+  // Cachea el careContext durante la sesión del chat — solo se re-consulta a
+  // Supabase si pasaron >2 min desde la última vez (o si es la primera).
+  async function getCareContext() {
+    const cached = careContextRef.current
+    if (cached.text !== null && Date.now() - cached.fetchedAt < CARE_CONTEXT_TTL_MS) return cached.text
+    const text = await buildCareContext(ownerId)
+    careContextRef.current = { text, fetchedAt: Date.now() }
+    return text
+  }
+
+  // Si el contexto no se pudo armar (falla la query), Milo/Luna responde con
+  // su prompt genérico de siempre — la IA nunca se cae por el contexto.
+  async function buildSystemPrompt() {
+    const careContext = await getCareContext()
+    if (!careContext) return cfg.prompt
+    return `${cfg.prompt}\n\n${CONTEXT_RULES}\n\n${careContext}`
+  }
+
   async function send() {
     const text = input.trim()
     if (!text || loading || !cfg) return
@@ -126,7 +161,8 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
     const firstUser = prior.findIndex(m => m.role === 'user')
     const history = firstUser >= 0 ? prior.slice(firstUser) : []
 
-    const reply = await geminiChat(cfg.prompt, history, text, 300)
+    const systemPrompt = await buildSystemPrompt()
+    const reply = await geminiChat(systemPrompt, history, text, 300)
     setMessages(prev => [...prev, { role: 'companion', text: reply ?? FALLBACKS[companion] }])
     setLoading(false)
   }
@@ -139,7 +175,8 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
     if (loading || !cfg) return
     setMessages(prev => [...prev, { role: 'user', text }])
     setLoading(true)
-    const reply = await geminiChat(cfg.prompt, [], text, 300)
+    const systemPrompt = await buildSystemPrompt()
+    const reply = await geminiChat(systemPrompt, [], text, 300)
     setMessages(prev => [...prev, { role: 'companion', text: reply ?? FALLBACKS[companion] }])
     setLoading(false)
   }
