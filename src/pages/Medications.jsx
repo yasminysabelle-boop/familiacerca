@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { useSubscription } from '../contexts/SubscriptionContext'
 import { supabase } from '../lib/supabase'
-import { Plus, XIcon, Pencil, Bell, ChevronLeft, Pill, Camera, FileText, CheckIcon, MapPin } from '../components/Icons'
+import { Plus, XIcon, Pencil, Bell, ChevronLeft, Pill, Camera, FileText, CheckIcon, MapPin, Clock, Heart } from '../components/Icons'
 import MedicationDetail from '../components/MedicationDetail'
 import { usePushNotifications } from '../hooks/usePushNotifications'
 import { track } from '../lib/analytics'
@@ -79,6 +79,19 @@ function calcMedStatus(scheduledTime, windowMinutes = 60) {
   if (diffMins >= windowMinutes)  return 'tarde'
   if (diffMins >= windowMinutes - 15) return 'dar_pronto'
   return 'pendiente'
+}
+
+// Minutos que faltan para la hora programada (negativo si ya pasó)
+function minsUntilScheduled(scheduledTime) {
+  if (!scheduledTime) return 0
+  const [h, m] = scheduledTime.split(':').map(Number)
+  const now = new Date()
+  return (h * 60 + m) - (now.getHours() * 60 + now.getMinutes())
+}
+
+function fmt12h(scheduledTime) {
+  const [h, m] = scheduledTime.split(':').map(Number)
+  return `${h % 12 || 12}:${String(m).padStart(2, '0')}${h >= 12 ? 'pm' : 'am'}`
 }
 
 const MED_STATUS = {
@@ -680,21 +693,9 @@ export default function Medications() {
     if (!adminModal?.id || adminSaving) return
     const med = adminModal
     const _sched = firstTimeMed(med)
-    if (_sched) {
-      const [_hh, _mm] = _sched.split(':').map(Number)
-      const _window = med.time_window_minutes ?? 60
-      const _now = new Date()
-      const _nowMins = _now.getHours() * 60 + _now.getMinutes()
-      const _schedMins = _hh * 60 + _mm
-      // Handle midnight wrap: if current time is before scheduled time on the clock,
-      // the dose was scheduled the previous day and elapsed time wraps around 24h.
-      const _late = _nowMins >= _schedMins
-        ? _nowMins - _schedMins
-        : 24 * 60 - _schedMins + _nowMins
-      if (_late >= _window) {
-        setAdminError('La ventana clínica ha vencido. Esta dosis no puede administrarse. Continúa con la próxima dosis a su hora habitual.')
-        return
-      }
+    if (_sched && minsUntilScheduled(_sched) > 10) {
+      setAdminError(`Aún no se puede administrar. Disponible a las ${fmt12h(_sched)}.`)
+      return
     }
     setAdminSaving(true); setAdminError('')
     const confirmedAt = new Date().toISOString()
@@ -1103,22 +1104,41 @@ export default function Medications() {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 22, paddingBottom: 16 }}>
 
-            {/* ── Banner cálido — usa el conteo real de pendientes + atrasados ── */}
+            {/* ── Banner cálido — 3 estados: al día / pendientes / omitidos sin resolver ── */}
             {(() => {
               const patientFirst = (activePatientName || profile?.name || 'tu familiar').split(' ')[0]
               const totalPending = pendientesMeds.length + retrasadosMeds.length
-              const isAllDone = totalPending === 0 && administradosMeds.length > 0
-              const title = isAllDone ? `¡${patientFirst} está al día con sus cuidados! 💚` : `Un paso a la vez con ${patientFirst}`
-              const subtitle = isAllDone
-                ? 'Cada cuidado que das hoy cuenta. Gracias por estar cerca.'
-                : `Quedan ${totalPending} ${totalPending === 1 ? 'cuidado' : 'cuidados'} por confirmar hoy.`
+              const omitidosCount = medications.filter(med =>
+                (logsByMedId[med.id]?.[today] ?? []).some(l => l.status === 'missed')
+              ).length
+              const confirmedCount = medications.filter(med =>
+                (logsByMedId[med.id]?.[today] ?? []).some(l => l.status === 'confirmed')
+              ).length
+              const isAllDone = totalPending === 0 && omitidosCount === 0 && confirmedCount > 0
+              const hasUnresolvedOmitted = totalPending === 0 && omitidosCount > 0
+
+              let title, subtitle
+              if (isAllDone) {
+                title = `¡${patientFirst} está al día con sus cuidados!`
+                subtitle = 'Cada cuidado que das hoy cuenta. Gracias por estar cerca.'
+              } else if (hasUnresolvedOmitted) {
+                title = `Hoy hay ${omitidosCount} dosis sin registrar.`
+                subtitle = 'Puedes registrarlas si se administraron.'
+              } else {
+                title = `Un paso a la vez con ${patientFirst}`
+                subtitle = `${totalPending === 1 ? 'Queda' : 'Quedan'} ${totalPending} ${totalPending === 1 ? 'cuidado' : 'cuidados'} por confirmar hoy.`
+              }
+
               return (
                 <div style={{
                   background: isAllDone ? 'linear-gradient(135deg, #A8E5D6 0%, #F8F4ED 100%)' : 'linear-gradient(135deg, #FBEAE4 0%, #F8F4ED 100%)',
                   borderRadius: 22, padding: '20px 20px',
                   boxShadow: isAllDone ? '0 8px 20px -10px #087F7055' : '0 8px 20px -10px #E9826E44',
                 }}>
-                  <div style={{ fontFamily: "'Fraunces', Georgia, serif", fontStyle: 'italic', fontWeight: 600, fontSize: 17.5, color: '#08554A', lineHeight: 1.35 }}>{title}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{ fontFamily: "'Fraunces', Georgia, serif", fontStyle: 'italic', fontWeight: 600, fontSize: 17.5, color: '#08554A', lineHeight: 1.35 }}>{title}</div>
+                    {isAllDone && <Heart size={17} color="#E9826E" strokeWidth={2} filled />}
+                  </div>
                   <div style={{ fontSize: 13.5, color: '#3E5A54', marginTop: 6, lineHeight: 1.5 }}>{subtitle}</div>
                 </div>
               )
@@ -1236,65 +1256,88 @@ export default function Medications() {
                             </div>
                             {times.length > 0 && (
                               <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 10 }}>
-                                {times.map((t, i) => <span key={i} style={{ background: '#EAF7F3', color: '#08554A', padding: '2px 8px', borderRadius: 6, fontSize: 11, fontWeight: 600 }}>⏰ {t}</span>)}
+                                {times.map((t, i) => (
+                                  <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 3, background: '#EAF7F3', color: '#08554A', padding: '2px 8px', borderRadius: 6, fontSize: 11, fontWeight: 600 }}>
+                                    <Clock size={10} color="#08554A" strokeWidth={2.2} /> {t}
+                                  </span>
+                                ))}
                                 {med.time_window_minutes && <span style={{ fontSize: 11, color: '#6B7A88' }}>ventana {med.time_window_minutes} min</span>}
                               </div>
                             )}
-                            {!isFamiliar && (
-                              <button onClick={() => handleTapAdministrar(med)} style={{ width: '100%', padding: '10px', borderRadius: 999, border: 'none', background: '#E9826E', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer', boxShadow: '0 4px 12px rgba(233,130,110,0.35)' }}>
-                                ✅ Administrar
-                              </button>
-                            )}
+                            {!isFamiliar && (() => {
+                              const notYetOpen = firstT && minsUntilScheduled(firstT) > 10
+                              return (
+                                <button
+                                  onClick={() => !notYetOpen && handleTapAdministrar(med)}
+                                  disabled={notYetOpen}
+                                  style={{
+                                    width: '100%', padding: '10px', borderRadius: 999, border: 'none',
+                                    background: notYetOpen ? '#E5E1D6' : '#E9826E',
+                                    color: notYetOpen ? '#8A8F85' : 'white',
+                                    fontWeight: 700, fontSize: 14,
+                                    cursor: notYetOpen ? 'not-allowed' : 'pointer',
+                                    boxShadow: notYetOpen ? 'none' : '0 4px 12px rgba(233,130,110,0.35)',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                                  }}
+                                >
+                                  {notYetOpen
+                                    ? <><Clock size={14} color="#8A8F85" strokeWidth={2} /> Disponible a las {fmt12h(firstT)}</>
+                                    : <><CheckIcon size={15} color="white" strokeWidth={2.6} /> Administrar</>}
+                                </button>
+                              )
+                            })()}
                           </div>
                         )
                       }
 
-                      // ── ATRASADO: tarjeta melocotón + label coral ────────────
+                      // ── ATRASADO: tarjeta melocotón, pregunta amable + Registrar ahora ──
                       if (kind === 'atrasado') {
                         const times = med.scheduled_times?.length ? med.scheduled_times : med.time ? [med.time] : []
                         const firstT = times.length ? [...times].sort()[0] : null
-                        const timeLabel = firstT ? (() => {
-                          const [h, m] = firstT.split(':').map(Number)
-                          return `${h % 12 || 12}:${String(m).padStart(2, '0')}${h >= 12 ? 'pm' : 'am'}`
-                        })() : null
+                        const timeLabel = firstT ? fmt12h(firstT) : null
                         const medLabel = [med.name, med.dosage].filter(Boolean).join(' ')
                         const waText = encodeURIComponent(
-                          `⚠️ Dosis olvidada: ${medLabel}${timeLabel ? `. Hora programada: ${timeLabel}` : ''}. La dosis no fue administrada en el horario establecido. Por favor indique el procedimiento a seguir.`
+                          `${medLabel}${timeLabel ? ` — programado a las ${timeLabel}` : ''} no se registró a tiempo hoy. ¿Alguna indicación?`
                         )
                         return (
-                          <div key={med.id} style={{ background: '#FBEAE4', borderRadius: 20, padding: 16, boxShadow: '0 6px 14px -8px #E9826E44' }}>
+                          <div key={med.id} style={{ background: '#FBEAE4', borderRadius: 20, padding: 16, boxShadow: '0 6px 14px -8px #E9826E33' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                              <span style={{ width: 32, height: 32, borderRadius: '50%', flexShrink: 0, background: '#F6DAD0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <Clock size={15} color="#C4664F" strokeWidth={2} />
+                              </span>
                               <div style={{ flex: 1, minWidth: 0 }}>
-                                <p style={{ fontSize: 15.5, fontWeight: 700, color: '#C4664F', margin: '0 0 2px' }}>
-                                  ❌ {med.name}{med.dosage ? <span style={{ fontWeight: 400, color: '#6B7A88', fontSize: 13 }}> · {med.dosage}</span> : null}
+                                <p style={{ fontSize: 15.5, fontWeight: 700, color: '#1E2C3A', margin: '0 0 2px' }}>
+                                  {med.name}{med.dosage ? <span style={{ fontWeight: 400, color: '#6B7A88', fontSize: 13 }}> · {med.dosage}</span> : null}
                                 </p>
                                 {timeLabel && (
-                                  <p style={{ fontSize: 12, color: '#C4664F', fontWeight: 600, margin: 0 }}>
-                                    ⏰ Programado: {timeLabel} — ventana clínica vencida
+                                  <p style={{ fontSize: 12, color: '#8A5A4A', fontWeight: 600, margin: 0 }}>
+                                    Programado: {timeLabel}
                                   </p>
                                 )}
                               </div>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-                                <span style={{ fontSize: 10, fontWeight: 700, color: 'white', background: '#D9534F', padding: '3px 8px', borderRadius: 6 }}>Olvidada</span>
-                                {isAdmin && (
-                                  <button onClick={() => openEdit(med)} style={{ padding: 5, border: 'none', background: 'rgba(255,255,255,0.7)', borderRadius: 8, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
-                                    <Pencil size={13} color="#7D8A9A" strokeWidth={2} />
-                                  </button>
-                                )}
-                              </div>
+                              {isAdmin && (
+                                <button onClick={() => openEdit(med)} style={{ padding: 5, border: 'none', background: 'rgba(255,255,255,0.7)', borderRadius: 8, cursor: 'pointer', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+                                  <Pencil size={13} color="#7D8A9A" strokeWidth={2} />
+                                </button>
+                              )}
                             </div>
                             <div style={{ background: 'rgba(255,255,255,0.55)', borderRadius: 10, padding: '10px 12px', marginBottom: 10 }}>
-                              <p style={{ fontSize: 12, color: '#8A4A3A', lineHeight: 1.6, margin: 0, fontWeight: 500 }}>
-                                ⚠️ <strong>Dosis olvidada</strong> — No administres esta dosis. Continúa con la próxima dosis a su hora habitual. Si es un medicamento crítico o el paciente presenta síntomas, notifica al médico de inmediato.
+                              <p style={{ fontSize: 12.5, color: '#8A5A4A', lineHeight: 1.6, margin: 0, fontWeight: 500 }}>
+                                Esta dosis no se registró a tiempo. ¿Se administró y no dio tiempo de registrarla?
                               </p>
                             </div>
+                            {!isFamiliar && (
+                              <button onClick={() => handleTapAdministrar(med)} style={{ width: '100%', padding: '10px', borderRadius: 999, border: 'none', background: '#E9826E', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer', boxShadow: '0 4px 12px rgba(233,130,110,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 8 }}>
+                                <CheckIcon size={15} color="white" strokeWidth={2.6} /> Registrar ahora
+                              </button>
+                            )}
                             <a
                               href={`https://wa.me/?text=${waText}`}
                               target="_blank"
                               rel="noreferrer"
-                              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, width: '100%', padding: '10px', borderRadius: 10, background: '#25D366', color: 'white', fontWeight: 700, fontSize: 13, textDecoration: 'none', boxShadow: '0 2px 8px rgba(37,211,102,0.25)' }}
+                              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, width: '100%', padding: '8px', borderRadius: 10, border: '1px solid #E9826E', background: 'transparent', color: '#C4664F', fontWeight: 600, fontSize: 12.5, textDecoration: 'none' }}
                             >
-                              📱 Notificar al médico por WhatsApp
+                              Notificar al médico
                             </a>
                           </div>
                         )
@@ -1310,28 +1353,36 @@ export default function Medications() {
                       const omissionData  = omissionsByMedId[med.id]?.[today]
                       const stockDoc      = stockByMedId[med.id]
                       return (
-                        <div key={med.id} style={{ background: isAutoMissed ? '#FBEAE4' : isOmitted ? '#FFFBEB' : '#EAF7F3', borderRadius: 20, padding: 16, boxShadow: isAutoMissed ? '0 6px 14px -8px #D9534F44' : '0 6px 14px -8px #087F7022' }}>
+                        <div key={med.id} style={{ background: isOmitted ? '#FBEAE4' : '#EAF7F3', borderRadius: 20, padding: 16, boxShadow: isOmitted ? '0 6px 14px -8px #E9826E33' : '0 6px 14px -8px #087F7022' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-                            {!isOmitted && !isFamiliar ? (
-                              <button
-                                onClick={() => setUnconfirmTarget(med)}
-                                aria-label="Desmarcar dosis"
-                                style={{
-                                  width: 32, height: 32, borderRadius: '50%', flexShrink: 0, border: 'none', cursor: 'pointer',
-                                  background: '#A8E5D6',
-                                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                }}
-                              >
-                                <CheckIcon size={14} color="#087F70" strokeWidth={2.6} />
-                              </button>
+                            {!isOmitted ? (
+                              isFamiliar ? (
+                                <span style={{ width: 32, height: 32, borderRadius: '50%', flexShrink: 0, background: '#A8E5D6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                  <CheckIcon size={14} color="#087F70" strokeWidth={2.6} />
+                                </span>
+                              ) : (
+                                <button
+                                  onClick={() => setUnconfirmTarget(med)}
+                                  aria-label="Desmarcar dosis"
+                                  style={{
+                                    width: 32, height: 32, borderRadius: '50%', flexShrink: 0, border: 'none', cursor: 'pointer',
+                                    background: '#A8E5D6',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                  }}
+                                >
+                                  <CheckIcon size={14} color="#087F70" strokeWidth={2.6} />
+                                </button>
+                              )
                             ) : (
                               <span style={{
                                 width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
-                                background: isAutoMissed ? '#F1C9C6' : '#FDE68A',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14,
-                              }}>{isAutoMissed ? '❌' : '⚠️'}</span>
+                                background: '#F6DAD0',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              }}>
+                                <Clock size={15} color="#C4664F" strokeWidth={2} />
+                              </span>
                             )}
-                            <p style={{ fontSize: 14.5, fontWeight: 700, color: isAutoMissed ? '#D9534F' : isOmitted ? '#92400E' : '#087F70', margin: 0, flex: 1 }}>
+                            <p style={{ fontSize: 14.5, fontWeight: 700, color: isOmitted ? '#1E2C3A' : '#087F70', margin: 0, flex: 1 }}>
                               {med.name}{med.dosage ? <span style={{ fontWeight: 400, color: '#6B7A88', fontSize: 12 }}> · {med.dosage}</span> : null}
                             </p>
                             {isAdmin && (
@@ -1341,15 +1392,24 @@ export default function Medications() {
                             )}
                           </div>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: 4, paddingLeft: 42 }}>
-                            {scheduledTime && <span style={{ fontSize: 11, color: '#6B7A88' }}>📅 Programado: {scheduledTime}</span>}
-                            {confTime && <span style={{ fontSize: 11, color: '#087F70', fontWeight: 600 }}>🕐 {isOmitted ? 'Registrado:' : 'Administrado:'} {confTime}</span>}
-                            {byName && !isAutoMissed && <span style={{ fontSize: 11, color: '#6B7A88' }}>👤 Por: {byName}</span>}
-                            {isAutoMissed && <span style={{ fontSize: 11, color: '#D9534F', fontWeight: 600 }}>❌ Ventana clínica vencida — marcado por el sistema</span>}
-                            {isOmitted && !isAutoMissed && omissionData?.reason && (
-                              <span style={{ fontSize: 11, color: '#92400E' }}>⚠ Motivo: {omissionData.reason}</span>
+                            {scheduledTime && (
+                              <span style={{ fontSize: 11, color: '#6B7A88', display: 'flex', alignItems: 'center', gap: 4 }}>
+                                {isOmitted ? <Clock size={11} color="#6B7A88" strokeWidth={2} /> : '📅'} Programado: {scheduledTime}
+                              </span>
                             )}
-                            {isOmitted && !isAutoMissed && !omissionData?.reason && (
-                              <span style={{ fontSize: 11, color: '#92400E' }}>⚠ Dosis omitida</span>
+                            {confTime && (
+                              <span style={{ fontSize: 11, color: '#087F70', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
+                                {isOmitted ? <Clock size={11} color="#087F70" strokeWidth={2} /> : '🕐'} {isOmitted ? 'Registrado:' : 'Administrado:'} {confTime}
+                              </span>
+                            )}
+                            {byName && !isOmitted && <span style={{ fontSize: 11, color: '#6B7A88' }}>👤 Por: {byName}</span>}
+                            {isOmitted && (
+                              <div style={{ background: 'rgba(255,255,255,0.55)', borderRadius: 10, padding: '8px 10px', marginTop: 2 }}>
+                                <p style={{ fontSize: 11.5, color: '#8A5A4A', lineHeight: 1.5, margin: 0, fontWeight: 500 }}>
+                                  Esta dosis no se registró a tiempo. ¿Se administró y no dio tiempo de registrarla?
+                                  {!isAutoMissed && omissionData?.reason && ` Motivo registrado: ${omissionData.reason}.`}
+                                </p>
+                              </div>
                             )}
                             {!isOmitted && (
                               <span style={{ fontSize: 11, fontWeight: 600, color: todayLog?.given_on_time === false ? '#D97706' : '#087F70' }}>
@@ -1357,6 +1417,11 @@ export default function Medications() {
                                   ? `⚠️ Fuera de ventana (${todayLog.minutes_late} min)`
                                   : '✅ Administrado a tiempo'}
                               </span>
+                            )}
+                            {isOmitted && !isFamiliar && (
+                              <button onClick={() => handleTapAdministrar(med)} style={{ marginTop: 6, width: '100%', padding: '9px', borderRadius: 999, border: 'none', background: '#E9826E', color: 'white', fontWeight: 700, fontSize: 13, cursor: 'pointer', boxShadow: '0 4px 12px rgba(233,130,110,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                                <CheckIcon size={14} color="white" strokeWidth={2.4} /> Registrar ahora
+                              </button>
                             )}
                             {med.notes && <span style={{ fontSize: 11, color: '#6B7A88' }}>📝 {med.notes}</span>}
                             {(todayLog?.photo_url || stockDoc?.prescription_photo_url || stockDoc?.box_photo_url || (todayLog?.latitude && todayLog?.longitude)) && (
@@ -1964,7 +2029,7 @@ export default function Medications() {
           onClick={e => { if (e.target === e.currentTarget) setAdminConfirmWarningMed(null) }}
         >
           <div style={{ background: 'white', borderRadius: 20, padding: '28px 24px', maxWidth: 340, width: '100%', textAlign: 'center', boxShadow: '0 24px 64px -16px #08554A55' }}>
-            <p style={{ fontFamily: "'Fraunces', Georgia, serif", fontStyle: 'italic', fontSize: 17, fontWeight: 700, color: '#1E2C3A', marginBottom: 10 }}>
+            <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 17, fontWeight: 800, color: '#1E2C3A', marginBottom: 10 }}>
               Confirmar como administrador
             </p>
             <p style={{ fontSize: 13, color: '#8A661A', lineHeight: 1.6, marginBottom: 10, background: '#F6E4B8', borderRadius: 14, padding: '10px 14px' }}>
