@@ -127,7 +127,7 @@ Deno.serve(async (req: Request) => {
       : `📞 ${patientName} — Videollamada en 15 minutos`
     const body = call.created_by_name
       ? `${call.created_by_name} inició una videollamada`
-      : call.title ?? 'Videollamada familiar'
+      : 'Videollamada familiar'
 
     for (const sub of subs ?? []) {
       try {

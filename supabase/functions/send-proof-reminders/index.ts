@@ -99,7 +99,7 @@ Deno.serve(async (req: Request) => {
           { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
           JSON.stringify({
             title: `📷 ${patientName} — falta foto de prueba`,
-            body: `${medName} fue dado hace 30 min — agrega la foto de prueba`,
+            body: `Un cuidado de hace 30 min — agrega la foto de prueba`,
             url: '/medications',
             tag: `proof-missing-${log.id}`,
             data: { family_id: log.user_id, patient_name: patientName, event_type: 'PROOF_REMINDER', target_screen: 'medications' },
