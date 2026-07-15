@@ -55,7 +55,9 @@ Deno.serve(async (req: Request) => {
   )
 
   const now = new Date()
-  const nowVariants = [toHHMM(now), toHHMM(shiftTZ(now, -4)), toHHMM(shiftTZ(now, -5)), toHHMM(shiftTZ(now, -6))]
+  // Solo -4/-5/-6: no hay usuarios en UTC+0. Un candidato sin desplazar aquí coincide
+  // en dígitos con "hora local + ventana" leído como si fuera UTC — dispara ~4h antes.
+  const nowVariants = [toHHMM(shiftTZ(now, -4)), toHHMM(shiftTZ(now, -5)), toHHMM(shiftTZ(now, -6))]
 
   // Today in PR timezone (UTC-4) for log existence checks
   const todayPR = (() => {
@@ -124,7 +126,7 @@ Deno.serve(async (req: Request) => {
 
   // ── (a) 10 min antes de la hora programada ──────────────────────────────────
   const remind10 = new Date(now.getTime() + 10 * 60 * 1000)
-  const remind10Variants = [toHHMM(remind10), toHHMM(shiftTZ(remind10, -4)), toHHMM(shiftTZ(remind10, -5)), toHHMM(shiftTZ(remind10, -6))]
+  const remind10Variants = [toHHMM(shiftTZ(remind10, -4)), toHHMM(shiftTZ(remind10, -5)), toHHMM(shiftTZ(remind10, -6))]
 
   for (const med of allMeds ?? []) {
     for (const st of med.scheduled_times ?? []) {
