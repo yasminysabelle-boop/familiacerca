@@ -12,6 +12,7 @@ import SuccessAnimation, { useSuccessAnimation } from '../components/SuccessAnim
 import { usePullToRefresh } from '../hooks/usePullToRefresh'
 import { AlertTriangle, CheckIcon, User, XIcon, Pill, ClipboardCheck, Chat, Calendar, Receipt, Users, Camera, Clock, MessageCircle, Video, Hospital, Image, Building2, Heart, Bell, ChevronRight, Siren, Zap } from '../components/Icons'
 import { geminiGenerate } from '../lib/gemini'
+import { getActivitySummary } from '../lib/activitySummary'
 import { CARE_ITEMS } from '../lib/careItems'
 import TrialBanner from '../components/TrialBanner'
 import { usePushNotifications } from '../hooks/usePushNotifications'
@@ -1785,7 +1786,26 @@ function AttentionCard({ medName, medDosage, medTime, windowLabel, isExpired, on
   )
 }
 
-function RecentActivity({ items, onViewAll, onSelect, firstName }) {
+// Compartido entre la lista visible y el resumen narrado por IA (Fase 2) —
+// misma función, mismos textos, para que nunca puedan divergir.
+const ACTIVITY_ACTIONS = {
+  MED_CONFIRMED:     evt => `confirmó ${evt.medName ?? 'medicamento'}`,
+  VOICE_MEMORY:      () => 'grabó una memoria de voz',
+  PHOTO:             () => 'subió una foto',
+  NOTE:              () => 'escribió una nota',
+  EXPENSE:           () => 'registró un gasto',
+  APPOINTMENT:       evt => `agregó una cita${evt.appointmentTitle ? `: ${evt.appointmentTitle}` : ''}`,
+  APPOINTMENT_PROOF: () => 'confirmó una cita',
+  CARE_LOG:          () => 'completó una rutina',
+}
+function activityActor(evt, firstName) {
+  return (evt.confirmedBy ?? evt.uploaderName ?? evt.recorderName ?? evt.authorName ?? firstName ?? 'Alguien').split(' ')[0]
+}
+function activityAction(evt) {
+  return (ACTIVITY_ACTIONS[evt.type] ?? (() => 'registró actividad'))(evt)
+}
+
+function RecentActivity({ items, onViewAll, onSelect, firstName, summaryText, summaryEmpty }) {
   return (
     <section aria-label="Actividad reciente" style={{ borderRadius: 26, background: 'white', padding: 20, boxShadow: '0 6px 24px -12px rgba(51,65,85,0.18)' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
@@ -1794,6 +1814,14 @@ function RecentActivity({ items, onViewAll, onSelect, firstName }) {
         </h2>
         <button onClick={onViewAll} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, color: '#087F70', fontWeight: 700, padding: 0, WebkitTapHighlightColor: 'transparent' }}>Ver todo</button>
       </div>
+      {(summaryEmpty || summaryText) && (
+        <div style={{ background: '#EAF7F3', borderRadius: 14, padding: '12px 14px', marginBottom: 14 }}>
+          <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: '#087F70', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Resumen del día</p>
+          <p style={{ margin: '4px 0 0', fontSize: 13.5, color: '#475569', lineHeight: 1.5 }}>
+            {summaryEmpty ? 'Aún no hay registros del día.' : summaryText}
+          </p>
+        </div>
+      )}
       {items.length === 0 ? (
         <div style={{ padding: '6px 0 2px' }}>
           <p style={{ color: '#7C8698', fontSize: 13, margin: '0 0 4px', fontWeight: 500 }}>Aún no hay actividad reciente</p>
@@ -1804,18 +1832,13 @@ function RecentActivity({ items, onViewAll, onSelect, firstName }) {
       ) : (
         <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column' }}>
           {items.map((evt, i) => {
-            const actor = (evt.confirmedBy ?? evt.uploaderName ?? evt.recorderName ?? evt.authorName ?? firstName ?? 'Alguien').split(' ')[0]
-            const HUMAN = {
-              MED_CONFIRMED:     { text: `confirmó ${evt.medName ?? 'medicamento'}`, sub: 'Dosis confirmada' },
-              VOICE_MEMORY:      { text: 'grabó una memoria de voz', sub: '' },
-              PHOTO:             { text: 'subió una foto', sub: '' },
-              NOTE:              { text: 'escribió una nota', sub: '' },
-              EXPENSE:           { text: 'registró un gasto', sub: evt.description ?? '' },
-              APPOINTMENT:       { text: `agregó una cita${evt.appointmentTitle ? `: ${evt.appointmentTitle}` : ''}`, sub: '' },
-              APPOINTMENT_PROOF: { text: 'confirmó una cita', sub: evt.appointmentTitle ?? '' },
-              CARE_LOG:          { text: 'completó una rutina', sub: '' },
+            const actor = activityActor(evt, firstName)
+            const ACTIVITY_SUB = {
+              MED_CONFIRMED:     'Dosis confirmada',
+              EXPENSE:           evt.description ?? '',
+              APPOINTMENT_PROOF: evt.appointmentTitle ?? '',
             }
-            const meta = HUMAN[evt.type] ?? { text: 'registró actividad', sub: '' }
+            const meta = { text: activityAction(evt), sub: ACTIVITY_SUB[evt.type] ?? '' }
             const isNote = evt.type === 'NOTE'
             const time = evt.timestamp ? timeAgo(evt.timestamp instanceof Date ? evt.timestamp : new Date(evt.timestamp)) : ''
             const avatarLetter = actor.charAt(0).toUpperCase()
@@ -1908,6 +1931,7 @@ export default function Dashboard() {
   const [sosSent, setSosSent] = useState(false)
   const [sosConfirming, setSosConfirming] = useState(false)
   const [aiCards, setAiCards] = useState({})
+  const [activitySummaryText, setActivitySummaryText] = useState(null)
   const [checkoutSuccess, setCheckoutSuccess] = useState(false)
   const [reactions, setReactions] = useState({})
   const [sosLocation, setSosLocation] = useState(null)
@@ -2955,6 +2979,29 @@ export default function Dashboard() {
       .slice(0, 3)
   })()
 
+  // Fase 2 — resumen narrado: SOLO eventos de hoy, de la misma lista de arriba
+  // (nunca otra fuente), para que narrativa y auditoría jamás diverjan.
+  const todaysActivityItems = recentActivityItems.filter(e => e.dateKey === todayKey)
+  const activityLatestEventAt = todaysActivityItems[0]?.timestamp ?? null
+  const activityLatestEventMs = activityLatestEventAt ? activityLatestEventAt.getTime() : null
+
+  // Fase 2 — dispara la narración solo cuando hay eventos de hoy y cambia el
+  // más reciente; el cache (care_profiles.activity_summary) evita regenerar
+  // si nadie hizo nada nuevo. Nunca bloquea: la lista de abajo se ve normal
+  // mientras esto corre en segundo plano.
+  useEffect(() => {
+    if (loading || !ownerId || todaysActivityItems.length === 0 || !activityLatestEventMs) {
+      setActivitySummaryText(null)
+      return
+    }
+    let cancelled = false
+    const lines = todaysActivityItems.map(e => `${activityActor(e, firstName)} ${activityAction(e)}`)
+    getActivitySummary({ ownerId, patientName, lines, latestEventAt: activityLatestEventAt })
+      .then(text => { if (!cancelled) setActivitySummaryText(text) })
+    return () => { cancelled = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, ownerId, activityLatestEventMs, todaysActivityItems.length, patientName])
+
   // Cuidado de hoy card status
   let careStatus, careStatusType
   if (loading) {
@@ -3321,7 +3368,9 @@ export default function Dashboard() {
                   routineUpToDate={actividadHoy.some(e => e.type === 'CARE_LOG')}
                   familyCount={familyCount}
                   onClick={() => navigate('/paciente/perfil')}
-                  onFamilyClick={() => setShowFamilySwitcher(true)}
+                  onMedsClick={() => navigate('/medications')}
+                  onRoutineClick={() => navigate('/cuidado')}
+                  onFamilyClick={() => navigate('/familia')}
                 />
 
                 {/* ══ ATENCIÓN — medicamento pendiente (v0: AttentionCard) ══ */}
@@ -3343,6 +3392,8 @@ export default function Dashboard() {
                   onViewAll={() => navigate('/historial')}
                   onSelect={setSelectedEvent}
                   firstName={firstName}
+                  summaryText={loading ? null : activitySummaryText}
+                  summaryEmpty={!loading && todaysActivityItems.length === 0}
                 />
 
                 {/* ══ MILO Y LUNA (v0: PetsCard) ══ */}

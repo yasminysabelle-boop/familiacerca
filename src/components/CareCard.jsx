@@ -44,6 +44,8 @@ export default function CareCard({
   routineUpToDate = true,
   familyCount = 0,
   onClick,
+  onMedsClick,
+  onRoutineClick,
   onFamilyClick,
 }) {
   const s = STATUS[status] ?? STATUS.ok
@@ -125,11 +127,13 @@ export default function CareCard({
             icon={<Pill size={16} color={TEAL} strokeWidth={2} />}
             label="Medicamentos"
             sub={medsUpToDate ? 'al día' : 'pendiente'}
+            onClick={onMedsClick ? (e) => { e.stopPropagation(); onMedsClick() } : undefined}
           />
           <StatItem
             icon={<Calendar size={15} color={TEAL} strokeWidth={2} />}
             label="Rutina"
             sub={routineUpToDate ? 'al día' : 'pendiente'}
+            onClick={onRoutineClick ? (e) => { e.stopPropagation(); onRoutineClick() } : undefined}
           />
           <StatItem
             icon={<Users size={16} color={TEAL} strokeWidth={1.9} />}
