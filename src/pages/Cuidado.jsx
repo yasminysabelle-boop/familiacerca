@@ -108,7 +108,10 @@ export default function Cuidado() {
         supabase.from('care_item_schedules').select('item_key,scheduled_time').eq('user_id', ownerId),
       ])
       const cmap = {}
-      for (const row of (careRows ?? [])) cmap[row.item_key] = row
+      for (const row of (careRows ?? [])) {
+        if (row.status === 'no_completado') continue
+        cmap[row.item_key] = row
+      }
       setCareLogs(cmap)
       const smap = {}
       for (const row of (scheduleRows ?? [])) smap[row.item_key] = row.scheduled_time
@@ -152,6 +155,7 @@ export default function Cuidado() {
             log_date: today,
             checked_at: new Date().toISOString(),
             checked_by: displayName,
+            status: 'completed',
           }, { onConflict: 'user_id,item_key,log_date' })
           .select()
           .single()

@@ -2380,7 +2380,7 @@ export default function Dashboard() {
         .limit(10),
 
       supabase.from('daily_care_logs')
-        .select('item_key')
+        .select('item_key, status')
         .eq('user_id', ownerId)
         .eq('log_date', todayKey),
     ])
@@ -2389,7 +2389,7 @@ export default function Dashboard() {
     setMedsList(meds ?? [])
 
     const careLogMap = {}
-    ;(careLogsData ?? []).forEach(r => { careLogMap[r.item_key] = true })
+    ;(careLogsData ?? []).forEach(r => { if (r.status !== 'no_completado') careLogMap[r.item_key] = true })
     setCareLogsToday(careLogMap)
 
     const todayLogMap = {}

@@ -85,7 +85,7 @@ Deno.serve(async (req: Request) => {
     })
   }
 
-  // Index care data (needed for both no_completado inserts and push logic)
+  // Index care data (needed for both care_routine_missed logging and push logic)
   const confirmedMedIds = new Set((medLogs ?? []).map((l: { medication_id: string }) => l.medication_id))
   const activeCareOwners = new Set((careLogsRecent ?? []).map((l: { user_id: string }) => l.user_id))
   const careLoggedToday = new Map<string, Set<string>>()
@@ -95,41 +95,49 @@ Deno.serve(async (req: Request) => {
     careLoggedToday.set(log.user_id, entry)
   }
 
-  // ── Mark missed care items (no_completado) ───────────────────────────────────
-  // For every owner who actively uses the checklist, insert no_completado for
-  // any daily item not yet logged today. The trigger trg_fn_care_routine fires
-  // on each INSERT and logs care_routine_missed in activity_log.
-  // ignoreDuplicates:true makes this idempotent if the cron fires multiple times.
+  // ── Mark missed care items (care_routine_missed) ─────────────────────────────
+  // For every owner who actively uses the checklist, log care_routine_missed
+  // directly in activity_log for any daily item not yet logged today — via the
+  // same log_activity() RPC that trg_fn_care_routine used to call.
+  // daily_care_logs stays exclusively for real caregiver check-ins: it must
+  // never receive placeholder rows again (those showed up as false "completed"
+  // routines in /cuidado, since the UI treats any row there as done).
   if (activeCareOwners.size > 0) {
-    const missingCareRows: Array<{
-      user_id: string; item_key: string; log_date: string;
-      status: string; checked_by: string; checked_at: string;
-    }> = []
+    // Dedup guard so a cron re-fire doesn't double-log the same miss (replaces
+    // the old upsert's ignoreDuplicates:true, which relied on daily_care_logs'
+    // unique constraint — activity_log has no such constraint).
+    const { data: existingMissedLogs } = await supabase
+      .from('activity_log')
+      .select('owner_id, description')
+      .eq('type', 'care_routine_missed')
+      .eq('metadata->>log_date', today)
+    const alreadyLogged = new Set(
+      (existingMissedLogs ?? []).map((l: { owner_id: string; description: string }) => `${l.owner_id}:${l.description}`)
+    )
+
+    const nowIso = new Date().toISOString()
+    let missedCount = 0
     for (const ownerId of activeCareOwners) {
       const loggedItems = careLoggedToday.get(ownerId) ?? new Set<string>()
       for (const item_key of DAILY_CARE_KEYS) {
-        if (!loggedItems.has(item_key)) {
-          missingCareRows.push({
-            user_id: ownerId,
-            item_key,
-            log_date: today,
-            status: 'no_completado',
-            checked_by: 'Sistema automático',
-            checked_at: new Date().toISOString(),
-          })
+        if (loggedItems.has(item_key)) continue
+        if (alreadyLogged.has(`${ownerId}:${item_key}`)) continue
+        const { error: rpcErr } = await supabase.rpc('log_activity', {
+          p_type: 'care_routine_missed',
+          p_description: item_key,
+          p_owner_id: ownerId,
+          p_actor_name: 'Sistema automático',
+          p_metadata: { item_key, log_date: today },
+          p_created_at: nowIso,
+        })
+        if (rpcErr) {
+          console.error(`[send-evening-push] Error logging care_routine_missed for ${ownerId}/${item_key}:`, rpcErr)
+        } else {
+          missedCount++
         }
       }
     }
-    if (missingCareRows.length > 0) {
-      const { error: insertErr } = await supabase
-        .from('daily_care_logs')
-        .upsert(missingCareRows, { onConflict: 'user_id,item_key,log_date', ignoreDuplicates: true })
-      if (insertErr) {
-        console.error('[send-evening-push] Error inserting no_completado rows:', insertErr)
-      } else {
-        console.log(`[send-evening-push] no_completado: attempted ${missingCareRows.length} rows`)
-      }
-    }
+    console.log(`[send-evening-push] care_routine_missed: logged ${missedCount} entries`)
   }
 
   // ── Push notifications ───────────────────────────────────────────────────────

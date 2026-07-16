@@ -29,10 +29,10 @@ export function useBadgeCounts() {
       // 2) Pending care routines today (logs with null completion)
       const { data: careLogs } = await supabase
         .from('daily_care_logs')
-        .select('id')
+        .select('id, status')
         .eq('user_id', ownerId)
         .eq('log_date', today)
-      const completedRoutines = (careLogs ?? []).length
+      const completedRoutines = (careLogs ?? []).filter(l => l.status !== 'no_completado').length
       // We count pending as max(0, totalItems - completedRoutines) — use 7 as a rough daily count
       const pendingRoutines = Math.max(0, 7 - completedRoutines)
 
