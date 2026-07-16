@@ -14,6 +14,7 @@ import { AlertTriangle, CheckIcon, User, XIcon, Pill, ClipboardCheck, Chat, Cale
 import { geminiGenerate } from '../lib/gemini'
 import { getActivitySummary } from '../lib/activitySummary'
 import { CARE_ITEMS } from '../lib/careItems'
+import { incidentPhrase, incidentTypeInfo } from '../lib/incidentTypes'
 import TrialBanner from '../components/TrialBanner'
 import { usePushNotifications } from '../hooks/usePushNotifications'
 import { useHospitalMode } from '../contexts/HospitalModeContext'
@@ -1308,6 +1309,7 @@ const RECENT_EVENT_CONFIG = {
   APPOINTMENT:       { icon: '📅', color: '#3B82F6', label: e => e.appointmentTitle ?? 'Cita médica' },
   APPOINTMENT_PROOF: { icon: '✅', color: '#15803D', label: e => `Cita: ${e.appointmentTitle ?? 'médica'}` },
   NOTE:              { icon: '📝', color: '#6B7280', label: () => 'Nota registrada' },
+  INCIDENT:          { icon: '🤕', color: '#DC2626', label: e => incidentTypeInfo(e.incidentType).label },
 }
 
 function RecentEventRow({ evt, onTap }) {
@@ -1797,6 +1799,7 @@ const ACTIVITY_ACTIONS = {
   APPOINTMENT:       evt => `agregó una cita${evt.appointmentTitle ? `: ${evt.appointmentTitle}` : ''}`,
   APPOINTMENT_PROOF: () => 'confirmó una cita',
   CARE_LOG:          () => 'completó una rutina',
+  INCIDENT:          evt => `registró ${incidentPhrase(evt.incidentType)}`,
 }
 function activityActor(evt, firstName) {
   return (evt.confirmedBy ?? evt.uploaderName ?? evt.recorderName ?? evt.authorName ?? firstName ?? 'Alguien').split(' ')[0]
@@ -1943,6 +1946,7 @@ export default function Dashboard() {
   const [pdfLoading, setPdfLoading] = useState(false)
   const [careLogsToday, setCareLogsToday] = useState({})
   const [dailyMood, setDailyMood] = useState(null)
+  const [careRecordMood, setCareRecordMood] = useState(null)
   const [savingMood, setSavingMood] = useState(false)
   const [pressedMood, setPressedMood] = useState(null)
   const [pressedSOS, setPressedSOS] = useState(false)
@@ -2330,6 +2334,8 @@ export default function Dashboard() {
       { data: events },
       { data: sosAlerts },
       { data: careLogsData },
+      { data: incidents },
+      { data: careRecordToday },
     ] = await Promise.all([
       supabase.from('medications').select('*').eq('user_id', ownerId),
 
@@ -2383,10 +2389,27 @@ export default function Dashboard() {
         .select('item_key, status')
         .eq('user_id', ownerId)
         .eq('log_date', todayKey),
+
+      supabase.from('incidents')
+        .select('*')
+        .eq('owner_id', ownerId)
+        .gte('recorded_at', sevenAgoStartISO)
+        .order('recorded_at', { ascending: false })
+        .limit(20),
+
+      supabase.from('care_records')
+        .select('mood, recorded_at')
+        .eq('owner_id', ownerId)
+        .gte('recorded_at', new Date(todayKey + 'T00:00:00').toISOString())
+        .lte('recorded_at', new Date(todayKey + 'T23:59:59').toISOString())
+        .order('recorded_at', { ascending: false })
+        .limit(1)
+        .maybeSingle(),
     ])
 
     setMedTotal((meds ?? []).length)
     setMedsList(meds ?? [])
+    setCareRecordMood(careRecordToday?.mood ?? null)
 
     const careLogMap = {}
     ;(careLogsData ?? []).forEach(r => { if (r.status !== 'no_completado') careLogMap[r.item_key] = true })
@@ -2603,6 +2626,20 @@ export default function Dashboard() {
         longitude: alert.longitude ?? null,
         address: alert.address ?? null,
         resolved: alert.resolved ?? false,
+      })
+    }
+
+    // ── Incidents (caídas, fiebre, presión alta, agresividad...) ──
+    for (const inc of (incidents ?? [])) {
+      const dateKey = toLocalDateKey(new Date(inc.recorded_at))
+      allEvents.push({
+        id: `incident-${inc.id}`,
+        type: 'INCIDENT',
+        timestamp: new Date(inc.recorded_at),
+        dateKey,
+        incidentType: inc.type,
+        incidentDescription: inc.description,
+        photoUrl: inc.photo_url,
       })
     }
 
@@ -2979,11 +3016,49 @@ export default function Dashboard() {
       .slice(0, 3)
   })()
 
-  // Fase 2 — resumen narrado: SOLO eventos de hoy, de la misma lista de arriba
-  // (nunca otra fuente), para que narrativa y auditoría jamás diverjan.
-  const todaysActivityItems = recentActivityItems.filter(e => e.dateKey === todayKey)
+  // Fase 2 — resumen narrado: lo "hecho" sale de eventos que ya se muestran
+  // en otra parte del Dashboard (nunca una fuente distinta), para que
+  // narrativa y pantallas jamás puedan divergir. A diferencia de
+  // recentActivityItems (que corta a 3 eventos cruzando varios días solo por
+  // espacio en pantalla), aquí se usan TODOS los eventos relevantes de HOY:
+  // un incidente no puede perder su lugar en el resumen por "competir" con
+  // varias dosis de medicamento confirmadas el mismo día.
+  const todayEvents = todaySection?.events ?? []
+  const todaysActivityItems = todayEvents
+    .filter(e => !['MED_PENDING', 'CAREGIVER_CARD', 'SOS_ALERT', 'MED_MISSED'].includes(e.type))
+    .sort((a, b) => (b.timestamp?.getTime() ?? 0) - (a.timestamp?.getTime() ?? 0))
   const activityLatestEventAt = todaysActivityItems[0]?.timestamp ?? null
   const activityLatestEventMs = activityLatestEventAt ? activityLatestEventAt.getTime() : null
+
+  const medLabel = e => `${e.medName ?? 'Medicamento'}${e.medDosage ? ` ${e.medDosage}` : ''}`
+  const pendingMedLines = todayEvents
+    .filter(e => e.type === 'MED_PENDING')
+    .map(e => `${medLabel(e)} pendiente${e.medTime ? ` (programado ${fmtTime(e.medTime)})` : ''}`)
+  const missedMedLines = todayEvents
+    .filter(e => e.type === 'MED_MISSED')
+    .map(e => `${medLabel(e)} no se registró a tiempo${e.medTime ? ` (programado ${fmtTime(e.medTime)})` : ''} — puede registrarse aún`)
+
+  // Ánimo del día — care_records.mood es la fuente canónica (registro
+  // estructurado del cuidador); daily_moods.mood es respaldo si no hay
+  // registro de care_records hoy. Cada tabla usa su propio vocabulario de
+  // valores, de ahí el mapa de normalización.
+  const MOOD_PHRASES = {
+    excelente: 'excelente', bien: 'bueno', regular: 'regular', mal: 'difícil',
+    good: 'bueno', hard: 'difícil',
+  }
+  const canonicalMood = careRecordMood ?? dailyMood ?? null
+  const moodLine = canonicalMood ? `El ánimo de hoy fue ${MOOD_PHRASES[canonicalMood] ?? canonicalMood}` : null
+
+  // Rutina diaria — agregado, nunca ítem por ítem (evita spam de "cepillado
+  // de dientes", "baño", etc.). careLogsToday ya excluye los placeholders
+  // 'no_completado' (ver fix de /cuidado).
+  const routinesTotal = dailyItems.length
+  const routinesDoneCount = dailyItems.filter(i => careLogsToday[i.key]).length
+  const routineLine = routinesTotal === 0
+    ? null
+    : routinesDoneCount === routinesTotal
+      ? 'La rutina diaria de cuidado está al día'
+      : `Faltan ${routinesTotal - routinesDoneCount} de ${routinesTotal} cuidados de la rutina diaria`
 
   // patientName (con ese nombre exacto) solo existe dentro de otros closures
   // más abajo en este componente (otro useEffect y el IIFE del JSX) — aquí
@@ -2991,23 +3066,42 @@ export default function Dashboard() {
   // componente que sí están en scope.
   const dashPatientName = patientProfile?.nombre_completo || profile?.name || 'el familiar'
 
-  // Fase 2 — dispara la narración solo cuando hay eventos de hoy y cambia el
-  // más reciente; el cache (care_profiles.activity_summary) evita regenerar
-  // si nadie hizo nada nuevo. Nunca bloquea: la lista de abajo se ve normal
-  // mientras esto corre en segundo plano. Envuelto en try/catch a propósito:
-  // cualquier error aquí degrada a "sin resumen" (solo lista), nunca debe
-  // poder tumbar el Dashboard — ese fue exactamente el bug que causó el
-  // crash anterior (una variable fuera de scope), así que además de corregir
-  // la causa, blindamos el bloque completo.
+  // Fase 2 — dispara la narración cuando hay algo hecho, pendiente o sin
+  // registrar hoy, y cambia alguna de esas cantidades; el cache
+  // (care_profiles.activity_summary) evita regenerar si nada cambió. Nunca
+  // bloquea: las pantallas se ven normal mientras esto corre en segundo
+  // plano. Envuelto en try/catch a propósito: cualquier error aquí degrada a
+  // "sin resumen", nunca debe poder tumbar el Dashboard — ese fue exactamente
+  // el bug que causó el crash anterior (una variable fuera de scope), así que
+  // además de corregir la causa, blindamos el bloque completo.
+  // En Modo Hospital, HospitalDashboard reemplaza esta pantalla por completo
+  // y nunca lee activitySummaryText — generar el resumen normal sería un
+  // costo (llamada a Gemini + escritura en cache) sin ningún efecto visible,
+  // así que el resumen se salta mientras el modo esté activo.
+  const routinePending = routinesTotal > 0 && routinesDoneCount < routinesTotal
   useEffect(() => {
-    if (loading || !ownerId || todaysActivityItems.length === 0 || !activityLatestEventMs) {
+    const hasSignal = todaysActivityItems.length > 0 || pendingMedLines.length > 0 || missedMedLines.length > 0 || !!moodLine || !!routineLine
+    if (loading || !ownerId || !hasSignal || isHospitalMode) {
       setActivitySummaryText(null)
       return
     }
     let cancelled = false
     try {
-      const lines = todaysActivityItems.map(e => `${activityActor(e, firstName)} ${activityAction(e)}`)
-      getActivitySummary({ ownerId, patientName: dashPatientName, lines, latestEventAt: activityLatestEventAt })
+      const doneLines = todaysActivityItems.map(e => `${activityActor(e, firstName)} ${activityAction(e)}`)
+      if (moodLine) doneLines.push(moodLine)
+      if (routineLine && !routinePending) doneLines.push(routineLine)
+
+      const pendingLines = [...pendingMedLines]
+      if (routineLine && routinePending) pendingLines.push(routineLine)
+
+      getActivitySummary({
+        ownerId,
+        patientName: dashPatientName,
+        doneLines,
+        pendingLines,
+        missedLines: missedMedLines,
+        latestEventAt: activityLatestEventAt,
+      })
         .then(text => { if (!cancelled) setActivitySummaryText(text) })
         .catch(() => { if (!cancelled) setActivitySummaryText(null) })
     } catch {
@@ -3015,7 +3109,7 @@ export default function Dashboard() {
     }
     return () => { cancelled = true }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading, ownerId, activityLatestEventMs, todaysActivityItems.length, dashPatientName])
+  }, [loading, ownerId, isHospitalMode, activityLatestEventMs, todaysActivityItems.length, pendingMedLines.length, missedMedLines.length, moodLine, routineLine, routinePending, dashPatientName])
 
   // Cuidado de hoy card status
   let careStatus, careStatusType

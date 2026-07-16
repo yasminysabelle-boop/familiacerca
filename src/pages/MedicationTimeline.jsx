@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import { mapsUrl } from '../lib/gps'
 import { CARE_ITEMS } from '../lib/careItems'
+import { incidentTypeInfo } from '../lib/incidentTypes'
 import { SkeletonEventCard } from '../components/SkeletonLoader'
 import EmptyState from '../components/EmptyState'
 import { usePullToRefresh } from '../hooks/usePullToRefresh'
@@ -22,6 +23,7 @@ const EVENT_CONFIG = {
   care_routine:         { icon: '✅', label: 'Rutina completada',  color: '#16A34A', bg: '#F0FDF4', border: '#BBF7D0' },
   care_routine_missed:  { icon: '⚠️', label: 'Rutina omitida',     color: '#D97706', bg: '#FFFBEB', border: '#FDE68A' },
   care_photo:           { icon: '📸', label: 'Foto de cuidado',    color: '#C9882A', bg: '#FFFBEB', border: '#FDE68A' },
+  incident:             { icon: '🤕', label: 'Incidente',          color: '#DC2626', bg: '#FEF2F2', border: '#FECACA' },
 }
 
 const FILTER_OPTIONS = [
@@ -37,6 +39,7 @@ const FILTER_OPTIONS = [
   { id: 'expense',              label: 'Gastos',         icon: '💰' },
   { id: 'care_photo',           label: 'Fotos',          icon: '📸' },
   { id: 'caregiver_assigned',   label: 'Turnos',         icon: '👤' },
+  { id: 'incident',             label: 'Incidentes',     icon: '🤕' },
 ]
 
 const PERIOD_OPTIONS = [
@@ -112,6 +115,23 @@ function EventMetadata({ type, meta }) {
         {careItemIcon(meta.item_key)} {careItemLabel(meta.item_key)}
         {meta.log_date ? <span style={{ color: '#9CA3AF', fontWeight: 400 }}> · {meta.log_date}</span> : null}
       </p>
+    )
+  }
+
+  if (type === 'incident') {
+    return (
+      <>
+        {meta.description && (
+          <p style={{ fontSize: 12, color: '#143C32', margin: '4px 0 0' }}>{meta.description}</p>
+        )}
+        {meta.photo_url && (
+          <img
+            src={meta.photo_url}
+            alt="Evidencia"
+            style={{ marginTop: 8, width: '100%', maxHeight: 160, objectFit: 'cover', borderRadius: 10, border: '1px solid #FECACA' }}
+          />
+        )}
+      </>
     )
   }
 
@@ -279,7 +299,9 @@ function EventCard({ event, onClick }) {
         }}>
           {(event.type === 'care_routine' || event.type === 'care_routine_missed')
             ? `${careItemIcon(event.description)} ${careItemLabel(event.description)}`
-            : event.description}
+            : event.type === 'incident'
+              ? `${incidentTypeInfo(event.description).emoji} ${incidentTypeInfo(event.description).label}`
+              : event.description}
         </p>
 
         {/* Actor */}

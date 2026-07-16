@@ -5,17 +5,7 @@ import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import EvidencePhoto from '../components/EvidencePhoto'
 import { Plus, XIcon, CheckIcon } from '../components/Icons'
-
-const INCIDENT_TYPES = [
-  { value: 'caida',        emoji: '🤕', label: 'Caída' },
-  { value: 'golpe',        emoji: '💥', label: 'Golpe' },
-  { value: 'fiebre',       emoji: '🌡️', label: 'Fiebre' },
-  { value: 'presion_alta', emoji: '🩺', label: 'Presión alta' },
-  { value: 'desorientado', emoji: '😵', label: 'Desorientado' },
-  { value: 'agresivo',     emoji: '😤', label: 'Agresivo' },
-  { value: 'no_comio',     emoji: '🍽️', label: 'No quiso comer' },
-  { value: 'otro',         emoji: '📝', label: 'Otro' },
-]
+import { INCIDENT_TYPES, incidentTypeInfo } from '../lib/incidentTypes'
 
 function toLocalDateKey(d = new Date()) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
@@ -38,10 +28,6 @@ function dayLabel(dateKey) {
 function fmtTime(iso) {
   if (!iso) return ''
   return new Date(iso).toLocaleTimeString('es-US', { hour: 'numeric', minute: '2-digit', hour12: true })
-}
-
-function typeInfo(val) {
-  return INCIDENT_TYPES.find(t => t.value === val) ?? { emoji: '📝', label: val }
 }
 
 export default function Incidents() {
@@ -163,7 +149,7 @@ export default function Incidents() {
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {grouped[dateKey].map(inc => {
-                  const t = typeInfo(inc.type)
+                  const t = incidentTypeInfo(inc.type)
                   return (
                     <div key={inc.id} style={{
                       background: 'white', borderRadius: 16,
