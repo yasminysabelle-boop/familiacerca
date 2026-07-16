@@ -2985,22 +2985,37 @@ export default function Dashboard() {
   const activityLatestEventAt = todaysActivityItems[0]?.timestamp ?? null
   const activityLatestEventMs = activityLatestEventAt ? activityLatestEventAt.getTime() : null
 
+  // patientName (con ese nombre exacto) solo existe dentro de otros closures
+  // más abajo en este componente (otro useEffect y el IIFE del JSX) — aquí
+  // arriba hay que resolverlo de nuevo con las variables de nivel de
+  // componente que sí están en scope.
+  const dashPatientName = patientProfile?.nombre_completo || profile?.name || 'el familiar'
+
   // Fase 2 — dispara la narración solo cuando hay eventos de hoy y cambia el
   // más reciente; el cache (care_profiles.activity_summary) evita regenerar
   // si nadie hizo nada nuevo. Nunca bloquea: la lista de abajo se ve normal
-  // mientras esto corre en segundo plano.
+  // mientras esto corre en segundo plano. Envuelto en try/catch a propósito:
+  // cualquier error aquí degrada a "sin resumen" (solo lista), nunca debe
+  // poder tumbar el Dashboard — ese fue exactamente el bug que causó el
+  // crash anterior (una variable fuera de scope), así que además de corregir
+  // la causa, blindamos el bloque completo.
   useEffect(() => {
     if (loading || !ownerId || todaysActivityItems.length === 0 || !activityLatestEventMs) {
       setActivitySummaryText(null)
       return
     }
     let cancelled = false
-    const lines = todaysActivityItems.map(e => `${activityActor(e, firstName)} ${activityAction(e)}`)
-    getActivitySummary({ ownerId, patientName, lines, latestEventAt: activityLatestEventAt })
-      .then(text => { if (!cancelled) setActivitySummaryText(text) })
+    try {
+      const lines = todaysActivityItems.map(e => `${activityActor(e, firstName)} ${activityAction(e)}`)
+      getActivitySummary({ ownerId, patientName: dashPatientName, lines, latestEventAt: activityLatestEventAt })
+        .then(text => { if (!cancelled) setActivitySummaryText(text) })
+        .catch(() => { if (!cancelled) setActivitySummaryText(null) })
+    } catch {
+      setActivitySummaryText(null)
+    }
     return () => { cancelled = true }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading, ownerId, activityLatestEventMs, todaysActivityItems.length, patientName])
+  }, [loading, ownerId, activityLatestEventMs, todaysActivityItems.length, dashPatientName])
 
   // Cuidado de hoy card status
   let careStatus, careStatusType
