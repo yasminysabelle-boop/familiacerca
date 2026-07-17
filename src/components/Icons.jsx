@@ -478,3 +478,97 @@ export function Zap({ size, color, strokeWidth, filled = false }) {
     </Svg>
   )
 }
+
+// ── Íconos de tipos de cuidado (rutina diaria) ──────────────────────────────
+
+export function Bath({ size, color, strokeWidth }) {
+  return (
+    <Svg size={size} color={color} strokeWidth={strokeWidth}>
+      <path d="M4 12h16v2a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5v-2Z" />
+      <path d="M4 12V9a2 2 0 0 1 2-2h1" />
+      <path d="M9 4c-1 1-1 2 0 3M12.5 4c-1 1-1 2 0 3" />
+    </Svg>
+  )
+}
+
+export function Tooth({ size, color, strokeWidth }) {
+  return (
+    <Svg size={size} color={color} strokeWidth={strokeWidth}>
+      <path d="M12 3c-2.1 0-3.3 1.2-4.3 1.2S5.6 3.4 4.2 4.6c-1.7 1.3-1.9 3.9-1 6.2.7 1.7 1.2 3.3 1.4 5.2.3 2 1 4.3 2.2 4.3.9 0 1.2-1.4 1.6-2.9.4-1.2.9-2.2 1.6-2.2s1.2 1 1.6 2.2c.4 1.5.7 2.9 1.6 2.9 1.2 0 1.9-2.3 2.2-4.3.2-1.9.7-3.5 1.4-5.2.9-2.3.7-4.9-1-6.2C18.4 3.4 16.7 4.2 15.7 4.2S14.1 3 12 3Z" />
+    </Svg>
+  )
+}
+
+export function Shirt({ size, color, strokeWidth }) {
+  return (
+    <Svg size={size} color={color} strokeWidth={strokeWidth}>
+      <path d="M8.5 4 4.5 6.8l1.8 2.9 1.7-.9v9.7h8.5V8.8l1.7.9 1.8-2.9L16.5 4l-1.8 1.8h-4L8.5 4Z" />
+    </Svg>
+  )
+}
+
+export function Utensils({ size, color, strokeWidth }) {
+  return (
+    <Svg size={size} color={color} strokeWidth={strokeWidth}>
+      <path d="M7 2.3v6a1.9 1.9 0 1 0 3.8 0v-6M8.9 2.3v18.4" />
+      <path d="M15.8 2.3c-1.6 0-2.8 1.9-2.8 4.6s.9 4.2 1.9 4.6v9.2" />
+    </Svg>
+  )
+}
+
+export function Bed({ size, color, strokeWidth }) {
+  return (
+    <Svg size={size} color={color} strokeWidth={strokeWidth}>
+      <path d="M3 17.5v-5.8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5.8" />
+      <path d="M3 17.5v2.2M21 17.5v2.2" />
+      <path d="M5 9.7V6.2a1 1 0 0 1 1-1h4.6v4.5" />
+      <circle cx="7.3" cy="7.6" r="1.1" />
+    </Svg>
+  )
+}
+
+export function Sparkle({ size, color, strokeWidth }) {
+  return (
+    <Svg size={size} color={color} strokeWidth={strokeWidth}>
+      <path d="M12 3v3.6M12 17.4V21M3 12h3.6M17.4 12H21M6.3 6.3l2.2 2.2M15.5 15.5l2.2 2.2M17.7 6.3l-2.2 2.2M8.5 15.5l-2.2 2.2" />
+      <circle cx="12" cy="12" r="2.6" />
+    </Svg>
+  )
+}
+
+export function Footsteps({ size, color, strokeWidth }) {
+  return (
+    <Svg size={size} color={color} strokeWidth={strokeWidth}>
+      <circle cx="13.5" cy="4.2" r="2" />
+      <path d="M11 8.2 8.6 10l1 4.8-2.8 4.6M11 8.2l2.8 1.8 2.7-1 1.8 2.7M11.3 13l2.7 1 1 4.6" />
+    </Svg>
+  )
+}
+
+export function Scissors({ size, color, strokeWidth }) {
+  return (
+    <Svg size={size} color={color} strokeWidth={strokeWidth}>
+      <circle cx="6" cy="6.3" r="2.4" />
+      <circle cx="6" cy="17.7" r="2.4" />
+      <path d="M19.5 6 8 13M19.5 18 8 11" />
+    </Svg>
+  )
+}
+
+export function Lotus({ size, color, strokeWidth }) {
+  return (
+    <Svg size={size} color={color} strokeWidth={strokeWidth}>
+      <path d="M12 20.5c-3.6-2-5.5-5.6-5.5-9.3A5.5 5.5 0 0 1 12 5.7a5.5 5.5 0 0 1 5.5 5.5c0 3.7-1.9 7.3-5.5 9.3Z" />
+      <path d="M12 10.2v10.3" />
+    </Svg>
+  )
+}
+
+export function Lock({ size, color, strokeWidth }) {
+  return (
+    <Svg size={size} color={color} strokeWidth={strokeWidth}>
+      <rect x="4" y="10" width="16" height="10" rx="2" />
+      <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+    </Svg>
+  )
+}

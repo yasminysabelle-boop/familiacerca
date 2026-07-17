@@ -53,7 +53,7 @@ export default function Layout({ children }) {
   const location = useLocation()
   const navigate = useNavigate()
   const isHome      = location.pathname === '/dashboard'
-  const hasOwnHeader = isHome || location.pathname === '/mas' || location.pathname === '/medications' || location.pathname === '/chat'
+  const hasOwnHeader = isHome || location.pathname === '/mas' || location.pathname === '/medications' || location.pathname === '/chat' || location.pathname === '/cuidado'
   const isVideoCall = location.pathname === '/videollamada'
   const isSecondary = !PRIMARY_PAGES.has(location.pathname) && !isVideoCall
 
