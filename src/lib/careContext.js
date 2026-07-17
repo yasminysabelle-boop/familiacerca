@@ -33,6 +33,19 @@ const ACTIVITY_VERBS = {
   med_missed:    (_actor, desc) => `${desc} no se registró a tiempo`,
 }
 
+// Reglas innegociables al usar el contexto de cuidado real — compartidas por
+// todo asistente que inyecte buildCareContext() en su prompt (Milo/Luna en
+// CompanionChat.jsx, "Preguntar a Milo y Luna" en el chat familiar). Única
+// fuente de verdad: nunca duplicar este texto en otro archivo.
+export const CONTEXT_RULES = `Reglas para usar el contexto de cuidado (innegociables):
+- Si preguntan por el ESTADO del paciente o del cuidado (cómo está, qué se ha hecho hoy, medicamentos, quién hizo qué, actividad reciente), responde PRIMERO con los datos del contexto de cuidado de abajo. Deriva a una pantalla de la app SOLO cuando la respuesta requiera una ACCIÓN del usuario (agregar, editar, invitar) que tú no puedes hacer por chat — nunca derives a una pantalla para dar información que el contexto ya tiene. Ejemplo: ante "¿cómo está Deborath?" respondes con lo que dice el contexto, NUNCA "revisa la pantalla Inicio".
+- Responde SOLO con hechos presentes en el contexto de cuidado. Si el dato no está, di que no tienes ese registro. NUNCA inventes.
+- NUNCA infieras estados de salud, ánimo o causas que no estén registrados textualmente.
+- NUNCA des consejo médico: nada de dosis, interacciones, ni recomendaciones clínicas. Ante preguntas médicas responde que eso debe consultarse con su médico.
+- Usa siempre nombres de pila (ya vienen así en el contexto) — nunca nombres completos.
+- Tono cálido y familiar, sin culpa ni alarmismo.
+- Respuestas breves: 2-4 oraciones, salvo que pidan detalle.`
+
 export async function buildCareContext(ownerId) {
   if (!ownerId) return null
 
@@ -45,12 +58,20 @@ export async function buildCareContext(ownerId) {
       { data: activity },
       { data: careProfile },
       { data: members },
+      { data: voiceMemories },
+      { data: upcomingEvents },
+      { data: recentExpenses },
     ] = await Promise.all([
       supabase.from('medications').select('id, name, dosage, scheduled_times, time').eq('user_id', ownerId),
       supabase.from('medication_logs').select('medication_id, status, confirmed_at, confirmed_by_name, photo_url').eq('user_id', ownerId).eq('log_date', today),
       supabase.from('activity_log').select('type, description, actor_name, created_at').eq('owner_id', ownerId).order('created_at', { ascending: false }).limit(10),
       supabase.from('care_profiles').select('name, age').eq('user_id', ownerId).maybeSingle(),
       supabase.from('family_members').select('member_user_id, member_email, role').eq('user_id', ownerId),
+      // Fuentes opcionales — se omiten del contexto por completo si la familia
+      // no usa esa función, en vez de forzar un "sin registros" en cada prompt.
+      supabase.from('voice_diary').select('transcription, mood').eq('user_id', ownerId).order('created_at', { ascending: false }).limit(5),
+      supabase.from('events').select('title, date, time').eq('user_id', ownerId).gte('date', today).order('date', { ascending: true }).limit(3),
+      supabase.from('care_expenses').select('description, amount').eq('user_id', ownerId).order('created_at', { ascending: false }).limit(5),
     ])
 
     const patientName = careProfile?.name ? careProfile.name.split(' ')[0] : 'tu familiar'
@@ -93,6 +114,17 @@ export async function buildCareContext(ownerId) {
       ),
     ]
 
+    // Opcionales: solo se agregan si la familia realmente usa la función —
+    // omitir la sección entera es más honesto que decir "sin registros" de
+    // algo que ni siquiera está en uso.
+    const voiceLines = (voiceMemories ?? [])
+      .filter(m => m.transcription)
+      .map(m => `- "${m.transcription.slice(0, 80)}"${m.mood ? ` (ánimo: ${m.mood})` : ''}`)
+    const eventsLines = (upcomingEvents ?? [])
+      .map(e => `- ${e.title} el ${e.date}${e.time ? ` a las ${fmt12h(e.time) ?? e.time}` : ''}`)
+    const expenseLines = (recentExpenses ?? [])
+      .map(e => `- ${e.description ?? 'Gasto'}: $${e.amount}`)
+
     return [
       `CONTEXTO DE CUIDADO — ${patientName}${careProfile?.age ? `, ${careProfile.age} años` : ''}`,
       '',
@@ -104,6 +136,9 @@ export async function buildCareContext(ownerId) {
       '',
       'FAMILIA:',
       familyLines.join('\n'),
+      ...(voiceLines.length ? ['', 'DIARIO DE VOZ RECIENTE:', voiceLines.join('\n')] : []),
+      ...(eventsLines.length ? ['', 'PRÓXIMAS CITAS:', eventsLines.join('\n')] : []),
+      ...(expenseLines.length ? ['', 'GASTOS RECIENTES:', expenseLines.join('\n')] : []),
     ].join('\n')
   } catch (e) {
     console.error('[careContext] build failed:', e)

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
 import { geminiChat } from '../lib/gemini'
-import { buildCareContext } from '../lib/careContext'
+import { buildCareContext, CONTEXT_RULES } from '../lib/careContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { FAMILIACERCA_KNOWLEDGE } from '../lib/companionKnowledge'
 import miloLunaImg  from '../assets/companions/milo-luna.png'
@@ -69,18 +69,11 @@ const FALLBACKS = {
   luna: 'Te escucho 🌙',
 }
 
-// Reglas innegociables al usar el contexto de cuidado real — solo se agregan
-// cuando el contexto se pudo armar; si falla, Milo/Luna sigue con su prompt
-// genérico de siempre (ver buildSystemPrompt).
-const CONTEXT_RULES = `Reglas para usar el contexto de cuidado (innegociables):
-- Si preguntan por el ESTADO del paciente o del cuidado (cómo está, qué se ha hecho hoy, medicamentos, quién hizo qué, actividad reciente), responde PRIMERO con los datos del contexto de cuidado de abajo. Deriva a una pantalla de la app SOLO cuando la respuesta requiera una ACCIÓN del usuario (agregar, editar, invitar) que tú no puedes hacer por chat — nunca derives a una pantalla para dar información que el contexto ya tiene. Ejemplo: ante "¿cómo está Deborath?" respondes con lo que dice el contexto, NUNCA "revisa la pantalla Inicio".
-- Responde SOLO con hechos presentes en el contexto de cuidado. Si el dato no está, di que no tienes ese registro. NUNCA inventes.
-- NUNCA infieras estados de salud, ánimo o causas que no estén registrados textualmente.
-- NUNCA des consejo médico: nada de dosis, interacciones, ni recomendaciones clínicas. Ante preguntas médicas responde que eso debe consultarse con su médico.
-- Usa siempre nombres de pila (ya vienen así en el contexto) — nunca nombres completos.
-- Tono cálido y familiar, sin culpa ni alarmismo.
-- Respuestas breves: 2-4 oraciones, salvo que pidan detalle.`
-
+// Reglas innegociables al usar el contexto de cuidado real (CONTEXT_RULES,
+// importado de careContext.js — única fuente de verdad, compartida con el
+// asistente del chat familiar) — solo se agregan cuando el contexto se pudo
+// armar; si falla, Milo/Luna sigue con su prompt genérico de siempre (ver
+// buildSystemPrompt).
 const CARE_CONTEXT_TTL_MS = 2 * 60 * 1000
 
 // bottomOffset: px from bottom of viewport for the floating button.
