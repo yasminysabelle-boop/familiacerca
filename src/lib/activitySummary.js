@@ -6,8 +6,8 @@
 //
 // Cache compartido entre todos los que ven el dashboard de esa familia (no
 // por dispositivo): se guarda en care_profiles.activity_summary y solo se
-// regenera si cambió la cantidad de eventos hechos/pendientes/sin registrar
-// respecto al último resumen generado.
+// regenera si cambió el contenido de las líneas hechas/pendientes/sin
+// registrar respecto al último resumen generado.
 
 import { supabase } from './supabase'
 import { geminiGenerate } from './gemini'
@@ -31,11 +31,16 @@ const RULES = `Reglas (innegociables):
 
 // doneLines/pendingLines/missedLines: arrays de strings ya humanizados, en el
 // mismo texto que ve el usuario en las pantallas correspondientes.
-// latestEventAt: Date | string ISO del evento "hecho" más reciente de hoy (puede ser null si hoy solo hay pendientes/sin registrar).
-export async function getActivitySummary({ ownerId, patientName, doneLines = [], pendingLines = [], missedLines = [], latestEventAt }) {
+export async function getActivitySummary({ ownerId, patientName, doneLines = [], pendingLines = [], missedLines = [] }) {
   if (!ownerId || (!doneLines.length && !pendingLines.length && !missedLines.length)) return null
 
-  const cacheKey = `${latestEventAt ? new Date(latestEventAt).toISOString() : 'none'}|${doneLines.length}-${pendingLines.length}-${missedLines.length}`
+  // Clave por contenido, no por conteo: cualquier línea que pueda cambiar el
+  // texto (una rutina que avanza, un ánimo que se corrige) debe poder
+  // invalidar el cache. Antes se hasheaba solo doneLines.length/
+  // pendingLines.length/missedLines.length — como la mayoría de esos cambios
+  // no mueven una línea de un bucket a otro (solo le cambian el texto), el
+  // resumen se quedaba viejo indefinidamente.
+  const cacheKey = [...doneLines, ...pendingLines, ...missedLines].join('¤')
 
   try {
     const { data: careProfile } = await supabase

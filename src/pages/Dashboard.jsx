@@ -3100,7 +3100,6 @@ export default function Dashboard() {
         doneLines,
         pendingLines,
         missedLines: missedMedLines,
-        latestEventAt: activityLatestEventAt,
       })
         .then(text => { if (!cancelled) setActivitySummaryText(text) })
         .catch(() => { if (!cancelled) setActivitySummaryText(null) })
