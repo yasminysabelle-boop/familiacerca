@@ -3079,8 +3079,15 @@ export default function Dashboard() {
   // costo (llamada a Gemini + escritura en cache) sin ningún efecto visible,
   // así que el resumen se salta mientras el modo esté activo.
   const routinePending = routinesTotal > 0 && routinesDoneCount < routinesTotal
+  // Fuente única de "hay algo que narrar hoy" — usada tanto para decidir si
+  // se genera el resumen como para el estado vacío que se muestra en
+  // pantalla. Antes summaryEmpty (más abajo, prop de RecentActivity) miraba
+  // solo todaysActivityItems.length, de antes de que existieran mood/rutina
+  // en la narración — un día con solo ánimo/rutina registrados (sin
+  // medicamentos, fotos, etc.) generaba el resumen correcto pero la pantalla
+  // igual mostraba "Aún no hay registros del día" por encima.
+  const hasSignal = todaysActivityItems.length > 0 || pendingMedLines.length > 0 || missedMedLines.length > 0 || !!moodLine || !!routineLine
   useEffect(() => {
-    const hasSignal = todaysActivityItems.length > 0 || pendingMedLines.length > 0 || missedMedLines.length > 0 || !!moodLine || !!routineLine
     if (loading || !ownerId || !hasSignal || isHospitalMode) {
       setActivitySummaryText(null)
       return
@@ -3108,7 +3115,7 @@ export default function Dashboard() {
     }
     return () => { cancelled = true }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading, ownerId, isHospitalMode, activityLatestEventMs, todaysActivityItems.length, pendingMedLines.length, missedMedLines.length, moodLine, routineLine, routinePending, dashPatientName])
+  }, [loading, ownerId, isHospitalMode, hasSignal, activityLatestEventMs, todaysActivityItems.length, pendingMedLines.length, missedMedLines.length, moodLine, routineLine, routinePending, dashPatientName])
 
   // Cuidado de hoy card status
   let careStatus, careStatusType
@@ -3501,7 +3508,7 @@ export default function Dashboard() {
                   onSelect={setSelectedEvent}
                   firstName={firstName}
                   summaryText={loading ? null : activitySummaryText}
-                  summaryEmpty={!loading && todaysActivityItems.length === 0}
+                  summaryEmpty={!loading && !hasSignal}
                 />
 
                 {/* ══ MILO Y LUNA (v0: PetsCard) ══ */}
