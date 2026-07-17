@@ -3434,11 +3434,6 @@ export default function Dashboard() {
               .filter(e => e.type === 'PHOTO' || e.type === 'VOICE_MEMORY')
               .sort((a, b) => (b.timestamp ?? 0) - (a.timestamp ?? 0))[0] ?? null
 
-            const actividadHoy = (todaySection?.events ?? [])
-              .filter(e => !['MED_MISSED', 'CAREGIVER_CARD', 'MED_PENDING'].includes(e.type))
-              .sort((a, b) => (b.timestamp ?? 0) - (a.timestamp ?? 0))
-              .slice(0, 4)
-
             const recentPhotos = sections
               .flatMap(s => s.events)
               .filter(e => e.type === 'PHOTO' && e.fileUrl)
@@ -3480,7 +3475,7 @@ export default function Dashboard() {
                   photoUrl={profilePhoto}
                   status={isCritical ? 'critical' : isPendingToday ? 'warning' : 'ok'}
                   medsUpToDate={pendingCount === 0}
-                  routineUpToDate={actividadHoy.some(e => e.type === 'CARE_LOG')}
+                  routineUpToDate={pendingRoutinesCount === 0}
                   familyCount={familyCount}
                   onClick={() => navigate('/paciente/perfil')}
                   onMedsClick={() => navigate('/medications')}
