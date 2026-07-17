@@ -53,7 +53,7 @@ export async function buildCareContext(ownerId) {
       supabase.from('family_members').select('member_user_id, member_email, role').eq('user_id', ownerId),
     ])
 
-    const patientName = careProfile?.name ?? 'tu familiar'
+    const patientName = careProfile?.name ? careProfile.name.split(' ')[0] : 'tu familiar'
     const logByMedId = new Map((logs ?? []).map(l => [l.medication_id, l]))
 
     const medLines = (medications ?? []).map(med => {
@@ -67,7 +67,7 @@ export async function buildCareContext(ownerId) {
           ? new Date(log.confirmed_at).toLocaleTimeString('es-US', { hour: 'numeric', minute: '2-digit', hour12: true })
           : null
         const photoNote = log.photo_url ? ' (con foto de prueba)' : ''
-        return `- ${label}: confirmado${confTime ? ` a las ${confTime}` : ''}${log.confirmed_by_name ? ` por ${log.confirmed_by_name}` : ''}${photoNote}`
+        return `- ${label}: confirmado${confTime ? ` a las ${confTime}` : ''}${log.confirmed_by_name ? ` por ${log.confirmed_by_name.split(' ')[0]}` : ''}${photoNote}`
       }
       if (log?.status === 'missed') {
         return `- ${label}: no se registró a tiempo${timeLabel ? ` (programado a las ${timeLabel})` : ''}`
@@ -77,7 +77,7 @@ export async function buildCareContext(ownerId) {
 
     const activityLines = (activity ?? []).map(a => {
       const build = ACTIVITY_VERBS[a.type]
-      const actor = a.actor_name ?? 'Alguien'
+      const actor = (a.actor_name ?? 'Alguien').split(' ')[0]
       const text = build ? build(actor, a.description ?? '') : `${actor}: ${a.description ?? a.type}`
       return `- ${text} · ${timeAgo(a.created_at)}`
     })
@@ -87,9 +87,9 @@ export async function buildCareContext(ownerId) {
     const nameById = new Map((profiles ?? []).map(p => [p.id, p.full_name?.trim() || p.email?.split('@')[0]]))
 
     const familyLines = [
-      `- ${nameById.get(ownerId) ?? 'Administrador/a'} (administrador/a)`,
+      `- ${(nameById.get(ownerId) ?? 'Administrador/a').split(' ')[0]} (administrador/a)`,
       ...(members ?? []).map(m =>
-        `- ${nameById.get(m.member_user_id) ?? m.member_email?.split('@')[0] ?? 'Familiar'} (${m.role === 'cuidador' ? 'cuidador/a' : 'familiar'})`
+        `- ${(nameById.get(m.member_user_id) ?? m.member_email?.split('@')[0] ?? 'Familiar').split(' ')[0]} (${m.role === 'cuidador' ? 'cuidador/a' : 'familiar'})`
       ),
     ]
 

@@ -37,6 +37,19 @@ const GREETINGS = {
   luna: 'Hola... Soy Luna 🌙 Aquí contigo, sin prisa. ¿Cómo te sientes?',
 }
 
+// Sección "Cuidado de hoy" — arriba de las opciones de soporte. Usa el
+// primer nombre del paciente activo; con nombre genérico si aún no hay
+// paciente configurado.
+function careQuickOptions(patientFirstName) {
+  const p = patientFirstName || 'tu familiar'
+  return [
+    { emoji: '🩺', label: `¿Cómo va el día de ${p}?` },
+    { emoji: '💊', label: '¿Ya se dieron los medicamentos?' },
+    { emoji: '📋', label: '¿Qué queda pendiente hoy?' },
+    { emoji: '🕒', label: '¿Quién hizo el último registro?' },
+  ]
+}
+
 const QUICK_OPTIONS = [
   { emoji: '💊', label: 'Quiero agregar medicamentos' },
   { emoji: '👨‍👩‍👧', label: 'Quiero invitar a mi familia' },
@@ -60,9 +73,11 @@ const FALLBACKS = {
 // cuando el contexto se pudo armar; si falla, Milo/Luna sigue con su prompt
 // genérico de siempre (ver buildSystemPrompt).
 const CONTEXT_RULES = `Reglas para usar el contexto de cuidado (innegociables):
+- Si preguntan por el ESTADO del paciente o del cuidado (cómo está, qué se ha hecho hoy, medicamentos, quién hizo qué, actividad reciente), responde PRIMERO con los datos del contexto de cuidado de abajo. Deriva a una pantalla de la app SOLO cuando la respuesta requiera una ACCIÓN del usuario (agregar, editar, invitar) que tú no puedes hacer por chat — nunca derives a una pantalla para dar información que el contexto ya tiene. Ejemplo: ante "¿cómo está Deborath?" respondes con lo que dice el contexto, NUNCA "revisa la pantalla Inicio".
 - Responde SOLO con hechos presentes en el contexto de cuidado. Si el dato no está, di que no tienes ese registro. NUNCA inventes.
 - NUNCA infieras estados de salud, ánimo o causas que no estén registrados textualmente.
 - NUNCA des consejo médico: nada de dosis, interacciones, ni recomendaciones clínicas. Ante preguntas médicas responde que eso debe consultarse con su médico.
+- Usa siempre nombres de pila (ya vienen así en el contexto) — nunca nombres completos.
 - Tono cálido y familiar, sin culpa ni alarmismo.
 - Respuestas breves: 2-4 oraciones, salvo que pidan detalle.`
 
@@ -71,7 +86,8 @@ const CARE_CONTEXT_TTL_MS = 2 * 60 * 1000
 // bottomOffset: px from bottom of viewport for the floating button.
 // Pass 24 on Landing (no nav bar), use default 140 inside Layout (above FAB).
 export default function CompanionChat({ bottomOffset = 140, externalOpen = false, onExternalClose }) {
-  const { ownerId } = useFamily()
+  const { ownerId, activePatientName } = useFamily()
+  const careOptions = careQuickOptions(activePatientName?.split(' ')[0])
   const careContextRef = useRef({ text: null, fetchedAt: 0 })
 
   const [companion,  setCompanion]  = useState(() => {
@@ -306,29 +322,66 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
 
             {/* Quick option chips — only when no user message yet */}
             {showQuickOptions && !loading && (
-              <div style={{
-                display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6,
-                marginTop: 4,
-              }}>
-                {QUICK_OPTIONS.map(({ emoji, label }, i) => (
-                  <button
-                    key={i}
-                    onClick={() => sendQuick(`${emoji} ${label}`)}
-                    style={{
-                      padding: '7px 10px',
-                      borderRadius: 20,
-                      border: `1.5px solid ${i % 2 === 0 ? '#0d6b63' : '#C9882A'}`,
-                      background: i % 2 === 0 ? '#F0F7F3' : '#FDF6EC',
-                      color: i % 2 === 0 ? '#3A6347' : '#9A6420',
-                      fontSize: 11, fontWeight: 600,
-                      cursor: 'pointer', textAlign: 'left',
-                      lineHeight: 1.35,
-                      transition: 'all 0.15s',
-                    }}
-                  >
-                    {emoji} {label}
-                  </button>
-                ))}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 4 }}>
+                <div>
+                  <p style={{
+                    margin: '0 0 6px', fontSize: 10, fontWeight: 700,
+                    color: '#087F70', letterSpacing: '0.06em', textTransform: 'uppercase',
+                  }}>
+                    Cuidado de hoy
+                  </p>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+                    {careOptions.map(({ emoji, label }, i) => (
+                      <button
+                        key={`care-${i}`}
+                        onClick={() => sendQuick(`${emoji} ${label}`)}
+                        style={{
+                          padding: '7px 10px',
+                          borderRadius: 20,
+                          border: `1.5px solid ${i % 2 === 0 ? '#0d6b63' : '#C9882A'}`,
+                          background: i % 2 === 0 ? '#F0F7F3' : '#FDF6EC',
+                          color: i % 2 === 0 ? '#3A6347' : '#9A6420',
+                          fontSize: 11, fontWeight: 600,
+                          cursor: 'pointer', textAlign: 'left',
+                          lineHeight: 1.35,
+                          transition: 'all 0.15s',
+                        }}
+                      >
+                        {emoji} {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <p style={{
+                    margin: '0 0 6px', fontSize: 10, fontWeight: 700,
+                    color: '#9CA3AF', letterSpacing: '0.06em', textTransform: 'uppercase',
+                  }}>
+                    Soporte
+                  </p>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+                    {QUICK_OPTIONS.map(({ emoji, label }, i) => (
+                      <button
+                        key={i}
+                        onClick={() => sendQuick(`${emoji} ${label}`)}
+                        style={{
+                          padding: '7px 10px',
+                          borderRadius: 20,
+                          border: `1.5px solid ${i % 2 === 0 ? '#0d6b63' : '#C9882A'}`,
+                          background: i % 2 === 0 ? '#F0F7F3' : '#FDF6EC',
+                          color: i % 2 === 0 ? '#3A6347' : '#9A6420',
+                          fontSize: 11, fontWeight: 600,
+                          cursor: 'pointer', textAlign: 'left',
+                          lineHeight: 1.35,
+                          transition: 'all 0.15s',
+                        }}
+                      >
+                        {emoji} {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
             )}
 
