@@ -309,7 +309,11 @@ export default function Chat() {
 
 Reglas (innegociables):
 - Resume SOLO lo escrito en los mensajes de abajo. Nunca inventes ni agregues nada que no esté ahí.
-- Prioriza incidentes y medicamentos sobre charla social o mensajes de cortesía.
+- Orden de prioridad si hay que elegir qué mencionar por el límite de oraciones — en este orden exacto:
+  1. Incidentes: siempre primero.
+  2. Medicamentos: SIEMPRE se incluyen si hay al menos uno en los mensajes — nunca se omiten por espacio.
+  3. Charla social o mensajes de cortesía: es lo único que se puede omitir por completo si no alcanza el espacio.
+  Ajusta el límite de oraciones recortando desde el final de esta lista (la charla social), nunca desde el principio.
 - Usa nombres de pila.
 - Tono cálido, sin alarmismo.
 - Máximo 3-4 oraciones en total.
