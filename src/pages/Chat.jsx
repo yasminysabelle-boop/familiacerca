@@ -251,12 +251,19 @@ export default function Chat() {
     setAssistantCard({ type: 'ask', loading: true, text: null, error: null, question: q })
     try {
       const context = await buildCareContext(ownerId)
+      // "Eres LA VOZ de Milo y Luna hablando" (no "el asistente de Milo y
+      // Luna") — con la frase anterior el modelo a veces se confundía de rol
+      // y saludaba a "Milo y Luna" como si fueran otra persona. Aquí hablan
+      // ellos mismos, en primera persona, directo al familiar.
+      const persona = 'Eres la voz conjunta de Milo y Luna, los compañeros virtuales de FamiliaCerca, hablando en primera persona directamente con un familiar dentro del chat familiar. NUNCA te dirijas a "Milo y Luna" como si fueran otra persona, ni los saludes, ni te presentes como su asistente — tú ERES ellos hablando.'
       const prompt = context
-        ? `Eres el asistente de Milo y Luna dentro del chat familiar de FamiliaCerca. Responde en español.\n\n${CONTEXT_RULES}\n\n${context}\n\nPregunta: "${q}"`
-        : `Eres el asistente de Milo y Luna dentro del chat familiar de FamiliaCerca. No hay contexto de cuidado disponible en este momento — si preguntan por datos específicos, dilo honestamente en vez de inventar. Responde en español, cálido y breve (2-4 oraciones). Pregunta: "${q}"`
+        ? `${persona} Responde en español.\n\n${CONTEXT_RULES}\n\n${context}\n\nPregunta: "${q}"`
+        : `${persona} No hay contexto de cuidado disponible en este momento — si preguntan por datos específicos, dilo honestamente en vez de inventar. Responde en español, cálido y breve (2-4 oraciones). Pregunta: "${q}"`
       const response = await geminiGenerate(prompt, 250)
+      if (!response) console.warn('[Chat] preguntar: geminiGenerate devolvió vacío')
       setAssistantCard({ type: 'ask', loading: false, text: response ?? 'No pude obtener una respuesta. Intenta de nuevo.', error: null, question: q })
-    } catch {
+    } catch (e) {
+      console.error('[Chat] preguntar: excepción inesperada:', e)
       setAssistantCard({ type: 'ask', loading: false, text: null, error: 'No pude obtener una respuesta. Intenta de nuevo.', question: q })
     }
   }
@@ -275,10 +282,21 @@ export default function Chat() {
         .order('created_at', { ascending: true })
         .limit(150)
       if (since) query = query.gt('created_at', since)
-      const { data: newMsgs } = await query
+      const { data: newMsgs, error: fetchError } = await query
+
+      // Un error de consulta (RLS, red, etc.) NO debe disfrazarse de "no hay
+      // mensajes nuevos" — son estados distintos y el usuario merece saber
+      // cuál pasó. Antes no se revisaba `error`, así que un fallo silencioso
+      // acá se veía exactamente igual que estar al día.
+      if (fetchError) {
+        console.error('[Chat] ponte al día: error consultando mensajes:', fetchError)
+        setAssistantCard({ type: 'catchup', loading: false, text: null, error: 'No se pudo revisar el chat. Intenta de nuevo.' })
+        return
+      }
 
       if (!newMsgs?.length) {
-        setAssistantCard({ type: 'catchup', loading: false, text: 'No hay mensajes nuevos desde tu última visita.', error: null })
+        // Sin mensajes nuevos: mensaje fijo, NUNCA se llama a Gemini.
+        setAssistantCard({ type: 'catchup', loading: false, text: 'Estás al día — no hay mensajes nuevos desde tu última visita.', error: null, upToDate: true })
         return
       }
 
@@ -300,8 +318,10 @@ MENSAJES:
 ${lines}`
 
       const summary = await geminiGenerate(prompt, 220)
+      if (!summary) console.warn('[Chat] ponte al día: geminiGenerate devolvió vacío')
       setAssistantCard({ type: 'catchup', loading: false, text: summary ?? 'No se pudo generar el resumen. Intenta de nuevo.', error: null })
-    } catch {
+    } catch (e) {
+      console.error('[Chat] ponte al día: excepción inesperada:', e)
       setAssistantCard({ type: 'catchup', loading: false, text: null, error: 'No se pudo generar el resumen. Intenta de nuevo.' })
     }
   }
@@ -749,7 +769,7 @@ ${lines}`
                       {assistantCard.text}
                     </p>
                   </div>
-                  {assistantCard.type === 'catchup' && (
+                  {assistantCard.type === 'catchup' && !assistantCard.upToDate && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 8, fontSize: 11, fontWeight: 700, color: '#5B4BC4', opacity: 0.85 }}>
                       <Sparkles size={11} color="#5B4BC4" strokeWidth={2.2} />
                       Solo tú ves este resumen
