@@ -659,12 +659,16 @@ function RoutineCard({ item, state, isToggling, isFamiliar, scheduledTime, log, 
           </div>
         )}
 
-        {/* Evidencia — mismo patrón que medicamentos administrados */}
+        {/* Evidencia — mismo patrón que medicamentos administrados. Cualquier
+            completada de HOY sin foto ofrece agregarla (careLogs solo trae
+            filas de hoy — fetchData filtra por log_date — así que esta
+            lista nunca incluye días pasados; no hace falta filtrar de más).
+            Solo quien puede marcar (no isFamiliar) puede subir la foto. */}
         {isCompletada && (
           <div style={{ marginTop: 6 }}>
             {log?.photo_url ? (
               <EvidencePhoto photoUrl={log.photo_url} />
-            ) : justCompleted && onPhotoCapture ? (
+            ) : !isFamiliar && onPhotoCapture ? (
               <EvidencePhoto onPhotoCapture={onPhotoCapture} label="Agregar foto" bucket="care-photos" pathPrefix={`routines/${ownerId}`} />
             ) : null}
           </div>
