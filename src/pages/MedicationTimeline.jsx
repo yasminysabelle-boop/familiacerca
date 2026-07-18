@@ -62,7 +62,7 @@ const TYPE_META = {
   care_routine_missed:   { label: 'Rutinas omitidas',   Icon: ClipboardCheck, cat: 'coral',    route: '/cuidado' },
   hospital_mode_on:      { label: 'Hospital',            Icon: Hospital,       cat: 'gold' },
   hospital_discharge:    { label: 'Alta hospitalaria',   Icon: Home,           cat: 'teal' },
-  doctor_note:            { label: 'Notas',               Icon: Stethoscope,    cat: 'gold',     route: '/notas' },
+  doctor_note:            { label: 'Notas',               Icon: Stethoscope,    cat: 'gold',     route: '/diario-medico' },
   appointment:             { label: 'Citas',                Icon: Calendar,       cat: 'cool',     route: '/calendar' },
   caregiver_assigned:     { label: 'Turnos',              Icon: User,           cat: 'cool' },
   sos:                     { label: 'SOS',                  Icon: Siren,          cat: 'sos' },
@@ -235,6 +235,7 @@ function EventDetail({ event }) {
 const MISSED_TYPES = new Set(['med_missed', 'care_routine_missed'])
 
 function EventCard({ event, onClick }) {
+  const [pressed, setPressed] = useState(false)
   const cat = CAT[TYPE_META[event.type]?.cat ?? 'teal']
   const Icon = eventIcon(event)
   const title = eventTitle(event)
@@ -242,17 +243,24 @@ function EventCard({ event, onClick }) {
   const isIncident = event.type === 'incident'
   const photoUrl = eventPhotoUrl(event)
   const metaLine = event.actor_name ? `${event.actor_name.split(' ')[0]} · ${fmtTime(event.created_at)}` : fmtTime(event.created_at)
+  const clickable = !!onClick
 
   return (
     <div
       onClick={onClick}
+      onPointerDown={clickable ? () => setPressed(true) : undefined}
+      onPointerUp={clickable ? () => setPressed(false) : undefined}
+      onPointerLeave={clickable ? () => setPressed(false) : undefined}
       style={{
         background: isIncident ? PEACH : 'white',
         border: isIncident ? `1px solid ${CORAL_ACTION}` : '1px solid transparent',
         borderRadius: 16, padding: '11px 12px',
         display: 'flex', alignItems: 'flex-start', gap: 11,
         boxShadow: isIncident ? 'none' : (isMissed || event.type === 'sos') ? SHADOW_CORAL : SHADOW_CARD,
-        cursor: onClick ? 'pointer' : 'default',
+        cursor: clickable ? 'pointer' : 'default',
+        transform: pressed ? 'scale(0.985)' : 'scale(1)',
+        transition: 'transform 0.12s ease',
+        WebkitTapHighlightColor: 'transparent',
       }}
     >
       <div style={{
