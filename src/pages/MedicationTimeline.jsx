@@ -57,9 +57,9 @@ const ROUTINE_ICON = {
 // Metadatos por tipo de evento — reemplaza EVENT_CONFIG (emoji) del código anterior.
 const TYPE_META = {
   med_confirmed:        { label: 'Medicamentos',      Icon: Pill,           cat: 'teal',     route: '/medications' },
-  med_missed:            { label: 'Dosis omitidas',    Icon: Pill,           cat: 'coral' },
+  med_missed:            { label: 'Dosis omitidas',    Icon: Pill,           cat: 'coral',    route: '/medications' },
   care_routine:           { label: 'Rutinas',            Icon: ClipboardCheck, cat: 'teal',     route: '/cuidado' },
-  care_routine_missed:   { label: 'Rutinas omitidas',   Icon: ClipboardCheck, cat: 'coral' },
+  care_routine_missed:   { label: 'Rutinas omitidas',   Icon: ClipboardCheck, cat: 'coral',    route: '/cuidado' },
   hospital_mode_on:      { label: 'Hospital',            Icon: Hospital,       cat: 'gold' },
   hospital_discharge:    { label: 'Alta hospitalaria',   Icon: Home,           cat: 'teal' },
   doctor_note:            { label: 'Notas',               Icon: Stethoscope,    cat: 'gold',     route: '/notas' },
@@ -299,19 +299,25 @@ function EventCard({ event, onClick }) {
   )
 }
 
-// Marca de agua — mismo asset/técnica del CareCard (corazón + 2 figuras), tono
-// sobre tono adaptado a fondo claro. Nunca detrás de texto: las tarjetas tienen
-// fondo blanco opaco, así que solo asoma en el espacio negativo entre ellas.
-function WatermarkHeart({ opacity, width = 230, height = 230, style }) {
+// Marca de agua — mismo asset del CareCard (corazón + 2 figuras). El corazón va
+// en teal a opacidad baja; las 2 figuras van "caladas" en el color del fondo real
+// (fill sólido, sin atenuar) para que el logo se lea completo — a esta opacidad,
+// un simple tono-sobre-tono entre el corazón y las figuras se perdía por completo.
+// Nunca detrás de texto: las tarjetas tienen fondo opaco, así que solo asoma en
+// el espacio abierto alrededor de ellas.
+function WatermarkHeart({ heartOpacity, cutout, width = 230, height = 230, style }) {
   return (
     <svg
-      width={width} height={height} viewBox="0 0 100 100" fill={TEAL}
-      style={{ position: 'absolute', pointerEvents: 'none', opacity, ...style }}
+      width={width} height={height} viewBox="0 0 100 100"
+      style={{ position: 'absolute', pointerEvents: 'none', ...style }}
       aria-hidden="true"
     >
-      <path d="M50 88C22 68 8 54 8 34 8 22 17 13 29 13c8 0 15 5 21 13 6-8 13-13 21-13 12 0 21 9 21 21 0 20-14 34-42 54Z" />
-      <circle cx="40" cy="40" r="7" fill={TEAL_DEEP} /><path d="M28 62c0-8 5-13 12-13s12 5 12 13Z" fill={TEAL_DEEP} />
-      <circle cx="60" cy="45" r="5.5" fill={TEAL_DEEP} /><path d="M50 62c0-7 4-11 10-11s10 4 10 11Z" fill={TEAL_DEEP} />
+      <path
+        d="M50 88C22 68 8 54 8 34 8 22 17 13 29 13c8 0 15 5 21 13 6-8 13-13 21-13 12 0 21 9 21 21 0 20-14 34-42 54Z"
+        fill={TEAL} fillOpacity={heartOpacity}
+      />
+      <circle cx="40" cy="40" r="7" fill={cutout} /><path d="M28 62c0-8 5-13 12-13s12 5 12 13Z" fill={cutout} />
+      <circle cx="60" cy="45" r="5.5" fill={cutout} /><path d="M50 62c0-7 4-11 10-11s10 4 10 11Z" fill={cutout} />
     </svg>
   )
 }
@@ -547,7 +553,7 @@ export default function MedicationTimeline() {
           ) : days.length === 0 ? (
             <div style={{ position: 'relative', background: 'white', borderRadius: 20, padding: '48px 24px', textAlign: 'center', boxShadow: SHADOW_CARD, overflow: 'hidden' }}>
               <WatermarkHeart
-                opacity={0.06} width={190} height={190}
+                heartOpacity={0.08} cutout="white" width={190} height={190}
                 style={{ top: '50%', left: '50%', transform: 'translate(-50%,-50%)' }}
               />
               <div style={{ position: 'relative', zIndex: 1 }}>
@@ -568,7 +574,9 @@ export default function MedicationTimeline() {
             </div>
           ) : (
             <div style={{ position: 'relative' }}>
-              <WatermarkHeart opacity={0.025} width={340} height={340} style={{ right: -60, top: -10 }} />
+              {/* Ancorada al final de la lista, mayormente en el espacio abierto bajo
+                  la última tarjeta — detrás de tarjetas opacas casi no se percibía. */}
+              <WatermarkHeart heartOpacity={0.045} cutout="#F8F4ED" width={220} height={220} style={{ right: -36, bottom: -140 }} />
               <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {days.map(([dateKey, dayEvents]) => {
                   const isExpanded = expandedDays.has(dateKey)
