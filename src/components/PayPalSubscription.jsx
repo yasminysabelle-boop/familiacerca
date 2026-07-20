@@ -4,11 +4,12 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useSubscription } from '../contexts/SubscriptionContext'
 import { supabase } from '../lib/supabase'
+import { PAYPAL_PLAN_IDS } from '../config/paypalPlans'
 
 const PLANS = [
   {
     id: 'familiar',
-    paypalPlanId: 'P-6GJ913990S148394PNIZUIZQ',
+    paypalPlanId: PAYPAL_PLAN_IDS.familiar,
     name: 'Plan Familiar',
     price: '$12.99',
     period: '/mes',
@@ -27,7 +28,7 @@ const PLANS = [
   },
   {
     id: 'care_plus',
-    paypalPlanId: 'P-3Y806075YA415820CNIZULYA',
+    paypalPlanId: PAYPAL_PLAN_IDS.care_plus,
     name: 'Cuidado Total',
     price: '$24.99',
     period: '/mes',

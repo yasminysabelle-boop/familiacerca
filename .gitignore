@@ -31,3 +31,6 @@ src/companions/
 
 # Design reference mockups (Claude Design molds) — not part of the build
 design-refs/
+
+# Local Netlify folder
+.netlify

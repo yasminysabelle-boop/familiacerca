@@ -5,9 +5,10 @@ import { useAuth } from '../contexts/AuthContext'
 import { useSubscription } from '../contexts/SubscriptionContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
+import { PAYPAL_PLAN_IDS } from '../config/paypalPlans'
 
 const PAYPAL_OPTIONS = {
-  clientId: 'BAA59ArCPyhPel6E3o3Fg35_Ppi7ObhJyAUCKfSupXe_Ki7m6j6eY1wW_gTg9VFZs4wwrt0BHN0QlQ6nf0',
+  clientId: import.meta.env.VITE_PAYPAL_CLIENT_ID,
   intent: 'subscription',
   vault: true,
   currency: 'USD',
@@ -240,7 +241,7 @@ function UpgradeContent() {
             ) : (
               <PayPalSection
                 planKey="familiar"
-                paypalPlanId="P-6GJ913990S148394PNIZUIZQ"
+                paypalPlanId={PAYPAL_PLAN_IDS.familiar}
                 {...paypalProps}
               />
             )}
@@ -291,7 +292,7 @@ function UpgradeContent() {
             ) : (
               <PayPalSection
                 planKey="care_plus"
-                paypalPlanId="P-3Y806075YA415820CNIZULYA"
+                paypalPlanId={PAYPAL_PLAN_IDS.care_plus}
                 {...paypalProps}
               />
             )}

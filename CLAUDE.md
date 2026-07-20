@@ -86,3 +86,25 @@ Regla: cada sección responde UNA pregunta.
 - El hero del Dashboard está CERRADO — no rediseñar
 - La sala de videollamada activa permanece oscura (estándar de video)
 - Actualizar SESION-*.md al completar cada pantalla
+
+## PayPal Live (producción) — registro de IDs
+
+Migrado a la cuenta PayPal Business Live el 2026-07-20. Producto y planes
+creados vía API contra `api-m.paypal.com` con las credenciales Live
+(`PAYPAL_CLIENT_ID` / `PAYPAL_SECRET` en Supabase Edge Function secrets).
+
+- Producto: `PROD-2L502973JB662725F` ("FamiliaCerca", SERVICE/SOFTWARE)
+- Plan Familiar ($12.99/mes): `P-1ND05182V43172927NJPFH7Y`
+- Plan Total ($24.99/mes): `P-48V95038FD0449505NJPFIAA`
+- Fuente única de los Plan IDs en el código: `src/config/paypalPlans.js`
+  (importado por `Upgrade.jsx`, `PayPalSubscription.jsx` y la Edge Function
+  `paypal-webhook`)
+- Sin trial period en PayPal — el trial de 14 días sin tarjeta lo gestiona
+  la app; el usuario se suscribe en PayPal al terminar el trial.
+- Webhook: Edge Function `paypal-webhook`, valida firma contra
+  `PAYPAL_WEBHOOK_ID` (Supabase secret). Eventos procesados:
+  `BILLING.SUBSCRIPTION.ACTIVATED/CANCELLED/SUSPENDED/EXPIRED`,
+  `PAYMENT.SALE.COMPLETED`. Es la fuente de verdad del estado de la
+  suscripción — el `onApprove` del frontend es solo activación optimista.
+- `subscriptions.status` admite `suspended` desde 2026-07-20
+  (`supabase/add_subscription_suspended_status.sql`).
