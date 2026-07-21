@@ -279,6 +279,32 @@ Re-verificado: los 3 aparecen (verde/gris según presencia real).
 - Anotado como mejora futura (NO implementada): max-width centrado para
   la vista desktop de esta pantalla — ver `CLAUDE.md`.
 
+**Publicado a producción (2026-07-21):** commit `c27f991` pusheado
+(`48798fc..c27f991`). `Layout.jsx` y el resto de archivos de Yasmin
+quedaron fuera del push — son su propio commit pendiente.
+
+**⚠️ Hallazgo antes de desplegar — bare `npm run build` NO sirve para
+verificar el bundle de producción:** el `.env` local tiene
+`VITE_PAYPAL_CLIENT_ID` vacío; un `npm run build` corrido directo en la
+terminal hornea el Client ID de PayPal vacío (rompería el pago en
+producción). Detectado a tiempo antes de desplegar — la vía correcta es
+siempre `netlify deploy --build` (inyecta las env vars reales del sitio
+en Netlify), nunca un build local suelto, para cualquier verificación que
+vaya a terminar en un deploy real. Válido para toda la sesión anterior de
+build: los `npm run build` limpios que corrí para VideoCall/splash
+verificaban sintaxis y errores de build, no el valor de variables de
+entorno — para eso siempre hace falta pasar por Netlify CLI.
+
+- `netlify deploy --build` → draft `6a5f9656b659e1490a2e19d7`, verificado
+  `AVE784...Q7u` horneado en `dist/assets/index-B2Lsmms4.js`.
+- `netlify deploy --prod` → "0 files" subidos (mismo bundle exacto del
+  draft recién verificado).
+- `familiacerca.com` verificado sirviendo `index-B2Lsmms4.js`, descargado
+  directo del dominio y confirmado `AVE784...Q7u`, sin rastro del Client
+  ID viejo.
+
 **Pendiente:**
 - [ ] Fase 2 (historial real de llamadas) — ver `CLAUDE.md`
 - [ ] Mejora futura: max-width desktop — ver `CLAUDE.md`
+- [ ] Que Yasmin haga su propio commit de `Layout.jsx` (línea de
+      `hasOwnHeader`) y lo pushee cuando quiera
