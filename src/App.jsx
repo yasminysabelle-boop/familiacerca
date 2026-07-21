@@ -122,7 +122,11 @@ function AppShell() {
   return (
     <>
       {showSlides && !isLanding && <WelcomeSlides onDone={handleOnboardingDone} />}
-      {!showSlides && !splashDone && !isLanding && <Splash fading={splashFading} />}
+      {!showSlides && !splashDone && !isLanding && (
+        <div style={{ position: 'relative', zIndex: 9999, width: '100%', height: '100vh', transform: 'translateZ(0)' }}>
+          <Splash fading={splashFading} />
+        </div>
+      )}
       {showMemberOnboarding && <MemberOnboarding onDone={handleMemberOnboardingDone} />}
       <InstallPrompt />
       <Routes>
