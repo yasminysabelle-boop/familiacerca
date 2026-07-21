@@ -108,3 +108,63 @@ creados vía API contra `api-m.paypal.com` con las credenciales Live
   suscripción — el `onApprove` del frontend es solo activación optimista.
 - `subscriptions.status` admite `suspended` desde 2026-07-20
   (`supabase/add_subscription_suspended_status.sql`).
+
+## Videollamada — arquitectura (Fase 1, 2026-07-20)
+
+Rediseño de `/videollamada` (`src/pages/VideoCall.jsx`) fiel al export de
+Claude Design `Videollamada.dc.html`. Resumen de arquitectura real detrás
+de cada sección — importante antes de tocar esta pantalla otra vez:
+
+- **Presencia** ("¿Quién está disponible?"): `usePresence()`
+  (`src/contexts/PresenceContext.jsx`) — Supabase Realtime Presence, en
+  vivo, sin tabla. Mismo hook que usan `Familia.jsx` y `Dashboard.jsx`. No
+  hay "última vez visto" persistido, solo online/offline del momento.
+- **Llamadas reales**: tabla `video_calls`, creada exclusivamente vía el
+  Edge Function `create-daily-room` (aprovisiona una sala Daily.co
+  permanente por perfil de cuidado — `fc-{8 chars del ownerId}` — y crea la
+  fila). Cron `send-videocall-notifications` manda push a los 15 min y al
+  momento exacto a todos los invitados. Esta es la ÚNICA vía correcta para
+  crear una llamada (instantánea o programada) — cualquier código nuevo que
+  programe una llamada debe pasar por `create-daily-room`, nunca insertar
+  directo a una tabla.
+- **`VideoCallScheduleModal.jsx`** (usado desde el FAB de Dashboard) ya
+  implementaba el flujo correcto (instantánea + programada + selección de
+  participantes, todo vía `create-daily-room`). El botón "Programar
+  llamada" del rediseño reutiliza este mismo modal — no se duplicó la
+  lógica de agendar una tercera vez.
+- **`scheduled_calls` — tabla huérfana, sin uso, NO borrada.** Antes del
+  rediseño, la pestaña "Programar" de `VideoCall.jsx` insertaba
+  directamente en esta tabla (`patient_id, family_id, scheduled_at,
+  created_by, status, title`) sin crear sala de Daily.co ni notificación —
+  las llamadas "programadas" ahí no se podían ni siquiera unir. Auditado
+  el 2026-07-20 vía Edge Function temporal con service role: **0 filas**,
+  tabla completamente vacía — no hubo que migrar nada. El insert directo
+  se eliminó de `VideoCall.jsx`; la tabla queda en el esquema sin ningún
+  código que la use. Decisión: no borrarla todavía (por si acaso), pero no
+  usarla — si se necesita en el futuro, primero confirmar que sigue vacía.
+- **"Recordar" (toggle en la tarjeta de próxima llamada): visual-only,
+  estado local del componente, no persiste.** Decisión explícita: los
+  recordatorios push ya se mandan automáticamente a TODOS los invitados de
+  cada fila de `video_calls` (cron de 15 min / al momento) — no existe un
+  campo de preferencia por-usuario para activar/desactivar esto, y crear
+  uno es trabajo de backend nuevo fuera del alcance de Fase 1. Conectar el
+  toggle a algo que no controla nada real hubiera sido más confuso que
+  dejarlo visual.
+- **"Recientes" — estado vacío únicamente, Fase 2 pendiente.** No existe
+  historial de llamadas: no hay webhook de Daily.co, no hay `ended_at` ni
+  `duration_seconds` en `video_calls`, no hay registro de asistencia.
+  Daily.co sí guarda esto en sus propios servidores. Para implementar
+  Fase 2: Edge Function que reciba el webhook `meeting.ended` de Daily.co
+  (agregar `ended_at`/`duration_seconds` a `video_calls`); si se quiere
+  asistencia real por participante, además suscribirse a
+  `participant.joined`/`participant.left` y una tabla nueva
+  (`video_call_participants` o similar).
+- **Mejora futura, NO en el alcance actual: max-width centrado en desktop.**
+  El export está pensado mobile-first (390px); en pantallas anchas el
+  contenido se ve estirado de borde a borde. Pendiente definir el
+  max-width y el tratamiento del fondo sobrante antes de tocarlo.
+- **Footer legal (Términos · Privacidad · © 2026) es de `Layout.jsx`, no de
+  `VideoCall.jsx`** — vive en el `<footer>` dentro del `<main>` de Layout,
+  se renderiza para toda página que use Layout. En pantallas cortas de
+  contenido (ej. esta, en desktop) queda visible al fondo por espacio
+  sobrante; es comportamiento global de Layout, no un bug de esta pantalla.

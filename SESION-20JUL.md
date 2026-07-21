@@ -1,12 +1,31 @@
 # Sesión 20 julio 2026 — Migración PayPal Sandbox → Live
 
-## Estado: PAUSADO — pendiente prueba real de pago, sin push
+## Estado: PUBLICADO A PRODUCCIÓN — pendiente solo la prueba real de pago (Zinli, ahora en producción) + reembolso
 
-## Commits de esta sesión (local, sin pushear)
+**Decisión de Yasmin (post-deploy del draft conjunto):** promover a producción sin
+esperar la prueba de pago. Razón: el splash descentrado afectaba a todos los
+usuarios actuales, y el flujo de pago en producción ya estaba roto de todos
+modos (credenciales inválidas) — el código nuevo no podía empeorarlo. La
+prueba real con Zinli se hace directamente en producción.
+
+- **`netlify deploy --prod`**: build determinístico — "0 files" subidos
+  porque el CDN ya tenía los mismos hashes del draft
+  (`6a5ed198a1d613bb9b4f546c`), confirma que es exactamente el bundle ya
+  verificado.
+- **`familiacerca.com` verificado sirviendo el bundle nuevo:** el HTML de
+  producción referencia `index-D31JFDwB.js`; se descargó ese bundle
+  directamente de `familiacerca.com/assets/` y contiene `AVE784...Q7u`
+  horneado, sin rastro del Client ID viejo (`EHdOOw...`).
+- **Push a GitHub:** `git push origin main` → `d38fd1b..48798fc`. Git y
+  producción quedan alineados (ambos commits de esta sesión, ver tabla
+  abajo).
+
+## Commits de esta sesión (pusheados, en producción)
 
 | Commit | Descripción |
 |--------|-------------|
-| (pendiente) | feat: migración PayPal a Live — planes, config única y webhook (pendiente prueba real antes de push) |
+| `b8793d5` | feat: migración PayPal a Live — planes, config única y webhook |
+| `48798fc` | fix: splash de arranque desplazado a la derecha en Chrome/WebView móvil |
 
 ## Qué se hizo
 
@@ -89,22 +108,25 @@ completa antes de continuar con la prueba real:
    `dist/assets/index-*.js`: contiene `AVE784...Q7u`, no contiene el Client
    ID viejo (`EHdOOw...`).
 
-- **URL de prueba nueva (usar esta, la anterior ya no existe):
+- **URL de prueba (histórica, ya borrada):
   https://6a5ec66044a6f77b442651a1--familiacerca.netlify.app**
 
 ## Checklist restante (en orden)
 
-- [ ] Prueba real: suscripción al Plan Familiar con cuenta Zinli invitada, en
-      la URL de draft de arriba
+- [x] ~~Promocionar draft a producción~~ — hecho, `familiacerca.com` sirve
+      `index-D31JFDwB.js` (AVE784 verificado)
+- [x] ~~Push definitivo del commit de esta sesión~~ — hecho, `d38fd1b..48798fc`
+- [ ] Prueba real: suscripción al Plan Familiar con cuenta Zinli invitada,
+      **ahora directamente en `familiacerca.com`** (ya no en un draft)
 - [ ] Verificar logs de la Edge Function `paypal-webhook` (llegó el evento,
       firma validada, sin errores)
 - [ ] Verificar tabla `subscriptions` en Supabase: `plan`, `status`,
       `paypal_subscription_id`, `current_period_end` correctos para el usuario
       de prueba
 - [ ] Verificación visual completa en la app (plan activo reflejado en
-      Ajustes, Milo/careContext correctos)
-- [ ] Promocionar draft a producción (`netlify deploy --prod`)
-- [ ] Push definitivo del commit de esta sesión
+      Ajustes, Milo/careContext correctos; splash centrado en el teléfono
+      real tras actualizar la PWA — cerrar la app del todo y reabrirla,
+      tocar "Actualizar" si aparece el banner)
 - [ ] Cancelar/reembolsar el cargo de prueba de $12.99
 
 ---
@@ -156,6 +178,107 @@ la verificación antes de llegar a esta versión; los tres son necesarios.
   `Medications.jsx` ni `useGoBack.js` (los cambios sin commitear de
   Yasmin) — commit separado, solo `src/App.jsx`.
 
-**Pendiente:** verificación visual de Yasmin en su teléfono real tras el
-próximo deploy (este fix vive en un commit local aparte, todavía sin
-desplegar — no se mezcla con el draft/commit de PayPal).
+**Deploy:** draft anterior (`6a5ec66044a6f77b442651a1`, solo PayPal) borrado.
+Draft nuevo generado con `netlify deploy --build`, incluye ambos commits
+(`b8793d5` PayPal + `48798fc` fix del splash) — no toca producción.
+Verificado `AVE784...Q7u` horneado en `dist/assets/index-*.js`, sin rastro
+del Client ID viejo.
+
+- **URL de prueba (histórica, ya promovida a producción):
+  https://6a5ed198a1d613bb9b4f546c--familiacerca.netlify.app**
+
+**Promovido a producción** (ver sección de estado al inicio del archivo,
+`netlify deploy --prod` + push a GitHub). Pendiente: verificación visual de
+Yasmin en su teléfono real (splash centrado, actualizar la PWA primero) +
+prueba real de pago con Zinli, ambas ahora en `familiacerca.com` directo.
+
+---
+
+## Bug aparte (misma sesión): rediseño de Videollamada — Fase 1
+
+No relacionado con PayPal ni con el splash. Alcance aprobado: integrar el
+export de Claude Design (`Videollamada.dc.html`) a `src/pages/VideoCall.jsx`,
+conectando presencia, próximas llamadas y arreglando la fuga de
+`scheduled_calls`. Detalle de arquitectura completo en `CLAUDE.md` →
+"Videollamada — arquitectura (Fase 1)".
+
+**⚠️ Acción pendiente tuya antes de que esto se vea bien:** agregar
+`|| location.pathname === '/videollamada'` a la línea `hasOwnHeader` en
+`src/components/Layout.jsx` (línea 58) — no lo toqué porque el archivo
+tiene tus cambios sin commitear. Sin esa línea, Layout sigue pintando su
+header genérico ARRIBA del header propio que construí para esta pantalla
+("Videollamada" + avatar del paciente) → header duplicado. Avísame cuando
+la agregues para que la verificación visual final sea con el layout real.
+
+**Auditoría de `scheduled_calls` antes de tocar nada:** desplegué un Edge
+Function temporal de solo lectura con service role
+(`tmp-scheduled-calls-audit`), consulté la tabla, y la borré al terminar.
+Resultado: **0 filas** — vacía, no hubo que migrar nada real de usuarios.
+
+**Cambios en `src/pages/VideoCall.jsx`:**
+- Header propio (título + avatar del paciente activo) — asume la línea de
+  `hasOwnHeader` de arriba.
+- "¿Quién está disponible?": `usePresence()` real + `family_members` +
+  `user_profiles`, mismo patrón que `Familia.jsx`.
+- "Próximas llamadas": la llamada más próxima real de `video_calls`
+  (`status in scheduled/active`, `scheduled_at` futuro); la tarjeta es
+  clicable y navega a `/videollamada?id=...` (reutiliza el lobby/permisos
+  ya existente más abajo en el mismo archivo, sin duplicar esa lógica).
+- "Programar llamada" ahora abre `VideoCallScheduleModal` (el modal que
+  ya usa el FAB de Dashboard, ya conectado a `create-daily-room`) en vez
+  de insertar directo a `scheduled_calls`. Se eliminó todo el estado y las
+  funciones de la pestaña "Programar" vieja (`schedView`, `schedTitle`,
+  `handleSchedule`, `loadScheduledCalls`, etc.) — ya no existen en el
+  archivo.
+- "Recordar": visual-only (razón documentada en `CLAUDE.md`).
+- "Recientes": estado vacío del export ("Aún no hay llamadas recientes"),
+  sin query — Fase 2 pendiente, documentada en `CLAUDE.md`.
+- "Iniciar videollamada" (instantánea): sin cambios de comportamiento,
+  solo re-skin al estilo del export (botón con pulso).
+- Lobby, pantalla de "muy pronto"/expirada, y la llamada activa
+  (iframe de Daily.co) quedaron intactos — no eran parte del export.
+
+**Verificación visual:** armé un harness aislado fuera del repo (Vite +
+contexts/supabase mockeados, sin credenciales reales) que renderiza el
+componente REAL de `VideoCall.jsx` con datos de ejemplo calcados del
+export (Deborah/Yasmin/Carmen/Luis, Carmen offline). Capturé ambos estados
+de "Próximas llamadas" (con llamada y vacío) a 390px — coinciden con el
+export. `npm run build` limpio.
+
+**No tocado:** `Layout.jsx`, `Chat.jsx`, `Cuidado.jsx`,
+`MedicationTimeline.jsx`, `Medications.jsx`, `useGoBack.js` (tus archivos
+sin commitear).
+
+- [x] ~~Que agregues la línea de `hasOwnHeader` en `Layout.jsx`~~ — hecho por
+      Yasmin vía script quirúrgico (una sola línea, verificado con
+      `git diff`), no tocado por mí.
+- [x] ~~Verificación visual tuya con el layout real~~ — hecha en el draft,
+      header correcto sin duplicar.
+
+**Bug encontrado en la verificación — presencia mostraba solo al usuario
+conectado, RESUELTO:** auditado con Edge Function temporal (creada,
+consultada, borrada) contra la cuenta real de Yasmin — `family_members`
+sí tenía los 2 familiares reales (`badyfabian@gmail.com`,
+`armando.rojas.gamez@gmail.com`), la query estaba bien. Causa real: el
+`ownerId` de `useFamily()` cambia de valor mientras `FamilyContext`
+resuelve (tiene reintentos async de hasta 3-10s por RLS/timeouts), y
+`loadTeam()`/`loadNextCall()` no protegían contra que una respuesta vieja
+pisara a una más nueva. Fix: `teamRequestIdRef` — cada efecto marca un
+request id, cada respuesta async se descarta si ya no es la más reciente.
+Re-verificado: los 3 aparecen (verde/gris según presencia real).
+
+**Ajustes menores post-verificación:**
+- Fallback de nombre por email (cuando el familiar no tiene `full_name` en
+  su perfil, ej. `badyfabian`) ahora capitaliza la primera letra
+  (`Badyfabian` en vez de `badyfabian`). La solución real —que el familiar
+  complete su perfil— la gestiona Yasmin directamente, no es código.
+- Footer legal (Términos · Privacidad · © 2026) que reaparece en desktop:
+  confirmado que es 100% de `Layout.jsx` (su propio `<footer>` dentro de
+  `<main>`, para toda página) — no es de `VideoCall.jsx`, no se tocó.
+  Documentado en `CLAUDE.md`.
+- Anotado como mejora futura (NO implementada): max-width centrado para
+  la vista desktop de esta pantalla — ver `CLAUDE.md`.
+
+**Pendiente:**
+- [ ] Fase 2 (historial real de llamadas) — ver `CLAUDE.md`
+- [ ] Mejora futura: max-width desktop — ver `CLAUDE.md`

@@ -1,14 +1,17 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useFamily } from '../contexts/FamilyContext'
 import { useAuth } from '../contexts/AuthContext'
+import { usePresence } from '../contexts/PresenceContext'
 import Layout from '../components/Layout'
 import { Video } from '../components/Icons'
+import VideoCallScheduleModal from '../components/VideoCallScheduleModal'
 
 const SERVICE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-daily-room`
 
 const SPIN_KEYFRAMES = '@keyframes spin { to { transform: rotate(360deg); } }'
+const PULSE_KEYFRAMES = '@keyframes fc-pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(8,127,112,0.35); } 50% { box-shadow: 0 0 0 8px rgba(8,127,112,0); } }'
 
 function fmtScheduled(isoStr) {
   if (!isoStr) return ''
@@ -16,6 +19,26 @@ function fmtScheduled(isoStr) {
     weekday: 'short', day: 'numeric', month: 'short',
     hour: 'numeric', minute: '2-digit', hour12: true,
   })
+}
+
+// "Hoy · 7:00 PM · 4 invitados" style meta line for the upcoming-call card
+function fmtUpcomingMeta(isoStr, inviteCount) {
+  const d = new Date(isoStr)
+  const today = new Date()
+  const isToday = d.toDateString() === today.toDateString()
+  const tomorrow = new Date()
+  tomorrow.setDate(today.getDate() + 1)
+  const isTomorrow = d.toDateString() === tomorrow.toDateString()
+  const dayLabel = isToday ? 'Hoy' : isTomorrow ? 'Mañana'
+    : d.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'short' })
+  const timeLabel = d.toLocaleTimeString('es-MX', { hour: 'numeric', minute: '2-digit', hour12: true }).toUpperCase().replace(/\./g, '')
+  const guestLabel = `${inviteCount} invitado${inviteCount === 1 ? '' : 's'}`
+  return `${dayLabel} · ${timeLabel} · ${guestLabel}`
+}
+
+// Fallback display name from an email prefix (no full_name on the profile yet)
+function cap(s) {
+  return s ? s.charAt(0).toUpperCase() + s.slice(1) : s
 }
 
 function VideoIconCircle({ icon }) {
@@ -35,8 +58,9 @@ export default function VideoCall() {
   const [searchParams] = useSearchParams()
   const callId = searchParams.get('id')
   const navigate = useNavigate()
-  const { ownerId } = useFamily()
+  const { ownerId, activePatientName } = useFamily()
   const { user } = useAuth()
+  const onlineIds = usePresence()
 
   const [call, setCall] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -47,21 +71,83 @@ export default function VideoCall() {
   const [startingInstant, setStartingInstant] = useState(false)
   const [instantError, setInstantError] = useState('')
 
-  // Schedule state (no-callId screen only)
-  const [schedView, setSchedView] = useState('instant') // 'instant' | 'schedule'
-  const [schedTitle, setSchedTitle] = useState('')
-  const [schedDate, setSchedDate] = useState('')
-  const [schedTime, setSchedTime] = useState('')
-  const [scheduling, setScheduling] = useState(false)
-  const [schedError, setSchedError] = useState('')
-  const [schedSuccess, setSchedSuccess] = useState(null)
-  const [scheduledCalls, setScheduledCalls] = useState([])
-  const [loadingScheduled, setLoadingScheduled] = useState(false)
+  // Landing screen (no callId) state
+  const [team, setTeam] = useState([])
+  const [nextCall, setNextCall] = useState(null)
+  const [reminderSet, setReminderSet] = useState(false)
+  const [showScheduleModal, setShowScheduleModal] = useState(false)
 
   useEffect(() => {
     if (!callId) return
     load()
   }, [callId])
+
+  // ownerId settles across a few async stages in FamilyContext (initial
+  // fallback to user.id, then the real owner once family data resolves).
+  // Guard against a slower earlier request clobbering a newer one.
+  const teamRequestIdRef = useRef(0)
+
+  useEffect(() => {
+    if (callId || !ownerId) return
+    const requestId = ++teamRequestIdRef.current
+    loadTeam(ownerId, requestId)
+    loadNextCall(ownerId, requestId)
+  }, [callId, ownerId])
+
+  async function loadTeam(forOwnerId, requestId) {
+    const { data: memberRows } = await supabase
+      .from('family_members')
+      .select('member_user_id, member_email')
+      .eq('user_id', forOwnerId)
+    if (requestId !== teamRequestIdRef.current) return // stale response
+
+    const ids = [...new Set([
+      forOwnerId,
+      ...(memberRows ?? []).map(m => m.member_user_id).filter(Boolean),
+    ])]
+    let profileMap = {}
+    if (ids.length) {
+      const { data: profiles } = await supabase
+        .from('user_profiles')
+        .select('id, full_name, email')
+        .in('id', ids)
+      if (requestId !== teamRequestIdRef.current) return // stale response
+      ;(profiles ?? []).forEach(p => { profileMap[p.id] = p })
+    }
+
+    const ownerProfile = profileMap[forOwnerId]
+    const ownerIsMe = forOwnerId === user?.id
+    const ownerFallbackName = ownerIsMe
+      ? (user?.user_metadata?.full_name ?? cap(user?.email?.split('@')[0]) ?? 'Admin')
+      : 'Admin'
+    const entries = [{
+      id: forOwnerId,
+      name: ownerProfile?.full_name ?? cap(ownerProfile?.email?.split('@')[0]) ?? ownerFallbackName,
+    }]
+    ;(memberRows ?? []).forEach(m => {
+      if (!m.member_user_id || m.member_user_id === forOwnerId) return
+      const p = profileMap[m.member_user_id]
+      entries.push({
+        id: m.member_user_id,
+        name: p?.full_name ?? cap(m.member_email?.split('@')[0]) ?? '—',
+      })
+    })
+    setTeam(entries)
+  }
+
+  async function loadNextCall(forOwnerId, requestId) {
+    const { data } = await supabase
+      .from('video_calls')
+      .select('id, title, scheduled_at, status, participants')
+      .eq('owner_id', forOwnerId)
+      .in('status', ['scheduled', 'active'])
+      .gte('scheduled_at', new Date(Date.now() - 60 * 60 * 1000).toISOString())
+      .order('scheduled_at', { ascending: true })
+      .limit(1)
+      .maybeSingle()
+    if (requestId !== teamRequestIdRef.current) return // stale response
+    setNextCall(data ?? null)
+  }
 
   async function handleInstantCall() {
     if (!ownerId || startingInstant) return
@@ -103,300 +189,162 @@ export default function VideoCall() {
     setLoading(false)
   }
 
-  async function loadScheduledCalls() {
-    if (!ownerId) return
-    setLoadingScheduled(true)
-    const { data } = await supabase
-      .from('scheduled_calls')
-      .select('id, title, scheduled_at, status')
-      .eq('patient_id', ownerId)
-      .eq('status', 'scheduled')
-      .gte('scheduled_at', new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString())
-      .order('scheduled_at', { ascending: true })
-      .limit(5)
-    setScheduledCalls(data ?? [])
-    setLoadingScheduled(false)
-  }
-
-  function openScheduleTab() {
-    const now = new Date()
-    now.setMinutes(0, 0, 0)
-    now.setHours(now.getHours() + 1)
-    setSchedDate(now.toISOString().slice(0, 10))
-    setSchedTime(`${String(now.getHours()).padStart(2, '0')}:00`)
-    setSchedError('')
-    setSchedSuccess(null)
-    setSchedView('schedule')
-    loadScheduledCalls()
-  }
-
-  async function handleSchedule() {
-    if (!schedDate || !schedTime) return
-    const scheduledAt = new Date(`${schedDate}T${schedTime}`).toISOString()
-    if (new Date(scheduledAt) <= new Date()) {
-      setSchedError('La fecha y hora deben ser en el futuro.')
-      return
-    }
-    setScheduling(true)
-    setSchedError('')
-    try {
-      const { error: insErr } = await supabase.from('scheduled_calls').insert({
-        patient_id: ownerId,
-        family_id: ownerId,
-        scheduled_at: scheduledAt,
-        created_by: user?.id,
-        status: 'scheduled',
-        title: schedTitle.trim() || 'Videollamada familiar',
-      })
-      if (insErr) throw insErr
-      setSchedSuccess({ scheduled_at: scheduledAt })
-      setSchedTitle('')
-      loadScheduledCalls()
-    } catch (err) {
-      setSchedError(err.message)
-    } finally {
-      setScheduling(false)
-    }
-  }
-
-  // No callId — pantalla de inicio rápido
+  // No callId — pantalla de inicio (fiel al export de Claude Design)
   if (!callId) {
-    const minDate = new Date().toISOString().slice(0, 10)
+    const inviteCount = Array.isArray(nextCall?.participants) ? nextCall.participants.length : team.length
+    const headerName = activePatientName || user?.user_metadata?.full_name || user?.email || 'F'
+    const headerInitial = headerName.charAt(0).toUpperCase()
+
     return (
       <Layout>
-        <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%' }}>
-          {/* Tab switcher */}
-          <div style={{ display: 'flex', gap: 8, padding: '16px 20px 4px', flexShrink: 0 }}>
-            {[
-              { key: 'instant', label: '📹 Iniciar ahora' },
-              { key: 'schedule', label: '📅 Programar' },
-            ].map(tab => {
-              const active = schedView === tab.key
-              return (
-                <button
-                  key={tab.key}
-                  onClick={() => tab.key === 'schedule' ? openScheduleTab() : setSchedView('instant')}
-                  style={{
-                    flex: 1, padding: '10px 8px', borderRadius: 20,
-                    border: active ? 'none' : '1.5px solid #EDE5D8',
-                    background: active ? '#E9826E' : 'transparent',
-                    color: active ? '#143C32' : '#6B7280',
-                    fontWeight: 700, fontSize: 13, cursor: 'pointer',
-                    transition: 'all 0.15s',
-                  }}
-                >
-                  {tab.label}
-                </button>
-              )
-            })}
-          </div>
+        <div style={{ position: 'relative', minHeight: '100%', background: '#F8F4ED', overflow: 'hidden' }}>
 
-          {/* ── TAB: INICIAR AHORA ── */}
-          {schedView === 'instant' && (
-            <div style={{
-              flex: 1, display: 'flex', flexDirection: 'column',
-              alignItems: 'center', justifyContent: 'center',
-              gap: 24, padding: '32px 24px 48px',
-            }}>
-              <VideoIconCircle />
-              <div style={{ textAlign: 'center' }}>
-                <p style={{ color: '#143C32', fontSize: 22, fontWeight: 800, fontFamily: 'Georgia, serif', margin: '0 0 8px' }}>
-                  Videollamada familiar
-                </p>
-                <p style={{ color: '#6B7280', fontSize: 14, margin: 0 }}>
-                  La sala se abre al instante para toda la familia
-                </p>
-              </div>
-              {instantError && (
-                <div style={{
-                  padding: '12px 16px', borderRadius: 12, maxWidth: 320,
-                  background: '#FEF0ED', border: '1px solid #F5C6BB',
-                }}>
-                  <p style={{ color: '#B91C1C', fontSize: 13, fontWeight: 600, margin: 0 }}>{instantError}</p>
-                </div>
-              )}
+          {/* Decorative background heart — fiel al export */}
+          <svg viewBox="0 0 400 400" style={{ position: 'absolute', top: -60, right: -90, width: 420, height: 420, opacity: 0.05, pointerEvents: 'none', zIndex: 0 }} aria-hidden="true">
+            <path d="M200 330 C 60 240, 30 140, 110 90 C 160 60, 195 90, 200 130 C 205 90, 240 60, 290 90 C 370 140, 340 240, 200 330 Z" fill="#087F70" />
+            <circle cx="165" cy="165" r="22" fill="#F8F4ED" />
+            <path d="M130 230 C 130 195, 200 195, 200 230 L 200 245 L 130 245 Z" fill="#F8F4ED" />
+            <circle cx="235" cy="165" r="22" fill="#F8F4ED" />
+            <path d="M200 230 C 200 195, 270 195, 270 230 L 270 245 L 200 245 Z" fill="#F8F4ED" />
+          </svg>
+
+          {/* Header propio — requiere '/videollamada' en Layout.hasOwnHeader */}
+          <header style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 20px', background: '#FDFBF7', boxShadow: '0 2px 10px rgba(51,65,85,0.06)' }}>
+            <h1 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: '#334155' }}>Videollamada</h1>
+            <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#A8E5D6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 15, color: '#065A50' }}>
+              {headerInitial}
+            </div>
+          </header>
+
+          <main style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', gap: 28, padding: '22px 20px 40px' }}>
+
+            {/* Iniciar / Programar */}
+            <section style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <button
                 onClick={handleInstantCall}
                 disabled={startingInstant}
                 style={{
-                  padding: '16px 40px', borderRadius: 16, border: 'none',
-                  background: startingInstant ? '#C9C2B4' : '#0d6b63',
-                  color: 'white', fontWeight: 800, fontSize: 16,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+                  width: '100%', height: 64, border: 'none', borderRadius: 20,
+                  background: startingInstant ? '#9CA3AF' : '#087F70',
+                  color: '#FFFFFF', fontSize: 18, fontWeight: 700, fontFamily: 'inherit',
                   cursor: startingInstant ? 'default' : 'pointer',
-                  display: 'flex', alignItems: 'center', gap: 10,
+                  boxShadow: '0 10px 24px rgba(8,127,112,0.3)',
+                  animation: startingInstant ? 'none' : 'fc-pulse 2.8s ease-in-out infinite',
                 }}
               >
                 {startingInstant ? (
-                  <>
-                    <div style={{ width: 18, height: 18, border: '2px solid white', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
-                    Iniciando...
-                  </>
-                ) : 'Iniciar llamada ahora'}
+                  <div style={{ width: 18, height: 18, border: '2px solid white', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
+                ) : (
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 8l5-3v14l-5-3"></path><rect x="2" y="6" width="13" height="12" rx="2.5"></rect></svg>
+                )}
+                {startingInstant ? 'Iniciando...' : 'Iniciar videollamada'}
               </button>
+
+              {instantError && (
+                <p style={{ margin: 0, fontSize: 13, color: '#B91C1C', textAlign: 'center' }}>{instantError}</p>
+              )}
+
               <button
-                onClick={() => navigate('/dashboard')}
-                style={{ background: 'none', border: 'none', color: '#6B7280', fontSize: 13, cursor: 'pointer' }}
+                onClick={() => setShowScheduleModal(true)}
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                  width: '100%', height: 56, border: '2px solid #087F70', borderRadius: 18,
+                  background: '#FFFFFF', color: '#087F70', fontSize: 16, fontWeight: 700,
+                  fontFamily: 'inherit', cursor: 'pointer',
+                }}
               >
-                Volver al inicio
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#087F70" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"></rect><path d="M3 10h18"></path><path d="M8 3v4"></path><path d="M16 3v4"></path></svg>
+                Programar llamada
               </button>
-            </div>
-          )}
+            </section>
 
-          {/* ── TAB: PROGRAMAR ── */}
-          {schedView === 'schedule' && (
-            <div style={{ flex: 1, overflowY: 'auto', padding: '24px 20px 48px' }}>
+            {/* ¿Quién está disponible? — usePresence() real, igual que Familia.jsx/Dashboard.jsx */}
+            <section style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <h2 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#334155' }}>¿Quién está disponible?</h2>
+              <div style={{ display: 'flex', gap: 18, overflowX: 'auto', paddingBottom: 4 }}>
+                {team.map(m => {
+                  const online = onlineIds.has(m.id)
+                  const initial = m.name.charAt(0).toUpperCase()
+                  const bg = online ? '#A8E5D6' : '#E7E1D2'
+                  const fg = online ? '#065A50' : '#8A8270'
+                  const dot = online ? '#22C55E' : '#94A3B8'
+                  return (
+                    <div key={m.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, flexShrink: 0, width: 64 }}>
+                      <div style={{ position: 'relative', width: 56, height: 56 }}>
+                        <div style={{ width: 56, height: 56, borderRadius: '50%', background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 18, color: fg }}>
+                          {initial}
+                        </div>
+                        <span style={{ position: 'absolute', bottom: -2, right: -2, width: 14, height: 14, borderRadius: '50%', background: dot, border: '2px solid #F8F4ED' }} />
+                      </div>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: '#334155' }}>{m.name.split(' ')[0]}</span>
+                    </div>
+                  )
+                })}
+              </div>
+            </section>
 
-              {schedSuccess ? (
-                <div style={{ textAlign: 'center', padding: '40px 20px' }}>
-                  <span style={{ fontSize: 56 }}>✅</span>
-                  <p style={{ color: '#143C32', fontSize: 20, fontWeight: 800, fontFamily: 'Georgia, serif', margin: '16px 0 8px' }}>
-                    ¡Videollamada programada!
-                  </p>
-                  <p style={{ color: '#6B7280', fontSize: 14, lineHeight: 1.6, margin: '0 0 28px' }}>
-                    {'Videollamada programada para '}
-                    {new Date(schedSuccess.scheduled_at).toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' })}
-                    {' a las '}
-                    {new Date(schedSuccess.scheduled_at).toLocaleTimeString('es-MX', { hour: 'numeric', minute: '2-digit', hour12: true })}
-                  </p>
+            {/* Próximas llamadas — video_calls real, tarjeta clicable para unirse */}
+            <section style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <h2 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#334155' }}>Próximas llamadas</h2>
+              {nextCall ? (
+                <div
+                  onClick={() => navigate(`/videollamada?id=${nextCall.id}`)}
+                  style={{ display: 'flex', alignItems: 'center', gap: 14, background: '#FFFFFF', borderRadius: 20, padding: 16, boxShadow: '0 4px 16px rgba(51,65,85,0.08)', cursor: 'pointer' }}
+                >
+                  <div style={{ width: 48, height: 48, borderRadius: 14, background: '#A8E5D6', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#065A50" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"></rect><path d="M3 10h18"></path><path d="M8 3v4"></path><path d="M16 3v4"></path></svg>
+                  </div>
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
+                    <span style={{ fontSize: 15, fontWeight: 700, color: '#334155', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {nextCall.title || 'Videollamada familiar'}
+                    </span>
+                    <span style={{ fontSize: 13, color: '#64748B' }}>{fmtUpcomingMeta(nextCall.scheduled_at, inviteCount)}</span>
+                  </div>
                   <button
-                    onClick={() => setSchedSuccess(null)}
+                    onClick={e => { e.stopPropagation(); setReminderSet(s => !s) }}
                     style={{
-                      padding: '12px 28px', borderRadius: 14, border: '1.5px solid #EDE5D8',
-                      background: 'transparent', color: '#0d6b63',
-                      fontWeight: 700, fontSize: 14, cursor: 'pointer',
+                      display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 14,
+                      border: '1.5px solid #E9826E',
+                      background: reminderSet ? '#E9826E' : '#FDF0EC',
+                      color: reminderSet ? '#FFFFFF' : '#E9826E',
+                      fontSize: 13, fontWeight: 700, fontFamily: 'inherit', cursor: 'pointer', flexShrink: 0,
                     }}
                   >
-                    Programar otra
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={reminderSet ? '#FFFFFF' : '#E9826E'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 01-3.46 0"></path></svg>
+                    {reminderSet ? 'Recordatorio activo' : 'Recordar'}
                   </button>
                 </div>
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                    <label style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.07em' }}>
-                      Título (opcional)
-                    </label>
-                    <input
-                      type="text"
-                      value={schedTitle}
-                      onChange={e => setSchedTitle(e.target.value)}
-                      placeholder="Ej: Reunión semanal, Actualización médica..."
-                      style={{
-                        padding: '12px 14px', borderRadius: 12,
-                        border: '1.5px solid #EDE5D8',
-                        background: 'white',
-                        color: '#1A1A1A', fontSize: 14, outline: 'none', fontFamily: 'inherit',
-                      }}
-                    />
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, padding: '28px 16px', border: '1.5px dashed #C9BFA9', borderRadius: 20 }}>
+                  <div style={{ width: 52, height: 52, borderRadius: '50%', background: '#A8E5D6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#065A50" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"></rect><path d="M3 10h18"></path><path d="M8 3v4"></path><path d="M16 3v4"></path></svg>
                   </div>
-
-                  <div style={{ display: 'flex', gap: 10 }}>
-                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                      <label style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.07em' }}>
-                        Fecha
-                      </label>
-                      <input
-                        type="date"
-                        value={schedDate}
-                        min={minDate}
-                        onChange={e => setSchedDate(e.target.value)}
-                        style={{
-                          padding: '12px 10px', borderRadius: 12,
-                          border: '1.5px solid #EDE5D8',
-                          background: 'white',
-                          color: '#1A1A1A', fontSize: 14, outline: 'none',
-                        }}
-                      />
-                    </div>
-                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                      <label style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.07em' }}>
-                        Hora
-                      </label>
-                      <input
-                        type="time"
-                        value={schedTime}
-                        onChange={e => setSchedTime(e.target.value)}
-                        style={{
-                          padding: '12px 10px', borderRadius: 12,
-                          border: '1.5px solid #EDE5D8',
-                          background: 'white',
-                          color: '#1A1A1A', fontSize: 14, outline: 'none',
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  {schedError && (
-                    <p style={{ margin: 0, fontSize: 13, color: '#B91C1C', padding: '10px 14px', borderRadius: 10, background: '#FEF0ED', border: '1px solid #F5C6BB' }}>
-                      {schedError}
-                    </p>
-                  )}
-
-                  <button
-                    onClick={handleSchedule}
-                    disabled={!schedDate || !schedTime || scheduling}
-                    style={{
-                      padding: '15px', borderRadius: 16, border: 'none',
-                      background: schedDate && schedTime && !scheduling ? '#0d6b63' : '#E5DED2',
-                      color: schedDate && schedTime && !scheduling ? 'white' : '#9CA3AF',
-                      fontWeight: 800, fontSize: 15,
-                      cursor: schedDate && schedTime && !scheduling ? 'pointer' : 'default',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-                    }}
-                  >
-                    {scheduling ? (
-                      <>
-                        <div style={{ width: 16, height: 16, border: '2px solid rgba(255,255,255,0.4)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
-                        Programando...
-                      </>
-                    ) : 'Programar videollamada'}
-                  </button>
+                  <span style={{ fontSize: 14, color: '#64748B', fontWeight: 600 }}>No hay llamadas programadas</span>
                 </div>
               )}
+            </section>
 
-              {/* Próximas programadas */}
-              <div style={{ marginTop: 32 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-                  <div style={{ flex: 1, height: 1, background: '#EDE5D8' }} />
-                  <span style={{ fontSize: 11, color: '#9CA3AF', fontWeight: 700, letterSpacing: '0.07em' }}>PRÓXIMAS</span>
-                  <div style={{ flex: 1, height: 1, background: '#EDE5D8' }} />
+            {/* Recientes — Fase 1: estado vacío elegante, sin backend nuevo (ver Fase 2 en CLAUDE.md) */}
+            <section style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <h2 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#334155' }}>Recientes</h2>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, padding: '28px 16px', border: '1.5px dashed #C9BFA9', borderRadius: 20 }}>
+                <div style={{ width: 52, height: 52, borderRadius: '50%', background: '#A8E5D6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#065A50" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 8l5-3v14l-5-3"></path><rect x="2" y="6" width="13" height="12" rx="2.5"></rect></svg>
                 </div>
-                {loadingScheduled ? (
-                  <p style={{ textAlign: 'center', color: '#9CA3AF', fontSize: 13 }}>Cargando...</p>
-                ) : scheduledCalls.length === 0 ? (
-                  <p style={{ textAlign: 'center', color: '#9CA3AF', fontSize: 13 }}>No hay videollamadas programadas</p>
-                ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                    {scheduledCalls.map(sc => {
-                      const minsLeft = Math.round((new Date(sc.scheduled_at) - Date.now()) / 60000)
-                      const canJoin = minsLeft <= 15
-                      return (
-                        <div
-                          key={sc.id}
-                          style={{
-                            padding: '14px', borderRadius: 14,
-                            border: `1px solid ${canJoin ? '#143C32' : '#EDE5D8'}`,
-                            background: canJoin ? '#EAF3EC' : 'white',
-                          }}
-                        >
-                          <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#143C32' }}>
-                            {sc.title || 'Videollamada familiar'}
-                          </p>
-                          <p style={{ margin: '4px 0 0', fontSize: 12, color: canJoin ? '#16A34A' : '#6B7280' }}>
-                            {fmtScheduled(sc.scheduled_at)}
-                            {canJoin && minsLeft > 0 && ` · en ${minsLeft} min`}
-                            {canJoin && minsLeft <= 0 && ' · 🟢 En curso'}
-                          </p>
-                        </div>
-                      )
-                    })}
-                  </div>
-                )}
+                <span style={{ fontSize: 14, color: '#64748B', fontWeight: 600 }}>Aún no hay llamadas recientes</span>
               </div>
-            </div>
-          )}
+            </section>
 
-          <style>{SPIN_KEYFRAMES}</style>
+          </main>
         </div>
+
+        <VideoCallScheduleModal
+          open={showScheduleModal}
+          onClose={() => { setShowScheduleModal(false); loadNextCall(ownerId, teamRequestIdRef.current) }}
+        />
+
+        <style>{SPIN_KEYFRAMES}{PULSE_KEYFRAMES}</style>
       </Layout>
     )
   }
