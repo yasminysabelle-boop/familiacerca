@@ -379,3 +379,86 @@ solo analytics). Regla para toda sesión futura: en este repo, **nunca**
 producción o a un draft de verificación — siempre `netlify deploy
 --build` (o `--prod --build`), sin excepción, por el mismo motivo que ya
 costó un incidente el 20 jul.
+
+---
+
+## Videollamada — Fase 2, CERRADA y en producción (2026-07-23)
+
+Retomado después del incidente de Gemini. Alcance: integrar Daily.co
+Prebuilt (`@daily-co/daily-js`) con theme propio, lobby con presencia
+real, simplificar `VideoCallScheduleModal.jsx`, y adoptar un hook de
+"volver" (`useGoBack`) que deshace el paso real de navegación en vez de
+caer siempre a `/dashboard`. Detalle de arquitectura completo en
+`CLAUDE.md`.
+
+**⚠️ Hallazgo importante — el código ya estaba de facto en producción
+antes de commitearse:** estos cambios llevaban sin commitear desde antes
+de empezar con el incidente de Gemini. Un build (local o vía Netlify)
+compila lo que hay en el disco de trabajo, no lo que está commiteado en
+git — así que cada deploy hecho durante el cierre de Gemini (incluida la
+promoción a producción) ya incluía este código de Videollamada sin que
+git lo reflejara. La única pieza que faltaba de verdad era la Edge
+Function `get-call-presence`, recién desplegada en este cierre — antes
+de eso, el polling de presencia en el lobby fallaba en silencio (falla
+soft, sin error visible) para cualquiera que entrara a `/videollamada` en
+producción durante esa ventana. Sin reportes de usuarios afectados.
+
+**Revisión de coherencia antes de tocar nada:** `git diff` completo de
+los 12 archivos (`VideoCall.jsx`, `VideoCallScheduleModal.jsx`,
+`useGoBack.js`, `get-call-presence`, `Layout.jsx`, `Chat.jsx`,
+`Cuidado.jsx`, `Medications.jsx`, `MedicationTimeline.jsx`,
+`Dashboard.jsx`) + build + lint — coherente y completo, nada a medio
+romper. Los errores de lint que salieron son ruido preexistente de todo
+el proyecto (variables sin usar en `Medications.jsx`/`Dashboard.jsx`, una
+regla nueva `react-hooks/set-state-in-effect` que marca el patrón
+`useEffect`+fetch usado en toda la app por igual), no algo introducido
+por este trabajo.
+
+**Bug encontrado y corregido — modal "Programar llamada" se salía de la
+pantalla:** con 2+ llamadas en "Programadas", el contenido excedía la
+altura del modal sin poder scrollear (el bug clásico de un hijo flex que
+necesita `minHeight: 0` explícito para que `overflow: auto` funcione en
+vez de estirarse fuera del contenedor). Fix: el modal se divide en una
+zona fija arriba (header + formulario, `flexShrink: 0`) y una zona
+scrolleable abajo (divisor "Programadas" + lista, `flex: 1, minHeight: 0,
+overflowY: 'auto'`). Además, 32px de aire fijo bajo la última tarjeta
+(además del `safe-area-inset-bottom`, que puede ser 0 en desktop/algunos
+navegadores) para que nunca quede pegada al borde.
+
+**Verificación visual sin navegador interactivo disponible:** armado un
+harness estático fuera del repo con el CSS exacto del componente (mismo
+patrón que la verificación de VideoCall.jsx en Fase 1), 5 llamadas de
+prueba y viewport reducido a propósito para forzar overflow real.
+Confirmado con Playwright: el panel nunca se sale de la pantalla, la
+región scrolleable sí scrollea (`canScroll: true`), el botón "Programar"
+queda en el mismo píxel antes y después de scrollear la lista (confirma
+que el formulario de arriba queda fijo), y el gap final medido en
+píxeles reales es de 32.0px exactos. Yasmin confirmó en su teléfono real
+con llamadas reales antes del commit.
+
+**No verificado directamente (código revisado, no clickeado en vivo):**
+el theme de Daily Prebuilt (`DAILY_THEME`, colores del iframe al unirse a
+una llamada real) y la navegación real de `useGoBack` en Chat/Cuidado/
+Medicamentos/Historial — ninguno de los dos requiere cámara/micrófono
+real ni sesión autenticada interactiva, que no están disponibles en este
+entorno. Riesgo aceptado como bajo (cosmético/navegación, sin impacto en
+datos) dado que ya llevaban un rato de facto en producción sin reportes.
+Pendiente: que Yasmin confirme si nota algo raro en cualquiera de los dos.
+
+**Deploy:**
+- Commit `8975964` (`1c7ee8a..8975964`), separado del commit de Gemini
+  (`8a84891`).
+- `netlify deploy --prod --build` → `familiacerca.com` sirve
+  `index-Bz2fVHzW.js`. Verificado en el bundle: `gemini-proxy` y
+  `get-call-presence` presentes, `AVE784...` (PayPal) correcto, el CSS
+  `safe-area-inset-bottom) + 32px` presente.
+- `get-call-presence` desplegada (antes solo existía el archivo, nunca se
+  había desplegado). Verificada: 401 sin auth, 400 sin `callId`, 404 con
+  `callId` inexistente — el guard de acceso funciona. La consulta real a
+  la presence API de Daily.co (con una sala real) queda pendiente de
+  verificación por Yasmin, no reproducible sin crear una sala de pago.
+
+**Pendiente (sin cambios, hereda de Fase 1):**
+- [ ] Historial real de llamadas (webhook `meeting.ended` de Daily.co) —
+      ver `CLAUDE.md`
+- [ ] Mejora futura: max-width desktop — ver `CLAUDE.md`
