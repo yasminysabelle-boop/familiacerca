@@ -20,7 +20,7 @@ export default function PaywallModal({ onClose, patientName }) {
       }}>
         <div style={{ fontSize: 52, marginBottom: 16 }}>🔒</div>
         <h2 style={{
-          fontFamily: 'Georgia, serif', fontSize: 20, fontWeight: 700,
+          fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 20, fontWeight: 700,
           color: '#1A1A1A', margin: '0 0 10px',
         }}>
           Tu prueba gratuita ha terminado
@@ -34,9 +34,9 @@ export default function PaywallModal({ onClose, patientName }) {
           onClick={() => { navigate('/pricing'); onClose() }}
           style={{
             width: '100%', padding: '14px', borderRadius: 14, border: 'none',
-            background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
+            background: '#087F70',
             color: 'white', fontWeight: 700, fontSize: 15, cursor: 'pointer',
-            boxShadow: '0 6px 20px rgba(13,107,99,0.3)', marginBottom: 10,
+            boxShadow: '0 6px 20px rgba(8,127,112,0.3)', marginBottom: 10,
           }}
         >
           Ver planes →

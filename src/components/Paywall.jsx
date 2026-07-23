@@ -45,7 +45,7 @@ export default function Paywall() {
         </div>
 
         <h2 style={{
-          fontFamily: 'Georgia, serif', fontSize: 22, fontWeight: 700,
+          fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 22, fontWeight: 700,
           color: '#1A1A1A', marginBottom: 10, lineHeight: 1.3,
         }}>
           Tu período de prueba terminó
@@ -59,9 +59,9 @@ export default function Paywall() {
             onClick={() => navigate('/pricing')}
             style={{
               width: '100%', padding: '15px', borderRadius: 16, border: 'none',
-              background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
+              background: '#087F70',
               color: 'white', fontWeight: 700, fontSize: 15, cursor: 'pointer',
-              boxShadow: '0 8px 24px rgba(13,107,99,0.35)',
+              boxShadow: '0 8px 24px rgba(8,127,112,0.35)',
             }}
           >
             Ver planes →

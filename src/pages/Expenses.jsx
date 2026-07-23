@@ -15,10 +15,23 @@ import LoadingButton from '../components/LoadingButton'
 import { usePullToRefresh } from '../hooks/usePullToRefresh'
 import EvidencePhoto from '../components/EvidencePhoto'
 
+const SANS = "'Plus Jakarta Sans', system-ui, sans-serif"
+
+// Marca de agua decorativa — mismo trazo SVG que VideoCall.jsx/Familia.jsx, en teal.
+const WATERMARK_PATHS = (
+  <>
+    <path d="M200 330 C 60 240, 30 140, 110 90 C 160 60, 195 90, 200 130 C 205 90, 240 60, 290 90 C 370 140, 340 240, 200 330 Z" fill="#087F70" />
+    <circle cx="165" cy="165" r="22" fill="#F8F4ED" />
+    <path d="M130 230 C 130 195, 200 195, 200 230 L 200 245 L 130 245 Z" fill="#F8F4ED" />
+    <circle cx="235" cy="165" r="22" fill="#F8F4ED" />
+    <path d="M200 230 C 200 195, 270 195, 270 230 L 270 245 L 200 245 Z" fill="#F8F4ED" />
+  </>
+)
+
 const CATEGORIES = [
-  { id: 'Medicamentos',    emoji: '💊', color: '#0d6b63' },
+  { id: 'Medicamentos',    emoji: '💊', color: '#087F70' },
   { id: 'Citas médicas',   emoji: '🏥', color: '#2D86A0' },
-  { id: 'Transporte',      emoji: '🚗', color: '#0d6b63' },
+  { id: 'Transporte',      emoji: '🚗', color: '#087F70' },
   { id: 'Cuidador',        emoji: '🤝', color: '#7C5CBF' },
   { id: 'Equipos médicos', emoji: '🩺', color: '#C9882A' },
   { id: 'Otros',           emoji: '📋', color: '#9CA3AF' },
@@ -255,19 +268,26 @@ export default function Expenses() {
     fontSize: 14, outline: 'none', background: 'white',
     boxSizing: 'border-box', color: '#1A1A1A', transition: 'all 0.15s',
   }
-  const onFocus = e => { e.target.style.borderColor = '#0d6b63'; e.target.style.boxShadow = '0 0 0 3px rgba(13,107,99,0.1)' }
+  const onFocus = e => { e.target.style.borderColor = '#087F70'; e.target.style.boxShadow = '0 0 0 3px rgba(8,127,112,0.1)' }
   const onBlur  = e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.boxShadow = 'none' }
 
   const canSave = !saving && !!form.amount && !!(form.paid_by ?? '').trim()
 
   return (
     <Layout>
+      <div style={{ position: 'relative', minHeight: '100%', overflow: 'hidden' }}>
+
+        {/* Marca de agua decorativa — fiel al patrón de VideoCall.jsx/Familia.jsx */}
+        <svg viewBox="0 0 400 400" style={{ position: 'absolute', top: -60, right: -90, width: 420, height: 420, opacity: 0.05, pointerEvents: 'none', zIndex: 0 }} aria-hidden="true">
+          {WATERMARK_PATHS}
+        </svg>
+
       <div
         ref={pullRef}
         onTouchStart={pullStart}
         onTouchMove={pullMove}
         onTouchEnd={pullEnd}
-        style={{ paddingBottom: 96, overflowY: 'auto' }}
+        style={{ position: 'relative', zIndex: 1, paddingBottom: 96, overflowY: 'auto' }}
       >
         <PullIndicator />
 
@@ -282,7 +302,7 @@ export default function Expenses() {
           >
             <ChevronLeft size={18} color="#6B7280" strokeWidth={2} />
           </button>
-          <p style={{ fontFamily: 'Georgia, serif', fontSize: 17, fontWeight: 700, color: '#1A1A1A' }}>
+          <p style={{ fontFamily: SANS, fontSize: 17, fontWeight: 700, color: '#334155' }}>
             {MONTH_NAMES[month]} {year}
           </p>
           <button
@@ -296,23 +316,23 @@ export default function Expenses() {
         {/* Total card */}
         <div style={{ padding: '0 20px 16px' }}>
           <div style={{
-            background: 'linear-gradient(145deg, #0d6b63 0%, #2E5240 100%)',
+            background: '#FFFFFF', border: '1px solid #EDE5D8',
             borderRadius: 22, padding: '22px 24px',
-            boxShadow: '0 8px 28px rgba(13,107,99,0.28)',
+            boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
           }}>
             <p style={{
-              color: 'rgba(255,255,255,0.65)', fontSize: 11, fontWeight: 700,
+              color: '#6B7280', fontSize: 11, fontWeight: 700,
               letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 4,
             }}>
               Total del mes
             </p>
             <p style={{
-              color: 'white', fontSize: 38, fontWeight: 800,
-              lineHeight: 1, marginBottom: 6, fontFamily: 'Georgia, serif',
+              color: '#087F70', fontSize: 38, fontWeight: 800,
+              lineHeight: 1, marginBottom: 6, fontFamily: SANS,
             }}>
               {loading ? '—' : formatCurrency(total)}
             </p>
-            <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: 12 }}>
+            <p style={{ color: '#9CA3AF', fontSize: 12 }}>
               {!loading && `${expenses.length} gasto${expenses.length !== 1 ? 's' : ''} registrado${expenses.length !== 1 ? 's' : ''}`}
             </p>
           </div>
@@ -364,7 +384,7 @@ export default function Expenses() {
               <p style={{ fontSize: 14, color: '#D63031', marginBottom: 12 }}>{loadError}</p>
               <button onClick={loadExpenses} style={{
                 padding: '10px 20px', borderRadius: 12, border: 'none',
-                background: '#0d6b63', color: 'white', fontWeight: 700, fontSize: 13, cursor: 'pointer',
+                background: '#087F70', color: 'white', fontWeight: 700, fontSize: 13, cursor: 'pointer',
               }}>Reintentar</button>
             </div>
           ) : expenses.length === 0 ? (
@@ -409,7 +429,7 @@ export default function Expenses() {
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p style={{
                         fontSize: 14, fontWeight: 600, color: '#1A1A1A',
-                        marginBottom: 2, fontFamily: 'Georgia, serif',
+                        marginBottom: 2, fontFamily: SANS,
                         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                       }}>
                         {expense.description || expense.category}
@@ -495,18 +515,18 @@ export default function Expenses() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {memberContributions.map((m, i) => (
                 <div key={m.name} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: i === 0 ? '#EBF3EE' : '#F3F4F6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, flexShrink: 0, fontWeight: 700, color: i === 0 ? '#0d6b63' : '#9CA3AF' }}>
+                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: i === 0 ? '#EBF3EE' : '#F3F4F6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, flexShrink: 0, fontWeight: 700, color: i === 0 ? '#087F70' : '#9CA3AF' }}>
                     {i === 0 ? '🥇' : i === 1 ? '🥈' : '🥉'}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
                       <span style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.name}</span>
                       <span style={{ fontSize: 13, fontWeight: 700, color: '#1A1A1A', flexShrink: 0, marginLeft: 8 }}>
-                        {formatCurrency(m.amount)} · <span style={{ color: '#0d6b63' }}>{m.pct}%</span>
+                        {formatCurrency(m.amount)} · <span style={{ color: '#087F70' }}>{m.pct}%</span>
                       </span>
                     </div>
                     <div style={{ height: 4, background: '#F3F4F6', borderRadius: 2, overflow: 'hidden' }}>
-                      <div style={{ height: '100%', borderRadius: 2, background: i === 0 ? '#0d6b63' : '#9CA3AF', width: `${m.pct}%`, transition: 'width 0.4s ease' }} />
+                      <div style={{ height: '100%', borderRadius: 2, background: i === 0 ? '#087F70' : '#9CA3AF', width: `${m.pct}%`, transition: 'width 0.4s ease' }} />
                     </div>
                   </div>
                 </div>
@@ -516,6 +536,8 @@ export default function Expenses() {
         )}
       </div>
 
+      </div>
+
       {/* FAB — hidden for familiar (view only) */}
       {!isFamiliar && (
         <button
@@ -523,9 +545,9 @@ export default function Expenses() {
           style={{
             position: 'fixed', bottom: 84, right: 20, zIndex: 30,
             width: 54, height: 54, borderRadius: '50%',
-            background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
+            background: '#087F70',
             border: 'none', cursor: 'pointer',
-            boxShadow: '0 6px 20px rgba(13,107,99,0.4)',
+            boxShadow: '0 6px 20px rgba(8,127,112,0.4)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             transition: 'transform 0.15s',
           }}
@@ -551,7 +573,7 @@ export default function Expenses() {
             maxWidth: 340, width: '100%',
             boxShadow: '0 20px 60px rgba(0,0,0,0.25)',
           }}>
-            <p style={{ fontFamily: 'Georgia, serif', fontSize: 17, fontWeight: 700, color: '#1A1A1A', marginBottom: 10 }}>
+            <p style={{ fontFamily: SANS, fontSize: 17, fontWeight: 700, color: '#1A1A1A', marginBottom: 10 }}>
               ¿Eliminar este registro?
             </p>
             <p style={{ fontSize: 13, color: '#6B7280', marginBottom: 24, lineHeight: 1.6 }}>
@@ -608,7 +630,7 @@ export default function Expenses() {
               justifyContent: 'space-between', marginBottom: 22,
             }}>
               <div>
-                <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#1A1A1A' }}>
+                <p style={{ fontFamily: SANS, fontSize: 18, fontWeight: 700, color: '#1A1A1A' }}>
                   {editExpense ? 'Editar gasto' : 'Nuevo gasto'}
                 </p>
                 <p style={{ fontSize: 12, color: '#9CA3AF', marginTop: 2 }}>
@@ -787,7 +809,7 @@ export default function Expenses() {
                       }}
                     >
                       <span style={{ fontSize: 15 }}>📷</span>
-                      <span style={{ fontSize: 12, color: '#0d6b63', fontWeight: 600 }}>Tomar foto</span>
+                      <span style={{ fontSize: 12, color: '#087F70', fontWeight: 600 }}>Tomar foto</span>
                     </button>
                     <button
                       type="button"
@@ -800,7 +822,7 @@ export default function Expenses() {
                       }}
                     >
                       <span style={{ fontSize: 15 }}>🖼️</span>
-                      <span style={{ fontSize: 12, color: '#0d6b63', fontWeight: 600 }}>Elegir de galería</span>
+                      <span style={{ fontSize: 12, color: '#087F70', fontWeight: 600 }}>Elegir de galería</span>
                     </button>
                   </div>
                 )}

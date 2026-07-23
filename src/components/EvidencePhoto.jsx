@@ -264,7 +264,7 @@ export default function EvidencePhoto({
             display: 'inline-flex', alignItems: 'center', gap: 6,
             padding: '7px 12px', borderRadius: 10,
             border: '1.5px dashed #C0CCC5', background: '#FDF8F4',
-            cursor: 'pointer', fontSize: 12, color: '#0d6b63', fontWeight: 600,
+            cursor: 'pointer', fontSize: 12, color: '#087F70', fontWeight: 600,
             marginTop: 6,
           }}
         >
