@@ -42,6 +42,18 @@ const PAGE_TITLES = {
 
 const PRIMARY_PAGES = new Set(['/dashboard', '/familia', '/ajustes', '/planes', '/pricing', '/chat', '/diario-medico'])
 
+// Rutas que no dibujan su propio header (no están en hasOwnHeader) y deben
+// ver el header claro de Layout en vez del bloque oscuro #0B4F4A — mismo
+// mecanismo usado para /familia. Ampliar esta lista es seguro: no afecta a
+// las rutas con hasOwnHeader (Dashboard/Chat/Cuidado/Historial/Medicamentos/
+// Todo el cuidado/Videollamada dibujan el suyo, Layout nunca les pinta nada).
+const LIGHT_HEADER_PAGES = new Set([
+  '/chat', '/historial', '/videollamada', '/medications', '/familia',
+  '/calendar', '/notes', '/album', '/diario-voz', '/memorias', '/reportes',
+  '/gastos', '/directorio', '/ajustes', '/paciente/perfil', '/upgrade',
+  '/admin', '/diario-medico', '/registros', '/incidentes', '/roles',
+])
+
 
 export default function Layout({ children }) {
   const { inactivityWarning, user } = useAuth()
@@ -65,7 +77,7 @@ export default function Layout({ children }) {
   const navBg   = dark ? 'rgba(28,18,8,0.97)' : '#0B4F4A'
   const hdrBg   = dark ? 'rgba(28,18,8,0.95)' : '#0B4F4A'
   const border  = dark ? '#1E3A28' : 'rgba(255,255,255,0.08)'
-  const isLightHeader = location.pathname === '/chat' || location.pathname === '/historial' || location.pathname === '/videollamada' || location.pathname === '/medications' || location.pathname === '/familia'
+  const isLightHeader = LIGHT_HEADER_PAGES.has(location.pathname)
 
   const hospitalBarHeight = isHospitalMode ? 40 : 0
 
@@ -113,9 +125,12 @@ export default function Layout({ children }) {
         {isHome ? (
           <Logo showWordmark size={32} />
         ) : isLightHeader ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
             <img src="/logo.png" alt="FamiliaCerca" style={{ height: 28, width: 'auto', objectFit: 'contain', flexShrink: 0 }} />
-            <span style={{ fontSize: 16, fontWeight: 700, color: '#334155', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}>
+            <span style={{
+              fontSize: 16, fontWeight: 700, color: '#334155', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+            }}>
               {PAGE_TITLES[location.pathname] ?? 'Chat familiar'}
             </span>
           </div>
