@@ -70,7 +70,7 @@ export default function TodoElCuidado() {
     { Icon: DollarSign, label: 'Gastos del cuidado', onClick: () => navigate('/gastos') },
   ]
   const cuentaAjustes = [
-    { Icon: Shield, label: 'Permisos de acceso',   onClick: () => navigate('/permisos') },
+    { Icon: Shield, label: 'Permisos de acceso',   onClick: () => navigate('/roles') },
     { Icon: Star,   label: 'Planes y suscripción', onClick: () => navigate('/pricing') },
   ]
 
