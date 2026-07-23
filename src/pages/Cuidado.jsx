@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
+import { useGoBack } from '../hooks/useGoBack'
 import {
   ChevronLeft, CheckIcon, Clock, Lock, Heart,
   Bath, Tooth, Shirt, Utensils, Bed, Sparkle, Footsteps, Scissors, Lotus,
@@ -74,7 +75,7 @@ function toLocalDate(d = new Date()) {
 export default function Cuidado() {
   const { user } = useAuth()
   const { ownerId, memberRole, activePatientName } = useFamily()
-  const navigate = useNavigate()
+  const goBack = useGoBack()
   const [searchParams, setSearchParams] = useSearchParams()
   const [activeTab, setActiveTab] = useState(() =>
     searchParams.get('tab') === 'horarios' ? 'horarios' : 'hoy'
@@ -264,7 +265,7 @@ export default function Cuidado() {
           flexShrink: 0, background: '#F8F4ED',
         }}>
           <button
-            onClick={() => navigate('/dashboard')}
+            onClick={goBack}
             aria-label="Volver"
             style={{
               width: 34, height: 34, borderRadius: '50%', border: 'none',

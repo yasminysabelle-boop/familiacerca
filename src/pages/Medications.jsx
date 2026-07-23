@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import PaywallModal from '../components/PaywallModal'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
+import { useGoBack } from '../hooks/useGoBack'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { useSubscription } from '../contexts/SubscriptionContext'
@@ -194,7 +195,7 @@ export default function Medications() {
   const { user } = useAuth()
   const { ownerId, memberRole, profile, activePatientName } = useFamily()
   const { canEdit, trialExpired } = useSubscription()
-  const navigate = useNavigate()
+  const goBack = useGoBack()
   const [showPaywall, setShowPaywall] = useState(false)
   const { containerRef: pullRef, onTouchStart: pullStart, onTouchMove: pullMove, onTouchEnd: pullEnd, PullIndicator } = usePullToRefresh(fetchAll)
   const [searchParams, setSearchParams] = useSearchParams()
@@ -1009,7 +1010,7 @@ export default function Medications() {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '22px 16px 4px', maxWidth: 600 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
           <button
-            onClick={() => navigate('/dashboard')}
+            onClick={goBack}
             style={{ width: 38, height: 38, borderRadius: 14, border: 'none', background: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 6px 14px -8px #087F7055', cursor: 'pointer', flexShrink: 0 }}
           >
             <ChevronLeft size={19} color="#334155" strokeWidth={2.2} />

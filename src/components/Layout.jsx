@@ -11,6 +11,7 @@ import { useDarkMode } from '../contexts/DarkModeContext'
 import FamilySwitcher from './FamilySwitcher'
 import { useHospitalMode } from '../contexts/HospitalModeContext'
 import { useBadgeCounts } from '../hooks/useBadgeCounts'
+import { useGoBack } from '../hooks/useGoBack'
 
 const PAGE_TITLES = {
   '/dashboard':      'Inicio',
@@ -52,8 +53,9 @@ export default function Layout({ children }) {
   const { homeBadge, familyBadge } = useBadgeCounts()
   const location = useLocation()
   const navigate = useNavigate()
+  const goBack = useGoBack()
   const isHome      = location.pathname === '/dashboard'
-  const hasOwnHeader = isHome || location.pathname === '/mas' || location.pathname === '/medications' || location.pathname === '/chat' || location.pathname === '/cuidado' || location.pathname === '/historial'
+  const hasOwnHeader = isHome || location.pathname === '/mas' || location.pathname === '/medications' || location.pathname === '/chat' || location.pathname === '/cuidado' || location.pathname === '/historial' || location.pathname === '/videollamada'
   const isVideoCall = location.pathname === '/videollamada'
   const isSecondary = !PRIMARY_PAGES.has(location.pathname) && !isVideoCall
 
@@ -120,7 +122,7 @@ export default function Layout({ children }) {
         ) : isSecondary ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
             <button
-              onClick={() => navigate('/dashboard')}
+              onClick={goBack}
               style={{
                 display: 'flex', alignItems: 'center', gap: 2,
                 background: 'rgba(255,255,255,0.12)',
@@ -250,7 +252,7 @@ export default function Layout({ children }) {
           minHeight: 64,
         }}>
           {/* Inicio */}
-          <Link to="/dashboard" style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, textDecoration: 'none' }}>
+          <Link to="/dashboard" replace={location.pathname !== '/dashboard'} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, textDecoration: 'none' }}>
             <span style={{ width: location.pathname === '/dashboard' ? 52 : 36, height: 32, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: location.pathname === '/dashboard' ? '#087F70' : 'transparent', transition: 'width 0.15s ease' }}>
               <Home size={18} color={location.pathname === '/dashboard' ? 'white' : '#7C8698'} strokeWidth={2} />
             </span>
@@ -258,7 +260,7 @@ export default function Layout({ children }) {
           </Link>
 
           {/* Chat */}
-          <Link to="/chat" style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, textDecoration: 'none' }}>
+          <Link to="/chat" replace={location.pathname !== '/dashboard'} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, textDecoration: 'none' }}>
             <span style={{ position: 'relative', width: location.pathname === '/chat' ? 52 : 36, height: 32, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: location.pathname === '/chat' ? '#087F70' : 'transparent', transition: 'width 0.15s ease' }}>
               <Chat size={18} color={location.pathname === '/chat' ? 'white' : '#7C8698'} strokeWidth={2} />
               {familyBadge > 0 && (
@@ -269,7 +271,7 @@ export default function Layout({ children }) {
           </Link>
 
           {/* Historial */}
-          <Link to="/historial" style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, textDecoration: 'none' }}>
+          <Link to="/historial" replace={location.pathname !== '/dashboard'} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, textDecoration: 'none' }}>
             <span style={{ width: location.pathname === '/historial' ? 52 : 36, height: 32, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: location.pathname === '/historial' ? '#087F70' : 'transparent', transition: 'width 0.15s ease' }}>
               <ClipboardList size={18} color={location.pathname === '/historial' ? 'white' : '#7C8698'} strokeWidth={2} />
             </span>
@@ -277,7 +279,7 @@ export default function Layout({ children }) {
           </Link>
 
           {/* Medicamentos */}
-          <button onClick={() => navigate('/medications')} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, background: 'none', border: 'none', cursor: 'pointer', padding: 0, WebkitTapHighlightColor: 'transparent' }}>
+          <button onClick={() => navigate('/medications', { replace: location.pathname !== '/dashboard' })} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, background: 'none', border: 'none', cursor: 'pointer', padding: 0, WebkitTapHighlightColor: 'transparent' }}>
             <span style={{ width: location.pathname === '/medications' ? 52 : 36, height: 32, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: location.pathname === '/medications' ? '#087F70' : 'transparent', transition: 'width 0.15s ease' }}>
               <Pill size={18} color={location.pathname === '/medications' ? 'white' : '#7C8698'} strokeWidth={2} />
             </span>
@@ -285,7 +287,7 @@ export default function Layout({ children }) {
           </button>
 
           {/* Mi cuenta */}
-          <Link to="/ajustes" style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, textDecoration: 'none' }}>
+          <Link to="/ajustes" replace={location.pathname !== '/dashboard'} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, textDecoration: 'none' }}>
             <span style={{ width: location.pathname === '/ajustes' ? 52 : 36, height: 32, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: location.pathname === '/ajustes' ? '#087F70' : 'transparent', transition: 'width 0.15s ease' }}>
               <User size={18} color={location.pathname === '/ajustes' ? 'white' : '#7C8698'} strokeWidth={2} />
             </span>

@@ -8,6 +8,7 @@ import { CARE_ITEMS } from '../lib/careItems'
 import { incidentTypeInfo } from '../lib/incidentTypes'
 import { SkeletonEventCard } from '../components/SkeletonLoader'
 import { usePullToRefresh } from '../hooks/usePullToRefresh'
+import { useGoBack } from '../hooks/useGoBack'
 import {
   ChevronLeft, ChevronRight, Pill, ClipboardCheck, ClipboardList, Hospital, Home,
   Stethoscope, Calendar, Siren, Receipt, Camera, User, AlertTriangle, CheckIcon,
@@ -337,6 +338,7 @@ function toLocalDateKey(d = new Date()) {
 export default function MedicationTimeline() {
   const { ownerId, activePatientName, profile } = useFamily()
   const navigate = useNavigate()
+  const goBack = useGoBack()
   const patientFirstName = (activePatientName || profile?.name || 'tu familiar').split(' ')[0]
   const todayKey = toLocalDateKey()
   const { containerRef: pullRef, onTouchStart: pullStart, onTouchMove: pullMove, onTouchEnd: pullEnd, PullIndicator } = usePullToRefresh(fetchLog)
@@ -421,7 +423,7 @@ export default function MedicationTimeline() {
           flexShrink: 0, background: '#F8F4ED',
         }}>
           <button
-            onClick={() => navigate('/dashboard')}
+            onClick={goBack}
             aria-label="Volver"
             style={{
               width: 34, height: 34, borderRadius: '50%', border: 'none',

@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
-import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import VoiceInput from './VoiceInput'
 
 const SERVICE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-daily-room`
+const SANS = "'Plus Jakarta Sans', system-ui, sans-serif"
 
 function fmtScheduled(isoStr) {
   const d = new Date(isoStr)
@@ -17,7 +17,7 @@ function fmtScheduled(isoStr) {
   const dayLabel = isToday ? 'Hoy' : isTomorrow ? 'Mañana'
     : d.toLocaleDateString('es-MX', { weekday: 'short', day: 'numeric', month: 'short' })
   const timeLabel = d.toLocaleTimeString('es-MX', { hour: 'numeric', minute: '2-digit', hour12: true })
-  return `${dayLabel} ${timeLabel}`
+  return `${dayLabel} · ${timeLabel}`
 }
 
 function minutesUntil(isoStr) {
@@ -25,24 +25,16 @@ function minutesUntil(isoStr) {
 }
 
 export default function VideoCallScheduleModal({ open, onClose }) {
-  const { user } = useAuth()
-  const { ownerId, profile } = useFamily()
+  const { ownerId } = useFamily()
   const navigate = useNavigate()
 
-  const [view, setView] = useState('list') // 'list' | 'schedule'
   const [upcomingCalls, setUpcomingCalls] = useState([])
   const [loadingCalls, setLoadingCalls] = useState(false)
-
-  const [startingInstant, setStartingInstant] = useState(false)
-  const [instantError, setInstantError] = useState('')
 
   // Form state
   const [title, setTitle] = useState('')
   const [date, setDate] = useState('')
   const [time, setTime] = useState('')
-  const [participantMode, setParticipantMode] = useState('all') // 'all' | 'select'
-  const [members, setMembers] = useState([])
-  const [selectedIds, setSelectedIds] = useState([])
   const [scheduling, setScheduling] = useState(false)
   const [scheduleError, setScheduleError] = useState('')
 
@@ -54,10 +46,8 @@ export default function VideoCallScheduleModal({ open, onClose }) {
     now.setHours(now.getHours() + 1)
     setDate(now.toISOString().slice(0, 10))
     setTime(`${String(now.getHours()).padStart(2, '0')}:00`)
-    setView('list')
     setScheduleError('')
     loadUpcoming()
-    loadMembers()
   }, [open, ownerId])
 
   async function loadUpcoming() {
@@ -75,25 +65,6 @@ export default function VideoCallScheduleModal({ open, onClose }) {
     setLoadingCalls(false)
   }
 
-  async function loadMembers() {
-    if (!ownerId) return
-    const { data } = await supabase
-      .from('family_members')
-      .select('member_user_id, member_email, role')
-      .eq('user_id', ownerId)
-    const withProfiles = await Promise.all(
-      (data ?? []).map(async m => {
-        const { data: p } = await supabase
-          .from('user_profiles')
-          .select('full_name')
-          .eq('id', m.member_user_id)
-          .maybeSingle()
-        return { ...m, name: p?.full_name ?? m.member_email }
-      })
-    )
-    setMembers(withProfiles)
-  }
-
   async function handleSchedule() {
     if (!date || !time) return
     const scheduledAt = new Date(`${date}T${time}`).toISOString()
@@ -104,9 +75,6 @@ export default function VideoCallScheduleModal({ open, onClose }) {
     setScheduling(true)
     setScheduleError('')
     try {
-      const participants = participantMode === 'all'
-        ? 'all'
-        : selectedIds.length > 0 ? selectedIds : 'all'
       const { data: { session } } = await supabase.auth.getSession()
       const res = await fetch(SERVICE_URL, {
         method: 'POST',
@@ -118,16 +86,15 @@ export default function VideoCallScheduleModal({ open, onClose }) {
           ownerId,
           title: title.trim() || 'Videollamada familiar',
           scheduledAt,
-          participants,
+          participants: 'all',
         }),
       })
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
         throw new Error(body.error ?? `Error ${res.status}`)
       }
-      setView('list')
-      loadUpcoming()
       setTitle('')
+      loadUpcoming()
     } catch (err) {
       setScheduleError(err.message)
     } finally {
@@ -140,34 +107,14 @@ export default function VideoCallScheduleModal({ open, onClose }) {
     navigate(`/videollamada?id=${call.id}`)
   }
 
-  async function handleInstantCall() {
-    if (!ownerId || startingInstant) return
-    setStartingInstant(true)
-    setInstantError('')
-    try {
-      const { data: { session } } = await supabase.auth.getSession()
-      const res = await fetch(SERVICE_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
-        body: JSON.stringify({ ownerId, title: 'Llamada ahora', scheduledAt: new Date().toISOString(), participants: 'all' }),
-      })
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}))
-        throw new Error(body.error ?? `Error ${res.status}`)
-      }
-      const body = await res.json()
-      onClose()
-      navigate(`/videollamada?id=${body.callId}`)
-    } catch (err) {
-      setInstantError(err.message)
-      setStartingInstant(false)
-    }
-  }
-
   if (!open) return null
 
   const minDate = new Date().toISOString().slice(0, 10)
-  const canJoin = call => minutesUntil(call.scheduled_at) <= 15
+  const isLive = call => {
+    const mins = minutesUntil(call.scheduled_at)
+    return mins <= 0 && mins > -60
+  }
+  const canJoinSoon = call => minutesUntil(call.scheduled_at) <= 15
 
   // Portal to document.body — escapes Layout's stacking context so z-index
   // is resolved in the root context, above the bottom nav (z-index: 40).
@@ -175,261 +122,162 @@ export default function VideoCallScheduleModal({ open, onClose }) {
     <div
       style={{
         position: 'fixed', inset: 0, zIndex: 9000,
-        background: 'rgba(0,0,0,0.55)',
+        background: 'rgba(30,30,26,0.45)',
         display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
+        fontFamily: SANS,
       }}
       onClick={e => { if (e.target === e.currentTarget) onClose() }}
     >
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       <div style={{
         width: '100%', maxWidth: 480,
-        background: 'white', borderRadius: '24px 24px 0 0',
-        padding: '24px 20px calc(env(safe-area-inset-bottom) + 96px)',
-        boxShadow: '0 -8px 48px rgba(0,0,0,0.2)',
-        maxHeight: '90vh', overflowY: 'auto',
+        background: '#FFFFFF', borderRadius: '26px 26px 0 0',
+        boxShadow: '0 -16px 40px rgba(51,65,85,0.18)',
+        maxHeight: '90vh',
+        display: 'flex', flexDirection: 'column',
+        overflow: 'hidden',
       }}>
-        {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span style={{ fontSize: 24 }}>📹</span>
-            <div>
-              <h3 style={{ margin: 0, fontSize: 17, fontWeight: 800, fontFamily: 'Georgia, serif', color: '#1A1A1A' }}>
-                Videollamadas
-              </h3>
-              <p style={{ margin: '2px 0 0', fontSize: 11, color: '#6B7280' }}>
-                {profile?.name ? `Sala de ${profile.name}` : 'Sala familiar'}
-              </p>
+        {/* Fijo: header + formulario — no scrollea */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 18, padding: '22px 20px 18px', flexShrink: 0 }}>
+          {/* Header */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ width: 34, height: 34, borderRadius: 10, background: '#A8E5D6', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#065A50" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"></rect><path d="M3 10h18"></path><path d="M8 3v4"></path><path d="M16 3v4"></path></svg>
+              </div>
+              <h2 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: '#334155', fontFamily: SANS }}>Programar llamada</h2>
+            </div>
+            <button
+              onClick={onClose}
+              aria-label="Cerrar"
+              style={{ width: 30, height: 30, borderRadius: '50%', border: 'none', background: '#F3F4F6', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6B7280', flexShrink: 0 }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18"></path><path d="M6 6l12 12"></path></svg>
+            </button>
+          </div>
+
+          {/* Form */}
+          <VoiceInput
+            value={title}
+            onChange={setTitle}
+            placeholder="Ej: Cena familiar, control médico..."
+            rows={1}
+            label="Título de la llamada"
+          />
+
+          <div style={{ display: 'flex', gap: 10 }}>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <label style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Fecha</label>
+              <input
+                type="date"
+                value={date}
+                min={minDate}
+                onChange={e => setDate(e.target.value)}
+                style={{ padding: '11px 13px', borderRadius: 12, border: '1.5px solid #EDE5D8', background: '#F8F4ED', fontSize: 14, color: '#334155', fontFamily: 'inherit' }}
+              />
+            </div>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <label style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Hora</label>
+              <input
+                type="time"
+                value={time}
+                onChange={e => setTime(e.target.value)}
+                style={{ padding: '11px 13px', borderRadius: 12, border: '1.5px solid #EDE5D8', background: '#F8F4ED', fontSize: 14, color: '#334155', fontFamily: 'inherit' }}
+              />
             </div>
           </div>
+
+          {scheduleError && (
+            <p style={{ margin: 0, fontSize: 13, color: '#B91C1C', padding: '10px 14px', borderRadius: 10, background: '#FEF0ED', border: '1px solid #F5C6BB' }}>
+              {scheduleError}
+            </p>
+          )}
+
           <button
-            onClick={onClose}
-            style={{ width: 32, height: 32, borderRadius: '50%', border: 'none', background: '#F3F4F6', cursor: 'pointer', fontSize: 16, color: '#6B7280' }}
+            onClick={handleSchedule}
+            disabled={!date || !time || scheduling}
+            style={{
+              width: '100%', padding: 14, borderRadius: 15, border: 'none',
+              background: date && time && !scheduling ? '#087F70' : '#E5DED2',
+              color: date && time && !scheduling ? 'white' : '#9CA3AF',
+              fontWeight: 800, fontSize: 15, fontFamily: 'inherit',
+              cursor: date && time && !scheduling ? 'pointer' : 'default',
+              boxShadow: date && time && !scheduling ? '0 6px 18px rgba(8,127,112,0.35)' : 'none',
+            }}
           >
-            ✕
+            {scheduling ? 'Programando...' : 'Programar'}
           </button>
         </div>
 
-        {/* Tab switcher */}
-        <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
-          {['list', 'schedule'].map(v => (
-            <button
-              key={v}
-              onClick={() => setView(v)}
-              style={{
-                flex: 1, padding: '9px', borderRadius: 10, border: 'none',
-                fontWeight: 700, fontSize: 13, cursor: 'pointer',
-                background: view === v ? '#0d6b63' : '#F3F4F6',
-                color: view === v ? 'white' : '#6B7280',
-              }}
-            >
-              {v === 'list' ? '📹 Iniciar ahora' : '📅 Programar'}
-            </button>
-          ))}
-        </div>
+        {/* Scrolleable: divisor "Programadas" + lista — crece dentro del espacio restante bajo el form fijo */}
+        <div style={{
+          flex: 1, minHeight: 0, overflowY: 'auto',
+          display: 'flex', flexDirection: 'column', gap: 18,
+          padding: '0 20px calc(env(safe-area-inset-bottom) + 32px)',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 2 }}>
+            <div style={{ flex: 1, height: 1, background: '#EDE5D8' }} />
+            <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.08em', color: '#9CA3AF', textTransform: 'uppercase' }}>Programadas</span>
+            <div style={{ flex: 1, height: 1, background: '#EDE5D8' }} />
+          </div>
 
-        {/* ─── VIEW: INICIAR ─── */}
-        {view === 'list' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <button
-              onClick={handleInstantCall}
-              disabled={startingInstant}
-              style={{
-                width: '100%', padding: '15px', borderRadius: 16, border: 'none',
-                background: startingInstant
-                  ? '#9CA3AF'
-                  : 'linear-gradient(135deg, #0d6b63, #2D6A4F)',
-                color: 'white', fontWeight: 800, fontSize: 15,
-                cursor: startingInstant ? 'default' : 'pointer',
-                boxShadow: startingInstant ? 'none' : '0 6px 20px rgba(13,107,99,0.35)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-                transition: 'all 0.2s',
-              }}
-            >
-              {startingInstant ? (
-                <>
-                  <div style={{ width: 16, height: 16, border: '2px solid rgba(255,255,255,0.5)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
-                  Iniciando...
-                </>
-              ) : '📹 Iniciar llamada ahora'}
-            </button>
-
-            {instantError && (
-              <p style={{ margin: 0, fontSize: 12, color: '#DC2626', padding: '8px 12px', borderRadius: 8, background: '#FEF2F2' }}>
-                {instantError}
-              </p>
-            )}
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <div style={{ flex: 1, height: 1, background: '#E5E7EB' }} />
-              <span style={{ fontSize: 11, color: '#9CA3AF', fontWeight: 600 }}>PROGRAMADAS</span>
-              <div style={{ flex: 1, height: 1, background: '#E5E7EB' }} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {loadingCalls && (
+            <p style={{ textAlign: 'center', color: '#9CA3AF', fontSize: 13 }}>Cargando...</p>
+          )}
+          {!loadingCalls && upcomingCalls.length === 0 && (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: '26px 16px', border: '1.5px dashed #C9BFA9', borderRadius: 18 }}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#065A50" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"></rect><path d="M3 10h18"></path><path d="M8 3v4"></path><path d="M16 3v4"></path></svg>
+              <span style={{ fontSize: 13.5, color: '#64748B', fontWeight: 600 }}>No hay llamadas programadas</span>
             </div>
-
-            {loadingCalls && (
-              <p style={{ textAlign: 'center', color: '#9CA3AF', fontSize: 13 }}>Cargando...</p>
-            )}
-            {!loadingCalls && upcomingCalls.length === 0 && (
-              <div style={{ textAlign: 'center', padding: '20px 0' }}>
-                <p style={{ fontSize: 28 }}>📅</p>
-                <p style={{ fontSize: 13, color: '#6B7280', margin: '6px 0 0' }}>
-                  No hay llamadas programadas
-                </p>
-              </div>
-            )}
-            {upcomingCalls.map(call => {
-              const mins = minutesUntil(call.scheduled_at)
-              const canJoinNow = mins <= 15
-              const isLive = mins <= 0 && mins > -60
-              return (
-                <div
-                  key={call.id}
-                  style={{
-                    padding: '14px', borderRadius: 14,
-                    border: `1.5px solid ${isLive ? '#0d6b63' : '#E5E0D8'}`,
-                    background: isLive ? '#F0F9F4' : '#FAFAF9',
-                    display: 'flex', alignItems: 'center', gap: 12,
-                  }}
-                >
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#1A1A1A' }}>
+          )}
+          {upcomingCalls.map(call => {
+            const live = isLive(call)
+            const joinSoon = canJoinSoon(call)
+            return (
+              <div
+                key={call.id}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 12,
+                  background: live ? '#EAF7EE' : '#F8F4ED',
+                  border: `1px solid ${live ? '#BFE5CC' : '#EDE5D8'}`,
+                  borderRadius: 16, padding: '13px 14px',
+                }}
+              >
+                <div style={{ width: 38, height: 38, borderRadius: 12, background: '#A8E5D6', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#065A50" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 8l5-3v14l-5-3"></path><rect x="2" y="6" width="13" height="12" rx="2.5"></rect></svg>
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                    <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#334155', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {call.title}
                     </p>
-                    <p style={{ margin: '3px 0 0', fontSize: 12, color: isLive ? '#0d6b63' : '#6B7280', fontWeight: isLive ? 700 : 400 }}>
-                      {isLive ? '🟢 En curso' : fmtScheduled(call.scheduled_at)}
-                      {!isLive && canJoinNow && ` · en ${mins} min`}
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => joinCall(call)}
-                    style={{
-                      padding: '8px 16px', borderRadius: 10, border: 'none',
-                      background: canJoinNow ? '#0d6b63' : '#E5E0D8',
-                      color: canJoinNow ? 'white' : '#9CA3AF',
-                      fontWeight: 700, fontSize: 13,
-                      cursor: canJoinNow ? 'pointer' : 'default',
-                      flexShrink: 0,
-                    }}
-                  >
-                    {canJoinNow ? 'Unirse' : 'Ver'}
-                  </button>
-                </div>
-              )
-            })}
-          </div>
-        )}
-
-        {/* ─── VIEW: PROGRAMAR ─── */}
-        {view === 'schedule' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-            <VoiceInput
-              value={title}
-              onChange={setTitle}
-              placeholder="Ej: Reunión semanal, Actualización médica..."
-              rows={1}
-              label="Título (opcional)"
-            />
-
-            <div style={{ display: 'flex', gap: 10 }}>
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 5 }}>
-                <label style={{ fontSize: 12, fontWeight: 600, color: '#374151' }}>Fecha</label>
-                <input
-                  type="date"
-                  value={date}
-                  min={minDate}
-                  onChange={e => setDate(e.target.value)}
-                  style={{ padding: '10px 12px', borderRadius: 10, border: '1.5px solid #D1C9BF', fontSize: 14, color: '#1A1A1A' }}
-                />
-              </div>
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 5 }}>
-                <label style={{ fontSize: 12, fontWeight: 600, color: '#374151' }}>Hora</label>
-                <input
-                  type="time"
-                  value={time}
-                  onChange={e => setTime(e.target.value)}
-                  style={{ padding: '10px 12px', borderRadius: 10, border: '1.5px solid #D1C9BF', fontSize: 14, color: '#1A1A1A' }}
-                />
-              </div>
-            </div>
-
-            <div>
-              <label style={{ fontSize: 12, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 8 }}>
-                Participantes
-              </label>
-              <div style={{ display: 'flex', gap: 8, marginBottom: members.length > 0 && participantMode === 'select' ? 10 : 0 }}>
-                {['all', 'select'].map(mode => (
-                  <button
-                    key={mode}
-                    onClick={() => setParticipantMode(mode)}
-                    style={{
-                      flex: 1, padding: '8px', borderRadius: 9, fontSize: 13, fontWeight: 600,
-                      border: `1.5px solid ${participantMode === mode ? '#0d6b63' : '#D1C9BF'}`,
-                      background: participantMode === mode ? '#0d6b63' : 'white',
-                      color: participantMode === mode ? 'white' : '#374151',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    {mode === 'all' ? '👨‍👩‍👧 Todos' : '✓ Escoger'}
-                  </button>
-                ))}
-              </div>
-              {participantMode === 'select' && members.length > 0 && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  {members.map(m => (
-                    <label
-                      key={m.member_user_id}
-                      style={{
-                        display: 'flex', alignItems: 'center', gap: 10,
-                        padding: '9px 12px', borderRadius: 10, cursor: 'pointer',
-                        background: selectedIds.includes(m.member_user_id) ? '#F0F9F4' : '#F9F7F4',
-                        border: `1px solid ${selectedIds.includes(m.member_user_id) ? '#BBF7D0' : '#E5E0D8'}`,
-                      }}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedIds.includes(m.member_user_id)}
-                        onChange={e => setSelectedIds(prev =>
-                          e.target.checked
-                            ? [...prev, m.member_user_id]
-                            : prev.filter(id => id !== m.member_user_id)
-                        )}
-                        style={{ width: 16, height: 16, accentColor: '#0d6b63' }}
-                      />
-                      <span style={{ fontSize: 14, fontWeight: 600, color: '#1A1A1A' }}>{m.name}</span>
-                      <span style={{ fontSize: 11, color: '#9CA3AF', marginLeft: 'auto' }}>
-                        {m.role === 'cuidador' ? 'Cuidador' : 'Familiar'}
+                    {live && (
+                      <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.03em', padding: '2px 7px', borderRadius: 999, background: '#16A34A', color: 'white', flexShrink: 0 }}>
+                        EN CURSO
                       </span>
-                    </label>
-                  ))}
+                    )}
+                  </div>
+                  <p style={{ margin: '2px 0 0', fontSize: 12, color: live ? '#16A34A' : '#64748B', fontWeight: live ? 700 : 400 }}>
+                    {live ? 'En curso ahora' : fmtScheduled(call.scheduled_at)}
+                  </p>
                 </div>
-              )}
-              {participantMode === 'select' && members.length === 0 && (
-                <p style={{ fontSize: 12, color: '#9CA3AF', marginTop: 6 }}>
-                  No hay miembros adicionales en la familia.
-                </p>
-              )}
-            </div>
-
-            {scheduleError && (
-              <p style={{ margin: 0, fontSize: 12, color: '#DC2626', padding: '8px 12px', borderRadius: 8, background: '#FEF2F2' }}>
-                {scheduleError}
-              </p>
-            )}
-
-            <button
-              onClick={handleSchedule}
-              disabled={!date || !time || scheduling}
-              style={{
-                padding: '15px', borderRadius: 14, border: 'none',
-                background: date && time && !scheduling ? '#0d6b63' : '#9CA3AF',
-                color: 'white', fontWeight: 800, fontSize: 15,
-                cursor: date && time && !scheduling ? 'pointer' : 'default',
-                boxShadow: date && time ? '0 4px 16px rgba(13,107,99,0.3)' : 'none',
-              }}
-            >
-              {scheduling ? 'Programando...' : '📅 Programar videollamada'}
-            </button>
+                <button
+                  onClick={() => joinCall(call)}
+                  style={{
+                    padding: '8px 15px', borderRadius: 11, border: 'none',
+                    background: (live || joinSoon) ? '#087F70' : 'transparent',
+                    color: (live || joinSoon) ? 'white' : '#9CA3AF',
+                    fontWeight: (live || joinSoon) ? 800 : 700, fontSize: 12.5, fontFamily: 'inherit',
+                    cursor: 'pointer', flexShrink: 0,
+                  }}
+                >
+                  {live || joinSoon ? 'Unirse' : 'Ver'}
+                </button>
+              </div>
+            )
+          })}
           </div>
-        )}
+        </div>
       </div>
     </div>,
     document.body

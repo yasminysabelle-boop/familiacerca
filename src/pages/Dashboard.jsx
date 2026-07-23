@@ -3208,11 +3208,10 @@ export default function Dashboard() {
     return (
       <Layout>
         <HospitalModeModal open={showHospitalModal} onClose={() => setShowHospitalModal(false)} />
-        <VideoCallScheduleModal open={showVideoCallModal} onClose={() => setShowVideoCallModal(false)} />
         <HospitalDashboard
           onManageMode={() => setShowHospitalModal(true)}
           onSOS={prepareSOS}
-          onVideoCall={() => setShowVideoCallModal(true)}
+          onVideoCall={() => navigate('/videollamada')}
         />
         {sosConfirming && (
           <div

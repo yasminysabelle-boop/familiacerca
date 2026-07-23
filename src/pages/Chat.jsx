@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { useSubscription } from '../contexts/SubscriptionContext'
@@ -10,6 +9,7 @@ import Layout from '../components/Layout'
 import LoadingButton from '../components/LoadingButton'
 import MicButton from '../components/MicButton'
 import { useSpeechToText } from '../hooks/useSpeechToText'
+import { useGoBack } from '../hooks/useGoBack'
 import {
   ChevronLeft, Bell, AlertTriangle, Camera, Pill, ClipboardList, Calendar,
   MessageCircle, Sparkles, Clock, XIcon,
@@ -95,7 +95,7 @@ export default function Chat() {
   const { user } = useAuth()
   const { ownerId, activePatientName } = useFamily()
   const { canEdit } = useSubscription()
-  const navigate = useNavigate()
+  const goBack = useGoBack()
   const [messages, setMessages] = useState([])
   const [profiles, setProfiles] = useState({})
   const [input, setInput] = useState('')
@@ -409,7 +409,7 @@ ${lines}`
           flexShrink: 0, background: '#F8F4ED',
         }}>
           <button
-            onClick={() => navigate('/dashboard')}
+            onClick={goBack}
             aria-label="Volver"
             style={{
               width: 34, height: 34, borderRadius: '50%', border: 'none',
