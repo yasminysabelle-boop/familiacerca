@@ -461,4 +461,78 @@ Pendiente: que Yasmin confirme si nota algo raro en cualquiera de los dos.
 **Pendiente (sin cambios, hereda de Fase 1):**
 - [ ] Historial real de llamadas (webhook `meeting.ended` de Daily.co) —
       ver `CLAUDE.md`
+
+---
+
+## Rediseño de /familia — CERRADO y en producción (2026-07-23)
+
+Pantalla principal de familia ("Familiar a cuidar", "¿Quién cuida hoy?",
+calendario semanal, "Equipo de cuidado"), `src/pages/Familia.jsx`.
+Diagnóstico previo (PASO 0) en el hilo de la sesión — no repetido aquí.
+
+**Colores y tipografía:** reemplazado el verde vivo `#0d6b63` (discontinuado
+según `CLAUDE.md`) y sus gradientes con `#2D6A4F`/`#3A6347` por teal oficial
+`#087F70` en los ~30 usos (botones, badges, iconos, avatares, tarjeta de la
+persona a cuidar). Georgia/serif → Plus Jakarta Sans en toda la pantalla,
+incluidos los modales de miembro/turno/invitación. Se quitó "38 años" de la
+tarjeta de la persona. Marca de agua nueva en teal, mismo trazo SVG que
+`VideoCall.jsx` (no existía ninguna en esta pantalla antes, ni Dashboard.jsx
+tiene una — solo VideoCall).
+
+**Header compartido corregido aparte:** el bloque verde oscuro de arriba
+("Familia de Deborath") no vivía en `Familia.jsx` sino en el header
+compartido de `Layout.jsx`. Se agregó `/familia` a su lista `isLightHeader`
+— mecanismo que ya existía en el código pero era código muerto (las otras 4
+rutas que lo tenían asignado ya dibujan su propio header, así que nunca se
+ejecutaba). Al activarlo se encontró que `FamilySwitcher.jsx` (el chip
+"Familia de X" dentro de ese header) tenía el texto hardcodeado en blanco,
+asumiendo fondo oscuro — se le agregó un prop `isLight` que Layout solo
+pasa como `true` para `/familia`; ninguna otra pantalla cambia.
+
+**Sección "Hoy" nueva** (medicación pendiente + próxima cita, sin backend
+nuevo) — pasó por dos rondas de bugs reales antes de aprobarse:
+
+1. Primera versión mostraba una fila de "actividad reciente"
+   (`activity_log`) que resultó ser ruido: un trigger (`trg_care_routine`
+   en `add_care_routine_status_and_activity_log.sql`) auto-registra
+   `actor_name='Sistema automático'` cuando algo de la rutina diaria queda
+   sin marcar al cerrar el día — dato real de producción, pero no
+   accionable para la sección. Se quitó esa query por completo.
+2. La sección aparecía completamente vacía pese a haber medicamentos
+   claramente pendientes en Medicamentos ("Hoy"). Causa doble, encontrada
+   comparando línea por línea contra `Medications.jsx` (fuente de verdad):
+   - Fecha calculada con `new Date().toISOString()` (UTC) en vez de
+     `getTodayPR()` (`lib/utils.js`, Puerto Rico/Venezuela) — el helper que
+     usa el resto de la app (`Medications.jsx`, `careContext.js`,
+     `CareRecord.jsx`).
+   - Más importante: la query filtraba `medication_logs.status='pending'`,
+     pero **esa fila nunca existe** — confirmado en `Medications.jsx`
+     (línea 910-912) que "pendiente" ahí se calcula como *ausencia* de un
+     log `confirmed`/`missed` hoy, comparando la hora programada contra la
+     hora actual. `loadTodayGlance()` se reescribió para replicar esa
+     misma lógica (trae `medications` + logs de hoy, calcula pendientes
+     client-side, excluye "tarde" — esas se auto-marcan `missed` aparte —
+     ordena por hora, toma la más próxima). Badge "Pendiente" en dorado
+     `#7A5A18`/`#FEF3C7`, mismo par ya usado en este archivo para
+     "Invitación pendiente".
+
+**Bug preexistente corregido de paso:** el calendario "¿Quién cuida hoy?"
+tenía el mismo bug de fecha UTC (`care_shifts.shift_date` comparado con
+`today.toISOString().split('T')[0]`) — no reportado originalmente, pero
+mismo root cause fresco, corregido en el mismo pase con `getTodayPR()`/
+`getDatePR()`.
+
+**Verificación:** build + lint limpios en cada iteración (mismo ruido
+preexistente del proyecto, nada nuevo). Sin navegador interactivo
+disponible, se armó dos veces un harness visual estático (mismo patrón que
+VideoCall/VideoCallScheduleModal en Fase 1/2) para revisar paleta, header y
+la tarjeta "Hoy" antes de cada draft. Las queries nuevas (`scheduled_times`,
+`time_window_minutes`) se probaron contra la API real con un usuario
+desechable (`@familiacerca-test.invalid`) para confirmar que no hay error
+de columna/RLS. Yasmin confirmó en su teléfono real con Losartán/Metformina
+reales que "Hoy" coincide exactamente con lo que muestra Medicamentos.
+
+**Deploy:** commit `a374332` (`7ed5642..a374332`), separado de Videollamada
+y de Gemini. `netlify deploy --prod --build` → `familiacerca.com` sirve
+`index-BG7dtdxy.js`.
 - [ ] Mejora futura: max-width desktop — ver `CLAUDE.md`
