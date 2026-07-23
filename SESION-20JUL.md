@@ -536,3 +536,60 @@ reales que "Hoy" coincide exactamente con lo que muestra Medicamentos.
 y de Gemini. `netlify deploy --prod --build` → `familiacerca.com` sirve
 `index-BG7dtdxy.js`.
 - [ ] Mejora futura: max-width desktop — ver `CLAUDE.md`
+
+---
+
+## Header claro extendido a todas las rutas del Layout — CERRADO (2026-07-23)
+
+Después del rediseño de `/familia`, inventario completo del router: de las
+~32 rutas, solo Dashboard/Chat/Cuidado/Historial/Medicamentos/Todo el
+cuidado/Videollamada dibujan su propio header (`hasOwnHeader`); el resto
+dependía del header compartido de `Layout.jsx`, que antes de este cambio
+solo trataba como "claro" a 5 rutas — 4 de ellas ya cubiertas por
+`hasOwnHeader` (código muerto en la práctica) y `/familia` (agregada esta
+misma sesión, ver sección anterior). Todo lo demás (Calendar, Notes,
+Album, Memorias, Reportes, Gastos, Directorio, Ajustes, Perfil paciente,
+Upgrade, Admin, Diario médico, Registros, Incidentes, Roles) seguía
+viendo el bloque verde oscuro `#0B4F4A`, sin importar si el contenido de
+esa pantalla ya estaba migrado o no (caso `Reports.jsx`, que ya tenía
+paleta nueva pero header viejo).
+
+**Diagnóstico previo importante:** la lista que se iba a migrar incluía
+algunas rutas que en realidad no pasan por el header de Layout en
+absoluto — `NotasFamilia`, `Permissions` y `Pricing` no importan
+`Layout` — agregarlas a `isLightHeader` no habría tenido ningún efecto.
+Se corrigió la lista a las 15 rutas que sí aplican antes de tocar código.
+
+**Cambio:** `isLightHeader` pasó de una cadena de `===` encadenados a un
+`Set` (`LIGHT_HEADER_PAGES`, más manejable con 15+ entradas), con las 15
+rutas correctas agregadas. `FamilySwitcher.jsx` no necesitó ningún cambio
+nuevo — el prop `isLight` que ya se le agregó para `/familia` es genérico
+a nivel de Layout, así que se beneficia automáticamente en cuanto una
+ruta entra a la lista.
+
+**Bug encontrado al ampliar el alcance:** el título del header claro
+nunca tuvo protección contra overflow — con "Mi Familia" (10 caracteres)
+nunca se notó, pero títulos más largos que ahora sí pasan por esa rama
+("Permisos de acceso", "Perfil del paciente", 18-19 caracteres) podían
+desbordar en pantallas angostas junto al chip de `FamilySwitcher` y el
+avatar. Se agregó el mismo truncado con ellipsis que ya usa la rama
+`isSecondary` del mismo header. Verificado con Playwright a 360px: trunca
+limpio con "...", sin desbordar.
+
+**No se tocó:** `hasOwnHeader` (Dashboard/Chat/Cuidado/Historial/
+Medicamentos/Todo el cuidado/Videollamada dibujan su header exactamente
+igual que antes) ni el contenido interno de ninguna pantalla — este
+cambio es solo el header compartido.
+
+**Verificación:** Yasmin confirmó en su teléfono real Calendar, Settings,
+Directory y Roles (caso de título largo) con header claro correcto y
+texto legible; confirmó que Dashboard y Videollamada no cambiaron.
+
+**Deploy:** commit `de4b800` (`03b70dc..de4b800`), separado de todo lo
+demás. `netlify deploy --prod --build` → `familiacerca.com` sirve
+`index-C7ZXJcpA.js`.
+
+**Pendiente:** la migración de paleta/tipografía del *contenido* de cada
+pantalla (colores viejos `#0d6b63`/`#3A6347`/`#143C32`, Georgia puro) sigue
+sin tocar — esto fue solo el header. Inventario completo de qué pantalla
+falta migrar en el hilo de la sesión (no volcado a este archivo todavía).
