@@ -593,3 +593,71 @@ demás. `netlify deploy --prod --build` → `familiacerca.com` sirve
 pantalla (colores viejos `#0d6b63`/`#3A6347`/`#143C32`, Georgia puro) sigue
 sin tocar — esto fue solo el header. Inventario completo de qué pantalla
 falta migrar en el hilo de la sesión (no volcado a este archivo todavía).
+
+---
+
+## Migración de /gastos (Expenses.jsx) — CERRADA, y hallazgo de componentes compartidos (2026-07-23)
+
+**Decisión de paleta de categorías (Yasmin):** el sistema de color por
+categoría de gasto se mantiene — solo Medicamentos/Transporte (que usaban
+el verde vivo `#0d6b63`) pasan a teal `#087F70`. Azul `#2D86A0`, dorado
+`#C9882A` y gris `#9CA3AF` de las demás categorías quedan intactos: no son
+parte de la paleta discontinuada de `CLAUDE.md`, cumplen una función real
+de diferenciación visual, y tocarlos sería un rediseño de sistema de
+categorías aparte, no pedido hoy. `#D63031` (eliminar/error) también
+intacto — semántico, ya exceptuado por `CLAUDE.md`.
+
+**Cambios en Expenses.jsx:** tarjeta "Total del mes" de gradiente oscuro
+(`#0d6b63`+`#2E5240`, una tercera variante de verde oscuro no vista antes
+en ninguna otra pantalla) a tarjeta blanca con el monto en teal — mismo
+patrón que Familia/Videollamada. FAB, botón "Reintentar", medalla/%/barra
+de "¿Quién aportó más?", y "Tomar foto"/"Elegir de galería" — todo el
+verde vivo restante a teal sólido. 5 títulos en Georgia puro → Plus
+Jakarta Sans. Marca de agua nueva en teal. Estructura y contenido sin
+cambios.
+
+**Hallazgo importante — el barrido por archivo de pantalla no alcanza:**
+al pedir revisar el modal completo, aparecieron 4 componentes
+*compartidos* con el mismo resabio, que un `grep` sobre `Expenses.jsx`
+nunca iba a encontrar porque el color vive en el componente importado, no
+en la página:
+
+| Componente compartido | Dónde aparece en /gastos | Otras pantallas que también lo heredaban |
+|---|---|---|
+| `LoadingButton.jsx` | Botón "Guardar gasto" | **Chat.jsx y Medications.jsx** — ya dadas por migradas, tenían este resabio sin que nadie lo notara |
+| `EmptyState.jsx` | "Sin gastos este mes" | Dashboard, Cuidado, Calendar, Directory, Medications |
+| `EvidencePhoto.jsx` | Link "tomar/subir foto" del recibo | Cuidado, Incidents, Medications |
+| `Paywall.jsx` | Bloqueo por prueba vencida (global, vía `Layout.jsx`) | Todas las pantallas |
+| `PaywallModal.jsx` | Modal de prueba vencida al agregar gasto | **Familia.jsx** (recién migrada), DiarioMedico, Notes, Medications |
+
+Los 5 se corrigieron (gradiente → `#087F70` sólido, Georgia puro → Plus
+Jakarta Sans) — mismo commit que Expenses.jsx. Esto significa que
+Chat.jsx, Medications.jsx y Familia.jsx quedaron un poco más migradas de
+lo que ya estaban, como efecto colateral correcto.
+
+**Candidatos pendientes para una limpieza sistemática de componentes
+compartidos (sesión futura, NO tocados ahora — ninguno se renderiza en
+`/gastos`):** un barrido de `src/components/*.jsx` completo encontró estos
+~15-18 archivos más con `#0d6b63`/`#3A6347`/Georgia puro:
+
+`CareCard.jsx`, `CompanionChat.jsx`, `DiarioMedicoEntryModal.jsx`,
+`EmergencyAlert.jsx`, `FamilySelector.jsx`, `FamilySwitcher.jsx` (el chip
+del header ya se arregló — queda el modal "Tus familias" del propio
+componente), `InstallBanner.jsx`, `InstallPrompt.jsx`, `Layout.jsx` (el
+header ya se arregló — queda al menos el botón del banner de
+inactividad), `Logo.jsx`, `MedicationDetail.jsx`, `MemberOnboarding.jsx`,
+`PWAInstallBanner.jsx`, `PayPalSubscription.jsx`, `ProtectedRoute.jsx`,
+`TrialBanner.jsx` (usado en Dashboard), `VoiceInput.jsx`,
+`VoiceRecorder.jsx`, `WelcomeSlides.jsx`. (`Icons.jsx` también matchea
+pero es solo un comentario de ejemplo, no código real — no cuenta.)
+
+**Lección para toda migración de pantalla futura:** no basta con `grep`
+sobre el archivo de la página — hay que revisar también qué componentes
+compartidos importa y renderiza, porque el resabio puede vivir ahí y
+quedar invisible para un barrido por archivo.
+
+**Deploy:** commit `dd429eb` (`136d665..dd429eb`), separado de todo lo
+demás. `netlify deploy --prod --build` → `familiacerca.com` sirve
+`index-8vGJFLk5.js`. Yasmin confirmó en su teléfono con un gasto real de
+prueba ($10, Medicamentos) que todo se ve correcto, incluido el botón ya
+sin gradiente.
