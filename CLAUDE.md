@@ -109,6 +109,71 @@ creados vía API contra `api-m.paypal.com` con las credenciales Live
 - `subscriptions.status` admite `suspended` desde 2026-07-20
   (`supabase/add_subscription_suspended_status.sql`).
 
+## Proxy de Gemini — arquitectura (2026-07-23)
+
+`src/lib/gemini.js` (`geminiGenerate`/`geminiChat`, consumido por
+Dashboard/Chat/CompanionChat/activitySummary) y `src/pages/Medications.jsx`
+(extracción de datos de medicamentos por imagen) **nunca deben llamar a
+`generativelanguage.googleapis.com` directo desde el frontend** — la key
+viajaría expuesta en el bundle (ya pasó, incidente 2026-07-23 en
+`SESION-20JUL.md`). Ambos pasan por Edge Functions con el mismo patrón de
+auth: JWT de usuario Supabase obligatorio, `GEMINI_API_KEY` solo en
+`Deno.env` (nunca en `VITE_*`).
+
+- **`gemini-proxy`** (texto): una función, dos acciones —
+  `{action: 'generate', prompt, maxTokens}` y `{action: 'chat',
+  systemPrompt, history, text, maxTokens}`. Cualquier llamada nueva de
+  texto a Gemini desde el frontend debe pasar por aquí, nunca directo.
+- **`gemini-vision`** (imágenes, preexistente): extracción de datos de
+  cajas/recetas de medicamentos.
+- **`gemini-flash-latest` es un alias inestable — Google puede rotarlo a
+  otro modelo en cualquier momento sin aviso.** El 2026-07-23, al activar
+  una key nueva, el alias empezó a resolver a una generación
+  (`gemini-3.6-flash`, visto en `modelVersion` de la respuesta) que
+  **rechaza `thinkingConfig.thinkingBudget: 0`** (`400 INVALID_ARGUMENT`)
+  y **no respeta un budget bajo como techo estricto** — puede gastar
+  cientos de tokens "pensando" igual, y esos tokens cuentan contra
+  `maxOutputTokens`, truncando la respuesta a vacío si el techo es chico.
+  Config actual en `gemini-proxy`: `thinkingBudget: 256` + margen fijo de
+  `+700` sobre el `maxOutputTokens` que pide el caller.
+  **Si Milo/Luna (o gemini-vision) vuelven a devolver `null`/vacío sin
+  motivo aparente, sospechar esto primero.** Diagnóstico rápido: agregar
+  temporalmente una acción a la función que le pegue a `GET
+  https://generativelanguage.googleapis.com/v1beta/models?key=...` para
+  ver el `modelVersion` real y si acepta el thinking budget configurado
+  — quitar el diagnóstico antes de dejar la función en el estado final.
+- **Testing de Edge Functions con auth sin credenciales de usuario real:**
+  el sign-in anónimo de Supabase está deshabilitado en este proyecto
+  (`anonymous_provider_disabled`). Para probar una función que exige JWT,
+  crear un usuario desechable vía `POST {url}/auth/v1/signup` con email
+  `algo@algo-test.invalid` (TLD reservado, nunca entrega correo real) +
+  password — el proyecto tiene auto-confirm de email, así que el signup
+  devuelve `access_token` en el mismo response. Quedan filas huérfanas en
+  `auth.users` con ese dominio; inofensivas, limpiar de vez en cuando
+  desde el dashboard (Authentication > Users, filtrar
+  `familiacerca-test.invalid`).
+
+## ⚠️ Deploy — NUNCA `npm run build` + deploy manual de `dist/`
+
+Confirmado dos veces (incidente PayPal 2026-07-20, casi-incidente Gemini
+2026-07-23): el `.env` **local** de esta máquina tiene `VITE_PAYPAL_CLIENT_ID`
+y `VITE_POSTHOG_KEY` vacíos. Un `npm run build` corrido directo en la
+terminal hornea esos valores vacíos en el bundle — si ese `dist/` se sube
+a un draft o a producción, rompe lo que dependa de esa env var (ya rompió
+PayPal una vez). Para **cualquier** build que vaya a terminar en un
+deploy real (draft de verificación o producción), usar siempre:
+
+```
+netlify deploy --build           # draft
+netlify deploy --prod --build    # producción
+```
+
+Esto le pide a Netlify que construya usando las env vars reales
+configuradas en el sitio, ignorando el `.env` local roto. Un `npm run
+build` suelto solo sirve para verificar que el código compila (errores de
+sintaxis/build), nunca para verificar el contenido real de un bundle que
+se va a desplegar.
+
 ## Videollamada — arquitectura (Fase 1, 2026-07-20)
 
 Rediseño de `/videollamada` (`src/pages/VideoCall.jsx`) fiel al export de

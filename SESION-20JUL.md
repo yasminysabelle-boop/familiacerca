@@ -308,3 +308,74 @@ entorno — para eso siempre hace falta pasar por Netlify CLI.
 - [ ] Mejora futura: max-width desktop — ver `CLAUDE.md`
 - [ ] Que Yasmin haga su propio commit de `Layout.jsx` (línea de
       `hasOwnHeader`) y lo pushee cuando quiera
+
+---
+
+## Incidente aparte (2026-07-23): Milo/Luna caídos — key de Gemini expuesta + rotada, RESUELTO
+
+No relacionado con PayPal ni Videollamada. Al activar una key nueva de
+Gemini ("FamiliaCerca IA Key", proyecto limpio) en Supabase secrets, Milo/
+Luna dejaron de responder para usuarios reales — `src/lib/gemini.js`
+llamaba directo a Google con `VITE_GEMINI_API_KEY` **expuesta en el bundle
+del frontend** (la key vieja, ya inválida tras la rotación).
+
+**Fix — Edge Function `gemini-proxy` (commit `8a84891`):** mismo patrón de
+auth que `gemini-vision` (JWT de usuario Supabase obligatorio, key solo en
+`Deno.env`). `geminiGenerate`/`geminiChat` mantienen sus firmas —cero
+cambios en Dashboard.jsx/Chat.jsx/CompanionChat.jsx/activitySummary.js.
+`VITE_GEMINI_API_KEY` eliminada de `.env`/`.env.example`.
+
+**Segundo hallazgo, más importante — `gemini-flash-latest` cambió de
+modelo subyacente:** con la key nueva, ese alias ahora resuelve a una
+generación más nueva (`gemini-3.6-flash`) que **rechaza
+`thinkingConfig.thinkingBudget: 0`** (`400 INVALID_ARGUMENT`) — antes se
+usaba budget:0 para no gastar tokens "pensando". Confirmado que
+`gemini-vision` (sin tocar) fallaba exactamente igual, descartando que
+fuera un bug del proxy nuevo. Además, un budget bajo NO se respeta como
+techo estricto — el modelo puede gastar cientos de tokens pensando de
+todos modos, y esos tokens cuentan contra `maxOutputTokens`, truncando la
+respuesta a vacío si el techo es chico. **Fix:** `thinkingBudget: 256` +
+margen fijo de +700 tokens sobre el `maxOutputTokens` pedido, del lado del
+servidor en `gemini-proxy`. Detalle completo y cómo re-diagnosticar si
+Google vuelve a rotar el alias: ver `CLAUDE.md` → "Proxy de Gemini".
+
+**Verificado end-to-end sin credenciales de usuario real:** signup
+desechable vía email `@familiacerca-test.invalid` (TLD reservado, auto-
+confirm activado en el proyecto → devuelve JWT real en el mismo response;
+sign-in anónimo está deshabilitado). Con ese JWT: `generate` y `chat`
+devuelven texto real de Gemini (200), sin token devuelve 401. Draft
+promovido a Yasmin, confirmado por ella con su usuario real: Milo/Luna,
+resumen narrado y "Ponte al día" funcionando.
+
+**Deploy y verificación del bundle público:**
+- Push: `git push origin main` → `45c0359..8a84891`.
+- `netlify deploy --prod --build` (build gestionado por Netlify con las
+  env vars reales del sitio) → `familiacerca.com` sirve
+  `index-Cqf4KA0P.js`. Descargado directo del dominio: **cero** referencias
+  a `VITE_GEMINI`, **cero** llamadas directas a
+  `generativelanguage.googleapis.com`, string `gemini-proxy` presente
+  (confirma que el frontend pasa por el proxy). El único match de
+  `AIzaSy` en el bundle es el `apiKey` público de Firebase (esperado, no
+  es la key de Gemini).
+
+**⚠️ Casi repito el incidente de PayPal del 20 jul (bare `npm run build`
+horneando env vars locales vacías) — sin impacto real, pero anótalo:**
+antes de este cierre corrí `npm run build` local (no `netlify deploy
+--build`) y subí ese `dist/` directo a producción con `netlify deploy
+--dir=dist --prod`. Al releer esta misma nota de la sesión de PayPal
+noté el riesgo y verifiqué: el `.env` local tiene `VITE_PAYPAL_CLIENT_ID`
+**vacío** (confirmado reproducible con un rebuild limpio — un `npm run
+build` local hoy hornea el Client ID de PayPal vacío, igual que el 20
+jul). Sin embargo, el `dist/` que efectivamente llegó a producción en
+esta sesión sí tenía el Client ID correcto horneado (`AVE784...`,
+verificado en el bundle servido por `familiacerca.com` antes de tocar
+nada más) — no se rompió nada esta vez. Para eliminar cualquier duda
+igual re-desplegué con `netlify deploy --prod --build` (la vía correcta,
+usa las env vars reales del sitio en Netlify) — mismo hash de bundle,
+sin cambios funcionales, pero ahora construido por el proceso correcto.
+**`VITE_POSTHOG_KEY` también está vacío en el `.env` local** (no crítico,
+solo analytics). Regla para toda sesión futura: en este repo, **nunca**
+`npm run build` + deploy manual de `dist/` para nada que vaya a
+producción o a un draft de verificación — siempre `netlify deploy
+--build` (o `--prod --build`), sin excepción, por el mismo motivo que ya
+costó un incidente el 20 jul.
