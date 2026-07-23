@@ -65,7 +65,7 @@ export default function Layout({ children }) {
   const navBg   = dark ? 'rgba(28,18,8,0.97)' : '#0B4F4A'
   const hdrBg   = dark ? 'rgba(28,18,8,0.95)' : '#0B4F4A'
   const border  = dark ? '#1E3A28' : 'rgba(255,255,255,0.08)'
-  const isLightHeader = location.pathname === '/chat' || location.pathname === '/historial' || location.pathname === '/videollamada' || location.pathname === '/medications'
+  const isLightHeader = location.pathname === '/chat' || location.pathname === '/historial' || location.pathname === '/videollamada' || location.pathname === '/medications' || location.pathname === '/familia'
 
   const hospitalBarHeight = isHospitalMode ? 40 : 0
 
@@ -115,7 +115,7 @@ export default function Layout({ children }) {
         ) : isLightHeader ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <img src="/logo.png" alt="FamiliaCerca" style={{ height: 28, width: 'auto', objectFit: 'contain', flexShrink: 0 }} />
-            <span style={{ fontSize: 16, fontWeight: 700, color: '#143C32', fontFamily: 'Georgia, serif' }}>
+            <span style={{ fontSize: 16, fontWeight: 700, color: '#334155', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}>
               {PAGE_TITLES[location.pathname] ?? 'Chat familiar'}
             </span>
           </div>
@@ -156,7 +156,7 @@ export default function Layout({ children }) {
         )}
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-          <FamilySwitcher />
+          <FamilySwitcher isLight={isLightHeader} />
           <Link to="/ajustes" aria-label="Ir a configuración" style={{ flexShrink: 0, lineHeight: 0 }}>
             {userAvatar ? (
               <img

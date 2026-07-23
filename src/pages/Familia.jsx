@@ -9,6 +9,30 @@ import Layout from '../components/Layout'
 import { UserPlus, Phone, Mail, MapPin, XIcon } from '../components/Icons'
 import { track } from '../lib/analytics'
 import PaywallModal from '../components/PaywallModal'
+import { getTodayPR, getDatePR } from '../lib/utils'
+
+// Espejo mínimo de calcMedStatus() en Medications.jsx — solo necesitamos
+// distinguir "tarde" (ya se auto-marca missed aparte) del resto.
+function isMedTarde(scheduledTime, windowMinutes = 60) {
+  if (!scheduledTime) return false
+  const [h, m] = scheduledTime.split(':').map(Number)
+  const now = new Date()
+  const diffMins = (now.getHours() * 60 + now.getMinutes()) - (h * 60 + m)
+  return diffMins >= windowMinutes
+}
+
+const SANS = "'Plus Jakarta Sans', system-ui, sans-serif"
+
+// Marca de agua decorativa — mismo patrón/trazo que VideoCall.jsx, en teal.
+const WATERMARK_PATHS = (
+  <>
+    <path d="M200 330 C 60 240, 30 140, 110 90 C 160 60, 195 90, 200 130 C 205 90, 240 60, 290 90 C 370 140, 340 240, 200 330 Z" fill="#087F70" />
+    <circle cx="165" cy="165" r="22" fill="#F8F4ED" />
+    <path d="M130 230 C 130 195, 200 195, 200 230 L 200 245 L 130 245 Z" fill="#F8F4ED" />
+    <circle cx="235" cy="165" r="22" fill="#F8F4ED" />
+    <path d="M200 230 C 200 195, 270 195, 270 230 L 270 245 L 200 245 Z" fill="#F8F4ED" />
+  </>
+)
 
 export default function Familia() {
   const { user } = useAuth()
@@ -35,6 +59,7 @@ export default function Familia() {
   const [confirmRemoveDialog, setConfirmRemoveDialog] = useState(null) // { member, name }
   const [showPaywall, setShowPaywall] = useState(false)
   const [memberLastActivity, setMemberLastActivity] = useState(null)
+  const [todayGlance, setTodayGlance] = useState({ nextMed: null, nextEvent: null })
 
   const displayName = user?.user_metadata?.full_name?.trim() || user?.email?.trim() || 'Familiar'
   const isAdmin = user?.id === ownerId
@@ -53,7 +78,7 @@ export default function Familia() {
   }
 
   const today = new Date()
-  const todayKey = today.toISOString().split('T')[0]
+  const todayKey = getTodayPR()
 
   function getWeekDays() {
     const d = new Date(today)
@@ -67,13 +92,69 @@ export default function Familia() {
   }
 
   useEffect(() => {
-    if (user && ownerId) { fetchMembers(); loadShifts() }
+    if (user && ownerId) { fetchMembers(); loadShifts(); loadTodayGlance() }
   }, [user, ownerId])
+
+  // "Hoy": próxima medicación PENDIENTE (status='pending' explícito — nunca
+  // confirmada/perdida) y próxima cita. Sin "actividad reciente": ese feed
+  // incluye entradas automáticas del sistema (ej. rutina no marcada al
+  // cierre del día, actor_name='Sistema automático') que no son información
+  // accionable para la familia, solo ruido en una sección pensada para "qué
+  // falta atender hoy".
+  async function loadTodayGlance() {
+    const todayPR = getTodayPR()
+    const [{ data: meds }, { data: logsToday }, { data: eventRows }] = await Promise.all([
+      supabase
+        .from('medications')
+        .select('id, name, dosage, time, scheduled_times, time_window_minutes')
+        .eq('user_id', ownerId),
+      supabase
+        .from('medication_logs')
+        .select('medication_id, status')
+        .eq('user_id', ownerId)
+        .eq('log_date', todayPR),
+      supabase
+        .from('events')
+        .select('title, date, time')
+        .eq('user_id', ownerId)
+        .gte('date', todayPR)
+        .order('date', { ascending: true })
+        .order('time', { ascending: true })
+        .limit(1),
+    ])
+
+    // "Pendiente" = no tiene log confirmed/missed hoy — medication_logs NUNCA
+    // tiene una fila con status='pending' (se confirmó revisando Medications.jsx:
+    // ese estado es la ausencia de log, no un valor guardado). Se excluyen las
+    // "tarde" (se auto-marcan missed aparte, send-med-notifications/useEffect
+    // dedicado) para no duplicar esa lógica aquí.
+    const nextMed = (meds ?? [])
+      .filter(med => !(logsToday ?? []).some(l => l.medication_id === med.id && (l.status === 'confirmed' || l.status === 'missed')))
+      .map(med => {
+        const times = med.scheduled_times?.length ? med.scheduled_times : med.time ? [med.time] : []
+        return { name: med.name, dosage: med.dosage, scheduled_time: times.length ? [...times].sort()[0] : null, time_window_minutes: med.time_window_minutes }
+      })
+      .filter(med => !isMedTarde(med.scheduled_time, med.time_window_minutes ?? 60))
+      .sort((a, b) => (a.scheduled_time ?? '99:99').localeCompare(b.scheduled_time ?? '99:99'))[0] ?? null
+
+    setTodayGlance({
+      nextMed,
+      nextEvent: eventRows?.[0] ?? null,
+    })
+  }
+
+  function fmt12h(timeStr) {
+    if (!timeStr) return ''
+    const [h, m] = timeStr.split(':').map(Number)
+    const d = new Date()
+    d.setHours(h, m, 0, 0)
+    return d.toLocaleTimeString('es-MX', { hour: 'numeric', minute: '2-digit', hour12: true })
+  }
 
   async function loadShifts() {
     const weekDays = getWeekDays()
-    const from = weekDays[0].toISOString().split('T')[0]
-    const to   = weekDays[6].toISOString().split('T')[0]
+    const from = getDatePR(weekDays[0])
+    const to   = getDatePR(weekDays[6])
     const { data } = await supabase
       .from('care_shifts')
       .select('*')
@@ -215,44 +296,99 @@ export default function Familia() {
     fontSize: 14, outline: 'none', boxSizing: 'border-box', transition: 'all 0.15s',
   }
 
+  const { nextMed, nextEvent } = todayGlance
+  const hasGlanceData = nextMed || nextEvent
+
   return (
     <Layout>
-      <div style={{ padding: '16px 16px 0', maxWidth: 600 }}>
+      <div style={{ position: 'relative', minHeight: '100%', overflow: 'hidden' }}>
+
+        {/* Marca de agua decorativa — fiel al patrón de VideoCall.jsx */}
+        <svg viewBox="0 0 400 400" style={{ position: 'absolute', top: -60, right: -90, width: 420, height: 420, opacity: 0.05, pointerEvents: 'none', zIndex: 0 }} aria-hidden="true">
+          {WATERMARK_PATHS}
+        </svg>
+
+      <div style={{ position: 'relative', zIndex: 1, padding: '16px 16px 0', maxWidth: 600 }}>
 
         {/* Care profile summary */}
         {profile && (
           <div style={{
             display: 'flex', alignItems: 'center', gap: 14,
-            background: 'linear-gradient(135deg, #0d6b63, #2D6A4F)',
+            background: '#FFFFFF', border: '1px solid #EDE5D8',
             borderRadius: 20, padding: '16px 18px', marginBottom: 16,
+            boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
           }}>
             {profile.photo_url ? (
               <img src={profile.photo_url} alt={profile.name}
                 style={{ width: 52, height: 52, borderRadius: '50%', objectFit: 'cover',
-                  border: '2px solid rgba(255,255,255,0.4)', flexShrink: 0 }} />
+                  border: '2px solid #A8E5D6', flexShrink: 0 }} />
             ) : (
               <div style={{
                 width: 52, height: 52, borderRadius: '50%', flexShrink: 0,
-                background: 'rgba(255,255,255,0.15)',
+                background: '#A8E5D6',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 20, fontWeight: 700, color: 'white',
+                fontSize: 20, fontWeight: 700, color: '#065A50',
               }}>
                 {(activePatientName || profile?.name)?.charAt(0) ?? '?'}
               </div>
             )}
             <div>
-              <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: 11, margin: '0 0 2px' }}>
+              <p style={{ color: '#6B7280', fontSize: 11, margin: '0 0 2px' }}>
                 Familiar a cuidar
               </p>
-              <p style={{ color: 'white', fontSize: 18, fontWeight: 700, fontFamily: 'Georgia, serif', margin: 0 }}>
+              <p style={{ color: '#334155', fontSize: 18, fontWeight: 700, fontFamily: SANS, margin: 0 }}>
                 {activePatientName || profile?.name}
               </p>
-              {profile.age && (
-                <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 12, margin: '2px 0 0' }}>
-                  {profile.age} años
-                </p>
-              )}
             </div>
+          </div>
+        )}
+
+        {/* Hoy — vistazo accionable: qué falta atender (medicación pendiente, próxima cita) */}
+        {hasGlanceData && (
+          <div style={{
+            background: 'white', borderRadius: 20, border: '1px solid #EDE5D8',
+            padding: '16px 18px', marginBottom: 12,
+            boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
+            display: 'flex', flexDirection: 'column', gap: 12,
+          }}>
+            <p style={{ fontFamily: SANS, fontSize: 15, fontWeight: 700, color: '#334155', margin: 0 }}>
+              Hoy
+            </p>
+            {nextMed && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ width: 34, height: 34, borderRadius: 10, background: '#A8E5D6', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 15 }}>
+                  💊
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: '#334155', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {nextMed.name ?? 'Medicamento'}
+                    {nextMed.dosage ? ` ${nextMed.dosage}` : ''}
+                  </p>
+                  <p style={{ fontSize: 11, color: '#9CA3AF', margin: '2px 0 0' }}>
+                    Pendiente{nextMed.scheduled_time ? ` a las ${fmt12h(nextMed.scheduled_time)}` : ''}
+                  </p>
+                </div>
+                <span style={{ fontSize: 10, fontWeight: 700, color: '#7A5A18', background: '#FEF3C7', padding: '3px 10px', borderRadius: 6, flexShrink: 0 }}>
+                  Pendiente
+                </span>
+              </div>
+            )}
+            {nextEvent && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ width: 34, height: 34, borderRadius: 10, background: '#A8E5D6', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 15 }}>
+                  📅
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: '#334155', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {nextEvent.title}
+                  </p>
+                  <p style={{ fontSize: 11, color: '#9CA3AF', margin: '2px 0 0' }}>
+                    {new Date(nextEvent.date + 'T12:00:00').toLocaleDateString('es-US', { day: 'numeric', month: 'short' })}
+                    {nextEvent.time ? ` · ${fmt12h(nextEvent.time)}` : ''}
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -267,19 +403,19 @@ export default function Familia() {
               padding: '16px 18px', marginBottom: 12,
               boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
             }}>
-              <p style={{ fontFamily: 'Georgia, serif', fontSize: 15, fontWeight: 700, color: '#1A1A1A', margin: '0 0 12px' }}>
+              <p style={{ fontFamily: SANS, fontSize: 15, fontWeight: 700, color: '#1A1A1A', margin: '0 0 12px' }}>
                 ¿Quién cuida hoy?
               </p>
               {/* Today's caregiver highlight */}
               <div style={{
                 background: todayShift ? 'linear-gradient(135deg, #EBF3EE, #F7F3ED)' : '#F9F5F1',
-                borderRadius: 14, border: `1.5px solid ${todayShift ? '#0d6b63' : '#EDE5D8'}`,
+                borderRadius: 14, border: `1.5px solid ${todayShift ? '#087F70' : '#EDE5D8'}`,
                 padding: '12px 14px', marginBottom: 12,
                 display: 'flex', alignItems: 'center', gap: 10,
               }}>
                 <span style={{ fontSize: 24 }}>{todayShift ? '👤' : '❓'}</span>
                 <div style={{ flex: 1 }}>
-                  <p style={{ fontSize: 13, fontWeight: 700, color: todayShift ? '#0d6b63' : '#9CA3AF', margin: 0 }}>
+                  <p style={{ fontSize: 13, fontWeight: 700, color: todayShift ? '#087F70' : '#9CA3AF', margin: 0 }}>
                     {todayShift ? todayShift.caregiver_name : 'Sin asignar'}
                   </p>
                   <p style={{ fontSize: 11, color: '#9CA3AF', margin: '2px 0 0' }}>Cuidador de hoy</p>
@@ -289,7 +425,7 @@ export default function Familia() {
                     onClick={() => { setShiftModal(todayKey); setShiftName(todayShift?.caregiver_name ?? '') }}
                     style={{
                       padding: '6px 12px', borderRadius: 10, fontSize: 11, fontWeight: 700,
-                      border: '1.5px solid #0d6b63', background: 'white', color: '#0d6b63', cursor: 'pointer',
+                      border: '1.5px solid #087F70', background: 'white', color: '#087F70', cursor: 'pointer',
                     }}
                   >
                     {todayShift ? 'Cambiar' : 'Asignar'}
@@ -299,7 +435,7 @@ export default function Familia() {
               {/* Weekly mini-calendar */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4 }}>
                 {weekDays.map((day, i) => {
-                  const dk = day.toISOString().split('T')[0]
+                  const dk = getDatePR(day)
                   const isToday = dk === todayKey
                   const shift = shifts[dk]
                   const initials = shift?.caregiver_name?.charAt(0)?.toUpperCase() ?? '·'
@@ -322,7 +458,7 @@ export default function Familia() {
                       </span>
                       <div style={{
                         width: 22, height: 22, borderRadius: '50%',
-                        background: isToday ? '#0d6b63' : shift ? '#0d6b63' : '#E5E7EB',
+                        background: isToday ? '#087F70' : shift ? '#087F70' : '#E5E7EB',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         fontSize: 10, fontWeight: 700,
                         color: (isToday || shift) ? 'white' : '#9CA3AF',
@@ -344,7 +480,7 @@ export default function Familia() {
           boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-            <p style={{ fontFamily: 'Georgia, serif', fontSize: 15, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>
+            <p style={{ fontFamily: SANS, fontSize: 15, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>
               Equipo de cuidado
             </p>
             <button
@@ -352,11 +488,11 @@ export default function Familia() {
               style={{
                 display: 'flex', alignItems: 'center', gap: 6,
                 padding: '6px 14px', borderRadius: 10,
-                border: '1.5px solid #0d6b63', background: '#FFF8F4',
-                color: '#0d6b63', fontSize: 12, fontWeight: 700, cursor: 'pointer',
+                border: '1.5px solid #087F70', background: '#FFF8F4',
+                color: '#087F70', fontSize: 12, fontWeight: 700, cursor: 'pointer',
               }}
             >
-              <UserPlus size={14} color="#0d6b63" strokeWidth={1.75} />
+              <UserPlus size={14} color="#087F70" strokeWidth={1.75} />
               Invitar
             </button>
           </div>
@@ -365,7 +501,7 @@ export default function Familia() {
             <div style={{ display: 'flex', justifyContent: 'center', padding: 24 }}>
               <div style={{
                 width: 24, height: 24, borderRadius: '50%',
-                border: '3px solid #EDE5D8', borderTopColor: '#0d6b63',
+                border: '3px solid #EDE5D8', borderTopColor: '#087F70',
                 animation: 'spin 0.8s linear infinite',
               }} />
             </div>
@@ -396,19 +532,19 @@ export default function Familia() {
                     style={{
                       display: 'flex', alignItems: 'center', gap: 12,
                       padding: '12px 14px', borderRadius: 14,
-                      background: '#FDF8F5', border: '1.5px solid #0d6b6322',
+                      background: '#FDF8F5', border: '1.5px solid #087F7022',
                       cursor: 'pointer', transition: 'all 0.15s',
                     }}
                   >
                     <div style={{ position: 'relative', flexShrink: 0 }}>
                       <div style={{
                         width: 44, height: 44, borderRadius: '50%', overflow: 'hidden',
-                        background: '#EBF3EE', border: '2px solid #0d6b6344',
+                        background: '#EBF3EE', border: '2px solid #087F7044',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                       }}>
                         {adminMp?.avatar_url
                           ? <img src={adminMp.avatar_url} alt={adminName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                          : <span style={{ fontSize: 16, fontWeight: 700, color: '#0d6b63' }}>{adminInitials}</span>
+                          : <span style={{ fontSize: 16, fontWeight: 700, color: '#087F70' }}>{adminInitials}</span>
                         }
                       </div>
                       <div style={{ position: 'absolute', bottom: 0, right: 0, width: 12, height: 12, borderRadius: '50%', border: '2px solid white', background: adminOnline ? '#22C55E' : '#9CA3AF' }} />
@@ -416,7 +552,7 @@ export default function Familia() {
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p style={{ fontSize: 14, fontWeight: 600, color: '#1A1A1A', margin: '0 0 2px' }}>
                         {adminName.split(' ')[0]}
-                        {isAdmin && <span style={{ marginLeft: 6, fontSize: 10, fontWeight: 700, color: '#0d6b63', background: '#EBF3EE', padding: '2px 7px', borderRadius: 6 }}>Tú</span>}
+                        {isAdmin && <span style={{ marginLeft: 6, fontSize: 10, fontWeight: 700, color: '#087F70', background: '#EBF3EE', padding: '2px 7px', borderRadius: 6 }}>Tú</span>}
                       </p>
                       <p style={{ fontSize: 11, color: adminOnline ? '#16A34A' : '#9CA3AF', margin: 0 }}>
                         {adminOnline
@@ -428,7 +564,7 @@ export default function Familia() {
                       </p>
                     </div>
                     <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
-                      <span style={{ fontSize: 10, fontWeight: 700, color: '#0d6b63', background: '#EBF3EE', padding: '3px 10px', borderRadius: 6 }}>
+                      <span style={{ fontSize: 10, fontWeight: 700, color: '#087F70', background: '#EBF3EE', padding: '3px 10px', borderRadius: 6 }}>
                         Admin
                       </span>
                       <span style={{ color: '#D1D5DB', fontSize: 18, lineHeight: 1 }}>›</span>
@@ -468,7 +604,7 @@ export default function Familia() {
                         {mp?.avatar_url ? (
                           <img src={mp.avatar_url} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         ) : (
-                          <span style={{ fontSize: 16, fontWeight: 700, color: '#0d6b63' }}>{initials}</span>
+                          <span style={{ fontSize: 16, fontWeight: 700, color: '#087F70' }}>{initials}</span>
                         )}
                       </div>
                       <div style={{
@@ -496,7 +632,7 @@ export default function Familia() {
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
                         <span style={{
                           fontSize: 10, fontWeight: 700,
-                          color: isPending ? '#7A5A18' : isCuidador ? '#0d6b63' : '#6B7280',
+                          color: isPending ? '#7A5A18' : isCuidador ? '#087F70' : '#6B7280',
                           background: isPending ? '#FEF3C7' : isCuidador ? '#EBF3EE' : '#F3F4F6',
                           padding: '3px 10px', borderRadius: 6,
                         }}>
@@ -524,6 +660,8 @@ export default function Familia() {
             </div>
           )}
         </div>
+
+      </div>
 
       </div>
 
@@ -558,13 +696,13 @@ export default function Familia() {
                     display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     {mp?.avatar_url
                       ? <img src={mp.avatar_url} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      : <span style={{ fontSize: 24, fontWeight: 700, color: '#0d6b63' }}>{name.charAt(0)}</span>
+                      : <span style={{ fontSize: 24, fontWeight: 700, color: '#087F70' }}>{name.charAt(0)}</span>
                     }
                   </div>
                   <div style={{ position: 'absolute', bottom: 0, right: 0, width: 16, height: 16,
                     borderRadius: '50%', border: '2px solid white', background: online ? '#22C55E' : '#9CA3AF' }} />
                 </div>
-                <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>{name}</p>
+                <p style={{ fontFamily: SANS, fontSize: 18, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>{name}</p>
                 {mc?.relationship && <p style={{ fontSize: 13, color: '#9CA3AF', margin: '4px 0 0' }}>{mc.relationship}</p>}
                 <p style={{ fontSize: 11, color: '#9CA3AF', margin: '6px 0 0' }}>
                   {online ? '🟢 En línea' : '⚫ Desconectado'}
@@ -587,16 +725,16 @@ export default function Familia() {
                         disabled={savingRole || member.role === r.value}
                         style={{
                           flex: 1, padding: '11px 8px', borderRadius: 12,
-                          border: `1.5px solid ${member.role === r.value ? '#0d6b63' : '#EDE5D8'}`,
+                          border: `1.5px solid ${member.role === r.value ? '#087F70' : '#EDE5D8'}`,
                           background: member.role === r.value ? '#EBF3EE' : 'white',
-                          color: member.role === r.value ? '#0d6b63' : '#6B7280',
+                          color: member.role === r.value ? '#087F70' : '#6B7280',
                           cursor: member.role === r.value || savingRole ? 'default' : 'pointer',
                           fontWeight: 700, fontSize: 13,
                           transition: 'all 0.15s',
                         }}
                       >
                         <p style={{ margin: 0 }}>{r.label}</p>
-                        <p style={{ margin: '3px 0 0', fontSize: 10, fontWeight: 400, color: member.role === r.value ? '#3A6347' : '#9CA3AF' }}>
+                        <p style={{ margin: '3px 0 0', fontSize: 10, fontWeight: 400, color: member.role === r.value ? '#065A50' : '#9CA3AF' }}>
                           {r.desc}
                         </p>
                       </button>
@@ -631,7 +769,7 @@ export default function Familia() {
                 onClick={() => { setMemberModal(null); navigate('/chat') }}
                 style={{
                   width: '100%', padding: '13px', borderRadius: 14, border: 'none',
-                  background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
+                  background: '#087F70',
                   color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                   marginBottom: 10,
@@ -717,7 +855,7 @@ export default function Familia() {
             boxShadow: '0 -8px 48px rgba(0,0,0,0.2)',
           }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-              <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>
+              <p style={{ fontFamily: SANS, fontSize: 18, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>
                 Asignar cuidador
               </p>
               <button onClick={() => setShiftModal(null)}
@@ -739,8 +877,8 @@ export default function Familia() {
                     style={{
                       padding: '6px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: 'pointer',
                       background: shiftName === label ? '#EBF3EE' : '#F3F4F6',
-                      border: shiftName === label ? '1.5px solid #0d6b63' : '1.5px solid transparent',
-                      color: shiftName === label ? '#0d6b63' : '#6B7280',
+                      border: shiftName === label ? '1.5px solid #087F70' : '1.5px solid transparent',
+                      color: shiftName === label ? '#087F70' : '#6B7280',
                       transition: 'all 0.15s',
                     }}>
                     {label.split(' ')[0]}
@@ -757,7 +895,7 @@ export default function Familia() {
                 border: '1.5px solid #EDE5D8', background: '#FDFAF7',
                 fontSize: 14, outline: 'none', boxSizing: 'border-box', marginBottom: 14,
               }}
-              onFocus={e => { e.target.style.borderColor = '#0d6b63' }}
+              onFocus={e => { e.target.style.borderColor = '#087F70' }}
               onBlur={e => { e.target.style.borderColor = '#EDE5D8' }}
             />
             <button
@@ -765,7 +903,7 @@ export default function Familia() {
               disabled={savingShift || !shiftName.trim()}
               style={{
                 width: '100%', padding: '13px', borderRadius: 14, border: 'none',
-                background: shiftName.trim() && !savingShift ? 'linear-gradient(135deg, #0d6b63, #3A6347)' : '#C0CCC5',
+                background: shiftName.trim() && !savingShift ? '#087F70' : '#C0CCC5',
                 color: 'white', fontWeight: 700, fontSize: 14,
                 cursor: shiftName.trim() && !savingShift ? 'pointer' : 'not-allowed',
                 boxShadow: shiftName.trim() ? '0 6px 20px rgba(13,107,99,0.3)' : 'none',
@@ -792,7 +930,7 @@ export default function Familia() {
           }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
               <div>
-                <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>
+                <p style={{ fontFamily: SANS, fontSize: 18, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>
                   Invitar familiar
                 </p>
                 <p style={{ fontSize: 12, color: '#9CA3AF', margin: '4px 0 0' }}>El enlace expira en 24 horas</p>
@@ -824,7 +962,7 @@ export default function Familia() {
                     </div>
                     <button onClick={copyLink} style={{
                       width: '100%', padding: 13, borderRadius: 14, border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 14, color: 'white',
-                      background: copied ? 'linear-gradient(135deg, #0d6b63, #3A6147)' : 'linear-gradient(135deg, #0d6b63, #3A6347)',
+                      background: '#087F70',
                       transition: 'all 0.2s', marginBottom: 10,
                     }}>
                       {copied ? '¡Copiado!' : 'Copiar enlace'}
@@ -846,7 +984,7 @@ export default function Familia() {
                     onChange={e => setInviteEmail(e.target.value)}
                     placeholder="familiar@correo.com" autoFocus
                     style={fieldStyle}
-                    onFocus={e => { e.target.style.borderColor = '#0d6b63'; e.target.style.boxShadow = '0 0 0 3px rgba(13,107,99,0.1)' }}
+                    onFocus={e => { e.target.style.borderColor = '#087F70'; e.target.style.boxShadow = '0 0 0 3px rgba(13,107,99,0.1)' }}
                     onBlur={e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.boxShadow = 'none' }}
                   />
                 </div>
@@ -862,7 +1000,7 @@ export default function Familia() {
                     width: '100%', padding: 14, borderRadius: 14, border: 'none',
                     fontWeight: 700, fontSize: 14, color: 'white', cursor: 'pointer',
                     background: inviteEmail.trim() && inviteStatus !== 'sending'
-                      ? 'linear-gradient(135deg, #0d6b63, #3A6347)' : '#C0CCC5',
+                      ? '#087F70' : '#C0CCC5',
                     boxShadow: inviteEmail.trim() ? '0 6px 20px rgba(13,107,99,0.3)' : 'none',
                     transition: 'all 0.2s',
                   }}
@@ -884,7 +1022,7 @@ export default function Familia() {
           <div style={{ background: 'white', borderRadius: 20, padding: '28px 24px',
             maxWidth: 340, width: '100%', boxShadow: '0 24px 64px rgba(0,0,0,0.25)', textAlign: 'center' }}>
             <div style={{ fontSize: 40, marginBottom: 14 }}>👤</div>
-            <p style={{ fontFamily: 'Georgia, serif', fontSize: 17, fontWeight: 700, color: '#1A1A1A', marginBottom: 8 }}>
+            <p style={{ fontFamily: SANS, fontSize: 17, fontWeight: 700, color: '#1A1A1A', marginBottom: 8 }}>
               ¿Eliminar a {confirmRemoveDialog.name.split(' ')[0]} de la familia?
             </p>
             <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, marginBottom: 24 }}>

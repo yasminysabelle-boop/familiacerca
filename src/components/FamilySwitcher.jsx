@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useFamily } from '../contexts/FamilyContext'
 import { XIcon } from './Icons'
 
-export default function FamilySwitcher() {
+export default function FamilySwitcher({ isLight = false }) {
   const { families, activeOwnerId, switchFamily, activeFamilyLabel, activePatientName, hasMultiple } = useFamily()
   const [open, setOpen] = useState(false)
 
@@ -14,7 +14,7 @@ export default function FamilySwitcher() {
     return (
       <span style={{
         fontSize: 11, fontWeight: 600,
-        color: 'rgba(255,255,255,0.65)',
+        color: isLight ? '#6B7280' : 'rgba(255,255,255,0.65)',
         maxWidth: 110, overflow: 'hidden',
         textOverflow: 'ellipsis', whiteSpace: 'nowrap',
         display: 'block',
@@ -31,21 +31,21 @@ export default function FamilySwitcher() {
         onClick={() => setOpen(true)}
         style={{
           display: 'flex', alignItems: 'center', gap: 5,
-          background: 'rgba(255,255,255,0.12)',
-          border: '1px solid rgba(255,255,255,0.18)',
+          background: isLight ? '#F3F4F6' : 'rgba(255,255,255,0.12)',
+          border: isLight ? '1px solid #EDE5D8' : '1px solid rgba(255,255,255,0.18)',
           borderRadius: 20, padding: '5px 10px 5px 9px',
           cursor: 'pointer', maxWidth: 140,
           fontFamily: 'inherit',
         }}
       >
         <span style={{
-          fontSize: 11, fontWeight: 700, color: 'white',
+          fontSize: 11, fontWeight: 700, color: isLight ? '#334155' : 'white',
           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
           lineHeight: 1.2,
         }}>
           {displayLabel}
         </span>
-        <span style={{ fontSize: 7, color: 'rgba(255,255,255,0.55)', flexShrink: 0, marginTop: 1 }}>▼</span>
+        <span style={{ fontSize: 7, color: isLight ? '#9CA3AF' : 'rgba(255,255,255,0.55)', flexShrink: 0, marginTop: 1 }}>▼</span>
       </button>
 
       {/* Sheet */}
