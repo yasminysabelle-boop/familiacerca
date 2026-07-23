@@ -1,58 +1,34 @@
-const API_KEY  = import.meta.env.VITE_GEMINI_API_KEY
-const MODEL    = 'gemini-flash-latest'
-const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`
+import { supabase } from './supabase'
 
-// thinkingBudget:0 — sin esto, el modelo gasta el budget de maxOutputTokens
-// "pensando" internamente y puede devolver texto vacío o cortado a la mitad.
-const NO_THINKING = { thinkingConfig: { thinkingBudget: 0 } }
+const PROXY_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/gemini-proxy`
 
-export async function geminiGenerate(prompt, maxTokens = 300) {
-  if (!API_KEY) { console.error('[Gemini] VITE_GEMINI_API_KEY not set'); return null }
+async function callProxy(body) {
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session) { console.error('[Gemini] no active session'); return null }
 
   try {
-    const res = await fetch(`${ENDPOINT}?key=${API_KEY}`, {
+    const res = await fetch(PROXY_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ role: 'user', parts: [{ text: prompt }] }],
-        generationConfig: { maxOutputTokens: maxTokens, ...NO_THINKING },
-      }),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify(body),
     })
 
-    if (!res.ok) { console.error('[Gemini] API error:', res.status, await res.text()); return null }
+    if (!res.ok) { console.error('[Gemini] proxy error:', res.status, await res.text()); return null }
     const data = await res.json()
-    return data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? null
+    return data.text ?? null
   } catch (e) {
     console.error('[Gemini] fetch error:', e)
     return null
   }
 }
 
+export async function geminiGenerate(prompt, maxTokens = 300) {
+  return callProxy({ action: 'generate', prompt, maxTokens })
+}
+
 export async function geminiChat(systemPrompt, history, text, maxTokens = 300) {
-  if (!API_KEY) { console.error('[Gemini] VITE_GEMINI_API_KEY not set'); return null }
-
-  try {
-    const contents = history.map(m => ({
-      role: m.role === 'user' ? 'user' : 'model',
-      parts: [{ text: m.text }],
-    }))
-    contents.push({ role: 'user', parts: [{ text }] })
-
-    const res = await fetch(`${ENDPOINT}?key=${API_KEY}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        system_instruction: { parts: [{ text: systemPrompt }] },
-        contents,
-        generationConfig: { maxOutputTokens: maxTokens, ...NO_THINKING },
-      }),
-    })
-
-    if (!res.ok) { console.error('[Gemini] API error:', res.status, await res.text()); return null }
-    const data = await res.json()
-    return data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? null
-  } catch (e) {
-    console.error('[Gemini] fetch error:', e)
-    return null
-  }
+  return callProxy({ action: 'chat', systemPrompt, history, text, maxTokens })
 }
