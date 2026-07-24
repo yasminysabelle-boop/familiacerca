@@ -83,8 +83,8 @@ export default function Login() {
 
   const fieldBase = { border: '1.5px solid #EDE5D8', background: '#FDFAF7' }
   function onFocus(e) {
-    e.target.style.borderColor = '#0d6b63'
-    e.target.style.boxShadow = '0 0 0 3px rgba(13,107,99,0.1)'
+    e.target.style.borderColor = '#087F70'
+    e.target.style.boxShadow = '0 0 0 3px rgba(8,127,112,0.1)'
   }
   function onBlur(e) {
     e.target.style.borderColor = '#EDE5D8'
@@ -145,7 +145,7 @@ export default function Login() {
       <div style={{
         position: 'absolute', top: -60, left: -60,
         width: 220, height: 220,
-        background: '#143C32',
+        background: '#087F70',
         borderRadius: '0 55% 45% 60%',
         opacity: 0.45,
         pointerEvents: 'none',
@@ -191,7 +191,7 @@ export default function Login() {
         {/* ── RESET PASSWORD MODE ── */}
         {mode === 'reset' && (
           <>
-            <h2 style={{ fontFamily: 'Georgia, serif', fontSize: 22, fontWeight: 700, color: '#1A1A1A', marginBottom: 6 }}>
+            <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 22, fontWeight: 700, color: '#1A1A1A', marginBottom: 6 }}>
               Nueva contraseña
             </h2>
             <p style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 24 }}>
@@ -234,10 +234,10 @@ export default function Login() {
                     disabled={loading}
                     style={{
                       marginTop: 4, width: '100%', padding: '14px',
-                      background: loading ? '#C0CCC5' : '#0d6b63',
+                      background: loading ? '#C0CCC5' : '#087F70',
                       color: 'white', fontWeight: 700, fontSize: 14, borderRadius: 999,
                       border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
-                      boxShadow: loading ? 'none' : '0 6px 20px rgba(13,107,99,0.35)',
+                      boxShadow: loading ? 'none' : '0 6px 20px rgba(8,127,112,0.35)',
                       transition: 'all 0.15s',
                     }}
                   >
@@ -254,11 +254,11 @@ export default function Login() {
           <>
             <button
               onClick={() => { setMode('login'); setError(''); setResetSent(false) }}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#0d6b63', fontSize: 13, fontWeight: 600, padding: 0, marginBottom: 16 }}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#087F70', fontSize: 13, fontWeight: 600, padding: 0, marginBottom: 16 }}
             >
               ← Volver
             </button>
-            <h2 style={{ fontFamily: 'Georgia, serif', fontSize: 22, fontWeight: 700, color: '#1A1A1A', marginBottom: 6 }}>
+            <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 22, fontWeight: 700, color: '#1A1A1A', marginBottom: 6 }}>
               Recuperar acceso
             </h2>
 
@@ -273,7 +273,7 @@ export default function Login() {
                   onClick={() => { setMode('login'); setResetSent(false) }}
                   style={{
                     marginTop: 20, padding: '12px 28px', borderRadius: 999,
-                    background: '#0d6b63',
+                    background: '#087F70',
                     color: 'white', fontWeight: 700, fontSize: 14, border: 'none', cursor: 'pointer',
                   }}
                 >
@@ -307,10 +307,10 @@ export default function Login() {
                     type="submit" disabled={loading}
                     style={{
                       marginTop: 4, width: '100%', padding: '14px',
-                      background: loading ? '#C0CCC5' : '#0d6b63',
+                      background: loading ? '#C0CCC5' : '#087F70',
                       color: 'white', fontWeight: 700, fontSize: 14, borderRadius: 999,
                       border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
-                      boxShadow: loading ? 'none' : '0 6px 20px rgba(13,107,99,0.35)',
+                      boxShadow: loading ? 'none' : '0 6px 20px rgba(8,127,112,0.35)',
                       transition: 'all 0.15s',
                     }}
                   >
@@ -325,7 +325,7 @@ export default function Login() {
         {/* ── LOGIN MODE ── */}
         {mode === 'login' && (
           <>
-            <h2 style={{ fontFamily: 'Georgia, serif', fontSize: 22, fontWeight: 700, color: '#1A1A1A', marginBottom: 6 }}>
+            <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 22, fontWeight: 700, color: '#1A1A1A', marginBottom: 6 }}>
               Bienvenida de nuevo
             </h2>
             <p style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 24 }}>
@@ -360,7 +360,7 @@ export default function Login() {
                   <button
                     type="button"
                     onClick={() => { setMode('forgot'); setError('') }}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#0d6b63', fontSize: 12, fontWeight: 600, padding: 0 }}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#087F70', fontSize: 12, fontWeight: 600, padding: 0 }}
                   >
                     ¿Olvidaste tu contraseña?
                   </button>
@@ -396,10 +396,10 @@ export default function Login() {
                 type="submit" disabled={loading}
                 style={{
                   marginTop: 4, width: '100%', padding: '14px',
-                  background: loading ? '#C0CCC5' : '#0d6b63',
+                  background: loading ? '#C0CCC5' : '#087F70',
                   color: 'white', fontWeight: 700, fontSize: 14, borderRadius: 999,
                   border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
-                  boxShadow: loading ? 'none' : '0 6px 20px rgba(13,107,99,0.35)',
+                  boxShadow: loading ? 'none' : '0 6px 20px rgba(8,127,112,0.35)',
                   transition: 'all 0.15s',
                 }}
               >

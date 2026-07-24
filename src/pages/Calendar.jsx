@@ -482,7 +482,7 @@ export default function Calendar() {
                         onClick={() => { setMonth(i); setShowPicker(false) }}
                         style={{
                           padding: '7px 4px', borderRadius: 8, border: 'none',
-                          background: i === month ? '#0d6b63' : 'transparent',
+                          background: i === month ? '#087F70' : 'transparent',
                           color: i === month ? 'white' : '#374151',
                           fontWeight: i === month ? 700 : 400,
                           fontSize: 12, cursor: 'pointer',
@@ -512,8 +512,8 @@ export default function Calendar() {
                         style={{
                           display: 'block', width: '100%',
                           padding: '7px 12px', border: 'none',
-                          background: y === year ? '#EBF3EE' : 'transparent',
-                          color: y === year ? '#0d6b63' : '#374151',
+                          background: y === year ? '#E8F6F3' : 'transparent',
+                          color: y === year ? '#087F70' : '#374151',
                           fontWeight: y === year ? 700 : 400,
                           fontSize: 13, textAlign: 'center',
                           cursor: 'pointer', borderRadius: 8,
@@ -664,7 +664,7 @@ export default function Calendar() {
             maxWidth: 340, width: '100%',
             boxShadow: '0 20px 60px rgba(0,0,0,0.25)',
           }}>
-            <p style={{ fontFamily: 'Georgia, serif', fontSize: 17, fontWeight: 700, color: '#1A1A1A', marginBottom: 10 }}>
+            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 17, fontWeight: 700, color: '#1A1A1A', marginBottom: 10 }}>
               ¿Eliminar este registro?
             </p>
             <p style={{ fontSize: 13, color: '#6B7280', marginBottom: 24, lineHeight: 1.6 }}>

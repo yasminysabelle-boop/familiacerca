@@ -21,7 +21,7 @@ const fieldStyle = {
   fontSize: 14, outline: 'none', boxSizing: 'border-box',
   transition: 'all 0.15s', fontFamily: 'inherit',
 }
-const onFocus = e => { e.target.style.borderColor = '#0d6b63'; e.target.style.boxShadow = '0 0 0 3px rgba(13,107,99,0.1)' }
+const onFocus = e => { e.target.style.borderColor = '#087F70'; e.target.style.boxShadow = '0 0 0 3px rgba(8,127,112,0.1)' }
 const onBlur  = e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.boxShadow = 'none' }
 
 export default function Notes() {
@@ -174,7 +174,7 @@ export default function Notes() {
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
           <div>
-            <h2 style={{ fontFamily: 'Georgia, serif', fontSize: 20, fontWeight: 700, color: '#1A1A1A', marginBottom: 2 }}>
+            <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 20, fontWeight: 700, color: '#1A1A1A', marginBottom: 2 }}>
               Notas
             </h2>
             <p style={{ fontSize: 12, color: '#9CA3AF' }}>Observaciones del cuidado diario</p>
@@ -186,7 +186,7 @@ export default function Notes() {
               background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
               border: 'none', cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 4px 12px rgba(13,107,99,0.3)',
+              boxShadow: '0 4px 12px rgba(8,127,112,0.3)',
             }}
           >
             <Plus size={20} color="white" strokeWidth={2.5} />
@@ -206,12 +206,12 @@ export default function Notes() {
         {/* Notes list */}
         {loading ? (
           <div style={{ display: 'flex', justifyContent: 'center', padding: '48px 0' }}>
-            <div style={{ width: 28, height: 28, borderRadius: '50%', border: '3px solid #EDE5D8', borderTopColor: '#0d6b63', animation: 'spin 0.8s linear infinite' }} />
+            <div style={{ width: 28, height: 28, borderRadius: '50%', border: '3px solid #EDE5D8', borderTopColor: '#087F70', animation: 'spin 0.8s linear infinite' }} />
           </div>
         ) : loadError ? (
           <div style={{ background: 'white', borderRadius: 20, border: '1px solid #EDE5D8', padding: '40px 24px', textAlign: 'center' }}>
             <p style={{ fontSize: 14, color: '#D63031', marginBottom: 12 }}>{loadError}</p>
-            <button onClick={fetchNotes} style={{ padding: '10px 24px', borderRadius: 12, background: '#0d6b63', color: 'white', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>
+            <button onClick={fetchNotes} style={{ padding: '10px 24px', borderRadius: 12, background: '#087F70', color: 'white', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>
               Reintentar
             </button>
           </div>
@@ -254,7 +254,7 @@ export default function Notes() {
                           {new Date(note.created_at).toLocaleDateString('es-US', { day: 'numeric', month: 'short', year: 'numeric' })}
                         </span>
                         {note.tags?.map(tag => (
-                          <span key={tag} style={{ fontSize: 10, fontWeight: 700, color: '#0d6b63', background: '#EBF3EE', padding: '2px 8px', borderRadius: 20 }}>
+                          <span key={tag} style={{ fontSize: 10, fontWeight: 700, color: '#087F70', background: '#EBF3EE', padding: '2px 8px', borderRadius: 20 }}>
                             {tag}
                           </span>
                         ))}
@@ -324,7 +324,7 @@ export default function Notes() {
           <div style={{ width: '100%', maxHeight: '92vh', background: 'white', borderRadius: '24px 24px 0 0', padding: '24px 20px 96px', overflowY: 'auto', boxShadow: '0 -8px 48px rgba(0,0,0,0.2)' }}>
 
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-              <h3 style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>
+              <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 18, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>
                 {editId ? 'Editar nota' : 'Nueva nota'}
               </h3>
               <button onClick={handleCancel} style={{ padding: 8, border: 'none', background: 'none', cursor: 'pointer' }}>
@@ -391,7 +391,7 @@ export default function Notes() {
                       style={{
                         padding: '6px 14px', borderRadius: 20,
                         border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600,
-                        background: form.tags.includes(tag) ? '#0d6b63' : '#F3F4F6',
+                        background: form.tags.includes(tag) ? '#087F70' : '#F3F4F6',
                         color: form.tags.includes(tag) ? 'white' : '#6B7280',
                         transition: 'all 0.15s',
                       }}
@@ -419,7 +419,7 @@ export default function Notes() {
                     background: (saving || !canEdit) ? '#D4C4B8' : 'linear-gradient(135deg, #0d6b63, #3A6347)',
                     color: 'white', fontWeight: 700, fontSize: 14,
                     cursor: saving ? 'not-allowed' : 'pointer',
-                    boxShadow: saving ? 'none' : '0 6px 20px rgba(13,107,99,0.3)',
+                    boxShadow: saving ? 'none' : '0 6px 20px rgba(8,127,112,0.3)',
                     transition: 'all 0.15s',
                   }}
                 >
@@ -439,7 +439,7 @@ export default function Notes() {
         >
           <div style={{ background: 'white', borderRadius: 20, padding: '28px 24px', maxWidth: 340, width: '100%', boxShadow: '0 24px 64px rgba(0,0,0,0.25)', textAlign: 'center' }}>
             <div style={{ fontSize: 40, marginBottom: 14 }}>🗑️</div>
-            <p style={{ fontFamily: 'Georgia, serif', fontSize: 17, fontWeight: 700, color: '#1A1A1A', marginBottom: 8 }}>¿Eliminar este registro?</p>
+            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 17, fontWeight: 700, color: '#1A1A1A', marginBottom: 8 }}>¿Eliminar este registro?</p>
             <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, marginBottom: 24 }}>Esta acción no se puede deshacer.</p>
             <div style={{ display: 'flex', gap: 10 }}>
               <button onClick={() => setConfirmDialog(null)} style={{ flex: 1, padding: '12px', borderRadius: 12, border: '1.5px solid #EDE5D8', background: 'white', color: '#6B7280', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>

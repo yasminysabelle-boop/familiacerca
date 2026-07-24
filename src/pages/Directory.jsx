@@ -33,8 +33,8 @@ const CONTACT_RELATIONSHIPS = [
   'Cuidador profesional','Vecino cercano','Amigo cercano','Otro',
 ]
 const INST_TYPE_COLORS = {
-  Hospital: '#D63031', Clínica: '#2D86A0', Consultorio: '#0d6b63',
-  Laboratorio: '#7C5CBF', Farmacia: '#0d6b63', Otro: '#9CA3AF',
+  Hospital: '#D63031', Clínica: '#2D86A0', Consultorio: '#087F70',
+  Laboratorio: '#7C5CBF', Farmacia: '#087F70', Otro: '#9CA3AF',
 }
 
 const F = {
@@ -44,7 +44,7 @@ const F = {
   boxSizing: 'border-box', transition: 'border-color 0.15s',
   fontFamily: 'inherit',
 }
-const onFocus = e => { e.target.style.borderColor = '#0d6b63'; e.target.style.boxShadow = '0 0 0 3px rgba(13,107,99,0.1)' }
+const onFocus = e => { e.target.style.borderColor = '#087F70'; e.target.style.boxShadow = '0 0 0 3px rgba(8,127,112,0.1)' }
 const onBlur  = e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.boxShadow = 'none' }
 
 // ── Shared small components ────────────────────────────────────────
@@ -130,7 +130,7 @@ function AddBtn({ onClick, label }) {
   return (
     <button onClick={onClick} style={{
       width: '100%', padding: '14px', borderRadius: 16, marginTop: 8,
-      border: '1.5px dashed #0d6b63', background: '#FFF8F4', color: '#0d6b63',
+      border: '1.5px dashed #0d6b63', background: '#FFF8F4', color: '#087F70',
       fontWeight: 600, fontSize: 13, cursor: 'pointer',
       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
     }}>
@@ -147,7 +147,7 @@ function SheetModal({ title, subtitle, onClose, onSave, saveLabel, saving, child
       <div style={{ width: '100%', maxWidth: 480, background: 'white', borderRadius: '24px 24px 0 0', padding: '28px 24px 96px', boxShadow: '0 -8px 48px rgba(0,0,0,0.2)', maxHeight: '92svh', overflowY: 'auto' }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 20 }}>
           <div>
-            <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>{title}</p>
+            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 18, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>{title}</p>
             {subtitle && <p style={{ fontSize: 12, color: '#9CA3AF', marginTop: 4 }}>{subtitle}</p>}
           </div>
           <button onClick={onClose} style={{ padding: 8, borderRadius: 10, background: '#F3F4F6', border: 'none', cursor: 'pointer' }}>
@@ -162,7 +162,7 @@ function SheetModal({ title, subtitle, onClose, onSave, saveLabel, saving, child
           background: saving ? '#C0CCC5' : 'linear-gradient(135deg, #0d6b63, #3A6347)',
           color: 'white', fontWeight: 700, fontSize: 14,
           cursor: saving ? 'not-allowed' : 'pointer',
-          boxShadow: saving ? 'none' : '0 6px 20px rgba(13,107,99,0.3)',
+          boxShadow: saving ? 'none' : '0 6px 20px rgba(8,127,112,0.3)',
         }}>
           {saving ? 'Guardando...' : saveLabel}
         </button>
@@ -177,8 +177,8 @@ function DoctorCard({ doc, onEdit, onDeleteRequest, canDelete }) {
     <div style={{ background: 'white', borderRadius: 16, border: '1px solid #EDE5D8', borderTop: '3px solid #0d6b63', padding: '14px 16px', marginBottom: 10, boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10 }}>
         <div style={{ minWidth: 0, flex: 1 }}>
-          <p style={{ fontFamily: 'Georgia, serif', fontSize: 14, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>{doc.name}</p>
-          {doc.specialty && <p style={{ fontSize: 12, fontWeight: 600, color: '#0d6b63', marginTop: 2 }}>{doc.specialty}</p>}
+          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 14, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>{doc.name}</p>
+          {doc.specialty && <p style={{ fontSize: 12, fontWeight: 600, color: '#087F70', marginTop: 2 }}>{doc.specialty}</p>}
         </div>
         <CardActions onEdit={onEdit} onDeleteRequest={onDeleteRequest} canDelete={canDelete} />
       </div>
@@ -198,7 +198,7 @@ function InstitutionCard({ ins, onEdit, onDeleteRequest, canDelete }) {
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10 }}>
         <div style={{ minWidth: 0, flex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-            <p style={{ fontFamily: 'Georgia, serif', fontSize: 14, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>{ins.name}</p>
+            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 14, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>{ins.name}</p>
             {ins.type && (
               <span style={{ fontSize: 10, fontWeight: 700, color: typeColor, background: `${typeColor}14`, padding: '2px 8px', borderRadius: 6 }}>
                 {ins.type}
@@ -239,7 +239,7 @@ function ContactCard({ con, onEdit, onToggleEmergency, onDeleteRequest, canDelet
     <div style={{
       background: 'white', borderRadius: 16, padding: '14px 16px', marginBottom: 10,
       border: isEmergency ? '1.5px solid #FECACA' : '1px solid #EDE5D8',
-      borderTop: `3px solid ${isEmergency ? '#D63031' : '#0d6b63'}`,
+      borderTop: `3px solid ${isEmergency ? '#D63031' : '#087F70'}`,
       boxShadow: isEmergency ? '0 2px 12px rgba(214,48,49,0.1)' : '0 2px 8px rgba(0,0,0,0.05)',
     }}>
       {isEmergency && (
@@ -249,7 +249,7 @@ function ContactCard({ con, onEdit, onToggleEmergency, onDeleteRequest, canDelet
       )}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10 }}>
         <div style={{ minWidth: 0, flex: 1 }}>
-          <p style={{ fontFamily: 'Georgia, serif', fontSize: 14, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>{con.name}</p>
+          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 14, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>{con.name}</p>
           {con.relationship && <p style={{ fontSize: 12, color: '#6B7280', marginTop: 2 }}>{con.relationship}</p>}
         </div>
         <CardActions onEdit={onEdit} onDeleteRequest={onDeleteRequest} canDelete={canDelete} />
@@ -291,7 +291,7 @@ function ContactCard({ con, onEdit, onToggleEmergency, onDeleteRequest, canDelet
 
 function JoinedMemberCard({ member, inDirectory, onClick }) {
   const roleLabel  = member.role === 'cuidador' ? 'Cuidador' : 'Familiar'
-  const roleColor  = member.role === 'cuidador' ? '#0d6b63' : '#7C5CBF'
+  const roleColor  = member.role === 'cuidador' ? '#087F70' : '#7C5CBF'
   const roleBg     = member.role === 'cuidador' ? '#F0FDF4' : '#EDE9FE'
   const roleBorder = member.role === 'cuidador' ? '#BBF7D0' : '#C4B5FD'
   return (
@@ -329,7 +329,7 @@ function JoinedMemberCard({ member, inDirectory, onClick }) {
           {roleLabel}
         </span>
       </div>
-      <p style={{ fontSize: 11, color: inDirectory ? '#0d6b63' : '#0d6b63', margin: '8px 0 0', fontWeight: 600 }}>
+      <p style={{ fontSize: 11, color: inDirectory ? '#087F70' : '#087F70', margin: '8px 0 0', fontWeight: 600 }}>
         {inDirectory ? '✓ En directorio — toca para editar' : '+ Toca para añadir al directorio'}
       </p>
     </div>
@@ -668,7 +668,7 @@ export default function Directory() {
             {loading
               ? <p style={{ textAlign: 'center', color: '#9CA3AF', fontSize: 13, padding: '32px 0' }}>Cargando...</p>
               : loadError
-              ? <div style={{ textAlign: 'center', padding: '32px 0' }}><p style={{ fontSize: 13, color: '#D63031', marginBottom: 10 }}>{loadError}</p><button onClick={fetchAll} style={{ padding: '9px 20px', borderRadius: 12, background: '#0d6b63', color: 'white', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>Reintentar</button></div>
+              ? <div style={{ textAlign: 'center', padding: '32px 0' }}><p style={{ fontSize: 13, color: '#D63031', marginBottom: 10 }}>{loadError}</p><button onClick={fetchAll} style={{ padding: '9px 20px', borderRadius: 12, background: '#087F70', color: 'white', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>Reintentar</button></div>
               : doctors.length === 0
               ? <EmptyState Icon={BookOpen} title="Sin médicos registrados" subtitle="Agrega los médicos tratantes para tenerlos siempre a la mano" />
               : doctors.map(d => (
@@ -688,7 +688,7 @@ export default function Directory() {
             {loading
               ? <p style={{ textAlign: 'center', color: '#9CA3AF', fontSize: 13, padding: '32px 0' }}>Cargando...</p>
               : loadError
-              ? <div style={{ textAlign: 'center', padding: '32px 0' }}><p style={{ fontSize: 13, color: '#D63031', marginBottom: 10 }}>{loadError}</p><button onClick={fetchAll} style={{ padding: '9px 20px', borderRadius: 12, background: '#0d6b63', color: 'white', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>Reintentar</button></div>
+              ? <div style={{ textAlign: 'center', padding: '32px 0' }}><p style={{ fontSize: 13, color: '#D63031', marginBottom: 10 }}>{loadError}</p><button onClick={fetchAll} style={{ padding: '9px 20px', borderRadius: 12, background: '#087F70', color: 'white', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>Reintentar</button></div>
               : institutions.length === 0
               ? <EmptyState Icon={BookOpen} title="Sin instituciones registradas" subtitle="Agrega hospitales, clínicas y farmacias de referencia" />
               : institutions.map(i => (
@@ -708,7 +708,7 @@ export default function Directory() {
             {loading
               ? <p style={{ textAlign: 'center', color: '#9CA3AF', fontSize: 13, padding: '32px 0' }}>Cargando...</p>
               : loadError
-              ? <div style={{ textAlign: 'center', padding: '32px 0' }}><p style={{ fontSize: 13, color: '#D63031', marginBottom: 10 }}>{loadError}</p><button onClick={fetchAll} style={{ padding: '9px 20px', borderRadius: 12, background: '#0d6b63', color: 'white', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>Reintentar</button></div>
+              ? <div style={{ textAlign: 'center', padding: '32px 0' }}><p style={{ fontSize: 13, color: '#D63031', marginBottom: 10 }}>{loadError}</p><button onClick={fetchAll} style={{ padding: '9px 20px', borderRadius: 12, background: '#087F70', color: 'white', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>Reintentar</button></div>
               : (
                 <>
                   {/* Joined app members */}
@@ -775,7 +775,7 @@ export default function Directory() {
                       padding: '14px', borderRadius: 16, marginTop: 4,
                       background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
                       color: 'white', fontWeight: 700, fontSize: 14, textDecoration: 'none',
-                      boxShadow: '0 4px 16px rgba(13,107,99,0.3)',
+                      boxShadow: '0 4px 16px rgba(8,127,112,0.3)',
                     }}
                   >
                     Completar perfil del paciente →
@@ -836,7 +836,7 @@ export default function Directory() {
 
                     {/* Name + date */}
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: 'white', margin: 0, lineHeight: 1.2 }}>
+                      <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 18, fontWeight: 700, color: 'white', margin: 0, lineHeight: 1.2 }}>
                         {patientProfile.nombre_completo}
                       </p>
                       {patientProfile.fecha_nacimiento && (
@@ -915,7 +915,7 @@ export default function Directory() {
                 {/* Médico tratante */}
                 {patientProfile.medico_tratante && (
                   <div style={{ background: 'white', border: '1px solid #EDE5D8', borderTop: '3px solid #2563EB', borderRadius: 14, padding: '14px 16px', marginBottom: 10 }}>
-                    <p style={{ fontFamily: 'Georgia, serif', fontSize: 14, fontWeight: 700, color: '#1A1A1A', margin: '0 0 2px' }}>
+                    <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 14, fontWeight: 700, color: '#1A1A1A', margin: '0 0 2px' }}>
                       {patientProfile.medico_tratante}
                     </p>
                     {patientProfile.especialidad_medico && (
@@ -953,7 +953,7 @@ export default function Directory() {
                 <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(255,255,255,0.2)', border: '2px solid rgba(255,255,255,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px', fontSize: 28 }}>
                   👤
                 </div>
-                <p style={{ fontFamily: 'Georgia, serif', fontSize: 20, fontWeight: 700, color: 'white', margin: '0 0 4px' }}>{emergency.name}</p>
+                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 20, fontWeight: 700, color: 'white', margin: '0 0 4px' }}>{emergency.name}</p>
                 {emergency.relationship && <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', margin: '0 0 8px' }}>{emergency.relationship}</p>}
                 {emergency.phone && <p style={{ fontSize: 16, fontWeight: 600, color: 'rgba(255,255,255,0.9)', letterSpacing: '0.04em', margin: 0 }}>{emergency.phone}</p>}
               </div>
@@ -1038,7 +1038,7 @@ export default function Directory() {
             maxWidth: 340, width: '100%',
             boxShadow: '0 20px 60px rgba(0,0,0,0.25)',
           }}>
-            <p style={{ fontFamily: 'Georgia, serif', fontSize: 17, fontWeight: 700, color: '#1A1A1A', marginBottom: 10 }}>
+            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 17, fontWeight: 700, color: '#1A1A1A', marginBottom: 10 }}>
               ¿Eliminar este registro?
             </p>
             <p style={{ fontSize: 13, color: '#6B7280', marginBottom: 24, lineHeight: 1.6 }}>

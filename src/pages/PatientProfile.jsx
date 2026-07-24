@@ -47,7 +47,7 @@ const L = {
   fontSize:11, fontWeight:700, color:'#6B7280',
   letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:5, display:'block',
 }
-const fo = e => { e.target.style.borderColor='#0d6b63'; e.target.style.boxShadow='0 0 0 3px rgba(13,107,99,0.1)' }
+const fo = e => { e.target.style.borderColor='#087F70'; e.target.style.boxShadow='0 0 0 3px rgba(8,127,112,0.1)' }
 const fb = e => { e.target.style.borderColor='#EDE5D8'; e.target.style.boxShadow='none' }
 
 // ── Helper components ─────────────────────────────────────────────────────────
@@ -108,7 +108,7 @@ function Section({ color, icon, title, badge, open, onToggle, children }) {
   )
 }
 
-function CheckChips({ opts, value, onChange, colorOn='#0d6b63', bgOn='#EBF3EE' }) {
+function CheckChips({ opts, value, onChange, colorOn='#087F70', bgOn='#EBF3EE' }) {
   const toggle = o => onChange(value.includes(o) ? value.filter(x=>x!==o) : [...value, o])
   return (
     <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
@@ -429,7 +429,7 @@ export default function PatientProfile() {
                       onClick={() => set('sexo', form.sexo===o.v ? '' : o.v)}
                       style={{
                         flex:1, padding:'12px 0', borderRadius:12, fontWeight:700, fontSize:14, cursor:'pointer',
-                        border:`1.5px solid ${form.sexo===o.v ? '#0d6b63' : '#EDE5D8'}`,
+                        border:`1.5px solid ${form.sexo===o.v ? '#087F70' : '#EDE5D8'}`,
                         background: form.sexo===o.v ? '#EBF3EE' : 'white',
                         color: form.sexo===o.v ? '#2E5240' : '#6B7280',
                         transition:'all 0.15s',
@@ -565,7 +565,7 @@ export default function PatientProfile() {
                   Medicamentos, directorio, notas y citas
                 </p>
               </div>
-              {!generatingPDF && <span style={{ color: '#0d6b63', fontSize: 16 }}>↓</span>}
+              {!generatingPDF && <span style={{ color: '#087F70', fontSize: 16 }}>↓</span>}
             </button>
 
             {/* ══ S3: Preferencias ═══════════════════════════════════════════ */}

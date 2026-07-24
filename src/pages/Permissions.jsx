@@ -111,7 +111,7 @@ export default function Permissions() {
               boxShadow: '0 24px 64px rgba(0,0,0,0.35)',
             }}>
               <div style={{ fontSize: 56, marginBottom: 16 }}>✅</div>
-              <p style={{ fontFamily: 'Georgia, serif', fontSize: 20, fontWeight: 700, color: '#1A1A1A', marginBottom: 8 }}>
+              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 20, fontWeight: 700, color: '#1A1A1A', marginBottom: 8 }}>
                 ¡Permisos activados!
               </p>
               <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6 }}>
@@ -130,7 +130,7 @@ export default function Permissions() {
             }}>
               <div style={{ textAlign: 'center', marginBottom: 22 }}>
                 <div style={{ fontSize: 48, marginBottom: 12 }}>🔒</div>
-                <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#1A1A1A', marginBottom: 8 }}>
+                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 18, fontWeight: 700, color: '#1A1A1A', marginBottom: 8 }}>
                   Permisos no activados
                 </p>
                 <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6 }}>
@@ -168,7 +168,7 @@ export default function Permissions() {
                   background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
                   color: 'white', fontWeight: 700, fontSize: 14,
                   borderRadius: 14, border: 'none', cursor: 'pointer',
-                  boxShadow: '0 6px 20px rgba(13,107,99,0.3)',
+                  boxShadow: '0 6px 20px rgba(8,127,112,0.3)',
                 }}
               >
                 Continuar sin permisos →
@@ -188,13 +188,13 @@ export default function Permissions() {
               <div style={{ textAlign: 'center', marginBottom: 24 }}>
                 <div style={{
                   width: 56, height: 56, borderRadius: '50%',
-                  background: 'rgba(13,107,99,0.1)',
+                  background: 'rgba(8,127,112,0.1)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   margin: '0 auto 14px', fontSize: 26,
                 }}>
                   🔓
                 </div>
-                <p style={{ fontFamily: 'Georgia, serif', fontSize: 19, fontWeight: 700, color: '#1A1A1A', marginBottom: 6 }}>
+                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 19, fontWeight: 700, color: '#1A1A1A', marginBottom: 6 }}>
                   Necesitamos tu permiso
                 </p>
                 <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.5 }}>
@@ -246,7 +246,7 @@ export default function Permissions() {
                   color: 'white', fontWeight: 700, fontSize: 15,
                   borderRadius: 16, border: 'none',
                   cursor: status === 'requesting' ? 'not-allowed' : 'pointer',
-                  boxShadow: status === 'requesting' ? 'none' : '0 8px 24px rgba(13,107,99,0.35)',
+                  boxShadow: status === 'requesting' ? 'none' : '0 8px 24px rgba(8,127,112,0.35)',
                   transition: 'all 0.2s',
                 }}
               >

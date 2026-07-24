@@ -118,7 +118,7 @@ export default function Incidents() {
           <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', margin: '0 0 4px', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
             Registro de incidentes
           </p>
-          <h2 style={{ fontSize: 22, fontWeight: 700, color: 'white', fontFamily: 'Georgia, serif', margin: '0 0 4px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 700, color: 'white', fontFamily: "'Plus Jakarta Sans', sans-serif", margin: '0 0 4px' }}>
             Incidentes
           </h2>
           <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)', margin: 0 }}>
@@ -129,12 +129,12 @@ export default function Incidents() {
         {/* List */}
         {loading ? (
           <div style={{ display: 'flex', justifyContent: 'center', padding: 48 }}>
-            <div style={{ width: 28, height: 28, borderRadius: '50%', border: '3px solid #EDE5D8', borderTopColor: '#0d6b63', animation: 'spin 0.8s linear infinite' }} />
+            <div style={{ width: 28, height: 28, borderRadius: '50%', border: '3px solid #EDE5D8', borderTopColor: '#087F70', animation: 'spin 0.8s linear infinite' }} />
           </div>
         ) : dateKeys.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '48px 24px' }}>
             <div style={{ fontSize: 52, marginBottom: 16 }}>🩺</div>
-            <p style={{ fontSize: 16, fontWeight: 700, color: '#0B4F4A', fontFamily: 'Georgia, serif', margin: '0 0 8px' }}>
+            <p style={{ fontSize: 16, fontWeight: 700, color: '#0B4F4A', fontFamily: "'Plus Jakarta Sans', sans-serif", margin: '0 0 8px' }}>
               Sin incidentes registrados
             </p>
             <p style={{ fontSize: 14, color: '#9CA3AF', margin: 0, lineHeight: 1.6 }}>
@@ -231,7 +231,7 @@ export default function Incidents() {
           }}>
             {/* Modal header */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-              <h3 style={{ fontSize: 18, fontWeight: 700, color: '#1A1A1A', fontFamily: 'Georgia, serif', margin: 0 }}>
+              <h3 style={{ fontSize: 18, fontWeight: 700, color: '#1A1A1A', fontFamily: "'Plus Jakarta Sans', sans-serif", margin: 0 }}>
                 Registrar incidente
               </h3>
               <button onClick={closeModal} style={{ background: '#F3F4F6', border: 'none', borderRadius: '50%', width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>

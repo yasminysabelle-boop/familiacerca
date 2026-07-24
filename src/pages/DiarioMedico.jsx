@@ -104,7 +104,7 @@ function EntryCard({ entry }) {
         {/* Medications */}
         {hasMeds && (
           <div style={{ margin: '0 0 10px' }}>
-            <p style={{ margin: '0 0 6px', fontSize: 10, fontWeight: 700, color: '#0d6b63', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            <p style={{ margin: '0 0 6px', fontSize: 10, fontWeight: 700, color: '#087F70', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
               💊 Medicamentos
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
@@ -161,7 +161,7 @@ function EntryCard({ entry }) {
           onClick={() => setExpanded(e => !e)}
           style={{
             background: 'none', border: 'none', cursor: 'pointer',
-            color: '#0d6b63', fontSize: 12, fontWeight: 700, padding: '4px 0',
+            color: '#087F70', fontSize: 12, fontWeight: 700, padding: '4px 0',
           }}
         >
           {expanded ? '▲ Ver menos' : '▼ Ver más detalle'}
@@ -248,7 +248,7 @@ export default function DiarioMedico() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <span style={{ fontSize: 28 }}>📓</span>
             <div>
-              <p style={{ margin: 0, fontSize: 18, fontWeight: 800, color: 'white', fontFamily: 'Georgia, serif' }}>
+              <p style={{ margin: 0, fontSize: 18, fontWeight: 800, color: 'white', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                 Notas Médicas IA
               </p>
               <p style={{ margin: '3px 0 0', fontSize: 12, color: 'rgba(255,255,255,0.55)' }}>
@@ -295,7 +295,7 @@ export default function DiarioMedico() {
         {!loading && entries.length === 0 && (
           <div style={{ textAlign: 'center', padding: '48px 24px' }}>
             <p style={{ fontSize: 48, margin: '0 0 12px' }}>📓</p>
-            <p style={{ fontSize: 16, fontWeight: 700, color: '#1A1A1A', fontFamily: 'Georgia, serif', margin: '0 0 8px' }}>
+            <p style={{ fontSize: 16, fontWeight: 700, color: '#1A1A1A', fontFamily: "'Plus Jakarta Sans', sans-serif", margin: '0 0 8px' }}>
               Sin entradas aún
             </p>
             <p style={{ fontSize: 13, color: '#9CA3AF', lineHeight: 1.6, margin: '0 0 20px' }}>
@@ -308,9 +308,9 @@ export default function DiarioMedico() {
                 onClick={openEntry}
                 style={{
                   padding: '12px 24px', borderRadius: 12, border: 'none',
-                  background: '#0d6b63', color: 'white', fontWeight: 700,
+                  background: '#087F70', color: 'white', fontWeight: 700,
                   fontSize: 14, cursor: 'pointer',
-                  boxShadow: '0 4px 16px rgba(13,107,99,0.3)',
+                  boxShadow: '0 4px 16px rgba(8,127,112,0.3)',
                 }}
               >
                 Agregar primera entrada →
