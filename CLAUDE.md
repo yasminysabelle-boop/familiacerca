@@ -44,7 +44,41 @@ arquitectura de componentes.
 5. Ningún event handler eliminado
 Si algo de esto se rompió → corregir antes de entregar.
 
-## Design tokens (fuente de verdad)
+## 🎨 MIGRACIÓN DE DISEÑO — TEAL COMPLETA (2026-07-24)
+
+**STATUS:** ✅ 100% COMPLETADA
+
+**Sesión:** Miércoles 24 julio 2026 — Migración total de paleta de petróleo
+(`#143C32`, `#0d6b63`, `#0B4F4A`) a **teal moderno** (`#087F70`) + tipografía
+Georgia → **Plus Jakarta Sans** en toda la aplicación.
+
+**Alcance:**
+- 34 archivos modificados (componentes, páginas, públicas/privadas)
+- 150+ resabios de color/tipografía eliminados
+- 5 commits temáticos (Tanda 2, Tanda 3, Landing, Pantallas, Legales)
+
+**Cambios aplicados:**
+- **Color primario:** `#143C32` → `#087F70` (verde petróleo → teal)
+- **Color acción:** `#0d6b63` → `#087F70` (accents)
+- **RGBA colors:** `rgba(13,107,99)` / `rgba(20,60,50)` → `rgba(8,127,112)`
+- **Tipografía:** `Georgia, serif` / `Cormorant Garamond` → `'Plus Jakarta Sans', sans-serif`
+- **Gradientes:** petróleo → `#087F70 → #A8E5D6` (teal → light teal)
+
+**Archivos cubiertos:**
+- Componentes: Layout, Logo, CompanionChat, VoiceRecorder, VoiceInput,
+  WelcomeSlides, MemberOnboarding, DiarioMedicoEntryModal, TrialBanner,
+  PWAInstallBanner, InstallPrompt
+- Páginas internas: Calendar, Login, Register, Notes, PatientProfile,
+  Permissions, DiarioMedico, Directory, Incidents, Onboarding, Upgrade
+- Públicas: Landing.jsx (29 resabios), TermsOfService, PrivacyPolicy
+
+**Verificado:**
+- Navegación intacta (no se modificó ningún link/routing)
+- Funcionalidad preservada (botones, handlers, lógica)
+- Solo estilos/presentación cambiados
+- Aprobación visual requerida en localhost antes de push
+
+
 
 ⚠️ **REBRAND paleta app (2026-07-08):** paleta reemplazada de forma
 permanente. **Verde petróleo `#143C32` queda DESCONTINUADO — no usar en
