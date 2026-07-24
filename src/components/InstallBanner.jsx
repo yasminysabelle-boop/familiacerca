@@ -42,7 +42,7 @@ const IOS_STEPS = [
   },
   {
     label: 'Toca Agregar',
-    icon: <span style={{ fontSize: 17, color: '#0d6b63', fontWeight: 700 }}>✓</span>,
+    icon: <span style={{ fontSize: 17, color: '#087F70', fontWeight: 700 }}>✓</span>,
     desc: '¡FamiliaCerca estará en tu pantalla de inicio!',
   },
 ]
@@ -146,7 +146,7 @@ export default function InstallBanner() {
               style={{ width: 44, height: 44, borderRadius: 12, flexShrink: 0 }} />
             <div style={{ flex: 1 }}>
               <p style={{
-                fontFamily: 'Georgia, serif', fontSize: 16, fontWeight: 700,
+                fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 16, fontWeight: 700,
                 color: '#1A1A1A', margin: '0 0 3px',
               }}>
                 Instala FamiliaCerca
@@ -222,7 +222,7 @@ export default function InstallBanner() {
   return (
     <div style={{
       position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 8900,
-      background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
+      background: '#087F70',
       padding: '14px 16px',
       display: 'flex', alignItems: 'center', gap: 12,
       boxShadow: '0 -4px 24px rgba(0,0,0,0.2)',

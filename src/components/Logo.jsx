@@ -16,8 +16,8 @@ export default function Logo({ showWordmark = false, size = 36, variant = 'defau
           <p
             className="text-[15px] font-bold leading-tight"
             style={{
-              fontFamily: 'Georgia, serif',
-              color: light ? 'white' : '#0d6b63',
+              fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+              color: light ? 'white' : '#087F70',
             }}
           >
             FamiliaCerca

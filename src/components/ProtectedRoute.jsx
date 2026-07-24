@@ -85,7 +85,7 @@ function ConnectingScreen({ onRetry, hasError }) {
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12,
     }}>
       <img src="/logo.png" alt="FamiliaCerca" style={{ width: 72, objectFit: 'contain', marginBottom: 4 }} />
-      <p style={{ fontSize: 17, fontWeight: 700, color: '#143C32', margin: 0, fontFamily: 'Georgia, serif' }}>
+      <p style={{ fontSize: 17, fontWeight: 700, color: '#334155', margin: 0, fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}>
         {hasError ? 'No pudimos conectar' : 'Conectando…'}
       </p>
       <p style={{ fontSize: 13, color: '#9AA89E', margin: 0 }}>
@@ -93,7 +93,7 @@ function ConnectingScreen({ onRetry, hasError }) {
       </p>
       <button
         onClick={onRetry}
-        style={{ marginTop: 8, padding: '10px 24px', borderRadius: 12, border: 'none', background: '#143C32', color: 'white', fontWeight: 600, fontSize: 13, cursor: 'pointer' }}
+        style={{ marginTop: 8, padding: '10px 24px', borderRadius: 12, border: 'none', background: '#087F70', color: 'white', fontWeight: 600, fontSize: 13, cursor: 'pointer' }}
       >
         Reintentar
       </button>

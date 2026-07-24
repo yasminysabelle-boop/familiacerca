@@ -13,6 +13,8 @@ import { useHospitalMode } from '../contexts/HospitalModeContext'
 import { useBadgeCounts } from '../hooks/useBadgeCounts'
 import { useGoBack } from '../hooks/useGoBack'
 
+const SANS = "'Plus Jakarta Sans', system-ui, sans-serif"
+
 const PAGE_TITLES = {
   '/dashboard':      'Inicio',
   '/memorias':       'Memorias de voz',
@@ -43,7 +45,7 @@ const PAGE_TITLES = {
 const PRIMARY_PAGES = new Set(['/dashboard', '/familia', '/ajustes', '/planes', '/pricing', '/chat', '/diario-medico'])
 
 // Rutas que no dibujan su propio header (no están en hasOwnHeader) y deben
-// ver el header claro de Layout en vez del bloque oscuro #0B4F4A — mismo
+// ver el header claro de Layout en vez del bloque oscuro — mismo
 // mecanismo usado para /familia. Ampliar esta lista es seguro: no afecta a
 // las rutas con hasOwnHeader (Dashboard/Chat/Cuidado/Historial/Medicamentos/
 // Todo el cuidado/Videollamada dibujan el suyo, Layout nunca les pinta nada).
@@ -74,8 +76,8 @@ export default function Layout({ children }) {
   const [showQuickActions, setShowQuickActions] = useState(false)
 
   const bg      = dark ? '#0F1A12' : '#F8F4ED'
-  const navBg   = dark ? 'rgba(28,18,8,0.97)' : '#0B4F4A'
-  const hdrBg   = dark ? 'rgba(28,18,8,0.95)' : '#0B4F4A'
+  const navBg   = dark ? 'rgba(28,18,8,0.97)' : '#087F70'
+  const hdrBg   = dark ? 'rgba(28,18,8,0.95)' : '#087F70'
   const border  = dark ? '#1E3A28' : 'rgba(255,255,255,0.08)'
   const isLightHeader = LIGHT_HEADER_PAGES.has(location.pathname)
 
@@ -116,8 +118,8 @@ export default function Layout({ children }) {
           background: isLightHeader ? '#FAF7F1' : hdrBg,
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
-          borderBottom: isLightHeader ? '1px solid rgba(20,60,50,0.08)' : `1px solid ${border}`,
-          boxShadow: isLightHeader ? '0 1px 8px rgba(20,60,50,0.06)' : '0 1px 12px rgba(0,0,0,0.05)',
+          borderBottom: isLightHeader ? '1px solid rgba(8,127,112,0.08)' : `1px solid ${border}`,
+          boxShadow: isLightHeader ? '0 1px 8px rgba(8,127,112,0.06)' : '0 1px 12px rgba(0,0,0,0.05)',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           padding: '0 16px',
         }}
@@ -128,7 +130,7 @@ export default function Layout({ children }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
             <img src="/logo.png" alt="FamiliaCerca" style={{ height: 28, width: 'auto', objectFit: 'contain', flexShrink: 0 }} />
             <span style={{
-              fontSize: 16, fontWeight: 700, color: '#334155', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+              fontSize: 16, fontWeight: 700, color: '#334155', fontFamily: SANS,
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
             }}>
               {PAGE_TITLES[location.pathname] ?? 'Chat familiar'}
@@ -154,7 +156,7 @@ export default function Layout({ children }) {
             </button>
             <h1 style={{
               fontSize: 14, fontWeight: 700, color: 'rgba(255,255,255,0.85)',
-              fontFamily: 'Georgia, serif', margin: 0,
+              fontFamily: SANS, margin: 0,
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
             }}>
               {location.pathname === '/paciente/perfil' && (activePatientName || (activeFamilyLabel !== 'Mi familia' ? activeFamilyLabel : null))
@@ -177,16 +179,16 @@ export default function Layout({ children }) {
               <img
                 src={userAvatar} alt="Mi cuenta"
                 style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover',
-                  border: isLightHeader ? '2px solid rgba(20,60,50,0.18)' : '2px solid rgba(255,255,255,0.3)' }}
+                  border: isLightHeader ? '2px solid rgba(8,127,112,0.18)' : '2px solid rgba(255,255,255,0.3)' }}
               />
             ) : (
               <div style={{
                 width: 32, height: 32, borderRadius: '50%',
-                background: isLightHeader ? 'rgba(20,60,50,0.08)' : 'rgba(255,255,255,0.18)',
-                border: isLightHeader ? '2px solid rgba(20,60,50,0.15)' : '2px solid rgba(255,255,255,0.25)',
+                background: isLightHeader ? 'rgba(8,127,112,0.08)' : 'rgba(255,255,255,0.18)',
+                border: isLightHeader ? '2px solid rgba(8,127,112,0.15)' : '2px solid rgba(255,255,255,0.25)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 13, fontWeight: 700,
-                color: isLightHeader ? '#143C32' : 'white',
+                color: isLightHeader ? '#334155' : 'white',
                 fontFamily: 'Inter, system-ui, sans-serif',
               }}>
                 {userInitial}
@@ -240,7 +242,7 @@ export default function Layout({ children }) {
             onClick={() => window.dispatchEvent(new MouseEvent('mousemove'))}
             style={{
               padding: '10px 16px', borderRadius: 10, border: 'none',
-              background: '#0d6b63', color: 'white', fontWeight: 700,
+              background: '#087F70', color: 'white', fontWeight: 700,
               fontSize: 13, cursor: 'pointer', alignSelf: 'flex-start',
             }}
           >
