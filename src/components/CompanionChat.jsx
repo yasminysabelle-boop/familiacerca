@@ -361,9 +361,9 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
                         style={{
                           padding: '7px 10px',
                           borderRadius: 20,
-                          border: `1.5px solid ${i % 2 === 0 ? '#0d6b63' : '#C9882A'}`,
-                          background: i % 2 === 0 ? '#F0F7F3' : '#FDF6EC',
-                          color: i % 2 === 0 ? '#3A6347' : '#9A6420',
+                          border: `1.5px solid ${i % 2 === 0 ? '#087F70' : '#C9882A'}`,
+                          background: i % 2 === 0 ? '#E8F6F3' : '#FDF6EC',
+                          color: i % 2 === 0 ? '#1C5559' : '#9A6420',
                           fontSize: 11, fontWeight: 600,
                           cursor: 'pointer', textAlign: 'left',
                           lineHeight: 1.35,
@@ -383,7 +383,7 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
                 <div style={{
                   padding: '10px 14px',
                   borderRadius: '16px 16px 16px 4px',
-                  background: '#0d6b63',
+                  background: '#087F70',
                 }}>
                   <TypingDots />
                 </div>
@@ -431,7 +431,7 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
               aria-label="Enviar mensaje"
               style={{
                 width: 36, height: 36, borderRadius: '50%', border: 'none', flexShrink: 0,
-                background: input.trim() && !loading ? '#0d6b63' : '#E5E7EB',
+                background: input.trim() && !loading ? '#087F70' : '#E5E7EB',
                 cursor: input.trim() && !loading ? 'pointer' : 'default',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 transition: 'background 0.2s',
@@ -472,7 +472,7 @@ function SelectionCard({ onPick, onClose }) {
           style={{ width: 140, height: 140, objectFit: 'contain', marginBottom: 16 }}
         />
         <p style={{
-          fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700,
+          fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 18, fontWeight: 700,
           color: '#1A1A1A', margin: '0 0 8px',
         }}>
           ¿Quién quieres que te acompañe?
@@ -492,8 +492,8 @@ function SelectionCard({ onPick, onClose }) {
                 transition: 'border-color 0.15s, background 0.15s',
               }}
               onMouseEnter={e => {
-                e.currentTarget.style.borderColor = '#0d6b63'
-                e.currentTarget.style.background = '#EBF3EE'
+                e.currentTarget.style.borderColor = '#087F70'
+                e.currentTarget.style.background = '#E8F6F3'
               }}
               onMouseLeave={e => {
                 e.currentTarget.style.borderColor = '#EDE5D8'

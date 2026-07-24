@@ -41,8 +41,8 @@ export default function VoiceInput({
     ? value + (value ? ' ' : '') + interim
     : value
 
-  const micColor   = recording ? '#EF4444' : '#0d6b63'
-  const micBg      = recording ? 'rgba(239,68,68,0.08)' : 'rgba(13,107,99,0.08)'
+  const micColor   = recording ? '#EF4444' : '#087F70'
+  const micBg      = recording ? 'rgba(239,68,68,0.08)' : 'rgba(8,127,112,0.08)'
   const inputStyle = {
     width: '100%',
     padding: '10px 44px 10px 12px',
@@ -167,7 +167,7 @@ export default function VoiceInput({
             padding: '8px 20px',
             borderRadius: 10,
             border: 'none',
-            background: saving ? '#9CA3AF' : '#0d6b63',
+            background: saving ? '#9CA3AF' : '#087F70',
             color: 'white',
             fontWeight: 700,
             fontSize: 13,
@@ -188,7 +188,7 @@ export default function VoiceInput({
   )
 }
 
-function MicIcon({ color = '#0d6b63', size = 16 }) {
+function MicIcon({ color = '#087F70', size = 16 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
       <rect x="9" y="2" width="6" height="11" rx="3" />
