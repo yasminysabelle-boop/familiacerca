@@ -56,7 +56,7 @@ export default function Paywall() {
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <button
-            onClick={() => navigate('/pricing')}
+            onClick={() => navigate('/upgrade')}
             style={{
               width: '100%', padding: '15px', borderRadius: 16, border: 'none',
               background: '#087F70',

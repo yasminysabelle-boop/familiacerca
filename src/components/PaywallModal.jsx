@@ -31,7 +31,7 @@ export default function PaywallModal({ onClose, patientName }) {
           sin interrupciones.
         </p>
         <button
-          onClick={() => { navigate('/pricing'); onClose() }}
+          onClick={() => { navigate('/upgrade'); onClose() }}
           style={{
             width: '100%', padding: '14px', borderRadius: 14, border: 'none',
             background: '#087F70',

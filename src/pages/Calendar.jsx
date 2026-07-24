@@ -419,7 +419,7 @@ export default function Calendar() {
 
             <div className="flex gap-3">
               <button type="submit" disabled={saving || !canEdit}
-                onClick={!canEdit ? (e) => { e.preventDefault(); navigate('/pricing') } : undefined}
+                onClick={!canEdit ? (e) => { e.preventDefault(); navigate('/upgrade') } : undefined}
                 className="px-4 py-2 bg-primary hover:bg-primary-dark disabled:opacity-60 text-white text-sm font-medium rounded-lg transition-colors">
                 {saving ? 'Guardando...' : editEvent ? 'Guardar cambios' : 'Guardar'}
               </button>

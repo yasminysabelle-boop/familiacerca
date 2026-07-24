@@ -71,7 +71,7 @@ export default function TodoElCuidado() {
   ]
   const cuentaAjustes = [
     { Icon: Shield, label: 'Permisos de acceso',   onClick: () => navigate('/roles') },
-    { Icon: Star,   label: 'Planes y suscripción', onClick: () => navigate('/pricing') },
+    { Icon: Star,   label: 'Planes y suscripción', onClick: () => navigate('/upgrade') },
   ]
 
   return (

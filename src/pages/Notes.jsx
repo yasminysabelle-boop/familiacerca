@@ -413,7 +413,7 @@ export default function Notes() {
                 <button
                   type="submit"
                   disabled={saving || !canEdit}
-                  onClick={!canEdit ? e => { e.preventDefault(); navigate('/pricing') } : undefined}
+                  onClick={!canEdit ? e => { e.preventDefault(); navigate('/upgrade') } : undefined}
                   style={{
                     flex: 2, padding: '13px', borderRadius: 14, border: 'none',
                     background: (saving || !canEdit) ? '#D4C4B8' : 'linear-gradient(135deg, #0d6b63, #3A6347)',

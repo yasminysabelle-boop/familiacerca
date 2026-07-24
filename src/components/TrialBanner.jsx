@@ -12,7 +12,7 @@ export default function TrialBanner() {
   if (trialExpired && isAdmin) {
     return (
       <div
-        onClick={() => navigate('/pricing')}
+        onClick={() => navigate('/upgrade')}
         style={{
           margin: '0 16px 16px', borderRadius: 14, padding: '11px 16px',
           background: 'linear-gradient(135deg, #FFFBEB, #FEF3C7)',
@@ -52,7 +52,7 @@ export default function TrialBanner() {
         </p>
       </div>
       <button
-        onClick={() => navigate('/pricing')}
+        onClick={() => navigate('/upgrade')}
         style={{
           flexShrink: 0, padding: '8px 16px', borderRadius: 10, border: 'none',
           background: urgent ? '#DC2626' : 'linear-gradient(135deg, #0d6b63, #3A6347)',
