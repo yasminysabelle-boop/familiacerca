@@ -3,7 +3,7 @@ import { supabase } from '../../lib/supabase'
 import { useFamily } from '../../contexts/FamilyContext'
 
 const ROLE_LABEL = { familiar: 'Familiar', cuidador: 'Cuidador' }
-const ROLE_COLOR = { familiar: '#0d6b63', cuidador: '#2D86A0' }
+const ROLE_COLOR = { familiar: '#087F70', cuidador: '#2D86A0' }
 
 function timeAgo(isoStr) {
   if (!isoStr) return 'Nunca'
@@ -241,7 +241,7 @@ export default function AdminTeamSection() {
             boxShadow: '0 24px 64px rgba(0,0,0,0.2)',
           }}>
             <p style={{ fontSize: 36, margin: '0 0 12px' }}>⚠️</p>
-            <p style={{ fontFamily: 'Georgia, serif', fontSize: 17, fontWeight: 700, color: '#1A1A1A', margin: '0 0 8px' }}>
+            <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 17, fontWeight: 700, color: '#1A1A1A', margin: '0 0 8px' }}>
               ¿Eliminar a {confirmRemove.name}?
             </p>
             <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, margin: '0 0 24px' }}>

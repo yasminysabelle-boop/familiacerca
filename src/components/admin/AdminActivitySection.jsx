@@ -16,12 +16,12 @@ function timeAgo(isoStr) {
 }
 
 const TYPE_META = {
-  med_confirmed:  { icon: '💊', color: '#0d6b63', label: 'Medicamento confirmado' },
+  med_confirmed:  { icon: '💊', color: '#087F70', label: 'Medicamento confirmado' },
   note_added:     { icon: '📝', color: '#2D86A0', label: 'Nota agregada' },
   voice_memo:     { icon: '🎙️', color: '#7C5CBF', label: 'Memoria de voz' },
   expense_added:  { icon: '💰', color: '#C9882A', label: 'Gasto registrado' },
   hospital_doc:   { icon: '📁', color: '#B91C1C', label: 'Documento subido' },
-  visit_added:    { icon: '👥', color: '#0d6b63', label: 'Visita anotada' },
+  visit_added:    { icon: '👥', color: '#087F70', label: 'Visita anotada' },
   videocall:      { icon: '📹', color: '#1D4ED8', label: 'Videollamada programada' },
 }
 

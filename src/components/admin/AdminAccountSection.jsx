@@ -4,7 +4,7 @@ import { createPortalSession } from '../../lib/stripe'
 
 const PLAN_META = {
   free:      { label: 'Prueba gratuita', color: '#9CA3AF', icon: '🌱', features: ['2 cuidadores', 'Chat familiar', 'Medicamentos básicos', 'Historial 7 días'] },
-  familiar:  { label: 'Plan Familiar',   color: '#0d6b63', icon: '❤️', features: ['6 cuidadores', 'Recordatorios automáticos', 'Notas de voz', 'Foto-prueba', 'Reportes PDF', 'Álbum y gastos'] },
+  familiar:  { label: 'Plan Familiar',   color: '#087F70', icon: '❤️', features: ['6 cuidadores', 'Recordatorios automáticos', 'Notas de voz', 'Foto-prueba', 'Reportes PDF', 'Álbum y gastos'] },
   care_plus: { label: 'Cuidado Total',   color: '#7C3AED', icon: '⭐', features: ['Cuidadores ilimitados', 'Directorio médico', 'Alertas SOS prioritarias', 'Reporte semanal IA', 'Historial indefinido', 'Soporte prioritario'] },
 }
 
@@ -138,9 +138,9 @@ export default function AdminAccountSection() {
           disabled={loading}
           style={{
             padding: '14px', borderRadius: 14, border: 'none',
-            background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
+            background: '#087F70',
             color: 'white', fontWeight: 700, fontSize: 15,
-            cursor: 'pointer', boxShadow: '0 4px 16px rgba(13,107,99,0.3)',
+            cursor: 'pointer', boxShadow: '0 4px 16px rgba(8,127,112,0.3)',
           }}
         >
           ⭐ Ver planes y precios
