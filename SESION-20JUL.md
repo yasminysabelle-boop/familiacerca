@@ -661,3 +661,95 @@ demás. `netlify deploy --prod --build` → `familiacerca.com` sirve
 `index-8vGJFLk5.js`. Yasmin confirmó en su teléfono con un gasto real de
 prueba ($10, Medicamentos) que todo se ve correcto, incluido el botón ya
 sin gradiente.
+
+---
+
+## Barrido de componentes compartidos — Tanda 1 (mayor impacto) — CERRADA (2026-07-23)
+
+Continuación del hallazgo de `/gastos`: se inventariaron ~15-18
+componentes compartidos con el patrón viejo, ordenados por impacto real
+(rutas donde el resabio es visible). Yasmin aprobó empezar por los 5 de
+mayor alcance:
+
+- **`Layout.jsx`** (~24 rutas) — título Georgia→Sans, avatar `#143C32`
+  →`#334155`, bordes/sombras `rgba(20,60,50,X)`→`rgba(8,127,112,X)` (era
+  `#143C32` con transparencia), botón del banner de inactividad y los
+  fallbacks `hdrBg`/`navBg` `#0d6b63`/`#0B4F4A`→`#087F70`.
+- **`FamilySwitcher.jsx`** (~24 rutas, vía Layout) — el chip del header ya
+  se había arreglado antes; esta vez el modal "Tus familias" completo
+  (título, rol admin, borde activo, avatar, "✓ Viendo", botón "Ver →").
+- **`InstallBanner.jsx`** (~24 rutas, global vía Layout + JoinFamily +
+  Landing) — check del paso 3 de iOS, título, franja de Android.
+- **`ProtectedRoute.jsx`** (todas las rutas protegidas, pantalla de
+  carga/error transitoria) — texto y botón "Reintentar".
+- **`Logo.jsx`** (~10 rutas directas + 5 componentes que lo anidan) —
+  verificados los 14 usos del componente en el código antes de tocar el
+  color: la variante `light` (blanca) siempre se usa sobre fondo oscuro/
+  foto, `default` siempre sobre fondo claro. Solo se cambió el tono de
+  `default` (`#0d6b63`→`#087F70`), la rama `light` no se tocó.
+
+**Verificación:** harness visual estático (mismo patrón de siempre) para
+header claro + modal "Tus familias" + logo en ambas variantes, antes del
+draft. Yasmin confirmó en su teléfono: Dashboard, Ajustes/Calendar, el
+modal "Tus familias", y Login (logo sigue blanco) — todo correcto.
+
+**Hallazgos aparte durante la verificación, resueltos en la misma
+sesión:**
+
+1. **Bug de navegación — "Permisos de acceso" en Todo el cuidado
+   navegaba al Dashboard.** Causa: `TodoElCuidado.jsx` apuntaba a
+   `/permisos` (`Permissions.jsx`, la pantalla de solicitud de permisos
+   de *dispositivo* — cámara/micrófono/galería — del onboarding), que se
+   auto-salta a `/dashboard` vía `localStorage` en cuanto ya se completó
+   una vez. La pantalla real de "Permisos de acceso" (roles del equipo de
+   cuidado) es `FamilyRoles.jsx` en `/roles` — mismo destino que ya usaba
+   bien el menú equivalente en `Settings.jsx`. Fix: una línea en
+   `TodoElCuidado.jsx`, commit `b7c4c37`.
+
+2. **Unificación de pagos — Stripe seguía siendo el camino real para
+   casi todo el mundo, no solo texto residual.** Al aclarar la pantalla
+   "Planes y precios" (`Pricing.jsx`), se descubrió que **no es un resto
+   visual** — `createCheckoutSession()` invoca de verdad la Edge Function
+   `create-checkout`, que crea un Stripe Customer y una Checkout Session
+   reales. `STRIPE_SECRET_KEY`/`STRIPE_WEBHOOK_SECRET`/price IDs siguen
+   cargados en Supabase secrets. Casi todos los disparadores reales de
+   "actualiza tu plan" (`Paywall.jsx` global, `PaywallModal.jsx` en
+   Familia/DiarioMedico/Notes/Medications/Gastos, `TrialBanner.jsx` en
+   Dashboard, el intento de editar en modo solo-lectura de Calendar y
+   Notes, "Planes y suscripción" tanto en Todo el cuidado como en
+   Ajustes) mandaban a `/pricing` (Stripe) — solo "Mejorar mi plan" en
+   Ajustes ya apuntaba a `/upgrade` (PayPal, el sistema oficial desde la
+   migración del 20 jul).
+
+   **Verificación antes de tocar nada:** `supabase db query` de solo
+   lectura contra `subscriptions` — 11 filas, solo 1 con
+   `stripe_customer_id` (y ninguna con `stripe_subscription_id`): un
+   checkout abandonado de 2026-05-14, nunca pagado, sin actividad desde
+   2026-05-27. Cero suscripciones activas o pagas por Stripe. Nada real
+   que migrar — seguro desconectar la navegación.
+
+   **Fix:** los 7 disparadores redirigidos a `/upgrade`. **No se tocó**
+   `Pricing.jsx`, `create-checkout`, `stripe-webhook`, `create-portal` ni
+   las keys de Stripe — decisión explícita de Yasmin de dejarlos ahí sin
+   uso (por si sirven de respaldo/auditoría) en vez de borrarlos ahora;
+   esa decisión de apagar el backend de Stripe queda para otra sesión.
+   Commit `0265793`.
+
+**Pendiente — hallazgo nuevo, NO es un componente compartido:**
+`src/pages/Admin.jsx` (ruta `/admin`, "Panel de administración", tabs
+Equipo/Cuenta/Datos/Actividad) tiene su propio header en gradiente
+oscuro (`linear-gradient(135deg, #0B4F4A, #1A3A12)` — `#1A3A12` es una
+**quinta** variante de verde oscuro no vista en ningún otro archivo) y
+título en Georgia puro. No es parte del barrido de componentes
+compartidos — es contenido propio de esa pantalla (mismo tipo de trabajo
+que Familia.jsx o Gastos: header/hero interno de la página). Ya estaba
+en el inventario original de rutas con "3 resabios", pero se subestimó
+por contar sin abrir el archivo a ver qué eran esos 3 hits — lección
+repetida de la de Fraunces. Queda pendiente como su propia migración de
+pantalla completa (paleta + tipografía de `/admin` entero), sesión
+futura, sin tocar todavía.
+
+**Deploy:** 3 commits separados — `b7c4c37` (bug de permisos), `0265793`
+(unificación de pagos), `d86e6fd` (Tanda 1 de componentes compartidos).
+`netlify deploy --prod --build` → `familiacerca.com` sirve
+`index-W0NpbcK1.js`.
