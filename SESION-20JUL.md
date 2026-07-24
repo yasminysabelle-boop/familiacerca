@@ -753,3 +753,64 @@ futura, sin tocar todavía.
 (unificación de pagos), `d86e6fd` (Tanda 1 de componentes compartidos).
 `netlify deploy --prod --build` → `familiacerca.com` sirve
 `index-W0NpbcK1.js`.
+
+---
+
+## Migración de /admin (Panel de administración) — CERRADA (2026-07-24)
+
+`src/pages/Admin.jsx` + sus 4 secciones en `src/components/admin/`
+(`AdminTeamSection`, `AdminAccountSection`, `AdminDataSection`,
+`AdminActivitySection`). Header ya estaba en `LIGHT_HEADER_PAGES` desde
+la migración anterior — este trabajo fue solo el contenido interno.
+
+**Colores:** el header propio de la página tenía un gradiente
+`linear-gradient(135deg, #0B4F4A, #1A3A12)` — `#1A3A12` resultó ser una
+**quinta variante** de verde oscuro, nunca vista en ningún otro archivo
+del proyecto. Migrado al mismo patrón de tarjeta clara que Familia.jsx/
+Gastos (blanco, ícono en teal claro `#A8E5D6`, texto `#334155`). Tab
+activo `#0B4F4A`→`#087F70`. 6 usos más de `#0d6b63` repartidos en las 4
+secciones (Equipo, Cuenta x2, Datos x2) a teal oficial. 3 Georgia puro a
+Plus Jakarta Sans. Marca de agua nueva. `AdminActivitySection.jsx`
+mantiene su sistema de color por tipo de actividad (azul/morado/dorado/
+azul oscuro para nota/voz/gasto/documento/videollamada) — mismo criterio
+que Expenses.jsx, solo los 2 tipos en verde vivo (medicamento
+confirmado, visita anotada) cambiaron. Sin cambios de estructura.
+
+**Hallazgo de Stripe — tercer punto de contacto real, no cubierto en la
+unificación de pagos anterior:** `AdminAccountSection.jsx` tenía dos
+botones ("Gestionar suscripción", siempre visible; "⭐ Ver planes y
+precios", solo si prueba vencida/plan free) que llamaban a
+`createPortalSession()` (`lib/stripe`), abriendo el **Portal de
+Facturación real de Stripe** vía `window.location.href`. La sesión
+anterior solo había cubierto los `navigate('/pricing')` — este era un
+mecanismo distinto (redirección directa), por eso se escapó.
+
+**Antes de asumir que ambos botones debían ir al mismo lugar,** se
+verificó `Upgrade.jsx`: muestra el plan activo como "Tu plan actual"
+deshabilitado, pero **no tiene ninguna opción de cancelar o gestionar
+facturación** — es solo vitrina de planes/checkout. La cancelación real
+ya existe, completa, en `Settings.jsx` (`/ajustes`): mensaje de
+retención, confirmación, llamada a la Edge Function
+`cancel-paypal-subscription`. Por eso los dos botones quedaron con
+destinos distintos: **"Gestionar suscripción" → `/ajustes`** (donde está
+cancelar), **"Ver planes y precios" → `/upgrade`** (donde está
+suscribirse/cambiar de plan). Se quitó `createPortalSession`/`openPortal`
+y el estado `loading`/`error` de este archivo (sin uso ya); no se tocó
+`lib/stripe.js` ni la Edge Function `create-portal`.
+
+**Verificación:** build + lint limpios, harness visual estático antes
+del draft. Yasmin confirmó en su teléfono los 4 tabs — especialmente que
+"Ver planes y precios" lleva a `/upgrade` con los botones reales de
+PayPal, y "Gestionar suscripción" lleva a `/ajustes` (Mi Cuenta).
+
+**Pendiente, anotado por Yasmin — NO tocar todavía:** el header de
+"Mi Cuenta" (`Settings.jsx`, ruta `/ajustes`) sigue con un bloque verde
+oscuro sólido — parece ser un header propio de esa pantalla (no el
+compartido de `Layout.jsx`, que ya está migrado para esa ruta). Queda
+para una sesión futura junto con el resto de la migración de contenido
+de `Settings.jsx` (que ya sabíamos, por el inventario original de rutas,
+que tiene 21 resabios sin migrar).
+
+**Deploy:** 2 commits separados — `7e6c65a` (diseño de `/admin`),
+`239d211` (desconexión del Portal de Stripe). `netlify deploy --prod
+--build` → `familiacerca.com` sirve `index-Dk30GtBY.js`.
