@@ -11,18 +11,18 @@ const COMO_IMG = '/images/como.jpg'
 const CTA_IMG  = '/images/cta.jpg'
 const MILO_LUNA_IMG = '/images/milo-luna.webp'
 
-const PRIMARY = '#143C32'
-const ACTION  = '#0d6b63'
+const PRIMARY = '#087F70'
+const ACTION  = '#087F70'
 const CREAM   = '#F8F4ED'
 const SAND    = '#EDE5D8'
 const GOLD    = '#E9826E'
 const CORAL   = '#E9826E'
 const MINT_C  = '#EBF3EE'
-const DARK    = '#143C32'
+const DARK    = '#087F70'
 const WHITE   = '#FFFFFF'
 const BORDER  = 'rgba(13,107,99,0.12)'
 
-const SERIF = "'Cormorant Garamond', Georgia, serif"
+const SERIF = "'Plus Jakarta Sans', sans-serif"
 const SANS  = "'Inter', system-ui, sans-serif"
 
 function CTABtn({ to, children, style = {} }) {
@@ -44,7 +44,7 @@ function CTABtn({ to, children, style = {} }) {
 
 function FAQItem({ q, a, light = false, onTrack }) {
   const [open, setOpen] = useState(false)
-  const textColor   = light ? '#143C32' : 'rgba(255,255,255,0.82)'
+  const textColor   = light ? '#087F70' : 'rgba(255,255,255,0.82)'
   const answerColor = light ? '#6B7280' : 'rgba(255,255,255,0.50)'
   const borderColor = light ? 'rgba(13,107,99,0.18)' : `rgba(233,130,110,0.12)`
   const iconBorder  = light ? 'rgba(13,107,99,0.35)' : `rgba(233,130,110,0.40)`
@@ -264,20 +264,20 @@ export default function Landing() {
         <div style={{ maxWidth: 1140, margin: '0 auto', padding: '20px 2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24 }}>
           <div style={{ display:'flex', alignItems:'center', gap:'12px', flexShrink: 0 }}>
             <img src="/logo.png" alt="FamiliaCerca" style={{ width: 44, height: 44, objectFit: 'contain', display: 'block' }} />
-            <span style={{ fontFamily:'Georgia,serif', fontWeight:700, margin:0, padding:0 }}>
-              <span style={{ color:'#143C32', fontSize:'26px' }}>Familia</span>
+            <span style={{ fontFamily:"'Plus Jakarta Sans', sans-serif", fontWeight:700, margin:0, padding:0 }}>
+              <span style={{ color:'#087F70', fontSize:'26px' }}>Familia</span>
               <span style={{ color:'#E9826E', fontSize:'26px' }}>Cerca</span>
             </span>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 36 }} className="landing-desktop-nav">
             {navLinks.map(l => (
-              <a key={l.href} href={l.href} style={{ fontSize: 16, fontWeight: 400, color: '#143C32', textDecoration: 'none', fontFamily: SANS }}
+              <a key={l.href} href={l.href} style={{ fontSize: 16, fontWeight: 400, color: '#087F70', textDecoration: 'none', fontFamily: SANS }}
                 onMouseEnter={e => e.currentTarget.style.color = '#E9826E'}
-                onMouseLeave={e => e.currentTarget.style.color = '#143C32'}
+                onMouseLeave={e => e.currentTarget.style.color = '#087F70'}
               >{l.label}</a>
             ))}
-            <Link to="/login" className="btn-nav-cream" style={{ padding: '10px 28px', borderRadius: 9999, border: '1.5px solid #143C32', background: 'transparent', color: '#143C32', fontWeight: 500, fontSize: 16, textDecoration: 'none', fontFamily: SANS }}>
+            <Link to="/login" className="btn-nav-cream" style={{ padding: '10px 28px', borderRadius: 9999, border: '1.5px solid #087F70', background: 'transparent', color: '#087F70', fontWeight: 500, fontSize: 16, textDecoration: 'none', fontFamily: SANS }}>
               Iniciar sesión
             </Link>
           </div>
@@ -285,7 +285,7 @@ export default function Landing() {
           <button onClick={() => setMobileMenuOpen(o => !o)} className="landing-hamburger"
             style={{ display: 'none', background: 'none', border: 'none', cursor: 'pointer', padding: 8, flexDirection: 'column', gap: 5 }}
             aria-label="Menú">
-            {[0,1,2].map(i => <div key={i} style={{ width: 22, height: 1.5, background: '#143C32', borderRadius: 2 }} />)}
+            {[0,1,2].map(i => <div key={i} style={{ width: 22, height: 1.5, background: '#087F70', borderRadius: 2 }} />)}
           </button>
         </div>
 
@@ -293,11 +293,11 @@ export default function Landing() {
           <div style={{ padding: '12px 32px 24px', display: 'flex', flexDirection: 'column', gap: 2, borderTop: '1px solid rgba(20,60,50,0.08)', background: '#F8F4ED' }}>
             {navLinks.map(l => (
               <a key={l.href} href={l.href} onClick={() => setMobileMenuOpen(false)}
-                style={{ padding: '13px 8px', fontSize: 15, color: '#143C32', textDecoration: 'none', fontFamily: SANS }}>
+                style={{ padding: '13px 8px', fontSize: 15, color: '#087F70', textDecoration: 'none', fontFamily: SANS }}>
                 {l.label}
               </a>
             ))}
-            <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="btn-nav-cream" style={{ marginTop: 10, padding: '16px', borderRadius: 9999, textAlign: 'center', border: '1.5px solid #143C32', background: 'transparent', color: '#143C32', fontWeight: 500, fontSize: 16, textDecoration: 'none', fontFamily: SANS }}>
+            <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="btn-nav-cream" style={{ marginTop: 10, padding: '16px', borderRadius: 9999, textAlign: 'center', border: '1.5px solid #087F70', background: 'transparent', color: '#087F70', fontWeight: 500, fontSize: 16, textDecoration: 'none', fontFamily: SANS }}>
               Iniciar sesión
             </Link>
           </div>
@@ -361,10 +361,10 @@ export default function Landing() {
             <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'12px'}}>
               <div style={{width:38,height:38,borderRadius:'50%',background:'#EBF3EE',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'17px'}}>👵</div>
               <div>
-                <div style={{fontWeight:700,fontSize:'14px',color:'#143C32'}}>Deborah</div>
+                <div style={{fontWeight:700,fontSize:'14px',color:'#087F70'}}>Deborah</div>
                 <div style={{display:'flex',alignItems:'center',gap:'5px',marginTop:'2px'}}>
-                  <div style={{width:7,height:7,borderRadius:'50%',background:'#143C32'}}></div>
-                  <span style={{fontSize:'11px',color:'#143C32',fontWeight:600}}>Todo al día</span>
+                  <div style={{width:7,height:7,borderRadius:'50%',background:'#087F70'}}></div>
+                  <span style={{fontSize:'11px',color:'#087F70',fontWeight:600}}>Todo al día</span>
                 </div>
               </div>
             </div>
@@ -375,12 +375,12 @@ export default function Landing() {
             ].map((item,i)=>(
               <div key={i} style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'7px'}}>
                 <span style={{fontSize:'13px'}}>{item.icon}</span>
-                <span style={{fontSize:'11px',color:'#143C32',opacity:0.8}}>{item.text}</span>
-                <span style={{marginLeft:'auto',color:'#143C32',fontSize:'12px',fontWeight:700}}>✓</span>
+                <span style={{fontSize:'11px',color:'#087F70',opacity:0.8}}>{item.text}</span>
+                <span style={{marginLeft:'auto',color:'#087F70',fontSize:'12px',fontWeight:700}}>✓</span>
               </div>
             ))}
-            <div style={{borderTop:'1px solid rgba(20,60,50,0.1)',marginTop:'8px',paddingTop:'8px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-              <span style={{fontSize:'10px',color:'#143C32',opacity:0.6}}>Actualizado por Rosa</span>
+            <div style={{borderTop:'1px solid rgba(8,127,112,0.1)',marginTop:'8px',paddingTop:'8px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+              <span style={{fontSize:'10px',color:'#087F70',opacity:0.6}}>Actualizado por Rosa</span>
               <span style={{fontSize:'10px',color:'#E9826E',fontWeight:600}}>Hace 15 min</span>
             </div>
           </div>
@@ -782,7 +782,7 @@ export default function Landing() {
               ].map((s, i, arr) => (
                 <div key={s.n} className={`reveal reveal-delay-${i}`} style={{ display: 'flex', gap: 24, marginBottom: i < arr.length - 1 ? 32 : 0 }}>
                   <div style={{ flexShrink: 0, zIndex: 1 }}>
-                    <div style={{ width: 80, height: 80, borderRadius: '50%', background: `linear-gradient(135deg, ${ACTION} 0%, #143C32 100%)`, color: WHITE, fontWeight: 700, fontSize: 28, fontFamily: SERIF, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 12px 40px rgba(13,107,99,0.28)' }}>{s.n}</div>
+                    <div style={{ width: 80, height: 80, borderRadius: '50%', background: `linear-gradient(135deg, ${ACTION} 0%, #A8E5D6 100%)`, color: WHITE, fontWeight: 700, fontSize: 28, fontFamily: SERIF, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 12px 40px rgba(8,127,112,0.28)' }}>{s.n}</div>
                   </div>
                   <div style={{ paddingTop: 22 }}>
                     <h3 style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 600, color: PRIMARY, margin: '0 0 8px' }}>{s.title}</h3>
@@ -906,7 +906,7 @@ export default function Landing() {
       </section>
 
       {/* ─────────────── EMOTIONAL QUOTE 2 ─────────────── */}
-      <section style={{ padding: '128px 32px', background: '#143C32' }}>
+      <section style={{ padding: '128px 32px', background: '#087F70' }}>
         <div style={{ maxWidth: 860, margin: '0 auto', textAlign: 'center' }}>
           <div style={{ fontFamily: SERIF, fontSize: 110, color: GOLD, lineHeight: 0.7, marginBottom: 20, opacity: 0.22 }}>"</div>
           <blockquote className="reveal" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(28px,3.8vw,54px)', fontWeight: 500, color: CREAM, lineHeight: 1.45, margin: '0 0 36px' }}>
@@ -1062,14 +1062,14 @@ export default function Landing() {
       </section>
 
       {/* ─────────────── 16. FOOTER ─────────────── */}
-      <footer style={{ background: '#F8F4ED', padding: '64px 32px 48px', borderTop: `1px solid rgba(20,60,50,0.08)` }}>
+      <footer style={{ background: '#F8F4ED', padding: '64px 32px 48px', borderTop: `1px solid rgba(8,127,112,0.08)` }}>
         <div style={{ maxWidth: 1140, margin: '0 auto' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 48, marginBottom: 52 }}>
             <div style={{ flex: '0 0 auto', maxWidth: 280 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, padding: '4px 0' }}>
                 <img src="/logo.png" alt="FamiliaCerca" style={{ width: 44, height: 44, objectFit: 'contain', display: 'block' }} />
                 <span style={{ fontFamily: SERIF, fontWeight: 700, margin: 0, padding: 0 }}>
-                  <span style={{ color: '#143C32', fontSize: 26 }}>Familia</span>
+                  <span style={{ color: '#087F70', fontSize: 26 }}>Familia</span>
                   <span style={{ color: '#E9826E', fontSize: 26 }}>Cerca</span>
                 </span>
               </div>
@@ -1083,16 +1083,16 @@ export default function Landing() {
                   { label: 'WhatsApp', href: 'https://wa.me/?text=Te%20comparto%20FamiliaCerca%2C%20una%20app%20para%20coordinar%20el%20cuidado%20familiar%20%F0%9F%92%9A%20familiacerca.com', icon: <svg width={17} height={17} viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zm-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884z"/></svg> },
                 ].map(s => (
                   <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label}
-                    style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(20,60,50,0.06)', border: '1px solid rgba(20,60,50,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6B7280', textDecoration: 'none' }}
+                    style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(8,127,112,0.06)', border: '1px solid rgba(8,127,112,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6B7280', textDecoration: 'none' }}
                     onMouseEnter={e => { e.currentTarget.style.color = GOLD; e.currentTarget.style.background = `rgba(233,130,110,0.10)` }}
-                    onMouseLeave={e => { e.currentTarget.style.color = '#6B7280'; e.currentTarget.style.background = 'rgba(20,60,50,0.06)' }}
+                    onMouseLeave={e => { e.currentTarget.style.color = '#6B7280'; e.currentTarget.style.background = 'rgba(8,127,112,0.06)' }}
                   >{s.icon}</a>
                 ))}
               </div>
             </div>
             <div style={{ display: 'flex', gap: 56, flexWrap: 'wrap' }}>
               <div>
-                <p style={{ fontSize: 11, fontWeight: 500, color: '#143C32', textTransform: 'uppercase', letterSpacing: '0.12em', margin: '0 0 18px', fontFamily: SANS }}>Contacto</p>
+                <p style={{ fontSize: 11, fontWeight: 500, color: '#087F70', textTransform: 'uppercase', letterSpacing: '0.12em', margin: '0 0 18px', fontFamily: SANS }}>Contacto</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                   {[
                     { label: 'hola@familiacerca.com', href: 'mailto:hola@familiacerca.com' },
@@ -1100,29 +1100,29 @@ export default function Landing() {
                   ].map(l => (
                     <a key={l.href} href={l.href} target={l.href.startsWith('http') ? '_blank' : undefined} rel={l.href.startsWith('http') ? 'noopener noreferrer' : undefined}
                       style={{ fontSize: 15, color: '#6B7280', textDecoration: 'none', fontFamily: SANS, fontWeight: 300 }}
-                      onMouseEnter={e => e.currentTarget.style.color = '#143C32'}
+                      onMouseEnter={e => e.currentTarget.style.color = '#087F70'}
                       onMouseLeave={e => e.currentTarget.style.color = '#6B7280'}
                     >{l.label}</a>
                   ))}
                 </div>
               </div>
               <div>
-                <p style={{ fontSize: 11, fontWeight: 500, color: '#143C32', textTransform: 'uppercase', letterSpacing: '0.12em', margin: '0 0 18px', fontFamily: SANS }}>Producto</p>
+                <p style={{ fontSize: 11, fontWeight: 500, color: '#087F70', textTransform: 'uppercase', letterSpacing: '0.12em', margin: '0 0 18px', fontFamily: SANS }}>Producto</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                   {[{label:'Funciones',href:'#funciones'},{label:'Precios',href:'#precios'},{label:'Cómo funciona',href:'#como'},{label:'Preguntas',href:'#faq'}].map(l => (
                     <a key={l.href} href={l.href} style={{ fontSize: 15, color: '#6B7280', textDecoration: 'none', fontFamily: SANS, fontWeight: 300 }}
-                      onMouseEnter={e => e.currentTarget.style.color = '#143C32'}
+                      onMouseEnter={e => e.currentTarget.style.color = '#087F70'}
                       onMouseLeave={e => e.currentTarget.style.color = '#6B7280'}
                     >{l.label}</a>
                   ))}
                 </div>
               </div>
               <div>
-                <p style={{ fontSize: 11, fontWeight: 500, color: '#143C32', textTransform: 'uppercase', letterSpacing: '0.12em', margin: '0 0 18px', fontFamily: SANS }}>Legal</p>
+                <p style={{ fontSize: 11, fontWeight: 500, color: '#087F70', textTransform: 'uppercase', letterSpacing: '0.12em', margin: '0 0 18px', fontFamily: SANS }}>Legal</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                   {[{label:'Términos de uso',to:'/terminos'},{label:'Privacidad',to:'/privacidad'},{label:'Iniciar sesión',to:'/login'},{label:'Crear cuenta',to:'/register'}].map(l => (
                     <Link key={l.label} to={l.to} style={{ fontSize: 15, color: '#6B7280', textDecoration: 'none', fontFamily: SANS, fontWeight: 300 }}
-                      onMouseEnter={e => e.currentTarget.style.color = '#143C32'}
+                      onMouseEnter={e => e.currentTarget.style.color = '#087F70'}
                       onMouseLeave={e => e.currentTarget.style.color = '#6B7280'}
                     >{l.label}</Link>
                   ))}
@@ -1215,9 +1215,9 @@ export default function Landing() {
         .cta-coral { transition: background 0.2s ease !important; }
         .cta-coral:hover { background: #D86F5A !important; }
         .btn-outlined-teal { transition: background 0.2s ease, color 0.2s ease; }
-        .btn-outlined-teal:hover { background: #143C32 !important; color: white !important; }
+        .btn-outlined-teal:hover { background: #087F70 !important; color: white !important; }
         .btn-nav-cream { transition: background 0.2s ease, color 0.2s ease; }
-        .btn-nav-cream:hover { background: #143C32 !important; color: #F8F4ED !important; }
+        .btn-nav-cream:hover { background: #087F70 !important; color: #F8F4ED !important; }
 
         @media (max-width: 1024px) {
           .para-quien-grid { grid-template-columns: repeat(2, 1fr) !important; }
