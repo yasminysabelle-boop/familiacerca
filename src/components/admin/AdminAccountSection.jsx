@@ -1,6 +1,5 @@
-import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useSubscription } from '../../contexts/SubscriptionContext'
-import { createPortalSession } from '../../lib/stripe'
 
 const PLAN_META = {
   free:      { label: 'Prueba gratuita', color: '#9CA3AF', icon: '🌱', features: ['2 cuidadores', 'Chat familiar', 'Medicamentos básicos', 'Historial 7 días'] },
@@ -17,23 +16,9 @@ const STATUS_LABEL = {
 
 export default function AdminAccountSection() {
   const { sub, isPaid, isTrialing, daysLeft, trialExpired } = useSubscription()
-  const [loading, setLoading] = useState(false)
-  const [error, setError]     = useState('')
+  const navigate = useNavigate()
 
   const meta = PLAN_META[sub?.plan ?? 'free']
-
-  async function openPortal() {
-    setLoading(true)
-    setError('')
-    try {
-      const url = await createPortalSession()
-      window.location.href = url
-    } catch (err) {
-      setError('No se pudo abrir el portal. Intenta de nuevo.')
-    } finally {
-      setLoading(false)
-    }
-  }
 
   if (!sub) return <p style={{ color: '#9CA3AF', fontSize: 14, textAlign: 'center', padding: 24 }}>Cargando suscripción...</p>
 
@@ -96,22 +81,20 @@ export default function AdminAccountSection() {
       {/* Subscription management */}
       <div style={{ background: 'white', borderRadius: 14, border: '1px solid #EDE5D8', overflow: 'hidden' }}>
         <button
-          onClick={openPortal}
-          disabled={loading}
+          onClick={() => navigate('/ajustes')}
           style={{
             width: '100%', display: 'flex', alignItems: 'center', gap: 12,
             padding: '14px 16px', background: 'none', border: 'none',
-            borderBottom: '1px solid #F5F0EA', cursor: loading ? 'default' : 'pointer',
-            opacity: loading ? 0.6 : 1, textAlign: 'left',
+            borderBottom: '1px solid #F5F0EA', cursor: 'pointer', textAlign: 'left',
           }}
         >
           <span style={{ fontSize: 20, flexShrink: 0 }}>💳</span>
           <div style={{ flex: 1 }}>
             <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#1A1A1A' }}>
-              {loading ? 'Abriendo portal...' : 'Gestionar suscripción'}
+              Gestionar suscripción
             </p>
             <p style={{ margin: '1px 0 0', fontSize: 12, color: '#9CA3AF' }}>
-              Actualizar plan, historial de pagos, cancelar
+              Ver plan activo, próximo cobro, cancelar
             </p>
           </div>
           <span style={{ color: '#D1D5DB', fontSize: 18, flexShrink: 0 }}>›</span>
@@ -120,22 +103,15 @@ export default function AdminAccountSection() {
         <div style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
           <span style={{ fontSize: 16 }}>🔒</span>
           <p style={{ margin: 0, fontSize: 12, color: '#9CA3AF', lineHeight: 1.5 }}>
-            Los pagos se procesan de forma segura. El historial completo de facturas está disponible en el portal de suscripción.
+            Los pagos se procesan de forma segura a través de PayPal.
           </p>
         </div>
       </div>
 
-      {error && (
-        <p style={{ margin: 0, fontSize: 12, color: '#DC2626', padding: '8px 12px', borderRadius: 8, background: '#FEF2F2' }}>
-          {error}
-        </p>
-      )}
-
       {/* Upgrade CTA for free/expired */}
       {(trialExpired || sub.plan === 'free') && (
         <button
-          onClick={openPortal}
-          disabled={loading}
+          onClick={() => navigate('/upgrade')}
           style={{
             padding: '14px', borderRadius: 14, border: 'none',
             background: '#087F70',
