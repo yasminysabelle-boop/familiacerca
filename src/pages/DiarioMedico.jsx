@@ -241,7 +241,7 @@ export default function DiarioMedico() {
 
         {/* Header */}
         <div style={{
-          background: 'linear-gradient(135deg, #0B4F4A, #1A3A12)',
+          background: 'linear-gradient(135deg, #087F70, #0a9d8c)',
           borderRadius: 20, padding: '20px 18px', marginBottom: 20,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         }}>
