@@ -146,7 +146,7 @@ function UpgradeContent() {
         <div style={{ background: '#0B4F4A', padding: '36px 24px 32px', textAlign: 'center' }}>
           <h1 style={{
             color: 'white', fontSize: 26, fontWeight: 700,
-            fontFamily: 'Georgia, serif', margin: '0 0 8px',
+            fontFamily: "'Plus Jakarta Sans', sans-serif", margin: '0 0 8px',
           }}>
             Elige tu plan
           </h1>
@@ -176,7 +176,7 @@ function UpgradeContent() {
               </div>
             )}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
-              <p style={{ fontSize: 18, fontWeight: 700, color: '#1A1A1A', margin: 0, fontFamily: 'Georgia, serif' }}>
+              <p style={{ fontSize: 18, fontWeight: 700, color: '#1A1A1A', margin: 0, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                 Plan Gratis
               </p>
               <span style={{ fontSize: 24, fontWeight: 800, color: '#9CA3AF' }}>$0</span>
@@ -214,7 +214,7 @@ function UpgradeContent() {
               {activePlan === 'familiar' ? 'Tu plan actual' : 'Más popular'}
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
-              <p style={{ fontSize: 18, fontWeight: 700, color: '#1A1A1A', margin: 0, fontFamily: 'Georgia, serif' }}>
+              <p style={{ fontSize: 18, fontWeight: 700, color: '#1A1A1A', margin: 0, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                 Plan Familiar
               </p>
               <span style={{ fontSize: 24, fontWeight: 800, color: '#0B4F4A' }}>$12.99/mes</span>
@@ -265,7 +265,7 @@ function UpgradeContent() {
               </div>
             )}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
-              <p style={{ fontSize: 18, fontWeight: 700, color: '#1A1A1A', margin: 0, fontFamily: 'Georgia, serif' }}>
+              <p style={{ fontSize: 18, fontWeight: 700, color: '#1A1A1A', margin: 0, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                 Plan Cuidado Total
               </p>
               <span style={{ fontSize: 24, fontWeight: 800, color: '#0B4F4A' }}>$24.99/mes</span>

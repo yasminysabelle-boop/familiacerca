@@ -6,7 +6,7 @@ function Section({ title, children }) {
     <section className="mb-8">
       <h2
         className="text-base font-bold text-gray-900 mb-3 pb-2"
-        style={{ fontFamily: 'Georgia, serif', borderBottom: '2px solid #EDE5D8' }}
+        style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", borderBottom: '2px solid #EDE5D8' }}
       >
         {title}
       </h2>
@@ -20,7 +20,7 @@ function Section({ title, children }) {
 function Item({ children }) {
   return (
     <div className="flex gap-2.5">
-      <span className="mt-1 flex-shrink-0 w-1.5 h-1.5 rounded-full" style={{ background: '#0d6b63', marginTop: 6 }} />
+      <span className="mt-1 flex-shrink-0 w-1.5 h-1.5 rounded-full" style={{ background: '#087F70', marginTop: 6 }} />
       <p>{children}</p>
     </div>
   )
@@ -67,7 +67,7 @@ export default function TermsOfService() {
           <Logo size={26} />
           <span
             className="text-sm font-bold text-gray-900 truncate"
-            style={{ fontFamily: 'Georgia, serif' }}
+            style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
           >
             Términos de Servicio
           </span>
@@ -87,7 +87,7 @@ export default function TermsOfService() {
           </div>
           <h1
             className="text-2xl font-bold text-gray-900 leading-tight mb-2"
-            style={{ fontFamily: 'Georgia, serif' }}
+            style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
           >
             Términos de Servicio
           </h1>
@@ -144,8 +144,8 @@ export default function TermsOfService() {
                 style={{ background: 'white', border: '1.5px solid #EDE5D8', boxShadow: '0 2px 12px rgba(0,0,0,0.05)' }}
               >
                 <div className="flex items-center justify-between mb-1">
-                  <p className="font-bold text-gray-900" style={{ fontFamily: 'Georgia, serif' }}>Plan Familiar</p>
-                  <span className="font-bold" style={{ color: '#0d6b63' }}>$19 / mes</span>
+                  <p className="font-bold text-gray-900" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Plan Familiar</p>
+                  <span className="font-bold" style={{ color: '#087F70' }}>$19 / mes</span>
                 </div>
                 <p className="text-xs text-gray-500">Coordinación familiar básica: medicamentos, calendario, notas y álbum familiar.</p>
               </div>
@@ -154,7 +154,7 @@ export default function TermsOfService() {
                 style={{ background: 'white', border: '1.5px solid #C9882A', boxShadow: '0 2px 12px rgba(201,136,42,0.1)' }}
               >
                 <div className="flex items-center justify-between mb-1">
-                  <p className="font-bold text-gray-900" style={{ fontFamily: 'Georgia, serif' }}>Plan Premium</p>
+                  <p className="font-bold text-gray-900" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Plan Premium</p>
                   <span className="font-bold" style={{ color: '#A07830' }}>$29 / mes</span>
                 </div>
                 <p className="text-xs text-gray-500">Todo el Plan Familiar más: reportes avanzados, diario de voz, y soporte prioritario.</p>
@@ -281,7 +281,7 @@ export default function TermsOfService() {
         >
           <p className="text-xs text-gray-400 text-center leading-relaxed">
             ¿Prefieres leer esto en inglés? Escríbenos a{' '}
-            <a href="mailto:legal@familiacerca.com" className="underline" style={{ color: '#0d6b63' }}>
+            <a href="mailto:legal@familiacerca.com" className="underline" style={{ color: '#087F70' }}>
               legal@familiacerca.com
             </a>{' '}
             y te enviamos la versión en inglés.
@@ -289,7 +289,7 @@ export default function TermsOfService() {
           <Link
             to="/privacidad"
             className="text-xs font-semibold underline"
-            style={{ color: '#0d6b63' }}
+            style={{ color: '#087F70' }}
           >
             Ver Política de Privacidad →
           </Link>

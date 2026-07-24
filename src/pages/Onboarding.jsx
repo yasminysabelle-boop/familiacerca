@@ -38,7 +38,7 @@ const primaryBtn = (disabled) => ({
   color: 'white', fontWeight: 700, fontSize: 14,
   borderRadius: 16, border: 'none',
   cursor: disabled ? 'not-allowed' : 'pointer',
-  boxShadow: disabled ? 'none' : '0 8px 24px rgba(13,107,99,0.35)',
+  boxShadow: disabled ? 'none' : '0 8px 24px rgba(8,127,112,0.35)',
   transition: 'all 0.2s',
 })
 
@@ -51,9 +51,9 @@ const secondaryBtn = {
 const inputStyle = (active) => ({
   width: '100%', padding: '14px 16px', textAlign: 'center',
   fontSize: 16, fontWeight: 600, color: '#1A1A1A',
-  border: `2px solid ${active ? '#0d6b63' : '#EDE5D8'}`,
+  border: `2px solid ${active ? '#087F70' : '#EDE5D8'}`,
   borderRadius: 14, background: 'white', outline: 'none',
-  boxShadow: active ? '0 0 0 4px rgba(13,107,99,0.1)' : 'none',
+  boxShadow: active ? '0 0 0 4px rgba(8,127,112,0.1)' : 'none',
   transition: 'all 0.2s', boxSizing: 'border-box',
 })
 
@@ -193,7 +193,7 @@ export default function Onboarding() {
           <div style={{ textAlign: 'center', marginBottom: 24 }}>
             <div style={{ fontSize: 52, marginBottom: 14, lineHeight: 1 }}>{cfg.emoji}</div>
             <h2 style={{
-              fontFamily: 'Georgia, serif', fontSize: 20, fontWeight: 700,
+              fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 20, fontWeight: 700,
               color: '#1A1A1A', lineHeight: 1.3, marginBottom: 8,
             }}>
               {cfg.title(firstName)}

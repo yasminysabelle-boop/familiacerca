@@ -6,7 +6,7 @@ function Section({ title, children }) {
     <section className="mb-8">
       <h2
         className="text-base font-bold text-gray-900 mb-3 pb-2"
-        style={{ fontFamily: 'Georgia, serif', borderBottom: '2px solid #EDE5D8' }}
+        style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", borderBottom: '2px solid #EDE5D8' }}
       >
         {title}
       </h2>
@@ -20,7 +20,7 @@ function Section({ title, children }) {
 function Item({ children }) {
   return (
     <div className="flex gap-2.5">
-      <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full" style={{ background: '#0d6b63', marginTop: 6 }} />
+      <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full" style={{ background: '#087F70', marginTop: 6 }} />
       <p>{children}</p>
     </div>
   )
@@ -78,7 +78,7 @@ export default function PrivacyPolicy() {
           <Logo size={26} />
           <span
             className="text-sm font-bold text-gray-900 truncate"
-            style={{ fontFamily: 'Georgia, serif' }}
+            style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
           >
             Política de Privacidad
           </span>
@@ -98,7 +98,7 @@ export default function PrivacyPolicy() {
           </div>
           <h1
             className="text-2xl font-bold text-gray-900 leading-tight mb-2"
-            style={{ fontFamily: 'Georgia, serif' }}
+            style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
           >
             Política de Privacidad
           </h1>
@@ -203,7 +203,7 @@ export default function PrivacyPolicy() {
             >
               <span className="text-3xl">🏗️</span>
               <div>
-                <p className="font-bold text-gray-900 text-sm mb-1" style={{ fontFamily: 'Georgia, serif' }}>
+                <p className="font-bold text-gray-900 text-sm mb-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                   Infraestructura: Supabase en AWS (EE.UU.)
                 </p>
                 <p className="text-xs text-gray-500 leading-relaxed">
@@ -323,7 +323,7 @@ export default function PrivacyPolicy() {
         >
           <p className="text-xs text-gray-400 text-center leading-relaxed">
             ¿Prefieres leer esto en inglés? Escríbenos a{' '}
-            <a href="mailto:legal@familiacerca.com" className="underline" style={{ color: '#0d6b63' }}>
+            <a href="mailto:legal@familiacerca.com" className="underline" style={{ color: '#087F70' }}>
               legal@familiacerca.com
             </a>{' '}
             y te enviamos la versión en inglés.
@@ -331,7 +331,7 @@ export default function PrivacyPolicy() {
           <Link
             to="/terminos"
             className="text-xs font-semibold underline"
-            style={{ color: '#0d6b63' }}
+            style={{ color: '#087F70' }}
           >
             Ver Términos de Servicio →
           </Link>
