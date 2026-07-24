@@ -65,8 +65,8 @@ export default function WelcomeSlides({ onDone }) {
               <Logo size={84} />
             </div>
             <h1 style={{
-              color: '#143C32',
-              fontFamily: 'Georgia, serif',
+              color: '#087F70',
+              fontFamily: "'Plus Jakarta Sans', sans-serif",
               fontSize: 40, fontWeight: 700,
               margin: '0 0 10px',
               lineHeight: 1.1,
@@ -79,7 +79,7 @@ export default function WelcomeSlides({ onDone }) {
               fontSize: 21, fontWeight: 500,
               letterSpacing: '0.04em',
               margin: '0 0 18px',
-              fontFamily: 'Georgia, serif',
+              fontFamily: "'Plus Jakarta Sans', sans-serif",
             }}>
               Cuidado con amor
             </p>
@@ -119,8 +119,8 @@ export default function WelcomeSlides({ onDone }) {
               Todo en un solo lugar
             </p>
             <h2 style={{
-              color: '#143C32',
-              fontFamily: 'Georgia, serif',
+              color: '#087F70',
+              fontFamily: "'Plus Jakarta Sans', sans-serif",
               fontSize: 28, fontWeight: 700,
               margin: 0, lineHeight: 1.25,
             }}>
@@ -182,12 +182,12 @@ export default function WelcomeSlides({ onDone }) {
               marginBottom: 24,
             }}>
               <span style={{ fontSize: 16 }}>🎁</span>
-              <span style={{ color: '#143C32', fontSize: 14, fontWeight: 700 }}>14 días gratis</span>
+              <span style={{ color: '#087F70', fontSize: 14, fontWeight: 700 }}>14 días gratis</span>
             </div>
 
             <h2 style={{
-              color: '#143C32',
-              fontFamily: 'Georgia, serif',
+              color: '#087F70',
+              fontFamily: "'Plus Jakarta Sans', sans-serif",
               fontSize: 36, fontWeight: 700,
               margin: '0 0 14px', lineHeight: 1.15,
             }}>
@@ -207,11 +207,11 @@ export default function WelcomeSlides({ onDone }) {
               style={{
                 width: '100%', padding: '18px',
                 borderRadius: 16,
-                background: '#143C32',
+                background: '#087F70',
                 color: 'white',
                 fontSize: 17, fontWeight: 800,
                 border: 'none', cursor: 'pointer',
-                boxShadow: '0 4px 20px rgba(20,60,50,0.18)',
+                boxShadow: '0 4px 20px rgba(8,127,112,0.18)',
                 marginBottom: 14,
                 letterSpacing: '-0.2px',
               }}
@@ -226,8 +226,8 @@ export default function WelcomeSlides({ onDone }) {
                 width: '100%', padding: '15px',
                 borderRadius: 16,
                 background: 'transparent',
-                border: '1.5px solid #143C32',
-                color: '#143C32',
+                border: '1.5px solid #087F70',
+                color: '#087F70',
                 fontSize: 15, fontWeight: 600,
                 cursor: 'pointer',
               }}
@@ -297,11 +297,11 @@ export default function WelcomeSlides({ onDone }) {
               pointerEvents: 'auto',
               padding: '15px 48px',
               borderRadius: 50,
-              background: '#143C32',
+              background: '#087F70',
               color: 'white',
               fontSize: 16, fontWeight: 700,
               border: 'none', cursor: 'pointer',
-              boxShadow: '0 4px 20px rgba(20,60,50,0.18)',
+              boxShadow: '0 4px 20px rgba(8,127,112,0.18)',
               letterSpacing: '-0.2px',
             }}
           >

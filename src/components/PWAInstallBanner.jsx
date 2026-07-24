@@ -55,7 +55,7 @@ export default function PWAInstallBanner() {
   return (
     <div style={{
       position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 8900,
-      background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
+      background: 'linear-gradient(135deg, #087F70, #A8E5D6)',
       boxShadow: '0 -4px 24px rgba(0,0,0,0.25)',
     }}>
       <div style={{
@@ -86,7 +86,7 @@ export default function PWAInstallBanner() {
           onClick={handleInstall}
           style={{
             padding: '8px 14px', borderRadius: 10, border: 'none', flexShrink: 0,
-            background: 'white', color: '#0d6b63',
+            background: 'white', color: '#087F70',
             fontWeight: 700, fontSize: 12, cursor: 'pointer',
             whiteSpace: 'nowrap',
           }}

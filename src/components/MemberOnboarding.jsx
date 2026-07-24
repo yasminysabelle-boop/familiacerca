@@ -143,7 +143,7 @@ export default function MemberOnboarding({ onDone }) {
           <p style={{ margin: '0 0 4px', fontSize: 11, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
             Paso 1 de 2
           </p>
-          <h2 style={{ margin: '0 0 4px', fontSize: 20, fontWeight: 800, color: '#1A1A1A', fontFamily: 'Georgia, serif', lineHeight: 1.2 }}>
+          <h2 style={{ margin: '0 0 4px', fontSize: 20, fontWeight: 800, color: '#1A1A1A', fontFamily: "'Plus Jakarta Sans', sans-serif", lineHeight: 1.2 }}>
             Cuéntanos de ti
           </h2>
           <p style={{ margin: '0 0 22px', fontSize: 13, color: '#6B7280', lineHeight: 1.5 }}>
@@ -158,9 +158,9 @@ export default function MemberOnboarding({ onDone }) {
                 onClick={() => fileInputRef.current?.click()}
                 style={{
                   width: 88, height: 88, borderRadius: '50%', border: 'none',
-                  background: photoPreview ? 'transparent' : '#F0F9F4',
+                  background: photoPreview ? 'transparent' : '#E8F6F3',
                   cursor: 'pointer', padding: 0, overflow: 'hidden',
-                  border: '3px solid #0d6b63',
+                  border: '3px solid #087F70',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}
               >
@@ -172,7 +172,7 @@ export default function MemberOnboarding({ onDone }) {
               <div style={{
                 position: 'absolute', bottom: 2, right: 2,
                 width: 24, height: 24, borderRadius: '50%',
-                background: '#0d6b63', border: '2px solid white',
+                background: '#087F70', border: '2px solid white',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontSize: 12, pointerEvents: 'none',
               }}>
@@ -215,8 +215,8 @@ export default function MemberOnboarding({ onDone }) {
                   onClick={() => setRelationship(r.value)}
                   style={{
                     padding: '10px 4px', borderRadius: 12, border: 'none',
-                    background: relationship === r.value ? '#0d6b63' : '#F9F7F4',
-                    border: `1.5px solid ${relationship === r.value ? '#0d6b63' : '#E5E0D8'}`,
+                    background: relationship === r.value ? '#087F70' : '#F9F7F4',
+                    border: `1.5px solid ${relationship === r.value ? '#087F70' : '#E5E0D8'}`,
                     cursor: 'pointer', display: 'flex', flexDirection: 'column',
                     alignItems: 'center', gap: 4,
                     transition: 'all 0.15s',
@@ -248,9 +248,9 @@ export default function MemberOnboarding({ onDone }) {
             }}
             style={{
               width: '100%', padding: '14px', borderRadius: 14, border: 'none',
-              background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
+              background: 'linear-gradient(135deg, #087F70, #A8E5D6)',
               color: 'white', fontWeight: 800, fontSize: 15,
-              cursor: 'pointer', boxShadow: '0 6px 20px rgba(13,107,99,0.3)',
+              cursor: 'pointer', boxShadow: '0 6px 20px rgba(8,127,112,0.3)',
             }}
           >
             Continuar →
@@ -264,7 +264,7 @@ export default function MemberOnboarding({ onDone }) {
           <p style={{ margin: '0 0 4px', fontSize: 11, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
             Paso 2 de 2
           </p>
-          <h2 style={{ margin: '0 0 4px', fontSize: 20, fontWeight: 800, color: '#1A1A1A', fontFamily: 'Georgia, serif' }}>
+          <h2 style={{ margin: '0 0 4px', fontSize: 20, fontWeight: 800, color: '#1A1A1A', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
             Tu celular
           </h2>
           <p style={{ margin: '0 0 22px', fontSize: 13, color: '#6B7280', lineHeight: 1.5 }}>
@@ -301,10 +301,10 @@ export default function MemberOnboarding({ onDone }) {
             disabled={saving}
             style={{
               width: '100%', padding: '14px', borderRadius: 14, border: 'none',
-              background: saving ? '#9CA3AF' : 'linear-gradient(135deg, #0d6b63, #3A6347)',
+              background: saving ? '#9CA3AF' : 'linear-gradient(135deg, #087F70, #A8E5D6)',
               color: 'white', fontWeight: 800, fontSize: 15,
               cursor: saving ? 'default' : 'pointer',
-              boxShadow: saving ? 'none' : '0 6px 20px rgba(13,107,99,0.3)',
+              boxShadow: saving ? 'none' : '0 6px 20px rgba(8,127,112,0.3)',
               marginBottom: 10,
             }}
           >

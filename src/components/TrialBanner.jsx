@@ -44,7 +44,7 @@ export default function TrialBanner() {
       }}
     >
       <div>
-        <p style={{ fontSize: 13, fontWeight: 700, color: urgent ? '#DC2626' : '#0d6b63', margin: '0 0 2px' }}>
+        <p style={{ fontSize: 13, fontWeight: 700, color: urgent ? '#DC2626' : '#087F70', margin: '0 0 2px' }}>
           {urgent ? `⚠ Quedan ${daysLeft} día${daysLeft !== 1 ? 's' : ''} de prueba` : `✨ Prueba gratuita — ${daysLeft} días restantes`}
         </p>
         <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>
@@ -55,7 +55,7 @@ export default function TrialBanner() {
         onClick={() => navigate('/upgrade')}
         style={{
           flexShrink: 0, padding: '8px 16px', borderRadius: 10, border: 'none',
-          background: urgent ? '#DC2626' : 'linear-gradient(135deg, #0d6b63, #3A6347)',
+          background: urgent ? '#DC2626' : 'linear-gradient(135deg, #087F70, #A8E5D6)',
           color: 'white', fontWeight: 700, fontSize: 12, cursor: 'pointer',
           whiteSpace: 'nowrap',
         }}
