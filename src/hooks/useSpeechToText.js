@@ -20,18 +20,32 @@ export function useSpeechToText(onResult) {
     rec.interimResults  = true
     rec.maxAlternatives = 1
 
+    // Texto final acumulado de ESTA sesión de reconocimiento, reconstruido
+    // completo en cada evento — Chrome en modo continuo a veces "revisa" un
+    // resultado ya marcado isFinal (lo alarga) en vez de agregar uno nuevo;
+    // tratar cada isFinal como un fragmento independiente duplicaba esa
+    // revisión. Aquí se recalcula el total y solo se emite la diferencia.
+    let finalizedSoFar = ''
+
     rec.onresult = e => {
+      let sessionFinal = ''
       let live = ''
-      for (let i = e.resultIndex; i < e.results.length; i++) {
+      for (let i = 0; i < e.results.length; i++) {
         const t = e.results[i][0].transcript
         if (e.results[i].isFinal) {
-          onResultRef.current(t.trim())
-          setInterim('')
+          sessionFinal += (sessionFinal ? ' ' : '') + t.trim()
         } else {
           live += t
         }
       }
-      if (live) setInterim(live)
+      if (sessionFinal && sessionFinal !== finalizedSoFar) {
+        const delta = sessionFinal.startsWith(finalizedSoFar)
+          ? sessionFinal.slice(finalizedSoFar.length).trim()
+          : sessionFinal
+        finalizedSoFar = sessionFinal
+        if (delta) onResultRef.current(delta)
+      }
+      setInterim(live)
     }
 
     rec.onerror = e => {
