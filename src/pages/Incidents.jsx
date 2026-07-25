@@ -6,6 +6,7 @@ import Layout from '../components/Layout'
 import EvidencePhoto from '../components/EvidencePhoto'
 import { Plus, XIcon, CheckIcon } from '../components/Icons'
 import { INCIDENT_TYPES, incidentTypeInfo } from '../lib/incidentTypes'
+import VoiceInput from '../components/VoiceInput'
 
 function toLocalDateKey(d = new Date()) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
@@ -286,17 +287,11 @@ export default function Incidents() {
             <p style={{ fontSize: 12, fontWeight: 700, color: '#0B4F4A', margin: '0 0 8px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
               Descripción (opcional)
             </p>
-            <textarea
+            <VoiceInput
               value={form.description}
-              onChange={e => setForm(f => ({ ...f, description: e.target.value.slice(0, 300) }))}
+              onChange={v => setForm(f => ({ ...f, description: v.slice(0, 300) }))}
               placeholder="¿Qué pasó? ¿Cómo reaccionó?"
               rows={3}
-              style={{
-                width: '100%', borderRadius: 10, border: '1.5px solid #E5DDD2',
-                padding: '10px 12px', fontSize: 14, color: '#1A1A1A', lineHeight: 1.6,
-                resize: 'none', outline: 'none', fontFamily: 'inherit',
-                boxSizing: 'border-box', marginBottom: 4,
-              }}
             />
             <p style={{ fontSize: 11, color: '#9CA3AF', margin: '0 0 16px', textAlign: 'right' }}>{form.description.length}/300</p>
 
