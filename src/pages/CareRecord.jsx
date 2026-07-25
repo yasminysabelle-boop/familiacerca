@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import { CheckIcon } from '../components/Icons'
 import { getTodayPR } from '../lib/utils'
+import VoiceInput from '../components/VoiceInput'
 
 const SECTIONS = [
   {
@@ -245,25 +246,15 @@ export default function CareRecord() {
               <p style={{ fontSize: 12, fontWeight: 700, color: '#0B4F4A', margin: '0 0 10px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
                 Notas (opcional)
               </p>
-              <textarea
+              <VoiceInput
                 value={form.notes}
-                onChange={e => {
-                  if (isFamiliar) return
+                onChange={v => {
                   setSaved(false)
-                  setForm(f => ({ ...f, notes: e.target.value.slice(0, 300) }))
+                  setForm(f => ({ ...f, notes: v.slice(0, 300) }))
                 }}
-                readOnly={isFamiliar}
+                disabled={isFamiliar}
                 placeholder="Observaciones del día, comportamiento especial, síntomas..."
                 rows={3}
-                style={{
-                  width: '100%', borderRadius: 10,
-                  border: '1.5px solid #E5DDD2',
-                  padding: '10px 12px',
-                  fontSize: 14, color: '#1A1A1A', lineHeight: 1.6,
-                  background: isFamiliar ? '#F9F7F4' : 'white',
-                  resize: 'none', outline: 'none',
-                  fontFamily: 'inherit', boxSizing: 'border-box',
-                }}
               />
               <p style={{ fontSize: 11, color: '#9CA3AF', margin: '4px 0 0', textAlign: 'right' }}>
                 {form.notes.length}/300
