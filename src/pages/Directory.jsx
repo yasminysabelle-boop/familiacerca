@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
+import VoiceInput from '../components/VoiceInput'
 import {
   Plus, XIcon, Phone, Mail, MapPin, Star, Pencil, Trash,
   BookOpen, User, AlertTriangle, Users,
@@ -1078,7 +1079,10 @@ export default function Directory() {
           <FormInput label="Teléfono"           value={docForm.phone}     onChange={v => setDocForm(f => ({ ...f, phone: v }))}     placeholder="555-123-4567" type="tel" />
           <FormInput label="Correo"             value={docForm.email}     onChange={v => setDocForm(f => ({ ...f, email: v }))}     placeholder="medico@hospital.com" type="email" />
           <FormInput label="Clínica / Hospital" value={docForm.clinic}    onChange={v => setDocForm(f => ({ ...f, clinic: v }))}    placeholder="Hospital General del Norte" />
-          <FormInput label="Notas"              value={docForm.notes}     onChange={v => setDocForm(f => ({ ...f, notes: v }))}     placeholder="Próxima cita, horario de consulta…" rows={3} />
+          <div>
+            <Label>Notas</Label>
+            <VoiceInput value={docForm.notes} onChange={v => setDocForm(f => ({ ...f, notes: v }))} placeholder="Próxima cita, horario de consulta…" rows={3} />
+          </div>
         </SheetModal>
       )}
 
@@ -1091,7 +1095,10 @@ export default function Directory() {
           <FormInput label="Teléfono principal"    value={insForm.phone}           onChange={v => setInsForm(f => ({ ...f, phone: v }))}           placeholder="555-000-1234" type="tel" />
           <FormInput label="Teléfono de emergencia" value={insForm.emergency_phone} onChange={v => setInsForm(f => ({ ...f, emergency_phone: v }))} placeholder="911 o línea directa" type="tel" />
           <FormInput label="Sitio web" value={insForm.website} onChange={v => setInsForm(f => ({ ...f, website: v }))} placeholder="www.hospital.com" />
-          <FormInput label="Notas"     value={insForm.notes}   onChange={v => setInsForm(f => ({ ...f, notes: v }))}   placeholder="Urgencias 24h, especialidades…" rows={2} />
+          <div>
+            <Label>Notas</Label>
+            <VoiceInput value={insForm.notes} onChange={v => setInsForm(f => ({ ...f, notes: v }))} placeholder="Urgencias 24h, especialidades…" rows={2} />
+          </div>
         </SheetModal>
       )}
 
@@ -1103,7 +1110,10 @@ export default function Directory() {
           <FormInput label="Teléfono"   value={conForm.phone}        onChange={v => setConForm(f => ({ ...f, phone: v }))}        placeholder="555-678-9012" type="tel" />
           <FormInput label="Correo"     value={conForm.email}        onChange={v => setConForm(f => ({ ...f, email: v }))}        placeholder="familiar@correo.com" type="email" />
           <FormInput label="Dirección"  value={conForm.address}      onChange={v => setConForm(f => ({ ...f, address: v }))}      placeholder="Calle Robles 45, Col. Centro" />
-          <FormInput label="Notas"      value={conForm.notes}        onChange={v => setConForm(f => ({ ...f, notes: v }))}        placeholder="Disponible fines de semana…" rows={2} />
+          <div>
+            <Label>Notas</Label>
+            <VoiceInput value={conForm.notes} onChange={v => setConForm(f => ({ ...f, notes: v }))} placeholder="Disponible fines de semana…" rows={2} />
+          </div>
 
           {/* Emergency toggle */}
           <button type="button" onClick={() => setConForm(f => ({ ...f, is_emergency_contact: !f.is_emergency_contact }))}
