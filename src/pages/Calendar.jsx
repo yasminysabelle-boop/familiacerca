@@ -6,6 +6,7 @@ import { useSubscription } from '../contexts/SubscriptionContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import EmptyState from '../components/EmptyState'
+import VoiceInput from '../components/VoiceInput'
 
 const DAYS   = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
 const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
@@ -74,10 +75,6 @@ export default function Calendar() {
     el?.scrollIntoView({ block: 'center', behavior: 'instant' })
   }, [showPicker])
 
-  // Date display (dd/mm/aaaa)
-  const [dateDisplay, setDateDisplay] = useState('')
-  const [dateError, setDateError]     = useState('')
-
   // Attachment state
   const [attachFiles, setAttachFiles]     = useState([])   // {file, preview, name, isImage}
   const [existingUrls, setExistingUrls]   = useState([])   // already-saved URLs
@@ -127,10 +124,6 @@ export default function Calendar() {
 
   function openEdit(ev) {
     setEditEvent(ev)
-    const parts = (ev.date ?? '').split('-')
-    const display = parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : ''
-    setDateDisplay(display)
-    setDateError(display ? '' : 'La cita no tiene fecha — ingresa una fecha válida (dd/mm/aaaa)')
     setExistingUrls(ev.attachments ?? [])
     setAttachFiles([])
     setAttachError('')
@@ -139,35 +132,11 @@ export default function Calendar() {
   }
 
   function resetForm() {
-    setForm(emptyForm); setDateDisplay(''); setDateError('')
+    setForm(emptyForm)
     setAttachFiles([]); setExistingUrls([]); setAttachError('')
   }
 
   function handleChange(e) { setForm(prev => ({ ...prev, [e.target.name]: e.target.value })) }
-
-  function handleDateInput(val) {
-    // Auto-insert slashes as user types
-    let digits = val.replace(/\D/g, '').slice(0, 8)
-    let formatted = digits
-    if (digits.length > 2) formatted = digits.slice(0, 2) + '/' + digits.slice(2)
-    if (digits.length > 4) formatted = digits.slice(0, 2) + '/' + digits.slice(2, 4) + '/' + digits.slice(4)
-    setDateDisplay(formatted)
-    setDateError('')
-
-    const parts = formatted.split('/')
-    if (parts.length === 3 && parts[0].length === 2 && parts[1].length === 2 && parts[2].length === 4) {
-      const iso = `${parts[2]}-${parts[1]}-${parts[0]}`
-      const d = new Date(iso)
-      if (isNaN(d.getTime())) {
-        setDateError('Fecha inválida')
-        setForm(prev => ({ ...prev, date: '' }))
-      } else {
-        setForm(prev => ({ ...prev, date: iso }))
-      }
-    } else {
-      setForm(prev => ({ ...prev, date: '' }))
-    }
-  }
 
   function pickAttachment() {
     const el = document.createElement('input')
@@ -189,7 +158,7 @@ export default function Calendar() {
 
   async function handleSubmit(e) {
     e.preventDefault()
-    if (!form.date) { setDateError('Ingresa una fecha válida (dd/mm/aaaa)'); return }
+    if (!form.date || !form.title.trim()) return
     setSaving(true); setAttachError('')
 
     // Upload pending attachment files
@@ -306,20 +275,20 @@ export default function Calendar() {
             <div className="grid grid-cols-2 gap-4">
               <div className="col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">Título *</label>
-                <input name="title" required value={form.title} onChange={handleChange}
+                <VoiceInput
+                  value={form.title}
+                  onChange={v => setForm(prev => ({ ...prev, title: v }))}
                   placeholder="ej. Cita con el cardiólogo"
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                  rows={1}
+                />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Fecha *</label>
                 <input
-                  value={dateDisplay}
-                  onChange={e => handleDateInput(e.target.value)}
-                  placeholder="dd/mm/aaaa"
-                  inputMode="numeric"
-                  className={`w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary ${dateError ? 'border-red-400' : 'border-gray-200'}`}
+                  type="date" name="date" required
+                  value={form.date} onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                 />
-                {dateError && <p className="text-xs text-red-500 mt-1">{dateError}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Hora</label>
@@ -335,9 +304,12 @@ export default function Calendar() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
-                <input name="description" value={form.description} onChange={handleChange}
+                <VoiceInput
+                  value={form.description}
+                  onChange={v => setForm(prev => ({ ...prev, description: v }))}
                   placeholder="Notas adicionales"
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
+                  rows={1}
+                />
               </div>
 
               {/* Status pills */}
@@ -728,9 +700,14 @@ export default function Calendar() {
               )}
             </div>
 
-            <textarea value={proofNote} onChange={e => setProofNote(e.target.value)} rows={2}
-              placeholder="Notas de la cita (diagnóstico, instrucciones...)..."
-              className="w-full mb-4 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none" />
+            <div className="mb-4">
+              <VoiceInput
+                value={proofNote}
+                onChange={setProofNote}
+                placeholder="Notas de la cita (diagnóstico, instrucciones...)..."
+                rows={2}
+              />
+            </div>
 
             {proofUploadError && (
               <p className="text-xs text-orange-600 mb-3 px-1">⚠ {proofUploadError}</p>
