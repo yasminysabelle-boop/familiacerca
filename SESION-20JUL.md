@@ -814,3 +814,188 @@ que tiene 21 resabios sin migrar).
 **Deploy:** 2 commits separados — `7e6c65a` (diseño de `/admin`),
 `239d211` (desconexión del Portal de Stripe). `netlify deploy --prod
 --build` → `familiacerca.com` sirve `index-Dk30GtBY.js`.
+
+---
+
+## Hallazgo pendiente (2026-07-25): paleta dual `#087F70` / `#0B4F4A` — decidir en sesión futura
+
+Surgió durante una auditoría de UX de fricción de entrada (voz vs. texto
+libre), al verificar si `CareRecord.jsx` (`/registros`, "Síntomas físicos
+del día") tenía resabios de la paleta vieja (`#0d6b63`/`#3A6347`/
+`#2D6A4F`).
+
+**Verificado con grep:** `CareRecord.jsx` tiene **cero** coincidencias de
+esos tres colores. Usa `#0B4F4A` + `#3D6128` (header degradado, borde y
+fondo de los chips seleccionados, botón guardar).
+
+**No es un resabio — es un segundo sistema de color vigente:** `#0B4F4A`
+aparece en 13 archivos activos y ya migrados/modernos: `Dashboard.jsx`,
+`PatientProfile.jsx`, `Directory.jsx`, `Incidents.jsx`,
+`OnboardingFlow.jsx`, `FamilyRoles.jsx`, `NotasFamilia.jsx`,
+`Upgrade.jsx`, `Settings.jsx`, `EmptyState.jsx`, `PayPalSubscription.jsx`,
+`MedicationTabs.jsx`, `generateMedicalReport.js`. `Incidents.jsx` en
+particular ya fue tocado por la migración teal reciente (commit
+`d2bf416`, fuente/spinner `#0d6b63`→`#087F70`) y ese pase **dejó
+`#0B4F4A` intacto a propósito** — confirma que hoy conviven dos teales
+oficiales: `#087F70` (acento/CTA/botones primarios) y `#0B4F4A` (headers y
+selección en pantallas "clínicas": Registros, Incidentes, Diario Médico,
+Perfil del paciente, Directorio).
+
+**Pendiente — decisión de Yasmin para sesión futura:** ¿unificar todo a
+`#087F70`, o mantener el sistema dual intencionalmente (un teal para
+acción, otro para contexto clínico)? No tocado — anotado solo como
+hallazgo, sin cambios de código en esta sesión.
+
+---
+
+## Fase 1 de optimización UX (voz > foto > selección > texto libre) — CERRADA (2026-07-25)
+
+Auditoría de fricción de entrada del cuidador (todas las pantallas:
+Medicamentos, Cuidado, Historial, Chat, Notas, Registros, Diario Médico,
+Gastos, Incidentes, y luego ampliada a Directorio, Calendario, Onboarding,
+Perfil del paciente, Familia, Álbum, Permisos, Ajustes). Clasificación
+🟢 óptimo / 🟡 mejorable / 🔴 alto esfuerzo por campo, sin editar nada
+hasta tener el diagnóstico completo aprobado.
+
+**Hallazgos de la auditoría (sin cambios de código):**
+- Dos pantallas de "Notas" duplicadas escribiendo a la misma tabla
+  (`Notes.jsx` en `/notes`, sin ningún punto de entrada en la navegación
+  actual — huérfana; `NotasFamilia.jsx` en `/paciente/notas-familia`, la
+  que sí usan Dashboard/notificaciones).
+- `CareSchedule.jsx` (`/cuidado/horarios`) es una pantalla completa
+  duplicada de la pestaña "Horarios" de `Cuidado.jsx`, ya sin ruta activa
+  (redirect en `App.jsx`) pero el archivo sigue vivo en el repo.
+- Campos de renovación de stock (`renewalMethod`, `pharmacyName`,
+  `refillsRemaining`, `lastMailDate`) se guardan y se muestran en
+  `MedicationStockTab.jsx`, pero no hay ningún input en el formulario de
+  Agregar/Editar medicamento para llenarlos — función a medio construir.
+- El modal "Registrar omisión" de dosis (Medicamentos) no tiene ningún
+  botón que lo abra en el código actual — vestigio inalcanzable, no
+  tocado (fuera de alcance de esta fase).
+- Ya existían **4 patrones distintos** de captura de voz en el código
+  antes de esta fase: `VoiceInput.jsx` (Diario Médico), `MicButton` +
+  `useSpeechToText` directo (Chat, Notas), `VoiceRecorder.jsx`
+  (NotasFamilia, grabación principal de Diario Médico), y una
+  implementación propia dentro de `PatientProfile.jsx` (`VoiceArea`, sin
+  `continuous`, un solo resultado por toque — resultó ser el único de los
+  4 que no comparte el bug de duplicación descrito más abajo).
+
+**Cambios implementados (commits separados por pantalla, todos con draft
++ verificación de Yasmin antes de commit/push):**
+- Gastos: voz en "Descripción"; "Pagó \*" pasa de texto libre obligatorio
+  a mostrarse precargado y de solo lectura con un botón "Cambiar" —
+  se mantuvo editable (no solo-lectura fijo) porque el campo se usa de
+  verdad para atribuir gastos a otro familiar distinto de quien los
+  registra (ver "¿Quién aportó más este mes?").
+- Registros (`CareRecord.jsx`): voz en "Notas".
+- Incidentes: voz en "Descripción".
+- Calendario: campo de fecha con máscara manual `dd/mm/aaaa`
+  (`dateDisplay`/`handleDateInput`/`dateError`, parseo custom) reemplazado
+  por `<input type="date">` nativo — el único valor real usado en toda la
+  pantalla ya era `form.date` en ISO (guardado, consultado y comparado
+  así en `fetchEvents`/`eventsOnDay`/`openEdit`); la máscara era solo de
+  presentación, confirmado antes de tocar el código que no rompía nada.
+  Voz agregada en "Título", "Descripción" y "Notas de la cita" (modal de
+  prueba de asistencia). "Título" perdió el `required` nativo del HTML al
+  dejar de ser un `<input>` plano — se agregó el guard equivalente en
+  `handleSubmit`.
+
+**Bug crítico encontrado a mitad de la fase — duplicación de texto en
+dictado por voz, RESUELTO DE RAÍZ:** Yasmin reportó un registro real en
+"Historia de cuidado" con el texto `"visita visita visita visita visita
+al visita al ginecólogo visita al ginecólogo"`. Diagnóstico confirmado
+con consulta directa a la base (`supabase db query --linked`, sin tocar
+nada): el dato vivía en `care_expenses.description` (gasto de prueba de
+$12, creado hoy — el campo "Descripción" agregado en esta misma fase).
+"Historia de cuidado" es `MedicationTimeline.jsx` (`/historial`) — un
+timeline de solo lectura que agrega eventos de varias tablas (incluida
+`care_expenses`); no es una pantalla duplicada, solo estaba reflejando
+correctamente el dato ya corrompido en el origen.
+
+**Causa raíz:** `useSpeechToText.js` (hook compartido detrás de **todos**
+los caminos de voz de la app) trataba cada resultado `isFinal` de
+`SpeechRecognition` como un fragmento nuevo independiente y lo concatenaba
+sin deduplicar. En modo `continuous: true`, Chrome a veces revisa/alarga
+un resultado ya marcado final en vez de agregar uno nuevo ("visita" →
+"visita al" → "visita al ginecólogo"), y el código anterior reemitía cada
+revisión completa, duplicando el texto acumulado. **Alcance real: no era
+un bug de Gastos** — el mismo hook alimenta `VoiceInput.jsx` (Diario
+Médico, Gastos, Registros, Incidentes, y el Calendario recién agregado),
+`MicButton` (Chat, Notas) y `VoiceRecorder.jsx` (NotasFamilia, Diario
+Médico) — 6+ puntos de uso con el mismo riesgo latente.
+
+**Fix:** dentro de `useSpeechToText.js`, se reconstruye el texto final
+completo de la sesión de reconocimiento en cada evento (recorriendo
+`e.results` desde el índice 0, no desde `e.resultIndex`) y se emite solo
+la diferencia real respecto al texto ya reportado. El contrato hacia
+afuera no cambió — el hook sigue emitiendo fragmentos incrementales que
+el caller concatena — así que **no hizo falta tocar ningún consumidor**
+(`VoiceInput.jsx`, `VoiceRecorder.jsx`, `Chat.jsx`, `Notes.jsx`,
+`NotasFamilia.jsx`), un solo fix beneficia a los 6+ puntos de uso.
+Caso borde documentado y aceptado: si Chrome revisa el texto de una forma
+que no es una simple extensión (cambia palabras del medio en vez de solo
+alargar), el hook prefiere no reemitir nada antes que arriesgarse a
+duplicar — se puede perder una corrección menor de texto, nunca se
+duplica.
+
+**Verificación antes de aprobar el fix:** dos simulaciones con un arnés
+en Node que ejecuta el archivo real (no una copia) contra un
+`SpeechRecognition` falso controlado a mano — (A) la secuencia exacta
+que causó el bug de hoy → ya no duplica, reconstruye "visita al
+ginecólogo" limpio; (B) el patrón de frases cortas con pausas limpias de
+Diario Médico → idéntico resultado que antes, cero regresión. Ambas
+`PASA`. Draft conjunto (fix + Calendario) desplegado para que Yasmin
+probara con voz real en su teléfono: Gastos/Registros/Incidentes con
+dictado largo y pausas — confirmado que el bug ya no reproduce en
+producción, no solo en la simulación.
+
+**Dato de prueba corrompido eliminado:** el gasto de $12
+(`care_expenses.id = 405a4080-2af1-4561-b31c-9ae959fda29f`, "visita al
+ginecólogo..."), confirmado por id antes de borrar, eliminado después de
+aprobar el fix — era dato de prueba de Yasmin, sin impacto real.
+
+**Deploy:** 3 commits separados — fix de `useSpeechToText.js`, Calendar.jsx,
+y los 3 anteriores de Gastos/Registros/Incidentes ya estaban pusheados
+antes de este cierre. `netlify deploy --prod --build`.
+
+**Pendiente para sesión futura (fuera de alcance de esta fase, solo
+diagnóstico, no tocado):**
+- [ ] Decidir qué hacer con `Notes.jsx` (huérfana) y `CareSchedule.jsx`
+      (vestigio sin ruta) — ¿eliminar o reconectar?
+- [ ] Campos de stock (`renewalMethod`/`pharmacyName`/`refillsRemaining`/
+      `lastMailDate`) sin UI para llenarlos.
+- [ ] Modal "Registrar omisión" sin botón que lo abra.
+- [ ] Unificar los 4 patrones de voz existentes en uno solo (candidato:
+      `VoiceInput.jsx`, ya el más usado) — no es urgente ahora que el bug
+      compartido está resuelto, pero simplificaría mantenimiento futuro.
+- [ ] Resto de la lista ampliada de la auditoría con fricción 🟡 (nombres
+      cortos sin voz en Directorio/Onboarding, etc.) — de menor prioridad
+      que lo ya resuelto en esta fase.
+
+---
+
+## Hallazgo aparte (2026-07-25): Landing.jsx tiene una migración PARCIAL, no completa
+
+Al verificar por qué el hero de Landing.jsx se veía en itálica grande
+(pregunta de Yasmin sobre si algo de hoy lo había afectado sin querer),
+se confirmó con `git blame`/`git log` que **no fue nada de esta sesión**
+— el archivo no tiene ningún cambio sin commitear y ninguno de los
+cambios de hoy lo toca ni importa nada relacionado.
+
+El estilo itálico + tamaño grande del `<h1>` del hero es del commit
+`6e15354` (6 de julio 2026). La tipografía específica (`Plus Jakarta
+Sans`, vía la constante `SERIF`) es del commit `4e94323` (24 de julio
+2026, un día antes de esta sesión) — el mismo commit mencionado en la
+sección "Migración de diseño teal" de este archivo, con el mensaje
+"29 resabios eliminados".
+
+**Pendiente sin verificar — anotado, no investigado a fondo hoy:** ese
+commit del 24 de julio dice haber migrado colores/tipografía de
+`Landing.jsx` por completo, pero no se confirmó en esta sesión cuánto de
+esos "29 resabios" originales quedó realmente resuelto vs. cuánto pudo
+quedar parcial (mismo tipo de sorpresa que ya pasó antes en esta sesión
+con componentes compartidos que un grep por archivo no alcanza a ver, o
+con hallazgos de Stripe que aparecieron en más de un punto de contacto).
+Queda para una sesión futura: auditar `Landing.jsx` completo contra la
+paleta oficial y confirmar si el mensaje del commit del 24 jul describe
+el estado real del archivo hoy.
