@@ -999,3 +999,35 @@ con hallazgos de Stripe que aparecieron en más de un punto de contacto).
 Queda para una sesión futura: auditar `Landing.jsx` completo contra la
 paleta oficial y confirmar si el mensaje del commit del 24 jul describe
 el estado real del archivo hoy.
+
+---
+
+## Fase 2 de optimización UX — Directorio — CERRADA (2026-07-25)
+
+Continuación de la Fase 1 (voz), ahora sobre `/directorio` (Médicos,
+Lugares, Familia). Diagnóstico previo (PASO 0): las 3 sub-formas
+(`docForm`/`insForm`/`conForm`) usan el mismo componente compartido
+`FormInput` para el campo "Notas" — mismo nombre de campo por forma,
+misma etiqueta, mismo mecanismo interno (`rows` truthy → `<textarea>`).
+Sin divergencia estructural real entre las 3, solo `rows` (3 en Médico, 2
+en Lugares y Familia) y el placeholder.
+
+**Cambio:** `VoiceInput.jsx` reemplaza `FormInput` únicamente en los 3
+usos de "Notas", sin tocar `FormInput`/`FormSelect` en sí — así Nombre,
+Especialidad/Tipo/Parentesco, Teléfono, Correo, Dirección y Sitio web
+(explícitamente fuera de alcance, ya confirmados como texto estructurado
+correcto) quedan intactos en las 3 sub-formas.
+
+**Verificado con voz real en el teléfono** (dictado con pausa a mitad de
+frase, el mismo escenario que reprodujo el bug de hoy) en las 3
+sub-formas — sin duplicación, ya con el fix del hook compartido de la
+Fase 1 aplicado.
+
+**Deploy:** commit `a0c1e24` (`290a6b4..a0c1e24`), separado de todo lo
+demás. `netlify deploy --prod --build` → "0 files" subidos (mismo bundle
+exacto ya verificado en el draft).
+
+**Pendiente (hereda de la Fase 1, sin cambios):** unificar los 4 patrones
+de voz existentes, resto de la lista ampliada de la auditoría con
+fricción 🟡, `Notes.jsx`/`CareSchedule.jsx` huérfanos, campos de stock sin
+UI, modal de omisión sin botón que lo abra.
