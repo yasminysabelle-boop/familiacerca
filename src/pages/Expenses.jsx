@@ -14,6 +14,7 @@ import SuccessAnimation, { useSuccessAnimation } from '../components/SuccessAnim
 import LoadingButton from '../components/LoadingButton'
 import { usePullToRefresh } from '../hooks/usePullToRefresh'
 import EvidencePhoto from '../components/EvidencePhoto'
+import VoiceInput from '../components/VoiceInput'
 
 const SANS = "'Plus Jakarta Sans', system-ui, sans-serif"
 
@@ -87,6 +88,7 @@ export default function Expenses() {
   })
   const [photoFile,    setPhotoFile]    = useState(null)
   const [photoPreview, setPhotoPreview] = useState(null)
+  const [editingPaidBy, setEditingPaidBy] = useState(false)
   const [saving,    setSaving]    = useState(false)
   const { trigger: expSuccessTrigger, fire: fireExpSuccess } = useSuccessAnimation()
   const { containerRef: pullRef, onTouchStart: pullStart, onTouchMove: pullMove, onTouchEnd: pullEnd, PullIndicator } = usePullToRefresh(loadExpenses)
@@ -166,6 +168,7 @@ export default function Expenses() {
       setPhotoFile(null)
       setPhotoPreview(null)
     }
+    setEditingPaidBy(false)
     setSaveError('')
     setShowModal(true)
   }
@@ -715,38 +718,56 @@ export default function Expenses() {
                 }}>
                   Descripción
                 </label>
-                <input
-                  name="description"
-                  type="text"
+                <VoiceInput
                   value={form.description}
-                  onChange={handleChange}
+                  onChange={v => setForm(prev => ({ ...prev, description: v }))}
                   placeholder="ej. Insulina, Visita al cardiólogo..."
-                  style={fieldStyle}
-                  onFocus={onFocus}
-                  onBlur={onBlur}
+                  rows={1}
                 />
               </div>
 
               {/* Pagó + Fecha */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                 <div>
-                  <label style={{
-                    display: 'block', fontSize: 11, fontWeight: 700, color: '#6B7280',
-                    letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 6,
-                  }}>
-                    Pagó *
-                  </label>
-                  <input
-                    name="paid_by"
-                    type="text"
-                    required
-                    value={form.paid_by}
-                    onChange={handleChange}
-                    placeholder="Tu nombre"
-                    style={fieldStyle}
-                    onFocus={onFocus}
-                    onBlur={onBlur}
-                  />
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                    <label style={{
+                      fontSize: 11, fontWeight: 700, color: '#6B7280',
+                      letterSpacing: '0.07em', textTransform: 'uppercase',
+                    }}>
+                      Pagó *
+                    </label>
+                    {!editingPaidBy && (
+                      <button
+                        type="button"
+                        onClick={() => setEditingPaidBy(true)}
+                        style={{ background: 'none', border: 'none', padding: 0, fontSize: 11, fontWeight: 700, color: '#087F70', cursor: 'pointer' }}
+                      >
+                        Cambiar
+                      </button>
+                    )}
+                  </div>
+                  {editingPaidBy ? (
+                    <input
+                      name="paid_by"
+                      type="text"
+                      required
+                      autoFocus
+                      value={form.paid_by}
+                      onChange={handleChange}
+                      placeholder="Tu nombre"
+                      style={fieldStyle}
+                      onFocus={onFocus}
+                      onBlur={onBlur}
+                    />
+                  ) : (
+                    <p style={{
+                      margin: 0, padding: '11px 14px', borderRadius: 12,
+                      border: '1.5px solid #EDE5D8', background: '#F9FAFB',
+                      fontSize: 14, color: '#1A1A1A', boxSizing: 'border-box',
+                    }}>
+                      {form.paid_by || displayName}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label style={{
