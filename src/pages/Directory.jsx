@@ -4,6 +4,7 @@ import Cropper from 'react-easy-crop'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { supabase } from '../lib/supabase'
+import { uploadPatientPhoto } from '../lib/patientPhoto'
 import Layout from '../components/Layout'
 import VoiceInput from '../components/VoiceInput'
 import {
@@ -413,8 +414,8 @@ export default function Directory() {
       URL.revokeObjectURL(cropSrc)
       setCropSrc(null)
 
-      console.log('6. calling uploadPatientPhoto')
-      await uploadPatientPhoto(blob)
+      console.log('6. calling handlePatientPhotoUpload')
+      await handlePatientPhotoUpload(blob)
       console.log('7. upload complete')
     } catch (err) {
       console.error('ERROR in handleCropConfirm:', err)
@@ -427,33 +428,14 @@ export default function Directory() {
     if (photoInputRef.current) photoInputRef.current.value = ''
   }
 
-  async function uploadPatientPhoto(file) {
-    console.log('uploadPatientPhoto called — file:', file, 'size:', file?.size, 'type:', file?.type, 'patientId:', patientProfile?.id)
-    if (!file || !patientProfile?.id) {
-      console.log('uploadPatientPhoto: early return — missing file or patientId')
-      return
-    }
+  async function handlePatientPhotoUpload(file) {
+    if (!file || !ownerId) return
     setPhotoUploading(true)
     try {
-      const path = `${patientProfile.id}/photo.jpg`
-      console.log('uploading to bucket=patient-photos path=', path)
-      const { data: upData, error: upErr } = await supabase.storage
-        .from('patient-photos')
-        .upload(path, file, { upsert: true, contentType: 'image/jpeg' })
-      console.log('upload result — data:', upData, 'error:', upErr, 'status:', upErr?.status, 'message:', upErr?.message)
-      if (upErr) throw upErr
-      const { data: { publicUrl } } = supabase.storage.from('patient-photos').getPublicUrl(path)
-      console.log('publicUrl:', publicUrl)
-      const { error: updErr } = await supabase
-        .from('patient_profiles')
-        .update({ photo_url: publicUrl })
-        .eq('id', patientProfile.id)
-      if (updErr) throw updErr
-      console.log('photo_url updated:', publicUrl)
-      setPatientProfile(prev => ({ ...prev, photo_url: `${publicUrl}?t=${Date.now()}` }))
-      window.dispatchEvent(new CustomEvent('patientProfileUpdated'))
+      const { photoUrl } = await uploadPatientPhoto(ownerId, file)
+      setPatientProfile(prev => ({ ...prev, photo_url: photoUrl }))
     } catch (e) {
-      console.error('Photo upload failed — full error:', e, JSON.stringify(e))
+      console.error('Photo upload failed:', e)
     } finally {
       setPhotoUploading(false)
     }

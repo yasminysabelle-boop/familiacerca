@@ -8,6 +8,7 @@ import { ChevronLeft, CheckIcon, XIcon, AlertTriangle } from '../components/Icon
 import LoadingButton from '../components/LoadingButton'
 import PatientProfileContacts from '../components/PatientProfileContacts'
 import { generateMedicalReport, fetchReportData } from '../utils/generateMedicalReport'
+import { uploadPatientPhoto } from '../lib/patientPhoto'
 
 // ── Constants ────────────────────────────────────────────────────────────────
 const SANGRE     = ['A+','A-','B+','B-','O+','O-','AB+','AB-']
@@ -24,7 +25,7 @@ const COGNITIVO  = ['Orientado','Confusión leve','Demencia','Alzheimer']
 const DISPOSITIVOS = ['Lentes','Audífono','Dentadura','Prótesis','Pañal']
 
 const EMPTY = {
-  foto_url:'', cover_photo_url:'', nombre_completo:'', fecha_nacimiento:'', sexo:'',
+  photo_url:'', cover_photo_url:'', nombre_completo:'', fecha_nacimiento:'', sexo:'',
   tipo_sangre:'', diagnostico_principal:'', alergias_detalle:[],
   contacto_emergencia_nombre:'', contacto_emergencia_telefono:'',
   medico_tratante:'', especialidad_medico:'', telefono_medico:'',
@@ -174,14 +175,14 @@ export default function PatientProfile() {
         talla: row.talla?.toString() ?? '',
         // Fill in name/photo from care_profiles if patient_profiles is missing them
         nombre_completo: row.nombre_completo || cp?.name || '',
-        foto_url: row.foto_url || cp?.photo_url || '',
+        photo_url: row.photo_url || cp?.photo_url || '',
       })
     } else if (cp) {
       // patient_profiles doesn't exist yet — bootstrap from care_profiles
       setForm(prev => ({
         ...prev,
         nombre_completo: cp.name ?? '',
-        foto_url: cp.photo_url ?? '',
+        photo_url: cp.photo_url ?? '',
       }))
     }
     setLoading(false)
@@ -208,16 +209,12 @@ export default function PatientProfile() {
     const file = e.target.files?.[0]
     if (!file) return
     setUploading(true)
-    const ext = file.name.split('.').pop() || 'jpg'
-    const path = `${ownerId}/photo.${ext}`
-    const { error:upErr } = await supabase.storage
-      .from('patient-photos').upload(path, file, { upsert:true })
-    if (!upErr) {
-      const { data:{ publicUrl } } = supabase.storage
-        .from('patient-photos').getPublicUrl(path)
-      set('foto_url', publicUrl)
-      set('cover_photo_url', publicUrl)
-      window.dispatchEvent(new Event('patientProfileUpdated'))
+    try {
+      const { photoUrl } = await uploadPatientPhoto(ownerId, file)
+      set('photo_url', photoUrl)
+      set('cover_photo_url', photoUrl)
+    } catch (err) {
+      setError('No se pudo subir la foto: ' + err.message)
     }
     setUploading(false)
   }
@@ -261,7 +258,7 @@ export default function PatientProfile() {
     const arr = v => Array.isArray(v) ? v : []
     const payload = {
       owner_id:ownerId, created_by:user.id,
-      foto_url: n(form.foto_url), cover_photo_url: n(form.cover_photo_url), nombre_completo: n(form.nombre_completo),
+      cover_photo_url: n(form.cover_photo_url), nombre_completo: n(form.nombre_completo),
       fecha_nacimiento: n(form.fecha_nacimiento), sexo: n(form.sexo),
       tipo_sangre: n(form.tipo_sangre), diagnostico_principal: n(form.diagnostico_principal),
       alergias_detalle: arr(form.alergias_detalle),
@@ -286,9 +283,6 @@ export default function PatientProfile() {
     }
     const { error:err } = await supabase
       .from('patient_profiles').upsert(payload, { onConflict:'owner_id' })
-    if (!err && payload.foto_url !== undefined) {
-      await supabase.from('care_profiles').update({ photo_url: payload.foto_url }).eq('user_id', ownerId)
-    }
     if (err) setError('No se pudo guardar: '+err.message)
     else {
       setSuccess(true)
@@ -360,12 +354,12 @@ export default function PatientProfile() {
                   width:68, height:68, borderRadius:'50%',
                   border:'3px solid rgba(255,255,255,0.4)', overflow:'hidden',
                   cursor: canEdit?'pointer':'default',
-                  background: form.foto_url ? 'transparent' : 'rgba(255,255,255,0.2)',
+                  background: form.photo_url ? 'transparent' : 'rgba(255,255,255,0.2)',
                   display:'flex', alignItems:'center', justifyContent:'center',
                 }}
               >
-                {form.foto_url
-                  ? <img src={form.foto_url} alt="Paciente" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+                {form.photo_url
+                  ? <img src={form.photo_url} alt="Paciente" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
                   : <span style={{ color:'white', fontSize:22, fontWeight:700 }}>{initials}</span>
                 }
                 {uploading && (
