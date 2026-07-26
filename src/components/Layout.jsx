@@ -2,10 +2,11 @@ import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
+import { useSubscription } from '../contexts/SubscriptionContext'
 import Logo from './Logo'
 import { User, ChevronLeft, Home, Chat, ClipboardList, Pill } from './Icons'
-import Paywall from './Paywall'
-import InstallBanner from './InstallBanner'
+import PaywallModal from './PaywallModal'
+import PWAInstallBanner from './PWAInstallBanner'
 import OfflineBanner from './OfflineBanner'
 import { useDarkMode } from '../contexts/DarkModeContext'
 import FamilySwitcher from './FamilySwitcher'
@@ -35,14 +36,14 @@ const PAGE_TITLES = {
   '/cuidado':        'Rutina diaria',
   '/roles':          'Permisos de acceso',
   '/ajustes':        'Mi Cuenta',
-  '/pricing':        'Planes',
+  '/upgrade':        'Planes',
   '/paciente/perfil': 'Perfil del paciente',
   '/videollamada':   'Videollamada',
   '/registros':      'Síntomas físicos',
   '/incidentes':     'Incidentes',
 }
 
-const PRIMARY_PAGES = new Set(['/dashboard', '/familia', '/ajustes', '/planes', '/pricing', '/chat', '/diario-medico'])
+const PRIMARY_PAGES = new Set(['/dashboard', '/familia', '/ajustes', '/upgrade', '/chat', '/diario-medico'])
 
 // Rutas que no dibujan su propio header (no están en hasOwnHeader) y deben
 // ver el header claro de Layout en vez del bloque oscuro — mismo
@@ -59,7 +60,9 @@ const LIGHT_HEADER_PAGES = new Set([
 
 export default function Layout({ children }) {
   const { inactivityWarning, user } = useAuth()
-  const { activeFamilyLabel, activePatientName } = useFamily()
+  const { activeFamilyLabel, activePatientName, profile, memberRole } = useFamily()
+  const { trialExpired, isPaid, paywallDismissed, dismissPaywall } = useSubscription()
+  const isAdmin = memberRole === null
   const userAvatar = user?.user_metadata?.avatar_url ?? null
   const userInitial = (user?.user_metadata?.full_name ?? user?.email ?? '?').charAt(0).toUpperCase()
   const { dark } = useDarkMode()
@@ -206,7 +209,7 @@ export default function Layout({ children }) {
         bottom:        (isSecondary || isHospitalMode || isVideoCall) ? 'env(safe-area-inset-bottom)' : 'calc(64px + env(safe-area-inset-bottom))',
         paddingBottom: 80,
       }}>
-        <InstallBanner />
+        <PWAInstallBanner />
         <OfflineBanner />
 
         {children}
@@ -224,7 +227,9 @@ export default function Layout({ children }) {
         </footer>
       </main>
 
-      <Paywall />
+      {trialExpired && isAdmin && !isPaid && !paywallDismissed && (
+        <PaywallModal onClose={dismissPaywall} patientName={profile?.name?.split(' ')[0]} />
+      )}
 
       {/* Inactivity warning banner */}
       {inactivityWarning && (

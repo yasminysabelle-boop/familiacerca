@@ -29,7 +29,6 @@ import PrivacyPolicy from './pages/PrivacyPolicy'
 import JoinFamily from './pages/JoinFamily'
 import Permissions from './pages/Permissions'
 import Directory from './pages/Directory'
-import Pricing from './pages/Pricing'
 import Settings from './pages/Settings'
 import Cuidado from './pages/Cuidado'
 import PatientProfile from './pages/PatientProfile'
@@ -42,7 +41,6 @@ import DiarioMedico from './pages/DiarioMedico'
 import CareRecord from './pages/CareRecord'
 import Incidents from './pages/Incidents'
 import FamilyRoles from './pages/FamilyRoles'
-import InstallPrompt from './components/InstallPrompt'
 import { supabase } from './lib/supabase'
 
 const P = ({ children }) => <ProtectedRoute>{children}</ProtectedRoute>
@@ -128,7 +126,6 @@ function AppShell() {
         </div>
       )}
       {showMemberOnboarding && <MemberOnboarding onDone={handleMemberOnboardingDone} />}
-      <InstallPrompt />
       <Routes>
         <Route path="/"            element={<HomeRoute />} />
         <Route path="/login"       element={<Login />} />
@@ -158,7 +155,6 @@ function AppShell() {
         <Route path="/join"          element={<JoinFamily />} />
         <Route path="/permisos"    element={<P><Permissions /></P>} />
         <Route path="/roles"       element={<P><FamilyRoles /></P>} />
-        <Route path="/pricing"     element={<Pricing />} />
         <Route path="/upgrade"     element={<P><Upgrade /></P>} />
         <Route path="/ajustes"            element={<P><Settings /></P>} />
         <Route path="/paciente/perfil"      element={<P><PatientProfile /></P>} />

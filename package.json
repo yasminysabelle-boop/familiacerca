@@ -14,7 +14,6 @@
     "@paypal/react-paypal-js": "^10.0.0",
     "@supabase/supabase-js": "^2.105.4",
     "firebase": "^12.14.0",
-    "html2canvas": "^1.4.1",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.7",
     "posthog-js": "^1.373.4",

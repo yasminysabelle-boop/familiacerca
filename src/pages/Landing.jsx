@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { usePWAInstall } from '../hooks/usePWAInstall'
-import InstallBanner from '../components/InstallBanner'
 import CompanionChat from '../components/CompanionChat'
 
 const HERO_IMG = '/images/hero.jpg'
@@ -1136,8 +1135,6 @@ export default function Landing() {
           </div>
         </div>
       </footer>
-
-      <InstallBanner />
 
       {/* ─────────────── 17. STICKY BAR ─────────────── */}
       <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 9000, background: ACTION, padding: '14px 24px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, boxShadow: '0 -4px 24px rgba(0,0,0,0.22)', opacity: showBar && !dismissed ? 1 : 0, transform: showBar && !dismissed ? 'translateY(0)' : 'translateY(100%)', transition: 'opacity 0.35s ease, transform 0.35s cubic-bezier(0.16,1,0.3,1)', pointerEvents: showBar && !dismissed ? 'all' : 'none' }}>
