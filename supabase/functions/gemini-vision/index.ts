@@ -4,6 +4,14 @@ import { createClient } from "jsr:@supabase/supabase-js@2";
 const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent';
 const GEMINI_KEY = Deno.env.get('GEMINI_API_KEY') ?? '';
 
+// 'gemini-flash-latest' now resolves to a model generation that rejects
+// thinkingBudget:0 outright (INVALID_ARGUMENT) and doesn't treat a low budget
+// as a hard cap — thinking tokens count against maxOutputTokens, so we pad
+// the ceiling well above what the caller asked for or replies get truncated
+// empty (MAX_TOKENS with no text). Mismo patron que gemini-proxy/index.ts.
+const THINKING = { thinkingConfig: { thinkingBudget: 256 } };
+const THINKING_MARGIN = 700;
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -55,9 +63,7 @@ Deno.serve(async (req) => {
           { text: prompt },
         ],
       }],
-      // thinkingConfig:{thinkingBudget:0} — sin esto el modelo puede gastar el
-      // budget de tokens "pensando" y devolver el JSON vacío o cortado.
-      generationConfig: { temperature: 0.1, maxOutputTokens: 1024, thinkingConfig: { thinkingBudget: 0 } },
+      generationConfig: { temperature: 0.1, maxOutputTokens: 1024 + THINKING_MARGIN, ...THINKING },
     }),
   });
 
