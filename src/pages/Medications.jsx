@@ -327,10 +327,6 @@ export default function Medications() {
   const [addMedQueue,        setAddMedQueue]         = useState([])
   const photoInputRef = useRef(null)
 
-  // ── DEBUG TEMPORAL — flujo de foto en Android, quitar cuando se resuelva ────
-  const [debugLog, setDebugLog] = useState([])
-  const dbg = (msg) => setDebugLog(prev => [...prev, `${prev.length + 1}. ${new Date().toLocaleTimeString('es-US', { hour12: false })} — ${msg}`])
-
   // ── Stock form state ───────────────────────────────────────────────────────
   const [stockForm, setStockForm] = useState(emptyStock)
   const [editStockRecord, setEditStockRecord] = useState(null)
@@ -496,28 +492,22 @@ export default function Medications() {
 
   // ── AI photo processing ────────────────────────────────────────────────────
   function handlePhotoChosen(e) {
-    dbg('① onChange del input de foto disparado')
     const file = e.target.files?.[0]
     e.target.value = ''
-    if (!file) { dbg('⚠️ NO llegó ningún file (e.target.files vacío)'); return }
-    dbg(`② file recibido: ${file.name || '(sin nombre)'} · ${file.type || '(sin type)'} · ${(file.size / 1024 / 1024).toFixed(2)}MB`)
+    if (!file) return
     setAddPhotoFile(file)
-    dbg('③ llamando a resizeImageToBase64...')
     resizeImageToBase64(file)
       .then(dataUrl => {
-        dbg(`④ resize completado — dataURL de ${(dataUrl.length / 1024).toFixed(0)}KB`)
         setAddPhotoPreview(dataUrl)
         processPhoto(dataUrl.split(',')[1], addPhotoType).catch(err => {
           // Red de seguridad: processPhoto ya atrapa sus propios errores, pero si
           // algo se le escapa no debe dejar el sheet colgado en "Analizando…".
-          dbg(`⚠️ processPhoto rechazó: ${err?.message ?? err}`)
           console.error(err)
           setAddAiError('No se pudo leer la imagen. Puedes corregir manualmente.')
           setAddStep('ai-confirm')
         })
       })
       .catch(err => {
-        dbg(`⚠️ resizeImageToBase64 rechazó: ${err?.message ?? err}`)
         console.error(err)
         setAddAiError('No se pudo procesar la imagen. Puedes ingresar los datos manualmente.')
         setAddStep('form')
@@ -548,18 +538,15 @@ export default function Medications() {
   }
 
   async function processPhoto(base64, type) {
-    dbg('⑤ entrando a processPhoto')
     setAddStep('ai-processing')
     setAddAiError('')
     try {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) {
-        dbg('⚠️ sin sesión — se salta a form manual')
         setAddAiError('Función no disponible. Ingresa los datos manualmente.')
         setAddStep('form')
         return
       }
-      dbg('⑤b llamando a fetch(gemini-vision)...')
       const res = await fetch(GEMINI_VISION, {
         method: 'POST',
         headers: {
@@ -568,7 +555,6 @@ export default function Medications() {
         },
         body: JSON.stringify({ image_base64: base64, media_type: 'image/jpeg', prompt: type === 'box' ? BOX_PROMPT : RX_PROMPT }),
       })
-      dbg(`⑥ respuesta del fetch recibida — status ${res.status}`)
       if (!res.ok) throw new Error(`Gemini ${res.status}`)
       const parsed = await res.json()
       if (parsed.error) throw new Error(parsed.error)
@@ -577,7 +563,6 @@ export default function Medications() {
       }
       setAddAiExtracted(parsed)
     } catch (err) {
-      dbg(`⚠️ processPhoto catch: ${err?.message ?? err}`)
       console.error(err)
       setAddAiError('No se pudo leer la imagen. Puedes corregir manualmente.')
       setAddAiExtracted(null)
@@ -1028,21 +1013,6 @@ export default function Medications() {
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <Layout>
-      {/* ── DEBUG TEMPORAL — flujo de foto en Android, quitar cuando se resuelva ── */}
-      {debugLog.length > 0 && (
-        <div style={{
-          position: 'fixed', top: 0, left: 0, right: 0, zIndex: 99999,
-          maxHeight: '45vh', overflowY: 'auto',
-          background: 'rgba(0,0,0,0.92)', color: '#00FF88',
-          fontFamily: 'monospace', fontSize: 11, lineHeight: 1.5,
-          padding: '10px 12px', paddingTop: 'calc(10px + env(safe-area-inset-top))',
-          whiteSpace: 'pre-wrap', wordBreak: 'break-word',
-        }}>
-          <div style={{ color: 'white', fontWeight: 700, marginBottom: 4 }}>🐛 DEBUG foto (temporal)</div>
-          {debugLog.map((line, i) => <div key={i}>{line}</div>)}
-        </div>
-      )}
-
       {showPaywall && <PaywallModal onClose={() => setShowPaywall(false)} patientName={profile?.name?.split(' ')[0]} />}
 
       {/* Header propio — back + título + "Cuidando a X" + agregar */}
