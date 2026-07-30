@@ -11,7 +11,6 @@ import WelcomeSlides from './components/WelcomeSlides'
 import MemberOnboarding from './components/MemberOnboarding'
 import Login from './pages/Login'
 import Register from './pages/Register'
-import Onboarding from './pages/Onboarding'
 import Dashboard from './pages/Dashboard'
 import Medications from './pages/Medications'
 import MedicationTimeline from './pages/MedicationTimeline'
@@ -130,7 +129,11 @@ function AppShell() {
         <Route path="/"            element={<HomeRoute />} />
         <Route path="/login"       element={<Login />} />
         <Route path="/register"    element={<Register />} />
-        <Route path="/onboarding"  element={<P><Onboarding /></P>} />
+        {/* Onboarding.jsx (flujo viejo de 3 pasos) fue reemplazado por OnboardingFlow.jsx,
+            que ProtectedRoute muestra automáticamente en cualquier ruta protegida cuando
+            no hay perfil. Login/Register/Dashboard siguen navegando a "/onboarding" —
+            se redirige a /dashboard para que ese gate haga su trabajo. No quitar. */}
+        <Route path="/onboarding"  element={<Navigate to="/dashboard" replace />} />
         <Route path="/dashboard"   element={<P><Dashboard /></P>} />
         <Route path="/medications" element={<P><Medications /></P>} />
         {/* Red de seguridad permanente: emails ya enviados (bienvenida, resúmenes) y
