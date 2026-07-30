@@ -14,7 +14,7 @@ function urlBase64ToUint8Array(base64String) {
 }
 
 export function usePushNotifications() {
-  const { user, retryFcm } = useAuth()
+  const { user } = useAuth()
   const [permission, setPermission] = useState(() =>
     typeof Notification !== 'undefined' ? Notification.permission : 'default'
   )
@@ -159,9 +159,6 @@ export function usePushNotifications() {
       setSubscribeError(err?.message ?? 'Error al activar notificaciones')
       return
     }
-
-    // FCM token was likely not saved at login (permission was default/denied then).
-    retryFcm?.()
 
     // Show confirmation banner for 4 seconds
     setNotifActivated(true)

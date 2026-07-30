@@ -1,6 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
-import { requestFcmToken, onForegroundMessage } from '../lib/firebase'
 
 const AuthContext = createContext(null)
 
@@ -11,7 +10,6 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
   const [inactivityWarning, setInactivityWarning] = useState(false)
-  const [fcmError, setFcmError] = useState(null)
 
   useEffect(() => {
     // On slow/offline mobile, getSession() can hang if it needs to refresh an
@@ -43,23 +41,6 @@ export function AuthProvider({ children }) {
     return () => { subscription.unsubscribe(); clearTimeout(timer) }
   }, [])
 
-  // Register FCM token and expose a retry function for the UI
-  const registerFcmToken = useCallback(async (userId) => {
-    if (!userId) return
-    try {
-      const token = await requestFcmToken()
-      if (token) {
-        setFcmError(null)
-        await supabase.from('user_profiles').update({ fcm_token: token }).eq('id', userId)
-      } else {
-        setFcmError('unavailable')
-      }
-    } catch (err) {
-      console.warn('[FCM] Token registration failed:', err?.message ?? String(err))
-      setFcmError('registration_failed')
-    }
-  }, [])
-
   // Ensure a Web Push subscription exists for the user in push_subscriptions.
   // This runs on every login so background push works even if the user never
   // visits Settings or Medications (the only pages that mount usePushNotifications).
@@ -89,36 +70,11 @@ export function AuthProvider({ children }) {
     }
   }, [])
 
-  // Foreground listener + initial token registration on login
+  // Ensure Web Push subscription on login
   useEffect(() => {
     if (!user) return
-    let unsubForeground = () => {}
-
-    try {
-      unsubForeground = onForegroundMessage(payload => {
-        const { title, body } = payload.notification ?? {}
-        const data = payload.data ?? {}
-        if (!title || Notification.permission !== 'granted') return
-        // SOS alerts are already shown via Supabase Realtime banner
-        if (data.type === 'SOS') return
-        navigator.serviceWorker?.ready
-          .then(reg => reg.showNotification(title, {
-            body: body ?? '',
-            icon: '/icon-192.png',
-            badge: '/icon-72.png',
-            tag: data.type ?? 'fcm-foreground',
-            data: { url: data.url ?? '/' },
-          }))
-          .catch(() => {})
-      })
-    } catch (err) {
-      console.warn('[FCM] Foreground listener setup failed:', err)
-    }
-
-    registerFcmToken(user.id)
     ensurePushSubscription(user.id)
-    return () => unsubForeground()
-  }, [user?.id, registerFcmToken, ensurePushSubscription])
+  }, [user?.id, ensurePushSubscription])
 
   // Update last_seen every 2 minutes while active
   useEffect(() => {
@@ -166,8 +122,6 @@ export function AuthProvider({ children }) {
   return (
     <AuthContext.Provider value={{
       user, loading, signIn, signUp, signOut, inactivityWarning,
-      fcmError,
-      retryFcm: () => registerFcmToken(user?.id),
     }}>
       {children}
     </AuthContext.Provider>

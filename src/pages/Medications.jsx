@@ -238,10 +238,6 @@ export default function Medications() {
   // Desconfirmar una dosis ya dada
   const [unconfirmTarget, setUnconfirmTarget] = useState(null) // med
   const [unconfirming,    setUnconfirming]    = useState(false)
-  const [omisionModal,       setOmisionModal]       = useState(null)
-  const [omisionReason,      setOmisionReason]      = useState('')
-  const [omisionSaving,      setOmisionSaving]      = useState(false)
-  const [omisionError,       setOmisionError]       = useState('')
   const [toastMsg,           setToastMsg]           = useState('')
   const [omissionsByMedId,   setOmissionsByMedId]   = useState({})
   const [previewPhotoUrl,    setPreviewPhotoUrl]     = useState(null)
@@ -285,7 +281,6 @@ export default function Medications() {
   const [editId,          setEditId]          = useState(null)
   const [saving,          setSaving]          = useState(false)
   const [saveError,       setSaveError]       = useState(null)
-  const [confirmDialog,   setConfirmDialog]   = useState(null)
   const editOpenedRef = useRef(false)
 
   // ── AI photo state ─────────────────────────────────────────────────────────
@@ -855,36 +850,6 @@ export default function Medications() {
     })
     setUnconfirming(false)
     setUnconfirmTarget(null)
-  }
-
-  async function handleOmitir() {
-    if (!omisionModal || !omisionReason || omisionSaving) return
-    setOmisionSaving(true); setOmisionError('')
-    const med = omisionModal
-    const scheduledTime = firstTimeMed(med)
-    let scheduledAt = null
-    if (scheduledTime) {
-      const [hh, mm] = scheduledTime.split(':').map(Number)
-      const d = new Date(); d.setHours(hh, mm, 0, 0); scheduledAt = d.toISOString()
-    }
-    await supabase.from('medication_omissions').insert({
-      medication_id: med.id, owner_id: ownerId, scheduled_at: scheduledAt,
-      reason: omisionReason, omitted_by: user.id, omitted_by_name: displayName,
-    })
-    await supabase.from('medication_logs').upsert({
-      medication_id: med.id, user_id: ownerId, status: 'missed',
-      log_date: today, confirmed_by_name: displayName, confirmed_at: new Date().toISOString(),
-    }, { onConflict: 'medication_id,log_date,user_id' })
-    setLogsByMedId(prev => {
-      const next = { ...prev }
-      if (!next[med.id]) next[med.id] = {}
-      if (!next[med.id][today]) next[med.id][today] = []
-      next[med.id][today] = next[med.id][today].filter(l => l.status !== 'missed')
-      next[med.id][today].push({ medication_id: med.id, log_date: today, status: 'missed', confirmed_by_name: displayName, confirmed_at: new Date().toISOString() })
-      return next
-    })
-    setOmisionSaving(false); setOmisionModal(null); setOmisionReason('')
-    showToast('Omisión registrada ✓')
   }
 
   // ── Derived ────────────────────────────────────────────────────────────────
@@ -1507,21 +1472,6 @@ export default function Medications() {
         )}
 
       </div>
-
-      {/* ── Confirm delete dialog ─────────────────────────────────────────── */}
-      {confirmDialog && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 300, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 24px' }} onClick={e => { if (e.target === e.currentTarget) setConfirmDialog(null) }}>
-          <div style={{ background: 'white', borderRadius: 20, padding: '28px 24px', maxWidth: 340, width: '100%', boxShadow: '0 24px 64px rgba(0,0,0,0.25)', textAlign: 'center' }}>
-            <div style={{ fontSize: 40, marginBottom: 14 }}>🗑️</div>
-            <p style={{ fontFamily: 'Georgia, serif', fontSize: 17, fontWeight: 700, color: '#1A1A1A', marginBottom: 8 }}>¿Eliminar este medicamento?</p>
-            <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, marginBottom: 24 }}>Esta acción no se puede deshacer.</p>
-            <div style={{ display: 'flex', gap: 10 }}>
-              <button onClick={() => setConfirmDialog(null)} style={{ flex: 1, padding: '12px', borderRadius: 12, border: '1.5px solid #EDE5D8', background: 'white', color: '#6B7280', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>Cancelar</button>
-              <button onClick={() => { confirmDialog.onConfirm(); setConfirmDialog(null) }} style={{ flex: 1, padding: '12px', borderRadius: 12, border: 'none', background: '#D63031', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer', boxShadow: '0 4px 16px rgba(214,48,49,0.3)' }}>Eliminar</button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* ── Stock tab sheet ───────────────────────────────────────────────── */}
       {stockTabMed && (
@@ -2184,42 +2134,6 @@ export default function Medications() {
           </div>
         )
       })()}
-
-      {/* ── Modal: Omisión ─────────────────────────────────────────────────── */}
-      {omisionModal && (
-        <div
-          style={{ position: 'fixed', inset: 0, zIndex: 250, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 24px' }}
-          onClick={e => { if (e.target === e.currentTarget && !omisionSaving) { setOmisionModal(null); setOmisionReason('') } }}
-        >
-          <div style={{ background: 'white', borderRadius: 20, padding: '28px 24px', maxWidth: 380, width: '100%', boxShadow: '0 24px 64px rgba(0,0,0,0.25)' }}>
-            <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#1A1A1A', margin: '0 0 4px' }}>Registrar omisión</p>
-            <p style={{ fontSize: 13, color: '#6B7280', margin: '0 0 20px' }}>💊 {omisionModal.name}</p>
-            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#6B7280', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8 }}>Motivo *</label>
-            <div style={{ position: 'relative', marginBottom: 20 }}>
-              <select
-                value={omisionReason}
-                onChange={e => setOmisionReason(e.target.value)}
-                style={{ width: '100%', padding: '11px 32px 11px 14px', borderRadius: 12, border: `1.5px solid ${omisionReason ? '#087F70' : '#EDE5D8'}`, background: '#FDFAF7', fontSize: 14, outline: 'none', appearance: 'none', cursor: 'pointer', boxSizing: 'border-box' }}
-              >
-                <option value="">Seleccionar motivo...</option>
-                <option value="Paciente rechazó el medicamento">Paciente rechazó el medicamento</option>
-                <option value="No había medicamento disponible">No había medicamento disponible</option>
-                <option value="Indicación médica">Indicación médica</option>
-                <option value="Olvido del cuidador">Olvido del cuidador</option>
-                <option value="Otro">Otro</option>
-              </select>
-              <span style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#9CA3AF', fontSize: 12 }}>▼</span>
-            </div>
-            {omisionError && <p style={{ fontSize: 12, color: '#DC2626', margin: '0 0 12px' }}>⚠️ {omisionError}</p>}
-            <div style={{ display: 'flex', gap: 10 }}>
-              <button onClick={() => { setOmisionModal(null); setOmisionReason('') }} style={{ flex: 1, padding: '12px', borderRadius: 12, border: '1.5px solid #EDE5D8', background: 'white', color: '#6B7280', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>Cancelar</button>
-              <button onClick={handleOmitir} disabled={!omisionReason || omisionSaving} style={{ flex: 2, padding: '12px', borderRadius: 12, border: 'none', background: !omisionReason || omisionSaving ? '#C0CCC5' : '#DC2626', color: 'white', fontWeight: 700, fontSize: 14, cursor: !omisionReason || omisionSaving ? 'not-allowed' : 'pointer' }}>
-                {omisionSaving ? 'Guardando...' : 'Registrar omisión'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* ── Toast ──────────────────────────────────────────────────────────── */}
       {toastMsg && (
