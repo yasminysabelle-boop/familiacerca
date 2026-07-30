@@ -27,7 +27,6 @@ const PAGE_TITLES = {
   '/calendar':       'Citas médicas',
   '/notes':          'Notas',
   '/chat':           'Mensajes',
-  '/album':          'Fotos y videos',
   '/reportes':       'Reportes médicos',
   '/mas':            'Todo el cuidado',
   '/gastos':         'Cuentas Claras',
@@ -52,7 +51,7 @@ const PRIMARY_PAGES = new Set(['/dashboard', '/familia', '/ajustes', '/upgrade',
 // Todo el cuidado/Videollamada dibujan el suyo, Layout nunca les pinta nada).
 const LIGHT_HEADER_PAGES = new Set([
   '/chat', '/historial', '/videollamada', '/medications', '/familia',
-  '/calendar', '/notes', '/album', '/diario-voz', '/memorias', '/reportes',
+  '/calendar', '/notes', '/diario-voz', '/memorias', '/reportes',
   '/gastos', '/directorio', '/ajustes', '/paciente/perfil', '/upgrade',
   '/admin', '/diario-medico', '/registros', '/incidentes', '/roles',
 ])
@@ -340,7 +339,6 @@ export default function Layout({ children }) {
                 { emoji: '💊', label: 'Registrar medicamento', path: '/medications' },
                 { emoji: '✅', label: 'Registrar rutina',       path: '/cuidado' },
                 { emoji: '📝', label: 'Notas de la familia',    path: '/paciente/notas-familia' },
-                { emoji: '📸', label: 'Subir foto',             path: '/album' },
               ].map(({ emoji, label, path }) => (
                 <button
                   key={path}

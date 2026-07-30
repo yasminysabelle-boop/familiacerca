@@ -68,15 +68,14 @@ const TYPE_META = {
   caregiver_assigned:     { label: 'Turnos',              Icon: User,           cat: 'cool' },
   sos:                     { label: 'SOS',                  Icon: Siren,          cat: 'sos' },
   expense:                 { label: 'Gastos',               Icon: Receipt,        cat: 'gold',     route: '/gastos' },
-  care_photo:             { label: 'Fotos',                Icon: Camera,         cat: 'goldSoft', route: '/album' },
   incident:                { label: 'Incidentes',           Icon: AlertTriangle,  cat: 'coral' },
 }
 
-// Los 13 tipos reales tienen su propio pill (+ "Todo") = 14.
+// Los 12 tipos reales tienen su propio pill (+ "Todo") = 13.
 const FILTER_OPTIONS = [
   'all', 'med_confirmed', 'med_missed', 'care_routine', 'care_routine_missed',
   'hospital_mode_on', 'hospital_discharge', 'doctor_note', 'appointment', 'sos',
-  'expense', 'care_photo', 'caregiver_assigned', 'incident',
+  'expense', 'caregiver_assigned', 'incident',
 ]
 
 const PERIOD_OPTIONS = [
@@ -166,7 +165,6 @@ function PhotoThumb({ url, tone }) {
 function eventPhotoUrl(event) {
   const meta = event.metadata ?? {}
   if (event.type === 'expense') return meta.receipt_photo_url
-  if (event.type === 'care_photo') return meta.file_url
   return meta.photo_url
 }
 
@@ -225,10 +223,6 @@ function EventDetail({ event }) {
   if (type === 'expense') {
     const parts = [meta.category, meta.paid_by ? `Pagó ${meta.paid_by}` : null].filter(Boolean)
     return parts.length ? <p style={{ fontSize: 11.5, color: INK_FAINT, margin: '3px 0 0' }}>{parts.join(' · ')}</p> : null
-  }
-  if (type === 'care_photo') {
-    const caption = secondaryOnly(event.description, meta.caption)
-    return caption ? <p style={{ fontSize: 12, color: INK_SOFT, margin: '4px 0 0', lineHeight: 1.4 }}>{caption}</p> : null
   }
   return null
 }

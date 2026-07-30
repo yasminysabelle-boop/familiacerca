@@ -10,7 +10,7 @@ import CareCard from '../components/CareCard'
 import { SkeletonDashSummary, SkeletonCard } from '../components/SkeletonLoader'
 import SuccessAnimation, { useSuccessAnimation } from '../components/SuccessAnimation'
 import { usePullToRefresh } from '../hooks/usePullToRefresh'
-import { AlertTriangle, CheckIcon, User, XIcon, Pill, ClipboardCheck, Chat, Calendar, Receipt, Users, Camera, Clock, MessageCircle, Video, Hospital, Image, Building2, Heart, Bell, ChevronRight, Siren, Zap } from '../components/Icons'
+import { AlertTriangle, CheckIcon, User, XIcon, Pill, ClipboardCheck, Chat, Calendar, Receipt, Users, Camera, Clock, MessageCircle, Video, Hospital, Building2, Heart, Bell, ChevronRight, Siren, Zap } from '../components/Icons'
 import { geminiGenerate } from '../lib/gemini'
 import { getActivitySummary } from '../lib/activitySummary'
 import { CARE_ITEMS } from '../lib/careItems'
@@ -296,41 +296,6 @@ function MemoryCard({ evt, onTap }) {
           )}
         </div>
         <span style={{ fontSize: 11, color: '#9CA3AF', flexShrink: 0 }}>▶ Escuchar</span>
-      </div>
-    </div>
-  )
-}
-
-function PhotoCard({ evt, onTap }) {
-  const name = evt.uploaderName ? evt.uploaderName.split(' ')[0] : null
-  return (
-    <div onClick={onTap} style={{
-      background: 'white', borderRadius: 16,
-      border: '1px solid #EDE5D8',
-      overflow: 'hidden',
-      boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-      cursor: 'pointer',
-    }}>
-      <img
-        src={evt.fileUrl}
-        alt={evt.caption ?? 'Foto familiar'}
-        style={{ width: '100%', height: 180, objectFit: 'cover', display: 'block' }}
-      />
-      <div style={{ padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
-        <span style={{ fontSize: 16, flexShrink: 0 }}>📸</span>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', margin: 0 }}>
-            {name ? `${name} subió una foto` : 'Nueva foto'}
-          </p>
-          {evt.caption && (
-            <p style={{
-              fontSize: 11, color: '#9CA3AF', marginTop: 2,
-              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-            }}>
-              {evt.caption}
-            </p>
-          )}
-        </div>
       </div>
     </div>
   )
@@ -767,24 +732,6 @@ function NoteDetail({ evt }) {
   )
 }
 
-function PhotoDetailContent({ evt }) {
-  const time = evt.timestamp ? fmtTimestamp(evt.timestamp) : null
-  return (
-    <div>
-      {evt.fileUrl && (
-        <img src={evt.fileUrl} alt={evt.caption ?? 'Foto'} style={{ width: '100%', borderRadius: 12, maxHeight: 320, objectFit: 'cover', marginBottom: 16 }} />
-      )}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-        {evt.caption && (
-          <p style={{ fontSize: 14, color: '#1A1A1A', fontWeight: 500, margin: 0, lineHeight: 1.5 }}>{evt.caption}</p>
-        )}
-        {evt.uploaderName && <DetailRow icon="👤" label="Subida por" value={evt.uploaderName} />}
-        {time && <DetailRow icon="🕐" label="Hora" value={time} />}
-      </div>
-    </div>
-  )
-}
-
 function ExpenseDetail({ evt }) {
   const time = evt.timestamp ? fmtTimestamp(evt.timestamp) : null
   return (
@@ -865,7 +812,6 @@ function EventDetailSheet({ evt, onClose }) {
     MED_CONFIRMED: 'Medicamento',
     VOICE_MEMORY: 'Memoria de voz',
     NOTE: 'Nota',
-    PHOTO: 'Foto',
     EXPENSE: 'Gasto',
     SOS_ALERT: 'Alerta SOS',
     APPOINTMENT_PROOF: 'Cita médica',
@@ -909,7 +855,6 @@ function EventDetailSheet({ evt, onClose }) {
           {evt.type === 'MED_CONFIRMED' && <MedConfirmedDetail evt={evt} />}
           {evt.type === 'VOICE_MEMORY' && <VoiceMemoryDetail evt={evt} />}
           {evt.type === 'NOTE' && <NoteDetail evt={evt} />}
-          {evt.type === 'PHOTO' && <PhotoDetailContent evt={evt} />}
           {evt.type === 'EXPENSE' && <ExpenseDetail evt={evt} />}
           {evt.type === 'SOS_ALERT' && <SosDetail evt={evt} />}
           {evt.type === 'APPOINTMENT_PROOF' && (
@@ -963,7 +908,6 @@ function TimelineEvent({ evt, confirming, expandedAudio, onConfirm, onToggleAudi
       </div>
     )
   }
-  if (evt.type === 'PHOTO') return <div><PhotoCard evt={evt} onTap={() => onTap(evt)} />{bar}</div>
   if (evt.type === 'EXPENSE') return <div><ExpenseCard evt={evt} onTap={() => onTap(evt)} />{bar}</div>
   if (evt.type === 'APPOINTMENT') {
     return <div><AppointmentCard evt={evt} todayKey={todayKey} tomorrowKey={tomorrowKey} />{bar}</div>
@@ -1015,7 +959,7 @@ function EmptyState({ profile }) {
 const CATEGORY_GROUPS = [
   { id: 'meds',    emoji: '💊', label: 'Medicamentos', types: ['MED_PENDING', 'MED_CONFIRMED', 'MED_MISSED'] },
   { id: 'citas',   emoji: '📅', label: 'Citas',        types: ['APPOINTMENT', 'APPOINTMENT_PROOF'] },
-  { id: 'familia', emoji: '👥', label: 'Familia',      types: ['PHOTO', 'CAREGIVER_CARD'] },
+  { id: 'familia', emoji: '👥', label: 'Familia',      types: ['CAREGIVER_CARD'] },
   { id: 'notas',   emoji: '💬', label: 'Notas',        types: ['VOICE_MEMORY', 'NOTE'] },
   { id: 'gastos',  emoji: '💰', label: 'Gastos',       types: ['EXPENSE'] },
   { id: 'alertas', emoji: '🚨', label: 'Alertas',      types: ['SOS_ALERT'] },
@@ -1303,7 +1247,6 @@ function EmergencyCard({ onPress, sosSent }) {
 const RECENT_EVENT_CONFIG = {
   MED_CONFIRMED:     { icon: '💊', color: '#15803D', label: e => `${e.medName ?? 'Medicamento'} dado${e.confirmedBy ? ` por ${e.confirmedBy.split(' ')[0]}` : ''}` },
   VOICE_MEMORY:      { icon: '🎙️', color: '#7C5CBF', label: e => `Memoria de voz${e.recorderName ? ` de ${e.recorderName.split(' ')[0]}` : ''}` },
-  PHOTO:             { icon: '📸', color: '#0d6b63', label: e => `Foto${e.uploaderName ? ` de ${e.uploaderName.split(' ')[0]}` : ' familiar'}` },
   EXPENSE:           { icon: '💰', color: '#0d6b63', label: e => e.description ?? 'Gasto registrado' },
   SOS_ALERT:         { icon: '🚨', color: '#D63031', label: () => 'Alerta de emergencia' },
   APPOINTMENT:       { icon: '📅', color: '#3B82F6', label: e => e.appointmentTitle ?? 'Cita médica' },
@@ -1574,7 +1517,6 @@ function MedDetailRow({ evt, isToday, confirming, onConfirm, isFamiliar }) {
 
 const CARE_ROW_CONFIG = {
   VOICE_MEMORY:      { icon: '🎙️', label: e => e.recorderName ? `Memoria de ${e.recorderName.split(' ')[0]}` : 'Memoria de voz', sub: e => e.transcription ? `"${e.transcription.slice(0, 50)}${e.transcription.length > 50 ? '…' : ''}"` : null },
-  PHOTO:             { icon: '📸', label: e => e.caption || (e.uploaderName ? `Foto de ${e.uploaderName.split(' ')[0]}` : 'Foto familiar'), sub: () => null },
   NOTE:              { icon: '📝', label: e => e.noteText ? e.noteText.slice(0, 45) + (e.noteText.length > 45 ? '…' : '') : 'Nota', sub: e => e.authorName ? `Por ${e.authorName.split(' ')[0]}` : null },
   EXPENSE:           { icon: '💰', label: e => e.description || 'Gasto', sub: e => e.amount != null ? `$${Number(e.amount).toFixed(2)}` : null },
   APPOINTMENT:       { icon: '📅', label: e => e.appointmentTitle || 'Cita médica', sub: e => e.appointmentTime ? `Programada ${fmtTime(e.appointmentTime)}` : 'Próxima cita' },
@@ -1661,7 +1603,7 @@ function CareDayDetail({ section, todayKey, confirming, onConfirm, isFamiliar, o
     })
 
   const careEvents = events
-    .filter(e => ['VOICE_MEMORY', 'PHOTO', 'NOTE', 'EXPENSE', 'APPOINTMENT', 'APPOINTMENT_PROOF'].includes(e.type))
+    .filter(e => ['VOICE_MEMORY', 'NOTE', 'EXPENSE', 'APPOINTMENT', 'APPOINTMENT_PROOF'].includes(e.type))
     .sort((a, b) => b.timestamp - a.timestamp)
 
   const alertEvents = events
@@ -1793,7 +1735,6 @@ function AttentionCard({ medName, medDosage, medTime, windowLabel, isExpired, on
 const ACTIVITY_ACTIONS = {
   MED_CONFIRMED:     evt => `confirmó ${evt.medName ?? 'medicamento'}`,
   VOICE_MEMORY:      () => 'grabó una memoria de voz',
-  PHOTO:             () => 'subió una foto',
   NOTE:              () => 'escribió una nota',
   EXPENSE:           () => 'registró un gasto',
   APPOINTMENT:       evt => `agregó una cita${evt.appointmentTitle ? `: ${evt.appointmentTitle}` : ''}`,
@@ -2329,7 +2270,6 @@ export default function Dashboard() {
       { data: todayLogs },
       { data: confirmedLogs },
       { data: voiceMemories },
-      { data: photoMemories },
       { data: expenses },
       { data: events },
       { data: sosAlerts },
@@ -2356,13 +2296,6 @@ export default function Dashboard() {
         .gte('created_at', sevenAgoStartISO)
         .order('created_at', { ascending: false })
         .limit(20),
-
-      supabase.from('memories')
-        .select('*')
-        .in('user_id', allFamilyIds)
-        .gte('created_at', sevenAgoStartISO)
-        .order('created_at', { ascending: false })
-        .limit(10),
 
       supabase.from('care_expenses')
         .select('*')
@@ -2546,21 +2479,6 @@ export default function Dashboard() {
         transcription: mem.transcription,
         recorderName: mem.user_profiles?.full_name ?? null,
         mood: mem.mood ?? null,
-      })
-    }
-
-    // ── Photo memories ──
-    for (const photo of (photoMemories ?? [])) {
-      const dateKey = toLocalDateKey(new Date(photo.created_at))
-      allEvents.push({
-        id: `photo-${photo.id}`,
-        type: 'PHOTO',
-        timestamp: new Date(photo.created_at),
-        dateKey,
-        fileUrl: photo.file_url,
-        fileType: photo.file_type,
-        uploaderName: photo.uploader_name ?? null,
-        caption: photo.caption ?? null,
       })
     }
 
@@ -2994,12 +2912,12 @@ export default function Dashboard() {
   const activeSosEvent = sections.flatMap(s => s.events).find(e => e.type === 'SOS_ALERT' && !e.resolved) ?? null
   const hasActiveSOS = !!activeSosEvent
   const lastActivity = sections.flatMap(s => s.events)
-    .filter(e => ['MED_CONFIRMED', 'VOICE_MEMORY', 'PHOTO', 'NOTE', 'EXPENSE'].includes(e.type))
+    .filter(e => ['MED_CONFIRMED', 'VOICE_MEMORY', 'NOTE', 'EXPENSE'].includes(e.type))
     .sort((a, b) => b.timestamp - a.timestamp)[0] ?? null
   const lastUpdatedBy = lastActivity?.confirmedBy?.split(' ')[0] || lastActivity?.recorderName?.split(' ')[0] || lastActivity?.uploaderName?.split(' ')[0] || null
 
   // Last voice/photo memory across any day
-  const lastMemory = sections.flatMap(s => s.events).find(e => e.type === 'VOICE_MEMORY' || e.type === 'PHOTO') ?? null
+  const lastMemory = sections.flatMap(s => s.events).find(e => e.type === 'VOICE_MEMORY') ?? null
 
   const nextAppointment = sections.flatMap(s => s.events).find(e => e.type === 'APPOINTMENT') ?? null
 
@@ -3192,7 +3110,7 @@ export default function Dashboard() {
     const memDay = lastMemory.dateKey === todayKey ? 'hoy' : lastMemory.dateKey === yesterdayKey ? 'ayer' : 'esta semana'
     memStatus = `Última ${memDay}`
     memStatusType = 'ok'
-    memSubtitle = lastMemory.type === 'VOICE_MEMORY' ? 'Memoria de voz' : 'Foto familiar'
+    memSubtitle = 'Memoria de voz'
   } else {
     memStatus = 'Sin memorias aún'
     memStatusType = 'info'
@@ -3429,16 +3347,6 @@ export default function Dashboard() {
             const isCritical     = hasActiveSOS || (_isRetrasado && _retrasadoMins != null && _retrasadoMins >= 720)
             const isPendingToday = !isCritical && (pendingCount > 0 || _isRetrasado)
 
-            const momentoHoy = (todaySection?.events ?? [])
-              .filter(e => e.type === 'PHOTO' || e.type === 'VOICE_MEMORY')
-              .sort((a, b) => (b.timestamp ?? 0) - (a.timestamp ?? 0))[0] ?? null
-
-            const recentPhotos = sections
-              .flatMap(s => s.events)
-              .filter(e => e.type === 'PHOTO' && e.fileUrl)
-              .sort((a, b) => (b.timestamp ?? 0) - (a.timestamp ?? 0))
-              .slice(0, 3)
-
             const recentMembers = familyMembers.filter(m => m.last_seen && Date.now() - new Date(m.last_seen).getTime() < 24 * 60 * 60 * 1000)
             const participacion = recentMembers.length >= 2 ? 'Alta' : recentMembers.length === 1 ? 'Moderada' : 'Baja'
 
@@ -3554,7 +3462,6 @@ export default function Dashboard() {
                     { Icon: Users,    label: 'Equipo',   onClick: () => navigate('/familia'),          circleBg: '#EFF6F0', iconColor: '#0d6b63' },
                     { Icon: Building2, label: 'Hospital', onClick: () => setShowHospitalModal(true),   circleBg: '#FEF0ED', iconColor: '#E9826E' },
                     { Icon: Calendar, label: 'Citas',    onClick: () => navigate('/calendar'),         circleBg: '#FFF8EC', iconColor: '#D99A18' },
-                    { Icon: Image,    label: 'Álbum',    onClick: () => navigate('/album'),            circleBg: '#EFF6F0', iconColor: '#0d6b63' },
                   ]
                   return (
                     <div>
@@ -3562,7 +3469,7 @@ export default function Dashboard() {
                         <p style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 9, fontFamily: "'Fraunces', Georgia, serif", fontSize: 18, fontWeight: 600, color: '#334155' }}>Todo el cuidado</p>
                         <button onClick={() => navigate('/mas')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, color: '#087F70', fontWeight: 700, padding: 0, WebkitTapHighlightColor: 'transparent' }}>Ver todas</button>
                       </div>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 11 }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 11 }}>
                         {featuredTools.map(({ Icon, label, onClick, circleBg, iconColor }) => (
                           <button
                             key={label} onClick={onClick}

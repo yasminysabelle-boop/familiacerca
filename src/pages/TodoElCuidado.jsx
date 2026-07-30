@@ -5,7 +5,7 @@ import CompanionChat from '../components/CompanionChat'
 import {
   ChevronLeft, Heart, Pill, Calendar, ClipboardList,
   MessageCircle, Video, Users, AlertTriangle, Phone, Info, FileText,
-  Image, Pencil, DollarSign, Shield, Star, Settings,
+  Pencil, DollarSign, Shield, Star, Settings,
 } from '../components/Icons'
 
 const SERIF = "'Fraunces', Georgia, serif"
@@ -65,7 +65,6 @@ export default function TodoElCuidado() {
     { Icon: FileText,      label: 'Recetas y documentos', tint: '#087F70', tintBg: '#E5F4F1', emphasis: false, onClick: () => navigate('/reportes') },
   ]
   const vidaRecuerdos = [
-    { Icon: Image,      label: 'Álbum',              onClick: () => navigate('/album') },
     { Icon: Pencil,     label: 'Notas de familia',   onClick: () => navigate('/paciente/notas-familia') },
     { Icon: DollarSign, label: 'Gastos del cuidado', onClick: () => navigate('/gastos') },
   ]
