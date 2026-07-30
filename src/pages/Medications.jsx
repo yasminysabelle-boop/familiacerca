@@ -119,11 +119,31 @@ function computeScheduledTimes(frequency, startTimes) {
   return startTimes.filter(Boolean)
 }
 
-function toBase64(file) {
+// Redimensiona a un lado mayor de 1600px y comprime a JPEG antes de subir —
+// una foto de cámara real (varios MB, sin tocar) puede colgar el envío en
+// redes móviles lentas. Una sola lectura del archivo: el data URL resultante
+// sirve tanto para la vista previa como para el base64 que recibe la IA.
+function resizeImageToBase64(file, maxDim = 1600, quality = 0.8) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
-    reader.onload  = () => resolve(reader.result.split(',')[1])
     reader.onerror = reject
+    reader.onload = () => {
+      const img = new Image()
+      img.onerror = reject
+      img.onload = () => {
+        let { width, height } = img
+        if (width > maxDim || height > maxDim) {
+          if (width >= height) { height = Math.round(height * maxDim / width); width = maxDim }
+          else { width = Math.round(width * maxDim / height); height = maxDim }
+        }
+        const canvas = document.createElement('canvas')
+        canvas.width = width
+        canvas.height = height
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height)
+        resolve(canvas.toDataURL('image/jpeg', quality))
+      }
+      img.src = reader.result
+    }
     reader.readAsDataURL(file)
   })
 }
@@ -462,10 +482,22 @@ export default function Medications() {
     e.target.value = ''
     if (!file) return
     setAddPhotoFile(file)
-    const reader = new FileReader()
-    reader.onload = ev => setAddPhotoPreview(ev.target.result)
-    reader.readAsDataURL(file)
-    processPhoto(file, addPhotoType)
+    resizeImageToBase64(file)
+      .then(dataUrl => {
+        setAddPhotoPreview(dataUrl)
+        processPhoto(dataUrl.split(',')[1], addPhotoType).catch(err => {
+          // Red de seguridad: processPhoto ya atrapa sus propios errores, pero si
+          // algo se le escapa no debe dejar el sheet colgado en "Analizando…".
+          console.error(err)
+          setAddAiError('No se pudo leer la imagen. Puedes corregir manualmente.')
+          setAddStep('ai-confirm')
+        })
+      })
+      .catch(err => {
+        console.error(err)
+        setAddAiError('No se pudo procesar la imagen. Puedes ingresar los datos manualmente.')
+        setAddStep('form')
+      })
   }
 
   function applyMedToForm(med) {
@@ -491,25 +523,23 @@ export default function Medications() {
     setEditStockRecord(null)
   }
 
-  async function processPhoto(file, type) {
+  async function processPhoto(base64, type) {
     setAddStep('ai-processing')
     setAddAiError('')
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session) {
-      setAddAiError('Función no disponible. Ingresa los datos manualmente.')
-      setAddStep('form')
-      return
-    }
     try {
-      const b64  = await toBase64(file)
-      const mime = file.type || 'image/jpeg'
-      const res  = await fetch(GEMINI_VISION, {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        setAddAiError('Función no disponible. Ingresa los datos manualmente.')
+        setAddStep('form')
+        return
+      }
+      const res = await fetch(GEMINI_VISION, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${session.access_token}`,
         },
-        body: JSON.stringify({ image_base64: b64, media_type: mime, prompt: type === 'box' ? BOX_PROMPT : RX_PROMPT }),
+        body: JSON.stringify({ image_base64: base64, media_type: 'image/jpeg', prompt: type === 'box' ? BOX_PROMPT : RX_PROMPT }),
       })
       if (!res.ok) throw new Error(`Gemini ${res.status}`)
       const parsed = await res.json()
