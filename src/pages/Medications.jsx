@@ -128,21 +128,35 @@ function resizeImageToBase64(file, maxDim = 1600, quality = 0.8) {
     const reader = new FileReader()
     reader.onerror = reject
     reader.onload = () => {
-      const img = new Image()
-      img.onerror = reject
-      img.onload = () => {
-        let { width, height } = img
-        if (width > maxDim || height > maxDim) {
-          if (width >= height) { height = Math.round(height * maxDim / width); width = maxDim }
-          else { width = Math.round(width * maxDim / height); height = maxDim }
+      // Estos callbacks los dispara el navegador después de que esta función
+      // ejecutora ya retornó — un throw aquí adentro NO llega solo al reject
+      // de la promesa (no es código síncrono del executor). Sin este try/catch,
+      // una excepción (canvas sin contexto, drawImage fallando, etc.) deja la
+      // promesa colgada para siempre: nunca resuelve ni rechaza, y el .catch()
+      // de handlePhotoChosen nunca se entera.
+      try {
+        const img = new Image()
+        img.onerror = reject
+        img.onload = () => {
+          try {
+            let { width, height } = img
+            if (width > maxDim || height > maxDim) {
+              if (width >= height) { height = Math.round(height * maxDim / width); width = maxDim }
+              else { width = Math.round(width * maxDim / height); height = maxDim }
+            }
+            const canvas = document.createElement('canvas')
+            canvas.width = width
+            canvas.height = height
+            canvas.getContext('2d').drawImage(img, 0, 0, width, height)
+            resolve(canvas.toDataURL('image/jpeg', quality))
+          } catch (err) {
+            reject(err)
+          }
         }
-        const canvas = document.createElement('canvas')
-        canvas.width = width
-        canvas.height = height
-        canvas.getContext('2d').drawImage(img, 0, 0, width, height)
-        resolve(canvas.toDataURL('image/jpeg', quality))
+        img.src = reader.result
+      } catch (err) {
+        reject(err)
       }
-      img.src = reader.result
     }
     reader.readAsDataURL(file)
   })
