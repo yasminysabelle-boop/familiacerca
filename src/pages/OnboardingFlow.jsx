@@ -325,7 +325,7 @@ export default function OnboardingFlow() {
 
       {/* ── Header con barra de progreso ── */}
       <div style={{ background: '#087F70', padding: '0 20px', paddingTop: 'calc(env(safe-area-inset-top) + 14px)' }}>
-        <Logo showWordmark size={28} />
+        <Logo showWordmark size={28} variant="light" />
         <div style={{ marginTop: 16, height: 4, background: 'rgba(255,255,255,0.15)', borderRadius: 4 }}>
           <div style={{
             height: '100%', width: `${progress}%`, background: '#E9826E', borderRadius: 4,
