@@ -158,10 +158,10 @@ export default function CareRecord() {
 
         {/* Header */}
         <div style={{
-          background: 'linear-gradient(145deg, #0B4F4A 0%, #3D6128 100%)',
+          background: 'linear-gradient(148deg, #12A18C 0%, #0A8072 46%, #055C51 100%)',
           borderRadius: 20, padding: '20px 20px 18px',
           marginBottom: 20,
-          boxShadow: '0 4px 20px rgba(11,79,74,0.25)',
+          boxShadow: '0 4px 20px rgba(8,127,112,0.25)',
         }}>
           <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', margin: '0 0 4px', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
             {dayLabel(todayKey)}
@@ -200,7 +200,7 @@ export default function CareRecord() {
                 marginBottom: 12,
                 boxShadow: '0 1px 6px rgba(0,0,0,0.04)',
               }}>
-                <p style={{ fontSize: 12, fontWeight: 700, color: '#0B4F4A', margin: '0 0 12px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                <p style={{ fontSize: 12, fontWeight: 700, color: '#087F70', margin: '0 0 12px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
                   {section.label}
                 </p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
@@ -215,15 +215,15 @@ export default function CareRecord() {
                           display: 'flex', alignItems: 'center', gap: 6,
                           padding: '8px 14px',
                           borderRadius: 24,
-                          border: isSelected ? '2px solid #0B4F4A' : '1.5px solid #E5DDD2',
-                          background: isSelected ? '#0B4F4A' : 'white',
-                          color: isSelected ? 'white' : '#4B5563',
+                          border: isSelected ? '2px solid #087F70' : '1.5px solid #E5DDD2',
+                          background: isSelected ? '#A8E5D6' : 'white',
+                          color: isSelected ? '#087F70' : '#4B5563',
                           fontSize: 13, fontWeight: isSelected ? 700 : 500,
                           cursor: isFamiliar ? 'default' : 'pointer',
                           transition: 'all 0.15s',
                           WebkitTapHighlightColor: 'transparent',
                           opacity: isFamiliar ? 0.7 : 1,
-                          boxShadow: isSelected ? '0 2px 8px rgba(11,79,74,0.3)' : 'none',
+                          boxShadow: isSelected ? '0 2px 8px rgba(8,127,112,0.3)' : 'none',
                         }}
                       >
                         <span style={{ fontSize: 16, lineHeight: 1 }}>{opt.emoji}</span>
@@ -243,7 +243,7 @@ export default function CareRecord() {
               marginBottom: 20,
               boxShadow: '0 1px 6px rgba(0,0,0,0.04)',
             }}>
-              <p style={{ fontSize: 12, fontWeight: 700, color: '#0B4F4A', margin: '0 0 10px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+              <p style={{ fontSize: 12, fontWeight: 700, color: '#087F70', margin: '0 0 10px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
                 Notas (opcional)
               </p>
               <VoiceInput
@@ -284,12 +284,12 @@ export default function CareRecord() {
                     ? 'linear-gradient(135deg, #22C55E, #16A34A)'
                     : (!hasAnySelection || saving)
                       ? '#D1D5DB'
-                      : 'linear-gradient(135deg, #0B4F4A, #3D6128)',
+                      : 'linear-gradient(148deg, #12A18C 0%, #0A8072 46%, #055C51 100%)',
                   color: 'white', fontWeight: 700, fontSize: 15,
                   cursor: (!hasAnySelection || saving) ? 'not-allowed' : 'pointer',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                   transition: 'all 0.2s',
-                  boxShadow: hasAnySelection && !saving ? '0 4px 16px rgba(11,79,74,0.35)' : 'none',
+                  boxShadow: hasAnySelection && !saving ? '0 4px 16px rgba(8,127,112,0.35)' : 'none',
                   WebkitTapHighlightColor: 'transparent',
                 }}
               >
