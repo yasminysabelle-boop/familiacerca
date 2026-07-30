@@ -298,13 +298,23 @@ export default function OnboardingFlow() {
     try { await navigator.clipboard.writeText(inviteLink); setCopied(true); setTimeout(() => setCopied(false), 2500) } catch { }
   }
 
+  // El perfil/familia ya quedó creado en Supabase para este punto — lo único que puede
+  // fallar por una red inestable es este flag. Reintenta unas veces antes de rendirse
+  // en vez de depender de que el usuario vuelva a pasar por algún onboarding después.
+  async function saveOnboardingCompletedFlag(attempt = 1) {
+    const { error } = await supabase.auth.updateUser({ data: { onboarding_completed: true } })
+    if (!error) return
+    if (attempt >= 3) {
+      console.warn('[ONB] flag servidor no guardado tras 3 intentos:', error)
+      return
+    }
+    await new Promise(r => setTimeout(r, attempt * 1000))
+    return saveOnboardingCompletedFlag(attempt + 1)
+  }
+
   async function finish() {
     localStorage.setItem('fc_patient_onboarding_done', '1')
-    try {
-      await supabase.auth.updateUser({ data: { onboarding_completed: true } })
-    } catch (e) {
-      console.warn('[ONB] flag servidor no guardado, se reintentará en próximo login', e)
-    }
+    await saveOnboardingCompletedFlag()
     refresh?.()
     window.location.href = '/dashboard'
   }

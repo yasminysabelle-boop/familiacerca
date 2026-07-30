@@ -76,6 +76,18 @@ export function AuthProvider({ children }) {
     ensurePushSubscription(user.id)
   }, [user?.id, ensurePushSubscription])
 
+  // Respaldo de OnboardingFlow.jsx: si el flag de servidor (onboarding_completed)
+  // no se guardó por un corte real de red durante el onboarding (los 3 reintentos
+  // de finish() no alcanzaron), se reintenta aquí en el próximo login.
+  useEffect(() => {
+    if (!user || user.user_metadata?.onboarding_completed) return
+    if (localStorage.getItem('fc_patient_onboarding_done') !== '1') return
+    supabase.auth.updateUser({ data: { onboarding_completed: true } }).then(({ data, error }) => {
+      if (error) { console.warn('[Auth] reintento de onboarding_completed falló:', error); return }
+      if (data?.user) setUser(data.user)
+    })
+  }, [user])
+
   // Update last_seen every 2 minutes while active
   useEffect(() => {
     if (!user) return
