@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { FamilyProvider, useFamily } from './contexts/FamilyContext'
@@ -40,6 +40,7 @@ import CareRecord from './pages/CareRecord'
 import Incidents from './pages/Incidents'
 import FamilyRoles from './pages/FamilyRoles'
 import { supabase } from './lib/supabase'
+import imgManos from './assets/images/splash-manos.png'
 
 const P = ({ children }) => <ProtectedRoute>{children}</ProtectedRoute>
 
@@ -54,14 +55,13 @@ function HomeRoute() {
 function AppShell() {
   const location  = useLocation()
   const navigate  = useNavigate()
-  const { user }  = useAuth()
+  const { user, loading: authLoading } = useAuth()
   const { memberRole, loading: familyLoading } = useFamily()
   const isLanding = location.pathname === '/'
 
   const onboardingDone = !!localStorage.getItem('fc_onboarding_done')
   const [showSlides, setShowSlides] = useState(!onboardingDone)
   const [splashDone, setSplashDone] = useState(() => !!sessionStorage.getItem('fc_logo_splash_done'))
-  const [splashFading, setSplashFading] = useState(false)
 
   // Member onboarding: shown once to family members who haven't completed it.
   // Auth metadata is the source of truth — clears stale localStorage for re-invited users.
@@ -107,12 +107,12 @@ function AppShell() {
       })
   }, [user?.id])
 
+  // Marca el splash como visto apenas empieza a mostrarse — el resto de su
+  // coreografía y timing (simple vs. la salida con crossfade a Login) vive
+  // adentro de <Splash>, que avisa acá mismo cuando termina via onDone.
   useEffect(() => {
     if (showSlides || splashDone) return
     sessionStorage.setItem('fc_logo_splash_done', '1')
-    const t1 = setTimeout(() => setSplashFading(true), 2200)
-    const t2 = setTimeout(() => setSplashDone(true), 2700)
-    return () => { clearTimeout(t1); clearTimeout(t2) }
   }, [showSlides])
 
   return (
@@ -120,7 +120,7 @@ function AppShell() {
       {showSlides && !isLanding && <WelcomeSlides onDone={handleOnboardingDone} />}
       {!showSlides && !splashDone && !isLanding && (
         <div style={{ position: 'relative', zIndex: 9999, width: '100%', height: '100vh', transform: 'translateZ(0)' }}>
-          <Splash fading={splashFading} />
+          <Splash toLogin={!authLoading && !user} onDone={() => setSplashDone(true)} />
         </div>
       )}
       {showMemberOnboarding && <MemberOnboarding onDone={handleMemberOnboardingDone} />}
@@ -173,43 +173,112 @@ function AppShell() {
   )
 }
 
-function Splash({ fading }) {
+// Splash de arranque. Dos coreografías de salida a los 2.2s:
+//  - "elaborada": crossfade hacia la foto+degradado de Login (mismo encuadre
+//    que Login.jsx) con el card blanco subiendo desde abajo — solo cuando
+//    vamos a aterrizar en Login (toLogin) y el usuario no pidió menos
+//    movimiento.
+//  - "simple": el fundido de siempre (opacity a 0.5s) — con sesión activa,
+//    con loading de auth aún sin resolver a los 2.2s, o con
+//    prefers-reduced-motion activo. Nunca asume toLogin de forma optimista.
+// toLogin se relee en el momento de decidir (2.2s), no al montar, porque a
+// montaje el loading de auth casi siempre sigue en true.
+function Splash({ toLogin, onDone }) {
+  const [phase, setPhase] = useState('enter') // 'enter' | 'crossfade' | 'card' | 'fade'
+  const toLoginRef = useRef(toLogin)
+  useEffect(() => { toLoginRef.current = toLogin }, [toLogin])
+
+  useEffect(() => {
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const timers = []
+    timers.push(setTimeout(() => {
+      const elaborate = toLoginRef.current && !reducedMotion
+      if (elaborate) {
+        setPhase('crossfade')
+        timers.push(setTimeout(() => setPhase('card'), 150))
+        timers.push(setTimeout(onDone, 850))
+      } else {
+        setPhase('fade')
+        timers.push(setTimeout(onDone, 500))
+      }
+    }, 2200))
+    return () => timers.forEach(clearTimeout)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const exiting = phase === 'crossfade' || phase === 'card'
+
   return (
     <div
       style={{
-        position: 'fixed', inset: 0, zIndex: 9999,
+        position: 'fixed', inset: 0, zIndex: 9999, overflow: 'hidden',
         background: '#F8F4ED',
-        opacity: fading ? 0 : 1,
+        opacity: phase === 'fade' ? 0 : 1,
         transition: 'opacity 0.5s ease-out',
-        pointerEvents: fading ? 'none' : 'all',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        pointerEvents: phase === 'enter' ? 'all' : 'none',
       }}
     >
-      <div className="animate-splash-in" style={{
-        display: 'flex', flexDirection: 'column', alignItems: 'center',
-      }}>
-        <img src="/logo.png" alt="FamiliaCerca" style={{ width: 100, height: 100, objectFit: 'contain' }} />
+      {/* Foto + degradado — mismo encuadre que Login.jsx (60vh, center 42%)
+          para que el crossfade termine exactamente en lo que Login muestra */}
+      <img
+        src={imgManos}
+        alt=""
+        style={{
+          position: 'absolute', top: 0, left: 0, right: 0,
+          width: '100%', height: '60vh',
+          objectFit: 'cover', objectPosition: 'center 42%',
+          opacity: exiting ? 1 : 0,
+          transition: 'opacity 0.65s ease-in-out',
+        }}
+      />
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: 'linear-gradient(to bottom, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.32) 38%, rgba(0,0,0,0.88) 75%, rgba(0,0,0,0.97) 100%)',
+        opacity: exiting ? 1 : 0,
+        transition: 'opacity 0.65s ease-in-out',
+      }} />
 
-        <div className="animate-splash-tag" style={{ textAlign: 'center', marginTop: 22 }}>
-          <p style={{
-            color: '#143C32',
-            fontFamily: 'Georgia, serif',
-            fontSize: 32, fontWeight: 700,
-            letterSpacing: '-0.5px', lineHeight: 1,
-            margin: 0,
-          }}>
-            FamiliaCerca
-          </p>
-          <p style={{
-            color: '#6B7280',
-            fontSize: 16, fontWeight: 400,
-            letterSpacing: '0.06em',
-            margin: '12px 0 0',
-          }}>
-            Cuidado con amor
-          </p>
+      <div style={{
+        position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+        opacity: exiting ? 0 : 1,
+        transform: exiting ? 'scale(0.88) translateY(-14px)' : 'scale(1) translateY(0)',
+        transition: 'opacity 0.5s ease-in, transform 0.5s ease-in',
+      }}>
+        <div className="animate-splash-in" style={{
+          display: 'flex', flexDirection: 'column', alignItems: 'center',
+        }}>
+          <img src="/logo.png" alt="FamiliaCerca" style={{ width: 100, height: 100, objectFit: 'contain' }} />
+
+          <div className="animate-splash-tag" style={{ textAlign: 'center', marginTop: 22 }}>
+            <p style={{
+              color: '#143C32',
+              fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+              fontSize: 30, fontWeight: 800,
+              letterSpacing: '-0.4px', lineHeight: 1,
+              margin: 0,
+            }}>
+              FamiliaCerca
+            </p>
+            <p style={{
+              color: '#6B7280',
+              fontSize: 16, fontWeight: 400,
+              letterSpacing: '0.06em',
+              margin: '12px 0 0',
+            }}>
+              Cuidado con amor
+            </p>
+          </div>
         </div>
       </div>
+
+      {/* Card blanco — silueta del formulario de Login subiendo desde abajo */}
+      <div style={{
+        position: 'absolute', left: 0, right: 0, bottom: 0, height: '40%',
+        background: 'white', borderRadius: '28px 28px 0 0',
+        boxShadow: '0 -8px 48px rgba(0,0,0,0.3)',
+        transform: phase === 'card' ? 'translateY(0%)' : 'translateY(100%)',
+        transition: 'transform 0.7s cubic-bezier(0.16,1,0.3,1)',
+      }} />
     </div>
   )
 }
