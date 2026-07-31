@@ -15,18 +15,37 @@ export default function CameraCapture({ guidance, onCapture, onCancel, onManualF
   useEffect(() => {
     let cancelled = false
     async function start() {
+      let stream
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({
+        // 'ideal' (no 'exact'): en una laptop sin cámara trasera esto no
+        // rechaza — el navegador entrega la cámara que tenga disponible.
+        stream = await navigator.mediaDevices.getUserMedia({
           video: { facingMode: { ideal: 'environment' } },
           audio: false,
         })
-        if (cancelled) { stream.getTracks().forEach(t => t.stop()); return }
-        streamRef.current = stream
-        if (videoRef.current) videoRef.current.srcObject = stream
-        setStatus('live')
       } catch {
-        if (!cancelled) setStatus('denied')
+        try {
+          // Fallback sin ningún constraint de facingMode, por si algún
+          // navegador se comporta raro con el objeto facingMode en desktop.
+          stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+        } catch {
+          if (!cancelled) setStatus('denied')
+          return
+        }
       }
+      if (cancelled) { stream.getTracks().forEach(t => t.stop()); return }
+      streamRef.current = stream
+      // El <video> ya está montado (se renderiza siempre, oculto vía CSS
+      // mientras status !== 'live') así que la ref ya existe en este punto.
+      const video = videoRef.current
+      if (video) {
+        video.srcObject = stream
+        // Algunos navegadores no auto-reproducen solo por el atributo
+        // autoPlay cuando srcObject se asigna de forma asíncrona/tardía —
+        // hay que pedir play() explícitamente.
+        try { await video.play() } catch { /* bloqueado por el navegador; el usuario puede tocar el video */ }
+      }
+      if (!cancelled) setStatus('live')
     }
     start()
     return () => {
@@ -75,6 +94,17 @@ export default function CameraCapture({ guidance, onCapture, onCancel, onManualF
         <XIcon size={16} color={status === 'denied' ? '#6B7A88' : 'white'} strokeWidth={2.2} />
       </button>
 
+      {/* Montado siempre desde el primer render — la ref debe existir antes
+          de que getUserMedia() resuelva, así que no puede depender de
+          `status === 'live'` para aparecer en el DOM. */}
+      <video
+        ref={videoRef}
+        autoPlay
+        playsInline
+        muted
+        style={{ flex: 1, width: '100%', objectFit: 'cover', display: status === 'live' ? 'block' : 'none' }}
+      />
+
       {status === 'requesting' && (
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
           <div style={{ width: 34, height: 34, borderRadius: '50%', border: '3px solid rgba(255,255,255,0.15)', borderTopColor: '#087F70', animation: 'camCaptureSpin 0.85s linear infinite' }} />
@@ -84,7 +114,6 @@ export default function CameraCapture({ guidance, onCapture, onCancel, onManualF
 
       {status === 'live' && (
         <>
-          <video ref={videoRef} autoPlay playsInline muted style={{ flex: 1, width: '100%', objectFit: 'cover' }} />
           <div style={{ position: 'absolute', top: 0, left: 0, right: 0, display: 'flex', justifyContent: 'center', paddingTop: 'calc(46px + env(safe-area-inset-top))' }}>
             {guidance && (
               <span style={{
