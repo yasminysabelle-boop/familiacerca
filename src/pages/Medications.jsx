@@ -13,6 +13,7 @@ import { track } from '../lib/analytics'
 import { getTodayPR } from '../lib/utils'
 import { getLocation, mapsUrl } from '../lib/gps'
 import MedicationStockTab from '../components/MedicationStockTab'
+import CameraCapture from '../components/CameraCapture'
 import EvidencePhoto from '../components/EvidencePhoto'
 import { SkeletonMedCard } from '../components/SkeletonLoader'
 import EmptyState from '../components/EmptyState'
@@ -133,7 +134,7 @@ function resizeImageToBase64(file, maxDim = 1600, quality = 0.8) {
       // de la promesa (no es código síncrono del executor). Sin este try/catch,
       // una excepción (canvas sin contexto, drawImage fallando, etc.) deja la
       // promesa colgada para siempre: nunca resuelve ni rechaza, y el .catch()
-      // de handlePhotoChosen nunca se entera.
+      // de handleCameraCapture nunca se entera.
       try {
         const img = new Image()
         img.onerror = reject
@@ -325,12 +326,6 @@ export default function Medications() {
   const [addAiError,      setAddAiError]      = useState('')
   const [selectedMedIndices, setSelectedMedIndices] = useState(new Set())
   const [addMedQueue,        setAddMedQueue]         = useState([])
-  const photoInputRef = useRef(null)
-  // Mensaje si el input de foto no recibe ningún archivo al volver de la cámara
-  // nativa (ver handleCameraReturn más abajo)
-  const [addPhotoTimeoutError, setAddPhotoTimeoutError] = useState('')
-  const awaitingPhotoRef     = useRef(false)
-  const photoReturnTimerRef  = useRef(null)
 
   // ── Stock form state ───────────────────────────────────────────────────────
   const [stockForm, setStockForm] = useState(emptyStock)
@@ -356,34 +351,6 @@ export default function Medications() {
     editOpenedRef.current = true
     openEdit(med); setSearchParams({}, { replace: true })
   }, [searchParams, medications, loading])
-
-  // Detecta el regreso de la cámara nativa (input[type=file][capture]) tras
-  // abrirla desde una PWA instalada en Android. En ese escenario Chrome a
-  // veces mata el proceso en background mientras la cámara está abierta; al
-  // volver, el evento `change` del input nunca llega — sin este chequeo el
-  // usuario queda viendo el sheet en blanco sin ninguna pista.
-  useEffect(() => {
-    function handleCameraReturn() {
-      if (document.visibilityState !== 'visible') return
-      if (!awaitingPhotoRef.current) return
-      if (photoReturnTimerRef.current) clearTimeout(photoReturnTimerRef.current)
-      // Da un margen a que el navegador entregue el `change` del input antes
-      // de asumir que se perdió.
-      photoReturnTimerRef.current = setTimeout(() => {
-        if (awaitingPhotoRef.current) {
-          awaitingPhotoRef.current = false
-          setAddPhotoTimeoutError('No se detectó la foto. Intenta de nuevo o usa "Ingresar manualmente".')
-        }
-      }, 3500)
-    }
-    document.addEventListener('visibilitychange', handleCameraReturn)
-    window.addEventListener('pageshow', handleCameraReturn)
-    return () => {
-      document.removeEventListener('visibilitychange', handleCameraReturn)
-      window.removeEventListener('pageshow', handleCameraReturn)
-      if (photoReturnTimerRef.current) clearTimeout(photoReturnTimerRef.current)
-    }
-  }, [])
 
   // ── Data fetching ──────────────────────────────────────────────────────────
   async function fetchAll() {
@@ -483,9 +450,6 @@ export default function Medications() {
     setStockForm(emptyStock); setAddPhotoFile(null); setAddPhotoPreview(null)
     setAddAiExtracted(null); setAddAiError(''); setAddPhotoType(null)
     setSaveError(null)
-    awaitingPhotoRef.current = false
-    if (photoReturnTimerRef.current) { clearTimeout(photoReturnTimerRef.current); photoReturnTimerRef.current = null }
-    setAddPhotoTimeoutError('')
     setAddStep('method'); setShowForm(true)
   }
 
@@ -524,22 +488,15 @@ export default function Medications() {
     setStockForm(emptyStock); setEditStockRecord(null); setAddPhotoFile(null); setAddPhotoPreview(null)
     setAddAiExtracted(null); setAddAiError(''); setAddPhotoType(null)
     setAddMedQueue([]); setSelectedMedIndices(new Set())
-    awaitingPhotoRef.current = false
-    if (photoReturnTimerRef.current) { clearTimeout(photoReturnTimerRef.current); photoReturnTimerRef.current = null }
-    setAddPhotoTimeoutError('')
   }
 
   // ── AI photo processing ────────────────────────────────────────────────────
-  function handlePhotoChosen(e) {
-    // El input SÍ entregó el evento `change` — cancela cualquier timeout de
-    // "no se detectó la foto" pendiente de handleCameraReturn.
-    awaitingPhotoRef.current = false
-    if (photoReturnTimerRef.current) { clearTimeout(photoReturnTimerRef.current); photoReturnTimerRef.current = null }
-    const file = e.target.files?.[0]
-    e.target.value = ''
-    if (!file) return
-    setAddPhotoFile(file)
-    resizeImageToBase64(file)
+  // Recibe el Blob JPEG crudo que entrega <CameraCapture onCapture>. Mismo
+  // camino que antes usaba el <input capture>: resize/compresión → IA →
+  // ai-confirm, sin cambios en esa parte.
+  function handleCameraCapture(blob) {
+    setAddPhotoFile(blob)
+    resizeImageToBase64(blob)
       .then(dataUrl => {
         setAddPhotoPreview(dataUrl)
         processPhoto(dataUrl.split(',')[1], addPhotoType).catch(err => {
@@ -1570,16 +1527,6 @@ export default function Medications() {
         />
       )}
 
-      {/* ── Hidden photo input ────────────────────────────────────────────── */}
-      <input
-        ref={photoInputRef}
-        type="file"
-        accept="image/*"
-        capture="environment"
-        style={{ display: 'none' }}
-        onChange={handlePhotoChosen}
-      />
-
       {/* ── Add / Edit sheet ──────────────────────────────────────────────── */}
       {showForm && (
         <div
@@ -1612,8 +1559,8 @@ export default function Medications() {
                   </span>, como prefieras.
                 </p>
                 {[
-                  { Icon: Camera,   iconBg: '#A8E5D6', iconColor: '#08554A', title: 'Foto de la caja',       desc: 'La IA lee nombre, dosis, cantidad y vencimiento',   shadow: '#087F7033', action: () => { setAddPhotoType('box'); setAddPhotoTimeoutError(''); awaitingPhotoRef.current = true; photoInputRef.current?.click(); setAddStep('photo-box') } },
-                  { Icon: FileText, iconBg: '#FBEAE4', iconColor: '#C4664F', title: 'Foto de la receta',     desc: 'La IA extrae el medicamento indicado por el médico', shadow: '#D99A1833', action: () => { setAddPhotoType('prescription'); setAddPhotoTimeoutError(''); awaitingPhotoRef.current = true; photoInputRef.current?.click(); setAddStep('photo-rx') } },
+                  { Icon: Camera,   iconBg: '#A8E5D6', iconColor: '#08554A', title: 'Foto de la caja',       desc: 'La IA lee nombre, dosis, cantidad y vencimiento',   shadow: '#087F7033', action: () => { setAddPhotoType('box'); setAddStep('photo-box') } },
+                  { Icon: FileText, iconBg: '#FBEAE4', iconColor: '#C4664F', title: 'Foto de la receta',     desc: 'La IA extrae el medicamento indicado por el médico', shadow: '#D99A1833', action: () => { setAddPhotoType('prescription'); setAddStep('photo-rx') } },
                   { Icon: Pencil,   iconBg: '#F6E4B8', iconColor: '#A87A0F', title: 'Ingresar manualmente',  desc: 'Llena los campos tú mismo',                          shadow: '#D99A1833', action: () => setAddStep('form') },
                 ].map(opt => (
                   <button
@@ -1638,16 +1585,14 @@ export default function Medications() {
               </div>
             )}
 
-            {/* ── STEP: esperando foto de cámara / se perdió el regreso ───── */}
-            {(addStep === 'photo-box' || addStep === 'photo-rx') && addPhotoTimeoutError && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                <div style={{ background: '#FBEAE4', borderRadius: 20, padding: '12px 14px', boxShadow: '0 6px 14px -8px #D9534F33' }}>
-                  <p style={{ fontSize: 13, color: '#C4664F', margin: 0 }}>⚠️ {addPhotoTimeoutError}</p>
-                </div>
-                <LoadingButton onClick={() => { setAddPhotoTimeoutError(''); setAddStep('method') }} style={{ padding: '13px' }}>
-                  Volver a intentar
-                </LoadingButton>
-              </div>
+            {/* ── STEP: cámara in-page (caja / receta) ─────────────────────── */}
+            {(addStep === 'photo-box' || addStep === 'photo-rx') && (
+              <CameraCapture
+                guidance={addStep === 'photo-box' ? '📦 Encuadra la caja o el frasco' : '📄 Encuadra la receta completa'}
+                onCapture={handleCameraCapture}
+                onCancel={() => setAddStep('method')}
+                onManualFallback={() => setAddStep('form')}
+              />
             )}
 
             {/* ── STEP: AI processing spinner ────────────────────────────── */}
