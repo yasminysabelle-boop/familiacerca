@@ -3,8 +3,10 @@ import { useSearchParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { supabase } from '../lib/supabase'
+import { getTodayPR } from '../lib/utils'
 import Logo from '../components/Logo'
 import { Heart } from '../components/Icons'
+import WatermarkHeart from '../components/WatermarkHeart'
 import imgFamilia from '../assets/images/splash-familia.png'
 import PWAInstallBanner from '../components/PWAInstallBanner'
 
@@ -102,6 +104,17 @@ export default function JoinFamily() {
   const [alreadyMember, setAlreadyMember] = useState(false)
   const [wrongEmailConfirm, setWrongEmailConfirm] = useState(false)
 
+  // Mini-intro post-invitación (entre "¡Bienvenido!" y el redirect al panel),
+  // distinta para cuidador/familiar — ver invitation.role.
+  const [showRoleIntro, setShowRoleIntro] = useState(false)
+  const [introMeds, setIntroMeds] = useState([])
+  const [introLogsToday, setIntroLogsToday] = useState([])
+  const [introLoading, setIntroLoading] = useState(true)
+  const [introMessage, setIntroMessage] = useState('')
+  const [introActionBusy, setIntroActionBusy] = useState(false)
+  const [introJustDone, setIntroJustDone] = useState(false)
+  const [introActionError, setIntroActionError] = useState('')
+
   // No token → redirect
   useEffect(() => {
     if (!token && !sessionLoading) {
@@ -127,6 +140,27 @@ export default function JoinFamily() {
     if (emailMismatch && !wrongEmailConfirm) return
     acceptInvitation()
   }, [user, invitation, wrongEmailConfirm])
+
+  // Datos para la mini-intro de después de aceptar — se dispara en cuanto
+  // `accepted` es true, en paralelo mientras la persona lee "¡Bienvenido!",
+  // para que la siguiente pantalla no tenga que mostrar un spinner.
+  useEffect(() => {
+    if (!accepted || !invitation) return
+    let cancelled = false
+    async function fetchIntroData() {
+      const [{ data: meds }, { data: logs }] = await Promise.all([
+        supabase.from('medications').select('id, name, scheduled_times, time').eq('user_id', invitation.user_id),
+        supabase.from('medication_logs').select('medication_id, status')
+          .eq('user_id', invitation.user_id).eq('log_date', getTodayPR()).eq('status', 'confirmed'),
+      ])
+      if (cancelled) return
+      setIntroMeds(meds ?? [])
+      setIntroLogsToday(logs ?? [])
+      setIntroLoading(false)
+    }
+    fetchIntroData()
+    return () => { cancelled = true }
+  }, [accepted, invitation])
 
   async function fetchInvitation() {
     const { data, error } = await supabase
@@ -201,6 +235,61 @@ export default function JoinFamily() {
     refreshFamily()
     setAccepting(false)
     setAccepted(true)
+  }
+
+  // ── Mini-intro post-invitación ──────────────────────────────────────────
+  const displayName = user?.user_metadata?.full_name ?? user?.email ?? 'Familiar'
+  const cuidadorHasData = introMeds.length > 0
+  const familiarHasData = introLogsToday.length > 0
+
+  const nextMed = (() => {
+    if (!introMeds.length) return null
+    const confirmedIds = new Set(introLogsToday.map(l => l.medication_id))
+    const pending = introMeds.filter(m => !confirmedIds.has(m.id))
+    const pool = pending.length ? pending : introMeds // ya confirmó todo — sin tercer estado, mostramos el primero igual
+    return [...pool].sort((a, b) => {
+      const ta = a.scheduled_times?.[0] ?? a.time ?? '99:99'
+      const tb = b.scheduled_times?.[0] ?? b.time ?? '99:99'
+      return ta.localeCompare(tb)
+    })[0]
+  })()
+
+  function fmtMedTime(med) {
+    const t = med?.scheduled_times?.[0] ?? med?.time
+    if (!t) return ''
+    const [h, m] = t.split(':').map(Number)
+    return `${h % 12 || 12}:${String(m).padStart(2, '0')}${h >= 12 ? 'pm' : 'am'}`
+  }
+
+  function skipIntroToPanel() {
+    navigate('/dashboard', { replace: true })
+  }
+
+  async function confirmFirstDose() {
+    if (!nextMed || introActionBusy) return
+    setIntroActionBusy(true); setIntroActionError('')
+    const { error } = await supabase.from('medication_logs').upsert({
+      medication_id: nextMed.id, user_id: invitation.user_id, status: 'confirmed',
+      log_date: getTodayPR(), confirmed_by_name: displayName, confirmed_at: new Date().toISOString(),
+    }, { onConflict: 'medication_id,log_date,user_id' })
+    setIntroActionBusy(false)
+    if (error) { setIntroActionError('No se pudo registrar. Intenta de nuevo.'); return }
+    setIntroJustDone(true)
+    setTimeout(() => navigate('/dashboard', { replace: true }), 550)
+  }
+
+  async function sendFirstMessage() {
+    const text = introMessage.trim()
+    if (!text || introActionBusy) return
+    setIntroActionBusy(true); setIntroActionError('')
+    const { error } = await supabase.from('chat_messages').insert({
+      owner_id: invitation.user_id, user_id: user.id, user_name: displayName,
+      message: text, category: 'general',
+    })
+    setIntroActionBusy(false)
+    if (error) { setIntroActionError('No se pudo enviar. Intenta de nuevo.'); return }
+    setIntroJustDone(true)
+    setTimeout(() => navigate('/dashboard', { replace: true }), 550)
   }
 
   if (!token) return null
@@ -399,7 +488,7 @@ export default function JoinFamily() {
           )}
 
           {/* Success — just accepted */}
-          {accepted && (
+          {accepted && !showRoleIntro && (
             <div style={CARD}>
               <div className="animate-heartbeat inline-flex" style={{ marginBottom: 16 }}>
                 <Heart size={56} color="#0d6b63" strokeWidth={1.2} filled />
@@ -411,7 +500,7 @@ export default function JoinFamily() {
                 Ahora formas parte del grupo de cuidado{patientName ? ` de ${patientName}` : ''}.
               </p>
               <button
-                onClick={() => navigate('/dashboard', { replace: true })}
+                onClick={() => setShowRoleIntro(true)}
                 style={{ ...BTN_PRIMARY, marginBottom: 12 }}
               >
                 Ir al panel →
@@ -419,6 +508,132 @@ export default function JoinFamily() {
               <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0, lineHeight: 1.5 }}>
                 Instala la app para recibir alertas en tiempo real
               </p>
+            </div>
+          )}
+
+          {/* Mini-intro post-invitación — cuidador vs. familiar, según invitation.role */}
+          {accepted && showRoleIntro && (
+            <div style={CARD}>
+              {invitation.role === 'familiar' ? (
+                <>
+                  <p style={{
+                    fontFamily: "'Fraunces', Georgia, serif", fontStyle: 'italic', fontWeight: 500,
+                    fontSize: 21, lineHeight: 1.3, color: '#1A1A1A', margin: '0 0 10px',
+                  }}>
+                    No estar ahí no significa no estar cerca.
+                  </p>
+                  <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, margin: '0 0 22px' }}>
+                    Desde donde estés, puedes ver cómo está {patientName || 'tu familiar'} y mandarle cariño en segundos.
+                  </p>
+
+                  {introLoading ? (
+                    <p style={{ color: '#9CA3AF', fontSize: 13, marginBottom: 18 }}>Cargando…</p>
+                  ) : familiarHasData ? (
+                    <div style={{ position: 'relative', background: '#F8F4ED', borderRadius: 20, padding: '14px 16px', marginBottom: 16, overflow: 'hidden', textAlign: 'left' }}>
+                      <WatermarkHeart heartOpacity={0.045} cutout="#F8F4ED" width={130} height={130} style={{ right: -18, bottom: -30 }} />
+                      <p style={{ position: 'relative', zIndex: 1, fontSize: 13, color: '#374151', margin: 0 }}>
+                        <b style={{ color: '#1A1A1A' }}>{introLogsToday.length} de {introMeds.length}</b> medicamentos dados hoy
+                      </p>
+                    </div>
+                  ) : (
+                    <div style={{ position: 'relative', background: 'white', borderRadius: 20, padding: '20px 16px', marginBottom: 16, overflow: 'hidden', textAlign: 'left', boxShadow: '0 6px 14px -8px rgba(0,0,0,0.08)' }}>
+                      <WatermarkHeart heartOpacity={0.08} cutout="white" width={130} height={130} style={{ top: '50%', left: '50%', transform: 'translate(-50%,-50%)' }} />
+                      <div style={{ position: 'relative', zIndex: 1 }}>
+                        <p style={{ fontSize: 13, fontWeight: 700, color: '#1A1A1A', margin: '0 0 4px' }}>Día 1 — el equipo recién está empezando</p>
+                        <p style={{ fontSize: 12.5, color: '#6B7280', margin: 0, lineHeight: 1.5 }}>
+                          Todavía no hay actividad registrada. Muy pronto verás aquí cómo va el día.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  <textarea
+                    value={introMessage}
+                    onChange={e => setIntroMessage(e.target.value)}
+                    placeholder={`Escribe algo para ${patientName || 'la familia'}...`}
+                    rows={2}
+                    disabled={introActionBusy || introJustDone}
+                    style={{
+                      width: '100%', padding: '11px 13px', borderRadius: 14, border: '1.5px solid #EDE5D8',
+                      fontSize: 13.5, fontFamily: 'inherit', resize: 'none', boxSizing: 'border-box', marginBottom: 12,
+                    }}
+                  />
+                  {introActionError && (
+                    <p style={{ color: '#D63031', fontSize: 12.5, marginBottom: 10 }}>{introActionError}</p>
+                  )}
+                  <button
+                    onClick={sendFirstMessage}
+                    disabled={introActionBusy || introJustDone || !introMessage.trim()}
+                    style={{ ...BTN_PRIMARY, marginBottom: 12, opacity: introJustDone ? 0.9 : 1 }}
+                  >
+                    {introJustDone ? '✓ ¡Enviado!' : introActionBusy ? 'Enviando…' : 'Enviar y entrar al panel →'}
+                  </button>
+                  <button onClick={skipIntroToPanel} disabled={introJustDone} style={BTN_OUTLINE}>
+                    Prefiero verlo después
+                  </button>
+                </>
+              ) : (
+                <>
+                  <p style={{
+                    fontFamily: "'Fraunces', Georgia, serif", fontStyle: 'italic', fontWeight: 500,
+                    fontSize: 21, lineHeight: 1.3, color: '#1A1A1A', margin: '0 0 10px',
+                  }}>
+                    Ya no estás cuidando solo/a.
+                  </p>
+                  <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, margin: '0 0 22px' }}>
+                    Desde ahora, alguien más sabe exactamente qué necesita {patientName || 'tu familiar'} — y no tienes que recordarlo todo tú.
+                  </p>
+
+                  {introLoading ? (
+                    <p style={{ color: '#9CA3AF', fontSize: 13, marginBottom: 18 }}>Cargando…</p>
+                  ) : cuidadorHasData ? (
+                    <>
+                      <div style={{ position: 'relative', background: '#F8F4ED', borderRadius: 20, padding: '14px 16px', marginBottom: 16, overflow: 'hidden', textAlign: 'left' }}>
+                        <WatermarkHeart heartOpacity={0.045} cutout="#F8F4ED" width={130} height={130} style={{ right: -18, bottom: -30 }} />
+                        <div style={{ position: 'relative', zIndex: 1 }}>
+                          <p style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#9CA3AF', margin: '0 0 6px' }}>
+                            Próxima dosis
+                          </p>
+                          <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 16, fontWeight: 800, color: '#1A1A1A', margin: 0 }}>
+                            {nextMed.name}
+                          </p>
+                          {fmtMedTime(nextMed) && (
+                            <p style={{ fontSize: 12.5, color: '#6B7280', margin: '6px 0 0' }}>{fmtMedTime(nextMed)}</p>
+                          )}
+                        </div>
+                      </div>
+                      {introActionError && (
+                        <p style={{ color: '#D63031', fontSize: 12.5, marginBottom: 10 }}>{introActionError}</p>
+                      )}
+                      <button
+                        onClick={confirmFirstDose}
+                        disabled={introActionBusy || introJustDone}
+                        style={{ ...BTN_PRIMARY, marginBottom: 12, opacity: introJustDone ? 0.9 : 1 }}
+                      >
+                        {introJustDone ? '✓ ¡Registrada!' : introActionBusy ? 'Confirmando…' : 'Confirmar dosis'}
+                      </button>
+                      <button onClick={skipIntroToPanel} disabled={introJustDone} style={BTN_OUTLINE}>
+                        Prefiero verlo después
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <div style={{ position: 'relative', background: 'white', borderRadius: 20, padding: '20px 16px', marginBottom: 16, overflow: 'hidden', textAlign: 'left', boxShadow: '0 6px 14px -8px rgba(0,0,0,0.08)' }}>
+                        <WatermarkHeart heartOpacity={0.08} cutout="white" width={130} height={130} style={{ top: '50%', left: '50%', transform: 'translate(-50%,-50%)' }} />
+                        <div style={{ position: 'relative', zIndex: 1 }}>
+                          <p style={{ fontSize: 13, fontWeight: 700, color: '#1A1A1A', margin: '0 0 4px' }}>Día 1 — todavía no hay medicamentos programados</p>
+                          <p style={{ fontSize: 12.5, color: '#6B7280', margin: 0, lineHeight: 1.5 }}>
+                            En cuanto {invitation.invited_by || 'el administrador'} agregue el primero, lo verás aquí para confirmarlo.
+                          </p>
+                        </div>
+                      </div>
+                      <button onClick={skipIntroToPanel} style={BTN_PRIMARY}>
+                        Ir al panel
+                      </button>
+                    </>
+                  )}
+                </>
+              )}
             </div>
           )}
 
