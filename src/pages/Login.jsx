@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 import Logo from '../components/Logo'
 import { Eye, EyeOff } from '../components/Icons'
-import imgHija from '../assets/images/splash-hija.png'
+import imgManos from '../assets/images/splash-manos.png'
 
 export default function Login() {
   const { signIn } = useAuth()
@@ -130,14 +130,18 @@ export default function Login() {
       flexDirection: 'column',
       background: '#0A0A0A',
     }}>
-      {/* Hero photo */}
+      {/* Hero photo — caja limitada al 60% superior de la pantalla (no a
+          inset:0) para que quede margen vertical real donde recortar. La
+          proporción de esta foto (941x1672) es casi idéntica a la de un
+          teléfono en vertical, así que a pantalla completa object-position
+          no tiene margen para reposicionar — de ahí el corte al 60vh. */}
       <img
-        src={imgHija}
+        src={imgManos}
         alt="Familia"
         style={{
-          position: 'absolute', inset: 0,
-          width: '100%', height: '100%',
-          objectFit: 'cover', objectPosition: 'center 15%',
+          position: 'absolute', top: 0, left: 0, right: 0,
+          width: '100%', height: '60vh',
+          objectFit: 'cover', objectPosition: 'center 42%',
         }}
       />
 
