@@ -213,6 +213,14 @@ export default function Landing() {
     if (typeof window !== 'undefined' && window.gtag) window.gtag('event', event, params)
   }
 
+  // ⚠️ NOTA PARA EL EQUIPO (no visible al usuario): Milo/Luna aparece abajo en
+  // los 3 planes con niveles de uso distintos (Gratis: 1 resumen/día · Familiar:
+  // tiempo real + alertas · Cuidado Total: tendencias/comparación semanal).
+  // Esto es un cambio de PRODUCTO real, no solo de marketing — todavía NO existe
+  // el límite de uso por plan en el backend. Antes de que esta landing sea
+  // definitiva hay que implementar el tope real (ej. 1 resumen/día para Gratis)
+  // en el servicio que genera los resúmenes de Milo/Luna. Aprobado por Yasmin
+  // como mockup/landing únicamente — no tocar lógica de backend todavía.
   const plans = [
     {
       name: 'Gratis', price: 0, period: 'Para siempre sin costo', highlight: false,
@@ -221,6 +229,7 @@ export default function Landing() {
         { label: 'Tu equipo', items: ['Hasta 2 cuidadores'] },
         { label: 'Cuidado diario', items: ['Medicamentos ilimitados', 'Checklist diario', 'Chat familiar'] },
         { label: 'Registro', items: ['Historial de 3 días'] },
+        { label: '✨ Acompañamiento IA', items: ['Resumen de Milo una vez al día'] },
       ],
       cta: 'Empezar gratis',
     },
@@ -232,6 +241,7 @@ export default function Landing() {
         { label: 'Tranquilidad clínica', items: ['Alerta clínica ±1h', 'Dosis olvidada bloqueada', 'Foto de prueba', 'Push + alertas SOS'] },
         { label: 'Organización', items: ['Citas con adjuntos', 'Notas de voz', 'Historial de 90 días'] },
         { label: 'Para el doctor', items: ['Exportar en PDF'] },
+        { label: '✨ Acompañamiento IA', items: ['Resumen de Milo en tiempo real + alertas'] },
       ],
       cta: 'Empezar gratis',
     },
@@ -241,7 +251,8 @@ export default function Landing() {
       groups: [
         { label: 'Tu equipo', items: ['Cuidadores ilimitados', 'Todo lo del plan Familiar'] },
         { label: 'Historial extendido', items: ['Registros médicos e incidentes', 'Directorio médico', 'Historial indefinido'] },
-        { label: 'Acompañamiento', items: ['Milo/Luna (IA)', 'Gastos de salud'] },
+        { label: '✨ Acompañamiento IA', items: ['Resumen de Milo + tendencias y comparación semanal', 'Análisis completo de la actividad de tu familiar'] },
+        { label: 'Bienestar', items: ['Gastos de salud'] },
         { label: 'Soporte', items: ['Soporte prioritario', 'Acceso anticipado a funciones nuevas'] },
       ],
       cta: 'Empezar gratis',
@@ -442,6 +453,80 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* ─────────────── LO QUE CAMBIA PARA TU FAMILIA ─────────────── */}
+      {/* Reubicada antes de Problema/Solución (junto con la sección de IA que
+          sigue) — es el diferenciador del producto, debe leerse temprano. */}
+      <section style={{ background: PRIMARY, padding: '110px 32px' }}>
+        <div style={{ maxWidth: 1140, margin: '0 auto' }}>
+          <div className="reveal" style={{ textAlign: 'center', maxWidth: 560, margin: '0 auto 56px' }}>
+            <p style={{ fontSize: 11, fontWeight: 500, color: GOLD, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>El cambio real</p>
+            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(28px,3.4vw,44px)', fontWeight: 600, color: WHITE, lineHeight: 1.15, margin: 0 }}>
+              Lo que cambia para tu familia
+            </h2>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 2, maxWidth: 880, margin: '0 auto' }}>
+            {whatChangesRows.map((r, i) => (
+              <div key={i} className={`what-changes-row reveal reveal-delay-${i}`} style={{ display: 'grid', gridTemplateColumns: '1fr 44px 1fr', alignItems: 'center', gap: 20, padding: '28px 8px', borderBottom: i < whatChangesRows.length - 1 ? '1px solid rgba(255,255,255,0.10)' : 'none' }}>
+                <p style={{ fontSize: 'clamp(15px,1.7vw,18px)', color: 'rgba(255,255,255,0.42)', lineHeight: 1.5, textAlign: 'right', margin: 0, fontFamily: SANS }}>{r.before}</p>
+                <div style={{ textAlign: 'center', color: CORAL, fontSize: 20 }}>→</div>
+                <p style={{ fontSize: 'clamp(16px,1.9vw,20px)', color: WHITE, fontWeight: 600, lineHeight: 1.5, margin: 0, fontFamily: SANS }}>{r.after}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─────────────── 7.2. INTELIGENCIA FAMILIACERCA ─────────────── */}
+      {/* Copy en voz propia de Milo (primera persona, cálida) — a propósito
+          SIN ningún juicio de salud ("está estable", "no detecté cambios que
+          requieran atención"): solo hechos verificables que la familia ya
+          registró. La familia decide qué significan, Milo no interpreta. */}
+      <section style={{ background: WHITE, padding: '110px 32px' }}>
+        <div style={{ maxWidth: 1140, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 64, flexWrap: 'wrap' }}>
+          <div className="ai-visual-col" style={{ flex: '0 0 340px', maxWidth: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div style={{ width: 210, borderRadius: 22, alignSelf: 'flex-start', marginLeft: 14, background: 'linear-gradient(160deg, rgba(117,102,216,0.09), rgba(167,154,234,0.05))', border: '1px solid rgba(117,102,216,0.18)', padding: 18, boxShadow: '0 16px 44px rgba(117,102,216,0.16)' }}>
+              <img src={MILO_LUNA_IMG} alt="Milo y Luna, los compañeros de inteligencia artificial de FamiliaCerca" style={{ width: '100%', display: 'block' }} />
+            </div>
+            <div className="ai-fact-card" style={{ width: 320, maxWidth: '100%', marginTop: -30, alignSelf: 'flex-end', position: 'relative', zIndex: 1, background: WHITE, borderRadius: 22, border: '1px solid rgba(117,102,216,0.24)', boxShadow: '0 24px 64px rgba(117,102,216,0.20)', padding: '26px 26px 18px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 11, marginBottom: 18 }}>
+                <div style={{ width: 40, height: 40, borderRadius: '50%', flexShrink: 0, background: `linear-gradient(135deg, ${AI_PURPLE}, #A79AEA)`, color: WHITE, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>✨</div>
+                <div>
+                  <div style={{ fontSize: 13.5, fontWeight: 700, color: '#4B3F9E', fontFamily: SANS }}>Milo</div>
+                  <div style={{ fontSize: 11, color: '#6B7280', marginTop: 1, fontFamily: SANS }}>Hoy, 7:32 AM</div>
+                </div>
+              </div>
+              <p style={{ fontSize: 14, lineHeight: 1.75, color: '#334155', margin: '0 0 16px', fontFamily: SANS }}>
+                &ldquo;Buenos días. Ya revisé todo lo de Deborah. Esto es lo importante hoy: tomó sus tres medicamentos a tiempo. No hay eventos nuevos registrados. La cita del jueves sigue en pie.&rdquo;
+              </p>
+              <div style={{ marginTop: 14, paddingTop: 13, borderTop: '1px solid rgba(117,102,216,0.14)', fontSize: 11, color: '#8A80C4', textAlign: 'center', fontStyle: 'italic', lineHeight: 1.5, fontFamily: SANS }}>
+                Basado en medicamentos, rutinas, notas, citas e historial — no en suposiciones.
+              </div>
+            </div>
+          </div>
+          <div style={{ flex: '1 1 420px', maxWidth: 560 }} className="reveal">
+            <p style={{ fontSize: 11, fontWeight: 500, color: AI_PURPLE, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>Inteligencia FamiliaCerca</p>
+            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(28px,3.4vw,42px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.18, margin: '0 0 18px' }}>
+              Un resumen que dice exactamente lo que pasó
+            </h2>
+            <p style={{ fontSize: 16, color: '#6B7280', lineHeight: 1.78, margin: '0 0 14px', fontFamily: SANS, fontWeight: 300 }}>
+              Cada mañana, Milo revisa la actividad real del día — medicamentos, rutinas, notas, citas e historial — y te la resume con sus propias palabras.
+            </p>
+            <p style={{ fontSize: 16, color: '#6B7280', lineHeight: 1.78, margin: 0, fontFamily: SANS, fontWeight: 300 }}>
+              Nunca un diagnóstico, nunca un juicio de cómo &ldquo;está&rdquo; tu familiar — solo los hechos que tu familia registró. Leerlos y decidir qué significan es siempre cosa tuya.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Frase repetida a propósito (también cierra la sección "5. PROBLEM
+          SPLIT" más abajo) — cierra el bloque de IA como puente hacia la
+          narrativa del Problema que sigue. */}
+      <section style={{ background: CREAM, padding: '0 32px 64px', textAlign: 'center' }}>
+        <p className="reveal" style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 600, fontSize: 'clamp(20px,2.4vw,28px)', color: CORAL, maxWidth: 640, margin: '0 auto', lineHeight: 1.4 }}>
+          El problema no es el medicamento. Es que la información está repartida.
+        </p>
+      </section>
+
       {/* ─────────────── 5. PROBLEM SPLIT ─────────────── */}
       <section style={{ overflow: 'hidden' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }} className="landing-problema-grid">
@@ -536,74 +621,6 @@ export default function Landing() {
                 <div style={{ width: 52, height: 52, borderRadius: 14, background: f.emergency ? 'rgba(217,83,79,0.10)' : 'rgba(8,127,112,0.08)', border: f.emergency ? '1px solid rgba(217,83,79,0.22)' : '1px solid rgba(8,127,112,0.14)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, marginBottom: 16 }}>{f.icon}</div>
                 <h3 style={{ fontFamily: SERIF, fontSize: 18, fontWeight: 700, color: f.emergency ? CORAL_EMERGENCY : PRIMARY, margin: '0 0 8px' }}>{f.title}</h3>
                 <p style={{ fontSize: 14.5, color: '#6B7280', lineHeight: 1.65, margin: 0, fontFamily: SANS, fontWeight: 300 }}>{f.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─────────────── 7.2. INTELIGENCIA FAMILIACERCA ─────────────── */}
-      <section style={{ background: WHITE, padding: '110px 32px' }}>
-        <div style={{ maxWidth: 1140, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 64, flexWrap: 'wrap' }}>
-          <div className="ai-visual-col" style={{ flex: '0 0 340px', maxWidth: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <div style={{ width: 210, borderRadius: 22, alignSelf: 'flex-start', marginLeft: 14, background: 'linear-gradient(160deg, rgba(117,102,216,0.09), rgba(167,154,234,0.05))', border: '1px solid rgba(117,102,216,0.18)', padding: 18, boxShadow: '0 16px 44px rgba(117,102,216,0.16)' }}>
-              <img src={MILO_LUNA_IMG} alt="Milo y Luna, los compañeros de inteligencia artificial de FamiliaCerca" style={{ width: '100%', display: 'block' }} />
-            </div>
-            <div className="ai-fact-card" style={{ width: 320, maxWidth: '100%', marginTop: -30, alignSelf: 'flex-end', position: 'relative', zIndex: 1, background: WHITE, borderRadius: 22, border: '1px solid rgba(117,102,216,0.24)', boxShadow: '0 24px 64px rgba(117,102,216,0.20)', padding: '26px 26px 18px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 11, marginBottom: 18 }}>
-                <div style={{ width: 40, height: 40, borderRadius: '50%', flexShrink: 0, background: `linear-gradient(135deg, ${AI_PURPLE}, #A79AEA)`, color: WHITE, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>✨</div>
-                <div>
-                  <div style={{ fontSize: 13.5, fontWeight: 700, color: '#4B3F9E', fontFamily: SANS }}>Resumen de hoy · Milo</div>
-                  <div style={{ fontSize: 11, color: '#6B7280', marginTop: 1, fontFamily: SANS }}>Generado a las 7:32 PM</div>
-                </div>
-              </div>
-              {[
-                { icon: '💊', text: '3 de 3 medicamentos confirmados' },
-                { icon: '📅', text: '1 cita esta semana — jueves, cardiólogo' },
-                { icon: '📋', text: 'Sin incidentes en los últimos 7 días' },
-                { icon: '🩺', text: 'Última nota médica: hace 2 días' },
-              ].map((f, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 0', borderBottom: i < 3 ? '1px solid rgba(117,102,216,0.12)' : 'none', fontSize: 13.5, color: '#334155', fontFamily: SANS }}>
-                  <span style={{ fontSize: 15, width: 20, textAlign: 'center', flexShrink: 0 }}>{f.icon}</span>
-                  <span>{f.text}</span>
-                  <span style={{ color: AI_PURPLE, fontWeight: 700, marginLeft: 'auto' }}>✓</span>
-                </div>
-              ))}
-              <div style={{ marginTop: 14, paddingTop: 13, borderTop: '1px solid rgba(117,102,216,0.14)', fontSize: 11, color: '#8A80C4', textAlign: 'center', fontStyle: 'italic', lineHeight: 1.5, fontFamily: SANS }}>
-                Basado en la actividad real registrada por tu familia — no en suposiciones.
-              </div>
-            </div>
-          </div>
-          <div style={{ flex: '1 1 420px', maxWidth: 560 }} className="reveal">
-            <p style={{ fontSize: 11, fontWeight: 500, color: AI_PURPLE, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>Inteligencia FamiliaCerca</p>
-            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(28px,3.4vw,42px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.18, margin: '0 0 18px' }}>
-              Un resumen que dice exactamente lo que pasó
-            </h2>
-            <p style={{ fontSize: 16, color: '#6B7280', lineHeight: 1.78, margin: '0 0 14px', fontFamily: SANS, fontWeight: 300 }}>
-              Milo y Luna leen la actividad real del día — medicamentos, citas, notas — y te la devuelven en hechos concretos, no en conversación genérica.
-            </p>
-            <p style={{ fontSize: 16, color: '#6B7280', lineHeight: 1.78, margin: 0, fontFamily: SANS, fontWeight: 300 }}>
-              Nada que adivinar, nada que interpretar: si dice &ldquo;3 de 3 confirmados&rdquo;, es porque los 3 quedaron registrados por alguien de tu familia.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* ─────────────── LO QUE CAMBIA PARA TU FAMILIA ─────────────── */}
-      <section style={{ background: PRIMARY, padding: '110px 32px' }}>
-        <div style={{ maxWidth: 1140, margin: '0 auto' }}>
-          <div className="reveal" style={{ textAlign: 'center', maxWidth: 560, margin: '0 auto 56px' }}>
-            <p style={{ fontSize: 11, fontWeight: 500, color: GOLD, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>El cambio real</p>
-            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(28px,3.4vw,44px)', fontWeight: 600, color: WHITE, lineHeight: 1.15, margin: 0 }}>
-              Lo que cambia para tu familia
-            </h2>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 2, maxWidth: 880, margin: '0 auto' }}>
-            {whatChangesRows.map((r, i) => (
-              <div key={i} className={`what-changes-row reveal reveal-delay-${i}`} style={{ display: 'grid', gridTemplateColumns: '1fr 44px 1fr', alignItems: 'center', gap: 20, padding: '28px 8px', borderBottom: i < whatChangesRows.length - 1 ? '1px solid rgba(255,255,255,0.10)' : 'none' }}>
-                <p style={{ fontSize: 'clamp(15px,1.7vw,18px)', color: 'rgba(255,255,255,0.42)', lineHeight: 1.5, textAlign: 'right', margin: 0, fontFamily: SANS }}>{r.before}</p>
-                <div style={{ textAlign: 'center', color: CORAL, fontSize: 20 }}>→</div>
-                <p style={{ fontSize: 'clamp(16px,1.9vw,20px)', color: WHITE, fontWeight: 600, lineHeight: 1.5, margin: 0, fontFamily: SANS }}>{r.after}</p>
               </div>
             ))}
           </div>
@@ -757,6 +774,17 @@ export default function Landing() {
               </div>
             ))}
           </div>
+
+          {/* Testimonio enfocado en IA — siempre visible, fuera del toggle
+              Ver más/menos historias porque es el diferenciador del producto. */}
+          <div className="reveal" style={{ marginTop: 24, maxWidth: 720, marginLeft: 'auto', marginRight: 'auto', background: 'linear-gradient(135deg, rgba(117,102,216,0.07), rgba(167,154,234,0.03))', border: '1px solid rgba(117,102,216,0.22)', borderRadius: 20, padding: '32px 36px', textAlign: 'center' }}>
+            <div style={{ fontSize: 26, marginBottom: 10 }}>✨</div>
+            <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 17, color: PRIMARY, lineHeight: 1.65, margin: '0 0 12px' }}>
+              &ldquo;Lo primero que hago cada mañana es abrir el resumen de Milo. En treinta segundos ya sé cómo estuvo mamá el día anterior. Ya no tengo que revisar veinte mensajes.&rdquo;
+            </p>
+            <p style={{ fontSize: 13, color: '#6B7280', margin: 0, fontFamily: SANS }}>— Sofía T., hija cuidadora · Houston, Texas</p>
+          </div>
+
           <div style={{ textAlign: 'center', marginTop: 48 }}>
             <button onClick={() => setShowAllTestimonials(v => !v)} style={{ padding: '14px 32px', borderRadius: 9999, border: `1.5px solid ${ACTION}`, background: 'transparent', color: ACTION, fontWeight: 500, fontSize: 15, fontFamily: SANS, cursor: 'pointer', letterSpacing: '0.02em' }}>
               {showAllTestimonials ? 'Ver menos historias' : 'Ver más historias'}
