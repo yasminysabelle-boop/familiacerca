@@ -168,15 +168,23 @@ function AppShell() {
   )
 }
 
-// Splash de arranque. Dos coreografías de salida a los 2.2s:
+// Splash de arranque.
+// Entrada (siempre, salvo prefers-reduced-motion — ver index.css): el logo
+// entra con scale+rotate y un rebote elástico real (overshoot), mientras un
+// degradado de marca saturado se aclara a crema detrás — animate-splash-in /
+// animate-splash-word / animate-splash-tag / animate-splash-bg-teal en
+// index.css. La entrada elaborada termina de asentarse ~1.8s in (el fondo es
+// lo último en aclararse); el hold se corrió de 2.2s a 2.6s para darle un
+// respiro real antes de decidir la salida.
+// Dos coreografías de salida a los 2.6s:
 //  - "elaborada": crossfade hacia la foto+degradado de Login (mismo encuadre
 //    que Login.jsx) con el card blanco subiendo desde abajo — solo cuando
 //    vamos a aterrizar en Login (toLogin) y el usuario no pidió menos
 //    movimiento.
 //  - "simple": el fundido de siempre (opacity a 0.5s) — con sesión activa,
-//    con loading de auth aún sin resolver a los 2.2s, o con
+//    con loading de auth aún sin resolver a los 2.6s, o con
 //    prefers-reduced-motion activo. Nunca asume toLogin de forma optimista.
-// toLogin se relee en el momento de decidir (2.2s), no al montar, porque a
+// toLogin se relee en el momento de decidir (2.6s), no al montar, porque a
 // montaje el loading de auth casi siempre sigue en true.
 function Splash({ toLogin, onDone }) {
   const [phase, setPhase] = useState('enter') // 'enter' | 'crossfade' | 'card' | 'fade'
@@ -196,7 +204,7 @@ function Splash({ toLogin, onDone }) {
         setPhase('fade')
         timers.push(setTimeout(onDone, 500))
       }
-    }, 2200))
+    }, 2600))
     return () => timers.forEach(clearTimeout)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -213,6 +221,14 @@ function Splash({ toLogin, onDone }) {
         pointerEvents: phase === 'enter' ? 'all' : 'none',
       }}
     >
+      {/* Entrada: momento de degradado de marca saturado que se aclara a
+          crema, sincronizado con el logo asentándose (animate-splash-bg-teal
+          en index.css se ocupa del timing y de prefers-reduced-motion) */}
+      <div className="animate-splash-bg-teal" style={{
+        position: 'absolute', inset: 0,
+        background: 'linear-gradient(148deg, #12A18C 0%, #0A8072 46%, #055C51 100%)',
+      }} />
+
       {/* Foto + degradado — mismo encuadre que Login.jsx (60vh, center 42%)
           para que el crossfade termine exactamente en lo que Login muestra */}
       <img
@@ -244,8 +260,8 @@ function Splash({ toLogin, onDone }) {
         }}>
           <img src="/logo.png" alt="FamiliaCerca" style={{ width: 100, height: 100, objectFit: 'contain' }} />
 
-          <div className="animate-splash-tag" style={{ textAlign: 'center', marginTop: 22 }}>
-            <p style={{
+          <div style={{ textAlign: 'center', marginTop: 22 }}>
+            <p className="animate-splash-word" style={{
               color: '#143C32',
               fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
               fontSize: 30, fontWeight: 800,
@@ -254,7 +270,7 @@ function Splash({ toLogin, onDone }) {
             }}>
               FamiliaCerca
             </p>
-            <p style={{
+            <p className="animate-splash-tag" style={{
               color: '#6B7280',
               fontSize: 16, fontWeight: 400,
               letterSpacing: '0.06em',

@@ -139,24 +139,43 @@ h1, h2, h3 {
 }
 .animate-float-in { animation: float-in 0.4s ease-out forwards; }
 
-/* Splash screen logo entrance — fade+scale in, then a single subtle heartbeat pulse */
-@keyframes splash-in {
-  0%   { opacity: 0; transform: scale(0.85); animation-timing-function: ease-out; }
-  50%  { opacity: 1; transform: scale(1);    animation-timing-function: ease-in-out; }
-  75%  { transform: scale(1.04); }
-  100% { transform: scale(1); }
+/* Splash screen background — brief brand-gradient wash that clears to cream,
+   synced with the logo's elastic entrance below. */
+@keyframes splash-bg-teal-out {
+  0%   { opacity: 1; }
+  35%  { opacity: 1; }
+  100% { opacity: 0; }
 }
-.animate-splash-in { animation: splash-in 1.2s forwards; }
+.animate-splash-bg-teal { animation: splash-bg-teal-out 1.8s ease-in-out forwards; }
 
-/* Splash screen tagline — staggered fade-in, lands together with the logo */
+/* Splash screen logo entrance — scale+rotate with a real elastic overshoot */
+@keyframes splash-in {
+  0%   { opacity: 0; transform: scale(0.6) rotate(-10deg); }
+  55%  { opacity: 1; transform: scale(1.15) rotate(4deg); }
+  78%  { transform: scale(0.95) rotate(-1deg); }
+  92%  { transform: scale(1.03) rotate(0.5deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+.animate-splash-in { animation: splash-in 0.75s cubic-bezier(.22,.85,.32,1) forwards; }
+
+/* Splash screen wordmark — fades in once the teal wash has mostly cleared */
+@keyframes splash-word {
+  0%   { opacity: 0; transform: translateY(10px) scale(0.9); }
+  65%  { opacity: 1; transform: translateY(-2px) scale(1.04); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+.animate-splash-word { animation: splash-word 0.4s ease-out 0.5s both; }
+
+/* Splash screen tagline — staggered fade-in after the wordmark */
 @keyframes splash-tag {
   from { opacity: 0; transform: translateY(6px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-.animate-splash-tag { animation: splash-tag 0.45s ease-out 0.15s both; }
+.animate-splash-tag { animation: splash-tag 0.35s ease-out 0.8s both; }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-splash-in, .animate-splash-tag {
+  .animate-splash-bg-teal { animation: none !important; opacity: 0 !important; }
+  .animate-splash-in, .animate-splash-word, .animate-splash-tag {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;
