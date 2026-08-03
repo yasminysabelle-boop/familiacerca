@@ -80,9 +80,9 @@ function PriceCard({ name, price, period, highlight, badge, groups, cta, annual,
       style={{ flex: '1 1 280px', borderRadius: 24, background: highlight ? ACTION : WHITE, padding: '44px 32px', boxShadow: highlight ? '0 32px 96px rgba(13,107,99,0.35)' : '0 4px 28px rgba(0,0,0,0.07)', border: highlight ? 'none' : `1px solid ${BORDER}`, position: 'relative', display: 'flex', flexDirection: 'column' }}
     >
       {badge && (
-        <div className={highlight ? 'badge-pulse-anim' : ''} style={{ position: 'absolute', top: -16, left: '50%', transform: 'translateX(-50%)', background: GOLD, color: 'white', fontSize: 10, fontWeight: 500, letterSpacing: '0.12em', padding: '6px 22px', borderRadius: 9999, whiteSpace: 'nowrap', fontFamily: SANS }}>{badge}</div>
+        <div className={highlight ? 'badge-pulse-anim' : ''} style={{ position: 'absolute', top: -16, left: '50%', transform: 'translateX(-50%)', background: GOLD, color: 'white', fontSize: 12, fontWeight: 500, letterSpacing: '0.12em', padding: '6px 22px', borderRadius: 9999, whiteSpace: 'nowrap', fontFamily: SANS }}>{badge}</div>
       )}
-      <p style={{ fontSize: 10, fontWeight: 500, color: highlight ? 'rgba(255,255,255,0.55)' : ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 12px', fontFamily: SANS }}>{name}</p>
+      <p style={{ fontSize: 16, fontWeight: 500, color: highlight ? 'rgba(255,255,255,0.55)' : ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 12px', fontFamily: SANS }}>{name}</p>
       {tagline && <p style={{ fontSize: 14, color: highlight ? 'rgba(255,255,255,0.65)' : '#6B7280', margin: '0 0 16px', fontFamily: SANS, fontWeight: 400, lineHeight: 1.4 }}>{tagline}</p>}
       <div style={{ marginBottom: 4, display: 'flex', alignItems: 'baseline', gap: 6 }}>
         <span style={{ fontSize: 52, fontWeight: 700, color: highlight ? 'white' : DARK, fontFamily: SERIF, lineHeight: 1 }}>{price === 0 ? 'Gratis' : `$${displayPrice}`}</span>
@@ -91,7 +91,7 @@ function PriceCard({ name, price, period, highlight, badge, groups, cta, annual,
       {annual && price > 0 && (
         <div style={{ marginBottom: 4, display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{ fontSize: 12, color: highlight ? 'rgba(255,255,255,0.30)' : '#6B7280', textDecoration: 'line-through', fontFamily: SANS }}>${price}/mes</span>
-          <span style={{ fontSize: 11, background: MINT_C, color: DARK, borderRadius: 4, padding: '2px 8px', fontFamily: SANS, fontWeight: 500 }}>-20%</span>
+          <span style={{ fontSize: 12, background: MINT_C, color: DARK, borderRadius: 4, padding: '2px 8px', fontFamily: SANS, fontWeight: 500 }}>-20%</span>
         </div>
       )}
       <p style={{ fontSize: 13, color: highlight ? 'rgba(255,255,255,0.45)' : '#6B7280', margin: '0 0 28px', fontFamily: SANS, fontWeight: 300 }}>{annual && price > 0 ? 'facturado anualmente' : period}</p>
@@ -101,7 +101,7 @@ function PriceCard({ name, price, period, highlight, badge, groups, cta, annual,
             <p style={{ fontSize: 11, fontWeight: 700, color: highlight ? '#FFD9CC' : GOLD, textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 8px', fontFamily: SANS }}>{g.label}</p>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
               {g.items.map((item, i) => (
-                <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 13, lineHeight: 1.5, fontFamily: SANS, fontWeight: 300 }}>
+                <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 14, lineHeight: 1.5, fontFamily: SANS, fontWeight: 300 }}>
                   <span style={{ color: highlight ? GOLD : ACTION, flexShrink: 0, fontWeight: 700 }}>✓</span>
                   <span style={{ color: highlight ? 'rgba(255,255,255,0.80)' : '#6B7280' }}>{item}</span>
                 </li>
@@ -293,7 +293,7 @@ export default function Landing() {
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 36 }} className="landing-desktop-nav">
             {navLinks.map(l => (
-              <a key={l.href} href={l.href} style={{ fontSize: 16, fontWeight: 400, color: '#087F70', textDecoration: 'none', fontFamily: SANS }}
+              <a key={l.href} href={l.href} style={{ fontSize: 17, fontWeight: 600, color: '#087F70', textDecoration: 'none', fontFamily: SANS }}
                 onMouseEnter={e => e.currentTarget.style.color = '#E9826E'}
                 onMouseLeave={e => e.currentTarget.style.color = '#087F70'}
               >{l.label}</a>
@@ -314,7 +314,7 @@ export default function Landing() {
           <div style={{ padding: '12px 32px 24px', display: 'flex', flexDirection: 'column', gap: 2, borderTop: '1px solid rgba(20,60,50,0.08)', background: '#F8F4ED' }}>
             {navLinks.map(l => (
               <a key={l.href} href={l.href} onClick={() => setMobileMenuOpen(false)}
-                style={{ padding: '13px 8px', fontSize: 15, color: '#087F70', textDecoration: 'none', fontFamily: SANS }}>
+                style={{ padding: '13px 8px', fontSize: 17, color: '#087F70', textDecoration: 'none', fontFamily: SANS }}>
                 {l.label}
               </a>
             ))}
@@ -335,7 +335,7 @@ export default function Landing() {
           <div style={{ position: 'relative', width: '100%', maxWidth: 520, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <div className="hero-reveal hero-delay-1" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, border: '1px solid rgba(13,107,99,0.40)', borderRadius: 9999, padding: '7px 18px', marginBottom: 36, background: 'rgba(13,107,99,0.14)' }}>
               <span style={{ fontSize: 13 }}>🌿</span>
-              <span style={{ fontSize: 12, fontWeight: 500, color: MINT_C, letterSpacing: '0.06em', fontFamily: SANS }}>Cuidado familiar coordinado</span>
+              <span style={{ fontSize: 14, fontWeight: 500, color: MINT_C, letterSpacing: '0.06em', fontFamily: SANS }}>Cuidado familiar coordinado</span>
             </div>
 
             <h1 className="hero-reveal hero-delay-2" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(40px, 5.5vw, 78px)', fontWeight: 700, color: WHITE, lineHeight: 1.08, margin: '0 0 20px', letterSpacing: '-1px', textAlign: 'center' }}>
@@ -356,7 +356,7 @@ export default function Landing() {
             </Link>
 
             <div className="hero-reveal hero-delay-5" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.40)', fontWeight: 300, fontFamily: SANS }}>
+              <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.70)', fontWeight: 300, fontFamily: SANS }}>
                 <span style={{ color: MINT_C, fontWeight: 600 }}>✓</span> Sin tarjeta{' '}
                 <span style={{ color: 'rgba(255,255,255,0.25)' }}>·</span>{' '}
                 <span style={{ color: MINT_C, fontWeight: 600 }}>✓</span> En 14 días{' '}
@@ -386,7 +386,7 @@ export default function Landing() {
                 <div style={{fontWeight:700,fontSize:'17px',color:'#087F70'}}>Deborah</div>
                 <div style={{display:'flex',alignItems:'center',gap:'5px',marginTop:'2px'}}>
                   <div style={{width:8,height:8,borderRadius:'50%',background:'#087F70'}}></div>
-                  <span style={{fontSize:'12.5px',color:'#087F70',fontWeight:600}}>Todo al día</span>
+                  <span style={{fontSize:'13px',color:'#087F70',fontWeight:600}}>Todo al día</span>
                 </div>
               </div>
             </div>
@@ -402,8 +402,8 @@ export default function Landing() {
               </div>
             ))}
             <div style={{borderTop:'1px solid rgba(8,127,112,0.1)',marginTop:'10px',paddingTop:'10px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-              <span style={{fontSize:'11px',color:'#087F70',opacity:0.6}}>Actualizado por Rosa</span>
-              <span style={{fontSize:'11px',color:'#E9826E',fontWeight:600}}>Hace 15 min</span>
+              <span style={{fontSize:'13px',color:'#087F70',opacity:0.6}}>Actualizado por Rosa</span>
+              <span style={{fontSize:'13px',color:'#E9826E',fontWeight:600}}>Hace 15 min</span>
             </div>
           </div>
         </div>
@@ -438,13 +438,13 @@ export default function Landing() {
                 <p style={{ fontFamily: SERIF, fontSize: 15.5, fontWeight: 700, color: PRIMARY, padding: '8px 22px 18px', margin: 0 }}>{c.title}</p>
                 <div className="antes-ahora-split" style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'stretch' }}>
                   <div style={{ padding: '16px 18px 22px', background: 'rgba(107,114,128,0.06)' }}>
-                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9CA3AF', margin: '0 0 8px' }}>Antes</p>
-                    <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.55, margin: 0, fontFamily: SANS }}>{c.before}</p>
+                    <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9CA3AF', margin: '0 0 8px' }}>Antes</p>
+                    <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.55, margin: 0, fontFamily: SANS }}>{c.before}</p>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: CORAL, fontSize: 16, background: WHITE, padding: '0 14px' }}>→</div>
                   <div style={{ padding: '16px 18px 22px', background: MINT_C }}>
-                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: PRIMARY, margin: '0 0 8px' }}>Ahora</p>
-                    <p style={{ fontSize: 13.5, color: PRIMARY, fontWeight: 500, lineHeight: 1.55, margin: 0, fontFamily: SANS }}>{c.after}</p>
+                    <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: PRIMARY, margin: '0 0 8px' }}>Ahora</p>
+                    <p style={{ fontSize: 14, color: PRIMARY, fontWeight: 500, lineHeight: 1.55, margin: 0, fontFamily: SANS }}>{c.after}</p>
                   </div>
                 </div>
               </div>
@@ -459,7 +459,7 @@ export default function Landing() {
       <section style={{ background: PRIMARY, padding: '110px 32px' }}>
         <div style={{ maxWidth: 1140, margin: '0 auto' }}>
           <div className="reveal" style={{ textAlign: 'center', maxWidth: 560, margin: '0 auto 56px' }}>
-            <p style={{ fontSize: 11, fontWeight: 500, color: GOLD, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>El cambio real</p>
+            <p style={{ fontSize: 13, fontWeight: 500, color: GOLD, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>El cambio real</p>
             <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(28px,3.4vw,44px)', fontWeight: 600, color: WHITE, lineHeight: 1.15, margin: 0 }}>
               Lo que cambia para tu familia
             </h2>
@@ -504,7 +504,7 @@ export default function Landing() {
             </div>
           </div>
           <div style={{ flex: '1 1 420px', maxWidth: 560 }} className="reveal">
-            <p style={{ fontSize: 11, fontWeight: 500, color: AI_PURPLE, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>Inteligencia FamiliaCerca</p>
+            <p style={{ fontSize: 13, fontWeight: 500, color: AI_PURPLE, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>Inteligencia FamiliaCerca</p>
             <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(28px,3.4vw,42px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.18, margin: '0 0 18px' }}>
               Un resumen que dice exactamente lo que pasó
             </h2>
@@ -534,7 +534,7 @@ export default function Landing() {
             <img src={PROB_IMG} alt="El reto del cuidado familiar" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }} />
           </div>
           <div style={{ background: PRIMARY, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 'clamp(56px,8vw,96px) clamp(36px,6vw,80px)' }}>
-            <p style={{ fontSize: 11, fontWeight: 500, color: GOLD, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 20px', fontFamily: SANS }}>El problema</p>
+            <p style={{ fontSize: 13, fontWeight: 500, color: GOLD, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 20px', fontFamily: SANS }}>El problema</p>
             <h2 className="reveal" style={{ fontFamily: SERIF, fontSize: 'clamp(32px,3.5vw,52px)', fontWeight: 600, color: WHITE, lineHeight: 1.12, margin: '0 0 44px' }}>
               Son las 8:30 de la noche, y nadie sabe qué está pasando.
             </h2>
@@ -574,7 +574,7 @@ export default function Landing() {
       <section style={{ background: CREAM, padding: 'clamp(96px,10vw,140px) 32px' }}>
         <div style={{ maxWidth: 1140, margin: '0 auto' }}>
           <div className="reveal" style={{ maxWidth: 600, margin: '0 auto 60px', textAlign: 'center' }}>
-            <p style={{ fontSize: 11, fontWeight: 500, color: ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 18px', fontFamily: SANS }}>La solución</p>
+            <p style={{ fontSize: 13, fontWeight: 500, color: ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 18px', fontFamily: SANS }}>La solución</p>
             <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(28px,3.4vw,44px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.15, margin: 0 }}>
               Un sistema, no más mensajes.
             </h2>
@@ -602,7 +602,7 @@ export default function Landing() {
         <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: 800, height: 400, pointerEvents: 'none', background: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(13,107,99,0.05) 0%, transparent 70%)' }} />
         <div style={{ maxWidth: 1140, margin: '0 auto', position: 'relative' }}>
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 64 }}>
-            <p style={{ fontSize: 11, fontWeight: 500, color: ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>Funciones</p>
+            <p style={{ fontSize: 13, fontWeight: 500, color: ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>Funciones</p>
             <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(32px,4vw,56px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.1, margin: '0 0 20px' }}>
               Todo lo que tu familia necesita, en un solo lugar
             </h2>
@@ -645,7 +645,7 @@ export default function Landing() {
       <section id="como" style={{ padding: '128px 32px', background: SAND }}>
         <div style={{ maxWidth: 1140, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 88, flexWrap: 'wrap' }} className="como-grid">
           <div style={{ flex: '1 1 360px' }}>
-            <p style={{ fontSize: 11, fontWeight: 500, color: ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 18px', fontFamily: SANS }}>Cómo funciona</p>
+            <p style={{ fontSize: 13, fontWeight: 500, color: ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 18px', fontFamily: SANS }}>Cómo funciona</p>
             <h2 className="reveal" style={{ fontFamily: SERIF, fontSize: 'clamp(32px,4vw,56px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.12, margin: '0 0 52px' }}>
               Listo en 3 minutos. Diseñado para acompañarte todos los días.
             </h2>
@@ -745,7 +745,7 @@ export default function Landing() {
       <section style={{ padding: '128px 32px', background: CREAM }}>
         <div style={{ maxWidth: 1140, margin: '0 auto' }}>
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 72 }}>
-            <p style={{ fontSize: 11, fontWeight: 500, color: GOLD, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>Testimonios</p>
+            <p style={{ fontSize: 13, fontWeight: 500, color: GOLD, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>Testimonios</p>
             <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(32px,4vw,60px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.1, margin: 0 }}>
               Familias que cuidan mejor juntas
             </h2>
@@ -767,7 +767,7 @@ export default function Landing() {
                     <p style={{ margin: '2px 0 6px', fontSize: 14, color: 'rgba(255,255,255,0.38)', fontFamily: SANS, fontWeight: 300 }}>{t.role}</p>
                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: `rgba(233,130,110,0.10)`, borderRadius: 9999, padding: '2px 10px' }}>
                       <span style={{ fontSize: 10 }}>📍</span>
-                      <span style={{ fontSize: 12, color: GOLD, fontFamily: SANS, fontWeight: 300 }}>{t.location}</span>
+                      <span style={{ fontSize: 14, color: GOLD, fontFamily: SANS, fontWeight: 300 }}>{t.location}</span>
                     </div>
                   </div>
                 </div>
@@ -782,7 +782,7 @@ export default function Landing() {
             <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 17, color: PRIMARY, lineHeight: 1.65, margin: '0 0 12px' }}>
               &ldquo;Lo primero que hago cada mañana es abrir el resumen de Milo. En treinta segundos ya sé cómo estuvo mamá el día anterior. Ya no tengo que revisar veinte mensajes.&rdquo;
             </p>
-            <p style={{ fontSize: 13, color: '#6B7280', margin: 0, fontFamily: SANS }}>— Sofía T., hija cuidadora · Houston, Texas</p>
+            <p style={{ fontSize: 14, color: '#6B7280', margin: 0, fontFamily: SANS }}>— Sofía T., hija cuidadora · Houston, Texas</p>
           </div>
 
           <div style={{ textAlign: 'center', marginTop: 48 }}>
@@ -810,7 +810,7 @@ export default function Landing() {
       <section id="precios" style={{ padding: '128px 32px', background: CREAM }}>
         <div style={{ maxWidth: 1140, margin: '0 auto' }}>
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 52 }}>
-            <p style={{ fontSize: 11, fontWeight: 500, color: ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>Precios</p>
+            <p style={{ fontSize: 13, fontWeight: 500, color: ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>Precios</p>
             <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(32px,4vw,60px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.1, margin: '0 0 16px' }}>Simple y transparente</h2>
             <p style={{ fontSize: 18, color: '#6B7280', lineHeight: 1.75, maxWidth: 520, margin: '0 auto 36px', fontFamily: SANS, fontWeight: 300 }}>
               Empieza gratis. Cambia de plan solo cuando tu familia necesite más herramientas.
@@ -839,7 +839,7 @@ export default function Landing() {
       <section style={{ padding: '128px 32px', background: PRIMARY }}>
         <div style={{ maxWidth: 980, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 72, flexWrap: 'wrap' }}>
           <div style={{ flex: '1 1 300px' }}>
-            <p style={{ fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 18px', fontFamily: SANS }}>Sin App Store</p>
+            <p style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 18px', fontFamily: SANS }}>Sin App Store</p>
             <h2 className="reveal" style={{ fontFamily: SERIF, fontSize: 'clamp(32px,4vw,56px)', fontWeight: 600, color: WHITE, lineHeight: 1.12, margin: '0 0 18px' }}>
               Agrégala a tu celular en segundos
             </h2>
@@ -914,7 +914,7 @@ export default function Landing() {
       <section id="faq" style={{ padding: '128px 32px', background: CREAM }}>
         <div style={{ maxWidth: 740, margin: '0 auto' }}>
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 72 }}>
-            <p style={{ fontSize: 11, fontWeight: 500, color: ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>Preguntas frecuentes</p>
+            <p style={{ fontSize: 13, fontWeight: 500, color: ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>Preguntas frecuentes</p>
             <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(32px,4vw,60px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.1, margin: 0 }}>
               Todo lo que necesitas saber
             </h2>
@@ -930,7 +930,7 @@ export default function Landing() {
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(20,60,50,0.65) 0%, transparent 55%)' }} />
         <div style={{ position: 'relative', zIndex: 1, maxWidth: 1140, margin: '0 auto', width: '100%' }}>
           <div style={{ maxWidth: 680 }}>
-            <p style={{ fontSize: 11, fontWeight: 500, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 20px', fontFamily: SANS }}>Empieza hoy</p>
+            <p style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 20px', fontFamily: SANS }}>Empieza hoy</p>
             <h2 className="reveal" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(44px,6vw,84px)', fontWeight: 700, color: WHITE, lineHeight: 1.02, margin: '0 0 24px' }}>
               Empieza a cuidar mejor, juntos.
             </h2>
@@ -980,7 +980,7 @@ export default function Landing() {
             </div>
             <div style={{ display: 'flex', gap: 56, flexWrap: 'wrap' }}>
               <div>
-                <p style={{ fontSize: 11, fontWeight: 500, color: '#087F70', textTransform: 'uppercase', letterSpacing: '0.12em', margin: '0 0 18px', fontFamily: SANS }}>Contacto</p>
+                <p style={{ fontSize: 13, fontWeight: 500, color: '#087F70', textTransform: 'uppercase', letterSpacing: '0.12em', margin: '0 0 18px', fontFamily: SANS }}>Contacto</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                   {[
                     { label: 'hola@familiacerca.com', href: 'mailto:hola@familiacerca.com' },
@@ -995,7 +995,7 @@ export default function Landing() {
                 </div>
               </div>
               <div>
-                <p style={{ fontSize: 11, fontWeight: 500, color: '#087F70', textTransform: 'uppercase', letterSpacing: '0.12em', margin: '0 0 18px', fontFamily: SANS }}>Producto</p>
+                <p style={{ fontSize: 13, fontWeight: 500, color: '#087F70', textTransform: 'uppercase', letterSpacing: '0.12em', margin: '0 0 18px', fontFamily: SANS }}>Producto</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                   {[{label:'Funciones',href:'#funciones'},{label:'Precios',href:'#precios'},{label:'Cómo funciona',href:'#como'},{label:'Preguntas',href:'#faq'}].map(l => (
                     <a key={l.href} href={l.href} style={{ fontSize: 15, color: '#6B7280', textDecoration: 'none', fontFamily: SANS, fontWeight: 300 }}
@@ -1006,7 +1006,7 @@ export default function Landing() {
                 </div>
               </div>
               <div>
-                <p style={{ fontSize: 11, fontWeight: 500, color: '#087F70', textTransform: 'uppercase', letterSpacing: '0.12em', margin: '0 0 18px', fontFamily: SANS }}>Legal</p>
+                <p style={{ fontSize: 13, fontWeight: 500, color: '#087F70', textTransform: 'uppercase', letterSpacing: '0.12em', margin: '0 0 18px', fontFamily: SANS }}>Legal</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                   {[{label:'Términos de uso',to:'/terminos'},{label:'Privacidad',to:'/privacidad'},{label:'Iniciar sesión',to:'/login'},{label:'Crear cuenta',to:'/register'}].map(l => (
                     <Link key={l.label} to={l.to} style={{ fontSize: 15, color: '#6B7280', textDecoration: 'none', fontFamily: SANS, fontWeight: 300 }}
