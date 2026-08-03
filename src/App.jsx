@@ -107,20 +107,15 @@ function AppShell() {
       })
   }, [user?.id])
 
-  // Marca el splash como visto apenas empieza a mostrarse — el resto de su
-  // coreografía y timing (simple vs. la salida con crossfade a Login) vive
-  // adentro de <Splash>, que avisa acá mismo cuando termina via onDone.
-  useEffect(() => {
-    if (showSlides || splashDone) return
-    sessionStorage.setItem('fc_logo_splash_done', '1')
-  }, [showSlides])
-
   return (
     <>
       {showSlides && !isLanding && <WelcomeSlides onDone={handleOnboardingDone} />}
       {!showSlides && !splashDone && !isLanding && (
         <div style={{ position: 'relative', zIndex: 9999, width: '100%', height: '100vh', transform: 'translateZ(0)' }}>
-          <Splash toLogin={!authLoading && !user} onDone={() => setSplashDone(true)} />
+          <Splash toLogin={!authLoading && !user} onDone={() => {
+            sessionStorage.setItem('fc_logo_splash_done', '1')
+            setSplashDone(true)
+          }} />
         </div>
       )}
       {showMemberOnboarding && <MemberOnboarding onDone={handleMemberOnboardingDone} />}
