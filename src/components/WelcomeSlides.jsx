@@ -12,8 +12,11 @@ const FEATURES = [
 
 export default function WelcomeSlides({ onDone }) {
   const [slide, setSlide] = useState(0)
+  const [dragX, setDragX] = useState(0)
+  const [isDragging, setIsDragging] = useState(false)
   const touchStartX = useRef(null)
   const touchStartY = useRef(null)
+  const dragDirection = useRef(null) // 'horizontal' | 'vertical', se fija apenas hay movimiento real para no pelear con el scroll vertical
 
   function goNext() { if (slide < 2) setSlide(s => s + 1) }
   function goPrev() { if (slide > 0) setSlide(s => s - 1) }
@@ -21,14 +24,44 @@ export default function WelcomeSlides({ onDone }) {
   function handleTouchStart(e) {
     touchStartX.current = e.touches[0].clientX
     touchStartY.current = e.touches[0].clientY
+    dragDirection.current = null
+    setDragX(0)
   }
-  function handleTouchEnd(e) {
+
+  function handleTouchMove(e) {
     if (touchStartX.current === null) return
-    const dx = touchStartX.current - e.changedTouches[0].clientX
-    const dy = Math.abs(touchStartY.current - e.changedTouches[0].clientY)
+    const deltaX = e.touches[0].clientX - touchStartX.current
+    const deltaY = e.touches[0].clientY - touchStartY.current
+
+    if (dragDirection.current === null) {
+      if (Math.abs(deltaX) < 6 && Math.abs(deltaY) < 6) return
+      dragDirection.current = Math.abs(deltaX) > Math.abs(deltaY) * 1.5 ? 'horizontal' : 'vertical'
+      if (dragDirection.current === 'horizontal') setIsDragging(true)
+    }
+    if (dragDirection.current !== 'horizontal') return
+
+    // Resistencia al arrastrar más allá del primer/último slide, para que no se sienta como un tope seco.
+    let dx = deltaX
+    if ((slide === 0 && dx > 0) || (slide === 2 && dx < 0)) dx *= 0.35
+    setDragX(dx)
+  }
+
+  function handleTouchEnd(e) {
+    const t = e.changedTouches && e.changedTouches[0]
+    if (touchStartX.current === null || !t) {
+      setIsDragging(false)
+      setDragX(0)
+      dragDirection.current = null
+      return
+    }
+    const dx = touchStartX.current - t.clientX
+    const dy = Math.abs(touchStartY.current - t.clientY)
     touchStartX.current = null
     touchStartY.current = null
-    if (dy > Math.abs(dx) || Math.abs(dx) < 40) return
+    dragDirection.current = null
+    setIsDragging(false)
+    setDragX(0)
+    if (dy > Math.abs(dx) * 1.5 || Math.abs(dx) < 30) return
     if (dx > 0) goNext()
     else goPrev()
   }
@@ -41,15 +74,17 @@ export default function WelcomeSlides({ onDone }) {
     <div
       style={{ position: 'fixed', inset: 0, zIndex: 9999, touchAction: 'pan-y' }}
       onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
+      onTouchCancel={handleTouchEnd}
     >
       {/* ── Sliding panel ── */}
       <div style={{
         display: 'flex',
         width: '300vw',
         height: '100%',
-        transform: `translateX(calc(-${slide} * 100vw))`,
-        transition: 'transform 0.38s cubic-bezier(0.4, 0, 0.2, 1)',
+        transform: `translateX(calc(-${slide} * 100vw + ${dragX}px))`,
+        transition: isDragging ? 'none' : 'transform 0.38s cubic-bezier(0.4, 0, 0.2, 1)',
         willChange: 'transform',
       }}>
 
