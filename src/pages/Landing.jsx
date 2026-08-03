@@ -20,6 +20,8 @@ const MINT_C  = '#EBF3EE'
 const DARK    = '#087F70'
 const WHITE   = '#FFFFFF'
 const BORDER  = 'rgba(13,107,99,0.12)'
+const CORAL_EMERGENCY = '#D9534F'
+const AI_PURPLE = '#7566D8'
 
 const SERIF = "'Plus Jakarta Sans', sans-serif"
 const SANS  = "'Inter', system-ui, sans-serif"
@@ -70,7 +72,7 @@ function FAQItem({ q, a, light = false, onTrack }) {
   )
 }
 
-function PriceCard({ name, price, period, highlight, badge, features, cta, annual, trackId, onTrack, tagline }) {
+function PriceCard({ name, price, period, highlight, badge, groups, cta, annual, trackId, onTrack, tagline }) {
   const displayPrice = annual && price > 0 ? (price * 0.8).toFixed(2) : price
   return (
     <div
@@ -93,14 +95,21 @@ function PriceCard({ name, price, period, highlight, badge, features, cta, annua
         </div>
       )}
       <p style={{ fontSize: 13, color: highlight ? 'rgba(255,255,255,0.45)' : '#6B7280', margin: '0 0 28px', fontFamily: SANS, fontWeight: 300 }}>{annual && price > 0 ? 'facturado anualmente' : period}</p>
-      <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 32px', display: 'flex', flexDirection: 'column', gap: 12, flex: 1 }}>
-        {features.map((f, i) => (
-          <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, fontSize: 14, lineHeight: 1.5, fontFamily: SANS, fontWeight: 300 }}>
-            <span style={{ color: f.included ? (highlight ? GOLD : ACTION) : (highlight ? 'rgba(255,255,255,0.20)' : '#6B7280'), flexShrink: 0, fontWeight: 500 }}>{f.included ? '✓' : '–'}</span>
-            <span style={{ color: f.included ? (highlight ? 'rgba(255,255,255,0.85)' : '#6B7280') : (highlight ? 'rgba(255,255,255,0.30)' : '#6B7280') }}>{f.text}</span>
-          </li>
+      <div style={{ margin: '0 0 32px', flex: 1 }}>
+        {groups.map(g => (
+          <div key={g.label} style={{ marginBottom: 18 }}>
+            <p style={{ fontSize: 11, fontWeight: 700, color: highlight ? '#FFD9CC' : GOLD, textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 8px', fontFamily: SANS }}>{g.label}</p>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {g.items.map((item, i) => (
+                <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 13, lineHeight: 1.5, fontFamily: SANS, fontWeight: 300 }}>
+                  <span style={{ color: highlight ? GOLD : ACTION, flexShrink: 0, fontWeight: 700 }}>✓</span>
+                  <span style={{ color: highlight ? 'rgba(255,255,255,0.80)' : '#6B7280' }}>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         ))}
-      </ul>
+      </div>
       <Link to="/register" onClick={() => onTrack && onTrack('pricing_click', { plan: trackId })} style={{ display: 'block', textAlign: 'center', padding: '16px', borderRadius: 9999, fontWeight: 500, fontSize: 15, textDecoration: 'none', fontFamily: SANS, letterSpacing: '0.02em', background: highlight ? 'white' : 'transparent', color: ACTION, border: highlight ? 'none' : `1.5px solid ${ACTION}`, boxShadow: highlight ? '0 8px 24px rgba(255,255,255,0.18)' : 'none' }}>{cta}</Link>
     </div>
   )
@@ -151,11 +160,33 @@ export default function Landing() {
     { label: 'Preguntas', href: '#faq' },
   ]
 
-  // Restaurar métricas reales cuando existan datos de producción
-  const statItems = [
-    { icon: '⚡', val: '3 minutos', label: 'para empezar' },
-    { icon: '🔒', val: 'Sin tarjeta', label: 'de crédito' },
-    { icon: '👨‍👩‍👧', val: 'Tu familia', label: 'conectada en un solo lugar' },
+  const antesAhora = [
+    { icon: '🍳', title: 'Desayuno confirmado', before: 'Nadie sabe si ya desayunó, o si se le olvidó a alguien preguntar.', after: 'Queda marcado apenas pasa, con hora y quién lo confirmó.' },
+    { icon: '🚗', title: 'Quién la lleva al médico', before: 'Mensajes cruzados un día antes, y al final nadie confirma.', after: 'Se asigna desde la cita y todos ven quién va.' },
+    { icon: '🩺', title: 'Qué dijo el doctor', before: 'Se cuenta de memoria por teléfono, y algo siempre se pierde.', after: 'Queda anotado en la app — toda la familia lo lee igual.' },
+  ]
+
+  const solutionSteps = [
+    { n: '1', title: 'Alguien registra', desc: 'Un cuidador marca el medicamento, la rutina o la cita — a veces con una foto de prueba.' },
+    { n: '2', title: 'Toda la familia recibe la actualización', desc: 'En el momento en que pasa, sin tener que preguntar ni escribirle a nadie.' },
+    { n: '3', title: 'Todos saben exactamente qué pasó', desc: 'Quién lo hizo, a qué hora y con qué evidencia — visible para siempre.' },
+  ]
+
+  const solutionCategories = ['💊 Medicamentos', '🗓️ Rutinas', '📅 Citas', '📝 Notas', '🆘 SOS', '📋 Historial']
+
+  const featureCards = [
+    { icon: '💊', title: 'Medicamentos', desc: 'Dosis, horarios y confirmación con foto de prueba — nunca más una dosis en duda.' },
+    { icon: '📅', title: 'Citas', desc: 'Calendario compartido con recordatorios, para que nadie se pierda una consulta.' },
+    { icon: '🗓️', title: 'Rutinas', desc: 'Checklist diario de comidas, baño y actividades — todo en un solo lugar.' },
+    { icon: '👨‍👩‍👧', title: 'Familia', desc: 'Cada cuidador y familiar con su rol y su acceso, coordinados en tiempo real.' },
+    { icon: '📋', title: 'Historial', desc: 'Cada acción queda registrada — listo para mostrarle al médico cuando haga falta.' },
+    { icon: '🆘', title: 'SOS / Modo de emergencia', desc: 'Un botón que avisa a todos al instante, y un modo especial para cuando tu familiar está hospitalizado.', emergency: true },
+  ]
+
+  const whatChangesRows = [
+    { before: 'Cada quien cuida a su manera, sin saber qué hace el otro.', after: 'Todos siguen el mismo plan, y lo ven al mismo tiempo.' },
+    { before: 'Las decisiones se toman a medias, con información incompleta.', after: 'Cada decisión se toma con el historial completo delante.' },
+    { before: 'El peso de recordarlo todo cae en una sola persona.', after: 'La responsabilidad se reparte entre toda la familia.' },
   ]
 
   const marqueePain = [
@@ -185,53 +216,33 @@ export default function Landing() {
   const plans = [
     {
       name: 'Gratis', price: 0, period: 'Para siempre sin costo', highlight: false,
-      trackId: 'gratis', tagline: 'Empieza a coordinar',
-      features: [
-        { text: 'Hasta 2 cuidadores', included: true },
-        { text: 'Medicamentos ilimitados', included: true },
-        { text: 'Checklist diario', included: true },
-        { text: 'Chat familiar', included: true },
-        { text: 'Historial 3 días', included: true },
-        { text: 'Foto de prueba', included: false },
-        { text: 'Alerta clínica ±1h', included: false },
-        { text: 'Push notifications', included: false },
-        { text: 'Citas médicas', included: false },
-        { text: 'Notas de voz', included: false },
-        { text: 'Exportar PDF', included: false },
+      trackId: 'gratis', tagline: 'Para empezar a coordinar',
+      groups: [
+        { label: 'Tu equipo', items: ['Hasta 2 cuidadores'] },
+        { label: 'Cuidado diario', items: ['Medicamentos ilimitados', 'Checklist diario', 'Chat familiar'] },
+        { label: 'Registro', items: ['Historial de 3 días'] },
       ],
       cta: 'Empezar gratis',
     },
     {
       name: 'Familiar', price: 12.99, period: 'Hasta 6 cuidadores',
       highlight: true, badge: 'Más popular', trackId: 'familiar', tagline: 'Para familias que necesitan más tranquilidad',
-      features: [
-        { text: 'Hasta 6 cuidadores', included: true },
-        { text: 'Todo del plan Gratis', included: true },
-        { text: 'Alerta clínica ±1h', included: true },
-        { text: 'Dosis olvidada bloqueada', included: true },
-        { text: 'Foto de prueba', included: true },
-        { text: 'Push SOS + recordatorios', included: true },
-        { text: 'Citas con adjuntos', included: true },
-        { text: 'Chat categorizado 🏥🚨', included: true },
-        { text: 'Notas de voz', included: true },
-        { text: 'Historial 90 días', included: true },
-        { text: 'PDF export + Álbum memorias', included: true },
+      groups: [
+        { label: 'Tu equipo', items: ['Hasta 6 cuidadores', 'Todo lo del plan Gratis'] },
+        { label: 'Tranquilidad clínica', items: ['Alerta clínica ±1h', 'Dosis olvidada bloqueada', 'Foto de prueba', 'Push + alertas SOS'] },
+        { label: 'Organización', items: ['Citas con adjuntos', 'Notas de voz', 'Historial de 90 días'] },
+        { label: 'Para el doctor', items: ['Exportar en PDF'] },
       ],
       cta: 'Empezar gratis',
     },
     {
       name: 'Cuidado Total', price: 24.99, period: 'Cuidadores ilimitados', highlight: false,
       trackId: 'total', tagline: 'Para el cuidado más completo, sin límites.',
-      features: [
-        { text: 'Cuidadores ilimitados', included: true },
-        { text: 'Todo del plan Familiar', included: true },
-        { text: 'Registros médicos e incidentes', included: true },
-        { text: 'Directorio médico', included: true },
-        { text: 'Gastos de salud', included: true },
-        { text: 'Milo/Luna IA', included: true },
-        { text: 'Historial indefinido', included: true },
-        { text: 'Soporte prioritario', included: true },
-        { text: 'Acceso anticipado a funciones', included: true },
+      groups: [
+        { label: 'Tu equipo', items: ['Cuidadores ilimitados', 'Todo lo del plan Familiar'] },
+        { label: 'Historial extendido', items: ['Registros médicos e incidentes', 'Directorio médico', 'Historial indefinido'] },
+        { label: 'Acompañamiento', items: ['Milo/Luna (IA)', 'Gastos de salud'] },
+        { label: 'Soporte', items: ['Soporte prioritario', 'Acceso anticipado a funciones nuevas'] },
       ],
       cta: 'Empezar gratis',
     },
@@ -247,12 +258,12 @@ export default function Landing() {
   ]
 
   const testimonials = [
-    { name: 'María G.',    initial: 'M', role: 'Hija cuidadora',         location: 'Houston, Texas',          headline: 'Se acabaron las discusiones familiares',                text: 'Antes mi hermano y yo nos peleábamos porque ninguno sabía si mamá ya había tomado su pastilla. Ahora con FamiliaCerca todos vemos lo mismo. ¡Nos salvó la convivencia familiar!' },
-    { name: 'Roberto S.',  initial: 'R', role: 'Hijo mayor',              location: 'Los Ángeles, California', headline: 'Por fin tenemos evidencia de todo',                      text: 'La función de foto de prueba fue un cambio total. Ahora tenemos evidencia de cada medicamento y podemos mostrársela al cardiólogo. El doctor quedó impresionado con el registro.' },
-    { name: 'Carmen L.',   initial: 'C', role: 'Enfermera, uso personal', location: 'Miami, Florida',         headline: 'La foto de confirmación cambió nuestra dinámica',        text: 'Llevo 15 años como enfermera y nunca había visto una app tan práctica para el cuidado en casa. La recomiendo a todas las familias de mis pacientes.' },
-    { name: 'Patricia V.', initial: 'P', role: 'Coordinadora familiar',   location: 'San Juan, Puerto Rico',  headline: 'Antes nadie sabía quién había dado la medicina',          text: 'Somos 4 hermanos en distintos estados cuidando a nuestro papá. FamiliaCerca nos unió. Cada uno sabe qué le toca y cuándo. Ya no hay excusas ni confusiones.' },
-    { name: 'Jorge M.',    initial: 'J', role: 'Esposo cuidador',         location: 'Nueva York, NY',         headline: 'Ahora todos estamos tranquilos',                          text: 'Mi esposa tiene Alzheimer y el checklist diario me salvó. Puedo registrar cada comida, cada baño, cada medicamento. Por fin duermo tranquilo sabiendo que nada se me escapa.' },
-    { name: 'Lucía R.',    initial: 'L', role: 'Hija única',              location: 'Chicago, Illinois',      headline: 'Mi mamá está mejor atendida y nosotros más organizados', text: 'Cuido sola a mis dos padres mayores desde hace 3 años. FamiliaCerca me ayuda a organizarme y el botón SOS me da tranquilidad cuando no estoy en casa. No sé cómo lo hacía antes.' },
+    { name: 'Daniela R.',  initial: 'D', role: 'Hija a distancia',        location: 'San Juan, Puerto Rico',              headline: 'Mi hermano en España y yo en Puerto Rico, por fin viendo lo mismo', text: 'Mi hermano vive en Madrid y yo en San Juan. Antes nos enterábamos tarde de todo lo de mamá, cada uno con una versión distinta de la historia. Ahora los dos abrimos la misma app y vemos exactamente lo mismo, a la misma hora, sin importar los kilómetros.' },
+    { name: 'Roberto M.',  initial: 'R', role: 'Hijo mayor',              location: 'Los Ángeles, California',            headline: 'Ya no cargo solo con la preocupación',                              text: 'Vivo a 20 minutos de mi papá pero trabajo todo el día. Antes pasaba la tarde con el estómago apretado, sin saber si alguien había ido a verlo. Ahora reviso la app y respiro tranquilo — sé exactamente cómo está.' },
+    { name: 'Patricia V.', initial: 'P', role: 'Coordinadora familiar',   location: 'Santo Domingo, República Dominicana', headline: 'Dejamos de repartirnos la culpa',                                   text: 'Somos 4 hermanos en distintas ciudades cuidando a papá. Antes, cuando algo salía mal, terminábamos buscando de quién había sido el descuido. Ahora no se trata de culpas — se trata de que todos vemos lo mismo, siempre.' },
+    { name: 'Carmen L.',   initial: 'C', role: 'Cuidadora de su madre',   location: 'Miami, Florida',                     headline: 'Ser enfermera no me preparó para cuidar a mi propia madre',         text: 'Llevo 15 años como enfermera, pero cuidar a mi mamá es distinto — ahí no eres profesional, eres hija, y el miedo a olvidar algo pesa igual. FamiliaCerca me quitó esa carga de tener que recordarlo todo yo sola.' },
+    { name: 'Jorge M.',    initial: 'J', role: 'Esposo cuidador',         location: 'Nueva York, NY',                     headline: 'Por fin duermo tranquilo',                                          text: 'Mi esposa tiene Alzheimer. Antes yo era el único que sabía cómo estaba en realidad, y cargaba esa responsabilidad solo, de noche, sin poder compartirla con nadie. Ahora mis hijos también lo ven, aunque vivan lejos.' },
+    { name: 'Lucía R.',    initial: 'L', role: 'Hija única',              location: 'Chicago, Illinois',                  headline: 'Cuido a mis dos padres, y por fin nada se me escapa',               text: 'Soy hija única y cuido sola a mis dos padres mayores desde hace 3 años. No tengo con quién repartir la responsabilidad, pero el botón SOS y el checklist diario me dan la tranquilidad de que, si algo pasa, no voy a enterarme tarde.' },
   ]
 
   return (
@@ -318,15 +329,15 @@ export default function Landing() {
 
             <h1 className="hero-reveal hero-delay-2" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(40px, 5.5vw, 78px)', fontWeight: 700, color: WHITE, lineHeight: 1.08, margin: '0 0 20px', letterSpacing: '-1px', textAlign: 'center' }}>
               Cuida a quien amas,{' '}
-              <span style={{ color: GOLD }}>sin perder ningún detalle.</span>
+              <span style={{ color: GOLD }}>sin cargar tú solo con todo.</span>
             </h1>
 
-            <p className="hero-reveal hero-delay-3" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(24px, 3.2vw, 38px)', fontWeight: 600, color: GOLD, lineHeight: 1.25, margin: '0 0 20px' }}>
-              ¿Ya se lo dieron?
+            <p className="hero-reveal hero-delay-3" style={{ fontSize: 'clamp(15px, 1.6vw, 18px)', color: 'rgba(255,255,255,0.62)', lineHeight: 1.65, margin: '0 0 20px', fontFamily: SANS, fontWeight: 300, textAlign: 'center' }}>
+              Comparte cada medicamento, cada cita y cada rutina con toda la familia — cuidadores y parientes ven la misma información, en el momento en que pasa.
             </p>
 
-            <p className="hero-reveal hero-delay-3" style={{ fontSize: 'clamp(15px, 1.6vw, 18px)', color: 'rgba(255,255,255,0.55)', lineHeight: 1.6, margin: '0 0 40px', fontFamily: SANS, fontWeight: 300, textAlign: 'center' }}>
-              La información del cuidado se pierde entre chats, llamadas y suposiciones.
+            <p className="hero-reveal hero-delay-3" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(20px, 2.4vw, 26px)', fontWeight: 600, color: GOLD, lineHeight: 1.35, margin: '0 0 40px' }}>
+              Se acabaron las llamadas para preguntar &ldquo;¿Ya se lo dieron?&rdquo;
             </p>
 
             <Link to="/register" className="hero-reveal hero-delay-4 cta-coral" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '18px 48px', borderRadius: 9999, marginBottom: 32, background: '#E9826E', color: WHITE, fontWeight: 600, fontSize: 18, fontFamily: SANS, textDecoration: 'none', letterSpacing: '0.02em', boxShadow: '0 12px 40px rgba(233,130,110,0.45)', transition: 'background 0.2s ease' }}>
@@ -337,9 +348,9 @@ export default function Landing() {
               <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.40)', fontWeight: 300, fontFamily: SANS }}>
                 <span style={{ color: MINT_C, fontWeight: 600 }}>✓</span> Sin tarjeta{' '}
                 <span style={{ color: 'rgba(255,255,255,0.25)' }}>·</span>{' '}
-                <span style={{ color: MINT_C, fontWeight: 600 }}>✓</span> iPhone y Android{' '}
+                <span style={{ color: MINT_C, fontWeight: 600 }}>✓</span> En 14 días{' '}
                 <span style={{ color: 'rgba(255,255,255,0.25)' }}>·</span>{' '}
-                <span style={{ color: MINT_C, fontWeight: 600 }}>✓</span> Sin app store
+                <span style={{ color: MINT_C, fontWeight: 600 }}>✓</span> iPhone y Android
               </span>
             </div>
           </div>
@@ -352,18 +363,19 @@ export default function Landing() {
 
           {/* Floating status card */}
           <div className="hero-reveal hero-delay-4" style={{
-            position:'absolute', bottom:'2rem', right:'1.5rem',
-            background:'#F8F4ED', borderRadius:'24px',
-            padding:'18px 22px', boxShadow:'0 8px 32px rgba(20,60,50,0.15)',
-            minWidth:'255px', maxWidth:'285px', zIndex: 4
+            position:'absolute', bottom:'2.2rem', right:'1.5rem',
+            background:'#F8F4ED', borderRadius:'26px',
+            border: '1px solid rgba(8,127,112,0.15)',
+            padding:'26px 30px', boxShadow:'0 20px 60px rgba(20,60,50,0.28)',
+            minWidth:'300px', maxWidth:'360px', zIndex: 4
           }}>
-            <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'12px'}}>
-              <div style={{width:38,height:38,borderRadius:'50%',background:'#EBF3EE',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'17px'}}>👵</div>
+            <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'16px'}}>
+              <div style={{width:48,height:48,borderRadius:'50%',background:'#EBF3EE',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'22px'}}>👵</div>
               <div>
-                <div style={{fontWeight:700,fontSize:'14px',color:'#087F70'}}>Deborah</div>
+                <div style={{fontWeight:700,fontSize:'17px',color:'#087F70'}}>Deborah</div>
                 <div style={{display:'flex',alignItems:'center',gap:'5px',marginTop:'2px'}}>
-                  <div style={{width:7,height:7,borderRadius:'50%',background:'#087F70'}}></div>
-                  <span style={{fontSize:'11px',color:'#087F70',fontWeight:600}}>Todo al día</span>
+                  <div style={{width:8,height:8,borderRadius:'50%',background:'#087F70'}}></div>
+                  <span style={{fontSize:'12.5px',color:'#087F70',fontWeight:600}}>Todo al día</span>
                 </div>
               </div>
             </div>
@@ -372,15 +384,15 @@ export default function Landing() {
               {icon:'🕙',text:'Última actualización 10:45 AM'},
               {icon:'👨‍👩‍👧',text:'4 familiares informados'},
             ].map((item,i)=>(
-              <div key={i} style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'7px'}}>
-                <span style={{fontSize:'13px'}}>{item.icon}</span>
-                <span style={{fontSize:'11px',color:'#087F70',opacity:0.8}}>{item.text}</span>
-                <span style={{marginLeft:'auto',color:'#087F70',fontSize:'12px',fontWeight:700}}>✓</span>
+              <div key={i} style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'9px'}}>
+                <span style={{fontSize:'16px'}}>{item.icon}</span>
+                <span style={{fontSize:'13px',color:'#087F70',opacity:0.8}}>{item.text}</span>
+                <span style={{marginLeft:'auto',color:'#087F70',fontSize:'13px',fontWeight:700}}>✓</span>
               </div>
             ))}
-            <div style={{borderTop:'1px solid rgba(8,127,112,0.1)',marginTop:'8px',paddingTop:'8px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-              <span style={{fontSize:'10px',color:'#087F70',opacity:0.6}}>Actualizado por Rosa</span>
-              <span style={{fontSize:'10px',color:'#E9826E',fontWeight:600}}>Hace 15 min</span>
+            <div style={{borderTop:'1px solid rgba(8,127,112,0.1)',marginTop:'10px',paddingTop:'10px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+              <span style={{fontSize:'11px',color:'#087F70',opacity:0.6}}>Actualizado por Rosa</span>
+              <span style={{fontSize:'11px',color:'#E9826E',fontWeight:600}}>Hace 15 min</span>
             </div>
           </div>
         </div>
@@ -400,16 +412,33 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ─────────────── 4. STATS ─────────────── */}
-      <section style={{ background: CREAM, padding: '72px 32px', borderBottom: `1px solid ${BORDER}` }}>
-        <div className="stats-grid" style={{ maxWidth: 1140, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 0 }}>
-          {statItems.map((s, i) => (
-            <div key={i} className="stats-grid-cell" style={{ textAlign: 'center', padding: '0 32px', borderLeft: i > 0 ? '1px solid rgba(13,107,99,0.22)' : 'none' }}>
-              <div style={{ fontSize: 28, marginBottom: 10 }}>{s.icon}</div>
-              <p style={{ margin: 0, fontFamily: SERIF, fontSize: 'clamp(30px, 3.6vw, 50px)', fontWeight: 700, color: ACTION, lineHeight: 1.1 }}>{s.val}</p>
-              <p style={{ margin: '10px 0 0', fontSize: 15, fontFamily: SANS, fontWeight: 300, color: '#6B7280', letterSpacing: '0.02em' }}>{s.label}</p>
-            </div>
-          ))}
+      {/* ─────────────── 4. ANTES / AHORA ─────────────── */}
+      <section style={{ background: CREAM, padding: '88px 32px', borderBottom: `1px solid ${BORDER}` }}>
+        <div style={{ maxWidth: 1140, margin: '0 auto' }}>
+          <div className="reveal" style={{ textAlign: 'center', marginBottom: 52 }}>
+            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(28px,3.4vw,42px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.15, margin: 0 }}>
+              Lo que cambia desde el primer día
+            </h2>
+          </div>
+          <div className="antes-ahora-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 22 }}>
+            {antesAhora.map((c, i) => (
+              <div key={c.title} className={`reveal reveal-delay-${i}`} style={{ background: WHITE, borderRadius: 20, border: `1px solid ${BORDER}`, boxShadow: '0 4px 20px rgba(13,107,99,0.06)', overflow: 'hidden' }}>
+                <div style={{ fontSize: 26, padding: '22px 22px 0' }}>{c.icon}</div>
+                <p style={{ fontFamily: SERIF, fontSize: 15.5, fontWeight: 700, color: PRIMARY, padding: '8px 22px 18px', margin: 0 }}>{c.title}</p>
+                <div className="antes-ahora-split" style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'stretch' }}>
+                  <div style={{ padding: '16px 18px 22px', background: 'rgba(107,114,128,0.06)' }}>
+                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9CA3AF', margin: '0 0 8px' }}>Antes</p>
+                    <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.55, margin: 0, fontFamily: SANS }}>{c.before}</p>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: CORAL, fontSize: 16, background: WHITE, padding: '0 14px' }}>→</div>
+                  <div style={{ padding: '16px 18px 22px', background: MINT_C }}>
+                    <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: PRIMARY, margin: '0 0 8px' }}>Ahora</p>
+                    <p style={{ fontSize: 13.5, color: PRIMARY, fontWeight: 500, lineHeight: 1.55, margin: 0, fontFamily: SANS }}>{c.after}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -422,7 +451,7 @@ export default function Landing() {
           <div style={{ background: PRIMARY, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 'clamp(56px,8vw,96px) clamp(36px,6vw,80px)' }}>
             <p style={{ fontSize: 11, fontWeight: 500, color: GOLD, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 20px', fontFamily: SANS }}>El problema</p>
             <h2 className="reveal" style={{ fontFamily: SERIF, fontSize: 'clamp(32px,3.5vw,52px)', fontWeight: 600, color: WHITE, lineHeight: 1.12, margin: '0 0 44px' }}>
-              El problema no es cuidar a tu familiar. El problema es que nadie sabe qué está pasando.
+              Son las 8:30 de la noche, y nadie sabe qué está pasando.
             </h2>
 
             <div className="reveal" style={{ display: 'flex', flexDirection: 'column', gap: 30 }}>
@@ -435,199 +464,148 @@ export default function Landing() {
               <div>
                 <p style={{ margin: '0 0 6px', fontFamily: SERIF, fontSize: 15, fontWeight: 600, color: GOLD, letterSpacing: '0.04em' }}>8:47 PM</p>
                 <p style={{ margin: 0, fontSize: 17, color: 'rgba(255,255,255,0.62)', fontFamily: SANS, fontWeight: 300, lineHeight: 1.7 }}>
-                  Un hermano cree que ya se la dieron. Otro no está seguro. El cuidador no respondió el WhatsApp.
+                  Alguien pregunta en el grupo de WhatsApp de la familia — el mismo de siempre. Un hermano cree que ya se la dieron. Otro no está seguro. El cuidador no responde.
                 </p>
               </div>
               <div>
                 <p style={{ margin: '0 0 6px', fontFamily: SERIF, fontSize: 15, fontWeight: 600, color: GOLD, letterSpacing: '0.04em' }}>9:12 PM</p>
                 <p style={{ margin: 0, fontSize: 17, color: 'rgba(255,255,255,0.62)', fontFamily: SANS, fontWeight: 300, lineHeight: 1.7 }}>
-                  El historial está perdido entre mensajes. La responsabilidad se diluye. Y tú cargas con la duda.
+                  La respuesta real está en algún mensaje de ese mismo grupo, enterrada entre meses de conversación. A esta hora, nadie tiene tiempo de buscarla.
                 </p>
               </div>
             </div>
 
-            <p className="reveal" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(24px,2.8vw,34px)', fontWeight: 600, color: GOLD, lineHeight: 1.3, margin: '40px 0 0' }}>
-              Esto no es falta de amor. Es falta de sistema.
+            <p className="reveal" style={{ fontSize: 15, color: 'rgba(255,255,255,0.92)', fontWeight: 600, lineHeight: 1.6, margin: '40px 0 0', paddingTop: 24, borderTop: '1px solid rgba(255,255,255,0.16)', fontFamily: SANS }}>
+              Hoy coordinan por WhatsApp, como siempre. Y precisamente por eso, nadie sabe con certeza qué pasó de verdad.
+            </p>
+            <p className="reveal" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(24px,2.8vw,34px)', fontWeight: 600, color: GOLD, lineHeight: 1.3, margin: '18px 0 0' }}>
+              El problema no es el medicamento. Es que la información está repartida.
             </p>
           </div>
         </div>
       </section>
 
       {/* ─────────────── 5.5. LA SOLUCIÓN ─────────────── */}
-      <section style={{ background: CREAM, padding: 'clamp(96px,14vw,168px) 32px' }}>
-        <div className="reveal" style={{ maxWidth: 640, margin: '0 auto', textAlign: 'center' }}>
-          <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(22px,2.6vw,32px)', fontWeight: 600, color: CORAL, lineHeight: 1.35, margin: '0 0 48px' }}>
-            La solución no es más mensajes. Es tener un sistema.
-          </p>
-          <p style={{ fontFamily: SERIF, fontWeight: 700, margin: '0 0 28px', padding: 0 }}>
-            <span style={{ color: PRIMARY, fontSize: 'clamp(30px,3.6vw,44px)' }}>Familia</span>
-            <span style={{ color: CORAL, fontSize: 'clamp(30px,3.6vw,44px)' }}>Cerca</span>
-          </p>
-          <p style={{ fontSize: 'clamp(18px,2vw,22px)', color: '#6B7280', lineHeight: 1.8, margin: 0, fontFamily: SANS, fontWeight: 300 }}>
-            Un sistema que convierte el cuidado familiar en algo claro, coordinado y en tiempo real. Cada persona sabe qué pasó. Cada acción queda registrada. Toda la familia ve lo mismo.
-          </p>
-        </div>
-      </section>
-
-      {/* ─────────────── 6. BENEFITS ─────────────── */}
-      <section style={{ background: SAND, padding: '96px 32px' }}>
+      <section style={{ background: CREAM, padding: 'clamp(96px,10vw,140px) 32px' }}>
         <div style={{ maxWidth: 1140, margin: '0 auto' }}>
-          <div className="reveal" style={{ textAlign: 'center', marginBottom: 64 }}>
-            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(32px,4vw,56px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.1, margin: 0 }}>
-              ¿Qué cambia para tu familia?
+          <div className="reveal" style={{ maxWidth: 600, margin: '0 auto 60px', textAlign: 'center' }}>
+            <p style={{ fontSize: 11, fontWeight: 500, color: ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 18px', fontFamily: SANS }}>La solución</p>
+            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(28px,3.4vw,44px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.15, margin: 0 }}>
+              Un sistema, no más mensajes.
             </h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 24 }}>
-            {[
-              { icon: '🧘', title: 'Tranquilidad', desc: 'Todos saben exactamente cómo está tu familiar.' },
-              { icon: '👨‍👩‍👧‍👦', title: 'Coordinación real', desc: 'Familiares y cuidadores trabajan como un solo equipo.' },
-              { icon: '📋', title: 'Historial completo', desc: 'Nada se pierde entre mensajes o llamadas.' },
-              { icon: '🚨', title: 'Respuesta rápida', desc: 'Alertas automáticas cuando algo requiere atención.' },
-            ].map((b, i) => (
-              <div key={b.title} className={`reveal reveal-delay-${i}`} style={{ background: WHITE, borderRadius: 20, border: `1px solid ${BORDER}`, padding: '36px 28px', boxShadow: '0 4px 20px rgba(13,107,99,0.06)' }}>
-                <div style={{ fontSize: 36, marginBottom: 16 }}>{b.icon}</div>
-                <h3 style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 600, color: PRIMARY, margin: '0 0 10px', lineHeight: 1.2 }}>{b.title}</h3>
-                <p style={{ fontSize: 16, color: '#6B7280', lineHeight: 1.75, margin: 0, fontFamily: SANS, fontWeight: 300 }}>{b.desc}</p>
+          <div className="solution-steps-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 32, marginBottom: 60, position: 'relative' }}>
+            <div className="solution-steps-line" style={{ position: 'absolute', top: 34, left: '16.6%', right: '16.6%', height: 2, background: `linear-gradient(to right, ${ACTION}, #A8E5D6, ${ACTION})` }} />
+            {solutionSteps.map((s, i) => (
+              <div key={s.n} className={`reveal reveal-delay-${i}`} style={{ position: 'relative', textAlign: 'center' }}>
+                <div style={{ width: 68, height: 68, borderRadius: '50%', margin: '0 auto 20px', background: `linear-gradient(135deg, ${ACTION}, #A8E5D6)`, color: WHITE, fontFamily: SERIF, fontWeight: 700, fontSize: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 10px 30px rgba(8,127,112,0.28)', position: 'relative', zIndex: 1 }}>{s.n}</div>
+                <h3 style={{ fontFamily: SERIF, fontSize: 18, color: PRIMARY, fontWeight: 700, margin: '0 0 8px' }}>{s.title}</h3>
+                <p style={{ fontSize: 14.5, color: '#6B7280', lineHeight: 1.6, maxWidth: 260, margin: '0 auto', fontFamily: SANS, fontWeight: 300 }}>{s.desc}</p>
               </div>
+            ))}
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 12 }}>
+            {solutionCategories.map(cat => (
+              <span key={cat} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: WHITE, border: `1px solid ${BORDER}`, borderRadius: 9999, padding: '10px 20px', fontSize: 14, fontWeight: 500, color: PRIMARY, fontFamily: SANS }}>{cat}</span>
             ))}
           </div>
         </div>
       </section>
 
       {/* ─────────────── 7. FEATURES ─────────────── */}
-      <section id="funciones" style={{ padding: '128px 32px', background: CREAM, position: 'relative', overflow: 'hidden' }}>
+      <section id="funciones" style={{ padding: '110px 32px', background: CREAM, position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: 800, height: 400, pointerEvents: 'none', background: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(13,107,99,0.05) 0%, transparent 70%)' }} />
         <div style={{ maxWidth: 1140, margin: '0 auto', position: 'relative' }}>
-          <div className="reveal" style={{ textAlign: 'center', marginBottom: 80 }}>
+          <div className="reveal" style={{ textAlign: 'center', marginBottom: 64 }}>
             <p style={{ fontSize: 11, fontWeight: 500, color: ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>Funciones</p>
-            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(32px,4vw,60px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.1, margin: '0 0 20px' }}>
-              Todo lo que necesitas en un solo lugar
+            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(32px,4vw,56px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.1, margin: '0 0 20px' }}>
+              Todo lo que tu familia necesita, en un solo lugar
             </h2>
             <p style={{ fontSize: 18, color: '#6B7280', lineHeight: 1.78, maxWidth: 540, margin: '0 auto', fontFamily: SANS, fontWeight: 300 }}>
-              FamiliaCerca coordina a toda la familia para que ningún detalle del cuidado quede sin atender.
+              Sin funciones de más — solo lo que de verdad ayuda a coordinar el cuidado.
             </p>
           </div>
-
-          {/* 3 large hero cards */}
-          <div className="feature-hero-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24, marginBottom: 24 }}>
-
-            {/* Card 1: Medicamentos */}
-            <div className="feature-hero-card reveal" style={{ background: WHITE, borderRadius: 22, border: `1px solid rgba(13,107,99,0.18)`, padding: '36px 30px', boxShadow: '0 4px 24px rgba(13,107,99,0.07)', minHeight: 420, position: 'relative' }}>
-              <div style={{ width: 60, height: 60, borderRadius: 16, background: `rgba(20,60,50,0.07)`, border: '1px solid rgba(20,60,50,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, marginBottom: 18 }}>📊</div>
-              <div style={{ display: 'inline-flex', padding: '4px 12px', borderRadius: 9999, border: `1px solid rgba(233,130,110,0.30)`, marginBottom: 12, background: 'rgba(233,130,110,0.07)' }}>
-                <span style={{ fontSize: 10, fontWeight: 500, color: GOLD, letterSpacing: '0.08em', fontFamily: SANS }}>Lo más importante</span>
-              </div>
-              <h3 style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 600, color: PRIMARY, margin: '0 0 10px', lineHeight: 1.2 }}>Estado del paciente en tiempo real</h3>
-              <p style={{ fontSize: 17, color: '#6B7280', lineHeight: 1.75, margin: '0 0 20px', fontFamily: SANS, fontWeight: 300 }}>
-                Lo primero que todos quieren saber. Estado actual, medicamentos pendientes, última actualización y quién la realizó.
-              </p>
-              <div style={{ background: SAND, borderRadius: 12, padding: '12px 14px', border: `1px solid rgba(13,107,99,0.10)` }}>
-                {[
-                  { label: 'Atenolol 25mg · 8am', done: true, alert: false },
-                  { label: 'Metformina 500mg · 1pm', done: true, alert: false },
-                  { label: 'Losartán 50mg · 8pm', done: false, alert: true },
-                ].map((item, i, arr) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '7px 0', borderBottom: i < arr.length - 1 ? `1px solid rgba(13,107,99,0.08)` : 'none' }}>
-                    <span style={{ width: 17, height: 17, borderRadius: '50%', background: item.done ? ACTION : 'transparent', border: `1.5px solid ${item.done ? ACTION : item.alert ? CORAL : 'rgba(13,107,99,0.25)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      {item.done && <span style={{ color: WHITE, fontSize: 8 }}>✓</span>}
-                    </span>
-                    <span style={{ fontSize: 11, fontFamily: SANS, color: item.done ? '#9BA89F' : item.alert ? CORAL : PRIMARY, textDecoration: item.done ? 'line-through' : 'none', fontWeight: item.alert ? 500 : 300 }}>{item.label}</span>
-                    {item.alert && <span style={{ fontSize: 9, color: CORAL, marginLeft: 'auto', fontFamily: SANS, fontWeight: 600 }}>⚠ PENDIENTE</span>}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Card 2: Chat categorizado */}
-            <div className="feature-hero-card reveal reveal-delay-1" style={{ background: WHITE, borderRadius: 22, border: `1px solid rgba(13,107,99,0.18)`, padding: '36px 30px', boxShadow: '0 4px 24px rgba(13,107,99,0.07)', minHeight: 420, position: 'relative' }}>
-              <div style={{ width: 60, height: 60, borderRadius: 16, background: `rgba(20,60,50,0.07)`, border: '1px solid rgba(20,60,50,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, marginBottom: 18 }}>💬</div>
-              <div style={{ display: 'inline-flex', padding: '4px 12px', borderRadius: 9999, border: `1px solid rgba(233,130,110,0.30)`, marginBottom: 12, background: 'rgba(233,130,110,0.07)' }}>
-                <span style={{ fontSize: 10, fontWeight: 500, color: GOLD, letterSpacing: '0.08em', fontFamily: SANS }}>Sin mensajes perdidos</span>
-              </div>
-              <h3 style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 600, color: PRIMARY, margin: '0 0 10px', lineHeight: 1.2 }}>Chat familiar organizado</h3>
-              <p style={{ fontSize: 17, color: '#6B7280', lineHeight: 1.75, margin: '0 0 20px', fontFamily: SANS, fontWeight: 300 }}>
-                Cada conversación en su categoría — medicamentos, citas, urgencias — para que nada se pierda entre mensajes.
-              </p>
-              <div style={{ background: SAND, borderRadius: 12, padding: '12px', border: `1px solid rgba(13,107,99,0.10)`, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {[
-                  { from: 'María', msg: '🏥 Cita con cardiólogo mañana 3pm', mine: false, tag: '#médico' },
-                  { from: 'Yo', msg: '✅ Ya le di el Atenolol, está bien', mine: true, tag: '#medicamentos' },
-                  { from: 'Carlos', msg: '🚨 Llamó diciendo que se siente mal', mine: false, tag: '#urgente' },
-                ].map((b, i) => (
-                  <div key={i} style={{ display: 'flex', justifyContent: b.mine ? 'flex-end' : 'flex-start' }}>
-                    <div style={{ maxWidth: '85%', padding: '7px 11px', borderRadius: 11, background: b.mine ? ACTION : WHITE, border: b.mine ? 'none' : `1px solid rgba(13,107,99,0.14)` }}>
-                      {!b.mine && <p style={{ margin: '0 0 2px', fontSize: 9, color: GOLD, fontFamily: SANS, fontWeight: 600 }}>{b.from}</p>}
-                      <p style={{ margin: 0, fontSize: 11, color: b.mine ? WHITE : PRIMARY, fontFamily: SANS, lineHeight: 1.4 }}>{b.msg}</p>
-                      <p style={{ margin: '2px 0 0', fontSize: 8, color: b.mine ? 'rgba(255,255,255,0.50)' : ACTION, fontFamily: SANS }}>{b.tag}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Card 3: Registros médicos + PDF */}
-            <div className="feature-hero-card feature-hero-card--span reveal reveal-delay-2" style={{ background: WHITE, borderRadius: 22, border: `1px solid rgba(13,107,99,0.18)`, padding: '36px 30px', boxShadow: '0 4px 24px rgba(13,107,99,0.07)', minHeight: 420, position: 'relative' }}>
-              <div className="feature-hero-span-content">
-                <div className="feature-hero-span-text">
-                  <div style={{ width: 60, height: 60, borderRadius: 16, background: `rgba(20,60,50,0.07)`, border: '1px solid rgba(20,60,50,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, marginBottom: 18 }}>📋</div>
-                  <div style={{ display: 'inline-flex', padding: '4px 12px', borderRadius: 9999, border: `1px solid rgba(233,130,110,0.30)`, marginBottom: 12, background: 'rgba(233,130,110,0.07)' }}>
-                    <span style={{ fontSize: 10, fontWeight: 500, color: GOLD, letterSpacing: '0.08em', fontFamily: SANS }}>Listo para el doctor</span>
-                  </div>
-                  <h3 style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 600, color: PRIMARY, margin: '0 0 10px', lineHeight: 1.2 }}>Historial médico y exportación</h3>
-                  <p style={{ fontSize: 17, color: '#6B7280', lineHeight: 1.75, margin: '0 0 20px', fontFamily: SANS, fontWeight: 300 }}>
-                    Visitas, incidentes y análisis organizados, exportables en PDF para cualquier consulta.
-                  </p>
-                </div>
-                <div className="feature-hero-span-mockup" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  {[
-                    { icon: '🏥', label: 'Visita cardiólogo', date: '28 may', color: `rgba(20,60,50,0.07)` },
-                    { icon: '⚠️', label: 'Incidente: caída leve', date: '25 may', color: 'rgba(233,130,110,0.07)' },
-                    { icon: '💉', label: 'Análisis de sangre', date: '20 may', color: `rgba(20,60,50,0.07)` },
-                    { icon: '📄', label: 'Exportar a PDF →', date: '', color: `rgba(233,130,110,0.09)`, action: true },
-                  ].map((item, i) => (
-                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 12px', background: item.color, borderRadius: 10, border: `1px solid rgba(13,107,99,0.08)` }}>
-                      <span style={{ fontSize: 15 }}>{item.icon}</span>
-                      <span style={{ fontSize: 11, fontFamily: SANS, color: item.action ? GOLD : PRIMARY, fontWeight: item.action ? 600 : 300, flex: 1 }}>{item.label}</span>
-                      {item.date && <span style={{ fontSize: 10, color: '#6B7280', fontFamily: SANS }}>{item.date}</span>}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* 3 small secondary cards */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 18 }}>
-            {[
-              { icon: '🎙️', title: 'Álbum de recuerdos y notas de voz', desc: 'Fotos y notas de voz que construyen la memoria de tu familiar.' },
-              { icon: '🆘', title: 'Botón SOS', desc: 'Un toque y todos reciben la alerta al instante.' },
-              { icon: '🗓️', title: 'Rutinas y citas médicas', desc: 'Checklist diario y citas con recordatorio automático.' },
-            ].map((f, i) => (
-              <div key={f.title} className={`reveal reveal-delay-${i}`} style={{ background: WHITE, borderRadius: 16, border: `1px solid rgba(13,107,99,0.16)`, padding: '26px 24px', display: 'flex', gap: 16, alignItems: 'flex-start', boxShadow: '0 2px 12px rgba(13,107,99,0.05)' }}>
-                <div style={{ width: 46, height: 46, borderRadius: 12, background: `rgba(20,60,50,0.07)`, border: `1px solid rgba(20,60,50,0.12)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>{f.icon}</div>
-                <div>
-                  <h3 style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 600, color: PRIMARY, margin: '0 0 6px' }}>{f.title}</h3>
-                  <p style={{ fontSize: 16, color: '#6B7280', lineHeight: 1.7, margin: 0, fontFamily: SANS, fontWeight: 300 }}>{f.desc}</p>
-                </div>
+          <div className="features-6-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 22 }}>
+            {featureCards.map((f, i) => (
+              <div key={f.title} className={`reveal reveal-delay-${i % 3}`} style={{
+                background: f.emergency ? 'linear-gradient(180deg, #FFF5F4 0%, #FFFFFF 60%)' : WHITE,
+                borderRadius: 20,
+                border: f.emergency ? '1px solid rgba(217,83,79,0.30)' : `1px solid rgba(13,107,99,0.16)`,
+                padding: '30px 26px', boxShadow: '0 4px 20px rgba(13,107,99,0.06)',
+              }}>
+                <div style={{ width: 52, height: 52, borderRadius: 14, background: f.emergency ? 'rgba(217,83,79,0.10)' : 'rgba(8,127,112,0.08)', border: f.emergency ? '1px solid rgba(217,83,79,0.22)' : '1px solid rgba(8,127,112,0.14)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, marginBottom: 16 }}>{f.icon}</div>
+                <h3 style={{ fontFamily: SERIF, fontSize: 18, fontWeight: 700, color: f.emergency ? CORAL_EMERGENCY : PRIMARY, margin: '0 0 8px' }}>{f.title}</h3>
+                <p style={{ fontSize: 14.5, color: '#6B7280', lineHeight: 1.65, margin: 0, fontFamily: SANS, fontWeight: 300 }}>{f.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ─────────────── 7.2. MILO & LUNA ─────────────── */}
-      <section style={{ background: PRIMARY, padding: '128px 32px' }}>
+      {/* ─────────────── 7.2. INTELIGENCIA FAMILIACERCA ─────────────── */}
+      <section style={{ background: WHITE, padding: '110px 32px' }}>
         <div style={{ maxWidth: 1140, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 64, flexWrap: 'wrap' }}>
-          <div style={{ flex: '0 0 auto' }}>
-            <img src={MILO_LUNA_IMG} alt="Milo y Luna, compañeros con inteligencia artificial de FamiliaCerca" style={{ width: 220, borderRadius: 20, display: 'block', boxShadow: '0 20px 60px rgba(0,0,0,0.30)' }} />
+          <div className="ai-visual-col" style={{ flex: '0 0 340px', maxWidth: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div style={{ width: 210, borderRadius: 22, alignSelf: 'flex-start', marginLeft: 14, background: 'linear-gradient(160deg, rgba(117,102,216,0.09), rgba(167,154,234,0.05))', border: '1px solid rgba(117,102,216,0.18)', padding: 18, boxShadow: '0 16px 44px rgba(117,102,216,0.16)' }}>
+              <img src={MILO_LUNA_IMG} alt="Milo y Luna, los compañeros de inteligencia artificial de FamiliaCerca" style={{ width: '100%', display: 'block' }} />
+            </div>
+            <div className="ai-fact-card" style={{ width: 320, maxWidth: '100%', marginTop: -30, alignSelf: 'flex-end', position: 'relative', zIndex: 1, background: WHITE, borderRadius: 22, border: '1px solid rgba(117,102,216,0.24)', boxShadow: '0 24px 64px rgba(117,102,216,0.20)', padding: '26px 26px 18px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 11, marginBottom: 18 }}>
+                <div style={{ width: 40, height: 40, borderRadius: '50%', flexShrink: 0, background: `linear-gradient(135deg, ${AI_PURPLE}, #A79AEA)`, color: WHITE, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>✨</div>
+                <div>
+                  <div style={{ fontSize: 13.5, fontWeight: 700, color: '#4B3F9E', fontFamily: SANS }}>Resumen de hoy · Milo</div>
+                  <div style={{ fontSize: 11, color: '#6B7280', marginTop: 1, fontFamily: SANS }}>Generado a las 7:32 PM</div>
+                </div>
+              </div>
+              {[
+                { icon: '💊', text: '3 de 3 medicamentos confirmados' },
+                { icon: '📅', text: '1 cita esta semana — jueves, cardiólogo' },
+                { icon: '📋', text: 'Sin incidentes en los últimos 7 días' },
+                { icon: '🩺', text: 'Última nota médica: hace 2 días' },
+              ].map((f, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 0', borderBottom: i < 3 ? '1px solid rgba(117,102,216,0.12)' : 'none', fontSize: 13.5, color: '#334155', fontFamily: SANS }}>
+                  <span style={{ fontSize: 15, width: 20, textAlign: 'center', flexShrink: 0 }}>{f.icon}</span>
+                  <span>{f.text}</span>
+                  <span style={{ color: AI_PURPLE, fontWeight: 700, marginLeft: 'auto' }}>✓</span>
+                </div>
+              ))}
+              <div style={{ marginTop: 14, paddingTop: 13, borderTop: '1px solid rgba(117,102,216,0.14)', fontSize: 11, color: '#8A80C4', textAlign: 'center', fontStyle: 'italic', lineHeight: 1.5, fontFamily: SANS }}>
+                Basado en la actividad real registrada por tu familia — no en suposiciones.
+              </div>
+            </div>
           </div>
-          <div style={{ flex: '1 1 420px', maxWidth: 560, textAlign: 'center' }} className="reveal">
-            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(30px,3.6vw,52px)', fontWeight: 600, color: CREAM, lineHeight: 1.15, margin: '0 0 20px' }}>
-              Tu familia nunca está sola
+          <div style={{ flex: '1 1 420px', maxWidth: 560 }} className="reveal">
+            <p style={{ fontSize: 11, fontWeight: 500, color: AI_PURPLE, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>Inteligencia FamiliaCerca</p>
+            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(28px,3.4vw,42px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.18, margin: '0 0 18px' }}>
+              Un resumen que dice exactamente lo que pasó
             </h2>
-            <p style={{ fontSize: 18, color: 'rgba(248,244,237,0.72)', lineHeight: 1.8, margin: 0, fontFamily: SANS, fontWeight: 300 }}>
-              Milo y Luna, los compañeros con inteligencia artificial de FamiliaCerca, ayudan a detectar cambios, recordar información y acompañar el cuidado — día y noche.
+            <p style={{ fontSize: 16, color: '#6B7280', lineHeight: 1.78, margin: '0 0 14px', fontFamily: SANS, fontWeight: 300 }}>
+              Milo y Luna leen la actividad real del día — medicamentos, citas, notas — y te la devuelven en hechos concretos, no en conversación genérica.
             </p>
+            <p style={{ fontSize: 16, color: '#6B7280', lineHeight: 1.78, margin: 0, fontFamily: SANS, fontWeight: 300 }}>
+              Nada que adivinar, nada que interpretar: si dice &ldquo;3 de 3 confirmados&rdquo;, es porque los 3 quedaron registrados por alguien de tu familia.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ─────────────── LO QUE CAMBIA PARA TU FAMILIA ─────────────── */}
+      <section style={{ background: PRIMARY, padding: '110px 32px' }}>
+        <div style={{ maxWidth: 1140, margin: '0 auto' }}>
+          <div className="reveal" style={{ textAlign: 'center', maxWidth: 560, margin: '0 auto 56px' }}>
+            <p style={{ fontSize: 11, fontWeight: 500, color: GOLD, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>El cambio real</p>
+            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(28px,3.4vw,44px)', fontWeight: 600, color: WHITE, lineHeight: 1.15, margin: 0 }}>
+              Lo que cambia para tu familia
+            </h2>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 2, maxWidth: 880, margin: '0 auto' }}>
+            {whatChangesRows.map((r, i) => (
+              <div key={i} className={`what-changes-row reveal reveal-delay-${i}`} style={{ display: 'grid', gridTemplateColumns: '1fr 44px 1fr', alignItems: 'center', gap: 20, padding: '28px 8px', borderBottom: i < whatChangesRows.length - 1 ? '1px solid rgba(255,255,255,0.10)' : 'none' }}>
+                <p style={{ fontSize: 'clamp(15px,1.7vw,18px)', color: 'rgba(255,255,255,0.42)', lineHeight: 1.5, textAlign: 'right', margin: 0, fontFamily: SANS }}>{r.before}</p>
+                <div style={{ textAlign: 'center', color: CORAL, fontSize: 20 }}>→</div>
+                <p style={{ fontSize: 'clamp(16px,1.9vw,20px)', color: WHITE, fontWeight: 600, lineHeight: 1.5, margin: 0, fontFamily: SANS }}>{r.after}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -645,123 +623,6 @@ export default function Landing() {
           </p>
         </div>
       </section>
-
-      {/* ─────────────── 8. WHATSAPP COMPARISON (de esto a esto) ─────────────── */}
-      <section style={{ background: CREAM, padding: '120px 32px', overflow: 'hidden' }}>
-        <div style={{ maxWidth: 1140, margin: '0 auto' }}>
-          <div className="reveal" style={{ textAlign: 'center', marginBottom: 72 }}>
-            <p style={{ fontSize: 11, fontWeight: 500, color: ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>El caos conocido</p>
-            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(32px,4vw,56px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.1, margin: '0 0 18px' }}>
-              WhatsApp es para conversar. FamiliaCerca es para cuidar.
-            </h2>
-            <p style={{ fontSize: 17, color: '#6B7280', lineHeight: 1.75, maxWidth: 520, margin: '0 auto', fontFamily: SANS, fontWeight: 300 }}>
-              Cuando una persona depende de varios familiares o cuidadores, los mensajes se pierden, las tareas se duplican y la información desaparece. FamiliaCerca mantiene todo organizado en un solo lugar.
-            </p>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 28 }} className="whatsapp-comparison-grid">
-
-            {/* WhatsApp: chaos panel — authentic WhatsApp colors intentional for contrast */}
-            <div className="reveal" style={{ borderRadius: 24, overflow: 'hidden', boxShadow: '0 12px 48px rgba(0,0,0,0.12)', border: '1px solid rgba(0,0,0,0.06)' }}>
-              <div style={{ background: '#075E54', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div style={{ width: 38, height: 38, borderRadius: '50%', background: '#128C7E', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>👨‍👩‍👧</div>
-                <div>
-                  <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: WHITE, fontFamily: SANS }}>
-                    <span style={{ color: '#25D366' }}>WhatsApp</span> — Familia
-                  </p>
-                  <p style={{ margin: 0, fontSize: 11, color: 'rgba(255,255,255,0.65)', fontFamily: SANS }}>8 participantes · 247 mensajes sin leer</p>
-                </div>
-                <div style={{ marginLeft: 'auto', background: '#25D366', borderRadius: 9999, width: 26, height: 26, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <span style={{ color: WHITE, fontSize: 10, fontWeight: 700 }}>247</span>
-                </div>
-              </div>
-              <div style={{ background: '#E5DDD5', padding: '14px', display: 'flex', flexDirection: 'column', gap: 8, minHeight: 380 }}>
-                {[
-                  { from: 'Mamá 📱', msg: '¿alguien le dio el medicamento a papá??', mine: false, time: '9:14' },
-                  { from: 'Jorge', msg: 'yo no sé, pensé que tú lo hacías 🤷', mine: false, time: '9:15' },
-                  { from: 'Tía Rosa', msg: 'esperen estoy buscando el mensaje de ayer', mine: false, time: '9:16' },
-                  { from: 'Mamá 📱', msg: 'AQUÍ DICE QUE SÍ SE LO DIERON pero no estoy segura', mine: false, time: '9:17' },
-                  { from: 'Yo', msg: 'no encuentro nada, hay 200 mensajes', mine: true, time: '9:18' },
-                  { from: 'Tía Rosa', msg: '😰 mejor daselo de nuevo?', mine: false, time: '9:19' },
-                  { from: 'Jorge', msg: 'NO no se puede dar doble dosis!! 🚫', mine: false, time: '9:19' },
-                  { from: 'Mamá 📱', msg: 'ay dios mío qué hacemos', mine: false, time: '9:20' },
-                ].map((b, i) => (
-                  <div key={i} style={{ display: 'flex', justifyContent: b.mine ? 'flex-end' : 'flex-start' }}>
-                    <div style={{ maxWidth: '78%', padding: '8px 12px', borderRadius: b.mine ? '14px 14px 4px 14px' : '14px 14px 14px 4px', background: b.mine ? '#DCF8C6' : WHITE, position: 'relative' }}>
-                      {!b.mine && <p style={{ margin: '0 0 2px', fontSize: 10, fontWeight: 600, color: '#128C7E', fontFamily: SANS }}>{b.from}</p>}
-                      <p style={{ margin: 0, fontSize: 12, color: '#303030', fontFamily: SANS, lineHeight: 1.4 }}>{b.msg}</p>
-                      <p style={{ margin: '3px 0 0', fontSize: 9, color: '#9CA3AF', fontFamily: SANS, textAlign: 'right' }}>{b.time}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div style={{ background: '#F0F0F0', padding: '12px 16px', textAlign: 'center' }}>
-                <p style={{ margin: 0, fontSize: 12, color: CORAL, fontFamily: SANS, fontWeight: 500 }}>✕ Sin registro · Sin confirmación · Sin claridad</p>
-              </div>
-            </div>
-
-            {/* FamiliaCerca: calm panel */}
-            <div className="reveal reveal-delay-1" style={{ borderRadius: 24, overflow: 'hidden', boxShadow: `0 12px 48px rgba(20,60,50,0.14)`, border: `2px solid ${ACTION}` }}>
-              <div style={{ background: PRIMARY, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
-                <img src="/icon-192.png" alt="FC" style={{ width: 38, height: 38, borderRadius: 10, objectFit: 'cover' }} />
-                <div>
-                  <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: WHITE, fontFamily: SANS }}>FamiliaCerca</p>
-                  <p style={{ margin: 0, fontSize: 11, color: MINT_C, fontFamily: SANS }}>Medicamentos · Todo en orden</p>
-                </div>
-                <div style={{ marginLeft: 'auto', background: 'rgba(235,246,238,0.18)', borderRadius: 9999, padding: '4px 12px' }}>
-                  <span style={{ color: MINT_C, fontSize: 11, fontWeight: 600 }}>✓ Al día</span>
-                </div>
-              </div>
-              <div style={{ background: SAND, padding: '14px', display: 'flex', flexDirection: 'column', gap: 10, minHeight: 380 }}>
-                {/* Confirmed med card */}
-                <div style={{ background: WHITE, borderRadius: 14, padding: '14px 16px', border: `1px solid rgba(13,107,99,0.15)` }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                    <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: PRIMARY, fontFamily: SANS }}>💊 Medicamentos del día</p>
-                    <span style={{ fontSize: 10, color: ACTION, background: MINT_C, borderRadius: 9999, padding: '2px 10px', fontFamily: SANS, fontWeight: 600 }}>2/3 ✓</span>
-                  </div>
-                  {[
-                    { med: 'Atenolol 25mg · 8am', who: 'Jorge', done: true },
-                    { med: 'Metformina · 1pm', who: 'Tía Rosa', done: true },
-                    { med: 'Losartán · 8pm', who: 'Pendiente', done: false },
-                  ].map((item, i) => (
-                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '5px 0', borderBottom: i < 2 ? '1px solid rgba(0,0,0,0.05)' : 'none' }}>
-                      <div style={{ width: 16, height: 16, borderRadius: '50%', background: item.done ? ACTION : 'transparent', border: `1.5px solid ${item.done ? ACTION : 'rgba(0,0,0,0.15)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                        {item.done && <span style={{ color: WHITE, fontSize: 7 }}>✓</span>}
-                      </div>
-                      <span style={{ fontSize: 11, fontFamily: SANS, color: item.done ? '#6B7280' : PRIMARY, textDecoration: item.done ? 'line-through' : 'none', flex: 1 }}>{item.med}</span>
-                      <span style={{ fontSize: 9, color: item.done ? ACTION : CORAL, fontFamily: SANS, fontWeight: 500 }}>{item.who}</span>
-                    </div>
-                  ))}
-                </div>
-                {/* Confirmation with photo */}
-                <div style={{ background: WHITE, borderRadius: 14, padding: '12px 16px', border: `1px solid rgba(13,107,99,0.15)` }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <div style={{ width: 40, height: 40, borderRadius: 10, background: MINT_C, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>📷</div>
-                    <div>
-                      <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: PRIMARY, fontFamily: SANS }}>Jorge confirmó con foto</p>
-                      <p style={{ margin: 0, fontSize: 10, color: '#6B7280', fontFamily: SANS }}>Atenolol 25mg · hoy 8:03 AM · ✓ Verificado</p>
-                    </div>
-                  </div>
-                </div>
-                {/* Alert card */}
-                <div style={{ background: 'rgba(233,130,110,0.07)', borderRadius: 14, padding: '12px 16px', border: `1px solid rgba(233,130,110,0.22)` }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <span style={{ fontSize: 18 }}>🔔</span>
-                    <div>
-                      <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: CORAL, fontFamily: SANS }}>Alerta: Losartán pendiente a las 8pm</p>
-                      <p style={{ margin: 0, fontSize: 10, color: '#6B7280', fontFamily: SANS }}>Notificado a 3 cuidadores · Ventana ±1 hora</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div style={{ background: MINT_C, padding: '12px 16px', textAlign: 'center' }}>
-                <p style={{ margin: 0, fontSize: 12, color: PRIMARY, fontFamily: SANS, fontWeight: 600 }}>✓ Registro claro · Foto de prueba · Todos informados</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
 
       {/* ─────────────── 9. HOW IT WORKS ─────────────── */}
       <section id="como" style={{ padding: '128px 32px', background: SAND }}>
@@ -923,8 +784,8 @@ export default function Landing() {
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 52 }}>
             <p style={{ fontSize: 11, fontWeight: 500, color: ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>Precios</p>
             <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(32px,4vw,60px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.1, margin: '0 0 16px' }}>Simple y transparente</h2>
-            <p style={{ fontSize: 18, color: '#6B7280', lineHeight: 1.75, maxWidth: 460, margin: '0 auto 36px', fontFamily: SANS, fontWeight: 300 }}>
-              Empieza gratis, actualiza cuando lo necesites. Sin contratos ni sorpresas.
+            <p style={{ fontSize: 18, color: '#6B7280', lineHeight: 1.75, maxWidth: 520, margin: '0 auto 36px', fontFamily: SANS, fontWeight: 300 }}>
+              Empieza gratis. Cambia de plan solo cuando tu familia necesite más herramientas.
             </p>
             <div style={{ display: 'inline-flex', background: WHITE, borderRadius: 9999, padding: 4, border: `1px solid ${BORDER}`, boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
               <button onClick={() => setAnnual(false)} style={{ padding: '10px 28px', borderRadius: 9999, border: 'none', cursor: 'pointer', background: !annual ? ACTION : 'transparent', color: !annual ? WHITE : '#6B7280', fontSize: 14, fontFamily: SANS, fontWeight: 500, transition: 'background 0.2s, color 0.2s' }}>Mensual</button>
@@ -1046,7 +907,7 @@ export default function Landing() {
               Empieza a cuidar mejor, juntos.
             </h2>
             <p style={{ fontSize: 18, color: 'rgba(255,255,255,0.62)', lineHeight: 1.80, margin: '0 0 48px', fontFamily: SANS, fontWeight: 300 }}>
-              Deja atrás el caos de WhatsApp. En 3 minutos tu familia tiene un solo lugar para coordinar el cuidado — gratis, sin tarjeta.
+              Deja atrás la carga de tener que informar a todos. En 3 minutos tu familia tiene un solo lugar para coordinar el cuidado — gratis, sin tarjeta.
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14 }}>
               <Link to="/register" style={{ padding: '20px 52px', borderRadius: 9999, background: WHITE, color: ACTION, fontWeight: 500, fontSize: 18, textDecoration: 'none', fontFamily: SANS, letterSpacing: '0.02em', boxShadow: '0 16px 56px rgba(0,0,0,0.28)', display: 'inline-flex', alignItems: 'center', gap: 10 }}>
@@ -1185,9 +1046,6 @@ export default function Landing() {
         .marquee-track-reverse { animation: marquee-scroll-reverse 52s linear infinite; }
         .marquee-track:hover, .marquee-track-reverse:hover { animation-play-state: paused; }
 
-        .feature-hero-card { transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s ease; }
-        .feature-hero-card:hover { transform: translateY(-8px) !important; box-shadow: 0 28px 80px rgba(13,107,99,0.12) !important; }
-
         .para-quien-card { transition: transform 0.25s ease, box-shadow 0.25s ease; }
         .para-quien-card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(20,60,50,0.12); }
 
@@ -1230,24 +1088,25 @@ export default function Landing() {
           .como-grid { flex-direction: column !important; gap: 52px !important; }
           .como-img { display: none !important; }
           .testimonios-grid { grid-template-columns: 1fr !important; }
-          .whatsapp-comparison-grid { grid-template-columns: 1fr !important; }
-          .stats-grid { grid-template-columns: 1fr !important; }
-          .stats-grid-cell { border-left: none !important; border-top: 1px solid rgba(13,107,99,0.22); padding: 24px 16px !important; }
-          .stats-grid-cell:first-child { border-top: none; }
-          .feature-hero-grid { grid-template-columns: 1fr !important; }
+          .antes-ahora-grid { grid-template-columns: 1fr !important; }
+          .solution-steps-grid { grid-template-columns: 1fr !important; gap: 44px !important; }
+          .solution-steps-line { display: none !important; }
+          .features-6-grid { grid-template-columns: 1fr !important; }
+          .ai-visual-col .ai-fact-card { align-self: center !important; margin-top: 16px !important; }
+          .what-changes-row { grid-template-columns: 1fr !important; text-align: center !important; gap: 10px !important; }
+          .what-changes-row p { text-align: center !important; }
         }
         @media (max-width: 1040px) and (min-width: 769px) {
-          .feature-hero-grid { grid-template-columns: repeat(2, 1fr) !important; }
-          .feature-hero-grid > *:last-child { grid-column: span 2; min-height: unset !important; }
-          .feature-hero-span-content { display: flex; gap: 32px; align-items: flex-start; }
-          .feature-hero-span-text { flex: 1 1 45%; }
-          .feature-hero-span-mockup { flex: 1 1 55%; }
+          .features-6-grid { grid-template-columns: repeat(2, 1fr) !important; }
         }
         @media (max-width: 640px) {
           .para-quien-grid { grid-template-columns: 1fr !important; }
         }
+        @media (max-width: 480px) {
+          .ai-visual-col > div:first-child { align-self: center !important; margin-left: 0 !important; }
+        }
         @media (prefers-reduced-motion: reduce) {
-          .reveal, .hero-reveal, .marquee-track, .feature-hero-card, .badge-pulse-anim, .como-line {
+          .reveal, .hero-reveal, .marquee-track, .badge-pulse-anim, .como-line {
             animation: none !important; transition: none !important; opacity: 1 !important; transform: none !important;
           }
         }
