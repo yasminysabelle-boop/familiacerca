@@ -84,22 +84,36 @@ export default function Permissions() {
           objectFit: 'cover', objectPosition: 'center 30%',
         }}
       />
+      {/* Gradient — zona superior consistentemente oscura (0.82-0.86) donde
+          vive el header del logo, sin importar la foto de fondo (más cálida
+          y luminosa que la de Login.jsx); se aclara en el medio porque ahí
+          la card ya trae su propio fondo casi opaco, y vuelve a oscurecer
+          hacia abajo para la nota de pie ("Tus datos están cifrados..."). */}
       <div style={{
         position: 'absolute', inset: 0,
-        background: 'linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.65) 100%)',
+        background: 'linear-gradient(to bottom, rgba(0,0,0,0.86) 0%, rgba(0,0,0,0.82) 18%, rgba(0,0,0,0.48) 40%, rgba(0,0,0,0.55) 68%, rgba(0,0,0,0.78) 100%)',
       }} />
+
+      {/* Logo — anclado en un bloque fijo arriba, igual que Login.jsx, para
+          que su posición nunca dependa de la altura de la card de abajo
+          (idle/granted/denied tienen alturas distintas) */}
+      <div style={{
+        position: 'relative', zIndex: 1,
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+        paddingTop: 56, paddingBottom: 24,
+      }}>
+        <Logo variant="light" size={32} showWordmark />
+      </div>
 
       {/* Content */}
       <div style={{
         position: 'relative', zIndex: 1,
-        minHeight: '100svh',
+        flex: 1,
         display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center',
-        padding: '32px 20px 48px',
+        padding: '0 20px 48px',
       }}>
-        <Logo variant="light" size={32} showWordmark />
-
-        <div style={{ marginTop: 24, width: '100%', maxWidth: 400 }}>
+        <div style={{ width: '100%', maxWidth: 400 }}>
 
           {/* ── Granted state ── */}
           {status === 'granted' && (
