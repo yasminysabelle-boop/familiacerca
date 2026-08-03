@@ -32,7 +32,7 @@ function CTABtn({ to, children, style = {} }) {
       display: 'inline-flex', alignItems: 'center', gap: 10,
       padding: '18px 52px', borderRadius: 9999,
       background: '#E9826E',
-      color: 'white', fontWeight: 500, fontSize: 18,
+      color: 'white', fontWeight: 500, fontSize: 'clamp(18px,1.6vw,21px)',
       textDecoration: 'none', fontFamily: SANS, letterSpacing: '0.025em',
       boxShadow: '0 12px 40px rgba(233,130,110,0.38)',
       transition: 'background 0.2s ease',
@@ -65,7 +65,7 @@ function FAQItem({ q, a, light = false, onTrack }) {
       </button>
       <div style={{ display: 'grid', gridTemplateRows: open ? '1fr' : '0fr', transition: 'grid-template-rows 0.3s ease' }}>
         <div style={{ overflow: 'hidden' }}>
-          <p style={{ fontSize: 17, color: answerColor, lineHeight: 1.85, padding: '0 16px 24px', margin: 0, fontFamily: SANS, fontWeight: 300 }}>{a}</p>
+          <p style={{ fontSize: 'clamp(17px,1.6vw,21px)', color: answerColor, lineHeight: 1.85, padding: '0 16px 24px', margin: 0, fontFamily: SANS, fontWeight: 300 }}>{a}</p>
         </div>
       </div>
     </div>
@@ -82,7 +82,7 @@ function PriceCard({ name, price, period, highlight, badge, groups, cta, annual,
       {badge && (
         <div className={highlight ? 'badge-pulse-anim' : ''} style={{ position: 'absolute', top: -16, left: '50%', transform: 'translateX(-50%)', background: GOLD, color: 'white', fontSize: 12, fontWeight: 500, letterSpacing: '0.12em', padding: '6px 22px', borderRadius: 9999, whiteSpace: 'nowrap', fontFamily: SANS }}>{badge}</div>
       )}
-      <p style={{ fontSize: 16, fontWeight: 500, color: highlight ? 'rgba(255,255,255,0.55)' : ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 12px', fontFamily: SANS }}>{name}</p>
+      <p style={{ fontSize: 'clamp(16px,1.2vw,19px)', fontWeight: 500, color: highlight ? 'rgba(255,255,255,0.55)' : ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 12px', fontFamily: SANS }}>{name}</p>
       {tagline && <p style={{ fontSize: 14, color: highlight ? 'rgba(255,255,255,0.65)' : '#6B7280', margin: '0 0 16px', fontFamily: SANS, fontWeight: 400, lineHeight: 1.4 }}>{tagline}</p>}
       <div style={{ marginBottom: 4, display: 'flex', alignItems: 'baseline', gap: 6 }}>
         <span style={{ fontSize: 52, fontWeight: 700, color: highlight ? 'white' : DARK, fontFamily: SERIF, lineHeight: 1 }}>{price === 0 ? 'Gratis' : `$${displayPrice}`}</span>
@@ -101,7 +101,7 @@ function PriceCard({ name, price, period, highlight, badge, groups, cta, annual,
             <p style={{ fontSize: 11, fontWeight: 700, color: highlight ? '#FFD9CC' : GOLD, textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 8px', fontFamily: SANS }}>{g.label}</p>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
               {g.items.map((item, i) => (
-                <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 14, lineHeight: 1.5, fontFamily: SANS, fontWeight: 300 }}>
+                <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 'clamp(14px,1vw,16px)', lineHeight: 1.5, fontFamily: SANS, fontWeight: 300 }}>
                   <span style={{ color: highlight ? GOLD : ACTION, flexShrink: 0, fontWeight: 700 }}>✓</span>
                   <span style={{ color: highlight ? 'rgba(255,255,255,0.80)' : '#6B7280' }}>{item}</span>
                 </li>
@@ -110,7 +110,7 @@ function PriceCard({ name, price, period, highlight, badge, groups, cta, annual,
           </div>
         ))}
       </div>
-      <Link to="/register" onClick={() => onTrack && onTrack('pricing_click', { plan: trackId })} style={{ display: 'block', textAlign: 'center', padding: '16px', borderRadius: 9999, fontWeight: 500, fontSize: 15, textDecoration: 'none', fontFamily: SANS, letterSpacing: '0.02em', background: highlight ? 'white' : 'transparent', color: ACTION, border: highlight ? 'none' : `1.5px solid ${ACTION}`, boxShadow: highlight ? '0 8px 24px rgba(255,255,255,0.18)' : 'none' }}>{cta}</Link>
+      <Link to="/register" onClick={() => onTrack && onTrack('pricing_click', { plan: trackId })} style={{ display: 'block', textAlign: 'center', padding: '16px', borderRadius: 9999, fontWeight: 500, fontSize: 'clamp(15px,1.3vw,17px)', textDecoration: 'none', fontFamily: SANS, letterSpacing: '0.02em', background: highlight ? 'white' : 'transparent', color: ACTION, border: highlight ? 'none' : `1.5px solid ${ACTION}`, boxShadow: highlight ? '0 8px 24px rgba(255,255,255,0.18)' : 'none' }}>{cta}</Link>
     </div>
   )
 }
@@ -282,7 +282,7 @@ export default function Landing() {
 
       {/* ─────────────── 1. NAV ─────────────── */}
       <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: '#F8F4ED', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(20,60,50,0.08)', boxShadow: '0 1px 8px rgba(20,60,50,0.06)' }}>
-        <div style={{ maxWidth: 1140, margin: '0 auto', padding: '20px 2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24 }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '20px 2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24 }}>
           <div style={{ display:'flex', alignItems:'center', gap:'12px', flexShrink: 0 }}>
             <img src="/logo.png" alt="FamiliaCerca" style={{ width: 44, height: 44, objectFit: 'contain', display: 'block' }} />
             <span style={{ fontFamily:"'Plus Jakarta Sans', sans-serif", fontWeight:700, margin:0, padding:0 }}>
@@ -293,7 +293,7 @@ export default function Landing() {
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 36 }} className="landing-desktop-nav">
             {navLinks.map(l => (
-              <a key={l.href} href={l.href} style={{ fontSize: 17, fontWeight: 600, color: '#087F70', textDecoration: 'none', fontFamily: SANS }}
+              <a key={l.href} href={l.href} style={{ fontSize: 'clamp(17px,1.4vw,19px)', fontWeight: 600, color: '#087F70', textDecoration: 'none', fontFamily: SANS }}
                 onMouseEnter={e => e.currentTarget.style.color = '#E9826E'}
                 onMouseLeave={e => e.currentTarget.style.color = '#087F70'}
               >{l.label}</a>
@@ -332,26 +332,26 @@ export default function Landing() {
         <div className="landing-hero-text" style={{ background: PRIMARY, position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: 'clamp(80px,8vw,120px) clamp(32px,5vw,72px)', overflow: 'hidden', textAlign: 'center' }}>
           <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'radial-gradient(ellipse 70% 55% at 30% 55%, rgba(13,107,99,0.22) 0%, transparent 70%)' }} />
 
-          <div style={{ position: 'relative', width: '100%', maxWidth: 520, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div style={{ position: 'relative', width: '100%', maxWidth: 620, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <div className="hero-reveal hero-delay-1" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, border: '1px solid rgba(13,107,99,0.40)', borderRadius: 9999, padding: '7px 18px', marginBottom: 36, background: 'rgba(13,107,99,0.14)' }}>
               <span style={{ fontSize: 13 }}>🌿</span>
               <span style={{ fontSize: 14, fontWeight: 500, color: MINT_C, letterSpacing: '0.06em', fontFamily: SANS }}>Cuidado familiar coordinado</span>
             </div>
 
-            <h1 className="hero-reveal hero-delay-2" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(40px, 5.5vw, 78px)', fontWeight: 700, color: WHITE, lineHeight: 1.08, margin: '0 0 20px', letterSpacing: '-1px', textAlign: 'center' }}>
+            <h1 className="hero-reveal hero-delay-2" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(40px, 27px + 3.4vw, 92px)', fontWeight: 700, color: WHITE, lineHeight: 1.08, margin: '0 0 20px', letterSpacing: '-1px', textAlign: 'center' }}>
               Cuida a quien amas,{' '}
               <span style={{ color: GOLD }}>sin cargar tú solo con todo.</span>
             </h1>
 
-            <p className="hero-reveal hero-delay-3" style={{ fontSize: 'clamp(15px, 1.6vw, 18px)', color: 'rgba(255,255,255,0.62)', lineHeight: 1.65, margin: '0 0 20px', fontFamily: SANS, fontWeight: 300, textAlign: 'center' }}>
+            <p className="hero-reveal hero-delay-3" style={{ fontSize: 'clamp(16px, 1.6vw, 21px)', color: 'rgba(255,255,255,0.62)', lineHeight: 1.65, margin: '0 0 20px', fontFamily: SANS, fontWeight: 300, textAlign: 'center' }}>
               Comparte cada medicamento, cada cita y cada rutina con toda la familia — cuidadores y parientes ven la misma información, en el momento en que pasa.
             </p>
 
-            <p className="hero-reveal hero-delay-3" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(20px, 2.4vw, 26px)', fontWeight: 600, color: GOLD, lineHeight: 1.35, margin: '0 0 40px' }}>
+            <p className="hero-reveal hero-delay-3" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(20px, 2.3vw, 30px)', fontWeight: 600, color: GOLD, lineHeight: 1.35, margin: '0 0 40px' }}>
               Se acabaron las llamadas para preguntar &ldquo;¿Ya se lo dieron?&rdquo;
             </p>
 
-            <Link to="/register" className="hero-reveal hero-delay-4 cta-coral" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '18px 48px', borderRadius: 9999, marginBottom: 32, background: '#E9826E', color: WHITE, fontWeight: 600, fontSize: 18, fontFamily: SANS, textDecoration: 'none', letterSpacing: '0.02em', boxShadow: '0 12px 40px rgba(233,130,110,0.45)', transition: 'background 0.2s ease' }}>
+            <Link to="/register" className="hero-reveal hero-delay-4 cta-coral" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '18px 48px', borderRadius: 9999, marginBottom: 32, background: '#E9826E', color: WHITE, fontWeight: 600, fontSize: 'clamp(18px,1.6vw,21px)', fontFamily: SANS, textDecoration: 'none', letterSpacing: '0.02em', boxShadow: '0 12px 40px rgba(233,130,110,0.45)', transition: 'background 0.2s ease' }}>
               Empezar gratis <span style={{ fontSize: 18, opacity: 0.85 }}>→</span>
             </Link>
 
@@ -425,9 +425,9 @@ export default function Landing() {
 
       {/* ─────────────── 4. ANTES / AHORA ─────────────── */}
       <section style={{ background: CREAM, padding: '88px 32px', borderBottom: `1px solid ${BORDER}` }}>
-        <div style={{ maxWidth: 1140, margin: '0 auto' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 52 }}>
-            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(28px,3.4vw,42px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.15, margin: 0 }}>
+            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(28px,3.9vw,50px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.15, margin: 0 }}>
               Lo que cambia desde el primer día
             </h2>
           </div>
@@ -439,12 +439,12 @@ export default function Landing() {
                 <div className="antes-ahora-split" style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'stretch' }}>
                   <div style={{ padding: '16px 18px 22px', background: 'rgba(107,114,128,0.06)' }}>
                     <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9CA3AF', margin: '0 0 8px' }}>Antes</p>
-                    <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.55, margin: 0, fontFamily: SANS }}>{c.before}</p>
+                    <p style={{ fontSize: 'clamp(14px,1.3vw,17px)', color: '#6B7280', lineHeight: 1.55, margin: 0, fontFamily: SANS }}>{c.before}</p>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: CORAL, fontSize: 16, background: WHITE, padding: '0 14px' }}>→</div>
                   <div style={{ padding: '16px 18px 22px', background: MINT_C }}>
                     <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: PRIMARY, margin: '0 0 8px' }}>Ahora</p>
-                    <p style={{ fontSize: 14, color: PRIMARY, fontWeight: 500, lineHeight: 1.55, margin: 0, fontFamily: SANS }}>{c.after}</p>
+                    <p style={{ fontSize: 'clamp(14px,1.3vw,17px)', color: PRIMARY, fontWeight: 500, lineHeight: 1.55, margin: 0, fontFamily: SANS }}>{c.after}</p>
                   </div>
                 </div>
               </div>
@@ -457,19 +457,19 @@ export default function Landing() {
       {/* Reubicada antes de Problema/Solución (junto con la sección de IA que
           sigue) — es el diferenciador del producto, debe leerse temprano. */}
       <section style={{ background: PRIMARY, padding: '110px 32px' }}>
-        <div style={{ maxWidth: 1140, margin: '0 auto' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <div className="reveal" style={{ textAlign: 'center', maxWidth: 560, margin: '0 auto 56px' }}>
             <p style={{ fontSize: 13, fontWeight: 500, color: GOLD, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>El cambio real</p>
-            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(28px,3.4vw,44px)', fontWeight: 600, color: WHITE, lineHeight: 1.15, margin: 0 }}>
+            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(28px,3.9vw,52px)', fontWeight: 600, color: WHITE, lineHeight: 1.15, margin: 0 }}>
               Lo que cambia para tu familia
             </h2>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2, maxWidth: 880, margin: '0 auto' }}>
             {whatChangesRows.map((r, i) => (
               <div key={i} className={`what-changes-row reveal reveal-delay-${i}`} style={{ display: 'grid', gridTemplateColumns: '1fr 44px 1fr', alignItems: 'center', gap: 20, padding: '28px 8px', borderBottom: i < whatChangesRows.length - 1 ? '1px solid rgba(255,255,255,0.10)' : 'none' }}>
-                <p style={{ fontSize: 'clamp(15px,1.7vw,18px)', color: 'rgba(255,255,255,0.42)', lineHeight: 1.5, textAlign: 'right', margin: 0, fontFamily: SANS }}>{r.before}</p>
+                <p style={{ fontSize: 'clamp(16px,1.6vw,21px)', color: 'rgba(255,255,255,0.42)', lineHeight: 1.5, textAlign: 'right', margin: 0, fontFamily: SANS }}>{r.before}</p>
                 <div style={{ textAlign: 'center', color: CORAL, fontSize: 20 }}>→</div>
-                <p style={{ fontSize: 'clamp(16px,1.9vw,20px)', color: WHITE, fontWeight: 600, lineHeight: 1.5, margin: 0, fontFamily: SANS }}>{r.after}</p>
+                <p style={{ fontSize: 'clamp(16px,1.7vw,23px)', color: WHITE, fontWeight: 600, lineHeight: 1.5, margin: 0, fontFamily: SANS }}>{r.after}</p>
               </div>
             ))}
           </div>
@@ -482,7 +482,7 @@ export default function Landing() {
           requieran atención"): solo hechos verificables que la familia ya
           registró. La familia decide qué significan, Milo no interpreta. */}
       <section style={{ background: WHITE, padding: '110px 32px' }}>
-        <div style={{ maxWidth: 1140, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 64, flexWrap: 'wrap' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 64, flexWrap: 'wrap' }}>
           <div className="ai-visual-col" style={{ flex: '0 0 340px', maxWidth: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <div style={{ width: 210, borderRadius: 22, alignSelf: 'flex-start', marginLeft: 14, background: 'linear-gradient(160deg, rgba(117,102,216,0.09), rgba(167,154,234,0.05))', border: '1px solid rgba(117,102,216,0.18)', padding: 18, boxShadow: '0 16px 44px rgba(117,102,216,0.16)' }}>
               <img src={MILO_LUNA_IMG} alt="Milo y Luna, los compañeros de inteligencia artificial de FamiliaCerca" style={{ width: '100%', display: 'block' }} />
@@ -505,13 +505,13 @@ export default function Landing() {
           </div>
           <div style={{ flex: '1 1 420px', maxWidth: 560 }} className="reveal">
             <p style={{ fontSize: 13, fontWeight: 500, color: AI_PURPLE, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>Inteligencia FamiliaCerca</p>
-            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(28px,3.4vw,42px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.18, margin: '0 0 18px' }}>
+            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(28px,3.9vw,50px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.18, margin: '0 0 18px' }}>
               Un resumen que dice exactamente lo que pasó
             </h2>
-            <p style={{ fontSize: 16, color: '#6B7280', lineHeight: 1.78, margin: '0 0 14px', fontFamily: SANS, fontWeight: 300 }}>
+            <p style={{ fontSize: 'clamp(16px,1.5vw,20px)', color: '#6B7280', lineHeight: 1.78, margin: '0 0 14px', fontFamily: SANS, fontWeight: 300 }}>
               Cada mañana, Milo revisa la actividad real del día — medicamentos, rutinas, notas, citas e historial — y te la resume con sus propias palabras.
             </p>
-            <p style={{ fontSize: 16, color: '#6B7280', lineHeight: 1.78, margin: 0, fontFamily: SANS, fontWeight: 300 }}>
+            <p style={{ fontSize: 'clamp(16px,1.5vw,20px)', color: '#6B7280', lineHeight: 1.78, margin: 0, fontFamily: SANS, fontWeight: 300 }}>
               Nunca un diagnóstico, nunca un juicio de cómo &ldquo;está&rdquo; tu familiar — solo los hechos que tu familia registró. Leerlos y decidir qué significan es siempre cosa tuya.
             </p>
           </div>
@@ -522,7 +522,7 @@ export default function Landing() {
           SPLIT" más abajo) — cierra el bloque de IA como puente hacia la
           narrativa del Problema que sigue. */}
       <section style={{ background: CREAM, padding: '0 32px 64px', textAlign: 'center' }}>
-        <p className="reveal" style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 600, fontSize: 'clamp(20px,2.4vw,28px)', color: CORAL, maxWidth: 640, margin: '0 auto', lineHeight: 1.4 }}>
+        <p className="reveal" style={{ fontFamily: SERIF, fontStyle: 'italic', fontWeight: 600, fontSize: 'clamp(20px,2.4vw,32px)', color: CORAL, maxWidth: 640, margin: '0 auto', lineHeight: 1.4 }}>
           El problema no es el medicamento. Es que la información está repartida.
         </p>
       </section>
@@ -535,7 +535,7 @@ export default function Landing() {
           </div>
           <div style={{ background: PRIMARY, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 'clamp(56px,8vw,96px) clamp(36px,6vw,80px)' }}>
             <p style={{ fontSize: 13, fontWeight: 500, color: GOLD, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 20px', fontFamily: SANS }}>El problema</p>
-            <h2 className="reveal" style={{ fontFamily: SERIF, fontSize: 'clamp(32px,3.5vw,52px)', fontWeight: 600, color: WHITE, lineHeight: 1.12, margin: '0 0 44px' }}>
+            <h2 className="reveal" style={{ fontFamily: SERIF, fontSize: 'clamp(32px,4.5vw,60px)', fontWeight: 600, color: WHITE, lineHeight: 1.12, margin: '0 0 44px' }}>
               Son las 8:30 de la noche, y nadie sabe qué está pasando.
             </h2>
 
@@ -563,7 +563,7 @@ export default function Landing() {
             <p className="reveal" style={{ fontSize: 15, color: 'rgba(255,255,255,0.92)', fontWeight: 600, lineHeight: 1.6, margin: '40px 0 0', paddingTop: 24, borderTop: '1px solid rgba(255,255,255,0.16)', fontFamily: SANS }}>
               Hoy coordinan por WhatsApp, como siempre. Y precisamente por eso, nadie sabe con certeza qué pasó de verdad.
             </p>
-            <p className="reveal" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(24px,2.8vw,34px)', fontWeight: 600, color: GOLD, lineHeight: 1.3, margin: '18px 0 0' }}>
+            <p className="reveal" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(24px,3vw,39px)', fontWeight: 600, color: GOLD, lineHeight: 1.3, margin: '18px 0 0' }}>
               El problema no es el medicamento. Es que la información está repartida.
             </p>
           </div>
@@ -572,10 +572,10 @@ export default function Landing() {
 
       {/* ─────────────── 5.5. LA SOLUCIÓN ─────────────── */}
       <section style={{ background: CREAM, padding: 'clamp(96px,10vw,140px) 32px' }}>
-        <div style={{ maxWidth: 1140, margin: '0 auto' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <div className="reveal" style={{ maxWidth: 600, margin: '0 auto 60px', textAlign: 'center' }}>
             <p style={{ fontSize: 13, fontWeight: 500, color: ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 18px', fontFamily: SANS }}>La solución</p>
-            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(28px,3.4vw,44px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.15, margin: 0 }}>
+            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(28px,3.9vw,52px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.15, margin: 0 }}>
               Un sistema, no más mensajes.
             </h2>
           </div>
@@ -585,7 +585,7 @@ export default function Landing() {
               <div key={s.n} className={`reveal reveal-delay-${i}`} style={{ position: 'relative', textAlign: 'center' }}>
                 <div style={{ width: 68, height: 68, borderRadius: '50%', margin: '0 auto 20px', background: `linear-gradient(135deg, ${ACTION}, #A8E5D6)`, color: WHITE, fontFamily: SERIF, fontWeight: 700, fontSize: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 10px 30px rgba(8,127,112,0.28)', position: 'relative', zIndex: 1 }}>{s.n}</div>
                 <h3 style={{ fontFamily: SERIF, fontSize: 18, color: PRIMARY, fontWeight: 700, margin: '0 0 8px' }}>{s.title}</h3>
-                <p style={{ fontSize: 14.5, color: '#6B7280', lineHeight: 1.6, maxWidth: 260, margin: '0 auto', fontFamily: SANS, fontWeight: 300 }}>{s.desc}</p>
+                <p style={{ fontSize: 'clamp(14px,1.3vw,17px)', color: '#6B7280', lineHeight: 1.6, maxWidth: 260, margin: '0 auto', fontFamily: SANS, fontWeight: 300 }}>{s.desc}</p>
               </div>
             ))}
           </div>
@@ -600,13 +600,13 @@ export default function Landing() {
       {/* ─────────────── 7. FEATURES ─────────────── */}
       <section id="funciones" style={{ padding: '110px 32px', background: CREAM, position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: 800, height: 400, pointerEvents: 'none', background: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(13,107,99,0.05) 0%, transparent 70%)' }} />
-        <div style={{ maxWidth: 1140, margin: '0 auto', position: 'relative' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto', position: 'relative' }}>
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 64 }}>
             <p style={{ fontSize: 13, fontWeight: 500, color: ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>Funciones</p>
-            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(32px,4vw,56px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.1, margin: '0 0 20px' }}>
+            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(32px,4.8vw,64px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.1, margin: '0 0 20px' }}>
               Todo lo que tu familia necesita, en un solo lugar
             </h2>
-            <p style={{ fontSize: 18, color: '#6B7280', lineHeight: 1.78, maxWidth: 540, margin: '0 auto', fontFamily: SANS, fontWeight: 300 }}>
+            <p style={{ fontSize: 'clamp(18px,1.7vw,22px)', color: '#6B7280', lineHeight: 1.78, maxWidth: 540, margin: '0 auto', fontFamily: SANS, fontWeight: 300 }}>
               Sin funciones de más — solo lo que de verdad ayuda a coordinar el cuidado.
             </p>
           </div>
@@ -620,7 +620,7 @@ export default function Landing() {
               }}>
                 <div style={{ width: 52, height: 52, borderRadius: 14, background: f.emergency ? 'rgba(217,83,79,0.10)' : 'rgba(8,127,112,0.08)', border: f.emergency ? '1px solid rgba(217,83,79,0.22)' : '1px solid rgba(8,127,112,0.14)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, marginBottom: 16 }}>{f.icon}</div>
                 <h3 style={{ fontFamily: SERIF, fontSize: 18, fontWeight: 700, color: f.emergency ? CORAL_EMERGENCY : PRIMARY, margin: '0 0 8px' }}>{f.title}</h3>
-                <p style={{ fontSize: 14.5, color: '#6B7280', lineHeight: 1.65, margin: 0, fontFamily: SANS, fontWeight: 300 }}>{f.desc}</p>
+                <p style={{ fontSize: 'clamp(14px,1.3vw,17px)', color: '#6B7280', lineHeight: 1.65, margin: 0, fontFamily: SANS, fontWeight: 300 }}>{f.desc}</p>
               </div>
             ))}
           </div>
@@ -632,10 +632,10 @@ export default function Landing() {
         <div style={{ maxWidth: 640, margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
           {/* Slot ampliable con testimonios reales de familias */}
           <div style={{ fontFamily: SERIF, fontSize: 90, color: PRIMARY, lineHeight: 0.7, marginBottom: 12, opacity: 0.18 }}>"</div>
-          <blockquote className="reveal" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(24px,3vw,38px)', fontWeight: 500, color: PRIMARY, lineHeight: 1.45, margin: '0 0 28px' }}>
+          <blockquote className="reveal" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(24px,3.3vw,44px)', fontWeight: 500, color: PRIMARY, lineHeight: 1.45, margin: '0 0 28px' }}>
             Antes era imposible coordinarnos. Ahora todos sabemos qué está pasando sin preguntar.
           </blockquote>
-          <p className="reveal reveal-delay-1" style={{ fontSize: 15, color: 'rgba(20,60,50,0.62)', fontFamily: SANS, fontWeight: 400, lineHeight: 1.65, maxWidth: 460, margin: 0 }}>
+          <p className="reveal reveal-delay-1" style={{ fontSize: 'clamp(15px,1.4vw,19px)', color: 'rgba(20,60,50,0.62)', fontFamily: SANS, fontWeight: 400, lineHeight: 1.65, maxWidth: 460, margin: 0 }}>
             — Ysabelle, fundadora de FamiliaCerca. Creó la app después de años coordinando el cuidado de su familia por WhatsApp.
           </p>
         </div>
@@ -643,10 +643,10 @@ export default function Landing() {
 
       {/* ─────────────── 9. HOW IT WORKS ─────────────── */}
       <section id="como" style={{ padding: '128px 32px', background: SAND }}>
-        <div style={{ maxWidth: 1140, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 88, flexWrap: 'wrap' }} className="como-grid">
+        <div style={{ maxWidth: 1280, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 88, flexWrap: 'wrap' }} className="como-grid">
           <div style={{ flex: '1 1 360px' }}>
             <p style={{ fontSize: 13, fontWeight: 500, color: ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 18px', fontFamily: SANS }}>Cómo funciona</p>
-            <h2 className="reveal" style={{ fontFamily: SERIF, fontSize: 'clamp(32px,4vw,56px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.12, margin: '0 0 52px' }}>
+            <h2 className="reveal" style={{ fontFamily: SERIF, fontSize: 'clamp(32px,4.8vw,64px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.12, margin: '0 0 52px' }}>
               Listo en 3 minutos. Diseñado para acompañarte todos los días.
             </h2>
             <div style={{ display: 'flex', flexDirection: 'column', position: 'relative' }}>
@@ -663,7 +663,7 @@ export default function Landing() {
                   </div>
                   <div style={{ paddingTop: 22 }}>
                     <h3 style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 600, color: PRIMARY, margin: '0 0 8px' }}>{s.title}</h3>
-                    <p style={{ fontSize: 17, color: '#6B7280', lineHeight: 1.78, margin: 0, fontFamily: SANS, fontWeight: 300 }}>{s.desc}</p>
+                    <p style={{ fontSize: 'clamp(17px,1.6vw,21px)', color: '#6B7280', lineHeight: 1.78, margin: 0, fontFamily: SANS, fontWeight: 300 }}>{s.desc}</p>
                   </div>
                 </div>
               ))}
@@ -680,9 +680,9 @@ export default function Landing() {
 
       {/* ─────────────── 9.5. PARA QUIÉN ES ─────────────── */}
       <section style={{ background: CREAM, padding: '112px 32px' }}>
-        <div style={{ maxWidth: 1140, margin: '0 auto' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 56 }}>
-            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(30px,3.6vw,52px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.15, margin: 0 }}>
+            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(30px,4.5vw,60px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.15, margin: 0 }}>
               FamiliaCerca es para ti si…
             </h2>
           </div>
@@ -732,7 +732,7 @@ export default function Landing() {
       <section style={{ padding: '128px 32px', background: DARK }}>
         <div style={{ maxWidth: 860, margin: '0 auto', textAlign: 'center' }}>
           <div style={{ fontFamily: SERIF, fontSize: 110, color: GOLD, lineHeight: 0.7, marginBottom: 20, opacity: 0.28 }}>"</div>
-          <blockquote className="reveal" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(28px,3.8vw,54px)', fontWeight: 500, color: GOLD, lineHeight: 1.45, margin: '0 0 40px' }}>
+          <blockquote className="reveal" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(28px,4.7vw,62px)', fontWeight: 500, color: GOLD, lineHeight: 1.45, margin: '0 0 40px' }}>
             Un día vas a querer volver a este momento. FamiliaCerca lo guarda por ti.
           </blockquote>
           <CTABtn to="/register">
@@ -743,10 +743,10 @@ export default function Landing() {
 
       {/* ─────────────── 11. TESTIMONIOS ─────────────── */}
       <section style={{ padding: '128px 32px', background: CREAM }}>
-        <div style={{ maxWidth: 1140, margin: '0 auto' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 72 }}>
             <p style={{ fontSize: 13, fontWeight: 500, color: GOLD, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>Testimonios</p>
-            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(32px,4vw,60px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.1, margin: 0 }}>
+            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(32px,5.1vw,68px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.1, margin: 0 }}>
               Familias que cuidan mejor juntas
             </h2>
           </div>
@@ -756,8 +756,8 @@ export default function Landing() {
                 <div style={{ display: 'flex', gap: 3, marginBottom: 14 }}>
                   {[1,2,3,4,5].map(s => <span key={s} style={{ color: CORAL, fontSize: 13 }}>★</span>)}
                 </div>
-                <p style={{ fontSize: 17, fontWeight: 600, color: WHITE, fontFamily: SERIF, margin: '0 0 12px', lineHeight: 1.3 }}>{t.headline}</p>
-                <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.72)', lineHeight: 1.85, margin: '0 0 24px', fontFamily: SANS, fontWeight: 300, fontStyle: 'italic', flex: 1 }}>"{t.text}"</p>
+                <p style={{ fontSize: 'clamp(17px,1.6vw,21px)', fontWeight: 600, color: WHITE, fontFamily: SERIF, margin: '0 0 12px', lineHeight: 1.3 }}>{t.headline}</p>
+                <p style={{ fontSize: 'clamp(16px,1.5vw,20px)', color: 'rgba(255,255,255,0.72)', lineHeight: 1.85, margin: '0 0 24px', fontFamily: SANS, fontWeight: 300, fontStyle: 'italic', flex: 1 }}>"{t.text}"</p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   <div style={{ width: 46, height: 46, borderRadius: '50%', background: ACTION, border: `1px solid rgba(13,107,99,0.60)`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                     <span style={{ fontFamily: SERIF, fontSize: 20, fontWeight: 700, color: WHITE }}>{t.initial}</span>
@@ -779,7 +779,7 @@ export default function Landing() {
               Ver más/menos historias porque es el diferenciador del producto. */}
           <div className="reveal" style={{ marginTop: 24, maxWidth: 720, marginLeft: 'auto', marginRight: 'auto', background: 'linear-gradient(135deg, rgba(117,102,216,0.07), rgba(167,154,234,0.03))', border: '1px solid rgba(117,102,216,0.22)', borderRadius: 20, padding: '32px 36px', textAlign: 'center' }}>
             <div style={{ fontSize: 26, marginBottom: 10 }}>✨</div>
-            <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 17, color: PRIMARY, lineHeight: 1.65, margin: '0 0 12px' }}>
+            <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(17px,1.6vw,21px)', color: PRIMARY, lineHeight: 1.65, margin: '0 0 12px' }}>
               &ldquo;Lo primero que hago cada mañana es abrir el resumen de Milo. En treinta segundos ya sé cómo estuvo mamá el día anterior. Ya no tengo que revisar veinte mensajes.&rdquo;
             </p>
             <p style={{ fontSize: 14, color: '#6B7280', margin: 0, fontFamily: SANS }}>— Sofía T., hija cuidadora · Houston, Texas</p>
@@ -797,10 +797,10 @@ export default function Landing() {
       <section style={{ padding: '128px 32px', background: '#087F70' }}>
         <div style={{ maxWidth: 860, margin: '0 auto', textAlign: 'center' }}>
           <div style={{ fontFamily: SERIF, fontSize: 110, color: GOLD, lineHeight: 0.7, marginBottom: 20, opacity: 0.22 }}>"</div>
-          <blockquote className="reveal" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(28px,3.8vw,54px)', fontWeight: 500, color: CREAM, lineHeight: 1.45, margin: '0 0 36px' }}>
+          <blockquote className="reveal" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(28px,4.7vw,62px)', fontWeight: 500, color: CREAM, lineHeight: 1.45, margin: '0 0 36px' }}>
             No tienes que cargar con todo en la memoria. FamiliaCerca recuerda por ti.
           </blockquote>
-          <p className="reveal reveal-delay-1" style={{ fontSize: 18, color: 'rgba(245,240,232,0.62)', lineHeight: 1.80, maxWidth: 640, margin: '0 auto', fontFamily: SANS, fontWeight: 300 }}>
+          <p className="reveal reveal-delay-1" style={{ fontSize: 'clamp(18px,1.7vw,22px)', color: 'rgba(245,240,232,0.62)', lineHeight: 1.80, maxWidth: 640, margin: '0 auto', fontFamily: SANS, fontWeight: 300 }}>
             Los medicamentos importan. Las citas importan. Las rutinas importan. Pero los recuerdos también. Cada actualización construye la historia de cuidado de la persona que amas.
           </p>
         </div>
@@ -808,11 +808,11 @@ export default function Landing() {
 
       {/* ─────────────── 12. PRECIOS ─────────────── */}
       <section id="precios" style={{ padding: '128px 32px', background: CREAM }}>
-        <div style={{ maxWidth: 1140, margin: '0 auto' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 52 }}>
             <p style={{ fontSize: 13, fontWeight: 500, color: ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>Precios</p>
-            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(32px,4vw,60px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.1, margin: '0 0 16px' }}>Simple y transparente</h2>
-            <p style={{ fontSize: 18, color: '#6B7280', lineHeight: 1.75, maxWidth: 520, margin: '0 auto 36px', fontFamily: SANS, fontWeight: 300 }}>
+            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(32px,5.1vw,68px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.1, margin: '0 0 16px' }}>Simple y transparente</h2>
+            <p style={{ fontSize: 'clamp(18px,1.7vw,22px)', color: '#6B7280', lineHeight: 1.75, maxWidth: 520, margin: '0 auto 36px', fontFamily: SANS, fontWeight: 300 }}>
               Empieza gratis. Cambia de plan solo cuando tu familia necesite más herramientas.
             </p>
             <div style={{ display: 'inline-flex', background: WHITE, borderRadius: 9999, padding: 4, border: `1px solid ${BORDER}`, boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
@@ -840,10 +840,10 @@ export default function Landing() {
         <div style={{ maxWidth: 980, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 72, flexWrap: 'wrap' }}>
           <div style={{ flex: '1 1 300px' }}>
             <p style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 18px', fontFamily: SANS }}>Sin App Store</p>
-            <h2 className="reveal" style={{ fontFamily: SERIF, fontSize: 'clamp(32px,4vw,56px)', fontWeight: 600, color: WHITE, lineHeight: 1.12, margin: '0 0 18px' }}>
+            <h2 className="reveal" style={{ fontFamily: SERIF, fontSize: 'clamp(32px,4.8vw,64px)', fontWeight: 600, color: WHITE, lineHeight: 1.12, margin: '0 0 18px' }}>
               Agrégala a tu celular en segundos
             </h2>
-            <p style={{ fontSize: 18, color: 'rgba(255,255,255,0.62)', lineHeight: 1.80, margin: '0 0 40px', fontFamily: SANS, fontWeight: 300 }}>
+            <p style={{ fontSize: 'clamp(18px,1.7vw,22px)', color: 'rgba(255,255,255,0.62)', lineHeight: 1.80, margin: '0 0 40px', fontFamily: SANS, fontWeight: 300 }}>
               Sin pasar por la App Store ni Google Play — funciona como una app nativa directo desde tu navegador.
             </p>
             <div style={{ display: 'flex', background: 'rgba(255,255,255,0.10)', borderRadius: 9999, padding: 4, marginBottom: 28, width: 'fit-content' }}>
@@ -915,7 +915,7 @@ export default function Landing() {
         <div style={{ maxWidth: 740, margin: '0 auto' }}>
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 72 }}>
             <p style={{ fontSize: 13, fontWeight: 500, color: ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>Preguntas frecuentes</p>
-            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(32px,4vw,60px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.1, margin: 0 }}>
+            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(32px,5.1vw,68px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.1, margin: 0 }}>
               Todo lo que necesitas saber
             </h2>
           </div>
@@ -928,17 +928,17 @@ export default function Landing() {
         <img src={CTA_IMG} alt="" aria-hidden="true" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(20,60,50,0.88)' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(20,60,50,0.65) 0%, transparent 55%)' }} />
-        <div style={{ position: 'relative', zIndex: 1, maxWidth: 1140, margin: '0 auto', width: '100%' }}>
+        <div style={{ position: 'relative', zIndex: 1, maxWidth: 1280, margin: '0 auto', width: '100%' }}>
           <div style={{ maxWidth: 680 }}>
             <p style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 20px', fontFamily: SANS }}>Empieza hoy</p>
-            <h2 className="reveal" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(44px,6vw,84px)', fontWeight: 700, color: WHITE, lineHeight: 1.02, margin: '0 0 24px' }}>
+            <h2 className="reveal" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(44px,7.3vw,96px)', fontWeight: 700, color: WHITE, lineHeight: 1.02, margin: '0 0 24px' }}>
               Empieza a cuidar mejor, juntos.
             </h2>
-            <p style={{ fontSize: 18, color: 'rgba(255,255,255,0.62)', lineHeight: 1.80, margin: '0 0 48px', fontFamily: SANS, fontWeight: 300 }}>
+            <p style={{ fontSize: 'clamp(18px,1.7vw,22px)', color: 'rgba(255,255,255,0.62)', lineHeight: 1.80, margin: '0 0 48px', fontFamily: SANS, fontWeight: 300 }}>
               Deja atrás la carga de tener que informar a todos. En 3 minutos tu familia tiene un solo lugar para coordinar el cuidado — gratis, sin tarjeta.
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14 }}>
-              <Link to="/register" style={{ padding: '20px 52px', borderRadius: 9999, background: WHITE, color: ACTION, fontWeight: 500, fontSize: 18, textDecoration: 'none', fontFamily: SANS, letterSpacing: '0.02em', boxShadow: '0 16px 56px rgba(0,0,0,0.28)', display: 'inline-flex', alignItems: 'center', gap: 10 }}>
+              <Link to="/register" style={{ padding: '20px 52px', borderRadius: 9999, background: WHITE, color: ACTION, fontWeight: 500, fontSize: 'clamp(18px,1.6vw,21px)', textDecoration: 'none', fontFamily: SANS, letterSpacing: '0.02em', boxShadow: '0 16px 56px rgba(0,0,0,0.28)', display: 'inline-flex', alignItems: 'center', gap: 10 }}>
                 Empezar gratis →
               </Link>
               <a href="#funciones" style={{ padding: '20px 36px', borderRadius: 9999, border: '1.5px solid rgba(255,255,255,0.22)', background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.78)', fontWeight: 400, fontSize: 15, textDecoration: 'none', fontFamily: SANS, display: 'inline-flex', alignItems: 'center', gap: 9 }}>
@@ -951,7 +951,7 @@ export default function Landing() {
 
       {/* ─────────────── 16. FOOTER ─────────────── */}
       <footer style={{ background: '#F8F4ED', padding: '64px 32px 48px', borderTop: `1px solid rgba(8,127,112,0.08)` }}>
-        <div style={{ maxWidth: 1140, margin: '0 auto' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 48, marginBottom: 52 }}>
             <div style={{ flex: '0 0 auto', maxWidth: 280 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, padding: '4px 0' }}>
