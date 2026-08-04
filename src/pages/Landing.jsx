@@ -282,7 +282,7 @@ export default function Landing() {
 
       {/* ─────────────── 1. NAV ─────────────── */}
       <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: '#F8F4ED', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(20,60,50,0.08)', boxShadow: '0 1px 8px rgba(20,60,50,0.06)' }}>
-        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '20px 2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24 }}>
+        <div style={{ maxWidth: 1440, margin: '0 auto', padding: '20px 2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24 }}>
           <div style={{ display:'flex', alignItems:'center', gap:'12px', flexShrink: 0 }}>
             <img src="/logo.png" alt="FamiliaCerca" style={{ width: 44, height: 44, objectFit: 'contain', display: 'block' }} />
             <span style={{ fontFamily:"'Plus Jakarta Sans', sans-serif", fontWeight:700, margin:0, padding:0 }}>
@@ -425,7 +425,7 @@ export default function Landing() {
 
       {/* ─────────────── 4. ANTES / AHORA ─────────────── */}
       <section style={{ background: CREAM, padding: '88px 32px', borderBottom: `1px solid ${BORDER}` }}>
-        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+        <div style={{ maxWidth: 1440, margin: '0 auto' }}>
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 52 }}>
             <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(28px,3.9vw,50px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.15, margin: 0 }}>
               Lo que cambia desde el primer día
@@ -457,7 +457,7 @@ export default function Landing() {
       {/* Reubicada antes de Problema/Solución (junto con la sección de IA que
           sigue) — es el diferenciador del producto, debe leerse temprano. */}
       <section style={{ background: PRIMARY, padding: '110px 32px' }}>
-        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+        <div style={{ maxWidth: 1440, margin: '0 auto' }}>
           <div className="reveal" style={{ textAlign: 'center', maxWidth: 560, margin: '0 auto 56px' }}>
             <p style={{ fontSize: 13, fontWeight: 500, color: GOLD, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>El cambio real</p>
             <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(28px,3.9vw,52px)', fontWeight: 600, color: WHITE, lineHeight: 1.15, margin: 0 }}>
@@ -482,7 +482,7 @@ export default function Landing() {
           requieran atención"): solo hechos verificables que la familia ya
           registró. La familia decide qué significan, Milo no interpreta. */}
       <section style={{ background: WHITE, padding: '110px 32px' }}>
-        <div className="landing-ai-grid" style={{ maxWidth: 1280, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 64, flexWrap: 'wrap' }}>
+        <div className="landing-ai-grid" style={{ maxWidth: 1440, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 64, flexWrap: 'wrap' }}>
           <div className="ai-visual-col" style={{ flex: '0 0 340px', maxWidth: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <div style={{ width: 210, borderRadius: 22, alignSelf: 'flex-start', marginLeft: 14, background: 'linear-gradient(160deg, rgba(117,102,216,0.09), rgba(167,154,234,0.05))', border: '1px solid rgba(117,102,216,0.18)', padding: 18, boxShadow: '0 16px 44px rgba(117,102,216,0.16)' }}>
               <img src={MILO_LUNA_IMG} alt="Milo y Luna, los compañeros de inteligencia artificial de FamiliaCerca" style={{ width: '100%', display: 'block' }} />
@@ -572,7 +572,7 @@ export default function Landing() {
 
       {/* ─────────────── 5.5. LA SOLUCIÓN ─────────────── */}
       <section style={{ background: CREAM, padding: 'clamp(96px,10vw,140px) 32px' }}>
-        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+        <div style={{ maxWidth: 1440, margin: '0 auto' }}>
           <div className="reveal" style={{ maxWidth: 600, margin: '0 auto 60px', textAlign: 'center' }}>
             <p style={{ fontSize: 13, fontWeight: 500, color: ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 18px', fontFamily: SANS }}>La solución</p>
             <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(28px,3.9vw,52px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.15, margin: 0 }}>
@@ -600,7 +600,7 @@ export default function Landing() {
       {/* ─────────────── 7. FEATURES ─────────────── */}
       <section id="funciones" style={{ padding: '110px 32px', background: CREAM, position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: 800, height: 400, pointerEvents: 'none', background: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(13,107,99,0.05) 0%, transparent 70%)' }} />
-        <div style={{ maxWidth: 1280, margin: '0 auto', position: 'relative' }}>
+        <div style={{ maxWidth: 1440, margin: '0 auto', position: 'relative' }}>
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 64 }}>
             <p style={{ fontSize: 13, fontWeight: 500, color: ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>Funciones</p>
             <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(32px,4.8vw,64px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.1, margin: '0 0 20px' }}>
@@ -643,7 +643,7 @@ export default function Landing() {
 
       {/* ─────────────── 9. HOW IT WORKS ─────────────── */}
       <section id="como" style={{ padding: '128px 32px', background: SAND }}>
-        <div style={{ maxWidth: 1280, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 88, flexWrap: 'wrap' }} className="como-grid">
+        <div style={{ maxWidth: 1440, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 88, flexWrap: 'wrap' }} className="como-grid">
           <div style={{ flex: '1 1 360px' }}>
             <p style={{ fontSize: 13, fontWeight: 500, color: ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 18px', fontFamily: SANS }}>Cómo funciona</p>
             <h2 className="reveal" style={{ fontFamily: SERIF, fontSize: 'clamp(32px,4.8vw,64px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.12, margin: '0 0 52px' }}>
@@ -680,7 +680,7 @@ export default function Landing() {
 
       {/* ─────────────── 9.5. PARA QUIÉN ES ─────────────── */}
       <section style={{ background: CREAM, padding: '112px 32px' }}>
-        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+        <div style={{ maxWidth: 1440, margin: '0 auto' }}>
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 56 }}>
             <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(30px,4.5vw,60px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.15, margin: 0 }}>
               FamiliaCerca es para ti si…
@@ -743,7 +743,7 @@ export default function Landing() {
 
       {/* ─────────────── 11. TESTIMONIOS ─────────────── */}
       <section style={{ padding: '128px 32px', background: CREAM }}>
-        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+        <div style={{ maxWidth: 1440, margin: '0 auto' }}>
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 72 }}>
             <p style={{ fontSize: 13, fontWeight: 500, color: GOLD, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>Testimonios</p>
             <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(32px,5.1vw,68px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.1, margin: 0 }}>
@@ -808,7 +808,7 @@ export default function Landing() {
 
       {/* ─────────────── 12. PRECIOS ─────────────── */}
       <section id="precios" style={{ padding: '128px 32px', background: CREAM }}>
-        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+        <div style={{ maxWidth: 1440, margin: '0 auto' }}>
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 52 }}>
             <p style={{ fontSize: 13, fontWeight: 500, color: ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>Precios</p>
             <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(32px,5.1vw,68px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.1, margin: '0 0 16px' }}>Simple y transparente</h2>
@@ -928,7 +928,7 @@ export default function Landing() {
         <img src={CTA_IMG} alt="" aria-hidden="true" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'rgba(20,60,50,0.88)' }} />
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(20,60,50,0.65) 0%, transparent 55%)' }} />
-        <div style={{ position: 'relative', zIndex: 1, maxWidth: 1280, margin: '0 auto', width: '100%' }}>
+        <div style={{ position: 'relative', zIndex: 1, maxWidth: 1440, margin: '0 auto', width: '100%' }}>
           <div style={{ maxWidth: 680 }}>
             <p style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 20px', fontFamily: SANS }}>Empieza hoy</p>
             <h2 className="reveal" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(44px,7.3vw,96px)', fontWeight: 700, color: WHITE, lineHeight: 1.02, margin: '0 0 24px' }}>
@@ -951,7 +951,7 @@ export default function Landing() {
 
       {/* ─────────────── 16. FOOTER ─────────────── */}
       <footer style={{ background: '#F8F4ED', padding: '64px 32px 48px', borderTop: `1px solid rgba(8,127,112,0.08)` }}>
-        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+        <div style={{ maxWidth: 1440, margin: '0 auto' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 48, marginBottom: 52 }}>
             <div style={{ flex: '0 0 auto', maxWidth: 280 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, padding: '4px 0' }}>
