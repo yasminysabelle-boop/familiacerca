@@ -482,7 +482,7 @@ export default function Landing() {
           requieran atención"): solo hechos verificables que la familia ya
           registró. La familia decide qué significan, Milo no interpreta. */}
       <section style={{ background: WHITE, padding: '110px 32px' }}>
-        <div style={{ maxWidth: 1280, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 64, flexWrap: 'wrap' }}>
+        <div className="landing-ai-grid" style={{ maxWidth: 1280, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 64, flexWrap: 'wrap' }}>
           <div className="ai-visual-col" style={{ flex: '0 0 340px', maxWidth: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <div style={{ width: 210, borderRadius: 22, alignSelf: 'flex-start', marginLeft: 14, background: 'linear-gradient(160deg, rgba(117,102,216,0.09), rgba(167,154,234,0.05))', border: '1px solid rgba(117,102,216,0.18)', padding: 18, boxShadow: '0 16px 44px rgba(117,102,216,0.16)' }}>
               <img src={MILO_LUNA_IMG} alt="Milo y Luna, los compañeros de inteligencia artificial de FamiliaCerca" style={{ width: '100%', display: 'block' }} />
@@ -529,11 +529,11 @@ export default function Landing() {
 
       {/* ─────────────── 5. PROBLEM SPLIT ─────────────── */}
       <section style={{ overflow: 'hidden' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }} className="landing-problema-grid">
+        <div style={{ display: 'grid', gridTemplateColumns: '42% 58%' }} className="landing-problema-grid">
           <div style={{ position: 'relative', minHeight: 700, overflow: 'hidden' }} className="landing-problema-img">
             <img src={PROB_IMG} alt="El reto del cuidado familiar" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }} />
           </div>
-          <div style={{ background: PRIMARY, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 'clamp(56px,8vw,96px) clamp(36px,6vw,80px)' }}>
+          <div className="landing-problema-text" style={{ background: PRIMARY, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 'clamp(56px,8vw,96px) clamp(36px,6vw,80px)' }}>
             <p style={{ fontSize: 13, fontWeight: 500, color: GOLD, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 20px', fontFamily: SANS }}>El problema</p>
             <h2 className="reveal" style={{ fontFamily: SERIF, fontSize: 'clamp(32px,4.5vw,60px)', fontWeight: 600, color: WHITE, lineHeight: 1.12, margin: '0 0 44px' }}>
               Son las 8:30 de la noche, y nadie sabe qué está pasando.
@@ -750,9 +750,9 @@ export default function Landing() {
               Familias que cuidan mejor juntas
             </h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }} className="testimonios-grid">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }} className="testimonios-grid">
             {(showAllTestimonials ? testimonials : testimonials.slice(0, 3)).map((t, i) => (
-              <div key={t.name} className={i >= 3 ? 'testimonios-expand' : `reveal reveal-delay-${i % 3}`} style={{ background: PRIMARY, borderRadius: 20, border: `1px solid rgba(13,107,99,0.28)`, padding: '32px 28px', boxShadow: '0 12px 32px rgba(20,60,50,0.12)', display: 'flex', flexDirection: 'column' }}>
+              <div key={t.name} className={`testimonio-item ${i % 2 === 0 ? 'testimonio-left' : 'testimonio-right'} ${i >= 3 ? 'testimonios-expand' : `reveal reveal-delay-${i % 3}`}`} style={{ background: PRIMARY, borderRadius: 20, border: `1px solid rgba(13,107,99,0.28)`, padding: '32px 28px', boxShadow: '0 12px 32px rgba(20,60,50,0.12)', display: 'flex', flexDirection: 'column' }}>
                 <div style={{ display: 'flex', gap: 3, marginBottom: 14 }}>
                   {[1,2,3,4,5].map(s => <span key={s} style={{ color: CORAL, fontSize: 13 }}>★</span>)}
                 </div>
@@ -1078,6 +1078,18 @@ export default function Landing() {
         .para-quien-card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(20,60,50,0.12); }
 
         .testimonios-expand { animation: fadeInUp 0.5s cubic-bezier(0.16,1,0.3,1) both; }
+        .testimonio-item { width: 100%; max-width: 680px; }
+        .testimonio-left  { margin-right: auto; }
+        .testimonio-right { margin-left: auto; }
+
+        /* Problema: la foto pasa a la derecha (order, no se toca el DOM) para
+           alternar con la sección de IA, que la tiene a la izquierda. */
+        .landing-problema-img  { order: 2; }
+        .landing-problema-text { order: 1; }
+
+        @media (min-width: 769px) {
+          .landing-ai-grid { justify-content: space-between !important; }
+        }
 
         @keyframes badge-pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(233,130,110,0.55); } 70% { box-shadow: 0 0 0 10px rgba(233,130,110,0); } 100% { box-shadow: 0 0 0 0 rgba(233,130,110,0); } }
         .badge-pulse-anim { animation: badge-pulse-ring 2s cubic-bezier(0.66,0,0,1) infinite; }
@@ -1112,10 +1124,12 @@ export default function Landing() {
           .landing-hero-right { display: none !important; }
           .landing-hero-text { padding: 80px 24px 64px !important; min-height: auto !important; }
           .landing-problema-grid { grid-template-columns: 1fr !important; }
-          .landing-problema-img { min-height: 300px !important; }
+          .landing-problema-img { min-height: 300px !important; order: 0 !important; }
+          .landing-problema-text { order: 0 !important; }
+          .landing-ai-grid { justify-content: center !important; }
           .como-grid { flex-direction: column !important; gap: 52px !important; }
           .como-img { display: none !important; }
-          .testimonios-grid { grid-template-columns: 1fr !important; }
+          .testimonio-item { max-width: 100% !important; margin-left: 0 !important; margin-right: 0 !important; }
           .antes-ahora-grid { grid-template-columns: 1fr !important; }
           .solution-steps-grid { grid-template-columns: 1fr !important; gap: 44px !important; }
           .solution-steps-line { display: none !important; }
