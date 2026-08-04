@@ -433,7 +433,7 @@ export default function Landing() {
           </div>
           <div className="antes-ahora-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 22 }}>
             {antesAhora.map((c, i) => (
-              <div key={c.title} className={`reveal reveal-delay-${i}`} style={{ background: WHITE, borderRadius: 20, border: `1px solid ${BORDER}`, boxShadow: '0 4px 20px rgba(13,107,99,0.06)', overflow: 'hidden' }}>
+              <div key={c.title} className={`reveal reveal-delay-${i} card-hover-lift`} style={{ background: WHITE, borderRadius: 20, border: `1px solid ${BORDER}`, boxShadow: '0 4px 20px rgba(13,107,99,0.06)', overflow: 'hidden' }}>
                 <div style={{ fontSize: 26, padding: '22px 22px 0' }}>{c.icon}</div>
                 <p style={{ fontFamily: SERIF, fontSize: 15.5, fontWeight: 700, color: PRIMARY, padding: '8px 22px 18px', margin: 0 }}>{c.title}</p>
                 <div className="antes-ahora-split" style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'stretch' }}>
@@ -483,7 +483,7 @@ export default function Landing() {
           registró. La familia decide qué significan, Milo no interpreta. */}
       <section style={{ background: WHITE, padding: '110px 32px' }}>
         <div className="landing-ai-grid" style={{ maxWidth: 1440, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 64, flexWrap: 'wrap' }}>
-          <div className="ai-visual-col" style={{ flex: '0 0 340px', maxWidth: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div className="ai-visual-col reveal" style={{ flex: '0 0 340px', maxWidth: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <div style={{ width: 210, borderRadius: 22, alignSelf: 'flex-start', marginLeft: 14, background: 'linear-gradient(160deg, rgba(117,102,216,0.09), rgba(167,154,234,0.05))', border: '1px solid rgba(117,102,216,0.18)', padding: 18, boxShadow: '0 16px 44px rgba(117,102,216,0.16)' }}>
               <img src={MILO_LUNA_IMG} alt="Milo y Luna, los compañeros de inteligencia artificial de FamiliaCerca" style={{ width: '100%', display: 'block' }} />
             </div>
@@ -530,7 +530,7 @@ export default function Landing() {
       {/* ─────────────── 5. PROBLEM SPLIT ─────────────── */}
       <section style={{ overflow: 'hidden' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '42% 58%' }} className="landing-problema-grid">
-          <div style={{ position: 'relative', minHeight: 700, overflow: 'hidden' }} className="landing-problema-img">
+          <div style={{ position: 'relative', minHeight: 700, overflow: 'hidden' }} className="landing-problema-img reveal">
             <img src={PROB_IMG} alt="El reto del cuidado familiar" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }} />
           </div>
           <div className="landing-problema-text" style={{ background: PRIMARY, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 'clamp(56px,8vw,96px) clamp(36px,6vw,80px)' }}>
@@ -612,7 +612,7 @@ export default function Landing() {
           </div>
           <div className="features-6-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 22 }}>
             {featureCards.map((f, i) => (
-              <div key={f.title} className={`reveal reveal-delay-${i % 3}`} style={{
+              <div key={f.title} className={`reveal reveal-delay-${i % 3} card-hover-lift`} style={{
                 background: f.emergency ? 'linear-gradient(180deg, #FFF5F4 0%, #FFFFFF 60%)' : WHITE,
                 borderRadius: 20,
                 border: f.emergency ? '1px solid rgba(217,83,79,0.30)' : `1px solid rgba(13,107,99,0.16)`,
@@ -752,7 +752,7 @@ export default function Landing() {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }} className="testimonios-grid">
             {(showAllTestimonials ? testimonials : testimonials.slice(0, 3)).map((t, i) => (
-              <div key={t.name} className={i >= 3 ? 'testimonios-expand' : `reveal reveal-delay-${i % 3}`} style={{ background: PRIMARY, borderRadius: 20, border: `1px solid rgba(13,107,99,0.28)`, padding: '32px 28px', boxShadow: '0 12px 32px rgba(20,60,50,0.12)', display: 'flex', flexDirection: 'column' }}>
+              <div key={t.name} className={`card-hover-lift ${i >= 3 ? 'testimonios-expand' : `reveal reveal-delay-${i % 3}`}`} style={{ background: PRIMARY, borderRadius: 20, border: `1px solid rgba(13,107,99,0.28)`, padding: '32px 28px', boxShadow: '0 12px 32px rgba(20,60,50,0.12)', display: 'flex', flexDirection: 'column' }}>
                 <div style={{ display: 'flex', gap: 3, marginBottom: 14 }}>
                   {[1,2,3,4,5].map(s => <span key={s} style={{ color: CORAL, fontSize: 13 }}>★</span>)}
                 </div>
@@ -938,10 +938,10 @@ export default function Landing() {
               Deja atrás la carga de tener que informar a todos. En 3 minutos tu familia tiene un solo lugar para coordinar el cuidado — gratis, sin tarjeta.
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14 }}>
-              <Link to="/register" style={{ padding: '20px 52px', borderRadius: 9999, background: WHITE, color: ACTION, fontWeight: 500, fontSize: 'clamp(18px,1.6vw,21px)', textDecoration: 'none', fontFamily: SANS, letterSpacing: '0.02em', boxShadow: '0 16px 56px rgba(0,0,0,0.28)', display: 'inline-flex', alignItems: 'center', gap: 10 }}>
+              <Link to="/register" className="cta-coral" style={{ padding: '20px 52px', borderRadius: 9999, background: WHITE, color: ACTION, fontWeight: 500, fontSize: 'clamp(18px,1.6vw,21px)', textDecoration: 'none', fontFamily: SANS, letterSpacing: '0.02em', boxShadow: '0 16px 56px rgba(0,0,0,0.28)', display: 'inline-flex', alignItems: 'center', gap: 10 }}>
                 Empezar gratis →
               </Link>
-              <a href="#funciones" style={{ padding: '20px 36px', borderRadius: 9999, border: '1.5px solid rgba(255,255,255,0.22)', background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.78)', fontWeight: 400, fontSize: 15, textDecoration: 'none', fontFamily: SANS, display: 'inline-flex', alignItems: 'center', gap: 9 }}>
+              <a href="#funciones" className="cta-coral" style={{ padding: '20px 36px', borderRadius: 9999, border: '1.5px solid rgba(255,255,255,0.22)', background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.78)', fontWeight: 400, fontSize: 15, textDecoration: 'none', fontFamily: SANS, display: 'inline-flex', alignItems: 'center', gap: 9 }}>
                 <span style={{ fontSize: 11 }}>▶</span> Ver funciones
               </a>
             </div>
@@ -951,7 +951,7 @@ export default function Landing() {
 
       {/* ─────────────── 16. FOOTER ─────────────── */}
       <footer style={{ background: '#F8F4ED', padding: '64px 32px 48px', borderTop: `1px solid rgba(8,127,112,0.08)` }}>
-        <div style={{ maxWidth: 1440, margin: '0 auto' }}>
+        <div className="reveal" style={{ maxWidth: 1440, margin: '0 auto' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 48, marginBottom: 52 }}>
             <div style={{ flex: '0 0 auto', maxWidth: 280 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, padding: '4px 0' }}>
@@ -1077,6 +1077,11 @@ export default function Landing() {
         .para-quien-card { transition: transform 0.25s ease, box-shadow 0.25s ease; }
         .para-quien-card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(20,60,50,0.12); }
 
+        /* Mismo lift+shadow de .para-quien-card, reutilizado tal cual en
+           Funciones, Testimonios y Antes/Ahora para consistencia. */
+        .card-hover-lift { transition: transform 0.25s ease, box-shadow 0.25s ease; }
+        .card-hover-lift:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(20,60,50,0.12); }
+
         .testimonios-expand { animation: fadeInUp 0.5s cubic-bezier(0.16,1,0.3,1) both; }
 
         /* Problema: la foto pasa a la derecha (order, no se toca el DOM) para
@@ -1110,8 +1115,6 @@ export default function Landing() {
 
         .cta-coral { transition: background 0.2s ease !important; }
         .cta-coral:hover { background: #D86F5A !important; }
-        .btn-outlined-teal { transition: background 0.2s ease, color 0.2s ease; }
-        .btn-outlined-teal:hover { background: #087F70 !important; color: white !important; }
         .btn-nav-cream { transition: background 0.2s ease, color 0.2s ease; }
         .btn-nav-cream:hover { background: #087F70 !important; color: #F8F4ED !important; }
 
