@@ -750,9 +750,9 @@ export default function Landing() {
               Familias que cuidan mejor juntas
             </h2>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }} className="testimonios-grid">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }} className="testimonios-grid">
             {(showAllTestimonials ? testimonials : testimonials.slice(0, 3)).map((t, i) => (
-              <div key={t.name} className={`testimonio-item ${i % 2 === 0 ? 'testimonio-left' : 'testimonio-right'} ${i >= 3 ? 'testimonios-expand' : `reveal reveal-delay-${i % 3}`}`} style={{ background: PRIMARY, borderRadius: 20, border: `1px solid rgba(13,107,99,0.28)`, padding: '32px 28px', boxShadow: '0 12px 32px rgba(20,60,50,0.12)', display: 'flex', flexDirection: 'column' }}>
+              <div key={t.name} className={i >= 3 ? 'testimonios-expand' : `reveal reveal-delay-${i % 3}`} style={{ background: PRIMARY, borderRadius: 20, border: `1px solid rgba(13,107,99,0.28)`, padding: '32px 28px', boxShadow: '0 12px 32px rgba(20,60,50,0.12)', display: 'flex', flexDirection: 'column' }}>
                 <div style={{ display: 'flex', gap: 3, marginBottom: 14 }}>
                   {[1,2,3,4,5].map(s => <span key={s} style={{ color: CORAL, fontSize: 13 }}>★</span>)}
                 </div>
@@ -1078,9 +1078,6 @@ export default function Landing() {
         .para-quien-card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(20,60,50,0.12); }
 
         .testimonios-expand { animation: fadeInUp 0.5s cubic-bezier(0.16,1,0.3,1) both; }
-        .testimonio-item { width: 100%; max-width: 680px; }
-        .testimonio-left  { margin-right: auto; }
-        .testimonio-right { margin-left: auto; }
 
         /* Problema: la foto pasa a la derecha (order, no se toca el DOM) para
            alternar con la sección de IA, que la tiene a la izquierda. */
@@ -1133,7 +1130,7 @@ export default function Landing() {
           .landing-ai-grid { justify-content: center !important; }
           .como-grid { flex-direction: column !important; gap: 52px !important; }
           .como-img { display: none !important; }
-          .testimonio-item { max-width: 100% !important; margin-left: 0 !important; margin-right: 0 !important; }
+          .testimonios-grid { grid-template-columns: 1fr !important; }
           .antes-ahora-grid { grid-template-columns: 1fr !important; }
           .solution-steps-grid { grid-template-columns: 1fr !important; gap: 44px !important; }
           .solution-steps-line { display: none !important; }
