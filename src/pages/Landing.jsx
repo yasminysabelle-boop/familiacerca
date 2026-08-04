@@ -1087,8 +1087,12 @@ export default function Landing() {
         .landing-problema-img  { order: 2; }
         .landing-problema-text { order: 1; }
 
-        @media (min-width: 769px) {
-          .landing-ai-grid { justify-content: space-between !important; }
+        /* 2 columnas reales solo desde 1024px: por debajo, el contenido
+           mínimo (imagen fija de 340px + encabezado largo) no cabe junto al
+           texto y flex-wrap los envuelve de todos modos — verificado que
+           colapsa a una columna incluso a 900px si se fuerza antes. */
+        @media (min-width: 1024px) {
+          .landing-ai-grid { flex-wrap: nowrap !important; justify-content: space-between !important; }
         }
 
         @keyframes badge-pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(233,130,110,0.55); } 70% { box-shadow: 0 0 0 10px rgba(233,130,110,0); } 100% { box-shadow: 0 0 0 0 rgba(233,130,110,0); } }
