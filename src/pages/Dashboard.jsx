@@ -1749,7 +1749,7 @@ function activityAction(evt) {
   return (ACTIVITY_ACTIONS[evt.type] ?? (() => 'registró actividad'))(evt)
 }
 
-function RecentActivity({ items, onViewAll, onSelect, firstName, summaryText, summaryEmpty }) {
+function RecentActivity({ items, onViewAll, onSelect, firstName, summaryText, summaryEmpty, summaryStale }) {
   return (
     <section aria-label="Actividad reciente" style={{ borderRadius: 26, background: 'white', padding: 20, boxShadow: '0 6px 24px -12px rgba(51,65,85,0.18)' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
@@ -1764,6 +1764,11 @@ function RecentActivity({ items, onViewAll, onSelect, firstName, summaryText, su
           <p style={{ margin: '4px 0 0', fontSize: 13.5, color: '#475569', lineHeight: 1.5 }}>
             {summaryEmpty ? 'Aún no hay registros del día.' : summaryText}
           </p>
+          {!summaryEmpty && summaryStale && (
+            <p style={{ margin: '6px 0 0', fontSize: 11.5, color: '#7C8698', lineHeight: 1.4, fontStyle: 'italic' }}>
+              Este resumen es de hoy, generado más temprano. Mañana Milo lo actualiza con lo último.
+            </p>
+          )}
         </div>
       )}
       {items.length === 0 ? (
@@ -1856,7 +1861,7 @@ export default function Dashboard() {
   const [startingInstantCall, setStartingInstantCall] = useState(false)
   const [instantCallError, setInstantCallError] = useState('')
   const [renewalAlerts, setRenewalAlerts] = useState([])
-  const { refresh: refreshSub } = useSubscription()
+  const { sub, loading: subLoading, refresh: refreshSub } = useSubscription()
   const [searchParams, setSearchParams] = useSearchParams()
 
   const [sections, setSections] = useState([])
@@ -1876,6 +1881,7 @@ export default function Dashboard() {
   const [sosConfirming, setSosConfirming] = useState(false)
   const [aiCards, setAiCards] = useState({})
   const [activitySummaryText, setActivitySummaryText] = useState(null)
+  const [activitySummaryStale, setActivitySummaryStale] = useState(false)
   const [checkoutSuccess, setCheckoutSuccess] = useState(false)
   const [reactions, setReactions] = useState({})
   const [sosLocation, setSosLocation] = useState(null)
@@ -3006,8 +3012,13 @@ export default function Dashboard() {
   // igual mostraba "Aún no hay registros del día" por encima.
   const hasSignal = todaysActivityItems.length > 0 || pendingMedLines.length > 0 || missedMedLines.length > 0 || !!moodLine || !!routineLine
   useEffect(() => {
-    if (loading || !ownerId || !hasSignal || isHospitalMode) {
+    // subLoading incluido a propósito: hasta que el plan no se resuelve no
+    // sabemos si aplica el límite de 1/día del plan Gratis — disparar antes
+    // arriesgaría una llamada a Gemini de más (o un gate de menos) mientras
+    // sub todavía es null.
+    if (loading || subLoading || !ownerId || !hasSignal || isHospitalMode) {
       setActivitySummaryText(null)
+      setActivitySummaryStale(false)
       return
     }
     let cancelled = false
@@ -3025,15 +3036,21 @@ export default function Dashboard() {
         doneLines,
         pendingLines,
         missedLines: missedMedLines,
+        plan: sub?.plan,
       })
-        .then(text => { if (!cancelled) setActivitySummaryText(text) })
-        .catch(() => { if (!cancelled) setActivitySummaryText(null) })
+        .then(result => {
+          if (cancelled) return
+          setActivitySummaryText(result?.text ?? null)
+          setActivitySummaryStale(!!result?.isStale)
+        })
+        .catch(() => { if (!cancelled) { setActivitySummaryText(null); setActivitySummaryStale(false) } })
     } catch {
       setActivitySummaryText(null)
+      setActivitySummaryStale(false)
     }
     return () => { cancelled = true }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading, ownerId, isHospitalMode, hasSignal, activityLatestEventMs, todaysActivityItems.length, pendingMedLines.length, missedMedLines.length, moodLine, routineLine, routinePending, dashPatientName])
+  }, [loading, subLoading, ownerId, isHospitalMode, hasSignal, activityLatestEventMs, todaysActivityItems.length, pendingMedLines.length, missedMedLines.length, moodLine, routineLine, routinePending, dashPatientName, sub?.plan])
 
   // Cuidado de hoy card status
   let careStatus, careStatusType
@@ -3411,6 +3428,7 @@ export default function Dashboard() {
                   firstName={firstName}
                   summaryText={loading ? null : activitySummaryText}
                   summaryEmpty={!loading && !hasSignal}
+                  summaryStale={!loading && activitySummaryStale}
                 />
 
                 {/* ══ MILO Y LUNA (v0: PetsCard) ══ */}

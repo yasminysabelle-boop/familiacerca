@@ -11,6 +11,7 @@
 
 import { supabase } from './supabase'
 import { geminiGenerate } from './gemini'
+import { getTodayPR, getDatePR } from './utils'
 
 const RULES = `Reglas (innegociables):
 - Responde SOLO con los hechos presentes en los eventos de hoy listados abajo. Si algo no está ahí, no lo menciones. NUNCA inventes.
@@ -31,7 +32,16 @@ const RULES = `Reglas (innegociables):
 
 // doneLines/pendingLines/missedLines: arrays de strings ya humanizados, en el
 // mismo texto que ve el usuario en las pantallas correspondientes.
-export async function getActivitySummary({ ownerId, patientName, doneLines = [], pendingLines = [], missedLines = [] }) {
+// plan: 'free' | 'familiar' | 'care_plus' — el plan Gratis se limita a 1
+// generación por día PR (ver bloque de gate abajo); Familiar y Cuidado Total
+// no cambian de comportamiento (cache por contenido, sin límite de fecha).
+//
+// Retorno: { text, isStale } en vez de un string plano — isStale es true
+// cuando lo que se está devolviendo es el resumen ya generado hoy del plan
+// Gratis pero la actividad real ya cambió desde entonces (cache_key
+// diverge), para que el llamador pueda mostrar una línea aclaratoria. null
+// si no hay nada que narrar o si la generación falla.
+export async function getActivitySummary({ ownerId, patientName, doneLines = [], pendingLines = [], missedLines = [], plan }) {
   if (!ownerId || (!doneLines.length && !pendingLines.length && !missedLines.length)) return null
 
   // Clave por contenido, no por conteo: cualquier línea que pueda cambiar el
@@ -47,8 +57,20 @@ export async function getActivitySummary({ ownerId, patientName, doneLines = [],
       .from('care_profiles').select('activity_summary').eq('user_id', ownerId).maybeSingle()
 
     const cached = careProfile?.activity_summary
+
+    // Gate de plan Gratis: 1 generación por día PR, sin importar cuántas
+    // veces cambie la actividad ese mismo día — a diferencia del cache por
+    // contenido de abajo (que sí regenera ante cualquier cambio), aquí el
+    // gate por fecha manda. Si ya pasó el día PR del último generated_at,
+    // este bloque no aplica y sigue el flujo normal (que regenerará porque
+    // es contenido de un día nuevo).
+    const cachedIsFromTodayPR = cached?.generated_at && getDatePR(cached.generated_at) === getTodayPR()
+    if (plan === 'free' && cachedIsFromTodayPR && cached?.text) {
+      return { text: cached.text, isStale: cached.cache_key !== cacheKey }
+    }
+
     if (cached?.text && cached?.cache_key === cacheKey) {
-      return cached.text
+      return { text: cached.text, isStale: false }
     }
 
     const sections = []
@@ -71,7 +93,7 @@ ${sections.join('\n\n')}`
       .eq('user_id', ownerId)
       .then(({ error }) => { if (error) console.warn('[activitySummary] cache write failed:', error.message) })
 
-    return text
+    return { text, isStale: false }
   } catch (e) {
     console.error('[activitySummary] failed:', e)
     return null
