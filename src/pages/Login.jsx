@@ -129,6 +129,7 @@ export default function Login() {
       display: 'flex',
       flexDirection: 'column',
       background: '#0A0A0A',
+      overflow: 'hidden',
     }}>
       {/* Hero photo — caja limitada al 60% superior de la pantalla (no a
           inset:0) para que quede margen vertical real donde recortar. La

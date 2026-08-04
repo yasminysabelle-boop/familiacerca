@@ -72,7 +72,7 @@ export default function WelcomeSlides({ onDone }) {
 
   return (
     <div
-      style={{ position: 'fixed', inset: 0, zIndex: 9999, touchAction: 'pan-y' }}
+      style={{ position: 'fixed', inset: 0, zIndex: 9999, touchAction: 'pan-y', overflow: 'hidden' }}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
