@@ -10,10 +10,12 @@ import { getLocation } from '../lib/gps'
 import MicButton from '../components/MicButton'
 import { useSpeechToText } from '../hooks/useSpeechToText'
 import { Plus, XIcon } from '../components/Icons'
+import { INCIDENT_TYPES, incidentTypeInfo } from '../lib/incidentTypes'
+import EvidencePhoto from '../components/EvidencePhoto'
 
 const TAG_OPTIONS = ['Salud', 'Médico', 'Familia', 'Dieta', 'Ejercicio', 'Otro']
 
-const emptyForm = { title: '', content: '', tags: [] }
+const emptyForm = { title: '', content: '', tags: [], is_incident: false, incident_type: null, photo_url: null }
 
 const fieldStyle = {
   width: '100%', padding: '11px 14px', borderRadius: 12,
@@ -102,6 +104,12 @@ export default function Notes() {
     }))
   }
 
+  function toggleIncident() {
+    setForm(prev => prev.is_incident
+      ? { ...prev, is_incident: false, incident_type: null, photo_url: null }
+      : { ...prev, is_incident: true })
+  }
+
   function openAdd() {
     if (trialExpired && isAdmin) { setShowPaywall(true); return }
     setEditId(null)
@@ -111,16 +119,23 @@ export default function Notes() {
 
   function openEdit(note) {
     setEditId(note.id)
-    setForm({ title: note.title ?? '', content: note.content ?? '', tags: note.tags ?? [] })
+    setForm({
+      title: note.title ?? '', content: note.content ?? '', tags: note.tags ?? [],
+      is_incident: note.is_incident ?? false, incident_type: note.incident_type ?? null, photo_url: note.photo_url ?? null,
+    })
     setExpanded(null)
     setShowForm(true)
   }
 
   async function handleSubmit(e) {
     e.preventDefault()
+    if (form.is_incident && !form.incident_type) return
     setSaving(true)
     if (editId) {
-      await supabase.from('notes').update({ title: form.title, content: form.content, tags: form.tags }).eq('id', editId)
+      await supabase.from('notes').update({
+        title: form.title, content: form.content, tags: form.tags,
+        is_incident: form.is_incident, incident_type: form.incident_type, photo_url: form.photo_url,
+      }).eq('id', editId)
     } else {
       const loc = await getLocation()
       await supabase.from('notes').insert({
@@ -238,7 +253,12 @@ export default function Notes() {
               return (
                 <div
                   key={note.id}
-                  style={{ background: 'white', borderRadius: 16, border: '1px solid #EDE5D8', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
+                  style={{
+                    background: note.is_incident ? '#FEF2E8' : 'white',
+                    borderRadius: 16,
+                    border: note.is_incident ? '1px solid #F4A261' : '1px solid #EDE5D8',
+                    overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                  }}
                 >
                   {/* Card header */}
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: 4, padding: '14px 14px 14px 16px' }}>
@@ -253,6 +273,11 @@ export default function Notes() {
                         <span style={{ fontSize: 11, color: '#9CA3AF' }}>
                           {new Date(note.created_at).toLocaleDateString('es-US', { day: 'numeric', month: 'short', year: 'numeric' })}
                         </span>
+                        {note.is_incident && (
+                          <span style={{ fontSize: 10, fontWeight: 700, color: '#C2410C', background: '#FDE8D8', padding: '2px 8px', borderRadius: 20 }}>
+                            {incidentTypeInfo(note.incident_type).emoji} {incidentTypeInfo(note.incident_type).label}
+                          </span>
+                        )}
                         {note.tags?.map(tag => (
                           <span key={tag} style={{ fontSize: 10, fontWeight: 700, color: '#087F70', background: '#EBF3EE', padding: '2px 8px', borderRadius: 20 }}>
                             {tag}
@@ -305,6 +330,11 @@ export default function Notes() {
                       </p>
                       {note.address && (
                         <p style={{ fontSize: 11, color: '#9CA3AF', marginTop: 8 }}>📍 {note.address}</p>
+                      )}
+                      {note.photo_url && (
+                        <div style={{ marginTop: 8 }}>
+                          <EvidencePhoto photoUrl={note.photo_url} />
+                        </div>
                       )}
                     </div>
                   )}
@@ -381,6 +411,82 @@ export default function Notes() {
               </div>
 
               <div>
+                <button
+                  type="button"
+                  onClick={toggleIncident}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 10, width: '100%',
+                    padding: '12px 14px', borderRadius: 12,
+                    border: form.is_incident ? '1.5px solid #F4A261' : '1.5px solid #EDE5D8',
+                    background: form.is_incident ? '#FEF2E8' : '#FDFAF7',
+                    cursor: 'pointer', textAlign: 'left',
+                  }}
+                >
+                  <span style={{ fontSize: 20 }}>🩺</span>
+                  <span style={{ flex: 1 }}>
+                    <span style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#1A1A1A' }}>Evento agudo</span>
+                    <span style={{ display: 'block', fontSize: 11, color: '#9CA3AF' }}>Caída, ER/hospitalización, cambio de conducta...</span>
+                  </span>
+                  <span style={{
+                    width: 40, height: 22, borderRadius: 20, flexShrink: 0, position: 'relative',
+                    background: form.is_incident ? '#C2410C' : '#D1D5DB', transition: 'background 0.15s',
+                  }}>
+                    <span style={{
+                      position: 'absolute', top: 2, left: form.is_incident ? 20 : 2,
+                      width: 18, height: 18, borderRadius: '50%', background: 'white',
+                      transition: 'left 0.15s', boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+                    }} />
+                  </span>
+                </button>
+
+                {form.is_incident && (
+                  <div style={{ marginTop: 10 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginBottom: 10 }}>
+                      {INCIDENT_TYPES.map(t => {
+                        const isSelected = form.incident_type === t.value
+                        return (
+                          <button
+                            key={t.value}
+                            type="button"
+                            onClick={() => setForm(f => ({ ...f, incident_type: t.value }))}
+                            style={{
+                              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+                              padding: '10px 4px', borderRadius: 14,
+                              border: isSelected ? '2px solid #C2410C' : '1.5px solid #E5DDD2',
+                              background: isSelected ? '#FEF2E8' : 'white',
+                              cursor: 'pointer', transition: 'all 0.15s',
+                            }}
+                          >
+                            <span style={{ fontSize: 20 }}>{t.emoji}</span>
+                            <span style={{ fontSize: 10, fontWeight: 700, color: isSelected ? '#C2410C' : '#6B7280', textAlign: 'center', lineHeight: 1.2 }}>{t.label}</span>
+                          </button>
+                        )
+                      })}
+                    </div>
+                    {form.photo_url ? (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <img src={form.photo_url} alt="Preview" style={{ width: 64, height: 64, borderRadius: 10, objectFit: 'cover', border: '1.5px solid #EDE5D8' }} />
+                        <button
+                          type="button"
+                          onClick={() => setForm(f => ({ ...f, photo_url: null }))}
+                          style={{ background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 8, padding: '4px 10px', fontSize: 12, color: '#DC2626', cursor: 'pointer', fontWeight: 600 }}
+                        >
+                          Quitar foto
+                        </button>
+                      </div>
+                    ) : (
+                      <EvidencePhoto
+                        onPhotoCapture={url => setForm(f => ({ ...f, photo_url: url }))}
+                        label="Agregar foto"
+                        bucket="care-photos"
+                        pathPrefix={`notes/${ownerId}`}
+                      />
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <div>
                 <p style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8 }}>Etiquetas</p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                   {TAG_OPTIONS.map(tag => (
@@ -412,11 +518,11 @@ export default function Notes() {
                 </button>
                 <button
                   type="submit"
-                  disabled={saving || !canEdit}
+                  disabled={saving || !canEdit || (form.is_incident && !form.incident_type)}
                   onClick={!canEdit ? e => { e.preventDefault(); navigate('/upgrade') } : undefined}
                   style={{
                     flex: 2, padding: '13px', borderRadius: 14, border: 'none',
-                    background: (saving || !canEdit) ? '#D4C4B8' : 'linear-gradient(135deg, #0d6b63, #3A6347)',
+                    background: (saving || !canEdit || (form.is_incident && !form.incident_type)) ? '#D4C4B8' : 'linear-gradient(135deg, #0d6b63, #3A6347)',
                     color: 'white', fontWeight: 700, fontSize: 14,
                     cursor: saving ? 'not-allowed' : 'pointer',
                     boxShadow: saving ? 'none' : '0 6px 20px rgba(8,127,112,0.3)',

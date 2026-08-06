@@ -37,7 +37,6 @@ import VideoCall from './pages/VideoCall'
 import Admin from './pages/Admin'
 import DiarioMedico from './pages/DiarioMedico'
 import CareRecord from './pages/CareRecord'
-import Incidents from './pages/Incidents'
 import FamilyRoles from './pages/FamilyRoles'
 import { supabase } from './lib/supabase'
 import imgManos from './assets/images/splash-manos.png'
@@ -159,7 +158,7 @@ function AppShell() {
         <Route path="/admin"              element={<P><Admin /></P>} />
         <Route path="/diario-medico"      element={<P><DiarioMedico /></P>} />
         <Route path="/registros"          element={<P><CareRecord /></P>} />
-        <Route path="/incidentes"         element={<P><Incidents /></P>} />
+        <Route path="/incidentes"         element={<Navigate to="/notes" replace />} />
         <Route path="/terminos"    element={<TermsOfService />} />
         <Route path="/privacidad"  element={<PrivacyPolicy />} />
         <Route path="*"            element={<Navigate to="/login" replace />} />

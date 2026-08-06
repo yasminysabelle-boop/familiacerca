@@ -2329,11 +2329,12 @@ export default function Dashboard() {
         .eq('user_id', ownerId)
         .eq('log_date', todayKey),
 
-      supabase.from('incidents')
+      supabase.from('notes')
         .select('*')
-        .eq('owner_id', ownerId)
-        .gte('recorded_at', sevenAgoStartISO)
-        .order('recorded_at', { ascending: false })
+        .eq('user_id', ownerId)
+        .eq('is_incident', true)
+        .gte('created_at', sevenAgoStartISO)
+        .order('created_at', { ascending: false })
         .limit(20),
 
       supabase.from('care_records')
@@ -2553,16 +2554,16 @@ export default function Dashboard() {
       })
     }
 
-    // ── Incidents (caídas, fiebre, presión alta, agresividad...) ──
+    // ── Incidents (caídas, fiebre, presión alta, agresividad... — notas marcadas is_incident) ──
     for (const inc of (incidents ?? [])) {
-      const dateKey = toLocalDateKey(new Date(inc.recorded_at))
+      const dateKey = toLocalDateKey(new Date(inc.created_at))
       allEvents.push({
         id: `incident-${inc.id}`,
         type: 'INCIDENT',
-        timestamp: new Date(inc.recorded_at),
+        timestamp: new Date(inc.created_at),
         dateKey,
-        incidentType: inc.type,
-        incidentDescription: inc.description,
+        incidentType: inc.incident_type,
+        incidentDescription: inc.content,
         photoUrl: inc.photo_url,
       })
     }
