@@ -2,6 +2,10 @@
 // Deploy: supabase functions deploy send-med-notifications
 // Secrets: supabase secrets set VAPID_PUBLIC_KEY=... VAPID_PRIVATE_KEY=... VAPID_CONTACT_EMAIL=...
 // Cron: run every minute via pg_cron (see supabase/setup_cron.sql)
+// Auth: Authorization: Bearer <anon key> (gateway) + X-Cron-Secret: <CRON_SECRET>
+// — único caller legítimo es pg_cron, sin fallback de usuario (a diferencia de
+// send-daily-summary). Remediación del hallazgo de seguridad 2026-08
+// (verify_jwt estaba en false, sin ningún chequeo).
 //
 // Privacidad: los pushes nunca nombran el medicamento ni la dosis — se ven en
 // pantallas bloqueadas. El detalle vive dentro de la app.
@@ -32,6 +36,17 @@ function fmt12h(hhmm: string) {
 
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
+
+  // El gateway (verify_jwt:true) exige que Authorization sea un JWT real — un
+  // secreto random ahí lo rechaza antes de llegar aquí. El CRON_SECRET va en
+  // un header aparte que el gateway no toca.
+  const cronSecret = Deno.env.get('CRON_SECRET')
+  const token = req.headers.get('X-Cron-Secret') ?? ''
+  if (!cronSecret || token !== cronSecret) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+  }
 
   const vapidPublicKey  = Deno.env.get('VAPID_PUBLIC_KEY')
   const vapidPrivateKey = Deno.env.get('VAPID_PRIVATE_KEY')

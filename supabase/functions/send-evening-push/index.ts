@@ -4,6 +4,8 @@
 // Deploy: supabase functions deploy send-evening-push
 // Secrets: VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, VAPID_CONTACT_EMAIL
 // Cron: see supabase/setup_cron.sql (fc-evening-push-utc4 / fc-evening-push-utc5 / fc-evening-push-utc6)
+// Auth: Authorization: Bearer <anon key> (gateway) + X-Cron-Secret: <CRON_SECRET>
+// (único caller es pg_cron). Remediación del hallazgo de seguridad 2026-08.
 
 import webpush from 'npm:web-push@3.6.7'
 import { createClient } from 'npm:@supabase/supabase-js@2'
@@ -32,6 +34,14 @@ function sevenDaysAgo(): string {
 
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
+
+  const cronSecret = Deno.env.get('CRON_SECRET')
+  const token = req.headers.get('X-Cron-Secret') ?? ''
+  if (!cronSecret || token !== cronSecret) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+  }
 
   const vapidPublicKey  = Deno.env.get('VAPID_PUBLIC_KEY')
   const vapidPrivateKey = Deno.env.get('VAPID_PRIVATE_KEY')

@@ -1,7 +1,9 @@
 // FamiliaCerca — Daily Medication Summary Email
 // Runs at 8 pm via pg_cron or Supabase scheduled invocation.
 // Sends each family a summary of how many medications were taken today.
-// Auth: Authorization: Bearer <CRON_SECRET>  OR a valid user JWT (admin).
+// Auth: X-Cron-Secret: <CRON_SECRET> (pg_cron) OR Authorization: Bearer <JWT de
+// usuario válido> — Authorization con verify_jwt:true exige un JWT real, así
+// que el secreto de cron va en header aparte (ver X-Cron-Secret más abajo).
 // Deploy: supabase functions deploy send-daily-summary
 
 import { createClient } from 'npm:@supabase/supabase-js@2'
@@ -67,9 +69,12 @@ function summaryEmailHtml(
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
 
-  // Accept either CRON_SECRET (for scheduled invocations) or a valid user JWT
+  // Accept either CRON_SECRET (scheduled invocations, en header propio — Authorization
+  // con verify_jwt:true exige un JWT real, un secreto suelto ahí lo rechaza en el
+  // gateway antes de llegar acá) o un JWT de usuario válido.
   const authHeader = req.headers.get('Authorization') ?? ''
   const cronSecret = Deno.env.get('CRON_SECRET')
+  const cronHeader = req.headers.get('X-Cron-Secret') ?? ''
   const token = authHeader.replace('Bearer ', '')
 
   const supabase = createClient(
@@ -79,7 +84,7 @@ Deno.serve(async (req: Request) => {
 
   let authorized = false
 
-  if (cronSecret && token === cronSecret) {
+  if (cronSecret && cronHeader === cronSecret) {
     authorized = true
   } else {
     const { data: { user } } = await supabase.auth.getUser(token)
