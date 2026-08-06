@@ -4,6 +4,8 @@ import { supabase } from '../lib/supabase'
 import { useFamily } from '../contexts/FamilyContext'
 import { useAuth } from '../contexts/AuthContext'
 import VoiceRecorder from '../components/VoiceRecorder'
+import { INCIDENT_TYPES, incidentTypeInfo } from '../lib/incidentTypes'
+import EvidencePhoto from '../components/EvidencePhoto'
 
 function timeAgoEs(dateStr) {
   if (!dateStr) return ''
@@ -30,6 +32,9 @@ export default function NotasFamilia() {
   const [saving, setSaving]   = useState(false)
   const [saveError, setSaveError] = useState('')
   const [saved, setSaved]     = useState(false)
+  const [isIncident, setIsIncident]     = useState(false)
+  const [incidentType, setIncidentType] = useState(null)
+  const [photoUrl, setPhotoUrl]         = useState(null)
 
   // Historial
   const [notes, setNotes]       = useState([])
@@ -41,17 +46,27 @@ export default function NotasFamilia() {
     setContent(prev => prev ? prev + ' ' + text : text)
   }
 
+  function toggleIncident() {
+    if (isIncident) { setIsIncident(false); setIncidentType(null); setPhotoUrl(null) }
+    else setIsIncident(true)
+  }
+
   async function handleSave() {
     if (!content.trim()) { setSaveError('Agrega un texto o graba algo antes de guardar.'); return }
+    if (isIncident && !incidentType) { setSaveError('Elige qué tipo de evento agudo fue.'); return }
     setSaving(true); setSaveError('')
     const { error } = await supabase.from('notes').insert({
       user_id: ownerId,
       created_by_user_id: user.id,
       content: content.trim(),
+      is_incident: isIncident,
+      incident_type: isIncident ? incidentType : null,
+      photo_url: isIncident ? photoUrl : null,
     })
     setSaving(false)
     if (error) { setSaveError('Error al guardar. Intenta de nuevo.'); return }
-    setContent(''); setSaved(true)
+    setContent(''); setIsIncident(false); setIncidentType(null); setPhotoUrl(null)
+    setSaved(true)
     setTimeout(() => setSaved(false), 2500)
     loadNotes()
   }
@@ -61,7 +76,7 @@ export default function NotasFamilia() {
     setLoading(true)
     const { data } = await supabase
       .from('notes')
-      .select('id, title, content, created_at, created_by_user_id')
+      .select('id, title, content, created_at, created_by_user_id, is_incident, incident_type, photo_url')
       .eq('user_id', ownerId)
       .order('created_at', { ascending: false })
     const rows = data ?? []
@@ -170,6 +185,78 @@ export default function NotasFamilia() {
               }}
             />
 
+            {/* Evento agudo — toggle + subtipo + foto */}
+            <button
+              onClick={toggleIncident}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 10, width: '100%', boxSizing: 'border-box',
+                padding: '12px 14px', borderRadius: 14, marginBottom: isIncident ? 12 : 16,
+                border: isIncident ? '1.5px solid #F4A261' : '1.5px solid #DDD5C8',
+                background: isIncident ? '#FEF2E8' : 'white',
+                cursor: 'pointer', textAlign: 'left', fontFamily: 'inherit',
+              }}
+            >
+              <span style={{ fontSize: 20 }}>🩺</span>
+              <span style={{ flex: 1 }}>
+                <span style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#1E2D26' }}>Evento agudo</span>
+                <span style={{ display: 'block', fontSize: 11, color: '#9CA3AF' }}>Caída, ER/hospitalización, cambio de conducta...</span>
+              </span>
+              <span style={{
+                width: 40, height: 22, borderRadius: 20, flexShrink: 0, position: 'relative',
+                background: isIncident ? '#C2410C' : '#D1D5DB', transition: 'background 0.15s',
+              }}>
+                <span style={{
+                  position: 'absolute', top: 2, left: isIncident ? 20 : 2,
+                  width: 18, height: 18, borderRadius: '50%', background: 'white',
+                  transition: 'left 0.15s', boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+                }} />
+              </span>
+            </button>
+
+            {isIncident && (
+              <div style={{ marginBottom: 16 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginBottom: 10 }}>
+                  {INCIDENT_TYPES.map(t => {
+                    const isSelected = incidentType === t.value
+                    return (
+                      <button
+                        key={t.value}
+                        onClick={() => setIncidentType(t.value)}
+                        style={{
+                          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+                          padding: '10px 4px', borderRadius: 14,
+                          border: isSelected ? '2px solid #C2410C' : '1.5px solid #E5DDD2',
+                          background: isSelected ? '#FEF2E8' : 'white',
+                          cursor: 'pointer', transition: 'all 0.15s', fontFamily: 'inherit',
+                        }}
+                      >
+                        <span style={{ fontSize: 20 }}>{t.emoji}</span>
+                        <span style={{ fontSize: 10, fontWeight: 700, color: isSelected ? '#C2410C' : '#6B7280', textAlign: 'center', lineHeight: 1.2 }}>{t.label}</span>
+                      </button>
+                    )
+                  })}
+                </div>
+                {photoUrl ? (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <img src={photoUrl} alt="Preview" style={{ width: 64, height: 64, borderRadius: 10, objectFit: 'cover', border: '1.5px solid #DDD5C8' }} />
+                    <button
+                      onClick={() => setPhotoUrl(null)}
+                      style={{ background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 8, padding: '4px 10px', fontSize: 12, color: '#DC2626', cursor: 'pointer', fontWeight: 600, fontFamily: 'inherit' }}
+                    >
+                      Quitar foto
+                    </button>
+                  </div>
+                ) : (
+                  <EvidencePhoto
+                    onPhotoCapture={url => setPhotoUrl(url)}
+                    label="Agregar foto"
+                    bucket="care-photos"
+                    pathPrefix={`notes/${ownerId}`}
+                  />
+                )}
+              </div>
+            )}
+
             {saveError && (
               <p style={{ margin: '0 0 12px', fontSize: 13, color: '#DC2626', fontWeight: 500 }}>{saveError}</p>
             )}
@@ -220,9 +307,9 @@ export default function NotasFamilia() {
                     key={note.id}
                     onClick={() => setExpanded(isOpen ? null : note.id)}
                     style={{
-                      background: 'white', borderRadius: 16, padding: '14px 16px', cursor: 'pointer',
+                      background: note.is_incident ? '#FEF2E8' : 'white', borderRadius: 16, padding: '14px 16px', cursor: 'pointer',
                       boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-                      border: `1.5px solid ${isOpen ? '#B7D9C4' : 'transparent'}`,
+                      border: `1.5px solid ${note.is_incident ? '#F4A261' : (isOpen ? '#B7D9C4' : 'transparent')}`,
                       transition: 'border-color 0.15s',
                     }}
                   >
@@ -244,6 +331,11 @@ export default function NotasFamilia() {
                           <span style={{ fontSize: 11, color: '#9CA3AF' }}>
                             {new Date(note.created_at).toLocaleString('es', { dateStyle: 'short', timeStyle: 'short' })}
                           </span>
+                          {note.is_incident && (
+                            <span style={{ fontSize: 10, fontWeight: 700, color: '#C2410C', background: '#FDE8D8', padding: '2px 8px', borderRadius: 20 }}>
+                              {incidentTypeInfo(note.incident_type).emoji} {incidentTypeInfo(note.incident_type).label}
+                            </span>
+                          )}
                         </div>
                         {note.title && (
                           <p style={{ margin: '0 0 3px', fontSize: 13, fontWeight: 600, color: '#1E2D26', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -256,6 +348,11 @@ export default function NotasFamilia() {
                         }}>
                           {note.content}
                         </p>
+                        {isOpen && note.photo_url && (
+                          <div style={{ marginTop: 8 }} onClick={e => e.stopPropagation()}>
+                            <EvidencePhoto photoUrl={note.photo_url} />
+                          </div>
+                        )}
                       </div>
                       <span style={{ fontSize: 11, color: '#9CA3AF', whiteSpace: 'nowrap', flexShrink: 0, marginTop: 2 }}>
                         {timeAgoEs(note.created_at)}
