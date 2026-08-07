@@ -1,6 +1,7 @@
 -- ================================================================
 -- FamiliaCerca — fusiona appointment_proofs dentro de events
--- Run in Supabase SQL Editor (safe to re-run hasta el DROP final)
+-- Ya ejecutado en producción el 2026-08-08 vía `supabase db query --linked`,
+-- incluido el DROP final (paso 3) — se deja versionado como registro.
 --
 -- appointment_proofs vivía como tabla aparte (una fila por persona que
 -- confirma asistencia a una cita, event_id+user_id único) pero en la
@@ -41,3 +42,6 @@ where e.id = ap.event_id;
 
 -- Verificación manual — conteo de filas migradas (debe ser 0 hoy):
 -- select count(*) from public.events where attended = true;
+
+-- 3. Drop de la tabla vieja — confirmado 0 filas antes de correr esto.
+drop table if exists public.appointment_proofs;
