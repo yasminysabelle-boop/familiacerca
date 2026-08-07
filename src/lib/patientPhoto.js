@@ -25,10 +25,29 @@ function extractStoragePath(publicUrl) {
   return idx === -1 ? null : publicUrl.slice(idx + marker.length)
 }
 
-// Sube la foto del paciente, actualiza patient_profiles.photo_url y
+// Reintenta fn() ante blips de red transitorios — nunca ante errores de
+// permiso (RLS = código Postgres 42501), esos deben fallar rápido y
+// mostrarse, no reintentarse a ciegas.
+async function withRetry(fn, delays = [300, 800]) {
+  for (let i = 0; ; i++) {
+    try { return await fn() }
+    catch (e) {
+      if (i >= delays.length || e.code === '42501') throw e
+      await new Promise(r => setTimeout(r, delays[i]))
+    }
+  }
+}
+
+// Sube la foto del paciente y actualiza patient_profiles.photo_url +
 // care_profiles.photo_url (FamilySwitcher/Settings/Familia leen de ahí,
-// no de patient_profiles), borra la foto anterior del bucket una vez
-// confirmado el éxito, y avisa al resto de la app vía patientProfileUpdated.
+// no de patient_profiles) en una sola transacción vía RPC — antes eran dos
+// escrituras separadas que podían quedar a mitad de camino si la segunda
+// fallaba (ver hallazgo 2026-08: RLS bloqueaba a los cuidadores en la
+// segunda escritura, dejando patient_profiles y care_profiles divergentes
+// permanentemente). Borra la foto anterior del bucket una vez confirmado
+// el éxito, y avisa al resto de la app vía patientProfileUpdated (con la
+// URL nueva en el detail, para que los listeners se actualicen sin
+// necesidad de un refetch).
 export async function uploadPatientPhoto(ownerId, file) {
   const row = await ensurePatientProfileRow(ownerId)
 
@@ -42,16 +61,13 @@ export async function uploadPatientPhoto(ownerId, file) {
 
   const { data: { publicUrl } } = supabase.storage.from(BUCKET).getPublicUrl(path)
 
-  const { error: patientErr } = await supabase
-    .from('patient_profiles')
-    .update({ photo_url: publicUrl })
-    .eq('id', row.id)
-  if (patientErr) throw patientErr
-
-  const { error: careErr } = await supabase
-    .from('care_profiles')
-    .upsert({ user_id: ownerId, photo_url: publicUrl }, { onConflict: 'user_id' })
-  if (careErr) throw careErr
+  await withRetry(async () => {
+    const { error } = await supabase.rpc('update_patient_photo', {
+      p_owner_id: ownerId,
+      p_photo_url: publicUrl,
+    })
+    if (error) throw error
+  })
 
   const oldPath = extractStoragePath(row.photo_url)
   if (oldPath && oldPath !== path) {
@@ -59,7 +75,7 @@ export async function uploadPatientPhoto(ownerId, file) {
     if (removeErr) console.error('[patientPhoto] no se pudo borrar la foto anterior:', removeErr)
   }
 
-  window.dispatchEvent(new CustomEvent('patientProfileUpdated'))
+  window.dispatchEvent(new CustomEvent('patientProfileUpdated', { detail: { ownerId, photoUrl: publicUrl } }))
 
   return { photoUrl: publicUrl }
 }

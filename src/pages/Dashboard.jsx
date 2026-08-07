@@ -2035,14 +2035,19 @@ export default function Dashboard() {
   }, [ownerId])
 
   useEffect(() => {
-    function onPatientUpdated() {
+    function onPatientUpdated(e) {
       if (!ownerId) return
+      // Camino rápido: la URL ya viene en el evento (subida de foto) — no hace
+      // falta ida y vuelta a la base de datos, se aplica en el mismo tick.
+      if (e?.detail?.ownerId === ownerId && e.detail.photoUrl) {
+        setPatientProfile(prev => prev ? { ...prev, photo_url: e.detail.photoUrl } : prev)
+        return
+      }
+      // Camino lento: otros cambios del perfil (nombre, diagnóstico, etc.) que
+      // no traen detail — sí hace falta refetch.
       supabase.from('patient_profiles').select('*').eq('owner_id', ownerId).maybeSingle()
         .then(({ data: pp }) => {
-          const withBuster = pp?.photo_url
-            ? { ...pp, photo_url: `${pp.photo_url}?t=${Date.now()}` }
-            : pp
-          setPatientProfile(withBuster ?? null)
+          setPatientProfile(pp ?? null)
           setPatientProfileIncomplete(!pp?.nombre_completo)
         })
     }

@@ -358,6 +358,7 @@ export default function Directory() {
   const [loadError, setLoadError] = useState('')
   const [confirmDialog, setConfirmDialog] = useState(null)
   const [photoUploading, setPhotoUploading] = useState(false)
+  const [photoError, setPhotoError] = useState('')
   const photoInputRef = useRef(null)
   const [cropSrc, setCropSrc] = useState(null)
   const [crop, setCrop] = useState({ x: 0, y: 0 })
@@ -431,11 +432,13 @@ export default function Directory() {
   async function handlePatientPhotoUpload(file) {
     if (!file || !ownerId) return
     setPhotoUploading(true)
+    setPhotoError('')
     try {
       const { photoUrl } = await uploadPatientPhoto(ownerId, file)
       setPatientProfile(prev => ({ ...prev, photo_url: photoUrl }))
     } catch (e) {
       console.error('Photo upload failed:', e)
+      setPhotoError('No se pudo subir la foto: ' + e.message)
     } finally {
       setPhotoUploading(false)
     }
@@ -846,6 +849,12 @@ export default function Directory() {
                     )}
                   </div>
                 </div>
+
+                {photoError && (
+                  <div style={{ background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 12, padding: '10px 14px', marginBottom: 12, fontSize: 13, color: '#DC2626' }}>
+                    {photoError}
+                  </div>
+                )}
 
                 {/* Alergias — destacadas primero */}
                 {patientProfile.alergias?.length > 0 && (

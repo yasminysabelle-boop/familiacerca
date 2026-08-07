@@ -22,7 +22,18 @@ export function FamilyProvider({ children }) {
   }, [user])
 
   useEffect(() => {
-    function onPatientUpdated() { loadFamiliesRef.current?.() }
+    function onPatientUpdated(e) {
+      // Camino rápido: la URL ya viene en el evento (subida de foto) — parchea
+      // en memoria, sin recargar toda la lista de familias.
+      if (e?.detail?.ownerId && e.detail.photoUrl) {
+        setFamilies(prev => prev.map(f => f.ownerId === e.detail.ownerId
+          ? { ...f, patientPhotoUrl: e.detail.photoUrl, profile: f.profile ? { ...f.profile, photo_url: e.detail.photoUrl } : f.profile }
+          : f))
+        return
+      }
+      // Camino lento: cambios que no traen detail (nombre, diagnóstico, etc.)
+      loadFamiliesRef.current?.()
+    }
     window.addEventListener('patientProfileUpdated', onPatientUpdated)
     return () => window.removeEventListener('patientProfileUpdated', onPatientUpdated)
   }, [])
