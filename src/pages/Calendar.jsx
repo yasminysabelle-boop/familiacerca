@@ -7,6 +7,8 @@ import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import EmptyState from '../components/EmptyState'
 import VoiceInput from '../components/VoiceInput'
+import CameraCapture from '../components/CameraCapture'
+import { submitAppointmentProof } from '../lib/appointmentProof'
 
 const DAYS   = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
 const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
@@ -30,12 +32,13 @@ const statusInfo = s => STATUS_OPTIONS.find(o => o.value === s) ?? STATUS_OPTION
 
 export default function Calendar() {
   const { user } = useAuth()
-  const { ownerId } = useFamily()
+  const { ownerId, memberRole } = useFamily()
   const { canEdit } = useSubscription()
   const navigate = useNavigate()
   const today    = new Date()
 
   const isAdmin = user?.id === ownerId
+  const isFamiliar = memberRole === 'familiar'
 
   const [year, setYear]         = useState(today.getFullYear())
   const [month, setMonth]       = useState(today.getMonth())
@@ -87,7 +90,7 @@ export default function Calendar() {
   const [proofNote, setProofNote]         = useState('')
   const [proofSaving, setProofSaving]     = useState(false)
   const [proofUploadError, setProofUploadError] = useState('')
-  const [proofs, setProofs]               = useState({})
+  const [showProofCamera, setShowProofCamera] = useState(false)
 
   useEffect(() => { if (user && ownerId) fetchEvents() }, [user, ownerId, year, month])
 
@@ -105,15 +108,6 @@ export default function Calendar() {
       if (fetchEventsIdRef.current !== myId) return // family or month changed mid-flight
 
       setEvents(data ?? [])
-
-      if (data?.length) {
-        const ids = data.map(e => e.id)
-        const { data: ps } = await supabase
-          .from('appointment_proofs').select('*').in('event_id', ids)
-        if (fetchEventsIdRef.current !== myId) return
-        const map = {}; ps?.forEach(p => { map[p.event_id] = p })
-        setProofs(map)
-      }
     } catch {
       if (fetchEventsIdRef.current !== myId) return
       setLoadError('No se pudieron cargar los eventos. Verifica tu conexión.')
@@ -204,48 +198,49 @@ export default function Calendar() {
   }
 
   function pickCamera() {
-    const el = document.createElement('input')
-    el.type = 'file'; el.accept = 'image/*'; el.capture = 'environment'
-    el.addEventListener('change', handleProofPhoto, { once: true })
-    el.click()
+    setShowProofCamera(true)
+  }
+
+  function handleProofCapture(blob) {
+    setShowProofCamera(false)
+    setProofPhoto(blob); setProofPreview(URL.createObjectURL(blob))
   }
 
   function pickGallery() {
     const el = document.createElement('input')
     el.type = 'file'; el.accept = 'image/*'
-    el.addEventListener('change', handleProofPhoto, { once: true })
+    el.addEventListener('change', e => {
+      const f = e.target.files?.[0]; if (!f) return
+      setProofPhoto(f); setProofPreview(URL.createObjectURL(f))
+    }, { once: true })
     el.click()
-  }
-
-  function handleProofPhoto(e) {
-    const f = e.target.files?.[0]; if (!f) return
-    setProofPhoto(f); setProofPreview(URL.createObjectURL(f))
   }
 
   async function submitProof() {
     if (!proofPhoto && !proofNote) return
     setProofSaving(true); setProofUploadError('')
 
-    let photo_url = null
-    if (proofPhoto) {
-      const ext  = proofPhoto.name.split('.').pop()
-      const path = `${user.id}/${proofEvent.id}.${ext}`
-      const { error: uploadErr } = await supabase.storage.from('appointment-proofs').upload(path, proofPhoto, { upsert: true, contentType: proofPhoto.type })
-      if (uploadErr) {
-        setProofUploadError('No se pudo subir la foto. La cita se guardará sin imagen.')
+    try {
+      await submitAppointmentProof(proofEvent.id, user.id, { file: proofPhoto, notes: proofNote || null })
+    } catch (err) {
+      // Si falla solo la foto pero hay nota, reintenta sin la foto para no
+      // perder la nota — mismo comportamiento que tenía el flujo viejo.
+      if (proofPhoto && proofNote) {
+        try {
+          await submitAppointmentProof(proofEvent.id, user.id, { notes: proofNote })
+          setProofUploadError('No se pudo subir la foto. La cita se guardó sin imagen.')
+        } catch {
+          setProofUploadError('No se pudo guardar. Intenta de nuevo.')
+          setProofSaving(false)
+          return
+        }
       } else {
-        const { data: { publicUrl } } = supabase.storage.from('appointment-proofs').getPublicUrl(path)
-        photo_url = publicUrl
+        console.error('[Calendar] submitProof failed:', err)
+        setProofUploadError('No se pudo guardar. Intenta de nuevo.')
+        setProofSaving(false)
+        return
       }
     }
-
-    await supabase.from('appointment_proofs').upsert({
-      event_id: proofEvent.id,
-      user_id: user.id,
-      photo_url,
-      notes: proofNote || null,
-      attended: true,
-    }, { onConflict: 'event_id,user_id' })
 
     setProofEvent(null); setProofPhoto(null); setProofPreview(null); setProofNote('')
     setProofSaving(false); fetchEvents()
@@ -545,7 +540,6 @@ export default function Calendar() {
             ) : (
               <ul className="space-y-4">
                 {(selected ? selectedEvents : events.slice(0, 5)).map(ev => {
-                  const proof = proofs[ev.id]
                   const si = statusInfo(ev.status ?? 'programada')
                   const evAttachments = ev.attachments ?? []
                   return (
@@ -598,22 +592,22 @@ export default function Calendar() {
                       )}
 
                       {/* Proof section */}
-                      {proof ? (
+                      {ev.attended ? (
                         <div className="flex items-center gap-2 mt-2">
-                          {proof.photo_url && (
-                            <img src={proof.photo_url} alt="Prueba" className="w-12 h-12 rounded-lg object-cover border border-green-200" />
+                          {ev.proof_photo_url && (
+                            <img src={ev.proof_photo_url} alt="Comprobante" className="w-12 h-12 rounded-lg object-cover border border-green-200" />
                           )}
                           <div>
                             <p className="text-xs text-primary font-semibold">✓ Asistencia confirmada</p>
-                            {proof.notes && <p className="text-xs text-gray-400">{proof.notes}</p>}
+                            {ev.proof_notes && <p className="text-xs text-gray-400">{ev.proof_notes}</p>}
                           </div>
                         </div>
-                      ) : (
+                      ) : !isFamiliar ? (
                         <button onClick={() => { setProofEvent(ev); setProofPhoto(null); setProofPreview(null); setProofNote('') }}
-                          className="text-xs text-gray-400 hover:text-primary transition-colors border border-dashed border-gray-200 hover:border-primary rounded-lg px-2 py-1 w-full text-center mt-1">
-                          📷 Marcar como asistido con foto
+                          className="flex items-center justify-center gap-2 text-sm font-semibold text-white bg-primary hover:bg-primary-dark transition-colors rounded-xl px-3 py-2.5 w-full mt-1 shadow-sm">
+                          📎 Adjuntar comprobante
                         </button>
-                      )}
+                      ) : null}
                     </li>
                   )
                 })}
@@ -724,6 +718,18 @@ export default function Calendar() {
             </div>
           </div>
         </div>
+      )}
+
+      {showProofCamera && (
+        <CameraCapture
+          guidance="📋 Encuadra el comprobante de la cita"
+          onCapture={handleProofCapture}
+          onCancel={() => setShowProofCamera(false)}
+          onManualFallback={() => { setShowProofCamera(false); pickGallery() }}
+          deniedTitle="No pudimos abrir la cámara"
+          deniedDescription="Necesitamos permiso de cámara para tomar la foto. Puedes elegir una desde tu galería."
+          deniedButtonLabel="Elegir de galería"
+        />
       )}
 
     </Layout>

@@ -7,7 +7,12 @@ import { XIcon, Camera } from './Icons'
 // foto sin ningún aviso (diagnosticado en Medications.jsx, ver memoria del
 // proyecto). getUserMedia nunca sale de la página, así que no hay ventana en la
 // que el sistema pueda matar el proceso a mitad de la captura.
-export default function CameraCapture({ guidance, onCapture, onCancel, onManualFallback }) {
+export default function CameraCapture({
+  guidance, onCapture, onCancel, onManualFallback,
+  deniedTitle = 'No pudimos abrir la cámara',
+  deniedDescription = 'Necesitamos permiso de cámara para tomar la foto. Puedes ingresar los datos del medicamento tú mismo.',
+  deniedButtonLabel = 'Ingresar manualmente',
+}) {
   const videoRef = useRef(null)
   const streamRef = useRef(null)
   const [status, setStatus] = useState('requesting') // 'requesting' | 'live' | 'denied'
@@ -154,10 +159,10 @@ export default function CameraCapture({ guidance, onCapture, onCancel, onManualF
             <Camera size={26} color="#C4664F" strokeWidth={1.8} />
           </div>
           <h3 style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 16.5, fontWeight: 800, color: '#1E2C3A', margin: 0 }}>
-            No pudimos abrir la cámara
+            {deniedTitle}
           </h3>
           <p style={{ fontSize: 13, lineHeight: 1.55, color: '#6B7A88', margin: 0, maxWidth: '27ch' }}>
-            Necesitamos permiso de cámara para tomar la foto. Puedes ingresar los datos del medicamento tú mismo.
+            {deniedDescription}
           </p>
           <button
             onClick={onManualFallback}
@@ -167,7 +172,7 @@ export default function CameraCapture({ guidance, onCapture, onCancel, onManualF
               boxShadow: '0 4px 14px rgba(8,127,112,0.3)',
             }}
           >
-            Ingresar manualmente
+            {deniedButtonLabel}
           </button>
         </div>
       )}

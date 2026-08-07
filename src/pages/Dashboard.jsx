@@ -15,6 +15,8 @@ import { geminiGenerate } from '../lib/gemini'
 import { getActivitySummary } from '../lib/activitySummary'
 import { CARE_ITEMS } from '../lib/careItems'
 import { incidentPhrase, incidentTypeInfo } from '../lib/incidentTypes'
+import { submitAppointmentProof as saveAppointmentProof } from '../lib/appointmentProof'
+import CameraCapture from '../components/CameraCapture'
 import TrialBanner from '../components/TrialBanner'
 import { usePushNotifications } from '../hooks/usePushNotifications'
 import { useHospitalMode } from '../contexts/HospitalModeContext'
@@ -806,7 +808,7 @@ function SosDetail({ evt }) {
   )
 }
 
-function EventDetailSheet({ evt, onClose }) {
+function EventDetailSheet({ evt, onClose, onAttachProof, isFamiliar }) {
   if (!evt) return null
   const TITLES = {
     MED_CONFIRMED: 'Medicamento',
@@ -814,6 +816,7 @@ function EventDetailSheet({ evt, onClose }) {
     NOTE: 'Nota',
     EXPENSE: 'Gasto',
     SOS_ALERT: 'Alerta SOS',
+    APPOINTMENT: 'Cita médica',
     APPOINTMENT_PROOF: 'Cita médica',
   }
   return (
@@ -857,6 +860,51 @@ function EventDetailSheet({ evt, onClose }) {
           {evt.type === 'NOTE' && <NoteDetail evt={evt} />}
           {evt.type === 'EXPENSE' && <ExpenseDetail evt={evt} />}
           {evt.type === 'SOS_ALERT' && <SosDetail evt={evt} />}
+          {evt.type === 'APPOINTMENT' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <p style={{ fontSize: 17, fontWeight: 700, color: '#1A1A1A', fontFamily: 'Georgia, serif', margin: 0 }}>
+                {evt.appointmentTitle}
+              </p>
+              {evt.appointmentTime && (
+                <DetailRow icon="🕐" label="Hora" value={fmtTime(evt.appointmentTime)} />
+              )}
+              {evt.attended ? (
+                <>
+                  <DetailRow icon="✅" label="Estado" value="Asistencia confirmada" />
+                  {evt.proofNotes && (
+                    <DetailRow icon="📝" label="Notas" value={evt.proofNotes} />
+                  )}
+                  {evt.proofPhotoUrl && (
+                    <div>
+                      <p style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
+                        Comprobante
+                      </p>
+                      <img
+                        src={evt.proofPhotoUrl}
+                        alt="Comprobante de cita"
+                        style={{ width: '100%', borderRadius: 12, objectFit: 'cover', maxHeight: 260, border: '1px solid #D1FAE5' }}
+                      />
+                    </div>
+                  )}
+                </>
+              ) : !isFamiliar ? (
+                <button
+                  onClick={() => onAttachProof?.(evt)}
+                  style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                    padding: '14px', borderRadius: 14, border: 'none',
+                    background: 'linear-gradient(135deg, #087F70, #0d6b63)',
+                    color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer',
+                    boxShadow: '0 4px 14px rgba(8,127,112,0.3)',
+                  }}
+                >
+                  📎 Adjuntar comprobante
+                </button>
+              ) : (
+                <DetailRow icon="🕓" label="Estado" value="Pendiente de asistencia" />
+              )}
+            </div>
+          )}
           {evt.type === 'APPOINTMENT_PROOF' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <p style={{ fontSize: 17, fontWeight: 700, color: '#1A1A1A', fontFamily: 'Georgia, serif', margin: 0 }}>
@@ -1887,6 +1935,8 @@ export default function Dashboard() {
   const [sosLocation, setSosLocation] = useState(null)
   const [adminConfirmEvt, setAdminConfirmEvt] = useState(null)
   const [selectedEvent, setSelectedEvent] = useState(null)
+  const [attachingProof, setAttachingProof] = useState(null)
+  const [proofError, setProofError] = useState('')
   const [chatCount, setChatCount] = useState(0)
   const [patientProfileIncomplete, setPatientProfileIncomplete] = useState(false)
   const [patientProfile, setPatientProfile] = useState(null)
@@ -2316,7 +2366,7 @@ export default function Dashboard() {
         .limit(20),
 
       supabase.from('events')
-        .select('*, appointment_proofs(*)')
+        .select('*')
         .eq('user_id', ownerId)
         .gte('date', sevenAgoKey)
         .order('date', { ascending: true })
@@ -2510,34 +2560,41 @@ export default function Dashboard() {
       })
     }
 
-    // ── Appointments: upcoming + past attended (with proof photos) ──
+    // ── Appointments: upcoming + past attended (con foto de comprobante) ──
+    // proof_photo_url/proof_notes/attended viven directo en events desde la
+    // fusión de appointment_proofs (ver supabase/merge_appointment_proofs_into_events.sql).
     for (const ev of (events ?? [])) {
       const evDate = ev.date
       const evTime = ev.time
-      const proof  = ev.appointment_proofs?.[0] ?? null
 
       if (evDate >= todayKey) {
-        // Upcoming — show as a forward-looking appointment card
+        // Hoy o futura — se muestra como cita próxima, ya sea que tenga
+        // comprobante o no (attended se resuelve dentro del detalle).
         allEvents.push({
           id: `evt-${ev.id}`,
           type: 'APPOINTMENT',
           timestamp: new Date(`${evDate}T${evTime ?? '09:00'}:00`),
           dateKey: evDate,
+          appointmentId: ev.id,
           appointmentTitle: ev.title,
           appointmentTime: evTime ?? null,
           status: ev.status ?? 'programada',
+          attended: ev.attended ?? false,
+          proofPhotoUrl: ev.proof_photo_url ?? null,
+          proofNotes: ev.proof_notes ?? null,
         })
-      } else if (proof) {
-        // Past appointment with a proof — surface it in the timeline
+      } else if (ev.attended) {
+        // Pasada y con comprobante — se surfacea en el timeline
         allEvents.push({
-          id: `proof-${proof.id}`,
+          id: `proof-${ev.id}`,
           type: 'APPOINTMENT_PROOF',
           timestamp: new Date(`${evDate}T${evTime ?? '09:00'}:00`),
           dateKey: evDate,
+          appointmentId: ev.id,
           appointmentTitle: ev.title,
           appointmentTime: evTime ?? null,
-          proofPhotoUrl: proof.photo_url ?? null,
-          proofNotes: proof.notes ?? null,
+          proofPhotoUrl: ev.proof_photo_url ?? null,
+          proofNotes: ev.proof_notes ?? null,
         })
       }
     }
@@ -2693,6 +2750,36 @@ export default function Dashboard() {
     if (isFamiliar) return
     if (isAdmin) { setAdminConfirmEvt(evt); return }
     quickConfirm(evt)
+  }
+
+  function pickProofGallery() {
+    const el = document.createElement('input')
+    el.type = 'file'; el.accept = 'image/*'
+    el.addEventListener('change', e => {
+      const f = e.target.files?.[0]
+      if (f) submitAppointmentProof(f)
+    }, { once: true })
+    el.click()
+  }
+
+  async function submitAppointmentProof(file) {
+    const evt = attachingProof
+    if (!evt) return
+    setAttachingProof(null)
+    setProofError('')
+    try {
+      const { photoUrl } = await saveAppointmentProof(evt.appointmentId, user.id, { file })
+      setSections(prev => prev.map(section => ({
+        ...section,
+        events: section.events.map(e =>
+          e.id === evt.id ? { ...e, attended: true, proofPhotoUrl: photoUrl } : e
+        ),
+      })))
+    } catch (err) {
+      console.error('[appointmentProof] upload failed:', err)
+      setProofError('No se pudo subir el comprobante. Intenta de nuevo.')
+      setTimeout(() => setProofError(''), 6000)
+    }
   }
 
   async function quickConfirm(evt) {
@@ -3640,7 +3727,33 @@ export default function Dashboard() {
       )}
 
       {selectedEvent && (
-        <EventDetailSheet evt={selectedEvent} onClose={() => setSelectedEvent(null)} />
+        <EventDetailSheet
+          evt={selectedEvent}
+          onClose={() => setSelectedEvent(null)}
+          onAttachProof={evt => { setSelectedEvent(null); setAttachingProof(evt) }}
+          isFamiliar={isFamiliar}
+        />
+      )}
+      {attachingProof && (
+        <CameraCapture
+          guidance="📋 Encuadra el comprobante de la cita"
+          onCapture={submitAppointmentProof}
+          onCancel={() => setAttachingProof(null)}
+          onManualFallback={pickProofGallery}
+          deniedTitle="No pudimos abrir la cámara"
+          deniedDescription="Necesitamos permiso de cámara para tomar la foto. Puedes elegir una desde tu galería."
+          deniedButtonLabel="Elegir de galería"
+        />
+      )}
+      {proofError && (
+        <div style={{
+          position: 'fixed', bottom: 'calc(80px + env(safe-area-inset-bottom))', left: 16, right: 16, zIndex: 250,
+          background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 12,
+          padding: '12px 16px', fontSize: 13, color: '#DC2626', textAlign: 'center',
+          boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+        }}>
+          {proofError}
+        </div>
       )}
       <VideoCallScheduleModal open={showVideoCallModal} onClose={() => setShowVideoCallModal(false)} />
       <SuccessAnimation visible={medSuccessTrigger > 0} key={medSuccessTrigger} />
