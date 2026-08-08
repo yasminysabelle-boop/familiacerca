@@ -11,6 +11,7 @@
 
 import { supabase } from './supabase'
 import { getTodayPR } from './utils'
+import { incidentTypeInfo } from './incidentTypes'
 
 function fmt12h(hhmm) {
   if (!hhmm) return null
@@ -51,6 +52,7 @@ export async function buildCareContext(ownerId) {
 
   try {
     const today = getTodayPR()
+    const sevenDaysAgoISO = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
 
     const [
       { data: medications },
@@ -61,6 +63,7 @@ export async function buildCareContext(ownerId) {
       { data: voiceMemories },
       { data: upcomingEvents },
       { data: recentExpenses },
+      { data: weekSymptoms },
     ] = await Promise.all([
       supabase.from('medications').select('id, name, dosage, scheduled_times, time').eq('user_id', ownerId),
       supabase.from('medication_logs').select('medication_id, status, confirmed_at, confirmed_by_name, photo_url').eq('user_id', ownerId).eq('log_date', today),
@@ -72,6 +75,10 @@ export async function buildCareContext(ownerId) {
       supabase.from('voice_diary').select('transcription, mood').eq('user_id', ownerId).order('created_at', { ascending: false }).limit(5),
       supabase.from('events').select('title, date, time').eq('user_id', ownerId).gte('date', today).order('date', { ascending: true }).limit(3),
       supabase.from('care_expenses').select('description, amount').eq('user_id', ownerId).order('created_at', { ascending: false }).limit(5),
+      // Conteo crudo por subtipo de "evento agudo" en los últimos 7 días — mismo
+      // patrón que MEDICAMENTOS DE HOY: solo el hecho, sin interpretación. Las
+      // reglas de CONTEXT_RULES (abajo) ya cubren no convertir esto en diagnóstico.
+      supabase.from('activity_log').select('description').eq('owner_id', ownerId).eq('type', 'incident').gte('created_at', sevenDaysAgoISO).limit(200),
     ])
 
     const patientName = careProfile?.name ? careProfile.name.split(' ')[0] : 'tu familiar'
@@ -99,9 +106,21 @@ export async function buildCareContext(ownerId) {
     const activityLines = (activity ?? []).map(a => {
       const build = ACTIVITY_VERBS[a.type]
       const actor = (a.actor_name ?? 'Alguien').split(' ')[0]
-      const text = build ? build(actor, a.description ?? '') : `${actor}: ${a.description ?? a.type}`
+      // Los incidentes guardan el subtipo crudo en `description` (p.ej.
+      // 'presion_alta') — se resuelve a su etiqueta legible antes de narrar,
+      // igual que ya hace el Historial vía incidentTypeInfo().
+      const desc = a.type === 'incident' ? incidentTypeInfo(a.description).label : a.description
+      const text = build ? build(actor, desc ?? '') : `${actor}: ${desc ?? a.type}`
       return `- ${text} · ${timeAgo(a.created_at)}`
     })
+
+    const symptomCounts = {}
+    for (const s of (weekSymptoms ?? [])) {
+      symptomCounts[s.description] = (symptomCounts[s.description] ?? 0) + 1
+    }
+    const symptomLines = Object.entries(symptomCounts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([value, count]) => `- ${incidentTypeInfo(value).label}: ${count} ve${count === 1 ? 'z' : 'ces'}`)
 
     const memberIds = [ownerId, ...(members ?? []).map(m => m.member_user_id).filter(Boolean)]
     const { data: profiles } = await supabase.from('user_profiles').select('id, full_name, email').in('id', memberIds)
@@ -133,6 +152,7 @@ export async function buildCareContext(ownerId) {
       '',
       'ACTIVIDAD RECIENTE:',
       activityLines.length ? activityLines.join('\n') : '- Sin actividad reciente registrada.',
+      ...(symptomLines.length ? ['', 'SÍNTOMAS ESTA SEMANA:', symptomLines.join('\n')] : []),
       '',
       'FAMILIA:',
       familyLines.join('\n'),

@@ -320,11 +320,18 @@ export default function MedicationTimeline() {
   const [filterType, setFilterType] = useState('all')
   const [period, setPeriod] = useState('today')
   const [customDate, setCustomDate] = useState('')
+  const [symptomFilter, setSymptomFilter] = useState(null)
   const [expandedDays, setExpandedDays] = useState(new Set([toLocalDateKey()]))
 
   useEffect(() => {
     if (ownerId) fetchLog()
   }, [ownerId, filterType, period, customDate])
+
+  // El drill-down por subtipo solo tiene sentido para el pill "Incidentes" en
+  // el período/tipo actuales — se limpia si cualquiera de los dos cambia.
+  useEffect(() => {
+    setSymptomFilter(null)
+  }, [filterType, period, customDate])
 
   async function fetchLog() {
     if (period === 'custom' && !customDate) {
@@ -374,9 +381,27 @@ export default function MedicationTimeline() {
     }
   }
 
+  // Conteo por subtipo — solo tiene sentido con el pill "Incidentes" activo,
+  // ya que ahí `events` ya viene filtrado por type='incident' desde el server
+  // para el período elegido. Se calcula sobre TODOS los eventos del período
+  // (no sobre displayEvents) para que el conteo no cambie al hacer drill-down.
+  const symptomCounts = {}
+  if (filterType === 'incident') {
+    for (const evt of events) {
+      symptomCounts[evt.description] = (symptomCounts[evt.description] ?? 0) + 1
+    }
+  }
+  const symptomEntries = Object.entries(symptomCounts)
+    .map(([value, count]) => ({ ...incidentTypeInfo(value), value, count }))
+    .sort((a, b) => b.count - a.count)
+
+  const displayEvents = symptomFilter
+    ? events.filter(e => e.description === symptomFilter)
+    : events
+
   // Agrupa por día (YYYY-MM-DD local)
   const grouped = {}
-  for (const evt of events) {
+  for (const evt of displayEvents) {
     const d = new Date(evt.created_at)
     const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
     if (!grouped[key]) grouped[key] = []
@@ -499,6 +524,35 @@ export default function MedicationTimeline() {
                   Elige un día para ver su actividad
                 </p>
               )}
+            </div>
+          )}
+
+          {/* Conteo por síntoma — solo con el pill "Incidentes" activo. Tocar
+              un badge acota la lista de abajo a ese subtipo; tocarlo de nuevo
+              lo quita. */}
+          {filterType === 'incident' && symptomEntries.length > 0 && (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 18 }}>
+              {symptomEntries.map(s => {
+                const selected = symptomFilter === s.value
+                return (
+                  <button
+                    key={s.value}
+                    onClick={() => setSymptomFilter(selected ? null : s.value)}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 5,
+                      padding: '6px 12px', borderRadius: 999, border: 'none',
+                      fontFamily: 'inherit', fontWeight: 700, fontSize: 12, cursor: 'pointer',
+                      background: selected ? CAT.coral.sel : CAT.coral.bg,
+                      color: selected ? '#fff' : CAT.coral.ink,
+                      transition: 'all 0.15s',
+                    }}
+                  >
+                    <span>{s.emoji}</span>
+                    {s.label}
+                    <span style={{ opacity: 0.75, fontVariantNumeric: 'tabular-nums' }}>· {s.count}</span>
+                  </button>
+                )
+              })}
             </div>
           )}
 
