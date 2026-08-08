@@ -868,6 +868,13 @@ function EventDetailSheet({ evt, onClose, onAttachProof, isFamiliar }) {
               {evt.appointmentTime && (
                 <DetailRow icon="🕐" label="Hora" value={fmtTime(evt.appointmentTime)} />
               )}
+              {evt.contactName && (
+                <DetailRow
+                  icon="👨‍⚕️"
+                  label="Con quién"
+                  value={evt.contactSpecialty ? `${evt.contactName} — ${evt.contactSpecialty}` : evt.contactName}
+                />
+              )}
               {evt.attended ? (
                 <>
                   <DetailRow icon="✅" label="Estado" value="Asistencia confirmada" />
@@ -2366,7 +2373,7 @@ export default function Dashboard() {
         .limit(20),
 
       supabase.from('events')
-        .select('*')
+        .select('*, directory_contacts(name, specialty, phone)')
         .eq('user_id', ownerId)
         .gte('date', sevenAgoKey)
         .order('date', { ascending: true })
@@ -2582,6 +2589,9 @@ export default function Dashboard() {
           attended: ev.attended ?? false,
           proofPhotoUrl: ev.proof_photo_url ?? null,
           proofNotes: ev.proof_notes ?? null,
+          contactName: ev.directory_contacts?.name ?? null,
+          contactSpecialty: ev.directory_contacts?.specialty ?? null,
+          contactPhone: ev.directory_contacts?.phone ?? null,
         })
       } else if (ev.attended) {
         // Pasada y con comprobante — se surfacea en el timeline

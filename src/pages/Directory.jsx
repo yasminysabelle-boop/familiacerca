@@ -488,17 +488,15 @@ export default function Directory() {
     setLoading(true)
     setLoadError('')
     try {
-      const [{ data: docs, error: e1 }, { data: inss, error: e2 }, { data: cons, error: e3 }, { data: members }, { data: pp }] = await Promise.all([
-        supabase.from('directory_doctors').select('*').eq('owner_id', ownerId).order('name'),
-        supabase.from('directory_institutions').select('*').eq('owner_id', ownerId).order('name'),
+      const [{ data: allContacts, error: e3 }, { data: members }, { data: pp }] = await Promise.all([
         supabase.from('directory_contacts').select('*').eq('owner_id', ownerId).order('name'),
         supabase.from('family_members').select('member_user_id, member_email, role, joined_at').eq('user_id', ownerId).not('member_user_id', 'is', null),
         supabase.from('patient_profiles').select('*').eq('owner_id', ownerId).maybeSingle(),
       ])
-      if (e1 || e2 || e3) throw e1 ?? e2 ?? e3
-      setDoctors(docs ?? [])
-      setInstitutions(inss ?? [])
-      setContacts(cons ?? [])
+      if (e3) throw e3
+      setDoctors((allContacts ?? []).filter(c => c.kind === 'medico'))
+      setInstitutions((allContacts ?? []).filter(c => c.kind === 'institucion'))
+      setContacts((allContacts ?? []).filter(c => c.kind === 'familiar'))
       setPatientProfile(pp ?? null)
 
       // Enrich family members with names from user_profiles
@@ -535,9 +533,9 @@ export default function Directory() {
     if (!docForm.name.trim()) return
     setSavingDoc(true)
     if (editDoc) {
-      await supabase.from('directory_doctors').update({ ...docForm, updated_at: new Date().toISOString() }).eq('id', editDoc.id)
+      await supabase.from('directory_contacts').update({ ...docForm, kind: 'medico', updated_at: new Date().toISOString() }).eq('id', editDoc.id)
     } else {
-      await supabase.from('directory_doctors').insert({ ...docForm, owner_id: ownerId })
+      await supabase.from('directory_contacts').insert({ ...docForm, kind: 'medico', owner_id: ownerId })
     }
     setSavingDoc(false)
     setDocModal(false)
@@ -555,9 +553,9 @@ export default function Directory() {
     if (!insForm.name.trim()) return
     setSavingIns(true)
     if (editIns) {
-      await supabase.from('directory_institutions').update({ ...insForm, updated_at: new Date().toISOString() }).eq('id', editIns.id)
+      await supabase.from('directory_contacts').update({ ...insForm, kind: 'institucion', updated_at: new Date().toISOString() }).eq('id', editIns.id)
     } else {
-      await supabase.from('directory_institutions').insert({ ...insForm, owner_id: ownerId })
+      await supabase.from('directory_contacts').insert({ ...insForm, kind: 'institucion', owner_id: ownerId })
     }
     setSavingIns(false)
     setInsModal(false)
@@ -589,9 +587,9 @@ export default function Directory() {
       await supabase.from('directory_contacts').update({ is_emergency_contact: false }).eq('owner_id', ownerId)
     }
     if (editCon) {
-      await supabase.from('directory_contacts').update({ ...conForm, updated_at: new Date().toISOString() }).eq('id', editCon.id)
+      await supabase.from('directory_contacts').update({ ...conForm, kind: 'familiar', updated_at: new Date().toISOString() }).eq('id', editCon.id)
     } else {
-      await supabase.from('directory_contacts').insert({ ...conForm, owner_id: ownerId })
+      await supabase.from('directory_contacts').insert({ ...conForm, kind: 'familiar', owner_id: ownerId })
     }
     setSavingCon(false)
     setConModal(false)
@@ -661,10 +659,10 @@ export default function Directory() {
                 <DoctorCard key={d.id} doc={d}
                   onEdit={() => openDoc(d)}
                   canDelete={isAdmin}
-                  onDeleteRequest={() => setConfirmDialog({ onConfirm: () => deleteItem('directory_doctors', d.id) })} />
+                  onDeleteRequest={() => setConfirmDialog({ onConfirm: () => deleteItem('directory_contacts', d.id) })} />
               ))
             }
-            <AddBtn onClick={() => openDoc()} label="Agregar médico" />
+            {canEdit && <AddBtn onClick={() => openDoc()} label="Agregar médico" />}
           </>
         )}
 
@@ -681,10 +679,10 @@ export default function Directory() {
                 <InstitutionCard key={i.id} ins={i}
                   onEdit={() => openIns(i)}
                   canDelete={isAdmin}
-                  onDeleteRequest={() => setConfirmDialog({ onConfirm: () => deleteItem('directory_institutions', i.id) })} />
+                  onDeleteRequest={() => setConfirmDialog({ onConfirm: () => deleteItem('directory_contacts', i.id) })} />
               ))
             }
-            <AddBtn onClick={() => openIns()} label="Agregar institución" />
+            {canEdit && <AddBtn onClick={() => openIns()} label="Agregar institución" />}
           </>
         )}
 
@@ -741,7 +739,7 @@ export default function Directory() {
                 </>
               )
             }
-            <AddBtn onClick={() => openCon()} label="Agregar familiar" />
+            {canEdit && <AddBtn onClick={() => openCon()} label="Agregar familiar" />}
           </>
         )}
 

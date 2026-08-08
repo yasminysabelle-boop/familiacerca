@@ -12,7 +12,7 @@ import { submitAppointmentProof } from '../lib/appointmentProof'
 
 const DAYS   = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
 const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
-const emptyForm = { title: '', date: '', time: '', description: '', type: 'appointment', status: 'programada' }
+const emptyForm = { title: '', date: '', time: '', description: '', type: 'appointment', status: 'programada', contact_id: '' }
 
 const EVENT_TYPES = [
   { value: 'appointment', label: 'Cita médica',  color: 'bg-blue-100 text-blue-800' },
@@ -43,6 +43,7 @@ export default function Calendar() {
   const [year, setYear]         = useState(today.getFullYear())
   const [month, setMonth]       = useState(today.getMonth())
   const [events, setEvents]     = useState([])
+  const [medicalContacts, setMedicalContacts] = useState([])
   const [selected, setSelected] = useState(null)
   const [showForm, setShowForm] = useState(false)
   const [form, setForm]         = useState(emptyForm)
@@ -94,6 +95,14 @@ export default function Calendar() {
 
   useEffect(() => { if (user && ownerId) fetchEvents() }, [user, ownerId, year, month])
 
+  // Médicos guardados en el directorio, para el selector "¿Con quién es?"
+  useEffect(() => {
+    if (!ownerId) return
+    supabase.from('directory_contacts').select('id, name, specialty')
+      .eq('owner_id', ownerId).eq('kind', 'medico').order('name')
+      .then(({ data }) => setMedicalContacts(data ?? []))
+  }, [ownerId])
+
   async function fetchEvents() {
     const myId = ++fetchEventsIdRef.current
     setLoadError('')
@@ -102,7 +111,7 @@ export default function Calendar() {
       const lastDay = new Date(year, month + 1, 0).getDate()
       const end   = `${year}-${String(month + 1).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`
       const { data, error } = await supabase
-        .from('events').select('*').eq('user_id', ownerId)
+        .from('events').select('*, directory_contacts(name, specialty, phone)').eq('user_id', ownerId)
         .gte('date', start).lte('date', end).order('date')
       if (error) throw error
       if (fetchEventsIdRef.current !== myId) return // family or month changed mid-flight
@@ -121,7 +130,7 @@ export default function Calendar() {
     setExistingUrls(ev.attachments ?? [])
     setAttachFiles([])
     setAttachError('')
-    setForm({ title: ev.title, date: ev.date, time: ev.time ?? '', description: ev.description ?? '', type: ev.type, status: ev.status ?? 'programada' })
+    setForm({ title: ev.title, date: ev.date, time: ev.time ?? '', description: ev.description ?? '', type: ev.type, status: ev.status ?? 'programada', contact_id: ev.contact_id ?? '' })
     setShowForm(true)
   }
 
@@ -171,10 +180,11 @@ export default function Calendar() {
     }
     const allAttachments = [...existingUrls, ...newUrls]
 
+    const payload = { ...form, time: form.time || null, contact_id: form.contact_id || null, attachments: allAttachments }
     if (editEvent) {
-      await supabase.from('events').update({ ...form, time: form.time || null, attachments: allAttachments }).eq('id', editEvent.id)
+      await supabase.from('events').update(payload).eq('id', editEvent.id)
     } else {
-      await supabase.from('events').insert({ ...form, time: form.time || null, user_id: ownerId, created_by_user_id: user.id, attachments: allAttachments })
+      await supabase.from('events').insert({ ...payload, user_id: ownerId, created_by_user_id: user.id })
     }
     resetForm(); setShowForm(false); setEditEvent(null); setSaving(false)
     fetchEvents()
@@ -295,6 +305,16 @@ export default function Calendar() {
                 <select name="type" value={form.type} onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary">
                   {EVENT_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+                </select>
+              </div>
+              <div className="col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">¿Con quién es?</label>
+                <select name="contact_id" value={form.contact_id} onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary">
+                  <option value="">Otro / sin especificar</option>
+                  {medicalContacts.map(c => (
+                    <option key={c.id} value={c.id}>{c.name}{c.specialty ? ` — ${c.specialty}` : ''}</option>
+                  ))}
                 </select>
               </div>
               <div>
@@ -560,6 +580,9 @@ export default function Calendar() {
                           </div>
                           <p className="text-sm font-semibold text-gray-800 leading-tight">{ev.title}</p>
                           {ev.time && <p className="text-xs text-gray-400 mt-0.5">⏰ {ev.time}</p>}
+                          {ev.directory_contacts?.name && (
+                            <p className="text-xs text-gray-400">👨‍⚕️ {ev.directory_contacts.name}{ev.directory_contacts.specialty ? ` — ${ev.directory_contacts.specialty}` : ''}</p>
+                          )}
                           {ev.description && <p className="text-xs text-gray-400">{ev.description}</p>}
                         </div>
                         <div className="flex items-center gap-1 flex-shrink-0">
