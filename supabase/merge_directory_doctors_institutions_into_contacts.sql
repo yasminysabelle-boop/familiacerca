@@ -69,8 +69,9 @@ create policy "directory_contacts: cuidador write"
 alter table public.events add column if not exists contact_id uuid references public.directory_contacts(id) on delete set null;
 
 -- ================================================================
--- Desmontaje de directory_doctors / directory_institutions — pendiente,
--- correr solo después de confirmar 0 filas (ver verificación arriba).
+-- Desmontaje de directory_doctors / directory_institutions — ejecutado
+-- en producción 2026-08-08, confirmado 0 filas antes y después de las
+-- pruebas de Playwright (ver commit fd29235).
 -- ================================================================
--- drop table if exists public.directory_doctors;
--- drop table if exists public.directory_institutions;
+drop table if exists public.directory_doctors;
+drop table if exists public.directory_institutions;
