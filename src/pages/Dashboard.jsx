@@ -10,7 +10,7 @@ import CareCard from '../components/CareCard'
 import { SkeletonDashSummary, SkeletonCard } from '../components/SkeletonLoader'
 import SuccessAnimation, { useSuccessAnimation } from '../components/SuccessAnimation'
 import { usePullToRefresh } from '../hooks/usePullToRefresh'
-import { AlertTriangle, CheckIcon, User, XIcon, Pill, ClipboardCheck, Chat, Calendar, Receipt, Users, Camera, Clock, MessageCircle, Video, Hospital, Building2, Heart, Bell, ChevronRight, Siren, Zap } from '../components/Icons'
+import { AlertTriangle, CheckIcon, User, XIcon, Pill, ClipboardCheck, Chat, Calendar, Receipt, Users, Camera, Clock, MessageCircle, Video, Hospital, Building2, Heart, Bell, ChevronRight, Siren, Zap, Phone, Stethoscope } from '../components/Icons'
 import { geminiGenerate } from '../lib/gemini'
 import { getActivitySummary } from '../lib/activitySummary'
 import { CARE_ITEMS } from '../lib/careItems'
@@ -1257,45 +1257,171 @@ function StatusCard({ icon, title, subtitle, status, statusType, to, onClick, pu
   )
 }
 
-function EmergencyCard({ onPress, sosSent }) {
+// Hoja de confirmación de SOS — reemplaza el modal duplicado que existía una
+// vez para Modo Hospital y otra para el dashboard normal. Integra la hoja de
+// emergencia (alergias, medicamentos, a quién llamar) arriba del botón de
+// activar, que se queda fijo fuera del área con scroll para que nunca quede
+// enterrado. El degradado y el anillo de pulso del botón vienen del antiguo
+// EmergencyCard (código muerto, nunca tuvo datos reales) — solo se reusa el
+// tratamiento visual.
+function SosConfirmSheet({ open, onClose, onConfirm, patientProfile, patientName, medsList, emergencyContact, primaryDoctor }) {
+  if (!open) return null
+  const allergies = (patientProfile?.alergias_detalle ?? []).filter(Boolean)
+  const diagnosis = patientProfile?.diagnostico_principal
+  const meds = medsList ?? []
+
   return (
-    <button
-      onClick={onPress}
-      style={{
-        width: '100%', borderRadius: 20, border: 'none',
-        background: sosSent
-          ? 'linear-gradient(135deg, #B91C1C 0%, #7F1D1D 100%)'
-          : 'linear-gradient(135deg, #D63031 0%, #991B1B 100%)',
-        padding: '20px 22px',
-        display: 'flex', alignItems: 'center', gap: 16,
-        cursor: 'pointer', marginBottom: 20,
-        boxShadow: '0 6px 24px rgba(214,48,49,0.35)',
-        WebkitTapHighlightColor: 'transparent',
-        textAlign: 'left',
-      }}
-      aria-label="Botón de emergencia SOS"
+    <div
+      style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}
+      onClick={e => { if (e.target === e.currentTarget) onClose() }}
     >
-      <div style={{ position: 'relative', flexShrink: 0 }}>
-        {!sosSent && (
-          <span style={{
-            position: 'absolute', inset: -5, borderRadius: '50%',
-            background: 'rgba(255,255,255,0.25)',
-            animation: 'ping 1.8s cubic-bezier(0,0,0.2,1) infinite',
-            pointerEvents: 'none',
-          }} />
-        )}
-        <span style={{ fontSize: 40, lineHeight: 1, position: 'relative', zIndex: 1 }}>🆘</span>
+      <style>{`
+        @keyframes sos-sheet-pulse { 0% { opacity: 0.7; transform: scale(1); } 100% { opacity: 0; transform: scale(1.05); } }
+        @media (prefers-reduced-motion: reduce) { .sos-sheet-pulse-ring { animation: none !important; } }
+      `}</style>
+      <div style={{ width: '100%', maxWidth: 480, maxHeight: '85vh', background: 'white', borderRadius: '24px 24px 0 0', boxShadow: '0 -8px 48px rgba(0,0,0,0.2)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        {/* header fijo */}
+        <div style={{ flexShrink: 0, padding: '14px 20px 12px', borderBottom: '1px solid #EDE5D8' }}>
+          <div style={{ width: 36, height: 4, borderRadius: 4, background: '#EDE5D8', margin: '0 auto 14px' }} />
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
+            <div>
+              <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#D9534F', margin: '0 0 4px' }}>Emergencia para</p>
+              <h3 style={{ fontSize: 20, fontWeight: 800, color: '#1A1A1A', margin: 0 }}>{patientName}</h3>
+            </div>
+            <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: '50%', background: '#F3F4F6', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <XIcon size={14} color="#6B7280" strokeWidth={2} />
+            </button>
+          </div>
+        </div>
+
+        {/* cuerpo con scroll — padding-bottom generoso para que el último bloque
+            (médico tratante) nunca quede pegado o cortado contra el footer fijo */}
+        <div style={{ flex: 1, overflowY: 'auto', padding: '16px 16px 28px', display: 'flex', flexDirection: 'column', gap: 12, WebkitOverflowScrolling: 'touch' }}>
+          {/* 1. Alergias y diagnóstico */}
+          <div style={{ background: '#FCEEED', border: '1.5px solid rgba(217,83,79,0.28)', borderRadius: 18, padding: 16 }}>
+            <p style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#D9534F', margin: '0 0 10px', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <AlertTriangle size={13} color="#D9534F" strokeWidth={2.3} />
+              Alergias y diagnóstico
+            </p>
+            {diagnosis && (
+              <p style={{ fontSize: 18, fontWeight: 700, color: '#334155', margin: '0 0 12px', lineHeight: 1.3 }}>{diagnosis}</p>
+            )}
+            {allergies.length > 0 ? (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                {allergies.map((a, i) => (
+                  <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: '#D9534F', color: 'white', fontSize: 14, fontWeight: 700, padding: '7px 13px', borderRadius: 100 }}>
+                    <AlertTriangle size={13} color="white" strokeWidth={2.5} />
+                    {a}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.5, margin: 0 }}>
+                Sin alergias registradas — nadie ha reportado ninguna todavía.
+              </p>
+            )}
+          </div>
+
+          {/* 2. Medicamentos activos */}
+          <div style={{ background: 'white', border: '1px solid #EDE5D8', borderRadius: 18, padding: 16 }}>
+            <p style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#6B7280', margin: '0 0 10px' }}>
+              Medicamentos activos
+            </p>
+            {meds.length > 0 ? (
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <tbody>
+                  {meds.map(med => {
+                    const times = med.scheduled_times?.length ? [...med.scheduled_times].sort() : (med.time ? [med.time] : [])
+                    return (
+                      <tr key={med.id} style={{ borderBottom: '1px solid #EDE5D8' }}>
+                        <td style={{ padding: '10px 0', fontSize: 15, fontWeight: 700, color: '#334155', width: '42%' }}>{med.name}</td>
+                        <td style={{ padding: '10px 8px 10px 0', fontSize: 14.5, fontWeight: 700, color: '#087F70', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>{med.dosage || '—'}</td>
+                        <td style={{ padding: '10px 0', fontSize: 12.5, color: '#6B7280', textAlign: 'right', fontVariantNumeric: 'tabular-nums', lineHeight: 1.4 }}>
+                          {times.length > 1 && <>{times.length}×/día<br /></>}
+                          {times.length > 0 ? times.map(fmtTime).join(' · ') : ''}
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            ) : (
+              <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.5, margin: 0 }}>Sin medicamentos activos registrados.</p>
+            )}
+          </div>
+
+          {/* 3. Contacto de emergencia */}
+          {emergencyContact ? (
+            <a href={`tel:${emergencyContact.phone}`} style={{ display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none', color: 'inherit', background: 'white', border: '1px solid #EDE5D8', borderRadius: 18, padding: '14px 14px' }}>
+              <div style={{ width: 44, height: 44, borderRadius: 13, flexShrink: 0, background: '#087F70', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Phone size={20} color="white" strokeWidth={2} />
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#6B7280', margin: '0 0 2px' }}>Contacto de emergencia</p>
+                <p style={{ fontSize: 16, fontWeight: 700, margin: 0, color: '#334155' }}>
+                  {emergencyContact.name}{emergencyContact.relationship ? <span style={{ fontWeight: 500, color: '#6B7280' }}> · {emergencyContact.relationship}</span> : null}
+                </p>
+                {emergencyContact.phone && <p style={{ fontSize: 12.5, color: '#087F70', fontWeight: 600, margin: '2px 0 0', fontVariantNumeric: 'tabular-nums' }}>{emergencyContact.phone} — toca para llamar</p>}
+              </div>
+              <ChevronRight size={17} color="#6B7280" strokeWidth={2} />
+            </a>
+          ) : (
+            <div style={{ background: '#E9F5F1', border: '1px solid rgba(8,127,112,0.14)', borderRadius: 18, padding: 16 }}>
+              <p style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#087F70', margin: '0 0 10px' }}>Contacto de emergencia</p>
+              <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.5, margin: 0 }}>
+                Aún no hay nadie marcado como contacto de emergencia — la familia recibe la alerta de todas formas al activar.
+              </p>
+            </div>
+          )}
+
+          {/* 4. Médico tratante */}
+          {primaryDoctor ? (
+            <a href={`tel:${primaryDoctor.phone}`} style={{ display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none', color: 'inherit', background: 'white', border: '1px solid #EDE5D8', borderRadius: 18, padding: '14px 14px' }}>
+              <div style={{ width: 44, height: 44, borderRadius: 13, flexShrink: 0, background: '#A8E5D6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Stethoscope size={20} color="#087F70" strokeWidth={2} />
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#6B7280', margin: '0 0 2px' }}>Médico tratante</p>
+                <p style={{ fontSize: 16, fontWeight: 700, margin: 0, color: '#334155' }}>{primaryDoctor.name}</p>
+                {(primaryDoctor.specialty || primaryDoctor.clinic) && (
+                  <p style={{ fontSize: 12.5, color: '#6B7280', margin: '2px 0 0' }}>{[primaryDoctor.specialty, primaryDoctor.clinic].filter(Boolean).join(' · ')}</p>
+                )}
+              </div>
+              {primaryDoctor.phone && <ChevronRight size={17} color="#6B7280" strokeWidth={2} />}
+            </a>
+          ) : (
+            <div style={{ background: '#E9F5F1', border: '1px solid rgba(8,127,112,0.14)', borderRadius: 18, padding: 16 }}>
+              <p style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#087F70', margin: '0 0 10px' }}>Médico tratante</p>
+              <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.5, margin: 0 }}>
+                Sin médico marcado como principal todavía — la familia sabrá a quién más avisar.
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* footer fijo — fuera del área con scroll, siempre visible */}
+        <div style={{ flexShrink: 0, padding: '14px 16px calc(16px + env(safe-area-inset-bottom, 0px))', background: 'white', borderTop: '1px solid #EDE5D8', boxShadow: '0 -6px 16px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <button
+            onClick={onConfirm}
+            style={{
+              position: 'relative', width: '100%', border: 'none', borderRadius: 16,
+              background: 'linear-gradient(135deg, #E2635F 0%, #B03430 100%)',
+              color: 'white', cursor: 'pointer', padding: '15px 18px',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+              fontSize: 16.5, fontWeight: 800,
+              boxShadow: '0 8px 22px rgba(217,83,79,0.4)',
+            }}
+          >
+            <span className="sos-sheet-pulse-ring" style={{ position: 'absolute', inset: 0, borderRadius: 16, border: '2px solid rgba(255,255,255,0.55)', animation: 'sos-sheet-pulse 2s cubic-bezier(0,0,0.2,1) infinite', pointerEvents: 'none' }} />
+            <Siren size={21} color="white" strokeWidth={2.3} style={{ position: 'relative', zIndex: 1 }} />
+            <span style={{ position: 'relative', zIndex: 1 }}>Activar emergencia</span>
+          </button>
+          <button onClick={onClose} style={{ width: '100%', border: 'none', background: 'transparent', color: '#6B7280', fontSize: 13.5, fontWeight: 600, padding: 6, cursor: 'pointer' }}>
+            Cancelar — fue un error
+          </button>
+        </div>
       </div>
-      <div style={{ flex: 1 }}>
-        <p style={{ fontSize: 18, fontWeight: 800, color: 'white', margin: 0 }}>
-          {sosSent ? '🚨 Alerta enviada' : 'Emergencia'}
-        </p>
-        <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.82)', margin: '3px 0 0', fontWeight: 500 }}>
-          {sosSent ? 'La familia ha sido notificada' : 'Toca para alertar a toda la familia'}
-        </p>
-      </div>
-      <span style={{ fontSize: 22, color: 'rgba(255,255,255,0.5)', fontWeight: 700 }}>›</span>
-    </button>
+    </div>
   )
 }
 
@@ -1947,6 +2073,8 @@ export default function Dashboard() {
   const [chatCount, setChatCount] = useState(0)
   const [patientProfileIncomplete, setPatientProfileIncomplete] = useState(false)
   const [patientProfile, setPatientProfile] = useState(null)
+  const [emergencyContact, setEmergencyContact] = useState(null)
+  const [primaryDoctor, setPrimaryDoctor] = useState(null)
   const [pdfLoading, setPdfLoading] = useState(false)
   const [careLogsToday, setCareLogsToday] = useState({})
   const [dailyMood, setDailyMood] = useState(null)
@@ -2110,6 +2238,18 @@ export default function Dashboard() {
     }
     window.addEventListener('patientProfileUpdated', onPatientUpdated)
     return () => window.removeEventListener('patientProfileUpdated', onPatientUpdated)
+  }, [ownerId])
+
+  // Contacto de emergencia y médico principal — solo para la hoja de SOS,
+  // se resuelven aparte de la lista completa del directorio.
+  useEffect(() => {
+    if (!ownerId) return
+    supabase.from('directory_contacts').select('name, relationship, phone')
+      .eq('owner_id', ownerId).eq('is_emergency_contact', true).maybeSingle()
+      .then(({ data }) => setEmergencyContact(data ?? null))
+    supabase.from('directory_contacts').select('name, specialty, clinic, phone')
+      .eq('owner_id', ownerId).eq('kind', 'medico').eq('is_primary', true).maybeSingle()
+      .then(({ data }) => setPrimaryDoctor(data ?? null))
   }, [ownerId])
 
   useEffect(() => {
@@ -3251,46 +3391,16 @@ export default function Dashboard() {
           onSOS={prepareSOS}
           onVideoCall={() => navigate('/videollamada')}
         />
-        {sosConfirming && (
-          <div
-            style={{
-              position: 'fixed', inset: 0, zIndex: 200,
-              background: 'rgba(0,0,0,0.6)',
-              display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
-            }}
-            onClick={e => { if (e.target === e.currentTarget) setSosConfirming(false) }}
-          >
-            <div style={{
-              width: '100%', maxWidth: 480,
-              background: 'white', borderRadius: '24px 24px 0 0',
-              padding: '28px 24px 96px',
-              boxShadow: '0 -8px 48px rgba(0,0,0,0.2)',
-            }}>
-              <div style={{ textAlign: 'center', marginBottom: 24 }}>
-                <div style={{
-                  width: 64, height: 64, borderRadius: '50%', margin: '0 auto 16px',
-                  background: '#FFF0F0', border: '2px solid #FFBABA',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 28,
-                }}>🚨</div>
-                <h3 style={{ fontSize: 20, fontWeight: 700, color: '#1A1A1A', fontFamily: 'Georgia, serif', margin: '0 0 8px' }}>
-                  ¿Activar emergencia?
-                </h3>
-                <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, margin: 0 }}>
-                  Todos los miembros de la familia recibirán una alerta inmediata.
-                </p>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                <button onClick={triggerSOS} style={{ width: '100%', padding: '14px', borderRadius: 16, border: 'none', background: 'linear-gradient(135deg, #D63031, #B82020)', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>
-                  Sí, es una emergencia real
-                </button>
-                <button onClick={() => setSosConfirming(false)} style={{ width: '100%', padding: '13px', borderRadius: 14, border: '1px solid #EDE5D8', background: 'white', color: '#6B7280', fontWeight: 600, fontSize: 14, cursor: 'pointer' }}>
-                  Cancelar — fue un error
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        <SosConfirmSheet
+          open={sosConfirming}
+          onClose={() => setSosConfirming(false)}
+          onConfirm={triggerSOS}
+          patientProfile={patientProfile}
+          patientName={dashPatientName}
+          medsList={medsList}
+          emergencyContact={emergencyContact}
+          primaryDoctor={primaryDoctor}
+        />
       </Layout>
     )
   }
@@ -3628,78 +3738,16 @@ export default function Dashboard() {
       </div>
 
       {/* ── SOS confirm dialog ────────────────────────────────────────────── */}
-      {sosConfirming && (
-        <div
-          style={{
-            position: 'fixed', inset: 0, zIndex: 200,
-            background: 'rgba(0,0,0,0.6)',
-            display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
-          }}
-          onClick={e => { if (e.target === e.currentTarget) setSosConfirming(false) }}
-        >
-          <div style={{
-            width: '100%', maxWidth: 480,
-            background: 'white', borderRadius: '24px 24px 0 0',
-            padding: '28px 24px 96px',
-            boxShadow: '0 -8px 48px rgba(0,0,0,0.2)',
-          }}>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
-              <button
-                onClick={() => setSosConfirming(false)}
-                style={{
-                  width: 32, height: 32, borderRadius: '50%',
-                  background: '#F3F4F6', border: 'none', cursor: 'pointer',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}
-              >
-                <XIcon size={14} color="#6B7280" strokeWidth={2} />
-              </button>
-            </div>
-            <div style={{ textAlign: 'center', marginBottom: 24 }}>
-              <div style={{
-                width: 64, height: 64, borderRadius: '50%', margin: '0 auto 16px',
-                background: '#FFF0F0', border: '2px solid #FFBABA',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <AlertTriangle size={28} color="#D63031" strokeWidth={1.5} />
-              </div>
-              <h3 style={{
-                fontSize: 20, fontWeight: 700, color: '#1A1A1A',
-                fontFamily: 'Georgia, serif', margin: '0 0 8px',
-              }}>
-                ¿Activar emergencia?
-              </h3>
-              <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, margin: 0 }}>
-                Todos los miembros de la familia recibirán una alerta inmediata
-                {profile?.name ? ` sobre ${profile.name}` : ''}.
-              </p>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <button
-                onClick={triggerSOS}
-                style={{
-                  width: '100%', padding: '14px', borderRadius: 16, border: 'none',
-                  background: 'linear-gradient(135deg, #D63031, #B82020)',
-                  color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer',
-                  boxShadow: '0 6px 20px rgba(214,48,49,0.35)',
-                }}
-              >
-                Sí, es una emergencia real
-              </button>
-              <button
-                onClick={() => setSosConfirming(false)}
-                style={{
-                  width: '100%', padding: '13px', borderRadius: 14,
-                  border: '1px solid #EDE5D8', background: 'white',
-                  color: '#6B7280', fontWeight: 600, fontSize: 14, cursor: 'pointer',
-                }}
-              >
-                Cancelar — fue un error
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <SosConfirmSheet
+        open={sosConfirming}
+        onClose={() => setSosConfirming(false)}
+        onConfirm={triggerSOS}
+        patientProfile={patientProfile}
+        patientName={dashPatientName}
+        medsList={medsList}
+        emergencyContact={emergencyContact}
+        primaryDoctor={primaryDoctor}
+      />
 
       {/* ── Admin emergency confirmation dialog ────────────────────────────── */}
       {adminConfirmEvt && (
