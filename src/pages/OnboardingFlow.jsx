@@ -5,31 +5,6 @@ import { supabase } from '../lib/supabase'
 import { uploadPatientPhoto } from '../lib/patientPhoto'
 import Logo from '../components/Logo'
 
-function calcAge(dateStr) {
-  if (!dateStr) return null
-  const b = new Date(dateStr)
-  const now = new Date()
-  let age = now.getFullYear() - b.getFullYear()
-  if (now.getMonth() < b.getMonth() || (now.getMonth() === b.getMonth() && now.getDate() < b.getDate())) age--
-  return age >= 0 ? age : null
-}
-
-const CARE_RELATIONS = [
-  { value: 'mama',   emoji: '👩', label: 'Mamá' },
-  { value: 'papa',   emoji: '👨', label: 'Papá' },
-  { value: 'abuelo', emoji: '👴', label: 'Abuelo' },
-  { value: 'abuela', emoji: '👵', label: 'Abuela' },
-  { value: 'otro',   emoji: '💛', label: 'Otro familiar' },
-]
-
-const CONCERNS = [
-  { value: 'medicamentos', emoji: '💊', label: 'Medicamentos' },
-  { value: 'alzheimer',    emoji: '🧠', label: 'Alzheimer o demencia' },
-  { value: 'hospital',     emoji: '🏥', label: 'Hospitalizaciones' },
-  { value: 'rutinas',      emoji: '📋', label: 'Rutinas diarias' },
-  { value: 'todo',         emoji: '✅', label: 'Todo lo anterior' },
-]
-
 const FREQ_OPTIONS = [
   { value: 'once_daily',  label: 'Una vez al día' },
   { value: 'twice_daily', label: 'Dos veces al día' },
@@ -38,11 +13,6 @@ const FREQ_OPTIONS = [
   { value: 'every_12h',   label: 'Cada 12 horas' },
   { value: 'as_needed',   label: 'Según necesidad' },
 ]
-
-const RELATION_PRONOUN = {
-  mama: 'tu mamá', papa: 'tu papá',
-  abuelo: 'tu abuelo', abuela: 'tu abuela', otro: 'el paciente',
-}
 
 const INPUT = {
   width: '100%', padding: '14px 16px', borderRadius: 14,
@@ -81,20 +51,6 @@ function PrimaryBtn({ children, onClick, disabled, pressed, onPD, onPU, onPL }) 
   )
 }
 
-function matchCareItemKey(text) {
-  const t = (text ?? '').toLowerCase()
-  if (/baño|bañar|ducha/.test(t))               return 'bath'
-  if (/cepill|diente|dental/.test(t))            return 'dental_morning'
-  if (/ropa|vestir|cambio.*ropa/.test(t))        return 'clothes'
-  if (/desayuno|breakfast/.test(t))              return 'breakfast'
-  if (/almuerzo|lunch|comida/.test(t))           return 'lunch'
-  if (/cena|dinner|merienda/.test(t))            return 'dinner'
-  if (/ejercicio|camina|walk|paseo|físic/.test(t)) return 'exercise'
-  if (/terapia|fisio|rehabilit/.test(t))         return 'home_therapy'
-  if (/uña|nail/.test(t))                        return 'nail_trim'
-  return null
-}
-
 function SkipBtn({ onClick, label = 'Hacer esto después' }) {
   return (
     <button
@@ -113,17 +69,19 @@ function SkipBtn({ onClick, label = 'Hacer esto después' }) {
 export default function OnboardingFlow() {
   const { user } = useAuth()
   const { refresh } = useFamily()
-  const TOTAL = 7
+  // 3 pasos core (perfil → medicamento → invitar) + bienvenida y celebración
+  // como bookends de 1 tap cada uno. Antes eran 7 — "¿A quién vas a cuidar?" y
+  // "¿Qué te preocupa más?" se eliminaron: ninguno de los dos se guardaba en
+  // la base de datos, solo personalizaban texto en pantalla (ver auditoría
+  // 2026-08-10).
+  const TOTAL = 5
 
   const [step, setStep]     = useState(1)
   const [pressed, setPressed] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError]   = useState('')
 
-  // Paso 2 — relación
-  const [careRelation, setCareRelation] = useState('')
-
-  // Paso 3 — perfil básico
+  // Paso 2 — perfil básico
   const [patientName, setPatientName]   = useState('')
   const [birthDate, setBirthDate]       = useState('')
   const [photoFile, setPhotoFile]       = useState(null)
@@ -132,36 +90,18 @@ export default function OnboardingFlow() {
   const cameraRef  = useRef(null)
   const galleryRef = useRef(null)
 
-  // Paso 4 — preocupaciones
-  const [concerns, setConcerns] = useState([])
+  // Paso 3 — primer medicamento
+  const [medName, setMedName]   = useState('')
+  const [medFreq, setMedFreq]   = useState('')
+  const [medTime, setMedTime]   = useState('')
 
-  // Paso 5 — invitar equipo
+  // Paso 4 — invitar equipo
   const [inviteLink, setInviteLink] = useState('')
   const [copied, setCopied]         = useState(false)
-
-  // Paso 6 — primera acción guiada
-  const [a6Med, setA6Med]           = useState('')
-  const [a6MedFreq, setA6MedFreq]   = useState('')
-  const [a6MedTime, setA6MedTime]   = useState('')
-  const [a6Task, setA6Task]         = useState('')
-  const [a6TaskTime, setA6TaskTime] = useState('')
-  const [a6Note, setA6Note]         = useState('')
 
   const displayName  = user?.user_metadata?.full_name ?? user?.email ?? 'Yo'
   const progress     = (step / TOTAL) * 100
   const patientFirst = patientName.trim().split(' ')[0] || 'tu familiar'
-
-  // Placeholder dinámico del campo nombre en paso 3
-  const namePlaceholder = {
-    mama: 'Nombre de tu mamá', papa: 'Nombre de tu papá',
-    abuelo: 'Nombre de tu abuelo', abuela: 'Nombre de tu abuela',
-    otro: 'Nombre del familiar',
-  }[careRelation] ?? 'Ej: María González'
-
-  // Qué mostrar en paso 6 según preocupaciones
-  const wantsMeds  = concerns.includes('medicamentos') || concerns.includes('todo')
-  const wantsNote  = !wantsMeds && (concerns.includes('alzheimer') || concerns.includes('hospital'))
-  const step6Type  = wantsMeds ? 'meds' : wantsNote ? 'note' : 'task'
 
   const pd = () => setPressed(true)
   const pu = () => setPressed(false)
@@ -171,16 +111,6 @@ export default function OnboardingFlow() {
     if (!f) return
     setPhotoFile(f)
     setPhotoPreview(URL.createObjectURL(f))
-  }
-
-  function toggleConcern(value) {
-    if (value === 'todo') {
-      const others = CONCERNS.filter(c => c.value !== 'todo').map(c => c.value)
-      const hasAll = others.every(v => concerns.includes(v)) && concerns.includes('todo')
-      setConcerns(hasAll ? [] : [...others, 'todo'])
-    } else {
-      setConcerns(prev => prev.includes(value) ? prev.filter(v => v !== value) : [...prev, value])
-    }
   }
 
   async function generateInviteLink() {
@@ -201,7 +131,7 @@ export default function OnboardingFlow() {
     }
   }
 
-  // ── Guardar perfil (Paso 3) ──────────────────────────────────────────
+  // ── Guardar perfil (Paso 2) ──────────────────────────────────────────
   async function handleSaveProfile() {
     if (!patientName.trim() || !birthDate) return
     setSaving(true); setError('')
@@ -217,7 +147,7 @@ export default function OnboardingFlow() {
       )
       if (e2) throw e2
       if (photoFile) await uploadPatientPhoto(user.id, photoFile)
-      setStep(4)
+      setStep(3)
     } catch (e) {
       console.error('[ONB-ERR]', e)
       setError('No se pudo guardar. Intenta de nuevo.')
@@ -226,60 +156,35 @@ export default function OnboardingFlow() {
     }
   }
 
-  // ── Avanzar de Paso 4 a Paso 5 (genera link de fondo) ───────────────
-  function goToStep5() {
+  // ── Avanzar del paso 3 (medicamento) al 4 (invitar), generando el enlace ──
+  function goToInvite() {
     generateInviteLink()
-    setStep(5)
+    setStep(4)
   }
 
-  // ── Guardar primera acción (Paso 6) ──────────────────────────────────
-  async function saveFirstAction() {
+  // ── Guardar primer medicamento (Paso 3) ───────────────────────────────
+  async function saveFirstMed() {
     setSaving(true)
     try {
-      if (step6Type === 'meds' && a6Med.trim()) {
-        const times = a6MedTime ? [a6MedTime] : []
+      if (medName.trim()) {
+        const times = medTime ? [medTime] : []
         await supabase.from('medications').insert({
           user_id: user.id, created_by_user_id: user.id,
-          name: a6Med.trim(),
-          frequency: a6MedFreq || null,
-          time: a6MedTime || null,
+          name: medName.trim(),
+          frequency: medFreq || null,
+          time: medTime || null,
           scheduled_times: times.length ? times : null,
-        })
-      } else if (step6Type === 'task' && a6Task.trim()) {
-        // Try to match the task to a predefined care item so it appears in Cuidado.jsx
-        const careKey = matchCareItemKey(a6Task)
-        if (careKey) {
-          await supabase.from('care_item_schedules').upsert({
-            user_id: user.id,
-            item_key: careKey,
-            scheduled_time: a6TaskTime || null,
-            updated_at: new Date().toISOString(),
-          }, { onConflict: 'user_id,item_key' })
-        } else {
-          await supabase.from('notes').insert({
-            user_id: user.id, created_by_user_id: user.id,
-            title: a6Task.trim(),
-            content: a6TaskTime ? `Horario: ${a6TaskTime}` : '',
-            tags: ['rutina'],
-          })
-        }
-      } else if (step6Type === 'note' && a6Note.trim()) {
-        await supabase.from('notes').insert({
-          user_id: user.id, created_by_user_id: user.id,
-          title: 'Nota inicial',
-          content: a6Note.trim(),
-          tags: ['médico'],
         })
       }
     } catch (err) {
-      console.warn('[OnboardingFlow] step6 save failed:', err)
+      console.warn('[OnboardingFlow] saveFirstMed failed:', err)
     } finally {
       setSaving(false)
-      setStep(7)
+      goToInvite()
     }
   }
 
-  // ── Funciones de compartir (Paso 5) ───────────────────────────────────
+  // ── Funciones de compartir (Paso 4) ───────────────────────────────────
   const inviteMsg = () =>
     `Te invito a FamiliaCerca para coordinar el cuidado de ${patientName || 'nuestro familiar'}. Descárgala en familiacerca.com${inviteLink ? ` o entra aquí: ${inviteLink}` : ''}`
 
@@ -376,45 +281,11 @@ export default function OnboardingFlow() {
           </>
         )}
 
-        {/* ════ PASO 2 — ¿A QUIÉN VAS A CUIDAR? ════ */}
+        {/* ════ PASO 2 — PERFIL BÁSICO ════ */}
         {step === 2 && (
           <>
-            <p style={{ fontSize: 26, fontWeight: 800, color: '#1A1A1A', fontFamily: 'Georgia, serif', lineHeight: 1.25, margin: '0 0 8px' }}>
-              ¿A quién vas a cuidar?
-            </p>
-            <p style={{ fontSize: 14, color: '#718096', margin: '0 0 28px' }}>
-              Selecciona para personalizar tu experiencia.
-            </p>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {CARE_RELATIONS.map(({ value, emoji, label }) => (
-                <button
-                  key={value}
-                  onClick={() => { setCareRelation(value); setStep(3) }}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: 16,
-                    padding: '18px 20px', borderRadius: 16,
-                    border: '1.5px solid #E8E4DC', background: 'white',
-                    cursor: 'pointer', textAlign: 'left',
-                    boxShadow: '0 2px 0px #E0DBD2', fontFamily: 'inherit',
-                    WebkitTapHighlightColor: 'transparent',
-                    transition: 'all 0.12s',
-                  }}
-                >
-                  <span style={{ fontSize: 32, flexShrink: 0 }}>{emoji}</span>
-                  <span style={{ fontSize: 18, fontWeight: 700, color: '#1A1A1A' }}>{label}</span>
-                  <span style={{ marginLeft: 'auto', color: '#D1D5DB', fontSize: 18 }}>›</span>
-                </button>
-              ))}
-            </div>
-          </>
-        )}
-
-        {/* ════ PASO 3 — PERFIL BÁSICO ════ */}
-        {step === 3 && (
-          <>
             <p style={{ fontSize: 26, fontWeight: 800, color: '#1A1A1A', fontFamily: 'Georgia, serif', lineHeight: 1.25, margin: '0 0 6px' }}>
-              Cuéntanos sobre {RELATION_PRONOUN[careRelation] ?? 'el paciente'}
+              Cuéntanos sobre tu familiar
             </p>
             <p style={{ fontSize: 14, color: '#718096', margin: '0 0 28px' }}>
               Solo lo básico — puedes agregar detalles médicos después.
@@ -463,7 +334,7 @@ export default function OnboardingFlow() {
                 <input
                   style={INPUT} value={patientName} autoFocus
                   onChange={e => setPatientName(e.target.value)}
-                  placeholder={namePlaceholder}
+                  placeholder="Ej: María González"
                 />
               </div>
               <div>
@@ -486,54 +357,60 @@ export default function OnboardingFlow() {
           </>
         )}
 
-        {/* ════ PASO 4 — ¿QUÉ TE PREOCUPA MÁS? ════ */}
-        {step === 4 && (
+        {/* ════ PASO 3 — PRIMER MEDICAMENTO ════ */}
+        {step === 3 && (
           <>
             <p style={{ fontSize: 26, fontWeight: 800, color: '#1A1A1A', fontFamily: 'Georgia, serif', lineHeight: 1.25, margin: '0 0 8px' }}>
-              ¿Qué te preocupa más?
+              Hagamos algo juntos
             </p>
-            <p style={{ fontSize: 14, color: '#718096', margin: '0 0 28px' }}>
-              Te ayudamos a organizarlo. Puedes elegir más de una.
+            <p style={{ fontSize: 14, color: '#718096', margin: '0 0 20px', lineHeight: 1.5 }}>
+              Tu primera acción en menos de 1 minuto.
             </p>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {CONCERNS.map(({ value, emoji, label }) => {
-                const selected = concerns.includes(value)
-                return (
-                  <button
-                    key={value}
-                    onClick={() => toggleConcern(value)}
-                    style={{
-                      display: 'flex', alignItems: 'center', gap: 16,
-                      padding: '16px 18px', borderRadius: 16,
-                      border: `2px solid ${selected ? '#087F70' : '#E8E4DC'}`,
-                      background: selected ? '#A8E5D6' : 'white',
-                      cursor: 'pointer', textAlign: 'left',
-                      fontFamily: 'inherit', transition: 'all 0.12s',
-                      WebkitTapHighlightColor: 'transparent',
-                    }}
-                  >
-                    <span style={{ fontSize: 24, flexShrink: 0 }}>{emoji}</span>
-                    <span style={{ fontSize: 15, fontWeight: 600, color: selected ? '#087F70' : '#374151', flex: 1 }}>
-                      {label}
-                    </span>
-                    {selected && <span style={{ fontSize: 16, color: '#087F70', flexShrink: 0 }}>✓</span>}
-                  </button>
-                )
-              })}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div style={{ padding: '12px 14px', background: '#A8E5D6', borderRadius: 12 }}>
+                <p style={{ margin: 0, fontSize: 13, color: '#087F70', fontWeight: 600 }}>
+                  💊 Primer medicamento de {patientFirst}
+                </p>
+              </div>
+              <div>
+                <label style={LABEL}>Nombre del medicamento *</label>
+                <input style={INPUT} value={medName} autoFocus
+                  onChange={e => setMedName(e.target.value)}
+                  placeholder="Ej: Metformina, Losartán, Aspirina..." />
+              </div>
+              <div>
+                <label style={LABEL}>Frecuencia</label>
+                <div style={{ position: 'relative' }}>
+                  <select value={medFreq} onChange={e => setMedFreq(e.target.value)}
+                    style={{ ...INPUT, paddingRight: 36, appearance: 'none', WebkitAppearance: 'none' }}>
+                    <option value="">Seleccionar...</option>
+                    {FREQ_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                  </select>
+                  <span style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#9CA3AF', fontSize: 12 }}>▼</span>
+                </div>
+              </div>
+              <div>
+                <label style={LABEL}>Hora de toma</label>
+                <input type="time" style={INPUT} value={medTime} onChange={e => setMedTime(e.target.value)} />
+              </div>
             </div>
 
             <div style={{ marginTop: 28, display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <PrimaryBtn onClick={goToStep5} pressed={pressed} onPD={pd} onPU={pu} onPL={pu}>
-                Continuar →
+              <PrimaryBtn
+                onClick={saveFirstMed}
+                disabled={saving || !medName.trim()}
+                pressed={pressed} onPD={pd} onPU={pu} onPL={pu}
+              >
+                {saving ? 'Guardando...' : 'Agregar medicamento →'}
               </PrimaryBtn>
-              <SkipBtn onClick={goToStep5} />
+              <SkipBtn onClick={goToInvite} />
             </div>
           </>
         )}
 
-        {/* ════ PASO 5 — INVITA AL EQUIPO ════ */}
-        {step === 5 && (
+        {/* ════ PASO 4 — INVITA AL EQUIPO ════ */}
+        {step === 4 && (
           <>
             <p style={{ fontSize: 26, fontWeight: 800, color: '#1A1A1A', fontFamily: 'Georgia, serif', lineHeight: 1.25, margin: '0 0 8px' }}>
               Invita a alguien del equipo
@@ -617,121 +494,16 @@ export default function OnboardingFlow() {
             </div>
 
             <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <PrimaryBtn onClick={() => setStep(6)} pressed={pressed} onPD={pd} onPU={pu} onPL={pu}>
+              <PrimaryBtn onClick={() => setStep(5)} pressed={pressed} onPD={pd} onPU={pu} onPL={pu}>
                 Continuar →
               </PrimaryBtn>
-              <SkipBtn onClick={() => setStep(6)} />
+              <SkipBtn onClick={() => setStep(5)} />
             </div>
           </>
         )}
 
-        {/* ════ PASO 6 — PRIMERA ACCIÓN GUIADA ════ */}
-        {step === 6 && (
-          <>
-            <p style={{ fontSize: 26, fontWeight: 800, color: '#1A1A1A', fontFamily: 'Georgia, serif', lineHeight: 1.25, margin: '0 0 8px' }}>
-              Hagamos algo juntos
-            </p>
-            <p style={{ fontSize: 14, color: '#718096', margin: '0 0 20px', lineHeight: 1.5 }}>
-              Tu primera acción en menos de 1 minuto.
-            </p>
-
-            {/* ── Meds ── */}
-            {step6Type === 'meds' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                <div style={{ padding: '12px 14px', background: '#A8E5D6', borderRadius: 12 }}>
-                  <p style={{ margin: 0, fontSize: 13, color: '#087F70', fontWeight: 600 }}>
-                    💊 Primer medicamento de {patientFirst}
-                  </p>
-                </div>
-                <div>
-                  <label style={LABEL}>Nombre del medicamento *</label>
-                  <input style={INPUT} value={a6Med} autoFocus
-                    onChange={e => setA6Med(e.target.value)}
-                    placeholder="Ej: Metformina, Losartán, Aspirina..." />
-                </div>
-                <div>
-                  <label style={LABEL}>Frecuencia</label>
-                  <div style={{ position: 'relative' }}>
-                    <select value={a6MedFreq} onChange={e => setA6MedFreq(e.target.value)}
-                      style={{ ...INPUT, paddingRight: 36, appearance: 'none', WebkitAppearance: 'none' }}>
-                      <option value="">Seleccionar...</option>
-                      {FREQ_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-                    </select>
-                    <span style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#9CA3AF', fontSize: 12 }}>▼</span>
-                  </div>
-                </div>
-                <div>
-                  <label style={LABEL}>Hora de toma</label>
-                  <input type="time" style={INPUT} value={a6MedTime} onChange={e => setA6MedTime(e.target.value)} />
-                </div>
-              </div>
-            )}
-
-            {/* ── Task / Rutina ── */}
-            {step6Type === 'task' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                <div style={{ padding: '12px 14px', background: '#A8E5D6', borderRadius: 12 }}>
-                  <p style={{ margin: 0, fontSize: 13, color: '#087F70', fontWeight: 600 }}>
-                    📋 Primera rutina diaria de {patientFirst}
-                  </p>
-                </div>
-                <div>
-                  <label style={LABEL}>Nombre de la rutina *</label>
-                  <input style={INPUT} value={a6Task} autoFocus
-                    onChange={e => setA6Task(e.target.value)}
-                    placeholder="Ej: Baño, Ejercicio, Fisioterapia..." />
-                </div>
-                <div>
-                  <label style={LABEL}>Hora</label>
-                  <input type="time" style={INPUT} value={a6TaskTime} onChange={e => setA6TaskTime(e.target.value)} />
-                </div>
-              </div>
-            )}
-
-            {/* ── Nota médica ── */}
-            {step6Type === 'note' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                <div style={{ padding: '12px 14px', background: '#A8E5D6', borderRadius: 12 }}>
-                  <p style={{ margin: 0, fontSize: 13, color: '#087F70', fontWeight: 600 }}>
-                    📝 Primera nota médica de {patientFirst}
-                  </p>
-                </div>
-                <div>
-                  <label style={LABEL}>Nota médica</label>
-                  <textarea
-                    style={{ ...INPUT, resize: 'none', minHeight: 110, lineHeight: 1.55 }}
-                    value={a6Note} autoFocus rows={4}
-                    onChange={e => setA6Note(e.target.value)}
-                    placeholder="Diagnóstico, medicamentos actuales, indicaciones del médico..."
-                  />
-                </div>
-              </div>
-            )}
-
-            <div style={{ marginTop: 28, display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <PrimaryBtn
-                onClick={saveFirstAction}
-                disabled={
-                  saving ||
-                  (step6Type === 'meds' && !a6Med.trim()) ||
-                  (step6Type === 'task' && !a6Task.trim()) ||
-                  (step6Type === 'note' && !a6Note.trim())
-                }
-                pressed={pressed} onPD={pd} onPU={pu} onPL={pu}
-              >
-                {saving
-                  ? 'Guardando...'
-                  : step6Type === 'meds' ? 'Agregar medicamento →'
-                  : step6Type === 'task' ? 'Agregar rutina →'
-                  : 'Guardar nota →'}
-              </PrimaryBtn>
-              <SkipBtn onClick={() => setStep(7)} />
-            </div>
-          </>
-        )}
-
-        {/* ════ PASO 7 — CELEBRACIÓN ════ */}
-        {step === 7 && (
+        {/* ════ PASO 5 — CELEBRACIÓN ════ */}
+        {step === 5 && (
           <>
             <div style={{ textAlign: 'center', marginBottom: 32 }}>
               <div style={{ fontSize: 56, marginBottom: 14, lineHeight: 1 }}>🎉</div>
