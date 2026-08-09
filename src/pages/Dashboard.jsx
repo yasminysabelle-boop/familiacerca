@@ -3573,7 +3573,12 @@ export default function Dashboard() {
         <div style={{ padding: '16px 16px 0', display: 'flex', flexDirection: 'column', gap: 24, paddingBottom: 104 }}>
           {(() => {
             const profilePhoto = patientProfile?.photo_url || patientProfile?.foto_url || profile?.photo_url || null
-            const patientName = patientProfile?.nombre_completo || profile?.name || 'Agregar familiar'
+            const realPatientName = patientProfile?.nombre_completo || profile?.name || null
+            const patientName = realPatientName || 'Agregar familiar'
+            // Solo partimos a "primer nombre" cuando patientName es un nombre real — el
+            // texto de fallback ("Agregar familiar") es un CTA, no un nombre, y partirlo
+            // mostraba solo "Agregar" en la tarjeta (bug encontrado 2026-08-09).
+            const patientFirstName = realPatientName ? realPatientName.split(' ')[0] : patientName
             const isCritical     = hasActiveSOS || (_isRetrasado && _retrasadoMins != null && _retrasadoMins >= 720)
             const isPendingToday = !isCritical && (pendingCount > 0 || _isRetrasado)
 
@@ -3608,7 +3613,7 @@ export default function Dashboard() {
                     HERO — CareCard (paleta app: teal/coral emergencia/gold — ver CLAUDE.md)
                     ══════════════════════════════════════════ */}
                 <CareCard
-                  name={patientName.split(' ')[0]}
+                  name={patientFirstName}
                   photoUrl={profilePhoto}
                   status={isCritical ? 'critical' : isPendingToday ? 'warning' : 'ok'}
                   medsUpToDate={pendingCount === 0}
@@ -3645,7 +3650,7 @@ export default function Dashboard() {
                 />
 
                 {/* ══ MILO Y LUNA (v0: PetsCard) ══ */}
-                <PetsCard onOpen={() => setShowCompanion(true)} patientFirstName={patientName.split(' ')[0]} />
+                <PetsCard onOpen={() => setShowCompanion(true)} patientFirstName={patientFirstName} />
 
                 {/* ════════════════════════════════════
                     ACCIONES RÁPIDAS + MÁS HERRAMIENTAS — directo sobre el fondo crema
