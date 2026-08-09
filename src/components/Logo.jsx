@@ -24,7 +24,7 @@ export default function Logo({ showWordmark = false, size = 36, variant = 'defau
           </p>
           <p
             className="text-[9px] leading-none tracking-widest uppercase mt-0.5"
-            style={{ color: light ? 'rgba(255,255,255,0.55)' : '#9CA3AF' }}
+            style={{ color: light ? 'rgba(255,255,255,0.8)' : '#9CA3AF' }}
           >
             Cuidado con amor
           </p>

@@ -257,7 +257,7 @@ export default function Settings() {
 
         {/* Account card */}
         <div style={{
-          background: 'linear-gradient(135deg, #0d6b63, #2E5240)',
+          background: '#075F55',
           borderRadius: 20, padding: '20px 20px', marginBottom: 16,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
@@ -297,7 +297,7 @@ export default function Settings() {
               <p style={{ color: 'white', fontSize: 16, fontWeight: 700, fontFamily: 'Georgia, serif', margin: 0 }}>
                 {user?.user_metadata?.full_name ?? 'Mi cuenta'}
               </p>
-              <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: 12, margin: '3px 0 0' }}>
+              <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 12, margin: '3px 0 0' }}>
                 {user?.email}
               </p>
             </div>

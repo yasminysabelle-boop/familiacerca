@@ -229,7 +229,7 @@ export default function OnboardingFlow() {
     <div style={{ minHeight: '100dvh', background: '#F8F4ED', display: 'flex', flexDirection: 'column' }}>
 
       {/* ── Header con barra de progreso ── */}
-      <div style={{ background: '#087F70', padding: '0 20px', paddingTop: 'calc(env(safe-area-inset-top) + 14px)' }}>
+      <div style={{ background: '#075F55', padding: '0 20px', paddingTop: 'calc(env(safe-area-inset-top) + 14px)' }}>
         <Logo showWordmark size={28} variant="light" />
         <div style={{ marginTop: 16, height: 4, background: 'rgba(255,255,255,0.15)', borderRadius: 4 }}>
           <div style={{

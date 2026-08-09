@@ -241,7 +241,7 @@ export default function DiarioMedico() {
 
         {/* Header */}
         <div style={{
-          background: 'linear-gradient(135deg, #087F70, #0a9d8c)',
+          background: '#075F55',
           borderRadius: 20, padding: '20px 18px', marginBottom: 20,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         }}>
@@ -251,7 +251,7 @@ export default function DiarioMedico() {
               <p style={{ margin: 0, fontSize: 18, fontWeight: 800, color: 'white', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                 Notas Médicas IA
               </p>
-              <p style={{ margin: '3px 0 0', fontSize: 12, color: 'rgba(255,255,255,0.55)' }}>
+              <p style={{ margin: '3px 0 0', fontSize: 12, color: 'rgba(255,255,255,0.8)' }}>
                 Habla o toma una foto y Milo organiza todo.
               </p>
             </div>

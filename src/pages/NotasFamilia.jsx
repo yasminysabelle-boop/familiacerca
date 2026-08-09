@@ -101,7 +101,7 @@ export default function NotasFamilia() {
     <div style={{ minHeight: '100vh', background: '#F8F4ED' }}>
 
       {/* Header + tabs */}
-      <div style={{ background: '#087F70', padding: '20px 20px 0' }}>
+      <div style={{ background: '#075F55', padding: '20px 20px 0' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
           <button
             onClick={() => navigate('/dashboard')}
@@ -125,7 +125,7 @@ export default function NotasFamilia() {
                 flex: 1, padding: '10px 0', border: 'none', cursor: 'pointer',
                 background: 'transparent', fontFamily: 'inherit',
                 fontSize: 13, fontWeight: 700,
-                color: tab === t.key ? 'white' : 'rgba(255,255,255,0.55)',
+                color: tab === t.key ? 'white' : 'rgba(255,255,255,0.8)',
                 borderBottom: tab === t.key ? '2px solid white' : '2px solid transparent',
                 transition: 'color 0.15s, border-color 0.15s',
                 WebkitTapHighlightColor: 'transparent',

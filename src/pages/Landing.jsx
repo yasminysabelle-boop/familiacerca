@@ -77,12 +77,12 @@ function PriceCard({ name, price, period, highlight, badge, groups, cta, annual,
   return (
     <div
       className={`price-card-hover${highlight ? ' price-card-highlighted' : ''}`}
-      style={{ flex: '1 1 280px', borderRadius: 24, background: highlight ? ACTION : WHITE, padding: '44px 32px', boxShadow: highlight ? '0 32px 96px rgba(13,107,99,0.35)' : '0 4px 28px rgba(0,0,0,0.07)', border: highlight ? 'none' : `1px solid ${BORDER}`, position: 'relative', display: 'flex', flexDirection: 'column' }}
+      style={{ flex: '1 1 280px', borderRadius: 24, background: highlight ? '#075F55' : WHITE, padding: '44px 32px', boxShadow: highlight ? '0 32px 96px rgba(13,107,99,0.35)' : '0 4px 28px rgba(0,0,0,0.07)', border: highlight ? 'none' : `1px solid ${BORDER}`, position: 'relative', display: 'flex', flexDirection: 'column' }}
     >
       {badge && (
         <div className={highlight ? 'badge-pulse-anim' : ''} style={{ position: 'absolute', top: -16, left: '50%', transform: 'translateX(-50%)', background: GOLD, color: 'white', fontSize: 12, fontWeight: 500, letterSpacing: '0.12em', padding: '6px 22px', borderRadius: 9999, whiteSpace: 'nowrap', fontFamily: SANS }}>{badge}</div>
       )}
-      <p style={{ fontSize: 'clamp(16px,1.2vw,19px)', fontWeight: 500, color: highlight ? 'rgba(255,255,255,0.55)' : ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 12px', fontFamily: SANS }}>{name}</p>
+      <p style={{ fontSize: 'clamp(16px,1.2vw,19px)', fontWeight: 500, color: highlight ? 'rgba(255,255,255,0.8)' : ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 12px', fontFamily: SANS }}>{name}</p>
       {tagline && <p style={{ fontSize: 14, color: highlight ? 'rgba(255,255,255,0.65)' : '#6B7280', margin: '0 0 16px', fontFamily: SANS, fontWeight: 400, lineHeight: 1.4 }}>{tagline}</p>}
       <div style={{ marginBottom: 4, display: 'flex', alignItems: 'baseline', gap: 6 }}>
         <span style={{ fontSize: 52, fontWeight: 700, color: highlight ? 'white' : DARK, fontFamily: SERIF, lineHeight: 1 }}>{price === 0 ? 'Gratis' : `$${displayPrice}`}</span>

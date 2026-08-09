@@ -45,7 +45,7 @@ export default function FamilySwitcher({ isLight = false }) {
         }}>
           {displayLabel}
         </span>
-        <span style={{ fontSize: 7, color: isLight ? '#9CA3AF' : 'rgba(255,255,255,0.55)', flexShrink: 0, marginTop: 1 }}>▼</span>
+        <span style={{ fontSize: 7, color: isLight ? '#9CA3AF' : 'rgba(255,255,255,0.8)', flexShrink: 0, marginTop: 1 }}>▼</span>
       </button>
 
       {/* Sheet */}
