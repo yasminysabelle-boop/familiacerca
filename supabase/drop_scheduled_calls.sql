@@ -1,0 +1,16 @@
+-- ================================================================
+-- FamiliaCerca — DROP scheduled_calls (implementación vieja de
+-- videollamadas, reemplazada por video_calls en Fase 2)
+-- Run in the Supabase SQL Editor
+--
+-- Auditoría de tablas huérfanas: scheduled_calls (patient_id, family_id,
+-- scheduled_at, created_by, status, title, created_at) no tiene ninguna
+-- referencia en el código actual — grep confirmado 0 resultados en src/,
+-- Edge Functions ni migraciones vigentes. video_calls (owner_id, room_name,
+-- room_url, participants, notification_15_sent/notification_0_sent, etc.)
+-- es la tabla real detrás de /videollamada, create-daily-room y
+-- send-videocall-notifications.
+--
+-- Confirmado 0 filas en producción antes de este DROP (2026-08-10).
+-- ================================================================
+drop table if exists public.scheduled_calls;

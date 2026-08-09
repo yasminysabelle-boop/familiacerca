@@ -12,7 +12,7 @@ import { SkeletonExpenseCard } from '../components/SkeletonLoader'
 import EmptyState from '../components/EmptyState'
 import SuccessAnimation, { useSuccessAnimation } from '../components/SuccessAnimation'
 import LoadingButton from '../components/LoadingButton'
-import { usePullToRefresh } from '../hooks/usePullToRefresh'
+import { usePullToRefresh } from '../hooks/usePullToRefresh.jsx'
 import EvidencePhoto from '../components/EvidencePhoto'
 import VoiceInput from '../components/VoiceInput'
 

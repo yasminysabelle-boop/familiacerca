@@ -7,7 +7,7 @@ import { mapsUrl } from '../lib/gps'
 import { CARE_ITEMS } from '../lib/careItems'
 import { incidentTypeInfo } from '../lib/incidentTypes'
 import { SkeletonEventCard } from '../components/SkeletonLoader'
-import { usePullToRefresh } from '../hooks/usePullToRefresh'
+import { usePullToRefresh } from '../hooks/usePullToRefresh.jsx'
 import { useGoBack } from '../hooks/useGoBack'
 import WatermarkHeart from '../components/WatermarkHeart'
 import {
