@@ -359,7 +359,7 @@ export default function PatientProfile() {
                 }}
               >
                 {form.photo_url
-                  ? <img src={form.photo_url} alt="Paciente" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+                  ? <img src={form.photo_url} alt={form.nombre_completo || 'Paciente'} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
                   : <span style={{ color:'white', fontSize:22, fontWeight:700 }}>{initials}</span>
                 }
                 {uploading && (
@@ -714,7 +714,7 @@ export default function PatientProfile() {
                 style={{ width: '100%', padding: '15px', fontSize: 15, marginBottom: 16 }}
               >
                 <CheckIcon size={17} color="white" strokeWidth={2.5} />
-                Guardar perfil del paciente
+                {form.nombre_completo ? `Guardar perfil de ${form.nombre_completo.split(' ')[0]}` : 'Guardar perfil del paciente'}
               </LoadingButton>
             )}
           </form>

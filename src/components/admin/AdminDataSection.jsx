@@ -67,7 +67,7 @@ export default function AdminDataSection() {
       if (patientData) {
         doc.setFontSize(13)
         doc.setFont('helvetica', 'bold')
-        doc.text('Perfil del paciente', 14, y)
+        doc.text(patientData.nombre_completo ? `Perfil de ${patientData.nombre_completo}` : 'Perfil del paciente', 14, y)
         y += 7
         const fields = [
           ['Nombre', patientData.nombre_completo],

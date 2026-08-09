@@ -46,7 +46,7 @@ export default function MemberOnboarding({ onDone }) {
 
   function validateStep1() {
     if (!name.trim()) { setError('Escribe tu nombre.'); return false }
-    if (!relationship) { setError('Selecciona tu relación con el paciente.'); return false }
+    if (!relationship) { setError(`Selecciona tu relación con ${patientName}.`); return false }
     return true
   }
 

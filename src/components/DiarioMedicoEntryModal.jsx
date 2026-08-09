@@ -187,7 +187,8 @@ function StepsList({ steps, onChange }) {
 
 export default function DiarioMedicoEntryModal({ open, onClose, onSaved }) {
   const { user } = useAuth()
-  const { ownerId } = useFamily()
+  const { ownerId, activePatientName } = useFamily()
+  const patientName = activePatientName ? activePatientName.split(' ')[0] : 'tu familiar'
 
   const [step, setStep]               = useState('input')  // input | processing | review
   const [inputType, setInputType]     = useState('voice')  // voice | photo
@@ -614,9 +615,9 @@ export default function DiarioMedicoEntryModal({ open, onClose, onSaved }) {
             <VoiceInput
               value={s.estado_general}
               onChange={v => setStructured(p => ({ ...p, estado_general: v }))}
-              placeholder="Cómo está el paciente..."
+              placeholder={`Cómo está ${patientName}...`}
               rows={2}
-              label="Estado del paciente"
+              label={`Estado de ${patientName}`}
             />
 
             <VoiceInput

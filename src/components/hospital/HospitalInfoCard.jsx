@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useHospitalMode } from '../../contexts/HospitalModeContext'
+import { useFamily } from '../../contexts/FamilyContext'
 
 const fieldStyle = {
   width: '100%', padding: '10px 13px', borderRadius: 10,
@@ -20,6 +21,8 @@ function fmtUpdated(iso) {
 
 export default function HospitalInfoCard() {
   const { hospitalMode, updateHospitalMode } = useHospitalMode()
+  const { activePatientName } = useFamily()
+  const patientName = activePatientName ? activePatientName.split(' ')[0] : 'tu familiar'
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -124,7 +127,7 @@ export default function HospitalInfoCard() {
           <Field label="👨‍⚕️ Médico tratante" value={form.treating_doctor}
             onChange={v => change('treating_doctor', v)}
             placeholder="Nombre del médico" />
-          <Field label="📋 Estado del paciente" value={form.patient_status}
+          <Field label={`📋 Estado de ${patientName}`} value={form.patient_status}
             onChange={v => change('patient_status', v)}
             placeholder="Ej: En observación, Post-operatorio..."
             multiline />

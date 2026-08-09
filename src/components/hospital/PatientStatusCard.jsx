@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react'
 import { useHospitalMode } from '../../contexts/HospitalModeContext'
+import { useFamily } from '../../contexts/FamilyContext'
 import VoiceInput from '../VoiceInput'
 
 export default function PatientStatusCard() {
   const { hospitalMode, updateHospitalMode } = useHospitalMode()
+  const { activePatientName } = useFamily()
+  const patientName = activePatientName ? activePatientName.split(' ')[0] : 'tu familiar'
   const [text, setText] = useState('')
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -32,7 +35,7 @@ export default function PatientStatusCard() {
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
         <span style={{ fontSize: 20 }}>🩺</span>
         <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#1A1A1A' }}>
-          Estado del paciente
+          Estado de {patientName}
         </h3>
         {saved && (
           <span style={{
@@ -61,7 +64,7 @@ export default function PatientStatusCard() {
       <VoiceInput
         value={text}
         onChange={setText}
-        placeholder="Describe cómo está el paciente... (toca el micrófono para dictar)"
+        placeholder={`Describe cómo está ${patientName}... (toca el micrófono para dictar)`}
         rows={3}
         label="Actualizar estado"
         onSave={handleSave}

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useHospitalMode } from '../../contexts/HospitalModeContext'
 import { useAuth } from '../../contexts/AuthContext'
+import { useFamily } from '../../contexts/FamilyContext'
 import VoiceInput from '../VoiceInput'
 
 /**
@@ -15,6 +16,8 @@ import VoiceInput from '../VoiceInput'
 export default function HospitalModeModal({ open, onClose }) {
   const { isHospitalMode, hospitalMode, activateHospitalMode, deactivateHospitalMode, updateHospitalMode } = useHospitalMode()
   const { user } = useAuth()
+  const { activePatientName } = useFamily()
+  const patientName = activePatientName ? activePatientName.split(' ')[0] : 'tu familiar'
   const [hospitalName,   setHospitalName]   = useState(hospitalMode?.hospital_name   ?? '')
   const [roomNumber,     setRoomNumber]     = useState(hospitalMode?.room_number      ?? '')
   const [treatingDoctor, setTreatingDoctor] = useState(hospitalMode?.treating_doctor  ?? '')
@@ -90,7 +93,7 @@ export default function HospitalModeModal({ open, onClose }) {
                 Modo Hospital
               </h3>
               <p style={{ margin: '2px 0 0', fontSize: 11, color: '#6B7280' }}>
-                {isHospitalMode ? 'Activo — el equipo está en alerta' : 'Activa cuando el paciente esté hospitalizado'}
+                {isHospitalMode ? 'Activo — el equipo está en alerta' : `Activa cuando ${patientName} esté hospitalizado`}
               </p>
             </div>
           </div>
