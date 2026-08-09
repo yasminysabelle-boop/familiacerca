@@ -50,8 +50,8 @@ FamiliaCerca es una aplicación web progresiva (PWA) para coordinar el cuidado d
 **Notas sobre precios:**
 - No hay contrato. Puedes cancelar desde Ajustes > Suscripción en cualquier momento.
 - Al cancelar, el plan baja a Gratis al final del período pagado.
-- Los pagos son procesados de forma segura por Stripe.
-- Para gestionar o cancelar la suscripción: ir a Mi cuenta (ícono de perfil, arriba a la derecha) > Suscripción > "Gestionar suscripción".
+- Los pagos son procesados de forma segura por PayPal.
+- Para subir de plan: Mi cuenta (ícono de perfil, arriba a la derecha) > Suscripción > "Mejorar mi plan". Para cancelar: mismo lugar > "Cancelar suscripción".
 
 ---
 
@@ -166,7 +166,7 @@ Ya puedes ingresar con la nueva contraseña.
 No. Los primeros 14 días son completamente gratis sin necesidad de tarjeta. Solo se solicita al elegir un plan de pago.
 
 **¿Puedo cancelar en cualquier momento?**
-Sí. Desde Mi cuenta > Suscripción > "Gestionar suscripción". Sin penalizaciones ni contratos. El plan baja a Gratis al terminar el período pagado.
+Sí. Desde Mi cuenta > Suscripción > "Cancelar suscripción". Sin penalizaciones ni contratos. El plan baja a Gratis al terminar el período pagado.
 
 **¿Los datos de mi familiar están seguros?**
 Sí. Toda la información está cifrada y almacenada de forma segura en infraestructura nivel empresarial. Solo tú y los miembros de tu equipo que tú invites pueden verla. Nunca se vende ni comparte con terceros.
@@ -297,14 +297,14 @@ El botón SOS está diseñado para situaciones de emergencia con el familiar.
 
 **Para subir de plan:**
 1. Ir a Mi cuenta (ícono de perfil, arriba a la derecha)
-2. Tocar "Ver planes" o "Gestionar suscripción"
-3. Elegir el nuevo plan y completar el pago con Stripe
+2. Tocar "Mejorar mi plan"
+3. Elegir el nuevo plan y pagar con el botón de PayPal, directo en la misma pantalla — sin redirigir a ningún checkout aparte
 El cambio es inmediato — accedes a las nuevas funciones al instante.
 
-**Para bajar de plan o cancelar:**
-1. Mi cuenta > Suscripción > "Gestionar suscripción"
-2. Esto abre el portal de Stripe donde puedes cambiar o cancelar
-3. Al cancelar, conservas el acceso al plan actual hasta el final del período ya pagado
+**Para cancelar (bajar a Plan Gratis):**
+1. Mi cuenta > Suscripción > "Cancelar suscripción"
+2. Elegir el motivo de la cancelación y confirmar — todo dentro de la app, sin abrir ningún portal externo
+3. Conservas el acceso al plan actual hasta el final del período ya pagado
 4. Luego el plan baja automáticamente a Gratis
 
 No hay penalizaciones, ni contratos, ni períodos mínimos.
@@ -314,10 +314,9 @@ No hay penalizaciones, ni contratos, ni períodos mínimos.
 ### CÓMO CANCELO MI SUSCRIPCIÓN
 
 1. Tocar el ícono de perfil (arriba a la derecha) para ir a Mi cuenta
-2. En la sección "Suscripción", tocar "Gestionar suscripción"
-3. Se abre el portal de Stripe (el mismo sistema que procesa el pago)
-4. Seleccionar "Cancelar plan"
-5. Confirmar la cancelación
+2. En la sección "Suscripción", tocar "Cancelar suscripción"
+3. Elegir el motivo de la cancelación
+4. Confirmar — todo sucede dentro de la app, sin abrir ningún portal externo
 
 Seguirás teniendo acceso al plan pagado hasta que termine el período actual. Después baja a Gratis automáticamente. Puedes reactivar en cualquier momento.
 
@@ -368,6 +367,7 @@ Para ayuda técnica, preguntas sobre facturación o reportar un problema:
 - **Correo:** hola@familiacerca.com
 - El equipo responde en horario de lunes a viernes
 
-Para gestionar la suscripción (cambiar plan, cancelar, ver facturas):
-- Dentro de la app: Mi cuenta > Suscripción > "Gestionar suscripción" (abre el portal de Stripe)
+Para gestionar la suscripción:
+- Para subir de plan: Mi cuenta > Suscripción > "Mejorar mi plan" (elige plan y paga con PayPal, en la misma pantalla)
+- Para cancelar: Mi cuenta > Suscripción > "Cancelar suscripción" (modal dentro de la app, sin salir a ningún portal externo)
 `
