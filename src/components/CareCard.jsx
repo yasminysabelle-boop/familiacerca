@@ -43,16 +43,21 @@ export default function CareCard({
   medsUpToDate = true,
   routineUpToDate = true,
   familyCount = 0,
+  hasPatient = true,
   onClick,
   onMedsClick,
   onRoutineClick,
   onFamilyClick,
 }) {
   const s = STATUS[status] ?? STATUS.ok
-  const defaultMood =
-    status === 'critical' ? `${name} necesita atención pronto.` :
-    status === 'warning'  ? `Hoy ${name} necesita un poco más de atención.` :
-    `Hoy ${name} está tranquila y de buen ánimo.`
+  // Sin paciente real, `name` es el texto del CTA ("Agregar familiar"), no una
+  // persona — no se le puede fingir un estado de ánimo. Mensaje de bienvenida
+  // en su lugar, nunca "Hoy Agregar familiar está tranquila...".
+  const defaultMood = !hasPatient
+    ? 'Agrega a tu familiar y empieza a coordinar su cuidado.'
+    : status === 'critical' ? `${name} necesita atención pronto.` :
+      status === 'warning'  ? `Hoy ${name} necesita un poco más de atención.` :
+      `Hoy ${name} está tranquila y de buen ánimo.`
 
   return (
     <div

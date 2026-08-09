@@ -3575,10 +3575,10 @@ export default function Dashboard() {
             const profilePhoto = patientProfile?.photo_url || patientProfile?.foto_url || profile?.photo_url || null
             const realPatientName = patientProfile?.nombre_completo || profile?.name || null
             const patientName = realPatientName || 'Agregar familiar'
-            // Solo partimos a "primer nombre" cuando patientName es un nombre real — el
-            // texto de fallback ("Agregar familiar") es un CTA, no un nombre, y partirlo
-            // mostraba solo "Agregar" en la tarjeta (bug encontrado 2026-08-09).
-            const patientFirstName = realPatientName ? realPatientName.split(' ')[0] : patientName
+            // patientFirstName solo es un nombre real o null — nunca el texto del CTA
+            // ("Agregar familiar"), para que CareCard/PetsCard no lo traten como si
+            // fuera una persona (bug encontrado y corregido 2026-08-09).
+            const patientFirstName = realPatientName ? realPatientName.split(' ')[0] : null
             const isCritical     = hasActiveSOS || (_isRetrasado && _retrasadoMins != null && _retrasadoMins >= 720)
             const isPendingToday = !isCritical && (pendingCount > 0 || _isRetrasado)
 
@@ -3613,7 +3613,8 @@ export default function Dashboard() {
                     HERO — CareCard (paleta app: teal/coral emergencia/gold — ver CLAUDE.md)
                     ══════════════════════════════════════════ */}
                 <CareCard
-                  name={patientFirstName}
+                  name={patientFirstName || patientName}
+                  hasPatient={!!realPatientName}
                   photoUrl={profilePhoto}
                   status={isCritical ? 'critical' : isPendingToday ? 'warning' : 'ok'}
                   medsUpToDate={pendingCount === 0}
