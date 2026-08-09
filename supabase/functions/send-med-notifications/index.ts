@@ -48,6 +48,30 @@ Deno.serve(async (req: Request) => {
     })
   }
 
+  const supabase = createClient(
+    Deno.env.get('SUPABASE_URL')!,
+    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+  )
+
+  // Observabilidad mínima (ver add_notification_runs_log.sql) — una fila por
+  // ejecución. Nunca debe poder romper el envío real: log_notification_run()
+  // ya traga sus propias excepciones (SECURITY DEFINER), y este wrapper
+  // agrega una segunda capa por si la llamada RPC en sí fallara en red.
+  async function logRun(opts: { attempted?: number; sent?: number; failed?: number; failureReasons?: Record<string, number>; fatalError?: string }) {
+    try {
+      await supabase.rpc('log_notification_run', {
+        p_function_name: 'send-med-notifications',
+        p_attempted: opts.attempted ?? 0,
+        p_sent: opts.sent ?? 0,
+        p_failed: opts.failed ?? 0,
+        p_failure_reasons: opts.failureReasons && Object.keys(opts.failureReasons).length ? opts.failureReasons : null,
+        p_fatal_error: opts.fatalError ?? null,
+      })
+    } catch (logErr) {
+      console.error('[send-med-notifications] Failed to log notification run (non-fatal):', logErr)
+    }
+  }
+
   const vapidPublicKey  = Deno.env.get('VAPID_PUBLIC_KEY')
   const vapidPrivateKey = Deno.env.get('VAPID_PRIVATE_KEY')
   const vapidEmail      = Deno.env.get('VAPID_CONTACT_EMAIL')
@@ -56,6 +80,7 @@ Deno.serve(async (req: Request) => {
 
   if (!vapidPublicKey || !vapidPrivateKey || !vapidEmail) {
     console.error('[send-med-notifications] Missing VAPID secrets. Set VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, VAPID_CONTACT_EMAIL via supabase secrets set.')
+    await logRun({ fatalError: 'Missing VAPID configuration' })
     return new Response(
       JSON.stringify({ error: 'Missing VAPID configuration', sent: 0 }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -63,11 +88,6 @@ Deno.serve(async (req: Request) => {
   }
 
   webpush.setVapidDetails(`mailto:${vapidEmail}`, vapidPublicKey, vapidPrivateKey)
-
-  const supabase = createClient(
-    Deno.env.get('SUPABASE_URL')!,
-    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-  )
 
   const now = new Date()
   // Solo -4/-5/-6: no hay usuarios en UTC+0. Un candidato sin desplazar aquí coincide
@@ -88,6 +108,7 @@ Deno.serve(async (req: Request) => {
 
   if (medsError) {
     console.error('[send-med-notifications] Error querying medications:', medsError)
+    await logRun({ fatalError: `Error querying medications: ${medsError.message}` })
     return new Response(
       JSON.stringify({ error: medsError.message, sent: 0 }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -104,6 +125,7 @@ Deno.serve(async (req: Request) => {
 
   let sentCount = 0
   let failCount = 0
+  const failureReasons: Record<string, number> = {}
 
   async function sendToOwner(ownerId: string, payload: Record<string, unknown>) {
     const { data: members } = await supabase
@@ -122,6 +144,9 @@ Deno.serve(async (req: Request) => {
       } catch (err: unknown) {
         failCount++
         const statusCode = (err as { statusCode?: number }).statusCode
+        const reasonKey = statusCode ? String(statusCode) : 'unknown'
+        failureReasons[reasonKey] = (failureReasons[reasonKey] ?? 0) + 1
+        console.error(`[send-med-notifications] ✗ Push failed for sub ${sub.id}, status=${statusCode}`)
         if (statusCode && statusCode >= 400 && statusCode !== 429 && statusCode !== 413) {
           await supabase.from('push_subscriptions').delete().eq('id', sub.id)
         }
@@ -202,6 +227,8 @@ Deno.serve(async (req: Request) => {
   }
 
   console.log(`[send-med-notifications] Done. sent=${sentCount}, failed=${failCount}`)
+
+  await logRun({ attempted: sentCount + failCount, sent: sentCount, failed: failCount, failureReasons })
 
   return new Response(
     JSON.stringify({ sent: sentCount, failed: failCount, medications: allMeds?.length ?? 0 }),
