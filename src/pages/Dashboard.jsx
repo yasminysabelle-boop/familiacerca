@@ -103,6 +103,17 @@ function toLocalDateKey(d = new Date()) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
+// Postgres devuelve las columnas `time` con segundos incluidos ("10:00:00"),
+// no "HH:MM" — concatenar ":00" directo sobre ese valor produce una cadena
+// inválida ("...10:00:00:00") que new Date() no puede parsear, y de ahí en
+// adelante todo cálculo (incluido timeAgo) se vuelve NaN en silencio. Se
+// parsean hh/mm explícitamente para que sea seguro sin importar el formato
+// de origen (bug encontrado y corregido 2026-08-10).
+function apptTimestamp(evDate, evTime) {
+  const [hh, mm] = (evTime ?? '09:00').split(':').map(Number)
+  return new Date(`${evDate}T${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}:00`)
+}
+
 function timeAgo(date) {
   if (!date) return null
   const diff = Math.floor((Date.now() - date.getTime()) / 60000)
@@ -2720,7 +2731,7 @@ export default function Dashboard() {
         allEvents.push({
           id: `evt-${ev.id}`,
           type: 'APPOINTMENT',
-          timestamp: new Date(`${evDate}T${evTime ?? '09:00'}:00`),
+          timestamp: apptTimestamp(evDate, evTime),
           dateKey: evDate,
           appointmentId: ev.id,
           appointmentTitle: ev.title,
@@ -2738,7 +2749,7 @@ export default function Dashboard() {
         allEvents.push({
           id: `proof-${ev.id}`,
           type: 'APPOINTMENT_PROOF',
-          timestamp: new Date(`${evDate}T${evTime ?? '09:00'}:00`),
+          timestamp: apptTimestamp(evDate, evTime),
           dateKey: evDate,
           appointmentId: ev.id,
           appointmentTitle: ev.title,
