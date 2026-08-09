@@ -82,6 +82,25 @@ Deno.serve(async (req: Request) => {
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
   )
 
+  // Observabilidad mínima (ver add_notification_runs_log.sql) — una fila por
+  // ejecución. Nunca debe poder romper el envío real: log_notification_run()
+  // ya traga sus propias excepciones (SECURITY DEFINER), y este wrapper
+  // agrega una segunda capa por si la llamada RPC en sí fallara en red.
+  async function logRun(opts: { attempted?: number; sent?: number; failed?: number; failureReasons?: Record<string, number>; fatalError?: string }) {
+    try {
+      await supabase.rpc('log_notification_run', {
+        p_function_name: 'send-daily-summary',
+        p_attempted: opts.attempted ?? 0,
+        p_sent: opts.sent ?? 0,
+        p_failed: opts.failed ?? 0,
+        p_failure_reasons: opts.failureReasons && Object.keys(opts.failureReasons).length ? opts.failureReasons : null,
+        p_fatal_error: opts.fatalError ?? null,
+      })
+    } catch (logErr) {
+      console.error('[send-daily-summary] Failed to log notification run (non-fatal):', logErr)
+    }
+  }
+
   let authorized = false
 
   if (cronSecret && cronHeader === cronSecret) {
@@ -99,6 +118,7 @@ Deno.serve(async (req: Request) => {
 
   const resendApiKey = Deno.env.get('RESEND_API_KEY')
   if (!resendApiKey) {
+    await logRun({ fatalError: 'Missing RESEND_API_KEY' })
     return new Response(JSON.stringify({ error: 'RESEND_API_KEY not configured' }), {
       status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
@@ -117,12 +137,14 @@ Deno.serve(async (req: Request) => {
   const { data: profiles, error: profilesErr } = await profilesQuery
   if (profilesErr) {
     console.error('[send-daily-summary] Error fetching profiles:', profilesErr)
+    await logRun({ fatalError: `Error fetching profiles: ${profilesErr.message}` })
     return new Response(JSON.stringify({ error: 'DB error' }), {
       status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
   }
 
   if (!profiles || profiles.length === 0) {
+    await logRun({})
     return new Response(JSON.stringify({ message: 'No families found', sent: 0 }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
@@ -164,6 +186,8 @@ Deno.serve(async (req: Request) => {
   )
 
   let totalSent = 0
+  let totalFailed = 0
+  const failureReasons: Record<string, number> = {}
 
   for (const profile of profiles) {
     const ownerId: string = profile.user_id
@@ -203,11 +227,22 @@ Deno.serve(async (req: Request) => {
         }),
       })
       console.log(`[send-daily-summary] Family ${ownerId}: sent to ${emails.length} recipients, status=${res.status}`)
-      if (res.ok) totalSent++
+      if (res.ok) {
+        totalSent++
+      } else {
+        totalFailed++
+        const reasonKey = String(res.status)
+        failureReasons[reasonKey] = (failureReasons[reasonKey] ?? 0) + 1
+        console.error(`[send-daily-summary] ✗ Resend non-ok status for family ${ownerId}: ${res.status}`)
+      }
     } catch (err) {
+      totalFailed++
+      failureReasons['exception'] = (failureReasons['exception'] ?? 0) + 1
       console.error(`[send-daily-summary] Failed for family ${ownerId}:`, err)
     }
   }
+
+  await logRun({ attempted: totalSent + totalFailed, sent: totalSent, failed: totalFailed, failureReasons })
 
   return new Response(
     JSON.stringify({ sent: totalSent, families: profiles.length, date: today }),
