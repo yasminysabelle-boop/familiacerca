@@ -43,6 +43,30 @@ Deno.serve(async (req: Request) => {
     })
   }
 
+  const supabase = createClient(
+    Deno.env.get('SUPABASE_URL')!,
+    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+  )
+
+  // Observabilidad mínima (ver add_notification_runs_log.sql) — una fila por
+  // ejecución. Nunca debe poder romper el envío real: log_notification_run()
+  // ya traga sus propias excepciones (SECURITY DEFINER), y este wrapper
+  // agrega una segunda capa por si la llamada RPC en sí fallara en red.
+  async function logRun(opts: { attempted?: number; sent?: number; failed?: number; failureReasons?: Record<string, number>; fatalError?: string }) {
+    try {
+      await supabase.rpc('log_notification_run', {
+        p_function_name: 'send-evening-push',
+        p_attempted: opts.attempted ?? 0,
+        p_sent: opts.sent ?? 0,
+        p_failed: opts.failed ?? 0,
+        p_failure_reasons: opts.failureReasons && Object.keys(opts.failureReasons).length ? opts.failureReasons : null,
+        p_fatal_error: opts.fatalError ?? null,
+      })
+    } catch (logErr) {
+      console.error('[send-evening-push] Failed to log notification run (non-fatal):', logErr)
+    }
+  }
+
   const vapidPublicKey  = Deno.env.get('VAPID_PUBLIC_KEY')
   const vapidPrivateKey = Deno.env.get('VAPID_PRIVATE_KEY')
   const vapidEmail      = Deno.env.get('VAPID_CONTACT_EMAIL')
@@ -51,6 +75,7 @@ Deno.serve(async (req: Request) => {
 
   if (!vapidPublicKey || !vapidPrivateKey || !vapidEmail) {
     console.error('[send-evening-push] Missing VAPID secrets.')
+    await logRun({ fatalError: 'Missing VAPID configuration' })
     return new Response(
       JSON.stringify({ error: 'Missing VAPID configuration', sent: 0 }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -58,11 +83,6 @@ Deno.serve(async (req: Request) => {
   }
 
   webpush.setVapidDetails(`mailto:${vapidEmail}`, vapidPublicKey, vapidPrivateKey)
-
-  const supabase = createClient(
-    Deno.env.get('SUPABASE_URL')!,
-    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-  )
 
   // utc_offset passed from cron body (-4, -5, or -6); defaults to -5
   let utcOffset = -5
@@ -90,6 +110,7 @@ Deno.serve(async (req: Request) => {
 
   if (medsError) {
     console.error('[send-evening-push] Error fetching medications:', medsError)
+    await logRun({ fatalError: `Error fetching medications: ${medsError.message}` })
     return new Response(JSON.stringify({ error: medsError.message }), {
       status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
@@ -153,6 +174,7 @@ Deno.serve(async (req: Request) => {
   // ── Push notifications ───────────────────────────────────────────────────────
   if (!medications?.length) {
     console.log('[send-evening-push] No medications configured — skipping push notifications')
+    await logRun({})
     return new Response(JSON.stringify({ sent: 0, today }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
@@ -181,6 +203,7 @@ Deno.serve(async (req: Request) => {
 
   if (!ownersWithPending.length) {
     console.log('[send-evening-push] All tasks complete for today — no notifications needed')
+    await logRun({})
     return new Response(JSON.stringify({ sent: 0, today, allDone: true }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
@@ -196,6 +219,7 @@ Deno.serve(async (req: Request) => {
 
   let sentCount = 0
   let failCount = 0
+  const failureReasons: Record<string, number> = {}
 
   for (const ownerId of ownersWithPending) {
     const { data: members } = await supabase
@@ -216,6 +240,8 @@ Deno.serve(async (req: Request) => {
 
     if (subsError) {
       console.error(`[send-evening-push] Error fetching subscriptions for owner ${ownerId}:`, subsError)
+      failCount++
+      failureReasons['subs_query_error'] = (failureReasons['subs_query_error'] ?? 0) + 1
       continue
     }
 
@@ -240,8 +266,10 @@ Deno.serve(async (req: Request) => {
       } catch (err: unknown) {
         failCount++
         const statusCode = (err as { statusCode?: number }).statusCode
+        const reasonKey = statusCode ? String(statusCode) : 'unknown'
+        failureReasons[reasonKey] = (failureReasons[reasonKey] ?? 0) + 1
         console.error(`[send-evening-push] ✗ Failed for user ${sub.user_id}, status=${statusCode}`)
-        if (statusCode === 410) {
+        if (statusCode && statusCode >= 400 && statusCode !== 429 && statusCode !== 413) {
           await supabase.from('push_subscriptions').delete().eq('id', sub.id)
         }
       }
@@ -249,6 +277,8 @@ Deno.serve(async (req: Request) => {
   }
 
   console.log(`[send-evening-push] Done. sent=${sentCount}, failed=${failCount}`)
+
+  await logRun({ attempted: sentCount + failCount, sent: sentCount, failed: failCount, failureReasons })
 
   return new Response(
     JSON.stringify({ sent: sentCount, failed: failCount, today, pendingOwners: ownersWithPending.length }),
