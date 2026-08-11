@@ -46,14 +46,48 @@ export const CONTEXT_RULES = `Reglas para usar el contexto de cuidado (innegocia
 - Usa siempre nombres de pila (ya vienen así en el contexto) — nunca nombres completos.
 - Tono cálido y familiar, sin culpa ni alarmismo.
 - Respuestas breves: 2-4 oraciones, salvo que pidan detalle.
-- Si te piden interpretar, evaluar o predecir el estado de salud de la persona cuidada — aunque insistan, aunque lo reformulen, aunque digan que es urgente — no lo hagas. Nunca digas si algo es normal, preocupante, mejor o peor. Responde con calidez, repite los hechos registrados que sean relevantes, y di que esa lectura le corresponde a la familia junto con su médico. No suavices esta regla por la forma en que te lo pidan.`
+- Si te piden interpretar, evaluar o predecir el estado de salud de la persona cuidada — aunque insistan, aunque lo reformulen, aunque digan que es urgente — no lo hagas. Nunca digas si algo es normal, preocupante, mejor o peor. Responde con calidez, repite los hechos registrados que sean relevantes, y di que esa lectura le corresponde a la familia junto con su médico. No suavices esta regla por la forma en que te lo pidan.
+- El contexto de abajo solo trae datos dentro de la ventana indicada en su encabezado (por ejemplo "últimos 7 días"). Si preguntan por algo de una fecha que cae fuera de esa ventana, dilo con naturalidad — "no tengo visibilidad de fechas tan antiguas" o equivalente — nunca como una falla ni como un castigo. NUNCA ofrezcas, sugieras ni menciones un plan superior como solución a esa falta de visibilidad, a menos que el usuario pregunte explícitamente por planes o límites de su cuenta.`
 
-export async function buildCareContext(ownerId) {
+// Profundidad conversacional por aiLevel ('basic' | 'realtime' | 'trends',
+// ver SubscriptionContext.jsx) — capa que se agrega sobre CONTEXT_RULES para
+// preguntas directas a Milo/Luna (CompanionChat.jsx, "Preguntar a Milo y
+// Luna" en Chat.jsx). No confundir con la ventana de datos (contextWindowDays,
+// que gobierna qué hechos existen en el contexto): esto gobierna cuánto
+// puede razonar el asistente sobre los hechos que sí tiene.
+export const CONTEXT_DEPTH = {
+  basic: `PROFUNDIDAD: Responde solo con hechos puntuales de hoy (medicamentos, actividad, citas). Si preguntan por tendencias, comparaciones o patrones a lo largo de varios días, dilo con naturalidad — esa lectura no está disponible en el plan actual — y responde igual con los hechos sueltos que sí tengas, sin sonar a límite ni a castigo. Nunca ofrezcas ni menciones un plan superior como solución, a menos que pregunten explícitamente por planes.`,
+
+  realtime: `PROFUNDIDAD: Puedes dar más detalle temporal sobre hoy (retrasos, próximas citas), pero no caracterizar tendencias ni patrones a lo largo de varias semanas — si preguntan por eso, dilo con naturalidad y responde con los hechos puntuales que sí tengas. Nunca ofrezcas ni menciones un plan superior como solución, a menos que pregunten explícitamente por planes.`,
+
+  trends: `PROFUNDIDAD: Si el contexto trae una sección de tendencias/síntomas con cifras, puedes reportarlas tal cual al responder — nunca las caracterices como buenas, malas, mejores o peores; el usuario saca su propia conclusión.`,
+}
+
+// windowDays: null (sin corte) o número de días — viene de
+// SubscriptionContext.contextWindowDays (deriva del plan real, no de
+// aiLevel; ver ese archivo). Gobierna qué tan atrás puede ver Milo/Luna en
+// las fuentes acotadas por fecha (actividad e incidentes/síntomas).
+function windowLabel(windowDays) {
+  return windowDays == null ? 'sin corte' : `últimos ${windowDays} días`
+}
+
+export async function buildCareContext(ownerId, windowDays = 7) {
   if (!ownerId) return null
 
   try {
     const today = getTodayPR()
-    const sevenDaysAgoISO = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+    const windowCutoffISO = windowDays == null ? null : new Date(Date.now() - windowDays * 24 * 60 * 60 * 1000).toISOString()
+    const label = windowLabel(windowDays)
+
+    let activityQuery = supabase.from('activity_log').select('type, description, actor_name, created_at').eq('owner_id', ownerId).order('created_at', { ascending: false }).limit(10)
+    if (windowCutoffISO) activityQuery = activityQuery.gte('created_at', windowCutoffISO)
+
+    // Conteo crudo por subtipo de "evento agudo" dentro de la ventana del
+    // plan — mismo patrón que MEDICAMENTOS DE HOY: solo el hecho, sin
+    // interpretación. Las reglas de CONTEXT_RULES (abajo) ya cubren no
+    // convertir esto en diagnóstico.
+    let symptomsQuery = supabase.from('activity_log').select('description').eq('owner_id', ownerId).eq('type', 'incident').limit(200)
+    if (windowCutoffISO) symptomsQuery = symptomsQuery.gte('created_at', windowCutoffISO)
 
     const [
       { data: medications },
@@ -68,7 +102,7 @@ export async function buildCareContext(ownerId) {
     ] = await Promise.all([
       supabase.from('medications').select('id, name, dosage, scheduled_times, time').eq('user_id', ownerId),
       supabase.from('medication_logs').select('medication_id, status, confirmed_at, confirmed_by_name, photo_url').eq('user_id', ownerId).eq('log_date', today),
-      supabase.from('activity_log').select('type, description, actor_name, created_at').eq('owner_id', ownerId).order('created_at', { ascending: false }).limit(10),
+      activityQuery,
       supabase.from('care_profiles').select('name, age').eq('user_id', ownerId).maybeSingle(),
       supabase.from('family_members').select('member_user_id, member_email, role').eq('user_id', ownerId),
       // Fuentes opcionales — se omiten del contexto por completo si la familia
@@ -76,10 +110,7 @@ export async function buildCareContext(ownerId) {
       supabase.from('voice_diary').select('transcription, mood').eq('user_id', ownerId).order('created_at', { ascending: false }).limit(5),
       supabase.from('events').select('title, date, time').eq('user_id', ownerId).gte('date', today).order('date', { ascending: true }).limit(3),
       supabase.from('care_expenses').select('description, amount').eq('user_id', ownerId).order('created_at', { ascending: false }).limit(5),
-      // Conteo crudo por subtipo de "evento agudo" en los últimos 7 días — mismo
-      // patrón que MEDICAMENTOS DE HOY: solo el hecho, sin interpretación. Las
-      // reglas de CONTEXT_RULES (abajo) ya cubren no convertir esto en diagnóstico.
-      supabase.from('activity_log').select('description').eq('owner_id', ownerId).eq('type', 'incident').gte('created_at', sevenDaysAgoISO).limit(200),
+      symptomsQuery,
     ])
 
     const patientName = careProfile?.name ? careProfile.name.split(' ')[0] : 'tu familiar'
@@ -146,14 +177,14 @@ export async function buildCareContext(ownerId) {
       .map(e => `- ${e.description ?? 'Gasto'}: $${e.amount}`)
 
     return [
-      `CONTEXTO DE CUIDADO — ${patientName}${careProfile?.age ? `, ${careProfile.age} años` : ''}`,
+      `CONTEXTO DE CUIDADO — ${patientName}${careProfile?.age ? `, ${careProfile.age} años` : ''} (datos disponibles: ${label})`,
       '',
       'MEDICAMENTOS DE HOY:',
       medLines.length ? medLines.join('\n') : '- No hay medicamentos configurados.',
       '',
-      'ACTIVIDAD RECIENTE:',
+      `ACTIVIDAD RECIENTE (${label.toUpperCase()}):`,
       activityLines.length ? activityLines.join('\n') : '- Sin actividad reciente registrada.',
-      ...(symptomLines.length ? ['', 'SÍNTOMAS ESTA SEMANA:', symptomLines.join('\n')] : []),
+      ...(symptomLines.length ? ['', `SÍNTOMAS (${label.toUpperCase()}):`, symptomLines.join('\n')] : []),
       '',
       'FAMILIA:',
       familyLines.join('\n'),

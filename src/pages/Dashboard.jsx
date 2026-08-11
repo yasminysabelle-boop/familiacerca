@@ -2053,7 +2053,7 @@ export default function Dashboard() {
   const [startingInstantCall, setStartingInstantCall] = useState(false)
   const [instantCallError, setInstantCallError] = useState('')
   const [renewalAlerts, setRenewalAlerts] = useState([])
-  const { sub, loading: subLoading, refresh: refreshSub } = useSubscription()
+  const { sub, loading: subLoading, refresh: refreshSub, aiLevel } = useSubscription()
   const [searchParams, setSearchParams] = useSearchParams()
 
   const [sections, setSections] = useState([])
@@ -3290,7 +3290,7 @@ export default function Dashboard() {
         doneLines,
         pendingLines,
         missedLines: missedMedLines,
-        plan: sub?.plan,
+        aiLevel,
       })
         .then(result => {
           if (cancelled) return
@@ -3304,7 +3304,7 @@ export default function Dashboard() {
     }
     return () => { cancelled = true }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading, subLoading, ownerId, isHospitalMode, hasSignal, activityLatestEventMs, todaysActivityItems.length, pendingMedLines.length, missedMedLines.length, moodLine, routineLine, routinePending, dashPatientName, sub?.plan])
+  }, [loading, subLoading, ownerId, isHospitalMode, hasSignal, activityLatestEventMs, todaysActivityItems.length, pendingMedLines.length, missedMedLines.length, moodLine, routineLine, routinePending, dashPatientName, aiLevel])
 
   // Cuidado de hoy card status
   let careStatus, careStatusType

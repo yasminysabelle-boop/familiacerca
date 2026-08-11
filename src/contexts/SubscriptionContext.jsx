@@ -53,12 +53,35 @@ export function SubscriptionProvider({ children }) {
   const isTrialing = !isAppAdmin && (sub?.status === 'trial' && trialEndMs > now)
   const trialExpired = !isAppAdmin && (sub?.plan === 'free' && (sub?.status === 'expired' || (sub?.status === 'trial' && trialEndMs <= now)))
   const daysLeft  = isTrialing ? Math.max(0, Math.ceil((trialEndMs - now) / 86400000)) : 0
-  const hasAI     = isAppAdmin || (isPaid && sub?.plan === 'care_plus')
   const canEdit   = isAppAdmin || isPaid || isTrialing
+
+  // Profundidad de Milo/Luna — por plan, no por estado de pago. El trial
+  // muestra la experiencia completa de Cuidado Total a propósito (para eso
+  // existe el trial); al expirar cae a la profundidad real del plan Gratis.
+  const aiLevel =
+      isAppAdmin                    ? 'trends'
+    : sub?.status === 'trial'       ? 'trends'
+    : sub?.plan === 'care_plus'     ? 'trends'
+    : sub?.plan === 'familiar'      ? 'realtime'
+    :                                  'basic'
+
+  // Ventana de datos históricos visible para Milo/Luna — deriva del PLAN
+  // real (sub.plan), NUNCA de aiLevel ni del estado de trial. A diferencia
+  // de aiLevel (que sí se infla durante el trial para mostrar la
+  // experiencia de Cuidado Total), esta ventana debe quedarse estable: si
+  // el trial diera contexto ilimitado y luego cayera a 7 días de golpe al
+  // expirar, Milo dejaría de ver datos de los que ya venía hablando — peor
+  // que no haberlos tenido nunca. El trial regala PROFUNDIDAD de análisis
+  // (aiLevel), no ventana de datos.
+  const contextWindowDays =
+      isAppAdmin                 ? null
+    : sub?.plan === 'care_plus'  ? null
+    : sub?.plan === 'familiar'   ? 90
+    :                               7
 
   const value = {
     sub, loading,
-    isPaid, isTrialing, trialExpired, daysLeft, hasAI, canEdit, isAppAdmin,
+    isPaid, isTrialing, trialExpired, daysLeft, aiLevel, contextWindowDays, canEdit, isAppAdmin,
     paywallDismissed,
     dismissPaywall: () => setPaywallDismissed(true),
     refresh: load,

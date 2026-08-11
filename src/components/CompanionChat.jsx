@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
 import { geminiChat } from '../lib/gemini'
-import { buildCareContext, CONTEXT_RULES } from '../lib/careContext'
+import { buildCareContext, CONTEXT_RULES, CONTEXT_DEPTH } from '../lib/careContext'
 import { useFamily } from '../contexts/FamilyContext'
+import { useSubscription } from '../contexts/SubscriptionContext'
 import { FAMILIACERCA_KNOWLEDGE } from '../lib/companionKnowledge'
 import miloLunaImg  from '../assets/companions/milo-luna.png'
 import miloAvatarImg from '../assets/companions/milo-avatar.png'
@@ -80,8 +81,9 @@ const CARE_CONTEXT_TTL_MS = 2 * 60 * 1000
 // Pass 24 on Landing (no nav bar), use default 140 inside Layout (above FAB).
 export default function CompanionChat({ bottomOffset = 140, externalOpen = false, onExternalClose }) {
   const { ownerId, activePatientName } = useFamily()
+  const { aiLevel, contextWindowDays } = useSubscription()
   const careOptions = careQuickOptions(activePatientName?.split(' ')[0])
-  const careContextRef = useRef({ text: null, fetchedAt: 0 })
+  const careContextRef = useRef({ text: null, fetchedAt: 0, windowDays: undefined })
 
   const [companion,  setCompanion]  = useState(() => {
     // migrate from old key
@@ -141,12 +143,13 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
   }
 
   // Cachea el careContext durante la sesión del chat — solo se re-consulta a
-  // Supabase si pasaron >2 min desde la última vez (o si es la primera).
+  // Supabase si pasaron >2 min desde la última vez (o si es la primera), o
+  // si cambió la ventana de datos del plan (ej. tras un upgrade).
   async function getCareContext() {
     const cached = careContextRef.current
-    if (cached.text !== null && Date.now() - cached.fetchedAt < CARE_CONTEXT_TTL_MS) return cached.text
-    const text = await buildCareContext(ownerId)
-    careContextRef.current = { text, fetchedAt: Date.now() }
+    if (cached.text !== null && cached.windowDays === contextWindowDays && Date.now() - cached.fetchedAt < CARE_CONTEXT_TTL_MS) return cached.text
+    const text = await buildCareContext(ownerId, contextWindowDays)
+    careContextRef.current = { text, fetchedAt: Date.now(), windowDays: contextWindowDays }
     return text
   }
 
@@ -155,7 +158,8 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
   async function buildSystemPrompt() {
     const careContext = await getCareContext()
     if (!careContext) return cfg.prompt
-    return `${cfg.prompt}\n\n${CONTEXT_RULES}\n\n${careContext}`
+    const depth = CONTEXT_DEPTH[aiLevel] ?? CONTEXT_DEPTH.basic
+    return `${cfg.prompt}\n\n${CONTEXT_RULES}\n\n${depth}\n\n${careContext}`
   }
 
   async function send() {

@@ -4,7 +4,7 @@ import { useFamily } from '../contexts/FamilyContext'
 import { useSubscription } from '../contexts/SubscriptionContext'
 import { supabase } from '../lib/supabase'
 import { geminiGenerate } from '../lib/gemini'
-import { buildCareContext, CONTEXT_RULES } from '../lib/careContext'
+import { buildCareContext, CONTEXT_RULES, CONTEXT_DEPTH } from '../lib/careContext'
 import Layout from '../components/Layout'
 import LoadingButton from '../components/LoadingButton'
 import MicButton from '../components/MicButton'
@@ -94,7 +94,7 @@ function metaFor(id) { return id === 'all' ? ALL_META : (CATEGORY_META[id] ?? AL
 export default function Chat() {
   const { user } = useAuth()
   const { ownerId, activePatientName } = useFamily()
-  const { canEdit } = useSubscription()
+  const { canEdit, aiLevel, contextWindowDays } = useSubscription()
   const goBack = useGoBack()
   const [messages, setMessages] = useState([])
   const [profiles, setProfiles] = useState({})
@@ -250,14 +250,15 @@ export default function Chat() {
     if (!q) return
     setAssistantCard({ type: 'ask', loading: true, text: null, error: null, question: q })
     try {
-      const context = await buildCareContext(ownerId)
+      const context = await buildCareContext(ownerId, contextWindowDays)
       // "Eres LA VOZ de Milo y Luna hablando" (no "el asistente de Milo y
       // Luna") — con la frase anterior el modelo a veces se confundía de rol
       // y saludaba a "Milo y Luna" como si fueran otra persona. Aquí hablan
       // ellos mismos, en primera persona, directo al familiar.
       const persona = 'Eres la voz conjunta de Milo y Luna, los compañeros virtuales de FamiliaCerca, hablando en primera persona directamente con un familiar dentro del chat familiar. NUNCA te dirijas a "Milo y Luna" como si fueran otra persona, ni los saludes, ni te presentes como su asistente — tú ERES ellos hablando.'
+      const depth = CONTEXT_DEPTH[aiLevel] ?? CONTEXT_DEPTH.basic
       const prompt = context
-        ? `${persona} Responde en español.\n\n${CONTEXT_RULES}\n\n${context}\n\nPregunta: "${q}"`
+        ? `${persona} Responde en español.\n\n${CONTEXT_RULES}\n\n${depth}\n\n${context}\n\nPregunta: "${q}"`
         : `${persona} No hay contexto de cuidado disponible en este momento — si preguntan por datos específicos, dilo honestamente en vez de inventar. Responde en español, cálido y breve (2-4 oraciones). Pregunta: "${q}"`
       const response = await geminiGenerate(prompt, 250)
       if (!response) console.warn('[Chat] preguntar: geminiGenerate devolvió vacío')
