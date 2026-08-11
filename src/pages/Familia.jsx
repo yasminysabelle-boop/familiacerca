@@ -38,7 +38,7 @@ export default function Familia() {
   const { user } = useAuth()
   const { profile, ownerId, activePatientName } = useFamily()
   const onlineIds = usePresence()
-  const { trialExpired } = useSubscription()
+  const { sub, trialExpired, caregiverLimit } = useSubscription()
   const navigate = useNavigate()
   const [members, setMembers] = useState([])
   const [memberProfiles, setMemberProfiles] = useState({})
@@ -58,6 +58,7 @@ export default function Familia() {
   const [savingRole, setSavingRole] = useState(false)
   const [confirmRemoveDialog, setConfirmRemoveDialog] = useState(null) // { member, name }
   const [showPaywall, setShowPaywall] = useState(false)
+  const [paywallVariant, setPaywallVariant] = useState('trial') // 'trial' | 'team-full'
   const [memberLastActivity, setMemberLastActivity] = useState(null)
   const [todayGlance, setTodayGlance] = useState({ nextMed: null, nextEvent: null })
 
@@ -259,8 +260,14 @@ export default function Familia() {
     setTimeout(() => setCopied(false), 2500)
   }
 
+  // Tamaño de equipo = dueño + members (el dueño se muestra por separado más
+  // abajo pero cuenta como una persona del equipo — "hasta 2 cuidadores"
+  // incluye al dueño, no son 2 invitados además de él).
+  const teamSize = 1 + members.length
+
   function openInvite() {
-    if (trialExpired && isAdmin) { setShowPaywall(true); return }
+    if (trialExpired && isAdmin) { setPaywallVariant('trial'); setShowPaywall(true); return }
+    if (teamSize >= caregiverLimit) { setPaywallVariant('team-full'); setShowPaywall(true); return }
     setInviteEmail(''); setInviteStatus('idle'); setInviteLink(''); setCopied(false)
     setShowInvite(true)
   }
@@ -1049,6 +1056,12 @@ export default function Familia() {
         <PaywallModal
           onClose={() => setShowPaywall(false)}
           patientName={profile?.name?.split(' ')[0]}
+          title={paywallVariant === 'team-full' ? 'Tu equipo está completo' : undefined}
+          message={paywallVariant === 'team-full'
+            ? sub?.plan === 'familiar'
+              ? 'El plan Familiar permite un equipo de 6 personas, contándote a ti. Con Cuidado Total no hay límite.'
+              : 'El plan Gratis permite un equipo de 2 personas, contándote a ti. Con Familiar pueden ser hasta 6.'
+            : undefined}
         />
       )}
     </Layout>

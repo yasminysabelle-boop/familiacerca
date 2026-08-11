@@ -79,9 +79,34 @@ export function SubscriptionProvider({ children }) {
     : sub?.plan === 'familiar'   ? 90
     :                               7
 
+  // Cuidadores y Historial (enforcement de Tarea B) siguen la regla general:
+  // el trial da la experiencia completa (isTrialing → sin tope), y el gate
+  // solo se activa con plan real 'free' + trial ya vencido. Esto es DISTINTO
+  // de contextWindowDays (arriba, para Milo), que a propósito NO se infla
+  // durante el trial — ahí la razón era continuidad (Milo no puede perder de
+  // golpe visibilidad de datos de los que ya venía hablando al expirar el
+  // trial). Esa razón no aplica a cuidadores/historial, así que aquí sí se
+  // infla durante el trial como el resto de los gates del producto
+  // (isPaid, canEdit, aiLevel). No unificar esto con contextWindowDays sin
+  // volver a pensar el caso de Milo — son intencionalmente distintos.
+  const caregiverLimit =
+      isAppAdmin                 ? Infinity
+    : isTrialing                 ? Infinity
+    : sub?.plan === 'care_plus'  ? Infinity
+    : sub?.plan === 'familiar'   ? 6
+    :                               2
+
+  const historyWindowDays =
+      isAppAdmin                 ? null
+    : isTrialing                 ? null
+    : sub?.plan === 'care_plus'  ? null
+    : sub?.plan === 'familiar'   ? 90
+    :                               7
+
   const value = {
     sub, loading,
-    isPaid, isTrialing, trialExpired, daysLeft, aiLevel, contextWindowDays, canEdit, isAppAdmin,
+    isPaid, isTrialing, trialExpired, daysLeft, aiLevel, contextWindowDays,
+    caregiverLimit, historyWindowDays, canEdit, isAppAdmin,
     paywallDismissed,
     dismissPaywall: () => setPaywallDismissed(true),
     refresh: load,

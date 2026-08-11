@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react'
-import PaywallModal from '../components/PaywallModal'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
@@ -61,7 +60,6 @@ export default function Expenses() {
   const { ownerId, memberRole, profile } = useFamily()
   const isFamiliar = memberRole === 'familiar'
   const { canEdit, trialExpired } = useSubscription()
-  const [showPaywall, setShowPaywall] = useState(false)
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
   const fileRef = useRef(null)
@@ -294,6 +292,18 @@ export default function Expenses() {
       >
         <PullIndicator />
 
+        {trialExpired ? (
+          <div style={{ padding: '16px 20px 0' }}>
+            <EmptyState
+              icon="💳"
+              title="Gastos es de Plan Familiar en adelante"
+              description="Lleva el registro de medicamentos, consultas, transporte e insumos, con el total del mes y el desglose por categoría."
+              actionLabel="Ver planes"
+              onAction={() => navigate('/upgrade')}
+            />
+          </div>
+        ) : (
+        <>
         {/* Month navigator */}
         <div style={{
           display: 'flex', alignItems: 'center',
@@ -537,14 +547,16 @@ export default function Expenses() {
             </div>
           </div>
         )}
+        </>
+        )}
       </div>
 
       </div>
 
-      {/* FAB — hidden for familiar (view only) */}
-      {!isFamiliar && (
+      {/* FAB — hidden for familiar (view only) y cuando Gastos está gateado */}
+      {!isFamiliar && !trialExpired && (
         <button
-          onClick={() => (trialExpired && isAdmin) ? setShowPaywall(true) : openModal()}
+          onClick={() => openModal()}
           style={{
             position: 'fixed', bottom: 84, right: 20, zIndex: 30,
             width: 54, height: 54, borderRadius: '50%',
@@ -886,12 +898,6 @@ export default function Expenses() {
             </form>
           </div>
         </div>
-      )}
-      {showPaywall && (
-        <PaywallModal
-          onClose={() => setShowPaywall(false)}
-          patientName={profile?.name?.split(' ')[0]}
-        />
       )}
       <SuccessAnimation visible={expSuccessTrigger > 0} key={expSuccessTrigger} />
     </Layout>

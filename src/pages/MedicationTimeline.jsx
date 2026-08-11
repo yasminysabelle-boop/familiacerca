@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useFamily } from '../contexts/FamilyContext'
+import { useSubscription } from '../contexts/SubscriptionContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import { mapsUrl } from '../lib/gps'
@@ -309,10 +310,14 @@ function toLocalDateKey(d = new Date()) {
 
 export default function MedicationTimeline() {
   const { ownerId, activePatientName, profile } = useFamily()
+  const { historyWindowDays } = useSubscription()
   const navigate = useNavigate()
   const goBack = useGoBack()
   const patientFirstName = (activePatientName || profile?.name || 'tu familiar').split(' ')[0]
   const todayKey = toLocalDateKey()
+  const minDateKey = historyWindowDays != null
+    ? toLocalDateKey(new Date(Date.now() - historyWindowDays * 24 * 60 * 60 * 1000))
+    : undefined
   const { containerRef: pullRef, onTouchStart: pullStart, onTouchMove: pullMove, onTouchEnd: pullEnd, PullIndicator } = usePullToRefresh(fetchLog)
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
@@ -322,10 +327,13 @@ export default function MedicationTimeline() {
   const [customDate, setCustomDate] = useState('')
   const [symptomFilter, setSymptomFilter] = useState(null)
   const [expandedDays, setExpandedDays] = useState(new Set([toLocalDateKey()]))
+  // true cuando el período pedido excede lo que el plan permite VER — nunca
+  // significa que los datos no existan, solo que esta pantalla no los trae.
+  const [windowClamped, setWindowClamped] = useState(false)
 
   useEffect(() => {
     if (ownerId) fetchLog()
-  }, [ownerId, filterType, period, customDate])
+  }, [ownerId, filterType, period, customDate, historyWindowDays])
 
   // El drill-down por subtipo solo tiene sentido para el pill "Incidentes" en
   // el período/tipo actuales — se limpia si cualquiera de los dos cambia.
@@ -358,6 +366,18 @@ export default function MedicationTimeline() {
         since = new Date()
         since.setDate(since.getDate() - parseInt(period))
       }
+
+      // Acota la ventana al máximo que el plan permite VER. Nunca se borra
+      // ni se deja de guardar nada — esto solo limita hasta dónde puede leer
+      // esta pantalla, la query de abajo nunca pide más atrás de este punto.
+      let clamped = false
+      if (historyWindowDays != null) {
+        const maxSince = new Date()
+        maxSince.setDate(maxSince.getDate() - historyWindowDays)
+        maxSince.setHours(0, 0, 0, 0)
+        if (since < maxSince) { since = maxSince; clamped = true }
+      }
+      setWindowClamped(clamped)
 
       let q = supabase
         .from('activity_log')
@@ -503,6 +523,30 @@ export default function MedicationTimeline() {
             ))}
           </div>
 
+          {/* Aviso no bloqueante — solo cuando el período pedido excede lo que
+              el plan permite VER. Nunca dice que faltan datos ni que se
+              borraron; el límite es de visibilidad, no de existencia. */}
+          {windowClamped && (
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10,
+              background: TEAL_CHIP, borderRadius: 12, padding: '10px 14px', marginBottom: 14,
+            }}>
+              <span style={{ fontSize: 12.5, color: TEAL_INK, lineHeight: 1.4 }}>
+                Tu plan permite ver hasta {historyWindowDays} día{historyWindowDays === 1 ? '' : 's'} de historial
+              </span>
+              <button
+                onClick={() => navigate('/upgrade')}
+                style={{
+                  flexShrink: 0, background: 'none', border: 'none', cursor: 'pointer',
+                  fontFamily: 'inherit', fontWeight: 700, fontSize: 12.5, color: TEAL,
+                  textDecoration: 'underline', padding: 0,
+                }}
+              >
+                Mejorar plan
+              </button>
+            </div>
+          )}
+
           {/* Selector de fecha — solo visible con período "custom" */}
           {period === 'custom' && (
             <div style={{ marginBottom: 18 }}>
@@ -510,6 +554,7 @@ export default function MedicationTimeline() {
                 type="date"
                 value={customDate}
                 max={todayKey}
+                min={minDateKey}
                 onChange={e => setCustomDate(e.target.value)}
                 style={{
                   width: '100%', padding: '10px 14px',

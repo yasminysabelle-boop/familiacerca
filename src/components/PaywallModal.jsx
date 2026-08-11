@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 
-export default function PaywallModal({ onClose, patientName }) {
+export default function PaywallModal({ onClose, patientName, title, message }) {
   const navigate = useNavigate()
   return (
     <div
@@ -23,12 +23,16 @@ export default function PaywallModal({ onClose, patientName }) {
           fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 20, fontWeight: 700,
           color: '#1A1A1A', margin: '0 0 10px',
         }}>
-          Tu prueba gratuita ha terminado
+          {title || 'Tu prueba gratuita ha terminado'}
         </h2>
         <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.6, margin: '0 0 24px' }}>
-          Actualiza tu plan para seguir cuidando a{' '}
-          <strong style={{ color: '#1A1A1A' }}>{patientName || 'tu familiar'}</strong>{' '}
-          sin interrupciones.
+          {message || (
+            <>
+              Actualiza tu plan para seguir cuidando a{' '}
+              <strong style={{ color: '#1A1A1A' }}>{patientName || 'tu familiar'}</strong>{' '}
+              sin interrupciones.
+            </>
+          )}
         </p>
         <button
           onClick={() => { navigate('/upgrade'); onClose() }}
