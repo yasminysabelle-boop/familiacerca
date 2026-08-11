@@ -144,20 +144,30 @@ export default function TermsOfService() {
                 style={{ background: 'white', border: '1.5px solid #EDE5D8', boxShadow: '0 2px 12px rgba(0,0,0,0.05)' }}
               >
                 <div className="flex items-center justify-between mb-1">
-                  <p className="font-bold text-gray-900" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Plan Familiar</p>
-                  <span className="font-bold" style={{ color: '#087F70' }}>$19 / mes</span>
+                  <p className="font-bold text-gray-900" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Plan Gratis</p>
+                  <span className="font-bold" style={{ color: '#9CA3AF' }}>$0</span>
                 </div>
-                <p className="text-xs text-gray-500">Coordinación familiar básica: medicamentos, calendario, notas y álbum familiar.</p>
+                <p className="text-xs text-gray-500">Coordinación familiar básica: hasta 2 cuidadores, medicamentos, chat familiar e historial de 7 días.</p>
+              </div>
+              <div
+                className="rounded-2xl p-4"
+                style={{ background: 'white', border: '1.5px solid #EDE5D8', boxShadow: '0 2px 12px rgba(0,0,0,0.05)' }}
+              >
+                <div className="flex items-center justify-between mb-1">
+                  <p className="font-bold text-gray-900" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Plan Familiar</p>
+                  <span className="font-bold" style={{ color: '#087F70' }}>$12.99 / mes</span>
+                </div>
+                <p className="text-xs text-gray-500">Todo lo del Plan Gratis, más: hasta 6 cuidadores, recordatorios automáticos, foto-prueba, reportes en PDF, álbum familiar, gastos de cuidado e historial de 90 días.</p>
               </div>
               <div
                 className="rounded-2xl p-4"
                 style={{ background: 'white', border: '1.5px solid #C9882A', boxShadow: '0 2px 12px rgba(201,136,42,0.1)' }}
               >
                 <div className="flex items-center justify-between mb-1">
-                  <p className="font-bold text-gray-900" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Plan Premium</p>
-                  <span className="font-bold" style={{ color: '#A07830' }}>$29 / mes</span>
+                  <p className="font-bold text-gray-900" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Plan Cuidado Total</p>
+                  <span className="font-bold" style={{ color: '#A07830' }}>$24.99 / mes</span>
                 </div>
-                <p className="text-xs text-gray-500">Todo el Plan Familiar más: reportes avanzados, diario de voz, y soporte prioritario.</p>
+                <p className="text-xs text-gray-500">Todo el Plan Familiar más: cuidadores ilimitados, alertas SOS prioritarias, reporte semanal automático, historial ilimitado y soporte prioritario.</p>
               </div>
             </div>
             <p className="text-xs text-gray-500">

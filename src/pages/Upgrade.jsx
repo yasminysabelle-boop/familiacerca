@@ -26,7 +26,7 @@ const FREE_FEATURES = [
 ]
 
 const FAMILIAR_FEATURES = [
-  'Hasta 3 cuidadores',
+  'Hasta 6 cuidadores',
   'Medicamentos con OCR (foto)',
   'Videollamadas integradas',
   'Milo & Luna IA 🐶🐱',
@@ -34,17 +34,16 @@ const FAMILIAR_FEATURES = [
   'Notas con evidencia fotográfica',
   'Rastreo GPS en notas',
   'Indicadores de presencia del equipo',
-  'Directorio médico del paciente',
-  'Historial 30 días',
+  'Gastos de cuidado',
+  'Historial de 90 días',
   'Todo lo del Plan Gratis',
 ]
 
 const TOTAL_FEATURES = [
   'Cuidadores ilimitados',
   'Hospital Mode (pantalla completa dedicada)',
-  'Cuentas Claras (gastos y finanzas del cuidado)',
+  'Gastos de cuidado',
   'Reporte médico en PDF',
-  'Cuidador profesional incluido',
   'Soporte prioritario',
   'Historial ilimitado',
   'Todo lo del Plan Familiar',
@@ -211,7 +210,7 @@ function UpgradeContent() {
               color: 'white', fontSize: 11, fontWeight: 700,
               padding: '4px 12px', borderRadius: '0 0 10px 10px',
             }}>
-              {activePlan === 'familiar' ? 'Tu plan actual' : 'Más popular'}
+              {activePlan === 'familiar' ? 'Tu plan actual' : 'Recomendado para la mayoría de las familias'}
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
               <p style={{ fontSize: 18, fontWeight: 700, color: '#1A1A1A', margin: 0, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>

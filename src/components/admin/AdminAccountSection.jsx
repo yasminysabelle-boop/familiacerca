@@ -2,9 +2,9 @@ import { useNavigate } from 'react-router-dom'
 import { useSubscription } from '../../contexts/SubscriptionContext'
 
 const PLAN_META = {
-  free:      { label: 'Prueba gratuita', color: '#9CA3AF', icon: '🌱', features: ['2 cuidadores', 'Chat familiar', 'Medicamentos básicos', 'Historial 7 días'] },
-  familiar:  { label: 'Plan Familiar',   color: '#087F70', icon: '❤️', features: ['6 cuidadores', 'Recordatorios automáticos', 'Notas de voz', 'Foto-prueba', 'Reportes PDF', 'Álbum y gastos'] },
-  care_plus: { label: 'Cuidado Total',   color: '#7C3AED', icon: '⭐', features: ['Cuidadores ilimitados', 'Directorio médico', 'Alertas SOS prioritarias', 'Reporte semanal IA', 'Historial indefinido', 'Soporte prioritario'] },
+  free:      { label: 'Gratis',        color: '#9CA3AF', icon: '🌱', features: ['2 cuidadores', 'Chat familiar', 'Medicamentos básicos', 'Historial 7 días'] },
+  familiar:  { label: 'Plan Familiar',   color: '#087F70', icon: '❤️', features: ['6 cuidadores', 'Recordatorios automáticos', 'Notas de voz', 'Foto-prueba', 'Reportes PDF', 'Álbum familiar', 'Gastos de cuidado', 'Historial 90 días'] },
+  care_plus: { label: 'Cuidado Total',   color: '#7C3AED', icon: '⭐', features: ['Cuidadores ilimitados', 'Alertas SOS prioritarias', 'Reporte semanal IA', 'Historial indefinido', 'Soporte prioritario'] },
 }
 
 const STATUS_LABEL = {

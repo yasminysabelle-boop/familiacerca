@@ -27,18 +27,16 @@ FamiliaCerca es una aplicación web progresiva (PWA) para coordinar el cuidado d
 - Todo lo del plan Gratis
 - Recordatorios automáticos de medicamentos
 - Notas de voz y texto
-- Historial completo de dosis
+- Historial de 90 días
 - Foto-prueba de medicamentos administrados
 - Reportes semanales y exportación a PDF
 - Álbum familiar de fotos y videos
-- Gastos compartidos (Cuentas Claras)
+- Gastos de cuidado (Cuentas Claras)
 - Resúmenes básicos con IA
 
 **Plan Cuidado Total — $24.99/mes**
 - Cuidadores ilimitados
 - Todo lo del plan Familiar
-- Directorio médico completo
-- Control avanzado de gastos de salud
 - Alertas SOS prioritarias
 - Detección de agotamiento del cuidador
 - Reporte semanal familiar automático
@@ -99,7 +97,7 @@ Grabaciones de voz del familiar o sobre el familiar. Se transcriben automáticam
 Agregar, editar y programar medicamentos con horarios específicos. Cada medicamento puede tener nombre, dosis y frecuencia. Los recordatorios automáticos requieren Plan Familiar o superior.
 
 **Control de dosis (Historial)**
-Registro completo de qué medicamentos fueron administrados, cuándo y por quién. Incluye foto-prueba con sello de tiempo. Disponible en Plan Familiar y superior.
+Registro de qué medicamentos fueron administrados, cuándo y por quién. Disponible en todos los planes; la ventana de tiempo visible depende del plan (ver HISTORIAL POR PLAN más abajo). La foto-prueba con sello de tiempo requiere Plan Familiar o superior.
 
 **Calendario**
 Citas médicas, controles y eventos importantes. Se pueden agregar con fecha y hora.
@@ -120,7 +118,7 @@ Datos de la persona a cuidar: nombre, edad, condiciones médicas, alergias, foto
 Registro de gastos del cuidado: medicamentos, consultas, transporte, insumos. Permite ver cuánto se está gastando y quién pagó qué.
 
 **Directorio**
-Contactos médicos (médicos, especialistas, farmacéutica) y contactos de emergencia del familiar. Se puede marcar quién es contacto de emergencia prioritario.
+Contactos médicos (médicos, especialistas, farmacéutica) y contactos de emergencia del familiar, en un solo lugar — nombre, especialidad, teléfono, correo, clínica u hospital, notas. Se puede marcar quién es contacto de emergencia prioritario — estos aparecen primero al activar el botón SOS. Disponible en todos los planes, sin límite.
 
 **Botón SOS**
 En situaciones de emergencia, envía una notificación urgente instantánea a todos los cuidadores del equipo. También muestra los contactos de emergencia guardados en el Directorio para llamarlos rápidamente.
@@ -200,16 +198,6 @@ Al confirmar que un medicamento fue administrado, puedes tomar una foto como evi
 
 ---
 
-### DIRECTORIO MÉDICO
-
-El Directorio guarda dos tipos de contactos:
-- **Médicos y especialistas**: nombre, especialidad, teléfono, correo, clínica u hospital, notas.
-- **Contactos de emergencia**: familiares, vecinos o personas de confianza. Se puede marcar quién es contacto de emergencia prioritario — estos aparecen primero al activar el botón SOS.
-
-**Disponibilidad:** El Directorio completo está disponible en el Plan Cuidado Total. En planes inferiores, los contactos de emergencia del familiar se pueden guardar en el perfil familiar.
-
----
-
 ### CONTROL DE GASTOS DE SALUD (CUENTAS CLARAS)
 
 Registra todos los gastos relacionados con el cuidado: medicamentos, consultas médicas, exámenes, transporte, insumos y más. Cada gasto lleva fecha, monto, categoría y quién lo pagó.
@@ -276,14 +264,14 @@ El botón SOS está diseñado para situaciones de emergencia con el familiar.
 
 ---
 
-### HISTORIAL COMPLETO VS HISTORIAL 7 DÍAS
+### HISTORIAL POR PLAN
 
-**Plan Gratis — historial 7 días:**
+**Plan Gratis — historial de 7 días:**
 - Solo puedes ver los registros de los últimos 7 días
 - Los datos más antiguos no desaparecen, pero no son accesibles desde la app
 
-**Plan Familiar — historial completo:**
-- Acceso a todos los registros desde el inicio
+**Plan Familiar — historial de 90 días:**
+- Acceso a los registros de los últimos 90 días
 - Filtros por fecha, medicamento o cuidador
 - Exportación a PDF de los últimos 30 días
 
