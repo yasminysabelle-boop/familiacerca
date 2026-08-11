@@ -123,6 +123,36 @@ Deno.serve(async (req: Request) => {
   const patientNameMap = new Map<string, string>()
   ;(careProfilesBatch ?? []).forEach((p: { user_id: string; name: string }) => patientNameMap.set(p.user_id, p.name))
 
+  // Enforcement de plan para los recordatorios de medicamentos (Tarea B) —
+  // "10 min antes" (a) y "ventana por vencer" (b) son la promesa de Plan
+  // Familiar. Free post-trial no los recibe; trial sí — misma regla que el
+  // resto del enforcement del producto: se evalúa contra plan real + trial
+  // vencido, nunca contra plan a secas. No toca autoMarkMissed(): ese es un
+  // registro de datos, no un aviso, y corre siempre sin importar el plan.
+  //
+  // Fail-open a propósito: si un ownerId no aparece en subscriptions (no
+  // debería pasar en producción), se le manda el recordatorio igual. Las
+  // consecuencias son asimétricas — un push de más a alguien que no paga es
+  // un costo trivial; silenciar la alerta de medicamentos de una familia por
+  // una fila faltante o corrupta es el riesgo #1 de retención del producto.
+  const { data: subscriptionRows } = await supabase
+    .from('subscriptions').select('user_id, plan, status, trial_end_date').in('user_id', ownerIdSet)
+  const subscriptionByOwner = new Map<string, { plan: string; status: string; trial_end_date: string | null }>()
+  ;(subscriptionRows ?? []).forEach((s: { user_id: string; plan: string; status: string; trial_end_date: string | null }) =>
+    subscriptionByOwner.set(s.user_id, s))
+
+  function remindersGated(ownerId: string): boolean {
+    const s = subscriptionByOwner.get(ownerId)
+    if (!s) {
+      console.warn(`[send-med-notifications] No subscription row for owner ${ownerId} — enviando recordatorio igual (fail-open)`)
+      return false
+    }
+    if (s.plan !== 'free') return false
+    const trialEndMs = s.trial_end_date ? new Date(s.trial_end_date).getTime() : 0
+    const trialExpired = s.status === 'expired' || (s.status === 'trial' && trialEndMs <= Date.now())
+    return trialExpired
+  }
+
   let sentCount = 0
   let failCount = 0
   const failureReasons: Record<string, number> = {}
@@ -171,6 +201,7 @@ Deno.serve(async (req: Request) => {
   for (const med of allMeds ?? []) {
     for (const st of med.scheduled_times ?? []) {
       if (!remind10Variants.includes(st)) continue
+      if (remindersGated(med.user_id)) continue
       const patientName = patientNameMap.get(med.user_id) ?? 'tu familiar'
       const timeLabel = fmt12h(st)
       console.log(`[send-med-notifications] (a) 10-min-antes: med ${med.id} @ ${st}`)
@@ -208,6 +239,7 @@ Deno.serve(async (req: Request) => {
 
     for (const w of windowClosingSoon) {
       if (confirmedSet.has(w.medId)) continue
+      if (remindersGated(w.userId)) continue
       const patientName = patientNameMap.get(w.userId) ?? 'tu familiar'
       const timeLabel = fmt12h(w.scheduledTime)
       console.log(`[send-med-notifications] (b) ventana-por-vencer: med ${w.medId} @ ${w.scheduledTime}`)
