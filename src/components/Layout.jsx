@@ -5,7 +5,8 @@ import { useFamily } from '../contexts/FamilyContext'
 import { useSubscription } from '../contexts/SubscriptionContext'
 import Logo from './Logo'
 import { User, ChevronLeft, Home, Chat, ClipboardList, Pill } from './Icons'
-import PaywallModal from './PaywallModal'
+import TrialEndedNotice from './TrialEndedNotice'
+import TrialBanner from './TrialBanner'
 import PWAInstallBanner from './PWAInstallBanner'
 import OfflineBanner from './OfflineBanner'
 import { useDarkMode } from '../contexts/DarkModeContext'
@@ -59,8 +60,8 @@ const LIGHT_HEADER_PAGES = new Set([
 
 export default function Layout({ children }) {
   const { inactivityWarning, user } = useAuth()
-  const { activeFamilyLabel, activePatientName, profile, memberRole } = useFamily()
-  const { trialExpired, isPaid, paywallDismissed, dismissPaywall } = useSubscription()
+  const { activeFamilyLabel, activePatientName, memberRole } = useFamily()
+  const { sub, trialExpired, markTrialEndedSeen } = useSubscription()
   const isAdmin = memberRole === null
   const userAvatar = user?.user_metadata?.avatar_url ?? null
   const userInitial = (user?.user_metadata?.full_name ?? user?.email ?? '?').charAt(0).toUpperCase()
@@ -210,6 +211,7 @@ export default function Layout({ children }) {
       }}>
         <PWAInstallBanner />
         <OfflineBanner />
+        <TrialBanner />
 
         {children}
         <footer style={{ padding: '24px 16px', textAlign: 'center', borderTop: '1px solid #EDE5D8' }}>
@@ -226,8 +228,8 @@ export default function Layout({ children }) {
         </footer>
       </main>
 
-      {trialExpired && isAdmin && !isPaid && !paywallDismissed && (
-        <PaywallModal onClose={dismissPaywall} patientName={profile?.name?.split(' ')[0]} />
+      {trialExpired && isAdmin && !sub?.trial_ended_seen_at && (
+        <TrialEndedNotice onClose={markTrialEndedSeen} />
       )}
 
       {/* Inactivity warning banner */}

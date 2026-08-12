@@ -17,7 +17,6 @@ import { CARE_ITEMS } from '../lib/careItems'
 import { incidentPhrase, incidentTypeInfo } from '../lib/incidentTypes'
 import { submitAppointmentProof as saveAppointmentProof } from '../lib/appointmentProof'
 import CameraCapture from '../components/CameraCapture'
-import TrialBanner from '../components/TrialBanner'
 import { usePushNotifications } from '../hooks/usePushNotifications'
 import { useHospitalMode } from '../contexts/HospitalModeContext'
 import HospitalDashboard from '../components/hospital/HospitalDashboard'
@@ -3516,7 +3515,6 @@ export default function Dashboard() {
         </div>
 
         {/* Banners */}
-        <TrialBanner />
         {notifActivated && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '12px 16px 0', padding: '10px 14px', background: '#F0FDF4', border: '1px solid #86EFAC', borderRadius: 14 }}>
             <span style={{ fontSize: 17, flexShrink: 0 }}>✅</span>

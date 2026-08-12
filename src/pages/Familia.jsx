@@ -266,8 +266,12 @@ export default function Familia() {
   const teamSize = 1 + members.length
 
   function openInvite() {
-    if (trialExpired && isAdmin) { setPaywallVariant('trial'); setShowPaywall(true); return }
+    // Tope de equipo primero: es la razón más específica y la que de verdad
+    // explica el bloqueo cuando ambas condiciones son ciertas a la vez (un
+    // Free con trial vencido llega al tope de 2 con solo un invitado). El
+    // trial vencido es la razón correcta solo cuando el equipo NO está lleno.
     if (teamSize >= caregiverLimit) { setPaywallVariant('team-full'); setShowPaywall(true); return }
+    if (trialExpired && isAdmin) { setPaywallVariant('trial'); setShowPaywall(true); return }
     setInviteEmail(''); setInviteStatus('idle'); setInviteLink(''); setCopied(false)
     setShowInvite(true)
   }

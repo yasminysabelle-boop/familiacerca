@@ -8,7 +8,6 @@ export function SubscriptionProvider({ children }) {
   const { user } = useAuth()
   const [sub, setSub] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [paywallDismissed, setPaywallDismissed] = useState(false)
 
   const load = useCallback(async () => {
     if (!user) { setSub(null); setLoading(false); return }
@@ -103,12 +102,24 @@ export function SubscriptionProvider({ children }) {
     : sub?.plan === 'familiar'   ? 90
     :                               7
 
+  // Mensaje único de "tu prueba terminó" (reemplaza el paywall global e
+  // incondicional que antes vivía en Layout.jsx). Se marca visto vía RPC
+  // security definer — subscriptions no tiene policy de update para el
+  // cliente, ver supabase/add_trial_ended_seen.sql. Optimista en el estado
+  // local para que no vuelva a aparecer en la misma sesión mientras el RPC
+  // viaja; persistido en DB (no localStorage) para que valga entre
+  // dispositivos.
+  async function markTrialEndedSeen() {
+    if (sub?.trial_ended_seen_at) return
+    setSub(prev => prev ? { ...prev, trial_ended_seen_at: new Date().toISOString() } : prev)
+    await supabase.rpc('mark_trial_ended_seen')
+  }
+
   const value = {
     sub, loading,
     isPaid, isTrialing, trialExpired, daysLeft, aiLevel, contextWindowDays,
     caregiverLimit, historyWindowDays, canEdit, isAppAdmin,
-    paywallDismissed,
-    dismissPaywall: () => setPaywallDismissed(true),
+    markTrialEndedSeen,
     refresh: load,
   }
 
