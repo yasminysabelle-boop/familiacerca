@@ -94,7 +94,7 @@ function metaFor(id) { return id === 'all' ? ALL_META : (CATEGORY_META[id] ?? AL
 export default function Chat() {
   const { user } = useAuth()
   const { ownerId, activePatientName } = useFamily()
-  const { canEdit, aiLevel, contextWindowDays } = useSubscription()
+  const { aiLevel, contextWindowDays } = useSubscription()
   const goBack = useGoBack()
   const [messages, setMessages] = useState([])
   const [profiles, setProfiles] = useState({})
@@ -858,7 +858,7 @@ ${lines}`
               <LoadingButton
                 type="submit"
                 loading={sending}
-                disabled={!input.trim() || !canEdit}
+                disabled={!input.trim()}
                 loadingText="..."
                 style={{
                   padding: '11px 18px', borderRadius: 999, fontSize: 13, flexShrink: 0,
