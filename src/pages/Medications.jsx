@@ -120,11 +120,13 @@ function computeScheduledTimes(frequency, startTimes) {
   return startTimes.filter(Boolean)
 }
 
-// Redimensiona a un lado mayor de 1600px y comprime a JPEG antes de subir —
+// Redimensiona a un lado mayor de 2048px y comprime a JPEG antes de subir —
 // una foto de cámara real (varios MB, sin tocar) puede colgar el envío en
-// redes móviles lentas. Una sola lectura del archivo: el data URL resultante
-// sirve tanto para la vista previa como para el base64 que recibe la IA.
-function resizeImageToBase64(file, maxDim = 1600, quality = 0.8) {
+// redes móviles lentas. 2048 (no 1600) para que una receta con letra chica
+// siga siendo legible para la IA — mismo criterio que DiarioMedicoEntryModal.jsx.
+// Una sola lectura del archivo: el data URL resultante sirve tanto para la
+// vista previa como para el base64 que recibe la IA.
+function resizeImageToBase64(file, maxDim = 2048, quality = 0.85) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.onerror = reject
@@ -555,16 +557,22 @@ export default function Medications() {
         },
         body: JSON.stringify({ image_base64: base64, media_type: 'image/jpeg', prompt: type === 'box' ? BOX_PROMPT : RX_PROMPT }),
       })
-      if (!res.ok) throw new Error(`Gemini ${res.status}`)
-      const parsed = await res.json()
-      if (parsed.error) throw new Error(parsed.error)
+      const parsed = await res.json().catch(() => null)
+      if (!res.ok) {
+        // 429 (límite diario/por hora) y 413 (imagen muy pesada) ya vienen con
+        // un mensaje cálido y entendible del servidor -- se muestra tal cual.
+        // Cualquier otro fallo (502 de Gemini, etc.) usa el mensaje genérico.
+        const friendly = (res.status === 429 || res.status === 413) ? parsed?.message : null
+        throw new Error(friendly || 'No se pudo leer la imagen. Puedes corregir manualmente.')
+      }
+      if (parsed?.error) throw new Error('No se pudo leer la imagen. Puedes corregir manualmente.')
       if (parsed.medications?.length > 0) {
         setSelectedMedIndices(new Set(parsed.medications.map((_, i) => i)))
       }
       setAddAiExtracted(parsed)
     } catch (err) {
       console.error(err)
-      setAddAiError('No se pudo leer la imagen. Puedes corregir manualmente.')
+      setAddAiError(err.message)
       setAddAiExtracted(null)
     }
     setAddStep('ai-confirm')

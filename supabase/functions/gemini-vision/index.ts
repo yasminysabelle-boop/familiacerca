@@ -18,6 +18,11 @@ const THINKING_MARGIN = 700;
 const DAILY_LIMIT = 20;
 const HOURLY_LIMIT = 10;
 
+// Backstop, no filtro principal -- Medications.jsx comprime a 2048px/
+// calidad 0.85 antes de subir (resizeImageToBase64), así que una foto
+// legítima queda lejos de este número. Mismo patrón que claude-proxy.
+const MAX_BODY_BYTES = 6 * 1024 * 1024;
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -79,7 +84,18 @@ Deno.serve(async (req) => {
     }
   }
 
-  const { image_base64, media_type, prompt } = await req.json();
+  const rawBody = await req.text();
+  if (new TextEncoder().encode(rawBody).length > MAX_BODY_BYTES) {
+    return new Response(JSON.stringify({
+      error: 'payload_too_large',
+      message: 'La imagen es demasiado pesada. Probá con una foto más liviana.',
+    }), {
+      status: 413,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
+  const { image_base64, media_type, prompt } = JSON.parse(rawBody);
 
   const geminiRes = await fetch(`${GEMINI_URL}?key=${GEMINI_KEY}`, {
     method: 'POST',

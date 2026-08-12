@@ -49,9 +49,76 @@ async function callClaude(messages, maxTokens = 1024) {
     },
     body: JSON.stringify({ model: MODEL, max_tokens: maxTokens, messages }),
   })
-  if (!res.ok) throw new Error(`Claude API ${res.status}`)
-  const data = await res.json()
+  const data = await res.json().catch(() => null)
+  if (!res.ok) {
+    // 429 (límite diario/por hora) y 413 (imagen muy pesada) ya vienen con un
+    // mensaje cálido y entendible del servidor -- se muestra tal cual.
+    // Cualquier otro fallo usa el código crudo, como antes.
+    const friendly = (res.status === 429 || res.status === 413) ? data?.message : null
+    throw new Error(friendly || `Claude API ${res.status}`)
+  }
   return data.content?.[0]?.text?.trim() ?? ''
+}
+
+// Redimensiona a un lado mayor de 2048px y recodifica a JPEG calidad 0.85
+// antes de subir -- una foto de receta/historia clínica sacada con el
+// teléfono puede pesar varios MB sin tocar. 2048 (no menos) para que texto
+// chico/letra manuscrita siga siendo legible para la IA -- comprimir de más
+// genera MÁS llamadas, no menos, porque la persona reintenta si no se lee.
+// Si la imagen ya es igual o más chica, se devuelve tal cual -- no agrandar
+// ni recodificar innecesariamente.
+const MAX_DIMENSION = 2048
+const JPEG_QUALITY = 0.85
+// Margen bajo el techo de 6MB del servidor (medido sobre el body en base64,
+// ~33% más pesado que el archivo crudo).
+const MAX_RAW_BYTES = 4 * 1024 * 1024
+
+function compressImage(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onerror = reject
+    reader.onload = () => {
+      try {
+        const img = new Image()
+        img.onerror = reject
+        img.onload = () => {
+          try {
+            let { width, height } = img
+            if (width <= MAX_DIMENSION && height <= MAX_DIMENSION) {
+              resolve(file)
+              return
+            }
+            if (width >= height) { height = Math.round(height * MAX_DIMENSION / width); width = MAX_DIMENSION }
+            else { width = Math.round(width * MAX_DIMENSION / height); height = MAX_DIMENSION }
+            const canvas = document.createElement('canvas')
+            canvas.width = width
+            canvas.height = height
+            canvas.getContext('2d').drawImage(img, 0, 0, width, height)
+            canvas.toBlob(blob => {
+              if (!blob) { reject(new Error('toBlob devolvió null')); return }
+              resolve(new File([blob], file.name.replace(/\.\w+$/, '.jpg'), { type: 'image/jpeg' }))
+            }, 'image/jpeg', JPEG_QUALITY)
+          } catch (err) { reject(err) }
+        }
+        img.src = reader.result
+      } catch (err) { reject(err) }
+    }
+    reader.readAsDataURL(file)
+  })
+}
+
+// Nunca rompe el flujo: si la compresión falla (HEIC no decodificable,
+// imagen corrupta, formato raro), intenta con el original si está bajo el
+// techo; si tampoco entra, pide una foto más liviana en vez de un error técnico.
+async function prepareImageForUpload(file) {
+  try {
+    const compressed = await compressImage(file)
+    if (compressed.size <= MAX_RAW_BYTES) return compressed
+  } catch (e) {
+    console.warn('[DiarioMedico] compresión de imagen falló, se intenta con el original:', e)
+  }
+  if (file.size <= MAX_RAW_BYTES) return file
+  throw new Error('La foto es muy pesada. Probá con una foto más liviana o con menos resolución antes de analizarla.')
 }
 
 function parseAIResponse(text) {
@@ -239,8 +306,9 @@ export default function DiarioMedicoEntryModal({ open, onClose, onSaved }) {
           { role: 'user', content: VOICE_PROMPT(transcript.trim()) }
         ])
       } else {
-        const b64  = await toBase64(photoFile)
-        const mime = photoFile.type || 'image/jpeg'
+        const fileToSend = await prepareImageForUpload(photoFile)
+        const b64  = await toBase64(fileToSend)
+        const mime = fileToSend.type || 'image/jpeg'
         rawText = await callClaude([{
           role: 'user',
           content: [
