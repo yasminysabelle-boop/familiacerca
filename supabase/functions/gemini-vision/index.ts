@@ -12,6 +12,12 @@ const GEMINI_KEY = Deno.env.get('GEMINI_API_KEY') ?? '';
 const THINKING = { thinkingConfig: { thinkingBudget: 256 } };
 const THINKING_MARGIN = 700;
 
+// Acción deliberada (agregar/renovar medicamento con foto), no
+// conversacional. 20/día da margen generoso para reintentos por foto mala
+// en un día muy activo, sin dejar la puerta abierta a un loop de fotos.
+const DAILY_LIMIT = 20;
+const HOURLY_LIMIT = 10;
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -49,6 +55,28 @@ Deno.serve(async (req) => {
       status: 503,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
+  }
+
+  // Rate limit por usuario, día y hora -- nunca confía en el cliente, se
+  // evalúa e incrementa server-side. isAppAdmin (cuenta de administración,
+  // no un plan pago) bypasea el límite.
+  if (user.app_metadata?.role !== 'admin') {
+    const { data: allowed, error: rlErr } = await supabase.rpc('check_and_increment_ai_usage', {
+      p_function_name: 'gemini-vision',
+      p_daily_limit: DAILY_LIMIT,
+      p_hourly_limit: HOURLY_LIMIT,
+    });
+    if (rlErr) {
+      console.error('[gemini-vision] rate limit check failed:', rlErr);
+    } else if (!allowed) {
+      return new Response(JSON.stringify({
+        error: 'rate_limited',
+        message: 'Ya usaste esta función varias veces hoy. Podés volver a intentarlo mañana, o cargar los datos a mano por ahora.',
+      }), {
+        status: 429,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
   }
 
   const { image_base64, media_type, prompt } = await req.json();

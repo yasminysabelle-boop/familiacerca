@@ -17,6 +17,17 @@ const corsHeaders = {
 const THINKING = { thinkingConfig: { thinkingBudget: 256 } };
 const THINKING_MARGIN = 700;
 
+// Uso normal esperado: Milo/Luna conversando (sin cache, 1 llamada/mensaje)
+// + hasta 4 tarjetas emocionales del Dashboard (cacheadas 1x/día/usuario en
+// localStorage) + resumen de actividad (cacheado por contenido). 20 preguntas
+// reales en un día es un cuidador comprometido, no abuso -- 60 le da 3x de
+// margen. El techo por hora existe para que nadie queme el cupo diario en
+// minutos -- un uso humano real nunca se acerca a 20/hora.
+const DAILY_LIMIT = 60;
+const HOURLY_LIMIT = 20;
+
+const RATE_LIMIT_MESSAGE = 'Hoy ya conversamos bastante — necesitamos un respiro y volvemos mañana con toda la energía. Si es algo urgente, comunícate directo con la familia o con el equipo médico.';
+
 const corsJson = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
@@ -43,6 +54,22 @@ Deno.serve(async (req) => {
 
   if (!GEMINI_KEY) {
     return corsJson({ error: 'API not configured' }, 503);
+  }
+
+  // Rate limit por usuario, día y hora -- nunca confía en el cliente, se
+  // evalúa e incrementa server-side. isAppAdmin (cuenta de administración,
+  // no un plan pago) bypasea el límite.
+  if (user.app_metadata?.role !== 'admin') {
+    const { data: allowed, error: rlErr } = await supabase.rpc('check_and_increment_ai_usage', {
+      p_function_name: 'gemini-proxy',
+      p_daily_limit: DAILY_LIMIT,
+      p_hourly_limit: HOURLY_LIMIT,
+    });
+    if (rlErr) {
+      console.error('[gemini-proxy] rate limit check failed:', rlErr);
+    } else if (!allowed) {
+      return corsJson({ text: RATE_LIMIT_MESSAGE });
+    }
   }
 
   const { action, prompt, maxTokens, systemPrompt, history, text } = await req.json();
