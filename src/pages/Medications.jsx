@@ -500,6 +500,7 @@ export default function Medications() {
     setAddPhotoFile(blob)
     resizeImageToBase64(blob)
       .then(dataUrl => {
+        console.log(`[Medications] foto: ${(blob.size / 1024).toFixed(0)}KB original -> ~${Math.round((dataUrl.length * 0.75) / 1024)}KB comprimida`)
         setAddPhotoPreview(dataUrl)
         processPhoto(dataUrl.split(',')[1], addPhotoType).catch(err => {
           // Red de seguridad: processPhoto ya atrapa sus propios errores, pero si

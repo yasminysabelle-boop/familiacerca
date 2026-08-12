@@ -307,6 +307,7 @@ export default function DiarioMedicoEntryModal({ open, onClose, onSaved }) {
         ])
       } else {
         const fileToSend = await prepareImageForUpload(photoFile)
+        console.log(`[DiarioMedico] foto: ${(photoFile.size / 1024).toFixed(0)}KB original -> ${(fileToSend.size / 1024).toFixed(0)}KB enviado (${fileToSend === photoFile ? 'sin recomprimir' : 'comprimida'})`)
         const b64  = await toBase64(fileToSend)
         const mime = fileToSend.type || 'image/jpeg'
         rawText = await callClaude([{
