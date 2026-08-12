@@ -89,16 +89,15 @@ $$;
 GRANT EXECUTE ON FUNCTION public.check_and_increment_ai_usage(text, int, int) TO authenticated;
 
 -- ----------------------------------------------------------------
--- Limpieza -- ai_usage_hourly acumula ~24 filas/usuario/función/día
--- sin este job. Mismo patrón que los cron jobs existentes
--- (setup_cron.sql), pero sin invocar ninguna Edge Function -- es SQL
--- puro, corre directo en el cron job.
+-- Limpieza -- SOLO ai_usage_hourly (acumula ~24 filas/usuario/función/
+-- día sin este job). ai_usage_daily NUNCA se purga a propósito -- es
+-- el histórico completo de uso, por decisión explícita de Yasmin
+-- (quiere poder mirarlo hacia atrás sin límite). Mismo patrón que los
+-- cron jobs existentes (setup_cron.sql), pero sin invocar ninguna
+-- Edge Function -- es SQL puro, corre directo en el cron job.
 -- ----------------------------------------------------------------
 SELECT cron.schedule(
   'fc-ai-usage-cleanup',
   '0 3 * * *',  -- 3am UTC todos los días
-  $$
-    DELETE FROM public.ai_usage_hourly WHERE usage_hour  < now() - interval '2 days';
-    DELETE FROM public.ai_usage_daily  WHERE usage_date  < (now() - interval '90 days')::date;
-  $$
+  $$DELETE FROM public.ai_usage_hourly WHERE usage_hour < now() - interval '2 days';$$
 );
