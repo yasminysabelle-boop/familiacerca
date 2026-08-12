@@ -92,10 +92,8 @@ function AppShell() {
     const token = localStorage.getItem('pendingInviteToken')
     if (!token) return
     supabase
-      .from('family_invitations')
-      .select('status')
-      .eq('token', token)
-      .single()
+      .rpc('get_invitation_by_token', { p_token: token })
+      .maybeSingle()
       .then(({ data }) => {
         if (!data || data.status !== 'pending') {
           localStorage.removeItem('pendingInviteToken')

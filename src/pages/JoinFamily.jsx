@@ -164,9 +164,7 @@ export default function JoinFamily() {
 
   async function fetchInvitation() {
     const { data, error } = await supabase
-      .from('family_invitations')
-      .select('*')
-      .eq('token', token)
+      .rpc('get_invitation_by_token', { p_token: token })
       .maybeSingle()
 
     if (error || !data) {
