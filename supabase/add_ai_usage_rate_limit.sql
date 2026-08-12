@@ -28,7 +28,7 @@
 CREATE TABLE public.ai_usage_daily (
   user_id       uuid NOT NULL REFERENCES auth.users(id),
   usage_date    date NOT NULL DEFAULT (now() AT TIME ZONE 'utc')::date,
-  function_name text NOT NULL,          -- 'gemini-proxy' | 'gemini-vision' | 'claude-proxy'
+  function_name text NOT NULL,          -- 'gemini-proxy' | 'gemini-vision' | 'gemini-vision-diario'
   request_count int  NOT NULL DEFAULT 0,
   updated_at    timestamptz NOT NULL DEFAULT now(),
   PRIMARY KEY (user_id, usage_date, function_name)

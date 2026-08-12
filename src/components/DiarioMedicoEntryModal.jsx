@@ -5,8 +5,7 @@ import { useFamily } from '../contexts/FamilyContext'
 import VoiceInput from './VoiceInput'
 import VoiceRecorder from './VoiceRecorder'
 
-const CLAUDE_PROXY = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/claude-proxy`
-const MODEL        = 'claude-sonnet-4-6'
+const GEMINI_VISION = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/gemini-vision`
 
 const PHOTO_TYPES = [
   { value: 'receta',       label: '💊 Receta' },
@@ -39,15 +38,17 @@ function toBase64(file) {
   })
 }
 
-async function callClaude(messages, maxTokens = 1024) {
+// feature:'diario' -- cupo de rate limit independiente del de Medications.jsx
+// (mismo endpoint gemini-vision, contador separado server-side).
+async function callGeminiVision(body) {
   const { data: { session } } = await supabase.auth.getSession()
-  const res = await fetch(CLAUDE_PROXY, {
+  const res = await fetch(GEMINI_VISION, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${session?.access_token}`,
     },
-    body: JSON.stringify({ model: MODEL, max_tokens: maxTokens, messages }),
+    body: JSON.stringify({ feature: 'diario', ...body }),
   })
   const data = await res.json().catch(() => null)
   if (!res.ok) {
@@ -55,9 +56,10 @@ async function callClaude(messages, maxTokens = 1024) {
     // mensaje cálido y entendible del servidor -- se muestra tal cual.
     // Cualquier otro fallo usa el código crudo, como antes.
     const friendly = (res.status === 429 || res.status === 413) ? data?.message : null
-    throw new Error(friendly || `Claude API ${res.status}`)
+    throw new Error(friendly || `Gemini API ${res.status}`)
   }
-  return data.content?.[0]?.text?.trim() ?? ''
+  if (data?.error) throw new Error('No se pudo interpretar la respuesta de IA')
+  return data
 }
 
 // Redimensiona a un lado mayor de 2048px y recodifica a JPEG calidad 0.85
@@ -121,42 +123,35 @@ async function prepareImageForUpload(file) {
   throw new Error('La foto es muy pesada. Probá con una foto más liviana o con menos resolución antes de analizarla.')
 }
 
-function parseAIResponse(text) {
-  try {
-    const match = text.match(/\{[\s\S]*\}/)
-    return match ? JSON.parse(match[0]) : JSON.parse(text)
-  } catch {
-    return null
-  }
-}
-
 const VOICE_PROMPT = transcript => `Eres un asistente médico. El familiar habló libremente sobre una consulta:
 
 "${transcript}"
 
 Extrae y estructura en JSON (usa null si no se menciona):
 {
-  "estado_general": "estado del paciente",
+  "estado_general": "solo si el documento (o la persona) lo dice de forma explícita, transcrito literalmente. Si hay que resumir, inferir o juntar varias frases para llenarlo, poné null.",
   "que_dijo_el_medico": "indicaciones o diagnóstico",
   "medicamentos": [{"nombre": "", "dosis": "", "frecuencia": ""}],
   "proximos_pasos": ["texto del paso pendiente"],
   "notas": "datos adicionales"
 }
 
-Responde SOLO con JSON válido.`
+Responde SOLO con JSON válido.
+No resumas ni parafrasees: transcribí. Si dudás entre transcribir e interpretar, poné null.`
 
 const PHOTO_PROMPT = tipo => `Eres un asistente médico. Analiza esta imagen (${tipo}).
 
 Extrae TODA la información médica visible:
 {
-  "estado_general": "diagnóstico o condición del paciente",
+  "estado_general": "solo si el documento (o la persona) lo dice de forma explícita, transcrito literalmente. Si hay que resumir, inferir o juntar varias frases para llenarlo, poné null.",
   "que_dijo_el_medico": "indicaciones o diagnóstico del médico",
   "medicamentos": [{"nombre": "", "dosis": "", "frecuencia": ""}],
   "proximos_pasos": ["estudios o citas indicadas"],
   "notas": "información adicional"
 }
 
-Responde SOLO con JSON válido.`
+Responde SOLO con JSON válido.
+No resumas ni parafrasees: transcribí. Si dudás entre transcribir e interpretar, poné null.`
 
 // ─── Subcomponents ────────────────────────────────────────────────────────────
 
@@ -300,27 +295,16 @@ export default function DiarioMedicoEntryModal({ open, onClose, onSaved }) {
     setStep('processing')
     setAiError('')
     try {
-      let rawText
+      let parsed
       if (inputType === 'voice') {
-        rawText = await callClaude([
-          { role: 'user', content: VOICE_PROMPT(transcript.trim()) }
-        ])
+        parsed = await callGeminiVision({ prompt: VOICE_PROMPT(transcript.trim()) })
       } else {
         const fileToSend = await prepareImageForUpload(photoFile)
         console.log(`[DiarioMedico] foto: ${(photoFile.size / 1024).toFixed(0)}KB original -> ${(fileToSend.size / 1024).toFixed(0)}KB enviado (${fileToSend === photoFile ? 'sin recomprimir' : 'comprimida'})`)
         const b64  = await toBase64(fileToSend)
         const mime = fileToSend.type || 'image/jpeg'
-        rawText = await callClaude([{
-          role: 'user',
-          content: [
-            { type: 'image', source: { type: 'base64', media_type: mime, data: b64 } },
-            { type: 'text',  text: PHOTO_PROMPT(photoType) },
-          ],
-        }])
+        parsed = await callGeminiVision({ image_base64: b64, media_type: mime, prompt: PHOTO_PROMPT(photoType) })
       }
-
-      const parsed = parseAIResponse(rawText)
-      if (!parsed) throw new Error('No se pudo interpretar la respuesta de IA')
 
       setStructured({
         estado_general:      parsed.estado_general     ?? '',

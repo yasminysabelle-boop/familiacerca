@@ -556,7 +556,7 @@ export default function Medications() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${session.access_token}`,
         },
-        body: JSON.stringify({ image_base64: base64, media_type: 'image/jpeg', prompt: type === 'box' ? BOX_PROMPT : RX_PROMPT }),
+        body: JSON.stringify({ feature: 'medications', image_base64: base64, media_type: 'image/jpeg', prompt: type === 'box' ? BOX_PROMPT : RX_PROMPT }),
       })
       const parsed = await res.json().catch(() => null)
       if (!res.ok) {
