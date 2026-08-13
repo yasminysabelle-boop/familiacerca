@@ -6,6 +6,7 @@ import { useSubscription } from '../contexts/SubscriptionContext'
 import Logo from './Logo'
 import { User, ChevronLeft, Home, Chat, ClipboardList, Pill } from './Icons'
 import TrialEndedNotice from './TrialEndedNotice'
+import TrialEndingNotice from './TrialEndingNotice'
 import TrialBanner from './TrialBanner'
 import PWAInstallBanner from './PWAInstallBanner'
 import OfflineBanner from './OfflineBanner'
@@ -61,7 +62,7 @@ const LIGHT_HEADER_PAGES = new Set([
 export default function Layout({ children }) {
   const { inactivityWarning, user } = useAuth()
   const { activeFamilyLabel, activePatientName, memberRole } = useFamily()
-  const { sub, trialExpired, markTrialEndedSeen } = useSubscription()
+  const { sub, trialExpired, markTrialEndedSeen, isTrialing, daysLeft, markTrialEndingSeen } = useSubscription()
   const isAdmin = memberRole === null
   const userAvatar = user?.user_metadata?.avatar_url ?? null
   const userInitial = (user?.user_metadata?.full_name ?? user?.email ?? '?').charAt(0).toUpperCase()
@@ -230,6 +231,10 @@ export default function Layout({ children }) {
 
       {trialExpired && isAdmin && !sub?.trial_ended_seen_at && (
         <TrialEndedNotice onClose={markTrialEndedSeen} />
+      )}
+
+      {isTrialing && isAdmin && daysLeft <= 4 && !sub?.trial_ending_seen_at && (
+        <TrialEndingNotice daysLeft={daysLeft} onClose={markTrialEndingSeen} />
       )}
 
       {/* Inactivity warning banner */}

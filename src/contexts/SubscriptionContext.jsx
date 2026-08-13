@@ -115,11 +115,21 @@ export function SubscriptionProvider({ children }) {
     await supabase.rpc('mark_trial_ended_seen')
   }
 
+  // Mismo patrón, para el aviso ANTERIOR al vencimiento (últimos días de
+  // trial, ver TrialEndingNotice) — columna y RPC separados de
+  // trial_ended_seen_at porque son dos momentos distintos del mismo trial,
+  // ver supabase/add_trial_ending_seen.sql.
+  async function markTrialEndingSeen() {
+    if (sub?.trial_ending_seen_at) return
+    setSub(prev => prev ? { ...prev, trial_ending_seen_at: new Date().toISOString() } : prev)
+    await supabase.rpc('mark_trial_ending_seen')
+  }
+
   const value = {
     sub, loading,
     isPaid, isTrialing, trialExpired, daysLeft, aiLevel, contextWindowDays,
     caregiverLimit, historyWindowDays, canEdit, isAppAdmin,
-    markTrialEndedSeen,
+    markTrialEndedSeen, markTrialEndingSeen,
     refresh: load,
   }
 
