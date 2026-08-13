@@ -14,6 +14,44 @@ const FREQ_OPTIONS = [
   { value: 'as_needed',   label: 'Según necesidad' },
 ]
 
+// Paso 3 — "Sobre el cuidado" (Care Complexity Score)
+const CAREGIVER_OPTIONS = [
+  { value: '1',   label: 'Solo yo' },
+  { value: '2',   label: 'Yo y otra persona' },
+  { value: '3-5', label: 'Varias personas' },
+  { value: '6+',  label: 'Muchas personas' },
+]
+
+const FOCUS_AREA_OPTIONS = [
+  { value: 'medicamentos', label: 'Medicamentos y dosis' },
+  { value: 'citas',        label: 'Citas médicas' },
+  { value: 'tareas',       label: 'Tareas y recordatorios' },
+  { value: 'gastos',       label: 'Gastos de cuidado' },
+  { value: 'todo',         label: 'Todo lo anterior' },
+]
+
+const COORD_FREQ_OPTIONS = [
+  { value: 'ocasional', label: 'Ocasionalmente', sub: 'Menos de 1 vez por semana' },
+  { value: 'regular',   label: 'Regularmente',   sub: 'Varias veces por semana' },
+  { value: 'diaria',    label: 'Todos los días' },
+]
+
+const CAREGIVER_POINTS = { '1': 0, '2': 10, '3-5': 25, '6+': 40 }
+const FOCUS_AREA_POINTS = { medicamentos: 15, citas: 10, tareas: 10, gastos: 15 }
+const COORD_FREQ_POINTS = { ocasional: 0, regular: 15, diaria: 25 }
+
+function computeComplexity(caregiverCount, focusAreas, frequency) {
+  const caregiverScore = CAREGIVER_POINTS[caregiverCount] ?? 0
+  const areaScore = focusAreas.includes('todo')
+    ? 30
+    : focusAreas.reduce((sum, a) => sum + (FOCUS_AREA_POINTS[a] ?? 0), 0)
+  const freqScore = COORD_FREQ_POINTS[frequency] ?? 0
+  const value = caregiverScore + areaScore + freqScore
+  const score = value <= 25 ? 'low' : value <= 60 ? 'medium' : 'high'
+  const recommendedPlan = score === 'low' ? 'free' : score === 'medium' ? 'familiar' : 'care_plus'
+  return { value, score, recommendedPlan }
+}
+
 const INPUT = {
   width: '100%', padding: '14px 16px', borderRadius: 14,
   border: '1.5px solid #E8E4DC', background: 'white',
@@ -51,6 +89,29 @@ function PrimaryBtn({ children, onClick, disabled, pressed, onPD, onPU, onPL }) 
   )
 }
 
+function Chip({ label, sub, selected, onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        padding: '10px 16px', borderRadius: 20,
+        border: `1.5px solid ${selected ? '#087F70' : '#D1C9BF'}`,
+        background: selected ? '#087F70' : 'white',
+        cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left',
+        display: 'flex', flexDirection: 'column', gap: 2,
+        WebkitTapHighlightColor: 'transparent',
+      }}
+    >
+      <span style={{ fontSize: 13, fontWeight: 700, color: selected ? 'white' : '#374151' }}>{label}</span>
+      {sub && <span style={{ fontSize: 11, fontWeight: 500, color: selected ? 'white' : '#9CA3AF' }}>{sub}</span>}
+    </button>
+  )
+}
+
+const QUESTION = {
+  fontSize: 15, fontWeight: 700, color: '#1A1A1A', margin: '0 0 10px', lineHeight: 1.35,
+}
+
 function SkipBtn({ onClick, label = 'Hacer esto después' }) {
   return (
     <button
@@ -69,12 +130,13 @@ function SkipBtn({ onClick, label = 'Hacer esto después' }) {
 export default function OnboardingFlow() {
   const { user } = useAuth()
   const { refresh } = useFamily()
-  // 3 pasos core (perfil → medicamento → invitar) + bienvenida y celebración
-  // como bookends de 1 tap cada uno. Antes eran 7 — "¿A quién vas a cuidar?" y
-  // "¿Qué te preocupa más?" se eliminaron: ninguno de los dos se guardaba en
-  // la base de datos, solo personalizaban texto en pantalla (ver auditoría
-  // 2026-08-10).
-  const TOTAL = 5
+  // 4 pasos core (perfil → sobre el cuidado → medicamento → invitar) + bienvenida
+  // y celebración como bookends de 1 tap cada uno. Antes eran 7 — "¿A quién vas
+  // a cuidar?" y "¿Qué te preocupa más?" se eliminaron: ninguno de los dos se
+  // guardaba en la base de datos, solo personalizaban texto en pantalla (ver
+  // auditoría 2026-08-10). "Sobre el cuidado" (paso 3) sí se guarda -- Care
+  // Complexity Score, usado después del trial para recomendar plan.
+  const TOTAL = 6
 
   const [step, setStep]     = useState(1)
   const [pressed, setPressed] = useState(false)
@@ -90,7 +152,12 @@ export default function OnboardingFlow() {
   const cameraRef  = useRef(null)
   const galleryRef = useRef(null)
 
-  // Paso 3 — primer medicamento
+  // Paso 3 — sobre el cuidado (Care Complexity Score)
+  const [caregiverCount, setCaregiverCount] = useState('')
+  const [focusAreas, setFocusAreas]         = useState([])
+  const [frequency, setFrequency]           = useState('')
+
+  // Paso 4 — primer medicamento
   const [medName, setMedName]   = useState('')
   const [medFreq, setMedFreq]   = useState('')
   const [medTime, setMedTime]   = useState('')
@@ -156,13 +223,61 @@ export default function OnboardingFlow() {
     }
   }
 
-  // ── Avanzar del paso 3 (medicamento) al 4 (invitar), generando el enlace ──
-  function goToInvite() {
-    generateInviteLink()
-    setStep(4)
+  function toggleArea(value) {
+    setFocusAreas(prev => {
+      if (value === 'todo') return prev.includes('todo') ? [] : ['todo']
+      const withoutTodo = prev.filter(v => v !== 'todo')
+      return withoutTodo.includes(value)
+        ? withoutTodo.filter(v => v !== value)
+        : [...withoutTodo, value]
+    })
   }
 
-  // ── Guardar primer medicamento (Paso 3) ───────────────────────────────
+  // ── Guardar respuestas de "Sobre el cuidado" (Paso 3) ─────────────────
+  async function saveComplexity() {
+    setSaving(true)
+    try {
+      const { value, score, recommendedPlan } = computeComplexity(caregiverCount, focusAreas, frequency)
+      const { error } = await supabase.from('care_complexity').upsert({
+        id: user.id,
+        caregiver_count: caregiverCount,
+        focus_areas: focusAreas,
+        frequency,
+        complexity_score_value: value,
+        complexity_score: score,
+        recommended_plan: recommendedPlan,
+        skipped: false,
+      }, { onConflict: 'id' })
+      if (error) throw error
+    } catch (e) {
+      console.warn('[OnboardingFlow] saveComplexity failed:', e)
+    } finally {
+      setSaving(false)
+      setStep(4)
+    }
+  }
+
+  async function skipComplexity() {
+    try {
+      const { error } = await supabase.from('care_complexity').upsert(
+        { id: user.id, skipped: true },
+        { onConflict: 'id' }
+      )
+      if (error) throw error
+    } catch (e) {
+      console.warn('[OnboardingFlow] skipComplexity failed:', e)
+    } finally {
+      setStep(4)
+    }
+  }
+
+  // ── Avanzar del paso 4 (medicamento) al 5 (invitar), generando el enlace ──
+  function goToInvite() {
+    generateInviteLink()
+    setStep(5)
+  }
+
+  // ── Guardar primer medicamento (Paso 4) ───────────────────────────────
   async function saveFirstMed() {
     setSaving(true)
     try {
@@ -357,8 +472,57 @@ export default function OnboardingFlow() {
           </>
         )}
 
-        {/* ════ PASO 3 — PRIMER MEDICAMENTO ════ */}
+        {/* ════ PASO 3 — SOBRE EL CUIDADO ════ */}
         {step === 3 && (
+          <>
+            <p style={{ fontSize: 26, fontWeight: 800, color: '#1A1A1A', fontFamily: 'Georgia, serif', lineHeight: 1.25, margin: '0 0 24px' }}>
+              Sobre el cuidado
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
+              <div>
+                <p style={QUESTION}>¿Cuántas personas están ayudando regularmente en el cuidado?</p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                  {CAREGIVER_OPTIONS.map(o => (
+                    <Chip key={o.value} label={o.label} selected={caregiverCount === o.value} onClick={() => setCaregiverCount(o.value)} />
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <p style={QUESTION}>¿Qué quieres coordinar principalmente?</p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                  {FOCUS_AREA_OPTIONS.map(o => (
+                    <Chip key={o.value} label={o.label} selected={focusAreas.includes(o.value)} onClick={() => toggleArea(o.value)} />
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <p style={QUESTION}>¿Con qué frecuencia necesitan coordinarse?</p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                  {COORD_FREQ_OPTIONS.map(o => (
+                    <Chip key={o.value} label={o.label} sub={o.sub} selected={frequency === o.value} onClick={() => setFrequency(o.value)} />
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div style={{ marginTop: 32, display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <PrimaryBtn
+                onClick={saveComplexity}
+                disabled={saving || !caregiverCount || !frequency || focusAreas.length === 0}
+                pressed={pressed} onPD={pd} onPU={pu} onPL={pu}
+              >
+                {saving ? 'Guardando...' : 'Continuar →'}
+              </PrimaryBtn>
+              <SkipBtn onClick={skipComplexity} />
+            </div>
+          </>
+        )}
+
+        {/* ════ PASO 4 — PRIMER MEDICAMENTO ════ */}
+        {step === 4 && (
           <>
             <p style={{ fontSize: 26, fontWeight: 800, color: '#1A1A1A', fontFamily: 'Georgia, serif', lineHeight: 1.25, margin: '0 0 8px' }}>
               Hagamos algo juntos
@@ -409,8 +573,8 @@ export default function OnboardingFlow() {
           </>
         )}
 
-        {/* ════ PASO 4 — INVITA AL EQUIPO ════ */}
-        {step === 4 && (
+        {/* ════ PASO 5 — INVITA AL EQUIPO ════ */}
+        {step === 5 && (
           <>
             <p style={{ fontSize: 26, fontWeight: 800, color: '#1A1A1A', fontFamily: 'Georgia, serif', lineHeight: 1.25, margin: '0 0 8px' }}>
               Invita a alguien del equipo
@@ -494,16 +658,16 @@ export default function OnboardingFlow() {
             </div>
 
             <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <PrimaryBtn onClick={() => setStep(5)} pressed={pressed} onPD={pd} onPU={pu} onPL={pu}>
+              <PrimaryBtn onClick={() => setStep(6)} pressed={pressed} onPD={pd} onPU={pu} onPL={pu}>
                 Continuar →
               </PrimaryBtn>
-              <SkipBtn onClick={() => setStep(5)} />
+              <SkipBtn onClick={() => setStep(6)} />
             </div>
           </>
         )}
 
-        {/* ════ PASO 5 — CELEBRACIÓN ════ */}
-        {step === 5 && (
+        {/* ════ PASO 6 — CELEBRACIÓN ════ */}
+        {step === 6 && (
           <>
             <div style={{ textAlign: 'center', marginBottom: 32 }}>
               <div style={{ fontSize: 56, marginBottom: 14, lineHeight: 1 }}>🎉</div>
