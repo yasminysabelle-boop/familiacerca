@@ -262,12 +262,14 @@ export default function Calendar() {
             <h2 className="text-2xl font-bold text-gray-900">Calendario</h2>
             <p className="text-gray-500 mt-1">Citas médicas y eventos importantes</p>
           </div>
-          <button
-            onClick={() => { setEditEvent(null); resetForm(); setShowForm(!showForm) }}
-            className="px-4 py-2 bg-primary hover:bg-primary-dark text-white text-sm font-medium rounded-lg transition-colors"
-          >
-            + Agregar evento
-          </button>
+          {isAdmin && (
+            <button
+              onClick={() => { setEditEvent(null); resetForm(); setShowForm(!showForm) }}
+              className="px-4 py-2 bg-primary hover:bg-primary-dark text-white text-sm font-medium rounded-lg transition-colors"
+            >
+              + Agregar evento
+            </button>
+          )}
         </div>
 
         {showForm && (
@@ -549,8 +551,8 @@ export default function Calendar() {
                 icon="📅"
                 title="Sin citas programadas"
                 description="Agrega una cita médica para hacer seguimiento."
-                actionLabel="+ Agregar cita"
-                onAction={() => { setEditEvent(null); resetForm(); setShowForm(true) }}
+                actionLabel={isAdmin ? '+ Agregar cita' : undefined}
+                onAction={isAdmin ? () => { setEditEvent(null); resetForm(); setShowForm(true) } : undefined}
               />
             ) : (
               <ul className="space-y-4">
@@ -581,8 +583,10 @@ export default function Calendar() {
                           {ev.description && <p className="text-xs text-gray-400">{ev.description}</p>}
                         </div>
                         <div className="flex items-center gap-1 flex-shrink-0">
-                          <button onClick={() => openEdit(ev)}
-                            className="text-gray-300 hover:text-gray-600 transition-colors text-xs p-0.5" title="Editar">✏️</button>
+                          {isAdmin && (
+                            <button onClick={() => openEdit(ev)}
+                              className="text-gray-300 hover:text-gray-600 transition-colors text-xs p-0.5" title="Editar">✏️</button>
+                          )}
                           {canActOn(ev) && (
                             <button onClick={() => setConfirmDialog({ onConfirm: () => handleDelete(ev.id) })}
                               className="text-gray-200 hover:text-red-500 transition-colors text-xs p-0.5" title="Eliminar">✕</button>
