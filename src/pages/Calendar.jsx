@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
-import { useSubscription } from '../contexts/SubscriptionContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import EmptyState from '../components/EmptyState'
@@ -33,8 +31,6 @@ const statusInfo = s => STATUS_OPTIONS.find(o => o.value === s) ?? STATUS_OPTION
 export default function Calendar() {
   const { user } = useAuth()
   const { ownerId, memberRole } = useFamily()
-  const { canEdit } = useSubscription()
-  const navigate = useNavigate()
   const today    = new Date()
 
   const isAdmin = user?.id === ownerId
@@ -405,8 +401,7 @@ export default function Calendar() {
             </div>
 
             <div className="flex gap-3">
-              <button type="submit" disabled={saving || !canEdit}
-                onClick={!canEdit ? (e) => { e.preventDefault(); navigate('/upgrade') } : undefined}
+              <button type="submit" disabled={saving}
                 className="px-4 py-2 bg-primary hover:bg-primary-dark disabled:opacity-60 text-white text-sm font-medium rounded-lg transition-colors">
                 {saving ? 'Guardando...' : editEvent ? 'Guardar cambios' : 'Guardar'}
               </button>

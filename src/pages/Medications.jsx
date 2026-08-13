@@ -1,10 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
-import PaywallModal from '../components/PaywallModal'
 import { useSearchParams } from 'react-router-dom'
 import { useGoBack } from '../hooks/useGoBack'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
-import { useSubscription } from '../contexts/SubscriptionContext'
 import { supabase } from '../lib/supabase'
 import { Plus, XIcon, Pencil, Bell, ChevronLeft, Pill, Camera, FileText, CheckIcon, MapPin, Clock, Heart, User } from '../components/Icons'
 import MedicationDetail from '../components/MedicationDetail'
@@ -231,9 +229,7 @@ const labelStyle = {
 export default function Medications() {
   const { user } = useAuth()
   const { ownerId, memberRole, profile, activePatientName } = useFamily()
-  const { canEdit, trialExpired } = useSubscription()
   const goBack = useGoBack()
-  const [showPaywall, setShowPaywall] = useState(false)
   const { containerRef: pullRef, onTouchStart: pullStart, onTouchMove: pullMove, onTouchEnd: pullEnd, PullIndicator } = usePullToRefresh(fetchAll)
   const [searchParams, setSearchParams] = useSearchParams()
   const { permission, supported, requestAndSubscribe } = usePushNotifications()
@@ -447,7 +443,6 @@ export default function Medications() {
 
   function openAdd() {
     if (!isAdmin) return
-    if (trialExpired) { setShowPaywall(true); return }
     setForm(emptyForm); setScheduledTimes(['']); setEditId(null)
     setStockForm(emptyStock); setAddPhotoFile(null); setAddPhotoPreview(null)
     setAddAiExtracted(null); setAddAiError(''); setAddPhotoType(null)
@@ -1022,7 +1017,6 @@ export default function Medications() {
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <Layout>
-      {showPaywall && <PaywallModal onClose={() => setShowPaywall(false)} patientName={profile?.name?.split(' ')[0]} />}
 
       {/* Header propio — back + título + "Cuidando a X" + agregar */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '22px 16px 4px', maxWidth: 600 }}>
@@ -1938,7 +1932,6 @@ export default function Medications() {
                   <LoadingButton
                     type="submit"
                     loading={saving}
-                    disabled={!canEdit}
                     loadingText="Guardando..."
                     style={{ flex: 2, padding: '13px' }}
                   >
