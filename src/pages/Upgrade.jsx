@@ -49,7 +49,7 @@ const TOTAL_FEATURES = [
   'Todo lo del Plan Familiar',
 ]
 
-function PayPalSection({ planKey, paypalPlanId, success, errors, isResolved, isRejected, onApprove, onError }) {
+function PayPalSection({ planKey, paypalPlanId, userId, success, errors, isResolved, isRejected, onApprove, onError }) {
   if (success === planKey) {
     return (
       <div style={{
@@ -81,7 +81,12 @@ function PayPalSection({ planKey, paypalPlanId, success, errors, isResolved, isR
       <PayPalButtons
         style={{ layout: 'vertical', color: 'gold', shape: 'rect', label: 'subscribe', height: 45 }}
         createSubscription={(_d, actions) =>
-          actions.subscription.create({ plan_id: paypalPlanId })
+          // custom_id -- PayPal lo devuelve en el resource de todos los
+          // eventos webhook de esta suscripción. Es lo único que le permite
+          // a paypal-webhook (que corre con service role, nunca al cliente)
+          // saber a qué user_id de FamiliaCerca corresponde el pago, sin
+          // depender de que el cliente escriba nada en `subscriptions`.
+          actions.subscription.create({ plan_id: paypalPlanId, custom_id: userId })
         }
         onApprove={data => onApprove(planKey, data)}
         onError={() => onError(planKey)}
@@ -135,7 +140,7 @@ function UpgradeContent() {
     setErrors(prev => ({ ...prev, [planKey]: 'Error con PayPal. Intenta de nuevo.' }))
   }
 
-  const paypalProps = { success, errors, isResolved, isRejected, onApprove, onError }
+  const paypalProps = { userId: user.id, success, errors, isResolved, isRejected, onApprove, onError }
 
   return (
     <Layout>

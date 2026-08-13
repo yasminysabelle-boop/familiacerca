@@ -2,11 +2,13 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
+import { useSubscription } from '../contexts/SubscriptionContext'
 import Layout from '../components/Layout'
-import AdminTeamSection     from '../components/admin/AdminTeamSection'
-import AdminAccountSection  from '../components/admin/AdminAccountSection'
-import AdminDataSection     from '../components/admin/AdminDataSection'
-import AdminActivitySection from '../components/admin/AdminActivitySection'
+import AdminTeamSection          from '../components/admin/AdminTeamSection'
+import AdminAccountSection       from '../components/admin/AdminAccountSection'
+import AdminDataSection          from '../components/admin/AdminDataSection'
+import AdminActivitySection      from '../components/admin/AdminActivitySection'
+import AdminPaymentAlertsSection from '../components/admin/AdminPaymentAlertsSection'
 
 const SANS = "'Plus Jakarta Sans', system-ui, sans-serif"
 
@@ -21,18 +23,26 @@ const WATERMARK_PATHS = (
   </>
 )
 
-const TABS = [
+const BASE_TABS = [
   { id: 'team',     label: 'Equipo',   icon: '👥' },
   { id: 'account',  label: 'Cuenta',   icon: '💳' },
   { id: 'data',     label: 'Datos',    icon: '📄' },
   { id: 'activity', label: 'Actividad', icon: '📋' },
 ]
 
+// Solo visible para staff interno (isAppAdmin) -- este panel es el de cada
+// dueño de familia, no un panel de staff, así que la pestaña de alertas de
+// pago (que puede tener datos de OTRAS familias) no puede aparecer para un
+// dueño de familia común, aunque esté viendo su propio /admin.
+const PAYMENT_ALERTS_TAB = { id: 'payments', label: 'Pagos', icon: '⚠️' }
+
 export default function Admin() {
   const { user } = useAuth()
   const { ownerId, memberRole, loading: familyLoading } = useFamily()
+  const { isAppAdmin } = useSubscription()
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('team')
+  const TABS = isAppAdmin ? [...BASE_TABS, PAYMENT_ALERTS_TAB] : BASE_TABS
 
   // Show loading while family context resolves
   if (familyLoading) {
@@ -128,7 +138,7 @@ export default function Admin() {
 
         {/* Tab bar */}
         <div style={{
-          display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
+          display: 'grid', gridTemplateColumns: `repeat(${TABS.length}, 1fr)`,
           gap: 6, marginBottom: 20,
         }}>
           {TABS.map(t => (
@@ -156,6 +166,7 @@ export default function Admin() {
         {activeTab === 'account'  && <AdminAccountSection />}
         {activeTab === 'data'     && <AdminDataSection />}
         {activeTab === 'activity' && <AdminActivitySection />}
+        {activeTab === 'payments' && isAppAdmin && <AdminPaymentAlertsSection />}
       </div>
 
       </div>
