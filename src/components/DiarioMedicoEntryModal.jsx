@@ -129,7 +129,7 @@ const VOICE_PROMPT = transcript => `Eres un asistente médico. El familiar habl�
 
 Extrae y estructura en JSON (usa null si no se menciona):
 {
-  "estado_general": "solo si el documento (o la persona) lo dice de forma explícita, transcrito literalmente. Si hay que resumir, inferir o juntar varias frases para llenarlo, poné null.",
+  "estado_general": "solo si la persona lo dice de forma explícita, transcrito literalmente. Si hay que resumir, inferir o juntar varias frases para llenarlo, poné null. Impresiones generales de quien habla (\"la vi bien\", \"estaba animada\", \"se veía cansada\") no son estado general -- van en notas.",
   "que_dijo_el_medico": "indicaciones o diagnóstico",
   "medicamentos": [{"nombre": "", "dosis": "", "frecuencia": ""}],
   "proximos_pasos": ["texto del paso pendiente"],
@@ -143,7 +143,7 @@ const PHOTO_PROMPT = tipo => `Eres un asistente médico. Analiza esta imagen (${
 
 Extrae TODA la información médica visible:
 {
-  "estado_general": "solo si el documento (o la persona) lo dice de forma explícita, transcrito literalmente. Si hay que resumir, inferir o juntar varias frases para llenarlo, poné null.",
+  "estado_general": "solo si el documento lo dice de forma explícita, transcrito literalmente. Si hay que resumir, inferir o juntar varias frases para llenarlo, poné null.",
   "que_dijo_el_medico": "indicaciones o diagnóstico del médico",
   "medicamentos": [{"nombre": "", "dosis": "", "frecuencia": ""}],
   "proximos_pasos": ["estudios o citas indicadas"],
