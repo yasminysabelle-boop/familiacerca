@@ -3,7 +3,7 @@ import PaywallModal from '../components/PaywallModal'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
-import { useBillingAccount } from '../contexts/BillingAccountContext'
+import { useFamilyPlan } from '../contexts/FamilyPlanContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import { getLocation } from '../lib/gps'
@@ -29,7 +29,7 @@ const onBlur  = e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.bo
 export default function Notes() {
   const { user } = useAuth()
   const { ownerId, profile, memberRole } = useFamily()
-  const { canEdit, trialExpired } = useBillingAccount()
+  const { familyCanEdit, familyTrialExpired } = useFamilyPlan()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
   const [showPaywall, setShowPaywall] = useState(false)
@@ -111,7 +111,13 @@ export default function Notes() {
   }
 
   function openAdd() {
-    if (trialExpired && isAdmin) { setShowPaywall(true); return }
+    // Mismo hueco que ya se cerró en Calendar.jsx: sin este chequeo, un rol
+    // 'familiar' (solo lectura) podía abrir el formulario de creación --
+    // acá además por URL directa (?add=1), no solo por el botón. Dueño o
+    // cuidador, igual que ya permite editar una nota existente (ver
+    // canModify más abajo) -- un 'familiar' nunca puede crear ni editar.
+    if (!isAdmin && !isCuidador) return
+    if (familyTrialExpired && isAdmin) { setShowPaywall(true); return }
     setEditId(null)
     setForm(emptyForm)
     setShowForm(true)
@@ -194,18 +200,20 @@ export default function Notes() {
             </h2>
             <p style={{ fontSize: 12, color: '#9CA3AF' }}>Observaciones del cuidado diario</p>
           </div>
-          <button
-            onClick={openAdd}
-            style={{
-              width: 40, height: 40, borderRadius: 12,
-              background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
-              border: 'none', cursor: 'pointer',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 4px 12px rgba(8,127,112,0.3)',
-            }}
-          >
-            <Plus size={20} color="white" strokeWidth={2.5} />
-          </button>
+          {(isAdmin || isCuidador) && (
+            <button
+              onClick={openAdd}
+              style={{
+                width: 40, height: 40, borderRadius: 12,
+                background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
+                border: 'none', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                boxShadow: '0 4px 12px rgba(8,127,112,0.3)',
+              }}
+            >
+              <Plus size={20} color="white" strokeWidth={2.5} />
+            </button>
+          )}
         </div>
 
         {/* Search */}
@@ -239,7 +247,7 @@ export default function Notes() {
             <p style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 20 }}>
               {search ? 'Intenta con otras palabras.' : 'Registra las observaciones del cuidado diario.'}
             </p>
-            {!search && (
+            {!search && (isAdmin || isCuidador) && (
               <button onClick={openAdd} style={{ padding: '10px 24px', borderRadius: 12, background: 'linear-gradient(135deg, #0d6b63, #3A6347)', color: 'white', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>
                 + Nueva nota
               </button>
@@ -518,11 +526,11 @@ export default function Notes() {
                 </button>
                 <button
                   type="submit"
-                  disabled={saving || !canEdit || (form.is_incident && !form.incident_type)}
-                  onClick={!canEdit ? e => { e.preventDefault(); navigate('/upgrade') } : undefined}
+                  disabled={saving || !familyCanEdit || (form.is_incident && !form.incident_type)}
+                  onClick={!familyCanEdit ? e => { e.preventDefault(); navigate('/upgrade') } : undefined}
                   style={{
                     flex: 2, padding: '13px', borderRadius: 14, border: 'none',
-                    background: (saving || !canEdit || (form.is_incident && !form.incident_type)) ? '#D4C4B8' : 'linear-gradient(135deg, #0d6b63, #3A6347)',
+                    background: (saving || !familyCanEdit || (form.is_incident && !form.incident_type)) ? '#D4C4B8' : 'linear-gradient(135deg, #0d6b63, #3A6347)',
                     color: 'white', fontWeight: 700, fontSize: 14,
                     cursor: saving ? 'not-allowed' : 'pointer',
                     boxShadow: saving ? 'none' : '0 6px 20px rgba(8,127,112,0.3)',
