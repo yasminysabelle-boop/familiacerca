@@ -1,0 +1,74 @@
+project_id = "ofubzbqaxaepxjicyegz"
+
+# verify_jwt por función -- declarado acá para que un `supabase functions
+# deploy <nombre>` sin flags nunca vuelva a depender de que quien lo corre se
+# acuerde de pasar --no-verify-jwt (o de no pasarlo). El CLI lee este archivo
+# y aplica el valor automáticamente, con o sin flag explícito.
+#
+# Regla: si el caller es un servicio externo que no puede mandar un JWT de
+# Supabase (PayPal, o cualquier webhook de terceros futuro), verify_jwt debe
+# ser false y la función tiene que traer su propia verificación (firma
+# criptográfica del proveedor, secreto compartido, etc.). Si el caller es
+# nuestro propio cliente (usuario logueado) o pg_cron (manda la anon key como
+# JWT válido + un secreto propio en un header aparte, ver
+# supabase/setup_cron.sql), verify_jwt debe quedar en true -- es una capa
+# gratis además del chequeo propio de la función.
+
+[functions.paypal-webhook]
+# Único caller es PayPal -- nunca manda Authorization con un JWT de Supabase,
+# manda sus propios headers paypal-transmission-* para su firma criptográfica
+# (verificada dentro del código, verifySignature()). Con verify_jwt:true el
+# gateway rechazaba TODA entrega de PayPal con 401 antes de que el código
+# corriera -- causa raíz real de que ningún pago se haya activado nunca
+# (encontrado y corregido 2026-08-14).
+verify_jwt = false
+
+[functions.cancel-paypal-subscription]
+verify_jwt = true
+
+[functions.send-med-notifications]
+# pg_cron: Authorization = anon key (JWT válido para el gateway) + X-Cron-Secret
+# propio (ver supabase/setup_cron.sql). true es correcto y necesario.
+verify_jwt = true
+
+[functions.send-daily-summary]
+verify_jwt = true
+
+[functions.send-proof-reminders]
+verify_jwt = true
+
+[functions.send-evening-push]
+verify_jwt = true
+
+[functions.send-videocall-notifications]
+verify_jwt = true
+
+[functions.send-hospital-notification]
+verify_jwt = true
+
+[functions.send-invitation]
+verify_jwt = true
+
+[functions.send-welcome]
+verify_jwt = true
+
+[functions.send-sos-notification]
+verify_jwt = true
+
+[functions.send-test-notification]
+verify_jwt = true
+
+[functions.create-daily-room]
+verify_jwt = true
+
+[functions.get-call-presence]
+verify_jwt = true
+
+[functions.delete-account]
+verify_jwt = true
+
+[functions.gemini-vision]
+verify_jwt = true
+
+[functions.gemini-proxy]
+verify_jwt = true
