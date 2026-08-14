@@ -8,7 +8,7 @@ import { supabase } from '../lib/supabase'
 // patrón de "una sola vez" (trial_ending_seen_at, ver
 // supabase/add_trial_ending_seen.sql), pero nunca puede coincidir con
 // TrialEndedNotice en pantalla: uno exige isTrialing, el otro trialExpired,
-// mutuamente excluyentes en SubscriptionContext.
+// mutuamente excluyentes en BillingAccountContext.
 //
 // recommended_plan de care_complexity (Paso 3 del onboarding, ver
 // project_familiacerca_onboarding_complexity) decide el caso a mostrar:

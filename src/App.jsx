@@ -2,7 +2,8 @@ import { useEffect, useState, useRef } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { FamilyProvider, useFamily } from './contexts/FamilyContext'
-import { SubscriptionProvider } from './contexts/SubscriptionContext'
+import { BillingAccountProvider } from './contexts/BillingAccountContext'
+import { FamilyPlanProvider } from './contexts/FamilyPlanContext'
 import { DarkModeProvider } from './contexts/DarkModeContext'
 import { PresenceProvider } from './contexts/PresenceContext'
 import { HospitalModeProvider } from './contexts/HospitalModeContext'
@@ -298,11 +299,13 @@ export default function App() {
         <DarkModeProvider>
           <FamilyProvider>
             <PresenceProvider>
-              <SubscriptionProvider>
-                <HospitalModeProvider>
-                  <AppShell />
-                </HospitalModeProvider>
-              </SubscriptionProvider>
+              <BillingAccountProvider>
+                <FamilyPlanProvider>
+                  <HospitalModeProvider>
+                    <AppShell />
+                  </HospitalModeProvider>
+                </FamilyPlanProvider>
+              </BillingAccountProvider>
             </PresenceProvider>
           </FamilyProvider>
         </DarkModeProvider>

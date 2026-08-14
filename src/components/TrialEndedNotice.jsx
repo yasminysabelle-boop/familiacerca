@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom'
 
 // Mensaje único al expirar el trial — reemplaza el paywall global que antes
 // vivía en Layout.jsx. Se muestra una sola vez (persistido en
-// subscriptions.trial_ended_seen_at, ver SubscriptionContext), nunca se
+// subscriptions.trial_ended_seen_at, ver BillingAccountContext), nunca se
 // repite en cada recarga/pestaña/dispositivo. Informa qué cambió y qué se
 // conserva — no es un cobro. Los bloqueos reales pasan en contexto
 // (Familia, Historial, Gastos), no acá.

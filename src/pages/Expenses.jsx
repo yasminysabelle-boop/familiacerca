@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
-import { useSubscription } from '../contexts/SubscriptionContext'
+import { useBillingAccount } from '../contexts/BillingAccountContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import { ChevronLeft, ChevronRight, Plus, XIcon, Camera } from '../components/Icons'
@@ -59,7 +59,7 @@ export default function Expenses() {
   const { user } = useAuth()
   const { ownerId, memberRole, profile } = useFamily()
   const isFamiliar = memberRole === 'familiar'
-  const { canEdit, trialExpired } = useSubscription()
+  const { canEdit, trialExpired } = useBillingAccount()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
   const fileRef = useRef(null)

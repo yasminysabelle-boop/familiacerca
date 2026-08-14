@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
-import { useSubscription } from '../contexts/SubscriptionContext'
+import { useBillingAccount } from '../contexts/BillingAccountContext'
 import { supabase } from '../lib/supabase'
 import { geminiGenerate } from '../lib/gemini'
 import { buildCareContext, CONTEXT_RULES, CONTEXT_DEPTH } from '../lib/careContext'
@@ -94,7 +94,7 @@ function metaFor(id) { return id === 'all' ? ALL_META : (CATEGORY_META[id] ?? AL
 export default function Chat() {
   const { user } = useAuth()
   const { ownerId, activePatientName } = useFamily()
-  const { aiLevel, contextWindowDays } = useSubscription()
+  const { aiLevel, contextWindowDays } = useBillingAccount()
   const goBack = useGoBack()
   const [messages, setMessages] = useState([])
   const [profiles, setProfiles] = useState({})

@@ -50,7 +50,7 @@ export const CONTEXT_RULES = `Reglas para usar el contexto de cuidado (innegocia
 - El contexto de abajo solo trae datos dentro de la ventana indicada en su encabezado (por ejemplo "últimos 7 días"). Si preguntan por algo de una fecha que cae fuera de esa ventana, dilo con naturalidad — "no tengo visibilidad de fechas tan antiguas" o equivalente — nunca como una falla ni como un castigo. NUNCA ofrezcas, sugieras ni menciones un plan superior como solución a esa falta de visibilidad, a menos que el usuario pregunte explícitamente por planes o límites de su cuenta.`
 
 // Profundidad conversacional por aiLevel ('basic' | 'realtime' | 'trends',
-// ver SubscriptionContext.jsx) — capa que se agrega sobre CONTEXT_RULES para
+// ver BillingAccountContext.jsx) — capa que se agrega sobre CONTEXT_RULES para
 // preguntas directas a Milo/Luna (CompanionChat.jsx, "Preguntar a Milo y
 // Luna" en Chat.jsx). No confundir con la ventana de datos (contextWindowDays,
 // que gobierna qué hechos existen en el contexto): esto gobierna cuánto
@@ -64,7 +64,7 @@ export const CONTEXT_DEPTH = {
 }
 
 // windowDays: null (sin corte) o número de días — viene de
-// SubscriptionContext.contextWindowDays (deriva del plan real, no de
+// BillingAccountContext.contextWindowDays (deriva del plan real, no de
 // aiLevel; ver ese archivo). Gobierna qué tan atrás puede ver Milo/Luna en
 // las fuentes acotadas por fecha (actividad e incidentes/síntomas).
 function windowLabel(windowDays) {

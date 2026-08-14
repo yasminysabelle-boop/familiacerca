@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
-import { useSubscription } from '../contexts/SubscriptionContext'
+import { useBillingAccount } from '../contexts/BillingAccountContext'
 import Layout from '../components/Layout'
 import DiarioMedicoEntryModal from '../components/DiarioMedicoEntryModal'
 import PaywallModal from '../components/PaywallModal'
@@ -174,7 +174,7 @@ function EntryCard({ entry }) {
 export default function DiarioMedico() {
   const { user }                     = useAuth()
   const { ownerId, memberRole, profile } = useFamily()
-  const { trialExpired }             = useSubscription()
+  const { trialExpired }             = useBillingAccount()
   const [entries, setEntries]        = useState([])
   const [loading, setLoading]        = useState(true)
   const [showModal, setShowModal]    = useState(false)

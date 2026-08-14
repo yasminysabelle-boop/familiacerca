@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
-import { useSubscription } from '../contexts/SubscriptionContext'
+import { useBillingAccount } from '../contexts/BillingAccountContext'
 import Logo from './Logo'
 import { User, ChevronLeft, Home, Chat, ClipboardList, Pill } from './Icons'
 import TrialEndedNotice from './TrialEndedNotice'
@@ -62,7 +62,7 @@ const LIGHT_HEADER_PAGES = new Set([
 export default function Layout({ children }) {
   const { inactivityWarning, user } = useAuth()
   const { activeFamilyLabel, activePatientName, memberRole } = useFamily()
-  const { sub, trialExpired, markTrialEndedSeen, isTrialing, daysLeft, markTrialEndingSeen } = useSubscription()
+  const { sub, trialExpired, markTrialEndedSeen, isTrialing, daysLeft, markTrialEndingSeen } = useBillingAccount()
   const isAdmin = memberRole === null
   const userAvatar = user?.user_metadata?.avatar_url ?? null
   const userInitial = (user?.user_metadata?.full_name ?? user?.email ?? '?').charAt(0).toUpperCase()

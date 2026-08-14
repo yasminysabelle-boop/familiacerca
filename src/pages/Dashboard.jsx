@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { Link, useSearchParams, useNavigate as useNav } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
-import { useSubscription } from '../contexts/SubscriptionContext'
+import { useBillingAccount } from '../contexts/BillingAccountContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import CareCard from '../components/CareCard'
@@ -2052,7 +2052,7 @@ export default function Dashboard() {
   const [startingInstantCall, setStartingInstantCall] = useState(false)
   const [instantCallError, setInstantCallError] = useState('')
   const [renewalAlerts, setRenewalAlerts] = useState([])
-  const { sub, loading: subLoading, refresh: refreshSub, aiLevel } = useSubscription()
+  const { sub, loading: subLoading, refresh: refreshSub, aiLevel } = useBillingAccount()
   const [searchParams, setSearchParams] = useSearchParams()
 
   const [sections, setSections] = useState([])

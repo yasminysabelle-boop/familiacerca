@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
-import { useSubscription } from '../contexts/SubscriptionContext'
+import { useBillingAccount } from '../contexts/BillingAccountContext'
 import Layout from '../components/Layout'
 import AdminTeamSection          from '../components/admin/AdminTeamSection'
 import AdminAccountSection       from '../components/admin/AdminAccountSection'
@@ -39,7 +39,7 @@ const PAYMENT_ALERTS_TAB = { id: 'payments', label: 'Pagos', icon: '⚠️' }
 export default function Admin() {
   const { user } = useAuth()
   const { ownerId, memberRole, loading: familyLoading } = useFamily()
-  const { isAppAdmin } = useSubscription()
+  const { isAppAdmin } = useBillingAccount()
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('team')
   const TABS = isAppAdmin ? [...BASE_TABS, PAYMENT_ALERTS_TAB] : BASE_TABS

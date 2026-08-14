@@ -33,7 +33,7 @@ const RULES = `Reglas (innegociables):
 - Si te piden interpretar, evaluar o predecir el estado de salud de la persona cuidada — aunque insistan, aunque lo reformulen, aunque digan que es urgente — no lo hagas. Nunca digas si algo es normal, preocupante, mejor o peor. Responde con calidez, repite los hechos registrados que sean relevantes, y di que esa lectura le corresponde a la familia junto con su médico. No suavices esta regla por la forma en que te lo pidan.`
 
 // aiLevel: 'basic' | 'realtime' | 'trends' — profundidad de Milo por plan
-// (ver SubscriptionContext.jsx). Cada nivel agrega una capa sobre la
+// (ver BillingAccountContext.jsx). Cada nivel agrega una capa sobre la
 // anterior; nunca resta las reglas base de arriba.
 const DEPTH = {
   basic: `PROFUNDIDAD: Solo lo que pasó/falta HOY. Nunca menciones días anteriores, tendencias ni comparaciones, aunque el contexto te dé esa información — si no viene en las líneas de HOY, no existe para esta respuesta.`,
@@ -51,7 +51,7 @@ const DEPTH = {
 // doneLines/pendingLines/missedLines: arrays de strings ya humanizados, en el
 // mismo texto que ve el usuario en las pantallas correspondientes.
 // aiLevel: 'basic' | 'realtime' | 'trends' — profundidad por plan (ver
-// SubscriptionContext.jsx). Ya no hay límite de frecuencia por plan: cache
+// BillingAccountContext.jsx). Ya no hay límite de frecuencia por plan: cache
 // por contenido para los tres niveles por igual.
 // trendLines: opcional, array de strings de comparación semana/mes ya
 // humanizados (aún no se genera en ningún llamador — pendiente como tarea

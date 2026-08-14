@@ -2,9 +2,15 @@ import { createContext, useContext, useEffect, useState, useCallback } from 'rea
 import { useAuth } from './AuthContext'
 import { supabase } from '../lib/supabase'
 
-const SubscriptionContext = createContext(null)
+// Cuenta de FACTURACIÓN de quien está logueado -- su propia fila en
+// `subscriptions`, su propio trial de 14 días desde que creó su cuenta. NO
+// representa el plan de la familia que está viendo -- eso es
+// FamilyPlanContext/useFamilyPlan. Ver
+// project_familiacerca_subscription_scoped_to_viewer en memoria para el
+// porqué de la separación.
+const BillingAccountContext = createContext(null)
 
-export function SubscriptionProvider({ children }) {
+export function BillingAccountProvider({ children }) {
   const { user } = useAuth()
   const [sub, setSub] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -134,12 +140,12 @@ export function SubscriptionProvider({ children }) {
   }
 
   return (
-    <SubscriptionContext.Provider value={value}>
+    <BillingAccountContext.Provider value={value}>
       {children}
-    </SubscriptionContext.Provider>
+    </BillingAccountContext.Provider>
   )
 }
 
-export function useSubscription() {
-  return useContext(SubscriptionContext)
+export function useBillingAccount() {
+  return useContext(BillingAccountContext)
 }

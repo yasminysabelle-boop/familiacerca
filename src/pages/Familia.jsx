@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { usePresence } from '../contexts/PresenceContext'
-import { useSubscription } from '../contexts/SubscriptionContext'
+import { useBillingAccount } from '../contexts/BillingAccountContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import { UserPlus, Phone, Mail, MapPin, XIcon } from '../components/Icons'
@@ -38,7 +38,7 @@ export default function Familia() {
   const { user } = useAuth()
   const { profile, ownerId, activePatientName } = useFamily()
   const onlineIds = usePresence()
-  const { sub, trialExpired, caregiverLimit } = useSubscription()
+  const { sub, trialExpired, caregiverLimit } = useBillingAccount()
   const navigate = useNavigate()
   const [members, setMembers] = useState([])
   const [memberProfiles, setMemberProfiles] = useState({})

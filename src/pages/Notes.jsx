@@ -3,7 +3,7 @@ import PaywallModal from '../components/PaywallModal'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
-import { useSubscription } from '../contexts/SubscriptionContext'
+import { useBillingAccount } from '../contexts/BillingAccountContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import { getLocation } from '../lib/gps'
@@ -29,7 +29,7 @@ const onBlur  = e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.bo
 export default function Notes() {
   const { user } = useAuth()
   const { ownerId, profile, memberRole } = useFamily()
-  const { canEdit, trialExpired } = useSubscription()
+  const { canEdit, trialExpired } = useBillingAccount()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
   const [showPaywall, setShowPaywall] = useState(false)

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useFamily } from '../contexts/FamilyContext'
-import { useSubscription } from '../contexts/SubscriptionContext'
+import { useBillingAccount } from '../contexts/BillingAccountContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import { mapsUrl } from '../lib/gps'
@@ -310,7 +310,7 @@ function toLocalDateKey(d = new Date()) {
 
 export default function MedicationTimeline() {
   const { ownerId, activePatientName, profile } = useFamily()
-  const { historyWindowDays } = useSubscription()
+  const { historyWindowDays } = useBillingAccount()
   const navigate = useNavigate()
   const goBack = useGoBack()
   const patientFirstName = (activePatientName || profile?.name || 'tu familiar').split(' ')[0]

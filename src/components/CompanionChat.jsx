@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom'
 import { geminiChat } from '../lib/gemini'
 import { buildCareContext, CONTEXT_RULES, CONTEXT_DEPTH } from '../lib/careContext'
 import { useFamily } from '../contexts/FamilyContext'
-import { useSubscription } from '../contexts/SubscriptionContext'
+import { useBillingAccount } from '../contexts/BillingAccountContext'
 import { FAMILIACERCA_KNOWLEDGE } from '../lib/companionKnowledge'
 import miloLunaImg  from '../assets/companions/milo-luna.png'
 import miloAvatarImg from '../assets/companions/milo-avatar.png'
@@ -81,7 +81,7 @@ const CARE_CONTEXT_TTL_MS = 2 * 60 * 1000
 // Pass 24 on Landing (no nav bar), use default 140 inside Layout (above FAB).
 export default function CompanionChat({ bottomOffset = 140, externalOpen = false, onExternalClose }) {
   const { ownerId, activePatientName } = useFamily()
-  const { aiLevel, contextWindowDays } = useSubscription()
+  const { aiLevel, contextWindowDays } = useBillingAccount()
   const careOptions = careQuickOptions(activePatientName?.split(' ')[0])
   const careContextRef = useRef({ text: null, fetchedAt: 0, windowDays: undefined })
 

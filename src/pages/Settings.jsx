@@ -3,7 +3,7 @@ import Cropper from 'react-easy-crop'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
-import { useSubscription } from '../contexts/SubscriptionContext'
+import { useBillingAccount } from '../contexts/BillingAccountContext'
 import { useDarkMode } from '../contexts/DarkModeContext'
 import { usePushNotifications } from '../hooks/usePushNotifications'
 import { supabase } from '../lib/supabase'
@@ -90,7 +90,7 @@ export default function Settings() {
   const { user, signOut } = useAuth()
   const { ownerId, memberRole, families, switchFamily, hasMultiple, activeOwnerId } = useFamily()
   const isAdmin = memberRole === null && ownerId === user?.id
-  const { sub, isPaid, isTrialing, trialExpired, daysLeft } = useSubscription()
+  const { sub, isPaid, isTrialing, trialExpired, daysLeft } = useBillingAccount()
   const { dark, toggleDark } = useDarkMode()
   const { permission, subscribed, supported, subscribeError, requestAndSubscribe, resubscribe } = usePushNotifications()
   const navigate = useNavigate()

@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { useSubscription } from '../../contexts/SubscriptionContext'
+import { useBillingAccount } from '../../contexts/BillingAccountContext'
 
 const PLAN_META = {
   free:      { label: 'Gratis',        color: '#9CA3AF', icon: '🌱', features: ['2 cuidadores', 'Chat familiar', 'Medicamentos básicos', 'Historial 7 días'] },
@@ -15,7 +15,7 @@ const STATUS_LABEL = {
 }
 
 export default function AdminAccountSection() {
-  const { sub, isPaid, isTrialing, daysLeft, trialExpired } = useSubscription()
+  const { sub, isPaid, isTrialing, daysLeft, trialExpired } = useBillingAccount()
   const navigate = useNavigate()
 
   const meta = PLAN_META[sub?.plan ?? 'free']

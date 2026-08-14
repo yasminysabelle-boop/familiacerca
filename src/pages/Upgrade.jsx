@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { PayPalScriptProvider, PayPalButtons, usePayPalScriptReducer } from '@paypal/react-paypal-js'
 import { useAuth } from '../contexts/AuthContext'
-import { useSubscription } from '../contexts/SubscriptionContext'
+import { useBillingAccount } from '../contexts/BillingAccountContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import { PAYPAL_PLAN_IDS } from '../config/paypalPlans'
@@ -106,7 +106,7 @@ function PayPalSection({ planKey, paypalPlanId, userId, success, errors, isResol
 
 function UpgradeContent() {
   const { user } = useAuth()
-  const { sub, refresh } = useSubscription()
+  const { sub, refresh } = useBillingAccount()
   const navigate = useNavigate()
   const [{ isResolved, isRejected }] = usePayPalScriptReducer()
   const [success, setSuccess] = useState(null)
