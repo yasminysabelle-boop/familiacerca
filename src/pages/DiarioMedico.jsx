@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
-import { useBillingAccount } from '../contexts/BillingAccountContext'
+import { useFamilyPlan } from '../contexts/FamilyPlanContext'
 import Layout from '../components/Layout'
 import DiarioMedicoEntryModal from '../components/DiarioMedicoEntryModal'
 import PaywallModal from '../components/PaywallModal'
@@ -174,7 +174,7 @@ function EntryCard({ entry }) {
 export default function DiarioMedico() {
   const { user }                     = useAuth()
   const { ownerId, memberRole, profile } = useFamily()
-  const { trialExpired }             = useBillingAccount()
+  const { familyTrialExpired }       = useFamilyPlan()
   const [entries, setEntries]        = useState([])
   const [loading, setLoading]        = useState(true)
   const [showModal, setShowModal]    = useState(false)
@@ -185,7 +185,7 @@ export default function DiarioMedico() {
   // Admin or cuidador can add entries
   const canAdd = memberRole === null || memberRole === 'cuidador'
   function openEntry() {
-    if (trialExpired && memberRole === null) { setShowPaywall(true); return }
+    if (familyTrialExpired && memberRole === null) { setShowPaywall(true); return }
     setShowModal(true)
   }
 

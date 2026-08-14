@@ -12,12 +12,27 @@ import { supabase } from '../lib/supabase'
 const FamilyPlanContext = createContext(null)
 
 export function FamilyPlanProvider({ children }) {
-  const { ownerId } = useFamily()
+  // ownerId de useFamily() cae a user?.id ANTES de que loadFamilies()
+  // resuelva la familia real -- nunca es null para un usuario logueado, así
+  // que no sirve por sí solo como guard. `loading` (de FamilyContext) tampoco
+  // alcanza: en el primer render tras resolver el usuario, `loading` puede
+  // seguir en `false` (quedó así de un reset() previo, sin user) en el MISMO
+  // render donde `ownerId` ya cayó al fallback -- loadFamilies() recién pone
+  // loading=true un ciclo después. `profileResolved` sí sirve: arranca en
+  // false y SOLO pasa a true al terminar loadFamilies(), en el mismo punto
+  // donde activeOwnerId ya quedó correcto -- nunca hay una ventana donde esté
+  // en true con el ownerId todavía sin resolver. Sin este guard, un miembro
+  // invitado dispara get_family_plan primero con SU PROPIO id (por el
+  // fallback) y recién después con el del dueño real -- el mismo bug que se
+  // está cerrando, pero como parpadeo transitorio en vez de estado
+  // persistente. Confirmado en vivo con Playwright antes de este fix.
+  const { ownerId, profileResolved } = useFamily()
   const { isAppAdmin } = useBillingAccount()
   const [familyPlan, setFamilyPlan] = useState(null)
   const [familyLoading, setFamilyLoading] = useState(true)
 
   const load = useCallback(async () => {
+    if (!profileResolved) { setFamilyLoading(true); return }
     if (!ownerId) { setFamilyPlan(null); setFamilyLoading(false); return }
     setFamilyLoading(true)
     const { data } = await supabase
@@ -25,7 +40,7 @@ export function FamilyPlanProvider({ children }) {
       .maybeSingle()
     setFamilyPlan(data ?? null)
     setFamilyLoading(false)
-  }, [ownerId])
+  }, [ownerId, profileResolved])
 
   useEffect(() => { load() }, [load])
 

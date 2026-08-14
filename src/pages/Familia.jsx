@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { usePresence } from '../contexts/PresenceContext'
-import { useBillingAccount } from '../contexts/BillingAccountContext'
+import { useFamilyPlan } from '../contexts/FamilyPlanContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import { UserPlus, Phone, Mail, MapPin, XIcon } from '../components/Icons'
@@ -38,7 +38,7 @@ export default function Familia() {
   const { user } = useAuth()
   const { profile, ownerId, activePatientName } = useFamily()
   const onlineIds = usePresence()
-  const { sub, trialExpired, caregiverLimit } = useBillingAccount()
+  const { familyPlan, familyTrialExpired, familyCaregiverLimit } = useFamilyPlan()
   const navigate = useNavigate()
   const [members, setMembers] = useState([])
   const [memberProfiles, setMemberProfiles] = useState({})
@@ -270,8 +270,8 @@ export default function Familia() {
     // explica el bloqueo cuando ambas condiciones son ciertas a la vez (un
     // Free con trial vencido llega al tope de 2 con solo un invitado). El
     // trial vencido es la razón correcta solo cuando el equipo NO está lleno.
-    if (teamSize >= caregiverLimit) { setPaywallVariant('team-full'); setShowPaywall(true); return }
-    if (trialExpired && isAdmin) { setPaywallVariant('trial'); setShowPaywall(true); return }
+    if (teamSize >= familyCaregiverLimit) { setPaywallVariant('team-full'); setShowPaywall(true); return }
+    if (familyTrialExpired && isAdmin) { setPaywallVariant('trial'); setShowPaywall(true); return }
     setInviteEmail(''); setInviteStatus('idle'); setInviteLink(''); setCopied(false)
     setShowInvite(true)
   }
@@ -1062,7 +1062,7 @@ export default function Familia() {
           patientName={profile?.name?.split(' ')[0]}
           title={paywallVariant === 'team-full' ? 'Tu equipo está completo' : undefined}
           message={paywallVariant === 'team-full'
-            ? sub?.plan === 'familiar'
+            ? familyPlan?.plan === 'familiar'
               ? 'El plan Familiar permite un equipo de 6 personas, contándote a ti. Con Cuidado Total no hay límite.'
               : 'El plan Gratis permite un equipo de 2 personas, contándote a ti. Con Familiar pueden ser hasta 6.'
             : undefined}

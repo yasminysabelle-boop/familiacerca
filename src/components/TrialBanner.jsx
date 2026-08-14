@@ -1,9 +1,9 @@
 import { useNavigate } from 'react-router-dom'
-import { useBillingAccount } from '../contexts/BillingAccountContext'
+import { useFamilyPlan } from '../contexts/FamilyPlanContext'
 import { useFamily } from '../contexts/FamilyContext'
 
 export default function TrialBanner() {
-  const { isTrialing, trialExpired, daysLeft } = useBillingAccount()
+  const { familyIsTrialing: isTrialing, familyTrialExpired: trialExpired, familyDaysLeft: daysLeft } = useFamilyPlan()
   const { memberRole } = useFamily()
   const navigate = useNavigate()
 

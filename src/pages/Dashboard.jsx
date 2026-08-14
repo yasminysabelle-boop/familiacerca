@@ -4,6 +4,7 @@ import { Link, useSearchParams, useNavigate as useNav } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { useBillingAccount } from '../contexts/BillingAccountContext'
+import { useFamilyPlan } from '../contexts/FamilyPlanContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import CareCard from '../components/CareCard'
@@ -2052,7 +2053,10 @@ export default function Dashboard() {
   const [startingInstantCall, setStartingInstantCall] = useState(false)
   const [instantCallError, setInstantCallError] = useState('')
   const [renewalAlerts, setRenewalAlerts] = useState([])
-  const { sub, loading: subLoading, refresh: refreshSub, aiLevel } = useBillingAccount()
+  // refresh: solo para refrescar la cuenta de facturación PROPIA tras un
+  // checkout de PayPal exitoso (ver abajo) -- nunca el plan de la familia.
+  const { refresh: refreshSub } = useBillingAccount()
+  const { familyLoading, familyAiLevel } = useFamilyPlan()
   const [searchParams, setSearchParams] = useSearchParams()
 
   const [sections, setSections] = useState([])
@@ -3265,11 +3269,11 @@ export default function Dashboard() {
   // igual mostraba "Aún no hay registros del día" por encima.
   const hasSignal = todaysActivityItems.length > 0 || pendingMedLines.length > 0 || missedMedLines.length > 0 || !!moodLine || !!routineLine
   useEffect(() => {
-    // subLoading incluido a propósito: hasta que el plan no se resuelve no
-    // sabemos si aplica el límite de 1/día del plan Gratis — disparar antes
-    // arriesgaría una llamada a Gemini de más (o un gate de menos) mientras
-    // sub todavía es null.
-    if (loading || subLoading || !ownerId || !hasSignal || isHospitalMode) {
+    // familyLoading incluido a propósito: hasta que el plan de la FAMILIA no
+    // se resuelve no sabemos qué profundidad (familyAiLevel) usar — disparar
+    // antes arriesgaría narrar con el nivel por defecto mientras familyPlan
+    // todavía es null.
+    if (loading || familyLoading || !ownerId || !hasSignal || isHospitalMode) {
       setActivitySummaryText(null)
       setActivitySummaryStale(false)
       return
@@ -3289,7 +3293,7 @@ export default function Dashboard() {
         doneLines,
         pendingLines,
         missedLines: missedMedLines,
-        aiLevel,
+        aiLevel: familyAiLevel,
       })
         .then(result => {
           if (cancelled) return
@@ -3303,7 +3307,7 @@ export default function Dashboard() {
     }
     return () => { cancelled = true }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading, subLoading, ownerId, isHospitalMode, hasSignal, activityLatestEventMs, todaysActivityItems.length, pendingMedLines.length, missedMedLines.length, moodLine, routineLine, routinePending, dashPatientName, aiLevel])
+  }, [loading, familyLoading, ownerId, isHospitalMode, hasSignal, activityLatestEventMs, todaysActivityItems.length, pendingMedLines.length, missedMedLines.length, moodLine, routineLine, routinePending, dashPatientName, familyAiLevel])
 
   // Cuidado de hoy card status
   let careStatus, careStatusType

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useFamily } from '../contexts/FamilyContext'
-import { useBillingAccount } from '../contexts/BillingAccountContext'
+import { useFamilyPlan } from '../contexts/FamilyPlanContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import { mapsUrl } from '../lib/gps'
@@ -310,13 +310,13 @@ function toLocalDateKey(d = new Date()) {
 
 export default function MedicationTimeline() {
   const { ownerId, activePatientName, profile } = useFamily()
-  const { historyWindowDays } = useBillingAccount()
+  const { familyHistoryWindowDays } = useFamilyPlan()
   const navigate = useNavigate()
   const goBack = useGoBack()
   const patientFirstName = (activePatientName || profile?.name || 'tu familiar').split(' ')[0]
   const todayKey = toLocalDateKey()
-  const minDateKey = historyWindowDays != null
-    ? toLocalDateKey(new Date(Date.now() - historyWindowDays * 24 * 60 * 60 * 1000))
+  const minDateKey = familyHistoryWindowDays != null
+    ? toLocalDateKey(new Date(Date.now() - familyHistoryWindowDays * 24 * 60 * 60 * 1000))
     : undefined
   const { containerRef: pullRef, onTouchStart: pullStart, onTouchMove: pullMove, onTouchEnd: pullEnd, PullIndicator } = usePullToRefresh(fetchLog)
   const [events, setEvents] = useState([])
@@ -333,7 +333,7 @@ export default function MedicationTimeline() {
 
   useEffect(() => {
     if (ownerId) fetchLog()
-  }, [ownerId, filterType, period, customDate, historyWindowDays])
+  }, [ownerId, filterType, period, customDate, familyHistoryWindowDays])
 
   // El drill-down por subtipo solo tiene sentido para el pill "Incidentes" en
   // el período/tipo actuales — se limpia si cualquiera de los dos cambia.
@@ -371,9 +371,9 @@ export default function MedicationTimeline() {
       // ni se deja de guardar nada — esto solo limita hasta dónde puede leer
       // esta pantalla, la query de abajo nunca pide más atrás de este punto.
       let clamped = false
-      if (historyWindowDays != null) {
+      if (familyHistoryWindowDays != null) {
         const maxSince = new Date()
-        maxSince.setDate(maxSince.getDate() - historyWindowDays)
+        maxSince.setDate(maxSince.getDate() - familyHistoryWindowDays)
         maxSince.setHours(0, 0, 0, 0)
         if (since < maxSince) { since = maxSince; clamped = true }
       }
@@ -532,7 +532,7 @@ export default function MedicationTimeline() {
               background: TEAL_CHIP, borderRadius: 12, padding: '10px 14px', marginBottom: 14,
             }}>
               <span style={{ fontSize: 12.5, color: TEAL_INK, lineHeight: 1.4 }}>
-                Tu plan permite ver hasta {historyWindowDays} día{historyWindowDays === 1 ? '' : 's'} de historial
+                Tu plan permite ver hasta {familyHistoryWindowDays} día{familyHistoryWindowDays === 1 ? '' : 's'} de historial
               </span>
               <button
                 onClick={() => navigate('/upgrade')}

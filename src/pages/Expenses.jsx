@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
-import { useBillingAccount } from '../contexts/BillingAccountContext'
+import { useFamilyPlan } from '../contexts/FamilyPlanContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import { ChevronLeft, ChevronRight, Plus, XIcon, Camera } from '../components/Icons'
@@ -59,7 +59,7 @@ export default function Expenses() {
   const { user } = useAuth()
   const { ownerId, memberRole, profile } = useFamily()
   const isFamiliar = memberRole === 'familiar'
-  const { canEdit, trialExpired } = useBillingAccount()
+  const { familyCanEdit, familyTrialExpired } = useFamilyPlan()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
   const fileRef = useRef(null)
@@ -292,7 +292,7 @@ export default function Expenses() {
       >
         <PullIndicator />
 
-        {trialExpired ? (
+        {familyTrialExpired ? (
           <div style={{ padding: '16px 20px 0' }}>
             <EmptyState
               icon="💳"
@@ -554,7 +554,7 @@ export default function Expenses() {
       </div>
 
       {/* FAB — hidden for familiar (view only) y cuando Gastos está gateado */}
-      {!isFamiliar && !trialExpired && (
+      {!isFamiliar && !familyTrialExpired && (
         <button
           onClick={() => openModal()}
           style={{
@@ -889,7 +889,7 @@ export default function Expenses() {
               <LoadingButton
                 type="submit"
                 loading={saving}
-                disabled={!canSave || !canEdit}
+                disabled={!canSave || !familyCanEdit}
                 loadingText="Guardando..."
                 style={{ marginTop: 4, width: '100%', padding: '14px' }}
               >

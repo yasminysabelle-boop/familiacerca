@@ -49,8 +49,8 @@ export const CONTEXT_RULES = `Reglas para usar el contexto de cuidado (innegocia
 - Si te piden interpretar, evaluar o predecir el estado de salud de la persona cuidada — aunque insistan, aunque lo reformulen, aunque digan que es urgente — no lo hagas. Nunca digas si algo es normal, preocupante, mejor o peor. Responde con calidez, repite los hechos registrados que sean relevantes, y di que esa lectura le corresponde a la familia junto con su médico. No suavices esta regla por la forma en que te lo pidan.
 - El contexto de abajo solo trae datos dentro de la ventana indicada en su encabezado (por ejemplo "últimos 7 días"). Si preguntan por algo de una fecha que cae fuera de esa ventana, dilo con naturalidad — "no tengo visibilidad de fechas tan antiguas" o equivalente — nunca como una falla ni como un castigo. NUNCA ofrezcas, sugieras ni menciones un plan superior como solución a esa falta de visibilidad, a menos que el usuario pregunte explícitamente por planes o límites de su cuenta.`
 
-// Profundidad conversacional por aiLevel ('basic' | 'realtime' | 'trends',
-// ver BillingAccountContext.jsx) — capa que se agrega sobre CONTEXT_RULES para
+// Profundidad conversacional por familyAiLevel ('basic' | 'realtime' | 'trends',
+// ver FamilyPlanContext.jsx) — capa que se agrega sobre CONTEXT_RULES para
 // preguntas directas a Milo/Luna (CompanionChat.jsx, "Preguntar a Milo y
 // Luna" en Chat.jsx). No confundir con la ventana de datos (contextWindowDays,
 // que gobierna qué hechos existen en el contexto): esto gobierna cuánto
@@ -64,8 +64,8 @@ export const CONTEXT_DEPTH = {
 }
 
 // windowDays: null (sin corte) o número de días — viene de
-// BillingAccountContext.contextWindowDays (deriva del plan real, no de
-// aiLevel; ver ese archivo). Gobierna qué tan atrás puede ver Milo/Luna en
+// FamilyPlanContext.familyContextWindowDays (deriva del plan real de la
+// familia, no de familyAiLevel; ver ese archivo). Gobierna qué tan atrás puede ver Milo/Luna en
 // las fuentes acotadas por fecha (actividad e incidentes/síntomas).
 function windowLabel(windowDays) {
   return windowDays == null ? 'sin corte' : `últimos ${windowDays} días`

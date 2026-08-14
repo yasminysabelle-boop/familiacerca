@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { useBillingAccount } from '../contexts/BillingAccountContext'
+import { useFamilyPlan } from '../contexts/FamilyPlanContext'
 import Logo from './Logo'
 import { User, ChevronLeft, Home, Chat, ClipboardList, Pill } from './Icons'
 import TrialEndedNotice from './TrialEndedNotice'
@@ -62,7 +63,14 @@ const LIGHT_HEADER_PAGES = new Set([
 export default function Layout({ children }) {
   const { inactivityWarning, user } = useAuth()
   const { activeFamilyLabel, activePatientName, memberRole } = useFamily()
-  const { sub, trialExpired, markTrialEndedSeen, isTrialing, daysLeft, markTrialEndingSeen } = useBillingAccount()
+  // sub/markTrialEndedSeen/markTrialEndingSeen se quedan en la cuenta PROPIA
+  // a propósito -- "ya vi este aviso" (trial_ended_seen_at/
+  // trial_ending_seen_at) es dato del usuario, no de la familia, y ni
+  // siquiera existe en get_family_plan (nunca devuelve esas columnas). Qué
+  // aviso corresponde mostrar (trialExpired/isTrialing/daysLeft) sí es del
+  // plan de la familia -- ver FamilyPlanContext.
+  const { sub, markTrialEndedSeen, markTrialEndingSeen } = useBillingAccount()
+  const { familyTrialExpired, familyIsTrialing, familyDaysLeft } = useFamilyPlan()
   const isAdmin = memberRole === null
   const userAvatar = user?.user_metadata?.avatar_url ?? null
   const userInitial = (user?.user_metadata?.full_name ?? user?.email ?? '?').charAt(0).toUpperCase()
@@ -229,12 +237,12 @@ export default function Layout({ children }) {
         </footer>
       </main>
 
-      {trialExpired && isAdmin && !sub?.trial_ended_seen_at && (
+      {familyTrialExpired && isAdmin && !sub?.trial_ended_seen_at && (
         <TrialEndedNotice onClose={markTrialEndedSeen} />
       )}
 
-      {isTrialing && isAdmin && daysLeft <= 4 && !sub?.trial_ending_seen_at && (
-        <TrialEndingNotice daysLeft={daysLeft} onClose={markTrialEndingSeen} />
+      {familyIsTrialing && isAdmin && familyDaysLeft <= 4 && !sub?.trial_ending_seen_at && (
+        <TrialEndingNotice daysLeft={familyDaysLeft} onClose={markTrialEndingSeen} />
       )}
 
       {/* Inactivity warning banner */}
