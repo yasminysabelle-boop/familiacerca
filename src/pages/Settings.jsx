@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { useBillingAccount } from '../contexts/BillingAccountContext'
+import { useFamilyPlan } from '../contexts/FamilyPlanContext'
 import { useDarkMode } from '../contexts/DarkModeContext'
 import { usePushNotifications } from '../hooks/usePushNotifications'
 import { supabase } from '../lib/supabase'
@@ -90,7 +91,16 @@ export default function Settings() {
   const { user, signOut } = useAuth()
   const { ownerId, memberRole, families, switchFamily, hasMultiple, activeOwnerId } = useFamily()
   const isAdmin = memberRole === null && ownerId === user?.id
+  // La tarjeta de Suscripción de abajo es la cuenta de FACTURACIÓN real
+  // (botón "Mejorar plan", cancelar, próximo cobro) -- se queda en
+  // useBillingAccount() a propósito, nunca useFamilyPlan(). Solo tiene
+  // sentido para quien paga. Migrarla a los datos de la familia rompería el
+  // flujo de cancelación/upgrade del dueño (esas acciones son sobre SU
+  // propia fila en `subscriptions`, no sobre la de otro). Un invitado ve en
+  // cambio un bloque puramente informativo más abajo (familyPlan, sin
+  // días/precio/botón) -- ver el `isAdmin ? ... : ...` de la tarjeta.
   const { sub, isPaid, isTrialing, trialExpired, daysLeft } = useBillingAccount()
+  const { familyPlan } = useFamilyPlan()
   const { dark, toggleDark } = useDarkMode()
   const { permission, subscribed, supported, subscribeError, requestAndSubscribe, resubscribe } = usePushNotifications()
   const navigate = useNavigate()
@@ -368,7 +378,12 @@ export default function Settings() {
           </div>
         )}
 
-        {/* Subscription card */}
+        {/* Subscription card -- solo el dueño ve la tarjeta de facturación
+            real (useBillingAccount, ver comentario arriba). Un invitado ve
+            un bloque puramente informativo con el plan de la FAMILIA
+            (useFamilyPlan) -- sin días, sin precio, sin botón: no es su
+            cuenta, no hay nada que gestionar acá. */}
+        {isAdmin ? (
         <div style={{
           background: 'white', borderRadius: 20, border: '1px solid #EDE5D8',
           padding: '20px', marginBottom: 12,
@@ -465,6 +480,36 @@ export default function Settings() {
             </button>
           )}
         </div>
+        ) : (
+          <div style={{
+            background: 'white', borderRadius: 20, border: '1px solid #EDE5D8',
+            padding: '20px', marginBottom: 12,
+            boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
+          }}>
+            <p style={{ fontFamily: 'Georgia, serif', fontSize: 15, fontWeight: 700, color: '#1A1A1A', margin: '0 0 16px' }}>
+              Suscripción
+            </p>
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 12,
+              padding: '14px', borderRadius: 14,
+              background: `${(PLAN_META[familyPlan?.plan ?? 'free'] ?? PLAN_META.free).color}0C`,
+              border: `1.5px solid ${(PLAN_META[familyPlan?.plan ?? 'free'] ?? PLAN_META.free).color}22`,
+            }}>
+              <div style={{
+                width: 44, height: 44, borderRadius: 12, flexShrink: 0,
+                background: `${(PLAN_META[familyPlan?.plan ?? 'free'] ?? PLAN_META.free).color}18`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 22,
+              }}>
+                {(PLAN_META[familyPlan?.plan ?? 'free'] ?? PLAN_META.free).icon}
+              </div>
+              <p style={{ fontSize: 14, color: '#374151', margin: 0, lineHeight: 1.4 }}>
+                Esta familia está en{' '}
+                <strong>{{ free: 'Plan Gratis', familiar: 'Plan Familiar', care_plus: 'Cuidado Total' }[familyPlan?.plan ?? 'free']}</strong>
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Preferences */}
         <div style={{ background: 'white', borderRadius: 20, border: '1px solid #EDE5D8', overflow: 'hidden', marginBottom: 12 }}>
