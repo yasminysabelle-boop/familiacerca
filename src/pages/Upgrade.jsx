@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { PayPalScriptProvider, PayPalButtons, usePayPalScriptReducer } from '@paypal/react-paypal-js'
 import { useAuth } from '../contexts/AuthContext'
+import { useFamily } from '../contexts/FamilyContext'
 import { useBillingAccount } from '../contexts/BillingAccountContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
@@ -106,6 +107,8 @@ function PayPalSection({ planKey, paypalPlanId, userId, success, errors, isResol
 
 function UpgradeContent() {
   const { user } = useAuth()
+  const { memberRole, ownerId, profileResolved } = useFamily()
+  const isAdmin = memberRole === null && ownerId === user?.id
   const { sub, refresh } = useBillingAccount()
   const navigate = useNavigate()
   const [{ isResolved, isRejected }] = usePayPalScriptReducer()
@@ -141,6 +144,54 @@ function UpgradeContent() {
   }
 
   const paypalProps = { userId: user.id, success, errors, isResolved, isRejected, onApprove, onError }
+
+  // Gate de RENDER, no de post-render: nunca mostramos las tarjetas de
+  // planes/botones de PayPal para despues ocultarlas -- eso es el flicker
+  // que se pidio evitar. `profileResolved` (de useFamily()) viene primero
+  // a proposito: memberRole/ownerId caen a valores de fallback (memberRole
+  // null, ownerId = user.id) ANTES de que la familia real se resuelva, lo
+  // que haria a isAdmin dar true por defecto para CUALQUIERA -- el mismo
+  // patron de bug ya encontrado en FamilyPlanContext, ver
+  // project_familiacerca_subscription_scoped_to_viewer en memoria. Sin
+  // este orden, un invitado real vería un flash de la pagina de pago
+  // completa antes de que se corrija a "bloqueado".
+  if (!profileResolved) {
+    return <Layout><div style={{ minHeight: '60vh' }} /></Layout>
+  }
+  if (!isAdmin) {
+    return (
+      <Layout>
+        <div style={{
+          background: '#F8F4ED', minHeight: '100svh',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          padding: '24px',
+        }}>
+          <div style={{
+            background: 'white', borderRadius: 20, border: '1px solid #EDE5D8',
+            padding: '32px 24px', textAlign: 'center', maxWidth: 340,
+            boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
+          }}>
+            <p style={{ fontSize: 32, marginBottom: 12 }}>🔒</p>
+            <p style={{ fontFamily: 'Georgia, serif', fontSize: 17, fontWeight: 700, color: '#1A1A1A', marginBottom: 8 }}>
+              Solo quien creó la familia puede cambiar el plan.
+            </p>
+            <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.5, marginBottom: 20 }}>
+              Si necesitas más cuidadores, historial o funciones, pídele al dueño de la familia que actualice el plan desde su cuenta.
+            </p>
+            <button
+              onClick={() => navigate('/ajustes')}
+              style={{
+                padding: '11px 24px', borderRadius: 12, border: 'none',
+                background: '#087F70', color: 'white', fontWeight: 700, fontSize: 13, cursor: 'pointer',
+              }}
+            >
+              Volver a Ajustes
+            </button>
+          </div>
+        </div>
+      </Layout>
+    )
+  }
 
   return (
     <Layout>

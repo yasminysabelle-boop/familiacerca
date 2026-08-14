@@ -15,6 +15,13 @@ const STATUS_LABEL = {
 }
 
 export default function AdminAccountSection() {
+  // useBillingAccount() a propósito, no useFamilyPlan(): esta sección solo
+  // se monta dentro de /admin, que ya está gateado a nivel de ruta a
+  // memberRole === null && ownerId === user?.id (el dueño de la familia,
+  // ver Admin.jsx) -- quien la ve SIEMPRE es el dueño, así que su cuenta de
+  // facturación propia y el plan de la familia son la misma fila. Migrarla
+  // rompería el botón de cancelar/gestionar suscripción (acciones sobre la
+  // propia fila en `subscriptions`, no sobre la de otro).
   const { sub, isPaid, isTrialing, daysLeft, trialExpired } = useBillingAccount()
   const navigate = useNavigate()
 
