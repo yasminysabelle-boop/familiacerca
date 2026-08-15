@@ -1,10 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { PayPalScriptProvider, PayPalButtons, usePayPalScriptReducer } from '@paypal/react-paypal-js'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { useBillingAccount } from '../contexts/BillingAccountContext'
-import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import { PAYPAL_PLAN_IDS } from '../config/paypalPlans'
 
@@ -14,6 +13,80 @@ const PAYPAL_OPTIONS = {
   vault: true,
   currency: 'USD',
   components: 'buttons',
+}
+
+// El cliente nunca escribe `plan`/`status` en `subscriptions` -- ni con una
+// policy de RLS nueva (mismo argumento que `care_complexity`: abriria la
+// puerta a que cualquiera se ponga plan='care_plus' por REST). La unica
+// fuente confiable de que el pago ocurrio es el webhook de PayPal
+// (paypal-webhook, service role). onApprove() solo espera a que esa fila
+// cambie -- ver project_familiacerca_paypal_payment_broken en memoria.
+const POLL_INTERVAL_MS = 2000
+const POLL_TIMEOUT_MS = 20000
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+async function copyToClipboard(text) {
+  try {
+    await navigator.clipboard.writeText(text)
+    return true
+  } catch {
+    // Fallback para navegadores/webviews sin Clipboard API sobre contexto
+    // no del todo estandar -- poco comun en HTTPS moderno, pero mas barato
+    // cubrirlo aca que dejar el boton mudo en algun dispositivo raro.
+    try {
+      const textarea = document.createElement('textarea')
+      textarea.value = text
+      textarea.style.position = 'fixed'
+      textarea.style.opacity = '0'
+      document.body.appendChild(textarea)
+      textarea.select()
+      document.execCommand('copy')
+      document.body.removeChild(textarea)
+      return true
+    } catch {
+      return false
+    }
+  }
+}
+
+function CopyableSubscriptionId({ subscriptionId }) {
+  const [copied, setCopied] = useState(false)
+
+  async function handleCopy() {
+    const ok = await copyToClipboard(subscriptionId)
+    if (ok) {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1800)
+    }
+  }
+
+  return (
+    <button
+      onClick={handleCopy}
+      style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        width: '100%', gap: 8, padding: '10px 12px', marginTop: 8,
+        background: '#F8F4ED', border: '1px solid #EDE5D8', borderRadius: 10,
+        cursor: 'pointer', textAlign: 'left',
+      }}
+    >
+      <span style={{
+        fontFamily: 'monospace', fontSize: 12.5, color: '#374151',
+        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+      }}>
+        {subscriptionId}
+      </span>
+      <span style={{
+        flexShrink: 0, fontSize: 11.5, fontWeight: 700,
+        color: copied ? '#087F70' : '#9CA3AF',
+      }}>
+        {copied ? 'Copiado ✓' : 'Copiar'}
+      </span>
+    </button>
+  )
 }
 
 const FREE_FEATURES = [
@@ -50,7 +123,10 @@ const TOTAL_FEATURES = [
   'Todo lo del Plan Familiar',
 ]
 
-function PayPalSection({ planKey, paypalPlanId, userId, success, errors, isResolved, isRejected, onApprove, onError }) {
+function PayPalSection({
+  planKey, paypalPlanId, userId, success, pending, timedOut, isActive,
+  errors, isResolved, isRejected, onApprove, onError, onBackToSettings,
+}) {
   if (success === planKey) {
     return (
       <div style={{
@@ -61,6 +137,79 @@ function PayPalSection({ planKey, paypalPlanId, userId, success, errors, isResol
           ✅ ¡Plan activado! Redirigiendo...
         </p>
       </div>
+    )
+  }
+  if (timedOut?.planKey === planKey) {
+    return (
+      <div style={{
+        background: '#F8F4ED', border: '1.5px solid #E9826E',
+        borderRadius: 14, padding: '16px',
+      }}>
+        <p style={{ color: '#087F70', fontWeight: 700, fontSize: 15, margin: '0 0 4px', lineHeight: 1.4 }}>
+          ✅ Tu pago se completó en PayPal.
+        </p>
+        <p style={{ color: '#374151', fontSize: 13, margin: '0 0 12px', lineHeight: 1.5 }}>
+          Estamos activando tu plan — puede tardar unos minutos.
+        </p>
+        <p style={{ color: '#6B7280', fontSize: 12.5, margin: '0 0 4px', lineHeight: 1.5 }}>
+          Si al volver no ves el cambio, escribinos a <strong>hola@familiacerca.com</strong> con este número:
+        </p>
+        <CopyableSubscriptionId subscriptionId={timedOut.subscriptionId} />
+        <button
+          onClick={onBackToSettings}
+          style={{
+            width: '100%', marginTop: 12, padding: '11px', borderRadius: 12,
+            border: 'none', background: '#087F70', color: 'white',
+            fontWeight: 700, fontSize: 13.5, cursor: 'pointer',
+            fontFamily: "'Plus Jakarta Sans', sans-serif",
+          }}
+        >
+          Volver a Ajustes
+        </button>
+      </div>
+    )
+  }
+  if (pending?.planKey === planKey) {
+    return (
+      <div style={{
+        background: '#E0F0EF', border: '1.5px solid #0B4F4A',
+        borderRadius: 14, padding: '16px', textAlign: 'center',
+      }}>
+        <p style={{ color: '#0B4F4A', fontWeight: 700, fontSize: 14, margin: 0 }}>
+          Confirmando tu pago...
+        </p>
+        <p style={{ color: '#3A6B65', fontSize: 12.5, margin: '4px 0 0' }}>
+          Esto suele tardar unos segundos.
+        </p>
+      </div>
+    )
+  }
+  // isActive va DESPUES de success/timedOut/pending a proposito -- esta
+  // cadena de if es la unica fuente de verdad sobre que se muestra para
+  // este plan. Antes esta decision estaba partida entre este componente y
+  // un ternario externo en UpgradeContent (activePlan === planKey ? boton
+  // : <PayPalSection/>), que decidia si PayPalSection llegaba a montarse
+  // ANTES de que este componente pudiera revisar success/pending/timedOut.
+  // Eso dejaba el resultado a merced de una carrera: el poll que confirma
+  // el pago llama a refresh() (setSub, que mueve activePlan) ANTES de
+  // llamar a setSuccess() -- asi que el re-render con activePlan ya en
+  // 'familiar'/'care_plus' pero success todavia null caia en la rama del
+  // boton "Tu plan actual" del ternario externo, desmontando
+  // PayPalSection para siempre en ese plan. setSuccess() llegaba un
+  // instante despues, pero ya no habia donde mostrarlo -- el usuario
+  // nunca veia "Plan activado", solo la redireccion 2s despues. Con la
+  // prioridad viviendo aca, como orden de if en un solo lugar, los
+  // estados transitorios ganan siempre mientras esten puestos, sin
+  // importar en que orden lleguen los setState.
+  if (isActive) {
+    return (
+      <button disabled style={{
+        width: '100%', padding: '13px', borderRadius: 14, border: 'none',
+        background: '#E5E7EB', color: '#9CA3AF',
+        fontWeight: 600, fontSize: 14, cursor: 'default',
+      }}>
+        Tu plan actual
+      </button>
     )
   }
   if (isRejected) {
@@ -113,7 +262,20 @@ function UpgradeContent() {
   const navigate = useNavigate()
   const [{ isResolved, isRejected }] = usePayPalScriptReducer()
   const [success, setSuccess] = useState(null)
+  const [pending, setPending] = useState(null) // { planKey, subscriptionId } | null
+  const [timedOut, setTimedOut] = useState(null) // { planKey, subscriptionId } | null
   const [errors, setErrors] = useState({})
+  const mountedRef = useRef(true)
+  useEffect(() => {
+    // No alcanza con useRef(true) + solo cleanup -- en StrictMode (dev) React
+    // monta/desmonta/remonta los effects una vez para detectar codigo no
+    // idempotente, y esa simulacion deja mountedRef.current en `false` para
+    // siempre si el mount real nunca lo vuelve a poner en `true` (encontrado
+    // con Playwright: el loop de polling quedaba trabado en "Confirmando tu
+    // pago" sin nunca resolver ni a exito ni a timeout).
+    mountedRef.current = true
+    return () => { mountedRef.current = false }
+  }, [])
 
   // Derive active plan directly from sub row — only 'active' status with a paid plan counts
   const activePlan = (sub?.status === 'active' && (sub?.plan === 'familiar' || sub?.plan === 'care_plus'))
@@ -121,29 +283,80 @@ function UpgradeContent() {
     : null
 
   async function onApprove(planKey, data) {
-    try {
-      const { error: dbErr } = await supabase
-        .from('subscriptions')
-        .update({
-          plan: planKey,
-          status: 'active',
-          paypal_subscription_id: data.subscriptionID,
-        })
-        .eq('user_id', user.id)
-      if (dbErr) throw dbErr
-      await refresh()
+    const subscriptionId = data.subscriptionID
+    setErrors(prev => {
+      if (!(planKey in prev)) return prev
+      const next = { ...prev }
+      delete next[planKey]
+      return next
+    })
+    setTimedOut(null)
+    setPending({ planKey, subscriptionId })
+
+    // El pago ya se hizo del lado de PayPal en este punto -- lo unico que
+    // esperamos es que paypal-webhook (service role, unica escritura real
+    // permitida en `subscriptions`) confirme la fila. El chequeo de exito
+    // corre SIEMPRE antes que el chequeo de timeout dentro de la misma
+    // vuelta del loop, asi que no hay forma de que ambos disparen para el
+    // mismo evento -- si el webhook llega justo en el limite, gana la
+    // confirmacion.
+    const deadline = Date.now() + POLL_TIMEOUT_MS
+    let activated = false
+    while (mountedRef.current) {
+      let fresh = null
+      try {
+        fresh = await refresh()
+      } catch {
+        // Hiccup de red en un poll -- no es el fallo del pago, seguimos intentando.
+      }
+      if (!mountedRef.current) return
+      if (fresh?.status === 'active' && fresh?.paypal_subscription_id === subscriptionId) {
+        activated = true
+        break
+      }
+      if (Date.now() >= deadline) break
+      await sleep(Math.min(POLL_INTERVAL_MS, Math.max(0, deadline - Date.now())))
+    }
+    if (!mountedRef.current) return
+
+    if (activated) {
+      setPending(null)
       setSuccess(planKey)
       setTimeout(() => navigate('/ajustes'), 2000)
-    } catch {
-      setErrors(prev => ({ ...prev, [planKey]: 'No se pudo activar el plan. Contacta soporte.' }))
+    } else {
+      setPending(null)
+      setTimedOut({ planKey, subscriptionId })
     }
   }
 
   function onError(planKey) {
+    setPending(null)
     setErrors(prev => ({ ...prev, [planKey]: 'Error con PayPal. Intenta de nuevo.' }))
   }
 
-  const paypalProps = { userId: user.id, success, errors, isResolved, isRejected, onApprove, onError }
+  function onBackToSettings() {
+    navigate('/ajustes')
+  }
+
+  // Hook de prueba SOLO para dev (import.meta.env.DEV es `false` en build de
+  // produccion, y el bundler elimina el bloque como codigo muerto -- no
+  // llega al bundle real, verificado con grep sobre dist/ despues de un
+  // build). Deja arrancar el estado "procesando" sin pasar por el boton
+  // real de PayPal, para poder probar el polling/timeout con Playwright sin
+  // hacer un cobro real -- ver project_familiacerca_paypal_payment_broken
+  // en memoria para el porque.
+  useEffect(() => {
+    if (!import.meta.env.DEV) return
+    window.__fcUpgradeDebug = {
+      startProcessing: (planKey, subscriptionId) => onApprove(planKey, { subscriptionID: subscriptionId }),
+    }
+    return () => { delete window.__fcUpgradeDebug }
+  })
+
+  const paypalProps = {
+    userId: user.id, success, pending, timedOut, errors,
+    isResolved, isRejected, onApprove, onError, onBackToSettings,
+  }
 
   // Gate de RENDER, no de post-render: nunca mostramos las tarjetas de
   // planes/botones de PayPal para despues ocultarlas -- eso es el flicker
@@ -285,21 +498,12 @@ function UpgradeContent() {
                 </div>
               ))}
             </div>
-            {activePlan === 'familiar' ? (
-              <button disabled style={{
-                width: '100%', padding: '13px', borderRadius: 14, border: 'none',
-                background: '#E5E7EB', color: '#9CA3AF',
-                fontWeight: 600, fontSize: 14, cursor: 'default',
-              }}>
-                Tu plan actual
-              </button>
-            ) : (
-              <PayPalSection
-                planKey="familiar"
-                paypalPlanId={PAYPAL_PLAN_IDS.familiar}
-                {...paypalProps}
-              />
-            )}
+            <PayPalSection
+              planKey="familiar"
+              paypalPlanId={PAYPAL_PLAN_IDS.familiar}
+              isActive={activePlan === 'familiar'}
+              {...paypalProps}
+            />
           </div>
 
           {/* Card 3 — Cuidado Total */}
@@ -336,21 +540,12 @@ function UpgradeContent() {
                 </div>
               ))}
             </div>
-            {activePlan === 'care_plus' ? (
-              <button disabled style={{
-                width: '100%', padding: '13px', borderRadius: 14, border: 'none',
-                background: '#E5E7EB', color: '#9CA3AF',
-                fontWeight: 600, fontSize: 14, cursor: 'default',
-              }}>
-                Tu plan actual
-              </button>
-            ) : (
-              <PayPalSection
-                planKey="care_plus"
-                paypalPlanId={PAYPAL_PLAN_IDS.care_plus}
-                {...paypalProps}
-              />
-            )}
+            <PayPalSection
+              planKey="care_plus"
+              paypalPlanId={PAYPAL_PLAN_IDS.care_plus}
+              isActive={activePlan === 'care_plus'}
+              {...paypalProps}
+            />
           </div>
 
           <p style={{ fontSize: 11, color: '#B0A898', textAlign: 'center', margin: '4px 0 0', lineHeight: 1.6 }}>

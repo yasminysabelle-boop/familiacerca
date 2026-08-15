@@ -39,10 +39,13 @@ export function BillingAccountProvider({ children }) {
         .select()
         .single()
       setSub(created)
+      setLoading(false)
+      return created
     } else {
       setSub(data)
+      setLoading(false)
+      return data
     }
-    setLoading(false)
   }, [user])
 
   useEffect(() => { load() }, [load])
