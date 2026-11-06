@@ -60,7 +60,6 @@ const QUICK_OPTIONS = [
   { emoji: '🔔', label: '¿Cómo funcionan las alertas SOS?' },
   { emoji: '🔑', label: 'Olvidé mi contraseña' },
   { emoji: '🔄', label: 'Quiero cambiar mi plan' },
-  { emoji: '❌', label: 'Quiero cancelar mi plan' },
   { emoji: '🔒', label: '¿Están seguros mis datos?' },
   { emoji: '📞', label: 'Quiero contactar soporte' },
 ]

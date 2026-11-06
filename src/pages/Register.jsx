@@ -27,9 +27,17 @@ export default function Register() {
       return
     }
     setLoading(true)
-    const { error: err } = await signUp(form.email, form.password, { full_name: form.name })
+    const { data, error: err } = await signUp(form.email, form.password, { full_name: form.name })
     setLoading(false)
-    if (err) {
+    // Supabase no devuelve error cuando el correo ya existe (con confirmación
+    // de email activa): devuelve un usuario "falso" sin identities. Se detecta
+    // aquí para no dejar registrar dos veces el mismo correo.
+    const alreadyRegistered =
+      (err && /already registered|already been registered|already exists/i.test(err.message)) ||
+      (!err && data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0)
+    if (alreadyRegistered) {
+      setError('Este correo ya está registrado. Inicia sesión o usa "Olvidé mi contraseña".')
+    } else if (err) {
       setError(err.message)
     } else {
       track('user_registered', { email: form.email })
