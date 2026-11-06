@@ -124,7 +124,6 @@ export default function Landing() {
   const [annual, setAnnual] = useState(false)
   const [showBar, setShowBar] = useState(false)
   const [dismissed, setDismissed] = useState(false)
-  const [showAllTestimonials, setShowAllTestimonials] = useState(false)
 
   useEffect(() => {
     if (document.getElementById('landing-gfonts')) return
@@ -266,15 +265,6 @@ export default function Landing() {
     { q: '¿Cómo se instala en el celular si no está en la App Store?', a: 'En iPhone: abre la página en Safari, toca el botón de compartir (cuadro con flecha) y selecciona "Agregar a inicio". En Android: toca el menú de tres puntos del navegador y selecciona "Instalar aplicación".' },
     { q: '¿Mis datos médicos están protegidos?', a: 'Sí. Tus datos se almacenan cifrados en infraestructura de nivel empresarial — la misma tecnología que usan bancos y hospitales. Solo los familiares que tú invites tienen acceso. Nunca vendemos ni compartimos tu información.' },
     { q: '¿Puedo cancelar mi suscripción en cualquier momento?', a: 'Por supuesto. Puedes cancelar desde Ajustes > Suscripción en cualquier momento. No hay penalizaciones ni contratos. Tu plan baja a Gratis al terminar el período pagado.' },
-  ]
-
-  const testimonials = [
-    { name: 'Daniela R.',  initial: 'D', role: 'Hija a distancia',        location: 'San Juan, Puerto Rico',              headline: 'Mi hermano en España y yo en Puerto Rico, por fin viendo lo mismo', text: 'Mi hermano vive en Madrid y yo en San Juan. Antes nos enterábamos tarde de todo lo de mamá, cada uno con una versión distinta de la historia. Ahora los dos abrimos la misma app y vemos exactamente lo mismo, a la misma hora, sin importar los kilómetros.' },
-    { name: 'Roberto M.',  initial: 'R', role: 'Hijo mayor',              location: 'Los Ángeles, California',            headline: 'Ya no cargo solo con la preocupación',                              text: 'Vivo a 20 minutos de mi papá pero trabajo todo el día. Antes pasaba la tarde con el estómago apretado, sin saber si alguien había ido a verlo. Ahora reviso la app y respiro tranquilo — sé exactamente cómo está.' },
-    { name: 'Patricia V.', initial: 'P', role: 'Coordinadora familiar',   location: 'Santo Domingo, República Dominicana', headline: 'Dejamos de repartirnos la culpa',                                   text: 'Somos 4 hermanos en distintas ciudades cuidando a papá. Antes, cuando algo salía mal, terminábamos buscando de quién había sido el descuido. Ahora no se trata de culpas — se trata de que todos vemos lo mismo, siempre.' },
-    { name: 'Carmen L.',   initial: 'C', role: 'Cuidadora de su madre',   location: 'Miami, Florida',                     headline: 'Ser enfermera no me preparó para cuidar a mi propia madre',         text: 'Llevo 15 años como enfermera, pero cuidar a mi mamá es distinto — ahí no eres profesional, eres hija, y el miedo a olvidar algo pesa igual. FamiliaCerca me quitó esa carga de tener que recordarlo todo yo sola.' },
-    { name: 'Jorge M.',    initial: 'J', role: 'Esposo cuidador',         location: 'Nueva York, NY',                     headline: 'Por fin duermo tranquilo',                                          text: 'Mi esposa tiene Alzheimer. Antes yo era el único que sabía cómo estaba en realidad, y cargaba esa responsabilidad solo, de noche, sin poder compartirla con nadie. Ahora mis hijos también lo ven, aunque vivan lejos.' },
-    { name: 'Lucía R.',    initial: 'L', role: 'Hija única',              location: 'Chicago, Illinois',                  headline: 'Cuido a mis dos padres, y por fin nada se me escapa',               text: 'Soy hija única y cuido sola a mis dos padres mayores desde hace 3 años. No tengo con quién repartir la responsabilidad, pero el botón SOS y el checklist diario me dan la tranquilidad de que, si algo pasa, no voy a enterarme tarde.' },
   ]
 
   return (
@@ -738,58 +728,6 @@ export default function Landing() {
           <CTABtn to="/register">
             Empezar gratis <span style={{ fontSize: 17, opacity: 0.8 }}>→</span>
           </CTABtn>
-        </div>
-      </section>
-
-      {/* ─────────────── 11. TESTIMONIOS ─────────────── */}
-      <section style={{ padding: '128px 32px', background: CREAM }}>
-        <div style={{ maxWidth: 1440, margin: '0 auto' }}>
-          <div className="reveal" style={{ textAlign: 'center', marginBottom: 72 }}>
-            <p style={{ fontSize: 13, fontWeight: 500, color: GOLD, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>Testimonios</p>
-            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(32px,5.1vw,68px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.1, margin: 0 }}>
-              Familias que cuidan mejor juntas
-            </h2>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }} className="testimonios-grid">
-            {(showAllTestimonials ? testimonials : testimonials.slice(0, 3)).map((t, i) => (
-              <div key={t.name} className={`card-hover-lift ${i >= 3 ? 'testimonios-expand' : `reveal reveal-delay-${i % 3}`}`} style={{ background: PRIMARY, borderRadius: 20, border: `1px solid rgba(13,107,99,0.28)`, padding: '32px 28px', boxShadow: '0 12px 32px rgba(20,60,50,0.12)', display: 'flex', flexDirection: 'column' }}>
-                <div style={{ display: 'flex', gap: 3, marginBottom: 14 }}>
-                  {[1,2,3,4,5].map(s => <span key={s} style={{ color: CORAL, fontSize: 13 }}>★</span>)}
-                </div>
-                <p style={{ fontSize: 'clamp(17px,1.6vw,21px)', fontWeight: 600, color: WHITE, fontFamily: SERIF, margin: '0 0 12px', lineHeight: 1.3 }}>{t.headline}</p>
-                <p style={{ fontSize: 'clamp(16px,1.5vw,20px)', color: 'rgba(255,255,255,0.72)', lineHeight: 1.85, margin: '0 0 24px', fontFamily: SANS, fontWeight: 300, fontStyle: 'italic', flex: 1 }}>"{t.text}"</p>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <div style={{ width: 46, height: 46, borderRadius: '50%', background: ACTION, border: `1px solid rgba(13,107,99,0.60)`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <span style={{ fontFamily: SERIF, fontSize: 20, fontWeight: 700, color: WHITE }}>{t.initial}</span>
-                  </div>
-                  <div>
-                    <p style={{ margin: 0, fontSize: 14, fontWeight: 500, color: WHITE, fontFamily: SANS }}>{t.name}</p>
-                    <p style={{ margin: '2px 0 6px', fontSize: 14, color: 'rgba(255,255,255,0.38)', fontFamily: SANS, fontWeight: 300 }}>{t.role}</p>
-                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: `rgba(233,130,110,0.10)`, borderRadius: 9999, padding: '2px 10px' }}>
-                      <span style={{ fontSize: 10 }}>📍</span>
-                      <span style={{ fontSize: 14, color: GOLD, fontFamily: SANS, fontWeight: 300 }}>{t.location}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Testimonio enfocado en IA — siempre visible, fuera del toggle
-              Ver más/menos historias porque es el diferenciador del producto. */}
-          <div className="reveal" style={{ marginTop: 24, maxWidth: 720, marginLeft: 'auto', marginRight: 'auto', background: 'linear-gradient(135deg, rgba(117,102,216,0.07), rgba(167,154,234,0.03))', border: '1px solid rgba(117,102,216,0.22)', borderRadius: 20, padding: '32px 36px', textAlign: 'center' }}>
-            <div style={{ fontSize: 26, marginBottom: 10 }}>✨</div>
-            <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(17px,1.6vw,21px)', color: PRIMARY, lineHeight: 1.65, margin: '0 0 12px' }}>
-              &ldquo;Lo primero que hago cada mañana es abrir el resumen de Milo. En treinta segundos ya sé cómo estuvo mamá el día anterior. Ya no tengo que revisar veinte mensajes.&rdquo;
-            </p>
-            <p style={{ fontSize: 14, color: '#6B7280', margin: 0, fontFamily: SANS }}>— Sofía T., hija cuidadora · Houston, Texas</p>
-          </div>
-
-          <div style={{ textAlign: 'center', marginTop: 48 }}>
-            <button onClick={() => setShowAllTestimonials(v => !v)} style={{ padding: '14px 32px', borderRadius: 9999, border: `1.5px solid ${ACTION}`, background: 'transparent', color: ACTION, fontWeight: 500, fontSize: 15, fontFamily: SANS, cursor: 'pointer', letterSpacing: '0.02em' }}>
-              {showAllTestimonials ? 'Ver menos historias' : 'Ver más historias'}
-            </button>
-          </div>
         </div>
       </section>
 
