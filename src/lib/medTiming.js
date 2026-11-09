@@ -22,3 +22,17 @@ export function startsTomorrow(med, now = new Date()) {
   firstDose.setHours(h || 0, m || 0, 0, 0)
   return created > firstDose
 }
+
+// Para la rutina diaria (y cualquier cosa con hora fija): si la familia
+// empezó a usar la app HOY después de esa hora, no cuenta como atrasada hoy;
+// empieza mañana. startedAt = patient_profiles.created_at (paso 2 del
+// onboarding).
+export function scheduledBeforeStart(timeStr, startedAt, now = new Date()) {
+  if (!timeStr || !startedAt) return false
+  const start = new Date(startedAt)
+  if (start.toDateString() !== now.toDateString()) return false
+  const [h, m] = timeStr.split(':').map(Number)
+  const at = new Date(now)
+  at.setHours(h || 0, m || 0, 0, 0)
+  return at < start
+}

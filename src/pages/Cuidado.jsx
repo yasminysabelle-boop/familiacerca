@@ -10,6 +10,7 @@ import {
   Bath, Tooth, Shirt, Utensils, Bed, Sparkle, Footsteps, Scissors, Lotus,
 } from '../components/Icons'
 import { CARE_ITEMS } from '../lib/careItems'
+import { scheduledBeforeStart } from '../lib/medTiming'
 import EvidencePhoto from '../components/EvidencePhoto'
 import EmptyState from '../components/EmptyState'
 import SuccessAnimation from '../components/SuccessAnimation'
@@ -93,6 +94,15 @@ export default function Cuidado() {
   const [loading, setLoading] = useState(true)
   const [showCompleted, setShowCompleted] = useState(false)
   const [openSchedKey, setOpenSchedKey] = useState(null)
+  // Cuándo empezó la familia (paso 2 del onboarding). El primer día, los
+  // cuidados cuya hora ya pasó antes de registrarse no salen "Atrasada":
+  // empiezan mañana (auditoría nov 2026).
+  const [familyStart, setFamilyStart] = useState(null)
+  useEffect(() => {
+    if (!ownerId) return
+    supabase.from('patient_profiles').select('created_at').eq('owner_id', ownerId).maybeSingle()
+      .then(({ data }) => setFamilyStart(data?.created_at ?? null))
+  }, [ownerId])
 
   const [times, setTimes] = useState(() =>
     Object.fromEntries(DAILY_ITEMS.map(i => [i.key, i.scheduledTime]))
@@ -230,11 +240,13 @@ export default function Cuidado() {
     setSearchParams(tab === 'horarios' ? { tab: 'horarios' } : {}, { replace: true })
   }
 
-  const requiredItems = CARE_ITEMS.filter(i => i.category === 'daily')
+  const isFromTomorrow = i => scheduledBeforeStart(careSchedules[i.key] ?? i.scheduledTime, familyStart)
+  const requiredItems = CARE_ITEMS.filter(i => i.category === 'daily' && !isFromTomorrow(i))
   const completedRequired = requiredItems.filter(i => !!careLogs[i.key]).length
   const allDone = requiredItems.length > 0 && completedRequired === requiredItems.length
 
-  const retrasadas  = CARE_ITEMS.filter(i => !careLogs[i.key] && calcularEstadoCuidado(i, false, careSchedules[i.key]) === 'tarde')
+  const retrasadas  = CARE_ITEMS.filter(i => !careLogs[i.key] && !isFromTomorrow(i) && calcularEstadoCuidado(i, false, careSchedules[i.key]) === 'tarde')
+  const desdeManana = CARE_ITEMS.filter(i => !careLogs[i.key] && isFromTomorrow(i))
   const proximas    = CARE_ITEMS.filter(i => !careLogs[i.key] && ['programado', 'pendiente'].includes(calcularEstadoCuidado(i, false, careSchedules[i.key])) && !!(careSchedules[i.key] ?? i.scheduledTime))
   const sinHorario  = CARE_ITEMS.filter(i => !careLogs[i.key] && !(careSchedules[i.key] ?? i.scheduledTime))
   const completadas = CARE_ITEMS.filter(i => !!careLogs[i.key])
@@ -391,6 +403,23 @@ export default function Cuidado() {
                   {proximas.length > 0 && (
                     <RoutineSection label="Próximas">
                       {proximas.map(item => (
+                        <RoutineCard
+                          key={item.key}
+                          item={item}
+                          state="proxima"
+                          isToggling={careToggling === item.key}
+                          isFamiliar={isFamiliar}
+                          scheduledTime={careSchedules[item.key] ?? item.scheduledTime}
+                          onToggle={() => toggleCareItem(item)}
+                        />
+                      ))}
+                    </RoutineSection>
+                  )}
+
+                  {/* Desde mañana: primer día, hora ya pasada al registrarse */}
+                  {desdeManana.length > 0 && (
+                    <RoutineSection label="Empiezan mañana">
+                      {desdeManana.map(item => (
                         <RoutineCard
                           key={item.key}
                           item={item}

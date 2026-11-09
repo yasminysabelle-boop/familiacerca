@@ -27,7 +27,7 @@ import CompanionChat from '../components/CompanionChat'
 import VideoCallScheduleModal from '../components/VideoCallScheduleModal'
 import { getLocation, mapsUrl } from '../lib/gps'
 import { track } from '../lib/analytics'
-import { startsTomorrow } from '../lib/medTiming'
+import { startsTomorrow, scheduledBeforeStart } from '../lib/medTiming'
 
 // Mood lookup — handles both stored text values and emoji values
 const MOOD_MAP = {
@@ -3169,7 +3169,9 @@ export default function Dashboard() {
   const todaySection = sections.find(s => s.dateKey === todayKey)
   const pendingCount = todaySection?.events.filter(e => e.type === 'MED_PENDING').length ?? 0
   const dailyItems = CARE_ITEMS.filter(i => i.category === 'daily')
-  const pendingRoutinesCount = dailyItems.filter(i => !careLogsToday[i.key]).length
+  // Primer día: cuidados cuya hora pasó antes de registrarse empiezan mañana
+  // (mismo criterio que Cuidado.jsx, lib/medTiming.js).
+  const pendingRoutinesCount = dailyItems.filter(i => !careLogsToday[i.key] && !scheduledBeforeStart(i.scheduledTime, patientProfile?.created_at)).length
   const confirmedTodayCount = todaySection?.events.filter(e => e.type === 'MED_CONFIRMED').length ?? 0
   const missedTodayCount = todaySection?.events.filter(e => e.type === 'MED_MISSED').length ?? 0
 

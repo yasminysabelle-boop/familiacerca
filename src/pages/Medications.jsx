@@ -729,7 +729,9 @@ export default function Medications() {
   // Los cuidadores van directo al modal.
   function handleTapAdministrar(med) {
     if (isFamiliar) return
-    if (isAdmin) { setAdminConfirmWarningMed(med); return }
+    // Antes el dueño veía "Confirmar como administrador (úsalo solo si el
+    // cuidador habitual no puede)" aunque él mismo sea quien cuida: un paso
+    // de más en cada dosis. Va directo al registro (auditoría nov 2026).
     openAdminModal(med)
   }
 
@@ -805,8 +807,8 @@ export default function Medications() {
     setAdminSaving(false); setAdminModal(null); setAdminPhotoBlob(null); setAdminPhotoPreview(null); setAdminGps(null)
     showToast('Medicamento registrado correctamente ✅')
 
-    // Recordatorio de prueba: si no se tomó foto, se ofrece el sheet de prueba (30 min)
-    if (!photoUrl) openProofSheet(med)
+    // La foto es opcional: ya no se abre sola otra hoja pidiéndola después de
+    // registrar. Sigue disponible desde la tarjeta "Agrega una foto".
   }
 
   // ── Recordatorio de prueba post-confirmación (30 min) ─────────────────────────
@@ -1204,7 +1206,7 @@ export default function Medications() {
                   <span style={{ flexShrink: 0, display: 'flex' }}><Camera size={17} color="#C4664F" strokeWidth={1.9} /></span>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <p style={{ fontSize: 13, fontWeight: 700, color: '#C4664F', margin: 0 }}>
-                      Agrega una foto de prueba — {minLeft} min
+                      ¿Quieres agregar una foto? (opcional)
                     </p>
                     <p style={{ fontSize: 11, color: '#8A5A4A', margin: '2px 0 0' }}>{med.name}</p>
                   </div>
@@ -2106,7 +2108,7 @@ export default function Medications() {
             <div style={{ width: '100%', maxWidth: 480, background: '#F8F4ED', borderRadius: '28px 28px 0 0', padding: '24px 20px 96px', boxShadow: '0 -12px 30px -12px #08554A55' }}>
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 16 }}>
                 <div>
-                  <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 18, fontWeight: 800, color: '#1E2C3A', margin: 0 }}>Foto de prueba</p>
+                  <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 18, fontWeight: 800, color: '#1E2C3A', margin: 0 }}>Agregar foto (opcional)</p>
                   <p style={{ fontSize: 13, color: minLeft <= 5 ? '#C4664F' : '#6B7A88', marginTop: 4 }}>
                     {proofSheet.med.name} — {minLeft > 0 ? `${minLeft} min restantes` : 'Tiempo agotado'}
                   </p>
@@ -2175,7 +2177,7 @@ export default function Medications() {
               >
                 {proofUploading
                   ? <><div style={{ width: 16, height: 16, borderRadius: '50%', border: '2.5px solid rgba(255,255,255,0.4)', borderTopColor: 'white', animation: 'spin 0.7s linear infinite' }} /> Guardando...</>
-                  : 'Guardar foto de prueba'}
+                  : 'Guardar foto'}
               </button>
 
               <button onClick={closeProofSheet} style={{ width: '100%', padding: 12, background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: '#6B7A88' }}>

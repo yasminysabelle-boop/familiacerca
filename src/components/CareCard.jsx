@@ -10,9 +10,9 @@ const SERIF = "'Fraunces', Georgia, serif"
 const SANS  = "'Plus Jakarta Sans', system-ui, sans-serif"
 
 const STATUS = {
-  ok:       { label: 'Todo bajo control',    dot: '#7BE0A0', glow: 'rgba(123,224,160,.28)' },
-  warning:  { label: 'Atención necesaria',   dot: '#FBBF24', glow: 'rgba(251,191,36,.28)' },
-  critical: { label: 'Requiere seguimiento', dot: CORAL_EMERGENCY, glow: 'rgba(217,83,79,.28)' },
+  ok:       { label: 'Todo al día',          dot: '#7BE0A0', glow: 'rgba(123,224,160,.28)' },
+  warning:  { label: 'Algo pendiente',       dot: '#FBBF24', glow: 'rgba(251,191,36,.28)' },
+  critical: { label: 'Pendientes de hoy',    dot: CORAL_EMERGENCY, glow: 'rgba(217,83,79,.28)' },
 }
 
 function StatItem({ icon, label, sub, last = false, onClick }) {
@@ -55,9 +55,11 @@ export default function CareCard({
   // en su lugar, nunca "Hoy Agregar familiar está tranquila...".
   const defaultMood = !hasPatient
     ? 'Agrega a tu familiar y empieza a coordinar su cuidado.'
-    : status === 'critical' ? `${name} necesita atención pronto.` :
-      status === 'warning'  ? `Hoy ${name} necesita un poco más de atención.` :
-      `Hoy ${name} está tranquila y de buen ánimo.`
+    // Solo hechos registrados, nunca un estado de ánimo inventado
+    // (auditoría nov 2026: decía "tranquila y de buen ánimo" sin datos).
+    : status === 'critical' ? `Hay cosas pendientes de hoy con ${name}.` :
+      status === 'warning'  ? `Hoy queda algo pendiente con ${name}.` :
+      `Hoy todo va al día con ${name}.`
 
   return (
     <div
