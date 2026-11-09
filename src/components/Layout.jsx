@@ -5,7 +5,7 @@ import { useFamily } from '../contexts/FamilyContext'
 import { useBillingAccount } from '../contexts/BillingAccountContext'
 import { useFamilyPlan } from '../contexts/FamilyPlanContext'
 import Logo from './Logo'
-import { User, ChevronLeft, Home, Chat, ClipboardList, Pill } from './Icons'
+import { User, ChevronLeft, Home, Chat, ClipboardList, Pill, Menu } from './Icons'
 import TrialEndedNotice from './TrialEndedNotice'
 import TrialEndingNotice from './TrialEndingNotice'
 import TrialBanner from './TrialBanner'
@@ -45,7 +45,7 @@ const PAGE_TITLES = {
   '/incidentes':     'Incidentes',
 }
 
-const PRIMARY_PAGES = new Set(['/dashboard', '/familia', '/ajustes', '/upgrade', '/chat', '/diario-medico'])
+const PRIMARY_PAGES = new Set(['/dashboard', '/familia', '/ajustes', '/upgrade', '/chat', '/diario-medico', '/medications', '/cuidado', '/mas'])
 
 // Rutas que no dibujan su propio header (no están en hasOwnHeader) y deben
 // ver el header claro de Layout en vez del bloque oscuro — mismo
@@ -295,6 +295,22 @@ export default function Layout({ children }) {
             <span style={{ fontSize: 10, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: location.pathname === '/dashboard' ? '#0C6C9C' : '#7C8698' }}>Inicio</span>
           </Link>
 
+          {/* Medicamentos */}
+          <button onClick={() => navigate('/medications', { replace: location.pathname !== '/dashboard' })} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, background: 'none', border: 'none', cursor: 'pointer', padding: 0, WebkitTapHighlightColor: 'transparent' }}>
+            <span style={{ width: location.pathname === '/medications' ? 52 : 36, height: 32, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: location.pathname === '/medications' ? '#0C6C9C' : 'transparent', transition: 'width 0.15s ease' }}>
+              <Pill size={18} color={location.pathname === '/medications' ? 'white' : '#7C8698'} strokeWidth={2} />
+            </span>
+            <span style={{ fontSize: 10, fontWeight: 700, color: location.pathname === '/medications' ? '#0C6C9C' : '#7C8698' }}>Medicamentos</span>
+          </button>
+
+          {/* Rutina */}
+          <Link to="/cuidado" replace={location.pathname !== '/dashboard'} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, textDecoration: 'none' }}>
+            <span style={{ width: location.pathname === '/cuidado' ? 52 : 36, height: 32, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: location.pathname === '/cuidado' ? '#0C6C9C' : 'transparent', transition: 'width 0.15s ease' }}>
+              <ClipboardList size={18} color={location.pathname === '/cuidado' ? 'white' : '#7C8698'} strokeWidth={2} />
+            </span>
+            <span style={{ fontSize: 10, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: location.pathname === '/cuidado' ? '#0C6C9C' : '#7C8698' }}>Rutina</span>
+          </Link>
+
           {/* Chat */}
           <Link to="/chat" replace={location.pathname !== '/dashboard'} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, textDecoration: 'none' }}>
             <span style={{ position: 'relative', width: location.pathname === '/chat' ? 52 : 36, height: 32, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: location.pathname === '/chat' ? '#0C6C9C' : 'transparent', transition: 'width 0.15s ease' }}>
@@ -306,28 +322,12 @@ export default function Layout({ children }) {
             <span style={{ fontSize: 10, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: location.pathname === '/chat' ? '#0C6C9C' : '#7C8698' }}>Chat</span>
           </Link>
 
-          {/* Historial */}
-          <Link to="/historial" replace={location.pathname !== '/dashboard'} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, textDecoration: 'none' }}>
-            <span style={{ width: location.pathname === '/historial' ? 52 : 36, height: 32, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: location.pathname === '/historial' ? '#0C6C9C' : 'transparent', transition: 'width 0.15s ease' }}>
-              <ClipboardList size={18} color={location.pathname === '/historial' ? 'white' : '#7C8698'} strokeWidth={2} />
+          {/* Más */}
+          <Link to="/mas" replace={location.pathname !== '/dashboard'} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, textDecoration: 'none' }}>
+            <span style={{ width: location.pathname === '/mas' ? 52 : 36, height: 32, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: location.pathname === '/mas' ? '#0C6C9C' : 'transparent', transition: 'width 0.15s ease' }}>
+              <Menu size={18} color={location.pathname === '/mas' ? 'white' : '#7C8698'} strokeWidth={2} />
             </span>
-            <span style={{ fontSize: 10, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: location.pathname === '/historial' ? '#0C6C9C' : '#7C8698' }}>Historial</span>
-          </Link>
-
-          {/* Medicamentos */}
-          <button onClick={() => navigate('/medications', { replace: location.pathname !== '/dashboard' })} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, background: 'none', border: 'none', cursor: 'pointer', padding: 0, WebkitTapHighlightColor: 'transparent' }}>
-            <span style={{ width: location.pathname === '/medications' ? 52 : 36, height: 32, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: location.pathname === '/medications' ? '#0C6C9C' : 'transparent', transition: 'width 0.15s ease' }}>
-              <Pill size={18} color={location.pathname === '/medications' ? 'white' : '#7C8698'} strokeWidth={2} />
-            </span>
-            <span style={{ fontSize: 10, fontWeight: 700, color: location.pathname === '/medications' ? '#0C6C9C' : '#7C8698' }}>Medicamentos</span>
-          </button>
-
-          {/* Mi cuenta */}
-          <Link to="/ajustes" replace={location.pathname !== '/dashboard'} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, textDecoration: 'none' }}>
-            <span style={{ width: location.pathname === '/ajustes' ? 52 : 36, height: 32, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: location.pathname === '/ajustes' ? '#0C6C9C' : 'transparent', transition: 'width 0.15s ease' }}>
-              <User size={18} color={location.pathname === '/ajustes' ? 'white' : '#7C8698'} strokeWidth={2} />
-            </span>
-            <span style={{ fontSize: 10, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: location.pathname === '/ajustes' ? '#0C6C9C' : '#7C8698' }}>Mi cuenta</span>
+            <span style={{ fontSize: 10, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: location.pathname === '/mas' ? '#0C6C9C' : '#7C8698' }}>Más</span>
           </Link>
         </nav>
 

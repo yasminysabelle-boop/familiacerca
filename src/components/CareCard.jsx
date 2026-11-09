@@ -13,6 +13,7 @@ const STATUS = {
   ok:       { label: 'Todo al día',          dot: '#4FD0E0', glow: 'rgba(79,208,224,.30)' },
   warning:  { label: 'Algo pendiente',       dot: '#FBBF24', glow: 'rgba(251,191,36,.28)' },
   critical: { label: 'Pendientes de hoy',    dot: CORAL_EMERGENCY, glow: 'rgba(217,83,79,.28)' },
+  setup:    { label: 'Por empezar',          dot: '#FFFFFF', glow: 'rgba(255,255,255,.25)' },
 }
 
 function StatItem({ icon, label, sub, last = false, onClick }) {
@@ -25,7 +26,7 @@ function StatItem({ icon, label, sub, last = false, onClick }) {
         <span style={{ flex: 'none', width: 28, height: 28, borderRadius: '50%', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           {icon}
         </span>
-        <span style={{ minWidth: 0, color: '#fff', fontSize: 10, fontWeight: 600, lineHeight: 1.25, letterSpacing: '-0.01em', fontFamily: SANS }}>
+        <span style={{ minWidth: 0, color: '#fff', fontSize: 11.5, fontWeight: 600, lineHeight: 1.25, letterSpacing: '-0.01em', fontFamily: SANS }}>
           {label}<br /><span style={{ fontWeight: 400, color: 'rgba(255,255,255,0.8)' }}>{sub}</span>
         </span>
       </div>
@@ -41,7 +42,9 @@ export default function CareCard({
   moodText,
   status = 'ok',
   medsUpToDate = true,
+  hasMeds = true,
   routineUpToDate = true,
+  routineStarted = true,
   familyCount = 0,
   hasPatient = true,
   onClick,
@@ -57,7 +60,8 @@ export default function CareCard({
     ? 'Agrega a tu familiar y empieza a coordinar su cuidado.'
     // Solo hechos registrados, nunca un estado de ánimo inventado
     // (auditoría nov 2026: decía "tranquila y de buen ánimo" sin datos).
-    : status === 'critical' ? `Hay cosas pendientes de hoy con ${name}.` :
+    : status === 'setup' ? `Empieza agregando el primer medicamento de ${name}.` :
+      status === 'critical' ? `Hay cosas pendientes de hoy con ${name}.` :
       status === 'warning'  ? `Hoy queda algo pendiente con ${name}.` :
       `Hoy todo va al día con ${name}.`
 
@@ -133,19 +137,19 @@ export default function CareCard({
           <StatItem
             icon={<Pill size={16} color={TEAL} strokeWidth={2} />}
             label="Medicamentos"
-            sub={medsUpToDate ? 'al día' : 'pendiente'}
+            sub={!hasMeds ? 'sin agregar' : medsUpToDate ? 'al día' : 'pendiente'}
             onClick={onMedsClick ? (e) => { e.stopPropagation(); onMedsClick() } : undefined}
           />
           <StatItem
             icon={<Calendar size={15} color={TEAL} strokeWidth={2} />}
             label="Rutina"
-            sub={routineUpToDate ? 'al día' : 'pendiente'}
+            sub={!routineStarted ? 'sin empezar' : routineUpToDate ? 'al día' : 'pendiente'}
             onClick={onRoutineClick ? (e) => { e.stopPropagation(); onRoutineClick() } : undefined}
           />
           <StatItem
             icon={<Users size={16} color={TEAL} strokeWidth={1.9} />}
             label="Familia"
-            sub={familyCount > 0 ? `${familyCount} conectado${familyCount === 1 ? '' : 's'}` : 'sin conectar'}
+            sub={familyCount <= 1 ? 'solo tú' : `${familyCount} conectados`}
             onClick={onFamilyClick ? (e) => { e.stopPropagation(); onFamilyClick() } : undefined}
             last
           />

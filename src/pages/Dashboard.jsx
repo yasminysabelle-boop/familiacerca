@@ -2090,6 +2090,21 @@ export default function Dashboard() {
   const [emergencyContact, setEmergencyContact] = useState(null)
   const [primaryDoctor, setPrimaryDoctor] = useState(null)
   const [careLogsToday, setCareLogsToday] = useState({})
+  // ¿La familia ya empezó a usar la rutina? (algún cuidado marcado alguna vez
+  // o algún horario configurado). Si no, la rutina NO cuenta como pendiente:
+  // el primer día no debe regañar por cuidados que nadie eligió (UX nov 2026).
+  const [routineStarted, setRoutineStarted] = useState(true)
+  useEffect(() => {
+    if (!ownerId) return
+    let off = false
+    Promise.all([
+      supabase.from('daily_care_logs').select('id').eq('user_id', ownerId).neq('status', 'no_completado').limit(1),
+      supabase.from('care_item_schedules').select('item_key').eq('user_id', ownerId).limit(1),
+    ]).then(([a, b]) => {
+      if (!off) setRoutineStarted(((a.data ?? []).length + (b.data ?? []).length) > 0)
+    }).catch(() => {})
+    return () => { off = true }
+  }, [ownerId])
   const [dailyMood, setDailyMood] = useState(null)
   const [careRecordMood, setCareRecordMood] = useState(null)
   const [savingMood, setSavingMood] = useState(false)
@@ -3166,7 +3181,18 @@ export default function Dashboard() {
   const dailyItems = CARE_ITEMS.filter(i => i.category === 'daily')
   // Primer día: cuidados cuya hora pasó antes de registrarse empiezan mañana
   // (mismo criterio que Cuidado.jsx, lib/medTiming.js).
-  const pendingRoutinesCount = dailyItems.filter(i => !careLogsToday[i.key] && !scheduledBeforeStart(i.scheduledTime, patientProfile?.created_at)).length
+  const routineActive = routineStarted || Object.keys(careLogsToday).length > 0
+  const pendingRoutinesCount = !routineActive ? 0 : dailyItems.filter(i => !careLogsToday[i.key] && !scheduledBeforeStart(i.scheduledTime, patientProfile?.created_at)).length
+  // Solo los cuidados cuya hora ya pasó cuentan para "Algo pendiente".
+  const overdueRoutinesCount = !routineActive ? 0 : (() => {
+    const nowMins = new Date().getHours() * 60 + new Date().getMinutes()
+    return dailyItems.filter(i => {
+      if (careLogsToday[i.key] || !i.scheduledTime) return false
+      if (scheduledBeforeStart(i.scheduledTime, patientProfile?.created_at)) return false
+      const [h, m] = i.scheduledTime.split(':').map(Number)
+      return h * 60 + m + 60 <= nowMins
+    }).length
+  })()
   const confirmedTodayCount = todaySection?.events.filter(e => e.type === 'MED_CONFIRMED').length ?? 0
   const missedTodayCount = todaySection?.events.filter(e => e.type === 'MED_MISSED').length ?? 0
 
@@ -3236,7 +3262,7 @@ export default function Dashboard() {
   // 'no_completado' (ver fix de /cuidado).
   const routinesTotal = dailyItems.length
   const routinesDoneCount = dailyItems.filter(i => careLogsToday[i.key]).length
-  const routineLine = routinesTotal === 0
+  const routineLine = (routinesTotal === 0 || !routineActive)
     ? null
     : routinesDoneCount === routinesTotal
       ? 'La rutina diaria de cuidado está al día'
@@ -3602,7 +3628,8 @@ export default function Dashboard() {
             // fuera una persona (bug encontrado y corregido 2026-08-09).
             const patientFirstName = realPatientName ? realPatientName.split(' ')[0] : null
             const isCritical     = hasActiveSOS || (_isRetrasado && _retrasadoMins != null && _retrasadoMins >= 720)
-            const isPendingToday = !isCritical && (pendingCount > 0 || _isRetrasado)
+            const isPendingToday = !isCritical && (pendingCount > 0 || _isRetrasado || overdueRoutinesCount > 0)
+            const isSetup = medTotal === 0 && !routineActive && !isCritical
 
             const recentMembers = familyMembers.filter(m => m.last_seen && Date.now() - new Date(m.last_seen).getTime() < 24 * 60 * 60 * 1000)
             const participacion = recentMembers.length >= 2 ? 'Alta' : recentMembers.length === 1 ? 'Moderada' : 'Baja'
@@ -3638,15 +3665,29 @@ export default function Dashboard() {
                   name={patientFirstName || patientName}
                   hasPatient={!!realPatientName}
                   photoUrl={profilePhoto}
-                  status={isCritical ? 'critical' : isPendingToday ? 'warning' : 'ok'}
+                  status={isSetup ? 'setup' : isCritical ? 'critical' : isPendingToday ? 'warning' : 'ok'}
                   medsUpToDate={pendingCount === 0}
-                  routineUpToDate={pendingRoutinesCount === 0}
+                  hasMeds={medTotal > 0}
+                  routineUpToDate={overdueRoutinesCount === 0}
+                  routineStarted={routineActive}
                   familyCount={familyCount}
                   onClick={() => navigate('/paciente/perfil')}
                   onMedsClick={() => navigate('/medications')}
                   onRoutineClick={() => navigate('/cuidado')}
                   onFamilyClick={() => navigate('/familia')}
                 />
+
+                {/* ══ SOLO TÚ — empujar a invitar (sin familia no hay avisos ni razón para volver) ══ */}
+                {isAdmin && !!realPatientName && familyCount <= 1 && (
+                  <div style={{ marginTop: 14, background: 'white', borderRadius: 20, padding: '16px 16px', border: '1px solid #E6E3DB', boxShadow: '0 6px 18px -10px rgba(10,74,107,0.25)', display: 'flex', alignItems: 'center', gap: 14 }}>
+                    <span style={{ flex: 'none', width: 46, height: 46, borderRadius: 14, background: '#E3F1F8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>👨‍👩‍👧</span>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#14303D' }}>Solo tú por ahora</p>
+                      <p style={{ margin: '2px 0 0', fontSize: 14, color: '#4E6470', lineHeight: 1.4 }}>Invita a tu familia para que todos vean el cuidado y reciban los avisos.</p>
+                    </div>
+                    <button onClick={() => navigate('/familia?invitar=1')} style={{ flex: 'none', padding: '10px 14px', borderRadius: 12, background: '#E9826E', color: 'white', fontSize: 14, fontWeight: 700, border: 'none', cursor: 'pointer' }}>Invitar</button>
+                  </div>
+                )}
 
                 {/* ══ ATENCIÓN — medicamento pendiente (v0: AttentionCard) ══ */}
                 {nextPendingMed && (

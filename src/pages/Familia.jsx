@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { usePresence } from '../contexts/PresenceContext'
@@ -37,6 +37,10 @@ export default function Familia() {
   const [memberModal, setMemberModal] = useState(null)
   const [memberContact, setMemberContact] = useState(undefined)
   const [showInvite, setShowInvite] = useState(false)
+  // Enlace general para compartir por WhatsApp (sirve para toda la familia).
+  const [waLink, setWaLink] = useState('')
+  const [waCopied, setWaCopied] = useState(false)
+  const location = useLocation()
   const [inviteEmail, setInviteEmail] = useState('')
   const [inviteStatus, setInviteStatus] = useState('idle')
   const [inviteLink, setInviteLink] = useState('')
@@ -255,6 +259,21 @@ export default function Familia() {
   // abajo pero cuenta como una persona del equipo — "hasta 2 cuidadores"
   // incluye al dueño, no son 2 invitados además de él).
   const teamSize = 1 + members.length
+
+  // Abre la invitación directo cuando se llega desde el aviso "Solo tú por ahora".
+  useEffect(() => {
+    if (new URLSearchParams(location.search).get('invitar')) openInvite()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Crea el enlace general al abrir la invitación (antes de tocar el botón,
+  // para que WhatsApp abra al instante y el navegador no lo bloquee).
+  useEffect(() => {
+    if (!showInvite || waLink) return
+    supabase.rpc('create_family_invitation', { p_invited_email: 'invitado@familiacerca.app', p_invited_by: displayName })
+      .then(({ data: token }) => { if (token) setWaLink(`${window.location.origin}/join?token=${token}`) })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showInvite])
 
   function openInvite() {
     // Tope de equipo primero: es la razón más específica y la que de verdad
@@ -933,7 +952,7 @@ export default function Familia() {
                 <p style={{ fontFamily: SANS, fontSize: 18, fontWeight: 700, color: '#14303D', margin: 0 }}>
                   Invitar familiar
                 </p>
-                <p style={{ fontSize: 12, color: '#5E7480', margin: '4px 0 0' }}>El enlace expira en 24 horas</p>
+                <p style={{ fontSize: 13, color: '#5E7480', margin: '4px 0 0' }}>El enlace vale por 7 días</p>
               </div>
               <button onClick={() => setShowInvite(false)}
                 style={{ padding: 8, borderRadius: 10, background: '#F3F4F6', border: 'none', cursor: 'pointer' }}>
@@ -974,6 +993,30 @@ export default function Familia() {
                 </button>
               </div>
             ) : (
+              <>
+              <a
+                href={waLink ? `https://wa.me/?text=${encodeURIComponent(`Te invito a FamiliaCerca para coordinar juntos el cuidado de ${activePatientName || profile?.name || 'nuestro familiar'}: ${waLink}`)}` : undefined}
+                target="_blank" rel="noopener noreferrer"
+                onClick={e => { if (!waLink) e.preventDefault(); else track('family_member_invited', { channel: 'whatsapp' }) }}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, width: '100%', padding: 15, borderRadius: 14, background: waLink ? '#25D366' : '#C9D6DB', color: 'white', fontWeight: 800, fontSize: 16, textDecoration: 'none', boxSizing: 'border-box' }}
+              >
+                💬 {waLink ? 'Invitar por WhatsApp' : 'Preparando enlace…'}
+              </a>
+              <button
+                type="button" disabled={!waLink}
+                onClick={async () => { try { await navigator.clipboard.writeText(waLink) } catch { window.prompt('Copia este enlace:', waLink) } setWaCopied(true) }}
+                style={{ width: '100%', marginTop: 10, padding: 13, borderRadius: 14, border: '1.5px solid #E6E3DB', background: 'white', color: '#0A4A6B', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}
+              >
+                {waCopied ? '¡Enlace copiado!' : '🔗 Copiar enlace'}
+              </button>
+              <p style={{ fontSize: 13, color: '#4E6470', textAlign: 'center', margin: '10px 0 18px', lineHeight: 1.5 }}>
+                Un solo enlace sirve para toda la familia. Cada quien entra con su propia cuenta.
+              </p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '0 0 14px' }}>
+                <div style={{ flex: 1, height: 1, background: '#E6E3DB' }} />
+                <span style={{ fontSize: 13, color: '#5E7480' }}>o por correo</span>
+                <div style={{ flex: 1, height: 1, background: '#E6E3DB' }} />
+              </div>
               <form onSubmit={handleInvite} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                 <div>
                   <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#4E6470', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>
@@ -982,7 +1025,7 @@ export default function Familia() {
                   <input
                     type="email" required value={inviteEmail}
                     onChange={e => setInviteEmail(e.target.value)}
-                    placeholder="familiar@correo.com" autoFocus
+                    placeholder="familiar@correo.com"
                     style={fieldStyle}
                     onFocus={e => { e.target.style.borderColor = '#0C6C9C'; e.target.style.boxShadow = '0 0 0 3px rgba(10,90,130,0.1)' }}
                     onBlur={e => { e.target.style.borderColor = '#E6E3DB'; e.target.style.boxShadow = 'none' }}
@@ -1008,6 +1051,7 @@ export default function Familia() {
                   {inviteStatus === 'sending' ? 'Creando...' : 'Enviar invitación →'}
                 </button>
               </form>
+              </>
             )}
           </div>
         </div>

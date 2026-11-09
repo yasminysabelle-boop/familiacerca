@@ -89,6 +89,17 @@ export default function Cuidado() {
 
   const [careLogs, setCareLogs] = useState({})
   const [careSchedules, setCareSchedules] = useState({})
+  // La rutina viene con cuidados sugeridos. Mientras la familia no la haya
+  // usado (ningún cuidado marcado nunca y ningún horario propio), no se marca
+  // nada como "Atrasada": el primer día no debe regañar (UX nov 2026).
+  const [routineStarted, setRoutineStarted] = useState(true)
+  useEffect(() => {
+    if (!ownerId) return
+    let off = false
+    supabase.from('daily_care_logs').select('id').eq('user_id', ownerId).neq('status', 'no_completado').limit(1)
+      .then(({ data }) => { if (!off) setRoutineStarted((data ?? []).length > 0) })
+    return () => { off = true }
+  }, [ownerId])
   const [careToggling, setCareToggling] = useState(null)
   const [justCompletedKey, setJustCompletedKey] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -245,9 +256,15 @@ export default function Cuidado() {
   const completedRequired = requiredItems.filter(i => !!careLogs[i.key]).length
   const allDone = requiredItems.length > 0 && completedRequired === requiredItems.length
 
-  const retrasadas  = CARE_ITEMS.filter(i => !careLogs[i.key] && !isFromTomorrow(i) && calcularEstadoCuidado(i, false, careSchedules[i.key]) === 'tarde')
+  const timeOf = i => careSchedules[i.key] ?? i.scheduledTime ?? '99:99'
+  const byTime = (a, b) => timeOf(a).localeCompare(timeOf(b))
+  const routineActive = routineStarted || Object.keys(careLogs).length > 0 || Object.keys(careSchedules).length > 0
+  const retrasadas  = !routineActive ? [] : CARE_ITEMS.filter(i => !careLogs[i.key] && !isFromTomorrow(i) && calcularEstadoCuidado(i, false, careSchedules[i.key]) === 'tarde').sort(byTime)
   const desdeManana = CARE_ITEMS.filter(i => !careLogs[i.key] && isFromTomorrow(i))
-  const proximas    = CARE_ITEMS.filter(i => !careLogs[i.key] && ['programado', 'pendiente'].includes(calcularEstadoCuidado(i, false, careSchedules[i.key])) && !!(careSchedules[i.key] ?? i.scheduledTime))
+  const proximas    = (!routineActive
+    ? CARE_ITEMS.filter(i => !careLogs[i.key] && !!(careSchedules[i.key] ?? i.scheduledTime))
+    : CARE_ITEMS.filter(i => !careLogs[i.key] && ['programado', 'pendiente'].includes(calcularEstadoCuidado(i, false, careSchedules[i.key])) && !!(careSchedules[i.key] ?? i.scheduledTime))
+  ).sort(byTime)
   const sinHorario  = CARE_ITEMS.filter(i => !careLogs[i.key] && !(careSchedules[i.key] ?? i.scheduledTime))
   const completadas = CARE_ITEMS.filter(i => !!careLogs[i.key])
 
@@ -259,6 +276,8 @@ export default function Cuidado() {
     ? 'Cada cuidado que das hoy cuenta. Gracias por estar cerca.'
     : requiredItems.length === 0
       ? 'Aún no hay cuidados diarios configurados.'
+      : !routineActive
+        ? 'Estos son cuidados comunes. Marca los que hagan en casa y la rutina empieza a contar. Puedes cambiar las horas en Horarios.'
       : `Van ${completedRequired} de ${requiredItems.length} cuidados. ${restantes === 1 ? 'Queda 1 por marcar.' : `Quedan ${restantes} por marcar.`}`
 
   return (
@@ -401,7 +420,7 @@ export default function Cuidado() {
 
                   {/* Próximas */}
                   {proximas.length > 0 && (
-                    <RoutineSection label="Próximas">
+                    <RoutineSection label={routineActive ? "Próximas" : "Cuidados sugeridos"}>
                       {proximas.map(item => (
                         <RoutineCard
                           key={item.key}
@@ -435,7 +454,7 @@ export default function Cuidado() {
 
                   {/* Sin horario */}
                   {sinHorario.length > 0 && (
-                    <RoutineSection label="Sin horario">
+                    <RoutineSection label={routineActive ? "Sin horario" : "Otros cuidados"}>
                       {sinHorario.map(item => (
                         <RoutineCard
                           key={item.key}
