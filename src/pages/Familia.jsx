@@ -24,15 +24,6 @@ function isMedTarde(scheduledTime, windowMinutes = 60) {
 const SANS = "'Plus Jakarta Sans', system-ui, sans-serif"
 
 // Marca de agua decorativa — mismo patrón/trazo que VideoCall.jsx, en teal.
-const WATERMARK_PATHS = (
-  <>
-    <path d="M200 330 C 60 240, 30 140, 110 90 C 160 60, 195 90, 200 130 C 205 90, 240 60, 290 90 C 370 140, 340 240, 200 330 Z" fill="#0C6C9C" />
-    <circle cx="165" cy="165" r="22" fill="#F7F6F2" />
-    <path d="M130 230 C 130 195, 200 195, 200 230 L 200 245 L 130 245 Z" fill="#F7F6F2" />
-    <circle cx="235" cy="165" r="22" fill="#F7F6F2" />
-    <path d="M200 230 C 200 195, 270 195, 270 230 L 270 245 L 200 245 Z" fill="#F7F6F2" />
-  </>
-)
 
 export default function Familia() {
   const { user } = useAuth()
@@ -316,9 +307,6 @@ export default function Familia() {
       <div style={{ position: 'relative', minHeight: '100%', overflow: 'hidden' }}>
 
         {/* Marca de agua decorativa — fiel al patrón de VideoCall.jsx */}
-        <svg viewBox="0 0 400 400" style={{ position: 'absolute', top: -60, right: -90, width: 420, height: 420, opacity: 0.05, pointerEvents: 'none', zIndex: 0 }} aria-hidden="true">
-          {WATERMARK_PATHS}
-        </svg>
 
       <div style={{ position: 'relative', zIndex: 1, padding: '16px 16px 0', maxWidth: 600 }}>
 
