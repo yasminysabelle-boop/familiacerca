@@ -21,7 +21,6 @@ import CameraCapture from '../components/CameraCapture'
 import { usePushNotifications } from '../hooks/usePushNotifications'
 import { useHospitalMode } from '../contexts/HospitalModeContext'
 import HospitalDashboard from '../components/hospital/HospitalDashboard'
-import { generateMedicalReport, fetchReportData } from '../utils/generateMedicalReport'
 import HospitalModeModal from '../components/hospital/HospitalModeModal'
 import CompanionChat from '../components/CompanionChat'
 import VideoCallScheduleModal from '../components/VideoCallScheduleModal'
@@ -2090,7 +2089,6 @@ export default function Dashboard() {
   const [patientProfile, setPatientProfile] = useState(null)
   const [emergencyContact, setEmergencyContact] = useState(null)
   const [primaryDoctor, setPrimaryDoctor] = useState(null)
-  const [pdfLoading, setPdfLoading] = useState(false)
   const [careLogsToday, setCareLogsToday] = useState({})
   const [dailyMood, setDailyMood] = useState(null)
   const [careRecordMood, setCareRecordMood] = useState(null)
@@ -3123,19 +3121,6 @@ export default function Dashboard() {
       events: s.events.map(e => e.id === activeSosEvent.id ? { ...e, resolved: true } : e),
     })))
     setSosSent(false)
-  }
-
-  async function handlePDF() {
-    if (pdfLoading || !ownerId) return
-    setPdfLoading(true)
-    try {
-      const data = await fetchReportData(ownerId)
-      await generateMedicalReport(data, profile?.name)
-    } catch (err) {
-      console.error('[PDF]', err)
-    } finally {
-      setPdfLoading(false)
-    }
   }
 
   function toggleDay(dateKey) {

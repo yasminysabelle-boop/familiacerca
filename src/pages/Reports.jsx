@@ -1,25 +1,38 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
+import { useFamilyPlan } from '../contexts/FamilyPlanContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
-import jsPDF from 'jspdf'
-import autoTable from 'jspdf-autotable'
+import { fetchPdfReportData, generatePdfReport, SECTIONS } from '../utils/generatePdfReport'
 
 const CONCERN_KEYWORDS = ['dolor', 'caída', 'se cayó', 'fiebre', 'triste', 'deprimido', 'sin apetito', 'no comió', 'confundido', 'desorientado', 'peor', 'mal', 'llora', 'angustia']
+
+// Estas dos constantes gobiernan SOLO el boton de PDF de abajo -- el panel
+// "Analisis de bienestar" de mas arriba (deteccion de CONCERN_KEYWORDS, con
+// frases como "Considera una consulta medica") es intencionalmente ajeno al
+// PDF. Ver generatePdfReport.js: nunca infiere ni evalua, mismo principio
+// que rige a Milo.
+const PDF_SECTIONS = [
+  SECTIONS.COVER, SECTIONS.ADHERENCE, SECTIONS.MEDICATIONS,
+  SECTIONS.FAMILY_NOTES, SECTIONS.MEDICAL_DIARY, SECTIONS.PAST_EVENTS,
+  SECTIONS.VOICE_MEMORIES,
+]
+const PDF_WINDOW_DAYS = 30
 
 export default function Reports() {
   const { user } = useAuth()
   const { profile, ownerId } = useFamily()
+  // Plan Gratis (después de la prueba): 1 reporte PDF al mes (src/lib/plans.js).
+  const { familyCanEdit } = useFamilyPlan()
   const [medications, setMedications] = useState([])
   const [notes, setNotes] = useState([])
   const [events, setEvents] = useState([])
   const [logs, setLogs] = useState([])
   const [loading, setLoading] = useState(true)
-  const [generating, setGenerating] = useState(false)
-  const [exportingHistory, setExportingHistory] = useState(false)
-  const [historyDone, setHistoryDone] = useState(false)
-  const [historyError, setHistoryError] = useState('')
+  const [generatingPdf, setGeneratingPdf] = useState(false)
+  const [pdfDone, setPdfDone] = useState(false)
+  const [pdfError, setPdfError] = useState('')
 
   useEffect(() => { if (user) fetchData() }, [user])
 
@@ -52,259 +65,35 @@ export default function Reports() {
     CONCERN_KEYWORDS.filter(kw => notes.some(n => (n.title + ' ' + n.content).toLowerCase().includes(kw)))
   )].slice(0, 5)
 
-  function generatePDF() {
-    setGenerating(true)
-    const doc = new jsPDF()
-    const W = doc.internal.pageSize.getWidth()
-    const todayStr = new Date().toLocaleDateString('es-US', { day: 'numeric', month: 'long', year: 'numeric' })
-    let y = 0
-
-    // Header bar
-    doc.setFillColor(27, 94, 32)
-    doc.rect(0, 0, W, 38, 'F')
-    doc.setTextColor(255, 255, 255)
-    doc.setFontSize(18); doc.setFont('helvetica', 'bold')
-    doc.text('FamiliaCerca — Reporte Médico Pre-Cita', 15, 14)
-    doc.setFontSize(9); doc.setFont('helvetica', 'normal')
-    doc.text(`Generado el ${todayStr}`, 15, 22)
-    if (profile?.name) doc.text(`Paciente: ${profile.name}${profile.age ? ` · ${profile.age} años` : ''}`, 15, 29)
-
-    y = 48
-
-    // Medical notes from profile
-    if (profile?.medical_notes) {
-      doc.setTextColor(0, 0, 0)
-      doc.setFontSize(11); doc.setFont('helvetica', 'bold')
-      doc.text('Notas médicas del perfil', 15, y); y += 6
-      doc.setFontSize(9); doc.setFont('helvetica', 'normal')
-      const lines = doc.splitTextToSize(profile.medical_notes, W - 30)
-      lines.slice(0, 6).forEach(line => { doc.text(line, 15, y); y += 5 })
-      y += 4
-    }
-
-    // Medications table
-    if (medications.length > 0) {
-      if (y > 220) { doc.addPage(); y = 20 }
-      doc.setTextColor(0, 0, 0)
-      doc.setFontSize(11); doc.setFont('helvetica', 'bold')
-      doc.text('Medicamentos actuales', 15, y); y += 4
-      autoTable(doc, {
-        startY: y,
-        head: [['Medicamento', 'Dosis', 'Frecuencia', 'Hora']],
-        body: medications.map(m => [m.name, m.dosage ?? '—', m.frequency ?? '—', m.time ?? '—']),
-        styles: { fontSize: 8, cellPadding: 2 },
-        headStyles: { fillColor: [27, 94, 32], fontSize: 8 },
-        margin: { left: 15, right: 15 },
-      })
-      y = doc.lastAutoTable.finalY + 8
-    }
-
-    // Adherence summary
-    if (logs.length > 0) {
-      if (y > 230) { doc.addPage(); y = 20 }
-      doc.setFontSize(11); doc.setFont('helvetica', 'bold')
-      doc.text('Adherencia a medicamentos (últimos 7 días)', 15, y); y += 6
-      doc.setFontSize(9); doc.setFont('helvetica', 'normal')
-      doc.text(`${confirmed7} dosis confirmadas · ${missed7} perdidas · Adherencia: ${adherence7}%`, 15, y)
-      y += 10
-    }
-
-    // Recent notes
-    if (notes.length > 0) {
-      if (y > 220) { doc.addPage(); y = 20 }
-      doc.setFontSize(11); doc.setFont('helvetica', 'bold')
-      doc.text('Observaciones recientes (últimos 30 días)', 15, y); y += 4
-      autoTable(doc, {
-        startY: y,
-        head: [['Fecha', 'Título', 'Contenido']],
-        body: notes.slice(0, 12).map(n => [
-          new Date(n.created_at).toLocaleDateString('es-US', { day: 'numeric', month: 'short' }),
-          n.title,
-          n.content.length > 90 ? n.content.substring(0, 90) + '…' : n.content,
-        ]),
-        styles: { fontSize: 7.5, cellPadding: 2 },
-        headStyles: { fillColor: [27, 94, 32], fontSize: 8 },
-        columnStyles: { 0: { cellWidth: 18 }, 1: { cellWidth: 42 } },
-        margin: { left: 15, right: 15 },
-      })
-      y = doc.lastAutoTable.finalY + 8
-    }
-
-    // Appointment history
-    if (events.length > 0) {
-      if (y > 220) { doc.addPage(); y = 20 }
-      doc.setFontSize(11); doc.setFont('helvetica', 'bold')
-      doc.text('Historial de citas y eventos', 15, y); y += 4
-      autoTable(doc, {
-        startY: y,
-        head: [['Fecha', 'Evento', 'Tipo', 'Hora']],
-        body: events.map(e => [
-          e.date,
-          e.title,
-          e.type === 'appointment' ? 'Cita médica' : e.type === 'therapy' ? 'Terapia' : e.type === 'medication' ? 'Medicamento' : 'Otro',
-          e.time ?? '—',
-        ]),
-        styles: { fontSize: 8, cellPadding: 2 },
-        headStyles: { fillColor: [27, 94, 32], fontSize: 8 },
-        margin: { left: 15, right: 15 },
-      })
-    }
-
-    // Footer
-    const pages = doc.internal.getNumberOfPages()
-    for (let i = 1; i <= pages; i++) {
-      doc.setPage(i)
-      doc.setFontSize(7.5); doc.setTextColor(150)
-      doc.text(`FamiliaCerca · Reporte médico confidencial · Página ${i} de ${pages}`, W / 2, 289, { align: 'center' })
-    }
-
-    const fileName = `reporte-${(profile?.name ?? 'familiar').replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.pdf`
-    doc.save(fileName)
-    setGenerating(false)
-  }
-
-  async function exportHistory() {
-    setExportingHistory(true)
-    setHistoryError('')
-    setHistoryDone(false)
+  async function handleGeneratePdf() {
+    setGeneratingPdf(true)
+    setPdfError('')
+    setPdfDone(false)
     try {
-      const thirtyDaysAgo = new Date()
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
-      const fromDate = thirtyDaysAgo.toISOString().split('T')[0]
-      const today = new Date().toISOString().split('T')[0]
-
       const exportId = ownerId ?? user.id
-      const [
-        { data: meds },
-        { data: histNotes },
-        { data: histEvents },
-        { data: memories },
-      ] = await Promise.all([
-        supabase.from('medication_logs')
-          .select('*, medications(name, dosage)')
-          .eq('user_id', exportId)
-          .gte('log_date', fromDate)
-          .eq('status', 'confirmed')
-          .order('log_date', { ascending: false }),
-        supabase.from('notes')
-          .select('*')
-          .eq('user_id', exportId)
-          .gte('created_at', fromDate + 'T00:00:00Z')
-          .order('created_at', { ascending: false }),
-        supabase.from('events')
-          .select('*')
-          .eq('user_id', exportId)
-          .gte('date', fromDate)
-          .order('date', { ascending: false }),
-        supabase.from('voice_diary')
-          .select('*')
-          .eq('user_id', exportId)
-          .gte('created_at', fromDate + 'T00:00:00Z')
-          .order('created_at', { ascending: false }),
-      ])
-
-      const doc = new jsPDF()
-      const pageW = doc.internal.pageSize.getWidth()
-
-      doc.setFillColor(196, 98, 58)
-      doc.rect(0, 0, pageW, 32, 'F')
-      doc.setTextColor(255, 255, 255)
-      doc.setFontSize(18); doc.setFont('helvetica', 'bold')
-      doc.text('FamiliaCerca — Historial de Cuidado', 14, 14)
-      doc.setFontSize(10); doc.setFont('helvetica', 'normal')
-      doc.text(`Últimos 30 días · Generado el ${new Date().toLocaleDateString('es-US', { day: 'numeric', month: 'long', year: 'numeric' })}`, 14, 24)
-
-      let y = 42
-      doc.setTextColor(26, 26, 26)
-
-      function sectionTitle(title, emoji) {
-        if (y > 260) { doc.addPage(); y = 20 }
-        doc.setFontSize(13); doc.setFont('helvetica', 'bold')
-        doc.setTextColor(196, 98, 58)
-        doc.text(`${emoji}  ${title}`, 14, y)
-        doc.setTextColor(26, 26, 26)
-        y += 6
+      if (!familyCanEdit) {
+        const monthStart = new Date(); monthStart.setDate(1); monthStart.setHours(0, 0, 0, 0)
+        const { count } = await supabase.from('activity_log')
+          .select('id', { count: 'exact', head: true })
+          .eq('owner_id', exportId).eq('type', 'pdf_report')
+          .gte('created_at', monthStart.toISOString())
+        if ((count ?? 0) >= 1) {
+          setPdfError('En el plan Gratis puedes generar 1 reporte al mes y ya lo usaste. Con el plan Familiar son ilimitados.')
+          return
+        }
       }
-
-      if (meds?.length) {
-        sectionTitle('Medicamentos administrados', '💊')
-        autoTable(doc, {
-          startY: y,
-          head: [['Fecha', 'Medicamento', 'Dosis', 'Administrado por']],
-          body: meds.map(m => [m.log_date, m.medications?.name ?? '—', m.medications?.dosage ?? '—', m.confirmed_by_name ?? '—']),
-          styles: { fontSize: 9, cellPadding: 3 },
-          headStyles: { fillColor: [196, 98, 58], textColor: 255, fontStyle: 'bold' },
-          alternateRowStyles: { fillColor: [255, 248, 240] },
-          margin: { left: 14, right: 14 },
-        })
-        y = doc.lastAutoTable.finalY + 10
-      }
-
-      if (histNotes?.length) {
-        if (y > 260) { doc.addPage(); y = 20 }
-        sectionTitle('Notas', '📝')
-        autoTable(doc, {
-          startY: y,
-          head: [['Fecha', 'Título', 'Contenido']],
-          body: histNotes.map(n => [
-            n.created_at?.split('T')[0] ?? '—', n.title ?? '—',
-            (n.content ?? '').substring(0, 80) + ((n.content?.length ?? 0) > 80 ? '…' : ''),
-          ]),
-          styles: { fontSize: 9, cellPadding: 3 },
-          headStyles: { fillColor: [74, 124, 89], textColor: 255, fontStyle: 'bold' },
-          alternateRowStyles: { fillColor: [235, 243, 238] },
-          margin: { left: 14, right: 14 },
-          columnStyles: { 2: { cellWidth: 90 } },
-        })
-        y = doc.lastAutoTable.finalY + 10
-      }
-
-      if (histEvents?.length) {
-        if (y > 260) { doc.addPage(); y = 20 }
-        sectionTitle('Eventos del calendario', '📅')
-        autoTable(doc, {
-          startY: y,
-          head: [['Fecha', 'Evento', 'Hora']],
-          body: histEvents.map(ev => [ev.date, ev.title ?? '—', ev.time ?? '—']),
-          styles: { fontSize: 9, cellPadding: 3 },
-          headStyles: { fillColor: [59, 130, 246], textColor: 255, fontStyle: 'bold' },
-          alternateRowStyles: { fillColor: [239, 246, 255] },
-          margin: { left: 14, right: 14 },
-        })
-        y = doc.lastAutoTable.finalY + 10
-      }
-
-      if (memories?.length) {
-        if (y > 260) { doc.addPage(); y = 20 }
-        sectionTitle('Memorias de voz', '🎙️')
-        autoTable(doc, {
-          startY: y,
-          head: [['Fecha', 'Transcripción']],
-          body: memories.map(m => [
-            m.created_at?.split('T')[0] ?? '—',
-            (m.transcription ?? '').substring(0, 100) + ((m.transcription?.length ?? 0) > 100 ? '…' : ''),
-          ]),
-          styles: { fontSize: 9, cellPadding: 3 },
-          headStyles: { fillColor: [124, 92, 191], textColor: 255, fontStyle: 'bold' },
-          alternateRowStyles: { fillColor: [245, 243, 255] },
-          margin: { left: 14, right: 14 },
-          columnStyles: { 1: { cellWidth: 120 } },
-        })
-      }
-
-      const totalPages = doc.getNumberOfPages()
-      for (let i = 1; i <= totalPages; i++) {
-        doc.setPage(i)
-        doc.setFontSize(8); doc.setTextColor(156, 163, 175)
-        doc.text(`FamiliaCerca LLC · Página ${i} de ${totalPages}`, 14, doc.internal.pageSize.getHeight() - 8)
-      }
-
-      doc.save(`historial-familiacerca-${today}.pdf`)
-      setHistoryDone(true)
+      const data = await fetchPdfReportData(exportId, { sections: PDF_SECTIONS, windowDays: PDF_WINDOW_DAYS })
+      await generatePdfReport(data, { sections: PDF_SECTIONS, windowDays: PDF_WINDOW_DAYS, patientName: profile?.name })
+      setPdfDone(true)
+      // Se registra para contar el límite mensual del plan Gratis.
+      supabase.rpc('log_activity', {
+        p_type: 'pdf_report', p_description: 'Generó el reporte para el médico',
+        p_owner_id: exportId, p_actor_name: user?.user_metadata?.full_name ?? null,
+      }).then(() => {}, () => {})
     } catch (err) {
-      setHistoryError('Error al generar el PDF: ' + (err.message ?? 'Intenta de nuevo.'))
+      setPdfError('Error al generar el PDF: ' + (err.message ?? 'Intenta de nuevo.'))
     } finally {
-      setExportingHistory(false)
+      setGeneratingPdf(false)
     }
   }
 
@@ -383,13 +172,13 @@ export default function Reports() {
         </div>
 
         {/* PDF Report */}
-        <div className="bg-white rounded-xl border border-green-100 p-6 mb-6">
+        <div className="bg-white rounded-xl border border-green-100 p-6">
           <div className="flex gap-4 mb-5">
             <div className="w-12 h-12 bg-primary-light rounded-xl flex items-center justify-center text-2xl flex-shrink-0">📄</div>
             <div>
-              <h3 className="font-semibold text-gray-900">Reporte médico completo (PDF)</h3>
+              <h3 className="font-semibold text-gray-900">Reporte para el médico (PDF)</h3>
               <p className="text-sm text-gray-500 mt-0.5">
-                Incluye: perfil del paciente, medicamentos, adherencia, notas de los últimos 30 días e historial de citas. Ideal para llevar al médico.
+                Perfil del paciente, medicamentos, adherencia, notas de familia, diario médico, eventos y memorias de voz de los últimos {PDF_WINDOW_DAYS} días. Ideal para llevar al médico o guardar como archivo.
               </p>
             </div>
           </div>
@@ -407,7 +196,7 @@ export default function Reports() {
               <div className="grid grid-cols-4 gap-3 mb-5 text-center">
                 {[
                   { n: medications.length, label: 'Medicamentos' },
-                  { n: notes.length,       label: 'Notas (30d)' },
+                  { n: notes.length,       label: `Notas (${PDF_WINDOW_DAYS}d)` },
                   { n: events.length,      label: 'Eventos' },
                   { n: `${adherence7 ?? '—'}${adherence7 != null ? '%' : ''}`, label: 'Adherencia' },
                 ].map(({ n, label }) => (
@@ -417,52 +206,23 @@ export default function Reports() {
                   </div>
                 ))}
               </div>
-              <button onClick={generatePDF} disabled={generating}
+              <button onClick={handleGeneratePdf} disabled={generatingPdf}
                 className="w-full py-3.5 bg-primary hover:bg-primary-dark disabled:opacity-60 text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2">
-                {generating
+                {generatingPdf
                   ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Generando PDF...</>
                   : <><span>📄</span> Descargar reporte PDF</>}
               </button>
+              {pdfDone && (
+                <p className="text-xs mt-2 px-3 py-2 rounded-lg" style={{ color: '#15803D', background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
+                  ✓ PDF descargado correctamente
+                </p>
+              )}
+              {pdfError && (
+                <p className="text-xs mt-2 px-3 py-2 rounded-lg" style={{ color: '#D63031', background: '#FFF0F0', border: '1px solid #FFBABA' }}>
+                  ⚠ {pdfError}
+                </p>
+              )}
             </>
-          )}
-        </div>
-
-        {/* Historial completo export */}
-        <div className="bg-white rounded-xl border border-green-100 p-6">
-          <div className="flex gap-4 mb-4">
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0" style={{ background: 'rgba(196,98,58,0.1)' }}>📋</div>
-            <div>
-              <h3 className="font-semibold text-gray-900">Exportar historial completo (PDF)</h3>
-              <p className="text-sm text-gray-500 mt-0.5">
-                Últimos 30 días: dosis confirmadas, notas, citas y memorias de voz. Para archivo o segunda opinión médica.
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={exportHistory}
-            disabled={exportingHistory}
-            className="w-full py-3.5 font-semibold rounded-xl flex items-center justify-center gap-2 transition-colors disabled:opacity-60"
-            style={{
-              background: exportingHistory ? '#C0CCC5' : 'linear-gradient(135deg, #C4623A, #A04D2A)',
-              color: 'white',
-              border: 'none',
-              cursor: exportingHistory ? 'not-allowed' : 'pointer',
-              boxShadow: exportingHistory ? 'none' : '0 4px 16px rgba(196,98,58,0.3)',
-            }}
-          >
-            {exportingHistory
-              ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Generando PDF...</>
-              : <><span>📋</span> Exportar historial PDF</>}
-          </button>
-          {historyDone && (
-            <p className="text-xs mt-2 px-3 py-2 rounded-lg" style={{ color: '#15803D', background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
-              ✓ PDF descargado correctamente
-            </p>
-          )}
-          {historyError && (
-            <p className="text-xs mt-2 px-3 py-2 rounded-lg" style={{ color: '#D63031', background: '#FFF0F0', border: '1px solid #FFBABA' }}>
-              ⚠ {historyError}
-            </p>
           )}
         </div>
       </div>

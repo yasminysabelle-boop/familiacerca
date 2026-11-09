@@ -34,3 +34,6 @@ design-refs/
 
 # Local Netlify folder
 .netlify
+
+# Supabase CLI local metadata (cambia con cada `supabase functions list`/deploy)
+supabase/.temp/

@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../contexts/AuthContext'
 import { useFamily } from '../../contexts/FamilyContext'
 import VoiceInput from '../VoiceInput'
+import { fetchPdfReportData, generatePdfReport, SECTIONS } from '../../utils/generatePdfReport'
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL
 
@@ -20,156 +21,16 @@ export default function AdminDataSection() {
   const [deleteError, setDeleteError] = useState('')
 
   // ── PDF export ──────────────────────────────────────────────────────────────
+  const PDF_SECTIONS = [
+    SECTIONS.COVER, SECTIONS.MEDICATIONS, SECTIONS.MEDICATION_LOG,
+    SECTIONS.FAMILY_NOTES, SECTIONS.EXPENSES,
+  ]
   async function handleExport() {
     setExporting(true)
     setExportError('')
     try {
-      const [
-        { data: patientData },
-        { data: meds },
-        { data: logs },
-        { data: notesData },
-        { data: expenses },
-      ] = await Promise.all([
-        supabase.from('patient_profiles').select('*').eq('owner_id', ownerId).maybeSingle(),
-        supabase.from('medications').select('*').eq('user_id', ownerId).order('name'),
-        supabase.from('medication_logs')
-          .select('*, medications(name)')
-          .eq('user_id', ownerId)
-          .gte('log_date', new Date(Date.now() - 90 * 86400000).toISOString().slice(0,10))
-          .order('log_date', { ascending: false })
-          .limit(200),
-        supabase.from('notes').select('*').eq('user_id', ownerId).order('created_at', { ascending: false }).limit(50),
-        supabase.from('care_expenses').select('*').eq('user_id', ownerId).order('date', { ascending: false }).limit(100),
-      ])
-
-      const { default: jsPDF } = await import('jspdf')
-      const { default: autoTable } = await import('jspdf-autotable')
-
-      const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
-      const W = 210
-      let y = 20
-
-      // Header
-      doc.setFillColor(45, 74, 30)
-      doc.rect(0, 0, W, 28, 'F')
-      doc.setTextColor(255, 255, 255)
-      doc.setFontSize(16)
-      doc.setFont('helvetica', 'bold')
-      doc.text('FamiliaCerca — Historial Médico Completo', W / 2, 14, { align: 'center' })
-      doc.setFontSize(9)
-      doc.setFont('helvetica', 'normal')
-      doc.text(`Generado: ${new Date().toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' })}`, W / 2, 22, { align: 'center' })
-      doc.setTextColor(0, 0, 0)
-      y = 38
-
-      // Patient profile
-      if (patientData) {
-        doc.setFontSize(13)
-        doc.setFont('helvetica', 'bold')
-        doc.text(patientData.nombre_completo ? `Perfil de ${patientData.nombre_completo}` : 'Perfil del paciente', 14, y)
-        y += 7
-        const fields = [
-          ['Nombre', patientData.nombre_completo],
-          ['Diagnóstico', patientData.diagnostico_principal],
-          ['Médico tratante', patientData.medico_tratante ? `${patientData.medico_tratante}${patientData.especialidad_medico ? ` (${patientData.especialidad_medico})` : ''}` : null],
-          ['Tipo de sangre', patientData.tipo_sangre],
-          ['Alergias', patientData.alergias?.join(', ')],
-          ['Seguro', patientData.seguro_compania ? `${patientData.seguro_compania} — ${patientData.seguro_poliza ?? ''}` : null],
-        ].filter(([, v]) => v)
-        autoTable(doc, {
-          startY: y, margin: { left: 14, right: 14 },
-          head: [], body: fields,
-          columnStyles: { 0: { fontStyle: 'bold', cellWidth: 48 } },
-          styles: { fontSize: 9 }, theme: 'grid',
-        })
-        y = doc.lastAutoTable.finalY + 8
-      }
-
-      // Medications
-      if (meds?.length) {
-        doc.setFontSize(13)
-        doc.setFont('helvetica', 'bold')
-        doc.text('Medicamentos activos', 14, y)
-        y += 4
-        autoTable(doc, {
-          startY: y, margin: { left: 14, right: 14 },
-          head: [['Medicamento', 'Dosis', 'Frecuencia', 'Horarios']],
-          body: meds.map(m => [m.name, m.dosage ?? '—', m.frequency ?? '—', m.scheduled_times?.join(', ') ?? '—']),
-          styles: { fontSize: 8 }, headStyles: { fillColor: [45, 74, 30] }, theme: 'striped',
-        })
-        y = doc.lastAutoTable.finalY + 8
-      }
-
-      // Medication logs (last 90 days)
-      if (logs?.length) {
-        if (y > 220) { doc.addPage(); y = 20 }
-        doc.setFontSize(13)
-        doc.setFont('helvetica', 'bold')
-        doc.text('Registro de medicamentos — últimos 90 días', 14, y)
-        y += 4
-        autoTable(doc, {
-          startY: y, margin: { left: 14, right: 14 },
-          head: [['Fecha', 'Medicamento', 'Estado', 'Confirmado por', 'Hora']],
-          body: logs.map(l => [
-            l.log_date,
-            l.medications?.name ?? '—',
-            l.status === 'confirmed' ? '✓ Confirmado' : l.status === 'missed' ? '✗ No dado' : 'Pendiente',
-            l.confirmed_by_name ?? '—',
-            l.confirmed_at ? new Date(l.confirmed_at).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' }) : '—',
-          ]),
-          styles: { fontSize: 7 }, headStyles: { fillColor: [45, 74, 30] }, theme: 'striped',
-        })
-        y = doc.lastAutoTable.finalY + 8
-      }
-
-      // Notes
-      if (notesData?.length) {
-        if (y > 220) { doc.addPage(); y = 20 }
-        doc.setFontSize(13)
-        doc.setFont('helvetica', 'bold')
-        doc.text('Notas', 14, y)
-        y += 4
-        autoTable(doc, {
-          startY: y, margin: { left: 14, right: 14 },
-          head: [['Fecha', 'Título', 'Contenido']],
-          body: notesData.map(n => [
-            new Date(n.created_at).toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' }),
-            n.title ?? '—',
-            (n.content ?? '').slice(0, 80) + (n.content?.length > 80 ? '…' : ''),
-          ]),
-          styles: { fontSize: 7 }, headStyles: { fillColor: [45, 74, 30] }, theme: 'striped',
-        })
-        y = doc.lastAutoTable.finalY + 8
-      }
-
-      // Expenses
-      if (expenses?.length) {
-        if (y > 220) { doc.addPage(); y = 20 }
-        doc.setFontSize(13)
-        doc.setFont('helvetica', 'bold')
-        doc.text('Gastos del cuidado', 14, y)
-        y += 4
-        const total = expenses.reduce((s, e) => s + Number(e.amount), 0)
-        autoTable(doc, {
-          startY: y, margin: { left: 14, right: 14 },
-          head: [['Fecha', 'Categoría', 'Descripción', 'Monto', 'Pagado por']],
-          body: [
-            ...expenses.map(e => [
-              e.date,
-              e.category,
-              e.description ?? '—',
-              `$${Number(e.amount).toLocaleString('es-MX', { minimumFractionDigits: 2 })}`,
-              e.paid_by,
-            ]),
-            ['', '', 'TOTAL', `$${total.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`, ''],
-          ],
-          styles: { fontSize: 7 }, headStyles: { fillColor: [45, 74, 30] }, theme: 'striped',
-        })
-      }
-
-      const filename = `historial-medico-${(profile?.name ?? 'paciente').replace(/\s+/g, '-').toLowerCase()}-${new Date().toISOString().slice(0,10)}.pdf`
-      doc.save(filename)
+      const data = await fetchPdfReportData(ownerId, { sections: PDF_SECTIONS, windowDays: 90 })
+      await generatePdfReport(data, { sections: PDF_SECTIONS, windowDays: 90, patientName: profile?.name })
     } catch (err) {
       console.error('[AdminDataSection] export error:', err)
       setExportError('No se pudo generar el PDF. Intenta de nuevo.')

@@ -7,7 +7,7 @@ import Layout from '../components/Layout'
 import { ChevronLeft, CheckIcon, XIcon, AlertTriangle } from '../components/Icons'
 import LoadingButton from '../components/LoadingButton'
 import PatientProfileContacts from '../components/PatientProfileContacts'
-import { generateMedicalReport, fetchReportData } from '../utils/generateMedicalReport'
+import { fetchPdfReportData, generatePdfReport, SECTIONS } from '../utils/generatePdfReport'
 import { uploadPatientPhoto } from '../lib/patientPhoto'
 
 // ── Constants ────────────────────────────────────────────────────────────────
@@ -237,11 +237,15 @@ export default function PatientProfile() {
   }
 
   // ── PDF ───────────────────────────────────────────────────────────────────
+  const PDF_SECTIONS = [
+    SECTIONS.COVER, SECTIONS.MEDICATIONS, SECTIONS.DIRECTORY,
+    SECTIONS.UPCOMING_APPOINTMENTS, SECTIONS.MEDICAL_DIARY,
+  ]
   async function handleGeneratePDF() {
     setGeneratingPDF(true)
     try {
-      const data = await fetchReportData(ownerId)
-      await generateMedicalReport(data, profile?.name)
+      const data = await fetchPdfReportData(ownerId, { sections: PDF_SECTIONS })
+      await generatePdfReport(data, { sections: PDF_SECTIONS, patientName: form.nombre_completo })
     } catch (err) {
       console.error('[PDF]', err)
     } finally {
@@ -539,7 +543,10 @@ export default function PatientProfile() {
             {/* ── Botón Reporte PDF ───────────────────────────────────────── */}
             <button
               type="button"
-              onClick={handleGeneratePDF}
+              // Un solo reporte para el médico en toda la app: lleva a
+              // Reportes (que aplica el límite del plan) en vez de generar
+              // aquí un PDF distinto (auditoría nov 2026).
+              onClick={() => navigate('/reportes')}
               disabled={generatingPDF}
               style={{
                 width: '100%', marginBottom: 12, padding: '13px 16px',
@@ -553,13 +560,13 @@ export default function PatientProfile() {
               <span style={{ fontSize: 20 }}>{generatingPDF ? '⏳' : '📄'}</span>
               <div style={{ flex: 1, textAlign: 'left' }}>
                 <p style={{ fontSize: 13, fontWeight: 700, color: '#0B4F4A', margin: 0 }}>
-                  {generatingPDF ? 'Generando reporte...' : 'Generar reporte PDF'}
+                  Reporte para el médico
                 </p>
                 <p style={{ fontSize: 11, color: '#9CA3AF', margin: '1px 0 0' }}>
-                  Medicamentos, directorio, notas y citas
+                  Para descargar y llevar a la consulta
                 </p>
               </div>
-              {!generatingPDF && <span style={{ color: '#087F70', fontSize: 16 }}>↓</span>}
+              <span style={{ color: '#087F70', fontSize: 16 }}>›</span>
             </button>
 
             {/* ══ S3: Preferencias ═══════════════════════════════════════════ */}
