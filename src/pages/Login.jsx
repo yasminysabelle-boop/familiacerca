@@ -141,7 +141,7 @@ export default function Login() {
         src={imgFamilia}
         alt="Familia"
         style={{
-          position: 'absolute', top: 0, left: 0, right: 0,
+          position: 'absolute', top: '13vh', left: 0, right: 0,
           width: '100%', height: '60vh',
           objectFit: 'cover', objectPosition: 'center top',
         }}
@@ -161,7 +161,7 @@ export default function Login() {
       {/* Gradient */}
       <div style={{
         position: 'absolute', inset: 0,
-        background: 'linear-gradient(to bottom, rgba(10,74,107,0.55) 0%, rgba(10,74,107,0) 24%, rgba(10,74,107,0) 40%, rgba(10,74,107,0.7) 56%, #0A4A6B 66%)',
+        background: 'linear-gradient(to bottom, #0A4A6B 0%, #0A4A6B 13%, rgba(10,74,107,0) 21%, rgba(10,74,107,0) 38%, rgba(10,74,107,0.75) 50%, #0A4A6B 58%)',
       }} />
 
       {/* Logo */}
