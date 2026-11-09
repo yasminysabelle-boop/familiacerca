@@ -344,9 +344,9 @@ export default function Landing() {
                     </span>
                   </div>
                   {[
-                    { i: '💊', t: 'Losartán 8:00 AM', s: 'Rosa lo marcó · 8:05', ok: true },
+                    { i: '💊', t: 'Losartán', s: '8:00 AM · Rosa', ok: true },
                     { i: '🍽️', t: 'Desayuno', s: 'Comió bien', ok: true },
-                    { i: '📅', t: 'Cardiólogo · jueves', s: 'La lleva Pedro', ok: false },
+                    { i: '📅', t: 'Cardiólogo', s: 'Jueves · Pedro', ok: false },
                   ].map((r, ri) => (
                     <div key={r.t} className={`hero2-row-${ri}`} style={{ display: 'flex', alignItems: 'center', gap: 8, background: WHITE, borderRadius: 12, padding: '8px 9px', marginTop: 7, border: '1px solid #E6E3DB' }}>
                       <span style={{ fontSize: 15 }}>{r.i}</span>
