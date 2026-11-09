@@ -136,9 +136,12 @@ export default function OnboardingFlow() {
   // guardaba en la base de datos, solo personalizaban texto en pantalla (ver
   // auditoría 2026-08-10). "Sobre el cuidado" (paso 3) sí se guarda -- Care
   // Complexity Score, usado después del trial para recomendar plan.
-  const TOTAL = 6
+  // Más corto (auditoría nov 2026): se quitaron la bienvenida (1) y la
+  // encuesta "Sobre el cuidado" (3). Quedan: familiar → medicamento → invitar → listo.
+  const STEP_ORDER = [2, 4, 5, 6]
+  const TOTAL = STEP_ORDER.length
 
-  const [step, setStep]     = useState(1)
+  const [step, setStep]     = useState(2)
   const [pressed, setPressed] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError]   = useState('')
@@ -167,7 +170,8 @@ export default function OnboardingFlow() {
   const [copied, setCopied]         = useState(false)
 
   const displayName  = user?.user_metadata?.full_name ?? user?.email ?? 'Yo'
-  const progress     = (step / TOTAL) * 100
+  const stepIndex    = Math.max(1, STEP_ORDER.indexOf(step) + 1)
+  const progress     = (stepIndex / TOTAL) * 100
   const patientFirst = patientName.trim().split(' ')[0] || 'tu familiar'
 
   const pd = () => setPressed(true)
@@ -214,7 +218,7 @@ export default function OnboardingFlow() {
       )
       if (e2) throw e2
       if (photoFile) await uploadPatientPhoto(user.id, photoFile)
-      setStep(3)
+      setStep(4)
     } catch (e) {
       console.error('[ONB-ERR]', e)
       setError('No se pudo guardar. Intenta de nuevo.')
@@ -368,7 +372,7 @@ export default function OnboardingFlow() {
           }} />
         </div>
         <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', textAlign: 'right', margin: '6px 0 14px', fontWeight: 600 }}>
-          {step} / {TOTAL}
+          {stepIndex} / {TOTAL}
         </p>
       </div>
 

@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 import Logo from '../components/Logo'
 import { Eye, EyeOff } from '../components/Icons'
-import imgManos from '../assets/images/splash-manos.png'
+import imgFamilia from '../assets/images/familia-inicio.webp'
 
 export default function Login() {
   const { signIn } = useAuth()
@@ -129,7 +129,7 @@ export default function Login() {
       minHeight: '100svh',
       display: 'flex',
       flexDirection: 'column',
-      background: '#0A0A0A',
+      background: '#0A4A6B',
       overflow: 'hidden',
     }}>
       {/* Hero photo — caja limitada al 60% superior de la pantalla (no a
@@ -138,12 +138,12 @@ export default function Login() {
           teléfono en vertical, así que a pantalla completa object-position
           no tiene margen para reposicionar — de ahí el corte al 60vh. */}
       <img
-        src={imgManos}
+        src={imgFamilia}
         alt="Familia"
         style={{
           position: 'absolute', top: 0, left: 0, right: 0,
           width: '100%', height: '60vh',
-          objectFit: 'cover', objectPosition: 'center 42%',
+          objectFit: 'cover', objectPosition: 'center top',
         }}
       />
 
@@ -161,7 +161,7 @@ export default function Login() {
       {/* Gradient */}
       <div style={{
         position: 'absolute', inset: 0,
-        background: 'linear-gradient(to bottom, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.32) 38%, rgba(0,0,0,0.88) 75%, rgba(0,0,0,0.97) 100%)',
+        background: 'linear-gradient(to bottom, rgba(10,74,107,0.55) 0%, rgba(10,74,107,0) 24%, rgba(10,74,107,0) 40%, rgba(10,74,107,0.7) 56%, #0A4A6B 66%)',
       }} />
 
       {/* Logo */}

@@ -40,7 +40,7 @@ import DiarioMedico from './pages/DiarioMedico'
 import CareRecord from './pages/CareRecord'
 import FamilyRoles from './pages/FamilyRoles'
 import { supabase } from './lib/supabase'
-import imgManos from './assets/images/splash-manos.png'
+import imgFamilia from './assets/images/familia-inicio.webp'
 
 const P = ({ children }) => <ProtectedRoute>{children}</ProtectedRoute>
 
@@ -60,7 +60,9 @@ function AppShell() {
   const isLanding = location.pathname === '/'
 
   const onboardingDone = !!localStorage.getItem('fc_onboarding_done')
-  const [showSlides, setShowSlides] = useState(!onboardingDone)
+  // Las 3 diapositivas de bienvenida se quitaron (auditoría nov 2026): la landing
+  // ya explica la app y alargaban el registro. Se deja el componente por si acaso.
+  const [showSlides, setShowSlides] = useState(false)
   const [splashDone, setSplashDone] = useState(() => !!sessionStorage.getItem('fc_logo_splash_done'))
 
   // Member onboarding: shown once to family members who haven't completed it.
@@ -230,19 +232,19 @@ function Splash({ toLogin, onDone }) {
       {/* Foto + degradado — mismo encuadre que Login.jsx (60vh, center 42%)
           para que el crossfade termine exactamente en lo que Login muestra */}
       <img
-        src={imgManos}
+        src={imgFamilia}
         alt=""
         style={{
           position: 'absolute', top: 0, left: 0, right: 0,
           width: '100%', height: '60vh',
-          objectFit: 'cover', objectPosition: 'center 42%',
+          objectFit: 'cover', objectPosition: 'center top',
           opacity: exiting ? 1 : 0,
           transition: 'opacity 0.65s ease-in-out',
         }}
       />
       <div style={{
         position: 'absolute', inset: 0,
-        background: 'linear-gradient(to bottom, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.32) 38%, rgba(0,0,0,0.88) 75%, rgba(0,0,0,0.97) 100%)',
+        background: 'linear-gradient(to bottom, rgba(10,74,107,0.55) 0%, rgba(10,74,107,0) 24%, rgba(10,74,107,0) 40%, rgba(10,74,107,0.7) 56%, #0A4A6B 66%)',
         opacity: exiting ? 1 : 0,
         transition: 'opacity 0.65s ease-in-out',
       }} />
@@ -256,7 +258,12 @@ function Splash({ toLogin, onDone }) {
         <div className="animate-splash-in" style={{
           display: 'flex', flexDirection: 'column', alignItems: 'center',
         }}>
-          <img src="/logo.png" alt="FamiliaCerca" style={{ width: 100, height: 100, objectFit: 'contain' }} />
+          <div style={{ position: 'relative', width: 100, height: 100 }}>
+            <span className="logo-glow" />
+            <span className="logo-ripple logo-ripple-1" />
+            <span className="logo-ripple logo-ripple-2" />
+            <img className="animate-logo-heartbeat" src="/logo.png" alt="FamiliaCerca" style={{ position: 'relative', width: 100, height: 100, objectFit: 'contain' }} />
+          </div>
 
           <div style={{ textAlign: 'center', marginTop: 22 }}>
             <p className="animate-splash-word" style={{

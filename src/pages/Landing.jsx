@@ -302,7 +302,7 @@ export default function Landing() {
 
           <div style={{ position: 'relative', width: '100%', maxWidth: 620, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <div className="hero-reveal hero-delay-1" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, border: '1px solid rgba(10,90,130,0.40)', borderRadius: 9999, padding: '7px 18px', marginBottom: 36, background: 'rgba(10,90,130,0.14)' }}>
-              <span style={{ fontSize: 13 }}>🌿</span>
+              <span style={{ fontSize: 13 }}>🤍</span>
               <span style={{ fontSize: 14, fontWeight: 500, color: MINT_C, letterSpacing: '0.06em', fontFamily: SANS }}>Cuidado familiar coordinado</span>
             </div>
 
@@ -332,6 +332,10 @@ export default function Landing() {
                 <span style={{ color: MINT_C, fontWeight: 600 }}>✓</span> iPhone y Android
               </span>
             </div>
+
+            {/* Foto solo en celular (en computadora va a la derecha) */}
+            <img className="landing-hero-photo-mobile hero-reveal hero-delay-5" src={HERO_IMG} alt="Abuelo abrazado por su hija y su nieta"
+              style={{ display: 'none', width: '100%', maxWidth: 440, aspectRatio: '4 / 3', objectFit: 'cover', objectPosition: 'center 30%', borderRadius: 24, marginTop: 36, boxShadow: '0 18px 48px rgba(0,0,0,0.28)', border: '4px solid rgba(255,255,255,0.14)' }} />
           </div>
         </div>
 
@@ -1044,6 +1048,7 @@ export default function Landing() {
           .landing-hamburger { display: flex !important; }
           .landing-hero-grid { grid-template-columns: 1fr !important; min-height: auto !important; }
           .landing-hero-right { display: none !important; }
+          .landing-hero-photo-mobile { display: block !important; }
           .landing-hero-text { padding: 80px 24px 64px !important; min-height: auto !important; }
           .landing-problema-grid { grid-template-columns: 1fr !important; }
           .landing-problema-img { min-height: 300px !important; order: 0 !important; }
