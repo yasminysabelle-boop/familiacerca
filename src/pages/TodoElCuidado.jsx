@@ -2,9 +2,11 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Layout from '../components/Layout'
 import CompanionChat from '../components/CompanionChat'
+import HowIsTodaySheet from '../components/HowIsTodaySheet'
+import { useFamily } from '../contexts/FamilyContext'
 import {
   ChevronLeft, Heart, Pill, Calendar, ClipboardList,
-  MessageCircle, Video, Users, AlertTriangle, Phone, Info, FileText,
+  MessageCircle, Video, Users, AlertTriangle, Phone, FileText,
   Pencil, DollarSign, Shield, Star, Settings,
 } from '../components/Icons'
 
@@ -46,11 +48,14 @@ function ToolCard({ Icon, label, tint, tintBg, emphasis = false, onClick, span2 
 export default function TodoElCuidado() {
   const navigate = useNavigate()
   const [showCompanion, setShowCompanion] = useState(false)
+  const [showHowIsToday, setShowHowIsToday] = useState(false)
+  const { activePatientName } = useFamily()
 
   const cuidarHoy = [
     { Icon: Pill,          label: 'Medicamentos',        onClick: () => navigate('/medications') },
     { Icon: Calendar,      label: 'Rutina diaria',       onClick: () => navigate('/cuidado') },
-    { Icon: Heart,         label: 'Estado de salud',     onClick: () => navigate('/registros') },
+    // Una sola puerta para todo lo que se escribe del familiar (HowIsTodaySheet)
+    { Icon: Heart,         label: '¿Cómo está hoy?',     onClick: () => setShowHowIsToday(true) },
     { Icon: ClipboardList, label: 'Historia de cuidado', onClick: () => navigate('/historial') },
   ]
   const familiaConectada = [
@@ -61,11 +66,11 @@ export default function TodoElCuidado() {
   const saludEmergencias = [
     { Icon: AlertTriangle, label: 'Modo emergencia',      tint: '#D9534F', tintBg: '#FBEAEA', emphasis: true,  onClick: () => navigate('/dashboard?sos=1') },
     { Icon: Phone,         label: 'Contactos médicos',    tint: '#087F70', tintBg: '#E5F4F1', emphasis: false, onClick: () => navigate('/directorio') },
-    { Icon: Info,          label: 'Información médica',   tint: '#087F70', tintBg: '#E5F4F1', emphasis: false, onClick: () => navigate('/diario-medico') },
+    { Icon: Calendar,      label: 'Citas y calendario',   tint: '#087F70', tintBg: '#E5F4F1', emphasis: false, onClick: () => navigate('/calendar') },
     { Icon: FileText,      label: 'Reportes para el médico', tint: '#087F70', tintBg: '#E5F4F1', emphasis: false, onClick: () => navigate('/reportes') },
   ]
   const vidaRecuerdos = [
-    { Icon: Pencil,     label: 'Notas de familia',   onClick: () => navigate('/paciente/notas-familia') },
+    { Icon: Pencil,     label: 'Memorias de voz',    onClick: () => navigate('/memorias') },
     { Icon: DollarSign, label: 'Gastos del cuidado', onClick: () => navigate('/gastos') },
   ]
   const cuentaAjustes = [
@@ -163,6 +168,7 @@ export default function TodoElCuidado() {
         </div>
       </div>
 
+      <HowIsTodaySheet open={showHowIsToday} onClose={() => setShowHowIsToday(false)} patientName={activePatientName?.split(' ')[0]} />
       <CompanionChat externalOpen={showCompanion} onExternalClose={() => setShowCompanion(false)} bottomOffset={24} />
     </Layout>
   )
