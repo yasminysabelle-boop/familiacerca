@@ -8,6 +8,8 @@ import { usePresence } from '../contexts/PresenceContext'
 import Layout from '../components/Layout'
 import { Video } from '../components/Icons'
 import VideoCallScheduleModal from '../components/VideoCallScheduleModal'
+import PaywallModal from '../components/PaywallModal'
+import { useFamilyPlan } from '../contexts/FamilyPlanContext'
 
 const SERVICE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-daily-room`
 const PRESENCE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-call-presence`
@@ -75,6 +77,11 @@ export default function VideoCall() {
   const { ownerId, activePatientName } = useFamily()
   const { user } = useAuth()
   const onlineIds = usePresence()
+  // Videollamada es del plan Familiar en adelante (src/lib/plans.js). Durante
+  // la prueba está incluida; al terminar, en Gratis se pausa (unirse a una
+  // llamada ya creada por otro sigue permitido).
+  const { familyCanEdit } = useFamilyPlan()
+  const [showPaywall, setShowPaywall] = useState(false)
 
   const [call, setCall] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -190,6 +197,7 @@ export default function VideoCall() {
 
   async function handleInstantCall() {
     if (!ownerId || startingInstant) return
+    if (!familyCanEdit) { setShowPaywall(true); return }
     setStartingInstant(true)
     setInstantError('')
     try {
@@ -237,6 +245,14 @@ export default function VideoCall() {
     return (
       <Layout>
         <div style={{ position: 'relative', minHeight: '100%', background: '#F8F4ED', overflow: 'hidden', fontFamily: SANS }}>
+          {showPaywall && (
+            <PaywallModal
+              onClose={() => setShowPaywall(false)}
+              patientName={activePatientName?.split(' ')[0]}
+              title="La videollamada es del plan Familiar"
+              message="Tu prueba terminó y sigues en el plan Gratis. Para iniciar o programar videollamadas con la familia, elige el plan Familiar."
+            />
+          )}
 
           {/* Decorative background heart — fiel al export */}
           <svg viewBox="0 0 400 400" style={{ position: 'absolute', top: -60, right: -90, width: 420, height: 420, opacity: 0.05, pointerEvents: 'none', zIndex: 0 }} aria-hidden="true">
@@ -281,7 +297,7 @@ export default function VideoCall() {
               )}
 
               <button
-                onClick={() => setShowScheduleModal(true)}
+                onClick={() => (familyCanEdit ? setShowScheduleModal(true) : setShowPaywall(true))}
                 style={{
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                   width: '100%', height: 56, border: '2px solid #087F70', borderRadius: 18,

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { useBillingAccount } from '../contexts/BillingAccountContext'
+import { PLANS } from '../lib/plans'
 import { useFamilyPlan } from '../contexts/FamilyPlanContext'
 import { useDarkMode } from '../contexts/DarkModeContext'
 import { usePushNotifications } from '../hooks/usePushNotifications'
@@ -19,40 +20,17 @@ const PLAN_META = {
 }
 
 const STATUS_LABEL = {
-  trial:     'Período de prueba',
+  trial:     'Activa',
   active:    'Activo',
   expired:   'Prueba expirada',
   cancelled: 'Cancelado',
 }
 
+// Listas de planes: única fuente en src/lib/plans.js.
 const PLAN_FEATURES = {
-  free: [
-    'Perfil del familiar',
-    'Hasta 2 cuidadores',
-    'Chat familiar',
-    'Checklist de cuidado diario',
-    'Medicamentos básicos',
-    'Historial 7 días',
-  ],
-  familiar: [
-    'Hasta 6 cuidadores',
-    'Recordatorios automáticos de medicamentos',
-    'Notas de voz y texto',
-    'Foto-prueba de medicamentos',
-    'Reportes y exportación PDF',
-    'Álbum familiar',
-    'Gastos de cuidado',
-    'Historial de 90 días',
-  ],
-  care_plus: [
-    'Cuidadores ilimitados',
-    'Todo lo del Plan Familiar',
-    'Alertas SOS prioritarias',
-    'Detección de agotamiento del cuidador',
-    'Reporte semanal automático',
-    'Historial indefinido',
-    'Soporte prioritario',
-  ],
+  free:      PLANS.free.features,
+  familiar:  PLANS.familiar.features,
+  care_plus: PLANS.care_plus.features,
 }
 
 function ToggleRow({ icon, label, subtitle, checked, onChange }) {
@@ -122,7 +100,10 @@ export default function Settings() {
   const [cancelError, setCancelError] = useState(null)
 
   const plan = sub?.plan ?? 'free'
-  const meta = PLAN_META[plan] ?? PLAN_META.free
+  // Durante la prueba la familia tiene todo incluido: no mostrar "Gratis".
+  const meta = isTrialing
+    ? { label: 'Prueba con todo incluido', color: '#087F70', icon: '✨' }
+    : (PLAN_META[plan] ?? PLAN_META.free)
   const features = PLAN_FEATURES[plan] ?? []
 
   const trialEnd = sub?.trial_end_date
@@ -442,7 +423,7 @@ export default function Settings() {
           {features.length > 0 && (
             <div style={{ marginBottom: 16 }}>
               <p style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8 }}>
-                Tu plan incluye
+                {isTrialing ? 'Al terminar la prueba sigues gratis con' : 'Tu plan incluye'}
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {features.map(f => (

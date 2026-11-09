@@ -4,6 +4,7 @@ import { PayPalScriptProvider, PayPalButtons, usePayPalScriptReducer } from '@pa
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { useBillingAccount } from '../contexts/BillingAccountContext'
+import { PLANS } from '../lib/plans'
 import Layout from '../components/Layout'
 import { PAYPAL_PLAN_IDS } from '../config/paypalPlans'
 
@@ -89,39 +90,10 @@ function CopyableSubscriptionId({ subscriptionId }) {
   )
 }
 
-const FREE_FEATURES = [
-  'Hasta 2 cuidadores',
-  '1 paciente',
-  'Chat familiar',
-  'Medicamentos básicos (manual)',
-  'Checklist de cuidado diario',
-  'Historial 7 días',
-  'Síntomas físicos básicos',
-]
-
-const FAMILIAR_FEATURES = [
-  'Hasta 6 cuidadores',
-  'Medicamentos con OCR (foto)',
-  'Videollamadas integradas',
-  'Milo & Luna IA 🐶🐱',
-  'Rutinas por período (mañana/tarde/noche)',
-  'Notas con evidencia fotográfica',
-  'Rastreo GPS en notas',
-  'Indicadores de presencia del equipo',
-  'Gastos de cuidado',
-  'Historial de 90 días',
-  'Todo lo del Plan Gratis',
-]
-
-const TOTAL_FEATURES = [
-  'Cuidadores ilimitados',
-  'Hospital Mode (pantalla completa dedicada)',
-  'Gastos de cuidado',
-  'Reporte médico en PDF',
-  'Soporte prioritario',
-  'Historial ilimitado',
-  'Todo lo del Plan Familiar',
-]
+// Listas de planes: única fuente en src/lib/plans.js (la landing usa la misma).
+const FREE_FEATURES     = PLANS.free.features
+const FAMILIAR_FEATURES = PLANS.familiar.features
+const TOTAL_FEATURES    = PLANS.care_plus.features
 
 function PayPalSection({
   planKey, paypalPlanId, userId, success, pending, timedOut, isActive,
@@ -419,7 +391,7 @@ function UpgradeContent() {
             Elige tu plan
           </h1>
           <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: 14, margin: 0, lineHeight: 1.5 }}>
-            14 días gratis, cancela cuando quieras
+            Sin contratos. Cancela cuando quieras. Si no eliges un plan, sigues gratis con lo esencial.
           </p>
         </div>
 
@@ -485,10 +457,10 @@ function UpgradeContent() {
               <p style={{ fontSize: 18, fontWeight: 700, color: '#1A1A1A', margin: 0, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                 Plan Familiar
               </p>
-              <span style={{ fontSize: 24, fontWeight: 800, color: '#0B4F4A' }}>$12.99/mes</span>
+              <span style={{ fontSize: 24, fontWeight: 800, color: '#0B4F4A' }}>${PLANS.familiar.price}/mes</span>
             </div>
             <p style={{ fontSize: 12, color: '#0B4F4A', fontWeight: 600, margin: '0 0 14px' }}>
-              14 días gratis
+              {PLANS.familiar.tagline}
             </p>
             <div style={{ marginBottom: 18 }}>
               {FAMILIAR_FEATURES.map(f => (
@@ -527,10 +499,10 @@ function UpgradeContent() {
               <p style={{ fontSize: 18, fontWeight: 700, color: '#1A1A1A', margin: 0, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                 Plan Cuidado Total
               </p>
-              <span style={{ fontSize: 24, fontWeight: 800, color: '#0B4F4A' }}>$24.99/mes</span>
+              <span style={{ fontSize: 24, fontWeight: 800, color: '#0B4F4A' }}>${PLANS.care_plus.price}/mes</span>
             </div>
             <p style={{ fontSize: 12, color: '#0B4F4A', fontWeight: 600, margin: '0 0 14px' }}>
-              14 días gratis
+              {PLANS.care_plus.tagline}
             </p>
             <div style={{ marginBottom: 18 }}>
               {TOTAL_FEATURES.map(f => (

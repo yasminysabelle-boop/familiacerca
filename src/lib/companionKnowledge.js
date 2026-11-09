@@ -1,3 +1,5 @@
+import { PLANS, PLAN_ORDER, PAUSED_ON_FREE, TRIAL_COPY } from './plans'
+
 export const FAMILIACERCA_KNOWLEDGE = `
 ## INFORMACIÓN COMPLETA DE FAMILIACERCA
 
@@ -13,43 +15,21 @@ FamiliaCerca es una aplicación web progresiva (PWA) para coordinar el cuidado d
 
 ### PLANES Y PRECIOS
 
-**Plan Gratis — $0**
-- 14 días de prueba completa sin tarjeta de crédito
-- Hasta 2 cuidadores en el equipo
-- Perfil del familiar
-- Chat familiar
-- Checklist de cuidado diario
-- Medicamentos (sin recordatorios automáticos)
-- Historial de 7 días
+IMPORTANTE: esta sección viene de la lista oficial de planes de la app. Si cualquier otra parte de este texto dice algo distinto sobre qué incluye cada plan, lo correcto es lo de esta sección.
 
-**Plan Familiar — $12.99/mes**
-- Hasta 6 cuidadores
-- Todo lo del plan Gratis
-- Recordatorios automáticos de medicamentos
-- Notas de voz y texto
-- Historial de 90 días
-- Foto-prueba de medicamentos administrados
-- Reportes semanales y exportación a PDF
-- Álbum familiar de fotos y videos
-- Gastos de cuidado (Cuentas Claras)
-- Resúmenes básicos con IA
+**Prueba:** ${TRIAL_COPY.long}
 
-**Plan Cuidado Total — $24.99/mes**
-- Cuidadores ilimitados
-- Todo lo del plan Familiar
-- Alertas SOS prioritarias
-- Detección de agotamiento del cuidador
-- Reporte semanal familiar automático
-- Resumen médico en PDF
-- Historial indefinido
-- Acceso anticipado a nuevas funciones
-- Soporte prioritario
+${PLAN_ORDER.map(k => `**Plan ${PLANS[k].name} — ${PLANS[k].price === 0 ? '$0' : '$' + PLANS[k].price + '/mes'}**\n${PLANS[k].features.map(f => '- ' + f).join('\n')}`).join('\n\n')}
+
+**Lo que se pausa si al terminar la prueba no eligen un plan:**
+${PAUSED_ON_FREE.map(f => '- ' + f).join('\n')}
 
 **Notas sobre precios:**
-- No hay contrato. Puedes cancelar desde Ajustes > Suscripción en cualquier momento.
-- Al cancelar, el plan baja a Gratis al final del período pagado.
-- Los pagos son procesados de forma segura por PayPal.
-- Para subir de plan: Mi cuenta (ícono de perfil, arriba a la derecha) > Suscripción > "Mejorar mi plan". Para cancelar: mismo lugar > "Cancelar suscripción".
+- No hay contrato. Se cancela desde Mi cuenta (ícono de perfil, arriba a la derecha) > Suscripción > "Cancelar suscripción".
+- Al cancelar, el plan baja a Gratis al final del período pagado. Nada se borra.
+- Los pagos se procesan de forma segura por PayPal.
+- Para subir de plan: Mi cuenta > Suscripción > "Mejorar mi plan".
+- Por ahora solo hay pago mensual.
 
 ---
 

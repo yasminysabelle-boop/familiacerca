@@ -271,7 +271,8 @@ export default function Familia() {
     // Free con trial vencido llega al tope de 2 con solo un invitado). El
     // trial vencido es la razón correcta solo cuando el equipo NO está lleno.
     if (teamSize >= familyCaregiverLimit) { setPaywallVariant('team-full'); setShowPaywall(true); return }
-    if (familyTrialExpired && isAdmin) { setPaywallVariant('trial'); setShowPaywall(true); return }
+    // Invitar hasta el tope del plan Gratis (2 personas) sigue permitido al
+    // terminar la prueba (src/lib/plans.js): invitar es lo que más retiene.
     setInviteEmail(''); setInviteStatus('idle'); setInviteLink(''); setCopied(false)
     setShowInvite(true)
   }

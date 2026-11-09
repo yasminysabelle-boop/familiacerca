@@ -3,6 +3,7 @@ import { Link, Navigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { usePWAInstall } from '../hooks/usePWAInstall'
 import CompanionChat from '../components/CompanionChat'
+import { PLANS, PLAN_ORDER, ANNUAL_ENABLED } from '../lib/plans'
 
 const HERO_IMG = '/images/hero.jpg'
 const PROB_IMG = '/images/familia-telefonos-noche.webp'
@@ -72,8 +73,8 @@ function FAQItem({ q, a, light = false, onTrack }) {
   )
 }
 
-function PriceCard({ name, price, period, highlight, badge, groups, cta, annual, trackId, onTrack, tagline }) {
-  const displayPrice = annual && price > 0 ? (price * 0.8).toFixed(2) : price
+function PriceCard({ name, price, annualPrice, period, highlight, badge, groups, cta, annual, trackId, onTrack, tagline }) {
+  const displayPrice = annual && price > 0 ? (annualPrice / 12).toFixed(2) : price
   return (
     <div
       className={`price-card-hover${highlight ? ' price-card-highlighted' : ''}`}
@@ -91,10 +92,10 @@ function PriceCard({ name, price, period, highlight, badge, groups, cta, annual,
       {annual && price > 0 && (
         <div style={{ marginBottom: 4, display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{ fontSize: 12, color: highlight ? 'rgba(255,255,255,0.30)' : '#6B7280', textDecoration: 'line-through', fontFamily: SANS }}>${price}/mes</span>
-          <span style={{ fontSize: 12, background: MINT_C, color: DARK, borderRadius: 4, padding: '2px 8px', fontFamily: SANS, fontWeight: 500 }}>-20%</span>
+          <span style={{ fontSize: 12, background: MINT_C, color: DARK, borderRadius: 4, padding: '2px 8px', fontFamily: SANS, fontWeight: 500 }}>2 meses gratis</span>
         </div>
       )}
-      <p style={{ fontSize: 13, color: highlight ? 'rgba(255,255,255,0.45)' : '#6B7280', margin: '0 0 28px', fontFamily: SANS, fontWeight: 300 }}>{annual && price > 0 ? 'facturado anualmente' : period}</p>
+      <p style={{ fontSize: 13, color: highlight ? 'rgba(255,255,255,0.45)' : '#6B7280', margin: '0 0 28px', fontFamily: SANS, fontWeight: 300 }}>{annual && price > 0 ? `$${annualPrice} facturado al año` : period}</p>
       <div style={{ margin: '0 0 32px', flex: 1 }}>
         {groups.map(g => (
           <div key={g.label} style={{ marginBottom: 18 }}>
@@ -220,43 +221,19 @@ export default function Landing() {
   // definitiva hay que implementar el tope real (ej. 1 resumen/día para Gratis)
   // en el servicio que genera los resúmenes de Milo/Luna. Aprobado por Yasmin
   // como mockup/landing únicamente — no tocar lógica de backend todavía.
-  const plans = [
-    {
-      name: 'Gratis', price: 0, period: 'Para siempre sin costo', highlight: false,
-      trackId: 'gratis', tagline: 'Para empezar a coordinar',
-      groups: [
-        { label: 'Tu equipo', items: ['Hasta 2 cuidadores'] },
-        { label: 'Cuidado diario', items: ['Medicamentos ilimitados', 'Checklist diario', 'Chat familiar'] },
-        { label: 'Registro', items: ['Historial de 7 días'] },
-        { label: '✨ Acompañamiento IA', items: ['Resumen de Milo con los hechos de hoy'] },
-      ],
-      cta: 'Empezar gratis',
-    },
-    {
-      name: 'Familiar', price: 12.99, period: 'Hasta 6 cuidadores',
-      highlight: true, badge: 'Recomendado para la mayoría de las familias', trackId: 'familiar', tagline: 'Para familias que necesitan más tranquilidad',
-      groups: [
-        { label: 'Tu equipo', items: ['Hasta 6 cuidadores', 'Todo lo del plan Gratis'] },
-        { label: 'Tranquilidad clínica', items: ['Alerta clínica ±1h', 'Si una dosis no aparece registrada, Familia te avisa', 'Foto de prueba', 'Push + alertas SOS'] },
-        { label: 'Organización', items: ['Citas con adjuntos', 'Notas de voz', 'Historial de 90 días'] },
-        { label: 'Para el doctor', items: ['Exportar en PDF'] },
-        { label: 'Bienestar', items: ['Gastos de cuidado'] },
-        { label: '✨ Acompañamiento IA', items: ['Resumen de Milo en tiempo real + alertas contextuales'] },
-      ],
-      cta: 'Empezar gratis',
-    },
-    {
-      name: 'Cuidado Total', price: 24.99, period: 'Cuidadores ilimitados', highlight: false,
-      trackId: 'total', tagline: 'Para el cuidado más completo, sin límites.',
-      groups: [
-        { label: 'Tu equipo', items: ['Cuidadores ilimitados', 'Todo lo del plan Familiar'] },
-        { label: 'Historial extendido', items: ['Historial indefinido'] },
-        { label: '✨ Acompañamiento IA', items: ['Resumen de Milo + tendencias y comparación semanal', 'Análisis completo de la actividad de tu familiar'] },
-        { label: 'Soporte', items: ['Soporte prioritario', 'Acceso anticipado a funciones nuevas'] },
-      ],
-      cta: 'Empezar gratis',
-    },
-  ]
+  // Planes: única fuente en src/lib/plans.js (la app usa la misma lista).
+  const plans = PLAN_ORDER.map(k => {
+    const p = PLANS[k]
+    return {
+      name: p.name, price: p.price, annualPrice: p.annualPrice,
+      period: p.price === 0 ? 'Para siempre sin costo' : p.caregivers,
+      highlight: k === 'familiar', badge: p.badge,
+      trackId: k === 'care_plus' ? 'total' : k === 'free' ? 'gratis' : 'familiar',
+      tagline: p.tagline,
+      groups: [{ label: 'Incluye', items: p.features }],
+      cta: k === 'free' ? 'Empezar gratis' : 'Probar 14 días gratis',
+    }
+  })
 
   const faqs = [
     { q: '¿Necesito crear una cuenta para usar FamiliaCerca?', a: 'Sí, necesitas una cuenta gratuita para empezar. El registro tarda menos de un minuto — solo tu correo y contraseña. No pedimos tarjeta de crédito para el plan Gratis.' },
@@ -265,6 +242,7 @@ export default function Landing() {
     { q: '¿Cómo se instala en el celular si no está en la App Store?', a: 'En iPhone: abre la página en Safari, toca el botón de compartir (cuadro con flecha) y selecciona "Agregar a inicio". En Android: toca el menú de tres puntos del navegador y selecciona "Instalar aplicación".' },
     { q: '¿Mis datos médicos están protegidos?', a: 'Sí. Tus datos se almacenan cifrados en infraestructura de nivel empresarial — la misma tecnología que usan bancos y hospitales. Solo los familiares que tú invites tienen acceso. Nunca vendemos ni compartimos tu información.' },
     { q: '¿Puedo cancelar mi suscripción en cualquier momento?', a: 'Por supuesto. Puedes cancelar desde Ajustes > Suscripción en cualquier momento. No hay penalizaciones ni contratos. Tu plan baja a Gratis al terminar el período pagado.' },
+    { q: '¿Qué pasa cuando terminan los 14 días de prueba?', a: 'Si no eliges un plan, tu familia sigue gratis con lo esencial: medicamentos, rutina, chat, notas y hasta 2 personas. Nada se borra. Solo se pausan los extras, como la videollamada, los gastos y los reportes PDF ilimitados.' },
   ]
 
   return (
@@ -349,7 +327,7 @@ export default function Landing() {
               <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.70)', fontWeight: 300, fontFamily: SANS }}>
                 <span style={{ color: MINT_C, fontWeight: 600 }}>✓</span> Sin tarjeta{' '}
                 <span style={{ color: 'rgba(255,255,255,0.25)' }}>·</span>{' '}
-                <span style={{ color: MINT_C, fontWeight: 600 }}>✓</span> En 14 días{' '}
+                <span style={{ color: MINT_C, fontWeight: 600 }}>✓</span> 14 días con todo incluido{' '}
                 <span style={{ color: 'rgba(255,255,255,0.25)' }}>·</span>{' '}
                 <span style={{ color: MINT_C, fontWeight: 600 }}>✓</span> iPhone y Android
               </span>
@@ -753,6 +731,7 @@ export default function Landing() {
             <p style={{ fontSize: 'clamp(18px,1.7vw,22px)', color: '#6B7280', lineHeight: 1.75, maxWidth: 520, margin: '0 auto 36px', fontFamily: SANS, fontWeight: 300 }}>
               Empieza gratis. Cambia de plan solo cuando tu familia necesite más herramientas.
             </p>
+            {ANNUAL_ENABLED && (
             <div style={{ display: 'inline-flex', background: WHITE, borderRadius: 9999, padding: 4, border: `1px solid ${BORDER}`, boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
               <button onClick={() => setAnnual(false)} style={{ padding: '10px 28px', borderRadius: 9999, border: 'none', cursor: 'pointer', background: !annual ? ACTION : 'transparent', color: !annual ? WHITE : '#6B7280', fontSize: 14, fontFamily: SANS, fontWeight: 500, transition: 'background 0.2s, color 0.2s' }}>Mensual</button>
               <button onClick={() => setAnnual(true)} style={{ padding: '10px 28px', borderRadius: 9999, border: 'none', cursor: 'pointer', background: annual ? ACTION : 'transparent', color: annual ? WHITE : '#6B7280', fontSize: 14, fontFamily: SANS, fontWeight: 500, transition: 'background 0.2s, color 0.2s', display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -760,6 +739,7 @@ export default function Landing() {
                 <span style={{ background: MINT_C, color: PRIMARY, fontSize: 11, padding: '2px 8px', borderRadius: 9999, fontWeight: 600 }}>-20%</span>
               </button>
             </div>
+            )}
           </div>
           <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', alignItems: 'flex-start', justifyContent: 'center' }}>
             {plans.map(p => <PriceCard key={p.name} {...p} annual={annual} onTrack={track} />)}

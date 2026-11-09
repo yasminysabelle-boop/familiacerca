@@ -3,7 +3,6 @@ import PaywallModal from '../components/PaywallModal'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
-import { useFamilyPlan } from '../contexts/FamilyPlanContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import { getLocation } from '../lib/gps'
@@ -29,7 +28,6 @@ const onBlur  = e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.bo
 export default function Notes() {
   const { user } = useAuth()
   const { ownerId, profile, memberRole } = useFamily()
-  const { familyCanEdit, familyTrialExpired } = useFamilyPlan()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
   const [showPaywall, setShowPaywall] = useState(false)
@@ -117,7 +115,8 @@ export default function Notes() {
     // cuidador, igual que ya permite editar una nota existente (ver
     // canModify más abajo) -- un 'familiar' nunca puede crear ni editar.
     if (!isAdmin && !isCuidador) return
-    if (familyTrialExpired && isAdmin) { setShowPaywall(true); return }
+    // Notas del día son parte del plan Gratis (src/lib/plans.js): no se
+    // bloquean al terminar la prueba.
     setEditId(null)
     setForm(emptyForm)
     setShowForm(true)
@@ -526,11 +525,10 @@ export default function Notes() {
                 </button>
                 <button
                   type="submit"
-                  disabled={saving || !familyCanEdit || (form.is_incident && !form.incident_type)}
-                  onClick={!familyCanEdit ? e => { e.preventDefault(); navigate('/upgrade') } : undefined}
+                  disabled={saving || (form.is_incident && !form.incident_type)}
                   style={{
                     flex: 2, padding: '13px', borderRadius: 14, border: 'none',
-                    background: (saving || !familyCanEdit || (form.is_incident && !form.incident_type)) ? '#D4C4B8' : 'linear-gradient(135deg, #0d6b63, #3A6347)',
+                    background: (saving || (form.is_incident && !form.incident_type)) ? '#D4C4B8' : 'linear-gradient(135deg, #0d6b63, #3A6347)',
                     color: 'white', fontWeight: 700, fontSize: 14,
                     cursor: saving ? 'not-allowed' : 'pointer',
                     boxShadow: saving ? 'none' : '0 6px 20px rgba(8,127,112,0.3)',
