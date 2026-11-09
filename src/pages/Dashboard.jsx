@@ -3677,6 +3677,11 @@ export default function Dashboard() {
                   onMedsClick={() => navigate(medTotal === 0 ? '/medications?add=1' : '/medications')}
                   onRoutineClick={() => navigate('/cuidado')}
                   onFamilyClick={() => navigate(isAdmin && familyCount <= 1 ? '/familia?invitar=1' : '/familia')}
+                  onStatusClick={() => navigate(
+                    (pendingCount > 0 || _isRetrasado) ? '/medications'
+                    : overdueRoutinesCount > 0 ? '/cuidado'
+                    : medTotal === 0 ? '/medications?add=1'
+                    : '/medications')}
                 />
 
                 {/* ══ SOLO TÚ — empujar a invitar (sin familia no hay avisos ni razón para volver) ══ */}

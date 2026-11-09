@@ -53,6 +53,7 @@ export default function CareCard({
   onMedsClick,
   onRoutineClick,
   onFamilyClick,
+  onStatusClick,
 }) {
   const s = STATUS[status] ?? STATUS.ok
   // Sin paciente real, `name` es el texto del CTA ("Agregar familiar"), no una
@@ -122,12 +123,18 @@ export default function CareCard({
             <p style={{ margin: '9px 0 0', fontFamily: SANS, fontSize: 16, fontWeight: 500, color: 'rgba(255,255,255,0.94)', lineHeight: 1.32, maxWidth: 200 }}>
               {moodText || defaultMood}
             </p>
-            <span style={{
-              display: 'inline-flex', alignItems: 'center', gap: 8, width: 'fit-content',
-              marginTop: 13, padding: '6px 13px 6px 10px', borderRadius: 999, background: 'rgba(255,255,255,0.14)',
-            }}>
+            {/* El estado lleva a lo que falta (antes todo iba al perfil). */}
+            <span
+              role={onStatusClick ? 'button' : undefined}
+              onClick={onStatusClick ? (e) => { e.stopPropagation(); onStatusClick() } : undefined}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 8, width: 'fit-content',
+                marginTop: 13, padding: '6px 13px 6px 10px', borderRadius: 999, background: 'rgba(255,255,255,0.14)',
+                cursor: onStatusClick ? 'pointer' : 'default',
+              }}>
               <span style={{ width: 11, height: 11, borderRadius: '50%', background: s.dot, boxShadow: `0 0 0 4px ${s.glow}` }} />
               <span style={{ fontFamily: SANS, color: '#fff', fontSize: 14, fontWeight: 600 }}>{s.label}</span>
+              {onStatusClick && <span aria-hidden="true" style={{ color: 'rgba(255,255,255,0.8)', fontSize: 16, lineHeight: 1 }}>›</span>}
             </span>
           </div>
         </div>
