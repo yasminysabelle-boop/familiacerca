@@ -1070,16 +1070,16 @@ export default function Medications() {
       </div>
 
       {/* Tab bar — pills sueltos, fuera del scroll, siempre visible */}
-      <div style={{ padding: '16px 16px 14px', maxWidth: 600, overflowX: 'auto' }}>
-        <div style={{ display: 'flex', gap: 8 }}>
+      <div style={{ padding: '16px 16px 14px', maxWidth: 600 }}>
+        <div style={{ display: 'flex', gap: 6 }}>
           {['hoy', 'todos', 'stock', 'recetas'].map(tab => (
             <button key={tab} onClick={() => setActiveTab(tab)}
               style={{
-                flex: 1, padding: '10px 0', cursor: 'pointer', whiteSpace: 'nowrap',
+                flex: 1, minWidth: 0, padding: '10px 4px', cursor: 'pointer', whiteSpace: 'nowrap',
                 borderRadius: 999, border: 'none',
                 background: activeTab === tab ? 'linear-gradient(148deg,#1677A6 0%,#0C6C9C 46%,#0A5A82 100%)' : '#FFFFFF',
                 color: activeTab === tab ? '#FFFFFF' : '#5C6B78',
-                fontWeight: 700, fontSize: 13.5,
+                fontWeight: 700, fontSize: 13,
                 fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
                 boxShadow: activeTab === tab ? '0 8px 16px -8px #087F7066' : '0 4px 10px -6px #087F7022',
                 transition: 'all 0.2s',
@@ -1128,8 +1128,8 @@ export default function Medications() {
           <EmptyState
             icon="💊"
             title="Sin medicamentos aún"
-            description="Agrega los medicamentos del familiar."
-            actionLabel={isAdmin ? '+ Agregar medicamento' : undefined}
+            description="Toma una foto de la receta o de la caja y Milo los agrega por ti. También puedes escribirlos."
+            actionLabel={isAdmin ? '📷 Agregar con una foto' : undefined}
             onAction={isAdmin ? openAdd : undefined}
           />
         ) : (

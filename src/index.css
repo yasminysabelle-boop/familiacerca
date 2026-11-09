@@ -219,3 +219,31 @@ h1, h2, h3 {
   60%       { box-shadow: 0 0 0 9px rgba(214,48,49,0); }
 }
 .animate-card-pulse { animation: card-pulse 1.8s ease-out infinite; }
+
+
+/* ── Botones con volumen y efecto de hundirse al tocar (UX nov 2026) ── */
+button, [role="button"] { -webkit-tap-highlight-color: transparent; }
+button:not(:disabled), [role="button"], a.cta-coral {
+  transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+}
+button:not(:disabled):active, [role="button"]:active, a.cta-coral:active {
+  transform: translateY(2px) scale(0.98);
+  filter: brightness(0.95);
+}
+/* Botones de color (azul y coral): sombra de volumen + brillo arriba */
+button[style*="background: rgb(233, 130, 110)"], button[style*="background-color: rgb(233, 130, 110)"],
+button[style*="background: rgb(12, 108, 156)"],  button[style*="background-color: rgb(12, 108, 156)"],
+button[style*="background: linear-gradient"],
+a[style*="background: rgb(233, 130, 110)"], a[style*="background: rgb(12, 108, 156)"] {
+  box-shadow: 0 3px 0 rgba(10, 74, 107, 0.22), 0 8px 18px -8px rgba(10, 74, 107, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.28) !important;
+}
+button[style*="background: rgb(233, 130, 110)"]:active, button[style*="background-color: rgb(233, 130, 110)"]:active,
+button[style*="background: rgb(12, 108, 156)"]:active,  button[style*="background-color: rgb(12, 108, 156)"]:active,
+button[style*="background: linear-gradient"]:active,
+a[style*="background: rgb(233, 130, 110)"]:active, a[style*="background: rgb(12, 108, 156)"]:active {
+  box-shadow: 0 1px 0 rgba(10, 74, 107, 0.22), 0 2px 6px -4px rgba(10, 74, 107, 0.45), inset 0 2px 4px rgba(0, 0, 0, 0.14) !important;
+}
+/* Botones blancos (tarjetas y accesos): sombra suave para que se vean tocables */
+button[style*="background: white"], button[style*="background: rgb(255, 255, 255)"] {
+  box-shadow: 0 2px 0 rgba(10, 74, 107, 0.06), 0 6px 16px -10px rgba(10, 74, 107, 0.35);
+}

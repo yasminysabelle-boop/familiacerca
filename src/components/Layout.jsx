@@ -91,7 +91,8 @@ export default function Layout({ children }) {
   const navBg   = dark ? 'rgba(28,18,8,0.97)' : '#0C6C9C'
   const hdrBg   = dark ? 'rgba(28,18,8,0.95)' : '#0C6C9C'
   const border  = dark ? '#14303D' : 'rgba(255,255,255,0.08)'
-  const isLightHeader = LIGHT_HEADER_PAGES.has(location.pathname)
+  // Todas las pantallas usan ahora el encabezado claro (UX nov 2026).
+  const isLightHeader = true || LIGHT_HEADER_PAGES.has(location.pathname)
 
   const hospitalBarHeight = isHospitalMode ? 40 : 0
 
@@ -138,37 +139,21 @@ export default function Layout({ children }) {
       >
         {isHome ? (
           <Logo showWordmark size={32} />
-        ) : isLightHeader ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-            <img src="/logo.png" alt="FamiliaCerca" style={{ height: 28, width: 'auto', objectFit: 'contain', flexShrink: 0 }} />
-            <span style={{
-              fontSize: 16, fontWeight: 700, color: '#2A4350', fontFamily: SANS,
-              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-            }}>
-              {PAGE_TITLES[location.pathname] ?? 'Chat familiar'}
-            </span>
-          </div>
-        ) : isSecondary ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+        ) : (
+          /* Un solo estilo para todas las pantallas: flecha + título (UX nov 2026) */
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
             <button
               onClick={goBack}
+              aria-label="Volver"
               style={{
-                display: 'flex', alignItems: 'center', gap: 2,
-                background: 'rgba(255,255,255,0.12)',
-                border: '1px solid rgba(255,255,255,0.18)',
-                borderRadius: 20, cursor: 'pointer',
-                color: 'white', fontSize: 14, fontWeight: 700,
-                padding: '5px 10px 5px 6px', flexShrink: 0,
-                WebkitTapHighlightColor: 'transparent',
+                width: 36, height: 36, borderRadius: '50%', border: 'none', background: 'white',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0,
               }}
-              aria-label="Volver al inicio"
             >
-              <ChevronLeft size={15} color="white" strokeWidth={2.5} />
-              Regresar
+              <ChevronLeft size={18} color="#2A4350" strokeWidth={2.3} />
             </button>
             <h1 style={{
-              fontSize: 14, fontWeight: 700, color: 'rgba(255,255,255,0.85)',
-              fontFamily: SANS, margin: 0,
+              fontSize: 18, fontWeight: 800, color: '#14303D', fontFamily: SANS, margin: 0, letterSpacing: '-0.01em',
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
             }}>
               {location.pathname === '/paciente/perfil' && (activePatientName || (activeFamilyLabel !== 'Mi familia' ? activeFamilyLabel : null))
@@ -176,12 +161,6 @@ export default function Layout({ children }) {
                 : PAGE_TITLES[location.pathname] ?? ''}
             </h1>
           </div>
-        ) : (
-          <img
-            src="/logo.png"
-            alt="FamiliaCerca"
-            style={{ height: 44, width: 'auto', objectFit: 'contain', flexShrink: 0 }}
-          />
         )}
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
@@ -216,14 +195,15 @@ export default function Layout({ children }) {
         background: bg,
         top:           hasOwnHeader ? `calc(${hospitalBarHeight}px + env(safe-area-inset-top))` : `calc(${hospitalBarHeight}px + 56px + env(safe-area-inset-top))`,
         bottom:        (isSecondary || isHospitalMode || isVideoCall) ? 'env(safe-area-inset-bottom)' : 'calc(64px + env(safe-area-inset-bottom))',
-        paddingBottom: 80,
+        paddingBottom: location.pathname === '/chat' ? 0 : 80,
       }}>
         <PWAInstallBanner />
         <OfflineBanner />
         <TrialBanner />
 
         {children}
-        <footer style={{ padding: '24px 16px', textAlign: 'center', borderTop: '1px solid #E6E3DB' }}>
+        {/* Texto legal solo en Mi cuenta (antes salía en todas las pantallas, hasta en el chat) */}
+        {location.pathname === '/ajustes' && <footer style={{ padding: '24px 16px', textAlign: 'center', borderTop: '1px solid #E6E3DB' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, marginBottom: 8 }}>
             <Link to="/terminos" style={{ fontSize: 13, color: '#5E7480', textDecoration: 'none' }}>
               Términos de servicio
@@ -233,8 +213,8 @@ export default function Layout({ children }) {
               Política de privacidad
             </Link>
           </div>
-          <p style={{ fontSize: 12, color: '#D1D5DB', margin: 0 }}>© 2026 FamiliaCerca LLC</p>
-        </footer>
+          <p style={{ fontSize: 12, color: '#5E7480', margin: 0 }}>© 2026 FamiliaCerca LLC</p>
+        </footer>}
       </main>
 
       {familyTrialExpired && isAdmin && !sub?.trial_ended_seen_at && (

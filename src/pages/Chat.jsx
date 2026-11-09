@@ -826,7 +826,7 @@ ${lines}`
                 value={input}
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Escribe un mensaje..."
+                placeholder="Mensaje…"
                 rows={1}
                 style={{
                   flex: 1, padding: '11px 16px',

@@ -420,7 +420,7 @@ export default function Settings() {
             </div>
           </div>
 
-          {features.length > 0 && (
+          {false && features.length > 0 && (
             <div style={{ marginBottom: 16 }}>
               <p style={{ fontSize: 13, fontWeight: 700, color: '#5E7480', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8 }}>
                 {isTrialing ? 'Al terminar la prueba sigues gratis con' : 'Tu plan incluye'}
@@ -448,7 +448,7 @@ export default function Settings() {
           >
             Mejorar mi plan →
           </button>
-          {isPaid && (
+          {isPaid && sub?.plan && sub.plan !== 'free' && (
             <button
               onClick={openCancelFlow}
               style={{

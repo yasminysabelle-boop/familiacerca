@@ -134,19 +134,19 @@ export default function TodoElCuidado() {
           </div>
 
           {/* Milo y Luna */}
-          <div style={block('linear-gradient(180deg, #ECE9F9 0%, #F1EFFB 100%)')}>
+          <div style={block('linear-gradient(180deg, #E3F1F8 0%, #EEF6FA 100%)')}>
             <button
               onClick={() => setShowCompanion(true)}
-              style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 14, background: '#EDEBFA', border: 'none', borderRadius: 18, padding: '14px 14px', cursor: 'pointer', WebkitTapHighlightColor: 'transparent', textAlign: 'left' }}
+              style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 14, background: '#E3F1F8', border: 'none', borderRadius: 18, padding: '14px 14px', cursor: 'pointer', WebkitTapHighlightColor: 'transparent', textAlign: 'left' }}
             >
-              <span style={{ flexShrink: 0, width: 56, height: 56, borderRadius: 14, background: '#DDD8F5', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+              <span style={{ flexShrink: 0, width: 56, height: 56, borderRadius: 14, background: '#CDE8F3', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                 <img src="/images/milo-luna.webp" alt="Milo el perro y Luna la gata" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
               </span>
               <span style={{ flex: 1, minWidth: 0 }}>
                 <span style={{ display: 'block', fontFamily: SERIF, fontWeight: 600, fontSize: 17, color: '#2A4350', marginBottom: 2 }}>Milo y Luna</span>
                 <span style={{ display: 'block', fontSize: 14, color: '#4E6470', lineHeight: 1.35 }}>Pregúntales lo que necesites del cuidado</span>
               </span>
-              <span style={{ fontSize: 20, color: '#7566D8', flexShrink: 0 }}>›</span>
+              <span style={{ fontSize: 20, color: '#0C6C9C', flexShrink: 0 }}>›</span>
             </button>
           </div>
 

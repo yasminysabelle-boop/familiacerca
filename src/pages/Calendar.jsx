@@ -259,8 +259,7 @@ export default function Calendar() {
       <div className="p-4 md:p-8 max-w-4xl">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Calendario</h2>
-            <p className="text-gray-500 mt-1">Citas médicas y eventos importantes</p>
+            <p className="text-gray-600">Citas médicas y eventos importantes</p>
           </div>
           {isAdmin && (
             <button

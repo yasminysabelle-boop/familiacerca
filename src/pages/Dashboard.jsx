@@ -2020,21 +2020,21 @@ function RecentActivity({ items, onViewAll, onSelect, firstName, summaryText, su
 
 function PetsCard({ onOpen, patientFirstName }) {
   return (
-    <section aria-label="Asistente Milo y Luna" onClick={onOpen} style={{ position: 'relative', overflow: 'hidden', borderRadius: 26, background: '#EAE7FA', padding: '16px 18px', boxShadow: '0 8px 24px -12px rgba(117,102,216,0.4)', cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}>
+    <section aria-label="Asistente Milo y Luna" onClick={onOpen} style={{ position: 'relative', overflow: 'hidden', borderRadius: 26, background: '#E3F1F8', padding: '16px 18px', boxShadow: '0 8px 24px -12px rgba(12,108,156,0.4)', cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-        <div style={{ flex: 'none', width: 74, height: 66, borderRadius: 16, overflow: 'hidden', background: '#DDD8F5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ flex: 'none', width: 74, height: 66, borderRadius: 16, overflow: 'hidden', background: '#CDE8F3', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <img src="/images/milo-luna.webp" alt="Milo el perro y Luna la gata" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ margin: 0, fontFamily: "'Fraunces', Georgia, serif", fontSize: 16, fontWeight: 600, color: '#5B4FC0', lineHeight: 1.2 }}>Milo y Luna están aquí para ayudar</p>
-          <p style={{ margin: '4px 0 0', fontSize: 13.5, color: '#6E64A8', lineHeight: 1.3 }}>
+          <p style={{ margin: 0, fontFamily: "'Fraunces', Georgia, serif", fontSize: 16, fontWeight: 600, color: '#0A4A6B', lineHeight: 1.2 }}>Milo y Luna están aquí para ayudar</p>
+          <p style={{ margin: '4px 0 0', fontSize: 13.5, color: '#4E6470', lineHeight: 1.3 }}>
             {patientFirstName ? `¿Necesitas algo sobre el cuidado de ${patientFirstName}?` : '¿Necesitas algo sobre el cuidado de tu familiar?'}
           </p>
-          <button onClick={(e) => { e.stopPropagation(); onOpen() }} style={{ marginTop: 11, display: 'inline-flex', alignItems: 'center', gap: 8, borderRadius: 999, background: '#7566D8', padding: '10px 16px', border: 'none', cursor: 'pointer', color: 'white', fontWeight: 700, fontSize: 13.5, boxShadow: '0 8px 16px -6px rgba(117,102,216,0.6)', WebkitTapHighlightColor: 'transparent' }}>
+          <button onClick={(e) => { e.stopPropagation(); onOpen() }} style={{ marginTop: 11, display: 'inline-flex', alignItems: 'center', gap: 8, borderRadius: 999, background: '#0C6C9C', padding: '10px 16px', border: 'none', cursor: 'pointer', color: 'white', fontWeight: 700, fontSize: 13.5, boxShadow: '0 8px 16px -6px rgba(12,108,156,0.6)', WebkitTapHighlightColor: 'transparent' }}>
             <MessageCircle size={16} color="white" strokeWidth={2} /> Hablar con Milo y Luna
           </button>
         </div>
-        <ChevronRight size={20} color="#8E82D6" strokeWidth={2.2} />
+        <ChevronRight size={20} color="#1677A6" strokeWidth={2.2} />
       </div>
     </section>
   )
@@ -3554,7 +3554,7 @@ export default function Dashboard() {
             <p style={{ flex: 1, fontSize: 13, color: '#15803D', margin: 0, fontWeight: 600 }}>Notificaciones activadas</p>
           </div>
         )}
-        {permission !== 'granted' && !notifDismissed && (
+        {permission !== 'granted' && !notifDismissed && !(isAdmin && familyCount <= 1) && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '12px 16px 0', padding: '10px 14px', background: 'white', border: '1px solid #E6E3DB', borderRadius: 16, boxShadow: '0 2px 8px rgba(20,35,30,0.05)' }}>
             <span style={{ fontSize: 17, flexShrink: 0 }}>🔔</span>
             <p style={{ flex: 1, fontSize: 14, color: '#0A4A6B', margin: 0, fontWeight: 500, lineHeight: 1.35 }}>
