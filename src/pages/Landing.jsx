@@ -296,78 +296,47 @@ export default function Landing() {
       </nav>
 
       {/* ─────────────── 2. HERO ─────────────── */}
-      {/* Rediseño nov 2026: foto real de la familia + celular con la app por
-          dentro (emoción + producto en 3 segundos). */}
-      <section className="hero2" style={{ background: `linear-gradient(160deg, #0A4A6B 0%, ${PRIMARY} 60%, #1677A6 100%)`, position: 'relative', overflow: 'hidden' }}>
-        <div aria-hidden="true" style={{ position: 'absolute', width: 520, height: 520, borderRadius: '50%', right: -160, top: -180, background: 'radial-gradient(circle, rgba(43,184,204,0.35) 0%, rgba(43,184,204,0) 70%)', pointerEvents: 'none' }} />
-        <div aria-hidden="true" style={{ position: 'absolute', width: 420, height: 420, borderRadius: '50%', left: -160, bottom: -200, background: 'radial-gradient(circle, rgba(233,130,110,0.28) 0%, rgba(233,130,110,0) 70%)', pointerEvents: 'none' }} />
-        <div className="hero2-grid" style={{ position: 'relative', maxWidth: 1240, margin: '0 auto', padding: '128px 28px 96px', display: 'grid', gridTemplateColumns: '1.05fr 1fr', gap: 56, alignItems: 'center' }}>
-          <div className="hero2-text">
-            <div className="hero-reveal hero-delay-1" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, borderRadius: 9999, padding: '8px 16px', marginBottom: 28, background: 'rgba(255,255,255,0.10)', border: '1px solid rgba(255,255,255,0.18)' }}>
+      {/* Foto real a pantalla completa con el texto en blanco encima
+          (pedido de Yasmin, nov 2026). Degradado azul de la marca para que
+          el texto se lea sin tapar las caras. */}
+      <section className="hero3" style={{ position: 'relative', overflow: 'hidden', minHeight: '100vh', display: 'flex', alignItems: 'center', background: '#0A4A6B' }}>
+        <img className="hero3-img" src={HERO_IMG} alt="Abuela con su hija y su nieta riéndose frente a una tableta" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: '70% center' }} />
+        <div className="hero3-shade" aria-hidden="true" style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, rgba(10,74,107,0.94) 0%, rgba(10,74,107,0.82) 30%, rgba(10,74,107,0.35) 52%, rgba(10,74,107,0) 68%)' }} />
+        <div aria-hidden="true" style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 160, background: 'linear-gradient(to top, rgba(10,74,107,0.55), rgba(10,74,107,0))' }} />
+
+        <div className="hero3-inner" style={{ position: 'relative', width: '100%', maxWidth: 1360, margin: '0 auto', padding: '140px 40px 110px' }}>
+          <div className="hero3-text" style={{ maxWidth: 600 }}>
+            <div className="hero-reveal hero-delay-1" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, borderRadius: 9999, padding: '8px 16px', marginBottom: 26, background: 'rgba(255,255,255,0.14)', border: '1px solid rgba(255,255,255,0.25)', backdropFilter: 'blur(6px)' }}>
               <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#4FD0E0' }} />
-              <span style={{ fontSize: 14, fontWeight: 600, color: '#E3F1F8', fontFamily: SANS }}>Para familias que cuidan juntas</span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: WHITE, fontFamily: SANS }}>Para familias que cuidan juntas</span>
             </div>
-            <h1 className="hero-reveal hero-delay-2" style={{ fontFamily: SERIF, fontSize: 'clamp(38px, 24px + 3.6vw, 72px)', fontWeight: 800, color: WHITE, lineHeight: 1.06, margin: '0 0 20px', letterSpacing: '-1.2px' }}>
-              Que toda la familia sepa <span style={{ color: '#4FD0E0' }}>cómo va el cuidado</span> de mamá.
+            <h1 className="hero-reveal hero-delay-2" style={{ fontFamily: SERIF, fontSize: 'clamp(40px, 22px + 3.6vw, 76px)', fontWeight: 800, color: WHITE, lineHeight: 1.05, margin: '0 0 22px', letterSpacing: '-1.2px', textShadow: '0 2px 24px rgba(0,0,0,0.25)' }}>
+              Que toda la familia sepa <span style={{ color: '#7FE3EF' }}>cómo va el cuidado</span> de mamá.
             </h1>
-            <p className="hero-reveal hero-delay-3" style={{ fontSize: 'clamp(17px, 1.5vw, 20px)', color: 'rgba(255,255,255,0.82)', lineHeight: 1.6, margin: '0 0 14px', fontFamily: SANS, maxWidth: 520 }}>
+            <p className="hero-reveal hero-delay-3" style={{ fontSize: 'clamp(17px, 1.4vw, 21px)', color: WHITE, lineHeight: 1.6, margin: '0 0 12px', fontFamily: SANS, maxWidth: 520, textShadow: '0 1px 12px rgba(0,0,0,0.25)' }}>
               Medicamentos, citas y el día a día en un solo lugar. Cuando alguien marca algo, todos lo ven al momento.
             </p>
-            <p className="hero-reveal hero-delay-3" style={{ fontSize: 'clamp(17px, 1.5vw, 20px)', color: GOLD, fontWeight: 700, lineHeight: 1.45, margin: '0 0 32px', fontFamily: SANS }}>
+            <p className="hero-reveal hero-delay-3" style={{ fontSize: 'clamp(17px, 1.4vw, 21px)', color: '#FFC2B5', fontWeight: 700, lineHeight: 1.45, margin: '0 0 32px', fontFamily: SANS }}>
               Se acabaron las llamadas para preguntar &ldquo;¿Ya se lo dieron?&rdquo;
             </p>
-            <div className="hero-reveal hero-delay-4 hero2-ctas" style={{ display: 'flex', alignItems: 'center', gap: 18, flexWrap: 'wrap' }}>
+            <div className="hero-reveal hero-delay-4 hero3-ctas" style={{ display: 'flex', alignItems: 'center', gap: 20, flexWrap: 'wrap' }}>
               <Link to="/register" onClick={() => track('hero_cta_click')} className="cta-coral" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, padding: '18px 40px', borderRadius: 9999, background: CORAL, color: WHITE, fontWeight: 700, fontSize: 18, textDecoration: 'none', fontFamily: SANS, boxShadow: '0 14px 40px rgba(233,130,110,0.45)' }}>
                 Empezar gratis <span aria-hidden="true">→</span>
               </Link>
               <a href="#como" style={{ color: WHITE, fontSize: 16, fontWeight: 600, fontFamily: SANS, textDecoration: 'underline', textUnderlineOffset: 4 }}>Ver cómo funciona</a>
             </div>
-            <p className="hero-reveal hero-delay-5" style={{ fontSize: 14, color: 'rgba(255,255,255,0.75)', margin: '20px 0 0', fontFamily: SANS }}>
+            <p className="hero-reveal hero-delay-5" style={{ fontSize: 15, color: WHITE, margin: '20px 0 0', fontFamily: SANS, opacity: 0.9 }}>
               ✓ Sin tarjeta &nbsp;·&nbsp; ✓ 14 días con todo incluido &nbsp;·&nbsp; ✓ iPhone y Android
             </p>
           </div>
+        </div>
 
-          <div className="hero2-visual hero-reveal hero-delay-3" style={{ position: 'relative', marginBottom: 150 }}>
-            <img src={HERO_IMG} alt="Abuela con su hija y su nieta riéndose frente a una tableta" style={{ width: '100%', aspectRatio: '3 / 2', objectFit: 'cover', objectPosition: 'center', borderRadius: 28, display: 'block', boxShadow: '0 30px 80px rgba(0,0,0,0.35)', border: '5px solid rgba(255,255,255,0.12)' }} />
-            {/* Celular con la app por dentro */}
-            <div className="hero2-phone" aria-hidden="true" style={{ position: 'absolute', right: 12, bottom: -170, width: 200, borderRadius: 34, background: '#0E1E26', padding: 8, boxShadow: '0 30px 70px rgba(0,0,0,0.45)', animation: 'hero2float 5s ease-in-out infinite' }}>
-              <div style={{ borderRadius: 27, overflow: 'hidden', background: CREAM, fontFamily: SANS }}>
-                <div style={{ height: 22, display: 'flex', justifyContent: 'center', alignItems: 'center', background: CREAM }}>
-                  <div style={{ width: 60, height: 14, borderRadius: 10, background: '#0E1E26' }} />
-                </div>
-                <div style={{ padding: '6px 10px 12px' }}>
-                  <div style={{ borderRadius: 16, padding: '12px 12px 10px', background: 'linear-gradient(140deg, #0C6C9C, #0A4A6B)', color: WHITE, position: 'relative', overflow: 'hidden' }}>
-                    <div style={{ fontSize: 15, fontWeight: 800 }}>Mamá ♥</div>
-                    <div style={{ fontSize: 11, opacity: 0.9, margin: '2px 0 8px' }}>Hoy todo va al día</div>
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 10, fontWeight: 700, background: 'rgba(255,255,255,0.16)', padding: '4px 8px', borderRadius: 999 }}>
-                      <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#4FD0E0' }} /> Todo al día
-                    </span>
-                  </div>
-                  {[
-                    { i: '💊', t: 'Losartán', s: '8:00 AM · Rosa', ok: true },
-                    { i: '🍽️', t: 'Desayuno', s: 'Comió bien', ok: true },
-                    { i: '📅', t: 'Cardiólogo', s: 'Jueves · Pedro', ok: false },
-                  ].map((r, ri) => (
-                    <div key={r.t} className={`hero2-row-${ri}`} style={{ display: 'flex', alignItems: 'center', gap: 8, background: WHITE, borderRadius: 12, padding: '8px 9px', marginTop: 7, border: '1px solid #E6E3DB' }}>
-                      <span style={{ fontSize: 15 }}>{r.i}</span>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: 11, fontWeight: 700, color: '#14303D' }}>{r.t}</div>
-                        <div style={{ fontSize: 10, color: '#4E6470' }}>{r.s}</div>
-                      </div>
-                      {r.ok && <span style={{ width: 18, height: 18, borderRadius: '50%', background: '#2BB8CC', color: WHITE, fontSize: 11, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✓</span>}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-            {/* Aviso flotante */}
-            <div className="hero2-toast" aria-hidden="true" style={{ position: 'absolute', left: -18, top: 26, display: 'flex', alignItems: 'center', gap: 10, background: WHITE, borderRadius: 16, padding: '10px 14px', boxShadow: '0 16px 40px rgba(0,0,0,0.25)', fontFamily: SANS, animation: 'hero2float 5s ease-in-out 1.2s infinite' }}>
-              <span style={{ width: 32, height: 32, borderRadius: '50%', background: '#FBEAE4', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>🔔</span>
-              <div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: '#14303D' }}>Rosa confirmó la dosis</div>
-                <div style={{ fontSize: 12, color: '#4E6470' }}>Toda la familia lo vio</div>
-              </div>
-            </div>
+        {/* Aviso flotante: lo que la familia ve en la app */}
+        <div className="hero3-toast" aria-hidden="true" style={{ position: 'absolute', right: '4%', bottom: '9%', display: 'flex', alignItems: 'center', gap: 12, background: WHITE, borderRadius: 18, padding: '12px 16px', boxShadow: '0 18px 44px rgba(0,0,0,0.30)', fontFamily: SANS, animation: 'hero2float 5s ease-in-out infinite' }}>
+          <span style={{ width: 38, height: 38, borderRadius: '50%', background: '#2BB8CC', color: WHITE, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 800 }}>✓</span>
+          <div>
+            <div style={{ fontSize: 15, fontWeight: 700, color: '#14303D' }}>Rosa confirmó la dosis de las 8:00</div>
+            <div style={{ fontSize: 13, color: '#4E6470' }}>Toda la familia lo vio · hace 2 min</div>
           </div>
         </div>
       </section>
@@ -415,33 +384,40 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ─────────────── 4. ANTES / AHORA ─────────────── */}
-      <section style={{ background: CREAM, padding: '88px 32px', borderBottom: `1px solid ${BORDER}` }}>
-        <div style={{ maxWidth: 1440, margin: '0 auto' }}>
-          <div className="reveal" style={{ textAlign: 'center', marginBottom: 52 }}>
-            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(28px,3.9vw,50px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.15, margin: 0 }}>
-              Lo que cambia desde el primer día
+      {/* ─────────────── 4. WHATSAPP VS FAMILIACERCA ─────────────── */}
+      {/* El competidor real es el grupo de WhatsApp de la familia. Se compara
+          con respeto: WhatsApp sigue para conversar; el cuidado va aquí. */}
+      <section style={{ background: CREAM, padding: 'clamp(80px,9vw,120px) 24px', borderBottom: `1px solid ${BORDER}` }}>
+        <div style={{ maxWidth: 980, margin: '0 auto' }}>
+          <div className="reveal" style={{ textAlign: 'center', maxWidth: 660, margin: '0 auto 48px' }}>
+            <p style={{ fontSize: 14, fontWeight: 600, color: CORAL, textTransform: 'uppercase', letterSpacing: '0.14em', margin: '0 0 14px', fontFamily: SANS }}>¿Por qué no basta el grupo de WhatsApp?</p>
+            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(30px,4vw,52px)', fontWeight: 700, color: PRIMARY, lineHeight: 1.12, margin: 0 }}>
+              WhatsApp es para conversar. El cuidado necesita orden.
             </h2>
           </div>
-          <div className="antes-ahora-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 22 }}>
-            {antesAhora.map((c, i) => (
-              <div key={c.title} className={`reveal reveal-delay-${i} card-hover-lift`} style={{ background: WHITE, borderRadius: 20, border: `1px solid ${BORDER}`, boxShadow: '0 4px 20px rgba(10,90,130,0.06)', overflow: 'hidden' }}>
-                <div style={{ fontSize: 26, padding: '22px 22px 0' }}>{c.icon}</div>
-                <p style={{ fontFamily: SERIF, fontSize: 15.5, fontWeight: 700, color: PRIMARY, padding: '8px 22px 18px', margin: 0 }}>{c.title}</p>
-                <div className="antes-ahora-split" style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'stretch' }}>
-                  <div style={{ padding: '16px 18px 22px', background: 'rgba(107,114,128,0.06)' }}>
-                    <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#5E7480', margin: '0 0 8px' }}>Antes</p>
-                    <p style={{ fontSize: 'clamp(14px,1.3vw,17px)', color: '#4E6470', lineHeight: 1.55, margin: 0, fontFamily: SANS }}>{c.before}</p>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: CORAL, fontSize: 16, background: WHITE, padding: '0 14px' }}>→</div>
-                  <div style={{ padding: '16px 18px 22px', background: MINT_C }}>
-                    <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: PRIMARY, margin: '0 0 8px' }}>Ahora</p>
-                    <p style={{ fontSize: 'clamp(14px,1.3vw,17px)', color: PRIMARY, fontWeight: 500, lineHeight: 1.55, margin: 0, fontFamily: SANS }}>{c.after}</p>
-                  </div>
-                </div>
+          <div className="wa-table reveal" style={{ background: WHITE, borderRadius: 24, border: `1px solid ${BORDER}`, boxShadow: '0 12px 40px rgba(10,90,130,0.08)', overflow: 'hidden' }}>
+            <div className="wa-row wa-head" style={{ display: 'grid', gridTemplateColumns: '1.1fr 1fr 1fr', fontFamily: SANS }}>
+              <div style={{ padding: '18px 22px' }} />
+              <div style={{ padding: '18px 22px', fontWeight: 700, fontSize: 16, color: '#4E6470', background: '#F2F2EE' }}>💬 Grupo de WhatsApp</div>
+              <div style={{ padding: '18px 22px', fontWeight: 800, fontSize: 16, color: WHITE, background: PRIMARY }}>✓ FamiliaCerca</div>
+            </div>
+            {[
+              { q: '¿Ya le dieron la pastilla?', wa: 'Hay que preguntar y esperar a que alguien conteste.', fc: 'Se marca y todos lo ven, con la hora y quién la dio.' },
+              { q: 'Lo que dijo el médico', wa: 'Se pierde entre fotos, audios y cadenas.', fc: 'Queda guardado en un solo lugar, fácil de encontrar.' },
+              { q: 'Citas', wa: 'Alguien escribe la fecha y después nadie la encuentra.', fc: 'Calendario compartido, con recordatorio y quién la lleva.' },
+              { q: 'Ir al médico con la información', wa: 'Buscar mensajes de meses atrás.', fc: 'Un reporte PDF en un toque.' },
+              { q: 'Alguien nuevo empieza a ayudar', wa: 'Tiene que leer cientos de mensajes.', fc: 'Ve todo organizado desde el primer día.' },
+            ].map((r, i) => (
+              <div key={r.q} className="wa-row" style={{ display: 'grid', gridTemplateColumns: '1.1fr 1fr 1fr', borderTop: `1px solid ${BORDER}`, fontFamily: SANS }}>
+                <div className="wa-q" style={{ padding: '20px 22px', fontWeight: 700, fontSize: 17, color: '#14303D' }}>{r.q}</div>
+                <div style={{ padding: '20px 22px', fontSize: 16, color: '#4E6470', background: '#FAFAF7', lineHeight: 1.5 }}><span className="wa-tag">💬 WhatsApp: </span>{r.wa}</div>
+                <div style={{ padding: '20px 22px', fontSize: 16, color: '#0A4A6B', fontWeight: 600, background: '#E3F1F8', lineHeight: 1.5 }}><span className="wa-tag">✓ FamiliaCerca: </span>{r.fc}</div>
               </div>
             ))}
           </div>
+          <p className="reveal" style={{ textAlign: 'center', fontSize: 'clamp(17px,1.6vw,20px)', color: '#30454F', margin: '32px auto 0', maxWidth: 620, lineHeight: 1.6, fontFamily: SANS }}>
+            Sigan usando WhatsApp para hablar. <strong style={{ color: PRIMARY }}>FamiliaCerca es para que el cuidado no se pierda en el chat.</strong>
+          </p>
         </div>
       </section>
 
@@ -846,6 +822,22 @@ export default function Landing() {
 
         @keyframes hero2float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
         @media (prefers-reduced-motion: reduce) { .hero2-phone, .hero2-toast { animation: none !important; } }
+        .wa-tag { display: none; }
+        @media (max-width: 760px) {
+          .wa-row { grid-template-columns: 1fr !important; }
+          .wa-head { display: none !important; }
+          .wa-q { padding-bottom: 6px !important; }
+          .wa-tag { display: inline; font-weight: 700; }
+        }
+        @media (max-width: 900px) {
+          .hero3 { min-height: auto !important; align-items: flex-end !important; }
+          .hero3-img { height: 62vh !important; bottom: auto !important; object-position: 60% center !important; }
+          .hero3-shade { background: linear-gradient(to bottom, rgba(10,74,107,0) 0%, rgba(10,74,107,0) 32vh, rgba(10,74,107,0.85) 52vh, #0A4A6B 62vh) !important; }
+          .hero3-inner { padding: 50vh 20px 56px !important; text-align: center; }
+          .hero3-text { margin: 0 auto; display: flex; flex-direction: column; align-items: center; }
+          .hero3-ctas { justify-content: center; }
+          .hero3-toast { right: 50% !important; transform: translateX(50%); bottom: auto !important; top: calc(50vh - 92px); animation: none !important; }
+        }
         @media (max-width: 900px) {
           .hero2-grid { grid-template-columns: 1fr !important; padding: 104px 20px 64px !important; gap: 40px !important; text-align: center; }
           .hero2-text { display: flex; flex-direction: column; align-items: center; }
