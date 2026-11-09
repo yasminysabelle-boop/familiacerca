@@ -53,7 +53,8 @@ export default function Login() {
     setError('')
     setLoading(true)
     const { error: err } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: 'https://familiacerca.netlify.app/login',
+      // El enlace vuelve al mismo dominio desde el que se pidió (familiacerca.com).
+      redirectTo: `${window.location.origin}/login`,
     })
     setLoading(false)
     if (err) {

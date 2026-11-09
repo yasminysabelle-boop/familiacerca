@@ -38,7 +38,13 @@ export default function Register() {
     if (alreadyRegistered) {
       setError('Este correo ya está registrado. Inicia sesión o usa "Olvidé mi contraseña".')
     } else if (err) {
-      setError(err.message)
+      // Errores del servidor (ej. 504 por correo de Supabase) llegan sin
+      // mensaje legible ("{}"): mostrar algo que la persona entienda.
+      const msg = (err.message || '').trim()
+      const serverError = !msg || msg === '{}' || (err.status && err.status >= 500)
+      setError(serverError
+        ? 'No pudimos crear tu cuenta en este momento. Intenta de nuevo en unos minutos.'
+        : msg)
     } else {
       track('user_registered', { email: form.email })
       const pending = localStorage.getItem('pendingInviteToken')
