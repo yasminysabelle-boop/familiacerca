@@ -170,7 +170,7 @@ export default function Login() {
         display: 'flex', flexDirection: 'column', alignItems: 'center',
         paddingTop: 72, paddingBottom: 32,
       }}>
-        <Logo variant="light" showWordmark size={52} />
+        <Logo variant="light" showWordmark size={44} />
       </div>
 
       <div style={{ flex: 1 }} />
