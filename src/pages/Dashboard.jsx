@@ -2098,8 +2098,18 @@ export default function Dashboard() {
   const [weekShifts, setWeekShifts] = useState([])
   const [familyCount, setFamilyCount] = useState(1)
   const { permission, notifActivated, requestAndSubscribe } = usePushNotifications()
-  const [notifDismissed, setNotifDismissed] = useState(() => !!localStorage.getItem('notif_dismissed'))
-  function dismissNotifBanner() { localStorage.setItem('notif_dismissed', '1'); setNotifDismissed(true) }
+  // Cerrar el aviso ya no lo esconde para siempre: vuelve a los 3 días (antes,
+  // un familiar que lo cerraba una vez nunca más recibía avisos).
+  const [notifDismissed, setNotifDismissed] = useState(() => {
+    const v = localStorage.getItem('notif_dismissed')
+    const t = Number(v)
+    return !!v && t > 1e12 && Date.now() - t < 3 * 24 * 3600 * 1000
+  })
+  // iPhone: los avisos solo funcionan con la app agregada a la pantalla de inicio.
+  const iosNeedsInstall = typeof navigator !== 'undefined' && /iphone|ipad|ipod/i.test(navigator.userAgent)
+    && !(window.matchMedia?.('(display-mode: standalone)').matches || window.navigator.standalone)
+  const [showIosHelp, setShowIosHelp] = useState(false)
+  function dismissNotifBanner() { localStorage.setItem('notif_dismissed', String(Date.now())); setNotifDismissed(true) }
   const [familyNames, setFamilyNames] = useState([])
   const [familyMembers, setFamilyMembers] = useState([])
 
@@ -3519,8 +3529,16 @@ export default function Dashboard() {
         {permission !== 'granted' && !notifDismissed && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '12px 16px 0', padding: '10px 14px', background: 'white', border: '1px solid #E6E3DB', borderRadius: 16, boxShadow: '0 2px 8px rgba(20,35,30,0.05)' }}>
             <span style={{ fontSize: 17, flexShrink: 0 }}>🔔</span>
-            <p style={{ flex: 1, fontSize: 13, color: '#0A4A6B', margin: 0, fontWeight: 500, lineHeight: 1.3 }}>Activa las notificaciones para estar al tanto</p>
-            <button onClick={requestAndSubscribe} style={{ padding: '6px 13px', borderRadius: 9, background: '#E9826E', color: 'white', fontSize: 12, fontWeight: 700, border: 'none', cursor: 'pointer', flexShrink: 0 }}>Activar</button>
+            <p style={{ flex: 1, fontSize: 14, color: '#0A4A6B', margin: 0, fontWeight: 500, lineHeight: 1.35 }}>
+              {iosNeedsInstall
+                ? (showIosHelp
+                    ? <>En iPhone: toca <strong>Compartir ⬆️</strong> en Safari, luego <strong>“Agregar a pantalla de inicio”</strong>. Abre FamiliaCerca desde ese ícono y toca Activar.</>
+                    : 'Para recibir avisos en iPhone, agrega FamiliaCerca a tu pantalla de inicio')
+                : 'Activa las notificaciones para saber si falta un medicamento'}
+            </p>
+            {iosNeedsInstall
+              ? !showIosHelp && <button onClick={() => setShowIosHelp(true)} style={{ padding: '7px 13px', borderRadius: 9, background: '#E9826E', color: 'white', fontSize: 13, fontWeight: 700, border: 'none', cursor: 'pointer', flexShrink: 0 }}>Cómo</button>
+              : <button onClick={requestAndSubscribe} style={{ padding: '7px 13px', borderRadius: 9, background: '#E9826E', color: 'white', fontSize: 13, fontWeight: 700, border: 'none', cursor: 'pointer', flexShrink: 0 }}>Activar</button>}
             <button onClick={dismissNotifBanner} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, flexShrink: 0, display: 'flex' }} aria-label="Cerrar">
               <XIcon size={14} color="#5E7480" strokeWidth={2} />
             </button>

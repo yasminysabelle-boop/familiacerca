@@ -136,7 +136,7 @@ export default function JoinFamily() {
     if (isExpired(invitation)) return
     if (accepted || accepting || alreadyMember) return
     if (user.id === invitation.user_id) return
-    const emailMismatch = invitation.invited_email && user.email !== invitation.invited_email
+    const emailMismatch = isPersonalInvite(invitation) && user.email !== invitation.invited_email
     if (emailMismatch && !wrongEmailConfirm) return
     acceptInvitation()
   }, [user, invitation, wrongEmailConfirm])
@@ -191,6 +191,13 @@ export default function JoinFamily() {
     if (cp?.photo_url) setPatientPhoto(cp.photo_url)
 
     setInvLoading(false)
+  }
+
+  // El enlace general (onboarding / compartir por WhatsApp) usa un correo de
+  // relleno @familiacerca.app. Antes la app decía "Correo diferente: esta
+  // invitación fue enviada a invitado@familiacerca.app" y la gente no se unía.
+  function isPersonalInvite(inv) {
+    return !!inv?.invited_email && !inv.invited_email.endsWith('@familiacerca.app')
   }
 
   function isExpired(inv) {
@@ -297,7 +304,7 @@ export default function JoinFamily() {
   const isValidPending = !!(invitation && invitation.status === 'pending' && !isExpired(invitation) && !invError)
   const hasWrongEmail = !!(
     user && isValidPending &&
-    invitation.invited_email && user.email !== invitation.invited_email &&
+    isPersonalInvite(invitation) && user.email !== invitation.invited_email &&
     !wrongEmailConfirm
   )
 
