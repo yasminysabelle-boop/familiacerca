@@ -850,7 +850,9 @@ export default function Landing() {
           .hero2-grid { grid-template-columns: 1fr !important; padding: 104px 20px 64px !important; gap: 40px !important; text-align: center; }
           .hero2-text { display: flex; flex-direction: column; align-items: center; }
           .hero2-ctas { justify-content: center; }
-          .hero2-phone { width: 168px !important; right: -6px !important; bottom: -24px !important; }
+          .hero2-visual { text-align: left; width: 100%; max-width: 440px; margin: 0 auto; }
+          .hero2-phone { width: 148px !important; right: -8px !important; bottom: -34px !important; padding: 6px !important; border-radius: 28px !important; }
+          .hero2-phone > div { border-radius: 23px !important; }
           .hero2-toast { left: -4px !important; top: -18px !important; }
         }
         @media (max-width: 1024px) {
