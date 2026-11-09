@@ -152,7 +152,7 @@ export default function CareCard({
         <div style={{ display: 'flex', alignItems: 'stretch', gap: 8 }}>
           <StatItem
             icon={<Pill size={16} color={TEAL} strokeWidth={2} />}
-            label="Medicamentos"
+            label="Medicinas"
             sub={!hasMeds ? 'sin agregar' : medsUpToDate ? 'al día' : 'pendiente'}
             onClick={onMedsClick ? (e) => { e.stopPropagation(); onMedsClick() } : undefined}
           />
