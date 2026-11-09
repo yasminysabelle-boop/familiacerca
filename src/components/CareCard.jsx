@@ -29,6 +29,8 @@ function StatItem({ icon, label, sub, last = false, onClick }) {
         <span style={{ minWidth: 0, color: '#fff', fontSize: 11.5, fontWeight: 600, lineHeight: 1.25, letterSpacing: '-0.01em', fontFamily: SANS }}>
           {label}<br /><span style={{ fontWeight: 400, color: 'rgba(255,255,255,0.8)' }}>{sub}</span>
         </span>
+        {/* Flecha: deja claro que se puede tocar para resolverlo */}
+        {onClick && <span aria-hidden="true" style={{ flex: 'none', color: 'rgba(255,255,255,0.75)', fontSize: 16, lineHeight: 1, marginLeft: -2 }}>›</span>}
       </div>
       {!last && <div style={{ flex: 'none', width: 1, height: 32, background: 'rgba(255,255,255,0.16)', margin: '0 3px' }} />}
     </>

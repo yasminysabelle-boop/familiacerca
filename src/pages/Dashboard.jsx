@@ -3674,9 +3674,9 @@ export default function Dashboard() {
                   routineStarted={routineActive}
                   familyCount={familyCount}
                   onClick={() => navigate('/paciente/perfil')}
-                  onMedsClick={() => navigate('/medications')}
+                  onMedsClick={() => navigate(medTotal === 0 ? '/medications?add=1' : '/medications')}
                   onRoutineClick={() => navigate('/cuidado')}
-                  onFamilyClick={() => navigate('/familia')}
+                  onFamilyClick={() => navigate(isAdmin && familyCount <= 1 ? '/familia?invitar=1' : '/familia')}
                 />
 
                 {/* ══ SOLO TÚ — empujar a invitar (sin familia no hay avisos ni razón para volver) ══ */}
