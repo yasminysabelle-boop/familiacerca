@@ -249,7 +249,7 @@ export default function Landing() {
     <div style={{ background: WHITE, color: DARK, overflowX: 'hidden', fontFamily: SANS }}>
 
       {/* ─────────────── 1. NAV ─────────────── */}
-      <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: '#F7F6F2', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(20,60,50,0.08)', boxShadow: '0 1px 8px rgba(20,60,50,0.06)' }}>
+      <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: '#F7F6F2', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(10,74,107,0.08)', boxShadow: '0 1px 8px rgba(10,74,107,0.06)' }}>
         <div style={{ maxWidth: 1440, margin: '0 auto', padding: '20px 2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24 }}>
           <div style={{ display:'flex', alignItems:'center', gap:'12px', flexShrink: 0 }}>
             <img src="/logo.png" alt="FamiliaCerca" style={{ width: 44, height: 44, objectFit: 'contain', display: 'block' }} />
@@ -279,7 +279,7 @@ export default function Landing() {
         </div>
 
         {mobileMenuOpen && (
-          <div style={{ padding: '12px 32px 24px', display: 'flex', flexDirection: 'column', gap: 2, borderTop: '1px solid rgba(20,60,50,0.08)', background: '#F7F6F2' }}>
+          <div style={{ padding: '12px 32px 24px', display: 'flex', flexDirection: 'column', gap: 2, borderTop: '1px solid rgba(10,74,107,0.08)', background: '#F7F6F2' }}>
             {navLinks.map(l => (
               <a key={l.href} href={l.href} onClick={() => setMobileMenuOpen(false)}
                 style={{ padding: '13px 8px', fontSize: 17, color: '#0C6C9C', textDecoration: 'none', fontFamily: SANS }}>
@@ -342,14 +342,14 @@ export default function Landing() {
         {/* Right: photo + floating medication card */}
         <div className="landing-hero-right" style={{ position: 'relative', overflow: 'hidden', minHeight: '100vh' }}>
           <img src={HERO_IMG} alt="Familia cuidando juntos" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }} />
-          <div style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(to right, rgba(20,60,50,0.38) 0%, transparent 30%)', pointerEvents: 'none' }} />
+          <div style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(to right, rgba(10,74,107,0.38) 0%, transparent 30%)', pointerEvents: 'none' }} />
 
           {/* Floating status card */}
           <div className="hero-reveal hero-delay-4" style={{
             position:'absolute', bottom:'2.2rem', right:'1.5rem',
             background:'#F7F6F2', borderRadius:'26px',
             border: '1px solid rgba(12,108,156,0.15)',
-            padding:'26px 30px', boxShadow:'0 20px 60px rgba(20,60,50,0.28)',
+            padding:'26px 30px', boxShadow:'0 20px 60px rgba(10,74,107,0.28)',
             minWidth:'300px', maxWidth:'360px', zIndex: 4
           }}>
             <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'16px'}}>
@@ -607,7 +607,7 @@ export default function Landing() {
           <blockquote className="reveal" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(24px,3.3vw,44px)', fontWeight: 500, color: PRIMARY, lineHeight: 1.45, margin: '0 0 28px' }}>
             Antes era imposible coordinarnos. Ahora todos sabemos qué está pasando sin preguntar.
           </blockquote>
-          <p className="reveal reveal-delay-1" style={{ fontSize: 'clamp(15px,1.4vw,19px)', color: 'rgba(20,60,50,0.62)', fontFamily: SANS, fontWeight: 400, lineHeight: 1.65, maxWidth: 460, margin: 0 }}>
+          <p className="reveal reveal-delay-1" style={{ fontSize: 'clamp(15px,1.4vw,19px)', color: 'rgba(10,74,107,0.62)', fontFamily: SANS, fontWeight: 400, lineHeight: 1.65, maxWidth: 460, margin: 0 }}>
             — Ysabelle, fundadora de FamiliaCerca. Creó la app después de años coordinando el cuidado de su familia por WhatsApp.
           </p>
         </div>
@@ -848,8 +848,7 @@ export default function Landing() {
       {/* ─────────────── 15. CTA FINAL ─────────────── */}
       <section style={{ position: 'relative', padding: '160px 32px', overflow: 'hidden', minHeight: 560, display: 'flex', alignItems: 'center' }}>
         <img src={CTA_IMG} alt="" aria-hidden="true" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(20,60,50,0.88)' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(20,60,50,0.65) 0%, transparent 55%)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, rgba(10,74,107,0.92) 0%, rgba(10,74,107,0.7) 55%, rgba(10,74,107,0.45) 100%)' }} />
         <div style={{ position: 'relative', zIndex: 1, maxWidth: 1440, margin: '0 auto', width: '100%' }}>
           <div style={{ maxWidth: 680 }}>
             <p style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 20px', fontFamily: SANS }}>Empieza hoy</p>
@@ -940,7 +939,7 @@ export default function Landing() {
               </div>
             </div>
           </div>
-          <div style={{ borderTop: '1px solid rgba(20,60,50,0.08)', paddingTop: 24, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
+          <div style={{ borderTop: '1px solid rgba(10,74,107,0.08)', paddingTop: 24, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
             <p style={{ fontSize: 12, color: '#4E6470', margin: 0, fontFamily: SANS, fontWeight: 300 }}>© {new Date().getFullYear()} FamiliaCerca. Todos los derechos reservados.</p>
             <p style={{ fontSize: 12, color: '#4E6470', margin: 0, fontFamily: SANS, fontWeight: 300 }}>Hecho con ❤️ para familias hispanohablantes</p>
           </div>
@@ -997,12 +996,12 @@ export default function Landing() {
         .marquee-track:hover, .marquee-track-reverse:hover { animation-play-state: paused; }
 
         .para-quien-card { transition: transform 0.25s ease, box-shadow 0.25s ease; }
-        .para-quien-card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(20,60,50,0.12); }
+        .para-quien-card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(10,74,107,0.12); }
 
         /* Mismo lift+shadow de .para-quien-card, reutilizado tal cual en
            Funciones, Testimonios y Antes/Ahora para consistencia. */
         .card-hover-lift { transition: transform 0.25s ease, box-shadow 0.25s ease; }
-        .card-hover-lift:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(20,60,50,0.12); }
+        .card-hover-lift:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(10,74,107,0.12); }
 
         .testimonios-expand { animation: fadeInUp 0.5s cubic-bezier(0.16,1,0.3,1) both; }
 
