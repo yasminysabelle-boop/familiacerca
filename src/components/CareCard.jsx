@@ -16,24 +16,30 @@ const STATUS = {
   setup:    { label: 'Por empezar',          dot: '#FFFFFF', glow: 'rgba(255,255,255,.25)' },
 }
 
-function StatItem({ icon, label, sub, last = false, onClick }) {
+// Cada dato es un botón con volumen (pedido de Yasmin, nov 2026): se nota que
+// se puede tocar y lleva a resolverlo.
+function StatItem({ icon, label, sub, onClick }) {
   return (
-    <>
-      <div
-        onClick={onClick}
-        style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 5, cursor: onClick ? 'pointer' : 'default' }}
-      >
-        <span style={{ flex: 'none', width: 28, height: 28, borderRadius: '50%', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          {icon}
-        </span>
-        <span style={{ minWidth: 0, color: '#fff', fontSize: 11.5, fontWeight: 600, lineHeight: 1.25, letterSpacing: '-0.01em', fontFamily: SANS }}>
-          {label}<br /><span style={{ fontWeight: 400, color: 'rgba(255,255,255,0.8)' }}>{sub}</span>
-        </span>
-        {/* Flecha: deja claro que se puede tocar para resolverlo */}
-        {onClick && <span aria-hidden="true" style={{ flex: 'none', color: 'rgba(255,255,255,0.75)', fontSize: 16, lineHeight: 1, marginLeft: -2 }}>›</span>}
-      </div>
-      {!last && <div style={{ flex: 'none', width: 1, height: 32, background: 'rgba(255,255,255,0.16)', margin: '0 3px' }} />}
-    </>
+    <button
+      type="button"
+      onClick={onClick}
+      className="carecard-stat"
+      style={{
+        flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5,
+        padding: '10px 4px 9px', borderRadius: 16,
+        background: 'linear-gradient(180deg, rgba(255,255,255,0.24) 0%, rgba(255,255,255,0.12) 100%)',
+        border: '1px solid rgba(255,255,255,0.28)',
+        boxShadow: '0 6px 14px -6px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.25)',
+        cursor: onClick ? 'pointer' : 'default', fontFamily: SANS, color: '#fff',
+        WebkitTapHighlightColor: 'transparent', transition: 'transform 0.12s ease, background 0.15s ease',
+      }}
+    >
+      <span style={{ flex: 'none', width: 30, height: 30, borderRadius: '50%', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 6px rgba(0,0,0,0.15)' }}>
+        {icon}
+      </span>
+      <span style={{ maxWidth: '100%', fontSize: 12.5, fontWeight: 700, lineHeight: 1.15, letterSpacing: '-0.01em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</span>
+      <span style={{ fontSize: 12, fontWeight: 500, color: 'rgba(255,255,255,0.88)', lineHeight: 1.1, whiteSpace: 'nowrap' }}>{sub} ›</span>
+    </button>
   )
 }
 
@@ -141,8 +147,9 @@ export default function CareCard({
 
         <div style={{ height: 1, background: 'rgba(255,255,255,0.16)', margin: '20px 0 16px' }} />
 
-        {/* 3 stats en columnas */}
-        <div style={{ display: 'flex', alignItems: 'center' }}>
+        {/* 3 datos como botones */}
+        <style>{`.carecard-stat:active { transform: scale(0.96); background: rgba(255,255,255,0.3) !important; }`}</style>
+        <div style={{ display: 'flex', alignItems: 'stretch', gap: 8 }}>
           <StatItem
             icon={<Pill size={16} color={TEAL} strokeWidth={2} />}
             label="Medicamentos"
@@ -160,7 +167,6 @@ export default function CareCard({
             label="Familia"
             sub={familyCount <= 1 ? 'solo tú' : `${familyCount} conectados`}
             onClick={onFamilyClick ? (e) => { e.stopPropagation(); onFamilyClick() } : undefined}
-            last
           />
         </div>
       </div>
