@@ -330,7 +330,7 @@ export default function Landing() {
           <div className="hero2-visual hero-reveal hero-delay-3" style={{ position: 'relative', marginBottom: 150 }}>
             <img src={HERO_IMG} alt="Abuela con su hija y su nieta riéndose frente a una tableta" style={{ width: '100%', aspectRatio: '3 / 2', objectFit: 'cover', objectPosition: 'center', borderRadius: 28, display: 'block', boxShadow: '0 30px 80px rgba(0,0,0,0.35)', border: '5px solid rgba(255,255,255,0.12)' }} />
             {/* Celular con la app por dentro */}
-            <div className="hero2-phone" aria-hidden="true" style={{ position: 'absolute', right: -36, bottom: -170, width: 200, borderRadius: 34, background: '#0E1E26', padding: 8, boxShadow: '0 30px 70px rgba(0,0,0,0.45)', animation: 'hero2float 5s ease-in-out infinite' }}>
+            <div className="hero2-phone" aria-hidden="true" style={{ position: 'absolute', right: 12, bottom: -170, width: 200, borderRadius: 34, background: '#0E1E26', padding: 8, boxShadow: '0 30px 70px rgba(0,0,0,0.45)', animation: 'hero2float 5s ease-in-out infinite' }}>
               <div style={{ borderRadius: 27, overflow: 'hidden', background: CREAM, fontFamily: SANS }}>
                 <div style={{ height: 22, display: 'flex', justifyContent: 'center', alignItems: 'center', background: CREAM }}>
                   <div style={{ width: 60, height: 14, borderRadius: 10, background: '#0E1E26' }} />
