@@ -51,12 +51,12 @@ export function usePushNotifications() {
       })
       const json = sub.toJSON()
       // Remove stale subs for this user and any cross-user endpoint conflict
-      await Promise.all([
-        supabase.from('push_subscriptions').delete()
-          .eq('user_id', user.id).neq('endpoint', json.endpoint),
-        supabase.from('push_subscriptions').delete()
-          .eq('endpoint', json.endpoint).neq('user_id', user.id),
-      ])
+      // Antes se borraban los OTROS celulares de este mismo usuario: si la
+      // familia usaba la misma cuenta en varios teléfonos, solo el último que
+      // activó recibía avisos. Ahora cada dispositivo conserva su suscripción
+      // (las vencidas las limpia el servidor al recibir 404/410).
+      await supabase.from('push_subscriptions').delete()
+        .eq('endpoint', json.endpoint).neq('user_id', user.id)
       const { error } = await supabase.from('push_subscriptions').upsert(
         {
           user_id: user.id,
@@ -93,12 +93,12 @@ export function usePushNotifications() {
       })
       const json = sub.toJSON()
       // Remove stale subs for this user and any cross-user endpoint conflict
-      await Promise.all([
-        supabase.from('push_subscriptions').delete()
-          .eq('user_id', user.id).neq('endpoint', json.endpoint),
-        supabase.from('push_subscriptions').delete()
-          .eq('endpoint', json.endpoint).neq('user_id', user.id),
-      ])
+      // Antes se borraban los OTROS celulares de este mismo usuario: si la
+      // familia usaba la misma cuenta en varios teléfonos, solo el último que
+      // activó recibía avisos. Ahora cada dispositivo conserva su suscripción
+      // (las vencidas las limpia el servidor al recibir 404/410).
+      await supabase.from('push_subscriptions').delete()
+        .eq('endpoint', json.endpoint).neq('user_id', user.id)
       const { error } = await supabase.from('push_subscriptions').upsert(
         {
           user_id: user.id,
@@ -138,16 +138,18 @@ export function usePushNotifications() {
       })
       const json = sub.toJSON()
 
-      // Replace all existing DB records for this user + clear cross-user endpoint conflicts
-      await supabase.from('push_subscriptions').delete().eq('user_id', user.id)
+      // Solo se reemplaza ESTE dispositivo; los otros celulares de la cuenta se conservan.
+      if (existing?.endpoint) {
+        await supabase.from('push_subscriptions').delete().eq('user_id', user.id).eq('endpoint', existing.endpoint)
+      }
       await supabase.from('push_subscriptions').delete()
         .eq('endpoint', json.endpoint).neq('user_id', user.id)
-      const { error } = await supabase.from('push_subscriptions').insert({
+      const { error } = await supabase.from('push_subscriptions').upsert({
         user_id: user.id,
         endpoint: json.endpoint,
         p256dh: json.keys.p256dh,
         auth: json.keys.auth,
-      })
+      }, { onConflict: 'user_id,endpoint' })
       if (error) {
         console.warn('[usePushNotifications] insert error:', error)
         setSubscribeError(error.message)
