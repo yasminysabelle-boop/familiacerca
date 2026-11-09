@@ -341,6 +341,15 @@ export default function OnboardingFlow() {
   async function finish() {
     localStorage.setItem('fc_patient_onboarding_done', '1')
     await saveOnboardingCompletedFlag()
+    // Correo de bienvenida al dueño (una sola vez). Nunca bloquea la entrada.
+    if (user?.id && !localStorage.getItem('fc_welcome_sent')) {
+      localStorage.setItem('fc_welcome_sent', '1')
+      // Se espera un momento (máx. 2.5 s) para que la navegación no corte el envío.
+      await Promise.race([
+        supabase.functions.invoke('send-welcome', { body: { ownerId: user.id } }).catch(() => {}),
+        new Promise(r => setTimeout(r, 2500)),
+      ])
+    }
     refresh?.()
     window.location.href = '/dashboard'
   }

@@ -233,6 +233,8 @@ export default function JoinFamily() {
     refreshFamily()
     setAccepting(false)
     setAccepted(true)
+    // Correo de bienvenida al nuevo miembro. Nunca bloquea la entrada.
+    supabase.functions.invoke('send-welcome', { body: { ownerId: invitation.user_id } }).catch(() => {})
   }
 
   // ── Mini-intro post-invitación ──────────────────────────────────────────
