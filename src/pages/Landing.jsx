@@ -327,10 +327,10 @@ export default function Landing() {
             </p>
           </div>
 
-          <div className="hero2-visual hero-reveal hero-delay-3" style={{ position: 'relative', paddingBottom: 40 }}>
-            <img src={HERO_IMG} alt="Abuela con su hija y su nieta riéndose frente a una tableta" style={{ width: '100%', aspectRatio: '4 / 3.4', objectFit: 'cover', objectPosition: 'center 35%', borderRadius: 28, display: 'block', boxShadow: '0 30px 80px rgba(0,0,0,0.35)', border: '5px solid rgba(255,255,255,0.12)' }} />
+          <div className="hero2-visual hero-reveal hero-delay-3" style={{ position: 'relative', marginBottom: 150 }}>
+            <img src={HERO_IMG} alt="Abuela con su hija y su nieta riéndose frente a una tableta" style={{ width: '100%', aspectRatio: '3 / 2', objectFit: 'cover', objectPosition: 'center', borderRadius: 28, display: 'block', boxShadow: '0 30px 80px rgba(0,0,0,0.35)', border: '5px solid rgba(255,255,255,0.12)' }} />
             {/* Celular con la app por dentro */}
-            <div className="hero2-phone" aria-hidden="true" style={{ position: 'absolute', right: -18, bottom: -10, width: 210, borderRadius: 34, background: '#0E1E26', padding: 8, boxShadow: '0 30px 70px rgba(0,0,0,0.45)', animation: 'hero2float 5s ease-in-out infinite' }}>
+            <div className="hero2-phone" aria-hidden="true" style={{ position: 'absolute', right: -36, bottom: -170, width: 200, borderRadius: 34, background: '#0E1E26', padding: 8, boxShadow: '0 30px 70px rgba(0,0,0,0.45)', animation: 'hero2float 5s ease-in-out infinite' }}>
               <div style={{ borderRadius: 27, overflow: 'hidden', background: CREAM, fontFamily: SANS }}>
                 <div style={{ height: 22, display: 'flex', justifyContent: 'center', alignItems: 'center', background: CREAM }}>
                   <div style={{ width: 60, height: 14, borderRadius: 10, background: '#0E1E26' }} />
@@ -851,9 +851,9 @@ export default function Landing() {
           .hero2-text { display: flex; flex-direction: column; align-items: center; }
           .hero2-ctas { justify-content: center; }
           .hero2-visual { text-align: left; width: 100%; max-width: 440px; margin: 0 auto; }
-          .hero2-visual { margin-bottom: 96px !important; }
+          .hero2-visual { margin-bottom: 200px !important; }
           .hero2-row-2 { display: none !important; }
-          .hero2-phone { width: 148px !important; right: -8px !important; bottom: -96px !important; padding: 6px !important; border-radius: 28px !important; }
+          .hero2-phone { width: 148px !important; right: 4px !important; bottom: -196px !important; padding: 6px !important; border-radius: 28px !important; }
           .hero2-phone > div { border-radius: 23px !important; }
           .hero2-toast { left: -4px !important; top: -18px !important; }
         }
