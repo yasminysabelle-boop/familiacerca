@@ -163,8 +163,7 @@ export default function Landing() {
   }, [])
 
   if (loading) return null
-  // ?ver=1 deja ver la landing aunque haya sesión abierta (para revisarla).
-  if (user && !new URLSearchParams(window.location.search).has("ver")) return <Navigate to="/dashboard" replace />
+  if (user) return <Navigate to="/dashboard" replace />
 
   const navLinks = [
     { label: 'Funciones', href: '#funciones' },

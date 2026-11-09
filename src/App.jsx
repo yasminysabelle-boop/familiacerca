@@ -48,7 +48,7 @@ function HomeRoute() {
   const { user, loading } = useAuth()
   const { loading: familyLoading } = useFamily()
   if (loading || (user && familyLoading)) return null
-  if (!user || new URLSearchParams(window.location.search).has('ver')) return <Landing />
+  if (!user) return <Landing />
   return <Navigate to="/dashboard" replace />
 }
 
