@@ -341,6 +341,33 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* ─────────────── 2.5. EN UN SOLO LUGAR ─────────────── */}
+      {/* Respiro claro entre la portada y el problema (dos fotos grandes
+          seguidas cansaban). Embudo: promesa → qué hace → dolor → WhatsApp. */}
+      <section style={{ background: WHITE, padding: 'clamp(64px,7vw,96px) 24px' }}>
+        <div style={{ maxWidth: 1120, margin: '0 auto' }}>
+          <div className="reveal" style={{ textAlign: 'center', maxWidth: 640, margin: '0 auto 44px' }}>
+            <p style={{ fontSize: 14, fontWeight: 600, color: CORAL, textTransform: 'uppercase', letterSpacing: '0.14em', margin: '0 0 12px', fontFamily: SANS }}>En un solo lugar</p>
+            <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(28px,3.4vw,44px)', fontWeight: 700, color: PRIMARY, lineHeight: 1.15, margin: 0 }}>
+              Todo lo del cuidado, sin perseguir a nadie
+            </h2>
+          </div>
+          <div className="lugar-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 22 }}>
+            {[
+              { icon: '💊', title: 'Cada dosis, confirmada', desc: 'Quien la da, la marca. Los demás lo ven al instante, con la hora.' },
+              { icon: '📅', title: 'Citas sin confusiones', desc: 'Fecha, hora y quién acompaña, a la vista de todos.' },
+              { icon: '👨‍👩‍👧', title: 'Toda la familia al tanto', desc: 'Desde la casa o desde lejos: hermanos, nietos y cuidadores.' },
+            ].map((it, i) => (
+              <div key={it.title} className={`reveal reveal-delay-${i}`} style={{ background: CREAM, borderRadius: 22, padding: '28px 26px', border: `1px solid ${BORDER}` }}>
+                <div style={{ width: 56, height: 56, borderRadius: 16, background: '#E3F1F8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, marginBottom: 16 }}>{it.icon}</div>
+                <h3 style={{ fontFamily: SERIF, fontSize: 20, fontWeight: 700, color: '#14303D', margin: '0 0 8px' }}>{it.title}</h3>
+                <p style={{ fontSize: 16, color: '#4E6470', lineHeight: 1.6, margin: 0, fontFamily: SANS }}>{it.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ─────────────── 5. PROBLEM SPLIT ─────────────── */}
       <section style={{ overflow: 'hidden' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '42% 58%' }} className="landing-problema-grid">
@@ -823,6 +850,7 @@ export default function Landing() {
         @keyframes hero2float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
         @media (prefers-reduced-motion: reduce) { .hero2-phone, .hero2-toast { animation: none !important; } }
         .wa-tag { display: none; }
+        @media (max-width: 760px) { .lugar-grid { grid-template-columns: 1fr !important; } }
         @media (max-width: 760px) {
           .wa-row { grid-template-columns: 1fr !important; }
           .wa-head { display: none !important; }
