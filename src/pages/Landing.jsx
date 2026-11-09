@@ -836,7 +836,7 @@ export default function Landing() {
           .hero3-inner { padding: 50vh 20px 56px !important; text-align: center; }
           .hero3-text { margin: 0 auto; display: flex; flex-direction: column; align-items: center; }
           .hero3-ctas { justify-content: center; }
-          .hero3-toast { right: 50% !important; transform: translateX(50%); bottom: auto !important; top: calc(50vh - 92px); animation: none !important; }
+          .hero3-toast { right: 50% !important; transform: translateX(50%); bottom: auto !important; top: calc(50vh - 104px); animation: none !important; width: max-content; max-width: 92vw; }
         }
         @media (max-width: 900px) {
           .hero2-grid { grid-template-columns: 1fr !important; padding: 104px 20px 64px !important; gap: 40px !important; text-align: center; }
