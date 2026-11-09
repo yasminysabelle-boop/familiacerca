@@ -62,7 +62,7 @@ export default function TodoElCuidado() {
     { Icon: AlertTriangle, label: 'Modo emergencia',      tint: '#D9534F', tintBg: '#FBEAEA', emphasis: true,  onClick: () => navigate('/dashboard?sos=1') },
     { Icon: Phone,         label: 'Contactos médicos',    tint: '#087F70', tintBg: '#E5F4F1', emphasis: false, onClick: () => navigate('/directorio') },
     { Icon: Info,          label: 'Información médica',   tint: '#087F70', tintBg: '#E5F4F1', emphasis: false, onClick: () => navigate('/diario-medico') },
-    { Icon: FileText,      label: 'Recetas y documentos', tint: '#087F70', tintBg: '#E5F4F1', emphasis: false, onClick: () => navigate('/reportes') },
+    { Icon: FileText,      label: 'Reportes para el médico', tint: '#087F70', tintBg: '#E5F4F1', emphasis: false, onClick: () => navigate('/reportes') },
   ]
   const vidaRecuerdos = [
     { Icon: Pencil,     label: 'Notas de familia',   onClick: () => navigate('/paciente/notas-familia') },

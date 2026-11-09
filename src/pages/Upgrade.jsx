@@ -230,7 +230,7 @@ function UpgradeContent() {
   const { user } = useAuth()
   const { memberRole, ownerId, profileResolved } = useFamily()
   const isAdmin = memberRole === null && ownerId === user?.id
-  const { sub, refresh } = useBillingAccount()
+  const { sub, refresh, isTrialing, daysLeft } = useBillingAccount()
   const navigate = useNavigate()
   const [{ isResolved, isRejected }] = usePayPalScriptReducer()
   const [success, setSuccess] = useState(null)
@@ -393,6 +393,11 @@ function UpgradeContent() {
           <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: 14, margin: 0, lineHeight: 1.5 }}>
             Sin contratos. Cancela cuando quieras. Si no eliges un plan, sigues gratis con lo esencial.
           </p>
+          {isTrialing && (
+            <p style={{ color: 'white', fontSize: 13, fontWeight: 700, margin: '10px 0 0', background: 'rgba(255,255,255,0.15)', borderRadius: 10, padding: '8px 12px', display: 'inline-block' }}>
+              ✨ Estás probando todo incluido · te queda{daysLeft !== 1 ? 'n' : ''} {daysLeft} día{daysLeft !== 1 ? 's' : ''}
+            </p>
+          )}
         </div>
 
         {/* Cards */}
@@ -412,7 +417,7 @@ function UpgradeContent() {
                 fontSize: 11, fontWeight: 700,
                 padding: '4px 12px', borderRadius: '0 0 10px 10px',
               }}>
-                Tu plan actual
+                {isTrialing ? 'Al terminar la prueba' : 'Tu plan actual'}
               </div>
             )}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
@@ -434,7 +439,7 @@ function UpgradeContent() {
               background: '#E5E7EB', color: '#9CA3AF',
               fontWeight: 600, fontSize: 14, cursor: 'default',
             }}>
-              {activePlan === null ? 'Tu plan actual' : 'Plan básico'}
+              {activePlan === null ? (isTrialing ? 'Sigues aquí si no eliges plan' : 'Tu plan actual') : 'Plan básico'}
             </button>
           </div>
 

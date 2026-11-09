@@ -27,6 +27,7 @@ import CompanionChat from '../components/CompanionChat'
 import VideoCallScheduleModal from '../components/VideoCallScheduleModal'
 import { getLocation, mapsUrl } from '../lib/gps'
 import { track } from '../lib/analytics'
+import { startsTomorrow } from '../lib/medTiming'
 
 // Mood lookup — handles both stored text values and emoji values
 const MOOD_MAP = {
@@ -2579,6 +2580,9 @@ export default function Dashboard() {
     // ── Pending medications (scheduled time passed, not confirmed) ──
     for (const med of (meds ?? [])) {
       if (todayLogMap[med.id]?.status === 'confirmed') continue
+      // Agregado hoy después de su hora: su primera dosis es mañana, no está
+      // "pendiente" ni atrasado (lib/medTiming.js, auditoría nov 2026).
+      if (startsTomorrow(med)) continue
       const times = med.scheduled_times?.length
         ? [...med.scheduled_times].sort()
         : (med.time ? [med.time] : [])

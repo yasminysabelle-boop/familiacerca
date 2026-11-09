@@ -315,7 +315,13 @@ export default function OnboardingFlow() {
     window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`)
   }
   async function copyLink() {
-    try { await navigator.clipboard.writeText(inviteLink); setCopied(true); setTimeout(() => setCopied(false), 2500) } catch { }
+    try {
+      await navigator.clipboard.writeText(inviteLink); setCopied(true); setTimeout(() => setCopied(false), 2500)
+    } catch {
+      // Algunos navegadores bloquean el portapapeles: mostrar el enlace para
+      // copiarlo a mano en vez de fallar en silencio.
+      window.prompt('Copia este enlace de invitación:', inviteLink)
+    }
   }
 
   // El perfil/familia ya quedó creado en Supabase para este punto — lo único que puede
@@ -377,7 +383,7 @@ export default function OnboardingFlow() {
               {[
                 { emoji: '💊', text: 'Medicamentos con recordatorios automáticos' },
                 { emoji: '👨‍👩‍👧', text: 'Todo el equipo coordinado en tiempo real' },
-                { emoji: '📋', text: 'Historial médico accesible desde cualquier lugar' },
+                { emoji: '📋', text: 'Todo lo del cuidado en un solo lugar, para toda la familia' },
               ].map(({ emoji, text }) => (
                 <div key={text} style={{
                   display: 'flex', alignItems: 'center', gap: 14,
@@ -673,7 +679,7 @@ export default function OnboardingFlow() {
               <div style={{ fontSize: 56, marginBottom: 14, lineHeight: 1 }}>🎉</div>
               <p style={{ fontSize: 26, fontWeight: 800, color: '#1A1A1A', fontFamily: 'Georgia, serif', lineHeight: 1.25, margin: '0 0 10px' }}>
                 {patientName.trim()
-                  ? `${patientName.trim().split(' ')[0]} ya está protegido.`
+                  ? `¡Listo! Ya están organizados para cuidar a ${patientName.trim()}.`
                   : '¡Todo listo!'}
               </p>
               <p style={{ fontSize: 15, color: '#718096', margin: 0, lineHeight: 1.6 }}>

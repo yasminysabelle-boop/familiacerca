@@ -22,6 +22,7 @@ import Layout from '../components/Layout'
 import MedicationListTab from '../components/MedicationListTab'
 import MedicationStockList from './medications/MedicationStockList'
 import MedicationRecetasTab from '../components/MedicationRecetasTab'
+import { startsTomorrow } from '../lib/medTiming'
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -794,8 +795,10 @@ export default function Medications() {
       const next = { ...prev }
       if (!next[med.id]) next[med.id] = {}
       if (!next[med.id][today]) next[med.id][today] = []
-      next[med.id][today] = next[med.id][today].filter(l => l.status !== 'confirmed')
-      next[med.id][today].push({ ...logPayload })
+      // Un solo registro por día (upsert por medication_id+log_date): el
+      // confirmado reemplaza también al 'missed' automático, para que la
+      // vista Hoy se actualice sin recargar (auditoría nov 2026).
+      next[med.id][today] = [{ ...logPayload }]
       return next
     })
     track('medication_administered', { medication_name: med.name })
@@ -922,6 +925,8 @@ export default function Medications() {
 
   const _noLogMeds = medications.filter(med =>
     !(logsByMedId[med.id]?.[today] ?? []).some(l => l.status === 'confirmed' || l.status === 'missed')
+    // Agregado hoy después de su hora: su primera dosis es mañana (lib/medTiming.js)
+    && !startsTomorrow(med)
   )
   const pendientesMeds = _noLogMeds
     .filter(med => {
@@ -1415,7 +1420,7 @@ export default function Medications() {
                             )}
                             {confTime && (
                               <span style={{ fontSize: 11, color: '#087F70', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
-                                <Clock size={11} color="#6B7A88" strokeWidth={2} /> {isOmitted ? 'Registrado:' : 'Administrado:'} {confTime}
+                                <Clock size={11} color="#6B7A88" strokeWidth={2} /> {isOmitted ? 'Sin registro de toma' : `Administrado: ${confTime}`}
                               </span>
                             )}
                             {byName && !isOmitted && (
@@ -1434,7 +1439,7 @@ export default function Medications() {
                             {!isOmitted && (
                               <span style={{ fontSize: 11, fontWeight: 600, color: todayLog?.given_on_time === false ? '#D97706' : '#087F70', display: 'flex', alignItems: 'center', gap: 4 }}>
                                 {todayLog?.given_on_time === false && todayLog?.minutes_late
-                                  ? `⚠️ Fuera de ventana (${todayLog.minutes_late} min)`
+                                  ? `Se registró más tarde de lo programado`
                                   : <><CheckIcon size={11} color="#6B7A88" strokeWidth={2.4} /> Administrado a tiempo</>}
                               </span>
                             )}
