@@ -136,14 +136,25 @@ export default function Landing() {
     document.head.appendChild(lk)
   }, [])
 
+  // Animación de entrada. Respaldo por scroll: si el IntersectionObserver no
+  // dispara (algunos navegadores/webviews), las secciones nunca aparecían.
   useEffect(() => {
-    const io = new IntersectionObserver(
-      entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in-view') }),
-      { threshold: 0.10, rootMargin: '0px 0px -32px 0px' }
-    )
-    document.querySelectorAll('.reveal').forEach(el => io.observe(el))
-    return () => io.disconnect()
-  }, [])
+    if (loading) return
+    const els = () => document.querySelectorAll('.reveal:not(.in-view)')
+    const check = () => els().forEach(el => { if (el.getBoundingClientRect().top < window.innerHeight - 24) el.classList.add('in-view') })
+    let io
+    if ('IntersectionObserver' in window) {
+      io = new IntersectionObserver(
+        entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in-view') }),
+        { threshold: 0.10, rootMargin: '0px 0px -32px 0px' }
+      )
+      els().forEach(el => io.observe(el))
+    }
+    check()
+    window.addEventListener('scroll', check, { passive: true })
+    window.addEventListener('resize', check)
+    return () => { io?.disconnect(); window.removeEventListener('scroll', check); window.removeEventListener('resize', check) }
+  }, [loading])
 
   useEffect(() => {
     const onScroll = () => setShowBar(window.scrollY > 150)
