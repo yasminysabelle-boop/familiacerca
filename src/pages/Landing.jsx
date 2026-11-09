@@ -1055,7 +1055,7 @@ export default function Landing() {
           .landing-problema-text { order: 0 !important; }
           .landing-ai-grid { justify-content: center !important; }
           .como-grid { flex-direction: column !important; gap: 52px !important; }
-          .como-img { display: none !important; }
+          .como-img { flex: 1 1 auto !important; width: 100% !important; }
           .testimonios-grid { grid-template-columns: 1fr !important; }
           .antes-ahora-grid { grid-template-columns: 1fr !important; }
           .solution-steps-grid { grid-template-columns: 1fr !important; gap: 44px !important; }
