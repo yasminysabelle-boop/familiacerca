@@ -61,7 +61,7 @@ const INPUT = {
 }
 
 const LABEL = {
-  display: 'block', fontSize: 11, fontWeight: 700, color: '#5E7480',
+  display: 'block', fontSize: 13, fontWeight: 700, color: '#5E7480',
   textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6,
 }
 
@@ -103,7 +103,7 @@ function Chip({ label, sub, selected, onClick }) {
       }}
     >
       <span style={{ fontSize: 13, fontWeight: 700, color: selected ? 'white' : '#30454F' }}>{label}</span>
-      {sub && <span style={{ fontSize: 11, fontWeight: 500, color: selected ? 'white' : '#5E7480' }}>{sub}</span>}
+      {sub && <span style={{ fontSize: 13, fontWeight: 500, color: selected ? 'white' : '#5E7480' }}>{sub}</span>}
     </button>
   )
 }
@@ -371,7 +371,7 @@ export default function OnboardingFlow() {
             transition: 'width 0.4s cubic-bezier(0.4,0,0.2,1)',
           }} />
         </div>
-        <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', textAlign: 'right', margin: '6px 0 14px', fontWeight: 600 }}>
+        <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', textAlign: 'right', margin: '6px 0 14px', fontWeight: 600 }}>
           {stepIndex} / {TOTAL}
         </p>
       </div>
@@ -444,7 +444,7 @@ export default function OnboardingFlow() {
                   ? <img src={photoPreview} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="foto" />
                   : <span style={{ fontSize: 30 }}>📷</span>}
               </div>
-              <p style={{ fontSize: 11, color: '#5E7480', margin: '6px 0 0' }}>
+              <p style={{ fontSize: 13, color: '#5E7480', margin: '6px 0 0' }}>
                 {photoPreview ? 'Cambiar foto' : 'Foto (opcional)'}
               </p>
 
@@ -570,7 +570,7 @@ export default function OnboardingFlow() {
                     <option value="">Seleccionar...</option>
                     {FREQ_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                   </select>
-                  <span style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#5E7480', fontSize: 12 }}>▼</span>
+                  <span style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#5E7480', fontSize: 14 }}>▼</span>
                 </div>
               </div>
               <div>
@@ -620,7 +620,7 @@ export default function OnboardingFlow() {
                 <span style={{ fontSize: 26, flexShrink: 0 }}>📱</span>
                 <div style={{ textAlign: 'left' }}>
                   <p style={{ margin: 0, fontSize: 15, fontWeight: 700 }}>Invitar por WhatsApp</p>
-                  <p style={{ margin: '2px 0 0', fontSize: 12, opacity: 0.85 }}>Mensaje con el nombre del paciente</p>
+                  <p style={{ margin: '2px 0 0', fontSize: 14, opacity: 0.85 }}>Mensaje con el nombre del paciente</p>
                 </div>
               </button>
 
@@ -638,7 +638,7 @@ export default function OnboardingFlow() {
                 <span style={{ fontSize: 26, flexShrink: 0 }}>💬</span>
                 <div style={{ textAlign: 'left' }}>
                   <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#14303D' }}>Invitar por SMS</p>
-                  <p style={{ margin: '2px 0 0', fontSize: 12, color: '#718096' }}>Mensaje de texto directo</p>
+                  <p style={{ margin: '2px 0 0', fontSize: 14, color: '#718096' }}>Mensaje de texto directo</p>
                 </div>
               </button>
 
@@ -656,7 +656,7 @@ export default function OnboardingFlow() {
                 <span style={{ fontSize: 26, flexShrink: 0 }}>📧</span>
                 <div style={{ textAlign: 'left' }}>
                   <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#14303D' }}>Invitar por correo</p>
-                  <p style={{ margin: '2px 0 0', fontSize: 12, color: '#718096' }}>Asunto y mensaje prellenado</p>
+                  <p style={{ margin: '2px 0 0', fontSize: 14, color: '#718096' }}>Asunto y mensaje prellenado</p>
                 </div>
               </button>
 

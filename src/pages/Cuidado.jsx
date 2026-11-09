@@ -375,7 +375,7 @@ export default function Cuidado() {
                   borderRadius: 12, padding: '10px 14px', marginBottom: 14,
                 }}>
                   <Lock size={15} color="#4E6470" strokeWidth={1.8} style={{ flexShrink: 0 }} />
-                  <p style={{ fontSize: 12, color: '#4E6470', margin: 0 }}>
+                  <p style={{ fontSize: 14, color: '#4E6470', margin: 0 }}>
                     Solo puedes ver el cuidado registrado por el cuidador.
                   </p>
                 </div>
@@ -476,7 +476,7 @@ export default function Cuidado() {
                         onClick={() => setShowCompleted(s => !s)}
                       >
                         <CheckIcon size={12} color="#0C6C9C" strokeWidth={2.6} />
-                        <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#0C6C9C' }}>
+                        <span style={{ fontSize: 13, fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#0C6C9C' }}>
                           Completadas <span style={{ opacity: 0.7, fontWeight: 600 }}>({completadas.length})</span>
                         </span>
                         <span style={{ marginLeft: 'auto', color: '#94A0AD', fontSize: 13 }}>{showCompleted ? '▾' : '▸'}</span>
@@ -509,7 +509,7 @@ export default function Cuidado() {
           {/* ── HORARIOS TAB ── */}
           {activeTab === 'horarios' && (
             <div>
-              <p style={{ fontSize: 12.5, color: '#4E6470', margin: '0 0 16px', lineHeight: 1.5 }}>
+              <p style={{ fontSize: 14, color: '#4E6470', margin: '0 0 16px', lineHeight: 1.5 }}>
                 Se avisa si no se marca 30 min después de la hora programada.
               </p>
 
@@ -520,7 +520,7 @@ export default function Cuidado() {
                   borderRadius: 12, padding: '10px 14px', marginBottom: 16,
                 }}>
                   <Lock size={15} color="#4E6470" strokeWidth={1.8} style={{ flexShrink: 0 }} />
-                  <p style={{ fontSize: 12, color: '#4E6470', margin: 0 }}>
+                  <p style={{ fontSize: 14, color: '#4E6470', margin: 0 }}>
                     Solo el administrador puede cambiar los horarios.
                   </p>
                 </div>
@@ -576,14 +576,14 @@ export default function Cuidado() {
                     background: '#E3F1F8', borderRadius: 12, padding: '10px 14px', margin: '10px 0 20px',
                   }}>
                     <Clock size={14} color="#0C6C9C" strokeWidth={2} style={{ marginTop: 1, flexShrink: 0 }} />
-                    <p style={{ fontSize: 12, color: '#0A5A82', margin: 0, lineHeight: 1.5 }}>
+                    <p style={{ fontSize: 14, color: '#0A5A82', margin: 0, lineHeight: 1.5 }}>
                       Los horarios aplican para toda la familia. Si un cuidado no se marca a tiempo,
                       aparece en <strong>Atrasadas</strong> dentro de Hoy.
                     </p>
                   </div>
 
                   {saveError && (
-                    <p style={{ fontSize: 12, color: '#C4664F', textAlign: 'center', marginBottom: 12 }}>
+                    <p style={{ fontSize: 14, color: '#C4664F', textAlign: 'center', marginBottom: 12 }}>
                       {saveError}
                     </p>
                   )}
@@ -651,7 +651,7 @@ export default function Cuidado() {
 function RoutineSection({ label, color = '#94A0AD', children }) {
   return (
     <div style={{ marginBottom: 16 }}>
-      <p style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color, margin: '0 0 8px 2px' }}>
+      <p style={{ fontSize: 13, fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color, margin: '0 0 8px 2px' }}>
         {label}
       </p>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -696,13 +696,13 @@ function RoutineCard({ item, state, isToggling, isFamiliar, scheduledTime, log, 
         </p>
 
         {isCompletada && checkedTime && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 3, fontSize: 11.5, fontWeight: 700, color: '#0C6C9C' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 3, fontSize: 13, fontWeight: 700, color: '#0C6C9C' }}>
             <CheckIcon size={11} color="#0C6C9C" strokeWidth={2.6} />
             {checkedTime}{log?.checked_by ? ` · ${log.checked_by.split(' ')[0]}` : ''}
           </div>
         )}
         {!isCompletada && scheduledTime && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 3, fontSize: 11.5, color: '#4E6470', fontWeight: 600 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 3, fontSize: 13, color: '#4E6470', fontWeight: 600 }}>
             <Clock size={11} color="#4E6470" strokeWidth={2.2} />
             {fmtTime(scheduledTime)}
           </div>
@@ -725,7 +725,7 @@ function RoutineCard({ item, state, isToggling, isFamiliar, scheduledTime, log, 
       </div>
 
       {isRetrasada && (
-        <span style={{ fontSize: 10.5, fontWeight: 800, color: '#8A5A4A', background: '#FBEAE4', padding: '3px 9px', borderRadius: 999, flexShrink: 0 }}>
+        <span style={{ fontSize: 12, fontWeight: 800, color: '#8A5A4A', background: '#FBEAE4', padding: '3px 9px', borderRadius: 999, flexShrink: 0 }}>
           Atrasada
         </span>
       )}

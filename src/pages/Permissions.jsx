@@ -156,19 +156,19 @@ export default function Permissions() {
                 background: '#F9F5F1', borderRadius: 14,
                 padding: '14px 16px', marginBottom: 20,
               }}>
-                <p style={{ fontSize: 12, fontWeight: 700, color: '#4E6470', marginBottom: 10, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                <p style={{ fontSize: 14, fontWeight: 700, color: '#4E6470', marginBottom: 10, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
                   Cómo habilitarlos
                 </p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
                     <span style={{ fontSize: 14, flexShrink: 0 }}>📱</span>
-                    <p style={{ fontSize: 12, color: '#30454F', lineHeight: 1.5 }}>
+                    <p style={{ fontSize: 14, color: '#30454F', lineHeight: 1.5 }}>
                       <strong>iPhone / Safari:</strong> Ajustes → Safari → Cámara y Micrófono → Permitir
                     </p>
                   </div>
                   <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
                     <span style={{ fontSize: 14, flexShrink: 0 }}>🌐</span>
-                    <p style={{ fontSize: 12, color: '#30454F', lineHeight: 1.5 }}>
+                    <p style={{ fontSize: 14, color: '#30454F', lineHeight: 1.5 }}>
                       <strong>Chrome / Android:</strong> Toca el candado 🔒 en la barra de dirección → Permisos
                     </p>
                   </div>
@@ -232,7 +232,7 @@ export default function Permissions() {
                       <p style={{ fontSize: 14, fontWeight: 700, color: '#14303D', marginBottom: 2 }}>
                         {item.title}
                       </p>
-                      <p style={{ fontSize: 12, color: '#4E6470', lineHeight: 1.5 }}>
+                      <p style={{ fontSize: 14, color: '#4E6470', lineHeight: 1.5 }}>
                         {item.desc}
                       </p>
                     </div>
@@ -242,7 +242,7 @@ export default function Permissions() {
 
               {/* Privacy note */}
               <p style={{
-                fontSize: 11, color: '#5E7480', textAlign: 'center',
+                fontSize: 13, color: '#5E7480', textAlign: 'center',
                 lineHeight: 1.6, marginBottom: 18,
               }}>
                 🔒 Tus permisos son solo para esta app. Nunca accedemos a tu cámara o micrófono sin que tú lo actives.
@@ -283,7 +283,7 @@ export default function Permissions() {
         </div>
 
         <p style={{
-          marginTop: 20, textAlign: 'center', fontSize: 11,
+          marginTop: 20, textAlign: 'center', fontSize: 13,
           color: 'rgba(255,255,255,0.4)', lineHeight: 1.6,
         }}>
           Tus datos están cifrados y son solo tuyos.

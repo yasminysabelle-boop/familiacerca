@@ -80,7 +80,7 @@ export default function TermsOfService() {
         {/* Title block */}
         <div className="mb-8 text-center">
           <div
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold mb-4"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold mb-4"
             style={{ background: '#E3F1F8', color: '#0A4A6B' }}
           >
             📄 Documento legal
@@ -91,7 +91,7 @@ export default function TermsOfService() {
           >
             Términos de Servicio
           </h1>
-          <p className="text-xs text-gray-400">
+          <p className="text-sm text-gray-400">
             Última actualización: 1 de mayo de 2025 · Vigente a partir de esa fecha
           </p>
         </div>
@@ -147,7 +147,7 @@ export default function TermsOfService() {
                   <p className="font-bold text-gray-900" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Plan Gratis</p>
                   <span className="font-bold" style={{ color: '#5E7480' }}>$0</span>
                 </div>
-                <p className="text-xs text-gray-500">Coordinación familiar básica: hasta 2 cuidadores, medicamentos, chat familiar e historial de 7 días.</p>
+                <p className="text-sm text-gray-500">Coordinación familiar básica: hasta 2 cuidadores, medicamentos, chat familiar e historial de 7 días.</p>
               </div>
               <div
                 className="rounded-2xl p-4"
@@ -157,7 +157,7 @@ export default function TermsOfService() {
                   <p className="font-bold text-gray-900" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Plan Familiar</p>
                   <span className="font-bold" style={{ color: '#0C6C9C' }}>$12.99 / mes</span>
                 </div>
-                <p className="text-xs text-gray-500">Todo lo del Plan Gratis, más: hasta 6 cuidadores, recordatorios automáticos, foto-prueba, reportes en PDF, álbum familiar, gastos de cuidado e historial de 90 días.</p>
+                <p className="text-sm text-gray-500">Todo lo del Plan Gratis, más: hasta 6 cuidadores, recordatorios automáticos, foto-prueba, reportes en PDF, álbum familiar, gastos de cuidado e historial de 90 días.</p>
               </div>
               <div
                 className="rounded-2xl p-4"
@@ -167,10 +167,10 @@ export default function TermsOfService() {
                   <p className="font-bold text-gray-900" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Plan Cuidado Total</p>
                   <span className="font-bold" style={{ color: '#A07830' }}>$24.99 / mes</span>
                 </div>
-                <p className="text-xs text-gray-500">Todo el Plan Familiar más: cuidadores ilimitados, alertas SOS prioritarias, reporte semanal automático, historial ilimitado y soporte prioritario.</p>
+                <p className="text-sm text-gray-500">Todo el Plan Familiar más: cuidadores ilimitados, alertas SOS prioritarias, reporte semanal automático, historial ilimitado y soporte prioritario.</p>
               </div>
             </div>
-            <p className="text-xs text-gray-500">
+            <p className="text-sm text-gray-500">
               Los precios están en dólares estadounidenses (USD) e incluyen impuestos aplicables.
               Nos reservamos el derecho de modificar los precios con un aviso mínimo de 30 días
               a los usuarios activos antes de que el cambio entre en vigor.
@@ -277,7 +277,7 @@ export default function TermsOfService() {
               <span className="text-2xl">✉️</span>
               <div>
                 <p className="font-semibold text-gray-900 text-sm">legal@familiacerca.com</p>
-                <p className="text-xs text-gray-400 mt-0.5">Respondemos en un plazo de 5 días hábiles</p>
+                <p className="text-sm text-gray-400 mt-0.5">Respondemos en un plazo de 5 días hábiles</p>
               </div>
             </div>
           </Section>
@@ -289,7 +289,7 @@ export default function TermsOfService() {
           className="mt-8 pt-6 flex flex-col items-center gap-3"
           style={{ borderTop: '1px solid #E6E3DB' }}
         >
-          <p className="text-xs text-gray-400 text-center leading-relaxed">
+          <p className="text-sm text-gray-400 text-center leading-relaxed">
             ¿Prefieres leer esto en inglés? Escríbenos a{' '}
             <a href="mailto:legal@familiacerca.com" className="underline" style={{ color: '#0C6C9C' }}>
               legal@familiacerca.com
@@ -298,12 +298,12 @@ export default function TermsOfService() {
           </p>
           <Link
             to="/privacidad"
-            className="text-xs font-semibold underline"
+            className="text-sm font-semibold underline"
             style={{ color: '#0C6C9C' }}
           >
             Ver Política de Privacidad →
           </Link>
-          <p className="text-[10px] text-gray-300 mt-1">
+          <p className="text-[12px] text-gray-300 mt-1">
             © 2025 FamiliaCerca LLC · Todos los derechos reservados
           </p>
         </div>

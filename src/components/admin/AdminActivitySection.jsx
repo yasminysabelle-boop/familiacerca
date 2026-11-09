@@ -142,7 +142,7 @@ export default function AdminActivitySection() {
 
   return (
     <div>
-      <p style={{ fontSize: 11, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 12px 2px' }}>
+      <p style={{ fontSize: 13, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 12px 2px' }}>
         Últimos 30 días ({events.length} eventos)
       </p>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
@@ -153,7 +153,7 @@ export default function AdminActivitySection() {
             <div key={ev.id}>
               {showDate && (
                 <p style={{
-                  fontSize: 10, fontWeight: 700, color: '#5E7480',
+                  fontSize: 12, fontWeight: 700, color: '#5E7480',
                   textTransform: 'uppercase', letterSpacing: '0.08em',
                   margin: i === 0 ? '0 0 8px' : '16px 0 8px',
                 }}>
@@ -178,7 +178,7 @@ export default function AdminActivitySection() {
                   <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#14303D', lineHeight: 1.3 }}>
                     {ev.what}
                   </p>
-                  <p style={{ margin: '3px 0 0', fontSize: 11, color: '#5E7480' }}>
+                  <p style={{ margin: '3px 0 0', fontSize: 13, color: '#5E7480' }}>
                     {ev.who} · {timeAgo(ev.ts)}
                   </p>
                 </div>

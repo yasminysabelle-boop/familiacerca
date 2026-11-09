@@ -75,13 +75,13 @@ function CopyableSubscriptionId({ subscriptionId }) {
       }}
     >
       <span style={{
-        fontFamily: 'monospace', fontSize: 12.5, color: '#30454F',
+        fontFamily: 'monospace', fontSize: 14, color: '#30454F',
         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
       }}>
         {subscriptionId}
       </span>
       <span style={{
-        flexShrink: 0, fontSize: 11.5, fontWeight: 700,
+        flexShrink: 0, fontSize: 13, fontWeight: 700,
         color: copied ? '#0C6C9C' : '#5E7480',
       }}>
         {copied ? 'Copiado ✓' : 'Copiar'}
@@ -123,7 +123,7 @@ function PayPalSection({
         <p style={{ color: '#30454F', fontSize: 13, margin: '0 0 12px', lineHeight: 1.5 }}>
           Estamos activando tu plan — puede tardar unos minutos.
         </p>
-        <p style={{ color: '#4E6470', fontSize: 12.5, margin: '0 0 4px', lineHeight: 1.5 }}>
+        <p style={{ color: '#4E6470', fontSize: 14, margin: '0 0 4px', lineHeight: 1.5 }}>
           Si al volver no ves el cambio, escribinos a <strong>hola@familiacerca.com</strong> con este número:
         </p>
         <CopyableSubscriptionId subscriptionId={timedOut.subscriptionId} />
@@ -150,7 +150,7 @@ function PayPalSection({
         <p style={{ color: '#0A4A6B', fontWeight: 700, fontSize: 14, margin: 0 }}>
           Confirmando tu pago...
         </p>
-        <p style={{ color: '#3A6B65', fontSize: 12.5, margin: '4px 0 0' }}>
+        <p style={{ color: '#3A6B65', fontSize: 14, margin: '4px 0 0' }}>
           Esto suele tardar unos segundos.
         </p>
       </div>
@@ -215,7 +215,7 @@ function PayPalSection({
       />
       {errors[planKey] && (
         <p style={{
-          fontSize: 12, color: '#DC2626', margin: '8px 0 0',
+          fontSize: 14, color: '#DC2626', margin: '8px 0 0',
           padding: '8px 12px', background: '#FFF0F0',
           border: '1px solid #FFBABA', borderRadius: 10,
         }}>
@@ -414,7 +414,7 @@ function UpgradeContent() {
               <div style={{
                 position: 'absolute', top: -1, right: 18,
                 background: '#5E7480', color: 'white',
-                fontSize: 11, fontWeight: 700,
+                fontSize: 13, fontWeight: 700,
                 padding: '4px 12px', borderRadius: '0 0 10px 10px',
               }}>
                 {isTrialing ? 'Al terminar la prueba' : 'Tu plan actual'}
@@ -453,7 +453,7 @@ function UpgradeContent() {
             <div style={{
               position: 'absolute', top: -1, right: 18,
               background: activePlan === 'familiar' ? '#0A4A6B' : '#E58B73',
-              color: 'white', fontSize: 11, fontWeight: 700,
+              color: 'white', fontSize: 13, fontWeight: 700,
               padding: '4px 12px', borderRadius: '0 0 10px 10px',
             }}>
               {activePlan === 'familiar' ? 'Tu plan actual' : 'Recomendado para la mayoría de las familias'}
@@ -464,7 +464,7 @@ function UpgradeContent() {
               </p>
               <span style={{ fontSize: 24, fontWeight: 800, color: '#0A4A6B' }}>${PLANS.familiar.price}/mes</span>
             </div>
-            <p style={{ fontSize: 12, color: '#0A4A6B', fontWeight: 600, margin: '0 0 14px' }}>
+            <p style={{ fontSize: 14, color: '#0A4A6B', fontWeight: 600, margin: '0 0 14px' }}>
               {PLANS.familiar.tagline}
             </p>
             <div style={{ marginBottom: 18 }}>
@@ -494,7 +494,7 @@ function UpgradeContent() {
               <div style={{
                 position: 'absolute', top: -1, right: 18,
                 background: '#0A4A6B', color: 'white',
-                fontSize: 11, fontWeight: 700,
+                fontSize: 13, fontWeight: 700,
                 padding: '4px 12px', borderRadius: '0 0 10px 10px',
               }}>
                 Tu plan actual
@@ -506,7 +506,7 @@ function UpgradeContent() {
               </p>
               <span style={{ fontSize: 24, fontWeight: 800, color: '#0A4A6B' }}>${PLANS.care_plus.price}/mes</span>
             </div>
-            <p style={{ fontSize: 12, color: '#0A4A6B', fontWeight: 600, margin: '0 0 14px' }}>
+            <p style={{ fontSize: 14, color: '#0A4A6B', fontWeight: 600, margin: '0 0 14px' }}>
               {PLANS.care_plus.tagline}
             </p>
             <div style={{ marginBottom: 18 }}>
@@ -525,7 +525,7 @@ function UpgradeContent() {
             />
           </div>
 
-          <p style={{ fontSize: 11, color: '#B0A898', textAlign: 'center', margin: '4px 0 0', lineHeight: 1.6 }}>
+          <p style={{ fontSize: 13, color: '#B0A898', textAlign: 'center', margin: '4px 0 0', lineHeight: 1.6 }}>
             Pago seguro procesado por PayPal · Cancela en cualquier momento
           </p>
         </div>

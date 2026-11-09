@@ -76,7 +76,7 @@ export default function PWAInstallBanner() {
           <p style={{ fontSize: 13, fontWeight: 700, color: 'white', margin: '0 0 1px' }}>
             {isIOS ? 'Instala FamiliaCerca' : 'Instala FamiliaCerca en tu celular'}
           </p>
-          <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)', margin: 0 }}>
+          <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', margin: 0 }}>
             {isIOS ? 'Acceso rápido desde tu pantalla de inicio' : 'Acceso rápido y notificaciones push'}
           </p>
         </div>
@@ -87,7 +87,7 @@ export default function PWAInstallBanner() {
           style={{
             padding: '8px 14px', borderRadius: 10, border: 'none', flexShrink: 0,
             background: 'white', color: '#0C6C9C',
-            fontWeight: 700, fontSize: 12, cursor: 'pointer',
+            fontWeight: 700, fontSize: 14, cursor: 'pointer',
             whiteSpace: 'nowrap',
           }}
         >
@@ -125,11 +125,11 @@ export default function PWAInstallBanner() {
                 width: 22, height: 22, borderRadius: '50%', flexShrink: 0,
                 background: 'rgba(255,255,255,0.20)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 11, fontWeight: 700, color: 'white',
+                fontSize: 13, fontWeight: 700, color: 'white',
               }}>
                 {s.icon}
               </div>
-              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.88)', margin: 0, lineHeight: 1.5, paddingTop: 2 }}>
+              <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.88)', margin: 0, lineHeight: 1.5, paddingTop: 2 }}>
                 {s.text}
               </p>
             </div>

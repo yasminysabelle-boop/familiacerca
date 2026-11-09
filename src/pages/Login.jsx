@@ -219,7 +219,7 @@ export default function Login() {
                 )}
                 <form onSubmit={handleReset} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                   <div>
-                    <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#4E6470', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>
+                    <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#4E6470', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>
                       Nueva contraseña
                     </label>
                     <div style={{ position: 'relative' }}>
@@ -298,7 +298,7 @@ export default function Login() {
                 )}
                 <form onSubmit={handleForgot} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                   <div>
-                    <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#4E6470', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>
+                    <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#4E6470', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>
                       Correo electrónico
                     </label>
                     <input
@@ -346,7 +346,7 @@ export default function Login() {
 
             <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div>
-                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#4E6470', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#4E6470', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>
                   Correo electrónico
                 </label>
                 <input
@@ -360,13 +360,13 @@ export default function Login() {
 
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                  <label style={{ fontSize: 11, fontWeight: 700, color: '#4E6470', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                  <label style={{ fontSize: 13, fontWeight: 700, color: '#4E6470', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                     Contraseña
                   </label>
                   <button
                     type="button"
                     onClick={() => { setMode('forgot'); setError('') }}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#0C6C9C', fontSize: 12, fontWeight: 600, padding: 0 }}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#0C6C9C', fontSize: 14, fontWeight: 600, padding: 0 }}
                   >
                     ¿Olvidaste tu contraseña?
                   </button>
@@ -420,7 +420,7 @@ export default function Login() {
               </Link>
             </p>
 
-            <p style={{ marginTop: 12, textAlign: 'center', fontSize: 11, color: '#5E7480' }}>
+            <p style={{ marginTop: 12, textAlign: 'center', fontSize: 13, color: '#5E7480' }}>
               <Link to="/terminos" style={{ color: '#5E7480', textDecoration: 'underline' }}>Términos de Servicio</Link>
               {' · '}
               <Link to="/privacidad" style={{ color: '#5E7480', textDecoration: 'underline' }}>Política de Privacidad</Link>

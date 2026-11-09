@@ -110,7 +110,7 @@ export default function Layout({ children }) {
           }}
         >
           <span style={{ fontSize: 13 }}>🏥</span>
-          <span style={{ fontSize: 11, fontWeight: 800, color: 'white', letterSpacing: '0.05em' }}>
+          <span style={{ fontSize: 13, fontWeight: 800, color: 'white', letterSpacing: '0.05em' }}>
             MODO HOSPITAL ACTIVO
             {hospitalMode?.hospital_name ? ` · ${hospitalMode.hospital_name}` : ''}
           </span>
@@ -157,7 +157,7 @@ export default function Layout({ children }) {
                 background: 'rgba(255,255,255,0.12)',
                 border: '1px solid rgba(255,255,255,0.18)',
                 borderRadius: 20, cursor: 'pointer',
-                color: 'white', fontSize: 12, fontWeight: 700,
+                color: 'white', fontSize: 14, fontWeight: 700,
                 padding: '5px 10px 5px 6px', flexShrink: 0,
                 WebkitTapHighlightColor: 'transparent',
               }}
@@ -225,15 +225,15 @@ export default function Layout({ children }) {
         {children}
         <footer style={{ padding: '24px 16px', textAlign: 'center', borderTop: '1px solid #E6E3DB' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, marginBottom: 8 }}>
-            <Link to="/terminos" style={{ fontSize: 11, color: '#5E7480', textDecoration: 'none' }}>
+            <Link to="/terminos" style={{ fontSize: 13, color: '#5E7480', textDecoration: 'none' }}>
               Términos de servicio
             </Link>
-            <span style={{ color: '#D1D5DB', fontSize: 11 }}>·</span>
-            <Link to="/privacidad" style={{ fontSize: 11, color: '#5E7480', textDecoration: 'none' }}>
+            <span style={{ color: '#D1D5DB', fontSize: 13 }}>·</span>
+            <Link to="/privacidad" style={{ fontSize: 13, color: '#5E7480', textDecoration: 'none' }}>
               Política de privacidad
             </Link>
           </div>
-          <p style={{ fontSize: 10, color: '#D1D5DB', margin: 0 }}>© 2026 FamiliaCerca LLC</p>
+          <p style={{ fontSize: 12, color: '#D1D5DB', margin: 0 }}>© 2026 FamiliaCerca LLC</p>
         </footer>
       </main>
 
@@ -292,7 +292,7 @@ export default function Layout({ children }) {
             <span style={{ width: location.pathname === '/dashboard' ? 52 : 36, height: 32, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: location.pathname === '/dashboard' ? '#0C6C9C' : 'transparent', transition: 'width 0.15s ease' }}>
               <Home size={18} color={location.pathname === '/dashboard' ? 'white' : '#7C8698'} strokeWidth={2} />
             </span>
-            <span style={{ fontSize: 10, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: location.pathname === '/dashboard' ? '#0C6C9C' : '#7C8698' }}>Inicio</span>
+            <span style={{ fontSize: 11, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: location.pathname === '/dashboard' ? '#0C6C9C' : '#7C8698' }}>Inicio</span>
           </Link>
 
           {/* Medicamentos */}
@@ -300,7 +300,7 @@ export default function Layout({ children }) {
             <span style={{ width: location.pathname === '/medications' ? 52 : 36, height: 32, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: location.pathname === '/medications' ? '#0C6C9C' : 'transparent', transition: 'width 0.15s ease' }}>
               <Pill size={18} color={location.pathname === '/medications' ? 'white' : '#7C8698'} strokeWidth={2} />
             </span>
-            <span style={{ fontSize: 10, fontWeight: 700, color: location.pathname === '/medications' ? '#0C6C9C' : '#7C8698' }}>Medicamentos</span>
+            <span style={{ fontSize: 11, fontWeight: 700, color: location.pathname === '/medications' ? '#0C6C9C' : '#7C8698' }}>Medicamentos</span>
           </button>
 
           {/* Rutina */}
@@ -308,7 +308,7 @@ export default function Layout({ children }) {
             <span style={{ width: location.pathname === '/cuidado' ? 52 : 36, height: 32, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: location.pathname === '/cuidado' ? '#0C6C9C' : 'transparent', transition: 'width 0.15s ease' }}>
               <ClipboardList size={18} color={location.pathname === '/cuidado' ? 'white' : '#7C8698'} strokeWidth={2} />
             </span>
-            <span style={{ fontSize: 10, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: location.pathname === '/cuidado' ? '#0C6C9C' : '#7C8698' }}>Rutina</span>
+            <span style={{ fontSize: 11, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: location.pathname === '/cuidado' ? '#0C6C9C' : '#7C8698' }}>Rutina</span>
           </Link>
 
           {/* Chat */}
@@ -319,7 +319,7 @@ export default function Layout({ children }) {
                 <span style={{ position: 'absolute', top: 0, right: 0, width: 7, height: 7, borderRadius: '50%', background: '#D99A18', display: 'block' }} />
               )}
             </span>
-            <span style={{ fontSize: 10, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: location.pathname === '/chat' ? '#0C6C9C' : '#7C8698' }}>Chat</span>
+            <span style={{ fontSize: 11, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: location.pathname === '/chat' ? '#0C6C9C' : '#7C8698' }}>Chat</span>
           </Link>
 
           {/* Más */}
@@ -327,7 +327,7 @@ export default function Layout({ children }) {
             <span style={{ width: location.pathname === '/mas' ? 52 : 36, height: 32, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: location.pathname === '/mas' ? '#0C6C9C' : 'transparent', transition: 'width 0.15s ease' }}>
               <Menu size={18} color={location.pathname === '/mas' ? 'white' : '#7C8698'} strokeWidth={2} />
             </span>
-            <span style={{ fontSize: 10, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: location.pathname === '/mas' ? '#0C6C9C' : '#7C8698' }}>Más</span>
+            <span style={{ fontSize: 11, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: location.pathname === '/mas' ? '#0C6C9C' : '#7C8698' }}>Más</span>
           </Link>
         </nav>
 

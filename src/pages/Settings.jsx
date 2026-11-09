@@ -42,7 +42,7 @@ function ToggleRow({ icon, label, subtitle, checked, onChange }) {
       <span style={{ fontSize: 18 }}>{icon}</span>
       <div style={{ flex: 1 }}>
         <p style={{ fontSize: 14, fontWeight: 600, color: '#14303D', margin: 0 }}>{label}</p>
-        {subtitle && <p style={{ fontSize: 11, color: '#5E7480', margin: '1px 0 0' }}>{subtitle}</p>}
+        {subtitle && <p style={{ fontSize: 13, color: '#5E7480', margin: '1px 0 0' }}>{subtitle}</p>}
       </div>
       <button
         role="switch" aria-checked={checked}
@@ -288,7 +288,7 @@ export default function Settings() {
               <p style={{ color: 'white', fontSize: 16, fontWeight: 700, fontFamily: 'Georgia, serif', margin: 0 }}>
                 {user?.user_metadata?.full_name ?? 'Mi cuenta'}
               </p>
-              <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 12, margin: '3px 0 0' }}>
+              <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 14, margin: '3px 0 0' }}>
                 {user?.email}
               </p>
             </div>
@@ -298,7 +298,7 @@ export default function Settings() {
         {/* Mis familias — only shown when user belongs to more than one care group */}
         {hasMultiple && (
           <div style={{ background: 'white', borderRadius: 20, border: '1px solid #E6E3DB', overflow: 'hidden', marginBottom: 12 }}>
-            <p style={{ fontSize: 11, fontWeight: 700, color: '#5E7480', letterSpacing: '0.08em', textTransform: 'uppercase', padding: '14px 16px 8px', margin: 0 }}>
+            <p style={{ fontSize: 13, fontWeight: 700, color: '#5E7480', letterSpacing: '0.08em', textTransform: 'uppercase', padding: '14px 16px 8px', margin: 0 }}>
               Mis familias
             </p>
             {families.map((fam, i) => {
@@ -335,12 +335,12 @@ export default function Settings() {
                     <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#14303D', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {fam.patientName ?? 'Sin paciente'}
                     </p>
-                    <p style={{ margin: '2px 0 0', fontSize: 11, color: '#5E7480' }}>
+                    <p style={{ margin: '2px 0 0', fontSize: 13, color: '#5E7480' }}>
                       {fam.role === null ? 'Tu grupo de cuidado' : 'Miembro del grupo'}
                     </p>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-                    <span style={{ padding: '3px 9px', borderRadius: 20, fontSize: 11, fontWeight: 700, background: roleBg, color: roleColor }}>
+                    <span style={{ padding: '3px 9px', borderRadius: 20, fontSize: 13, fontWeight: 700, background: roleBg, color: roleColor }}>
                       {roleLabel}
                     </span>
                     {isActive && (
@@ -352,7 +352,7 @@ export default function Settings() {
             })}
             <p style={{
               margin: 0, padding: '10px 16px 14px',
-              fontSize: 11, color: '#B0A898', lineHeight: 1.5, textAlign: 'center',
+              fontSize: 13, color: '#B0A898', lineHeight: 1.5, textAlign: 'center',
             }}>
               Para unirte a otra familia, pide al administrador que te envíe una invitación.
             </p>
@@ -394,7 +394,7 @@ export default function Settings() {
                   {meta.label}
                 </p>
                 <span style={{
-                  fontSize: 10, fontWeight: 700,
+                  fontSize: 12, fontWeight: 700,
                   color: meta.color, background: `${meta.color}18`,
                   padding: '2px 8px', borderRadius: 6,
                 }}>
@@ -402,18 +402,18 @@ export default function Settings() {
                 </span>
               </div>
               {isTrialing && (
-                <p style={{ fontSize: 12, color: daysLeft <= 3 ? '#DC2626' : '#5E7480', margin: '3px 0 0' }}>
+                <p style={{ fontSize: 14, color: daysLeft <= 3 ? '#DC2626' : '#5E7480', margin: '3px 0 0' }}>
                   {daysLeft <= 3 ? '⚠ ' : ''}{daysLeft} día{daysLeft !== 1 ? 's' : ''} restante{daysLeft !== 1 ? 's' : ''} de prueba
                   {trialEnd ? ` · Vence ${trialEnd}` : ''}
                 </p>
               )}
               {isPaid && periodEnd && (
-                <p style={{ fontSize: 12, color: '#5E7480', margin: '3px 0 0' }}>
+                <p style={{ fontSize: 14, color: '#5E7480', margin: '3px 0 0' }}>
                   Próximo cobro: {periodEnd}
                 </p>
               )}
               {trialExpired && (
-                <p style={{ fontSize: 12, color: '#DC2626', margin: '3px 0 0' }}>
+                <p style={{ fontSize: 14, color: '#DC2626', margin: '3px 0 0' }}>
                   Período de prueba terminado
                 </p>
               )}
@@ -422,7 +422,7 @@ export default function Settings() {
 
           {features.length > 0 && (
             <div style={{ marginBottom: 16 }}>
-              <p style={{ fontSize: 11, fontWeight: 700, color: '#5E7480', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8 }}>
+              <p style={{ fontSize: 13, fontWeight: 700, color: '#5E7480', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8 }}>
                 {isTrialing ? 'Al terminar la prueba sigues gratis con' : 'Tu plan incluye'}
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -494,7 +494,7 @@ export default function Settings() {
 
         {/* Preferences */}
         <div style={{ background: 'white', borderRadius: 20, border: '1px solid #E6E3DB', overflow: 'hidden', marginBottom: 12 }}>
-          <p style={{ fontSize: 11, fontWeight: 700, color: '#5E7480', letterSpacing: '0.08em', textTransform: 'uppercase', padding: '14px 16px 8px', margin: 0 }}>
+          <p style={{ fontSize: 13, fontWeight: 700, color: '#5E7480', letterSpacing: '0.08em', textTransform: 'uppercase', padding: '14px 16px 8px', margin: 0 }}>
             Preferencias
           </p>
           <ToggleRow
@@ -519,7 +519,7 @@ export default function Settings() {
             <p style={{ fontFamily: 'Georgia, serif', fontSize: 15, fontWeight: 700, color: '#14303D', margin: '0 0 6px' }}>
               Notificaciones push
             </p>
-            <p style={{ fontSize: 12, color: '#5E7480', margin: '0 0 12px', lineHeight: 1.5 }}>
+            <p style={{ fontSize: 14, color: '#5E7480', margin: '0 0 12px', lineHeight: 1.5 }}>
               {permission === 'granted'
                 ? subscribed
                   ? 'Activas — recibirás recordatorios de medicamentos y alertas familiares.'
@@ -540,7 +540,7 @@ export default function Settings() {
                 {permission === 'granted' && subscribed ? '🔔' : permission === 'denied' ? '🔕' : '🔔'}
               </span>
               <span style={{
-                fontSize: 12, fontWeight: 600,
+                fontSize: 14, fontWeight: 600,
                 color: permission === 'granted' && subscribed ? '#15803D' : '#7A5A18',
               }}>
                 {permission === 'granted' && subscribed
@@ -589,7 +589,7 @@ export default function Settings() {
             {testResult && (
               <>
                 <p style={{
-                  fontSize: 12, fontWeight: 600, margin: '10px 0 0',
+                  fontSize: 14, fontWeight: 600, margin: '10px 0 0',
                   color: testResult.ok ? '#15803D' : '#DC2626',
                   padding: '8px 12px', borderRadius: 10,
                   background: testResult.ok ? '#F0FDF4' : '#FEF2F2',
@@ -638,7 +638,7 @@ export default function Settings() {
                 <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#0A4A6B' }}>
                   Panel de administración
                 </p>
-                <p style={{ margin: '2px 0 0', fontSize: 12, color: '#0A5A82' }}>
+                <p style={{ margin: '2px 0 0', fontSize: 14, color: '#0A5A82' }}>
                   Equipo, cuenta, datos y actividad
                 </p>
               </div>
@@ -684,7 +684,7 @@ export default function Settings() {
           </button>
         </div>
 
-        <p style={{ textAlign: 'center', fontSize: 11, color: '#D1D5DB', marginTop: 8 }}>
+        <p style={{ textAlign: 'center', fontSize: 13, color: '#D1D5DB', marginTop: 8 }}>
           © 2025 FamiliaCerca LLC · v1.0
         </p>
       </div>

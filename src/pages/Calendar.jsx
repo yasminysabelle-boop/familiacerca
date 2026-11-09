@@ -362,13 +362,13 @@ export default function Calendar() {
                         ) : (
                           <div style={{ width: 64, height: 64, borderRadius: 8, border: '1px solid #E6E3DB', background: '#F9FAFB', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
                             <span style={{ fontSize: 22 }}>📄</span>
-                            <span style={{ fontSize: 9, color: '#4E6470', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 56, textAlign: 'center' }}>
+                            <span style={{ fontSize: 12, color: '#4E6470', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 56, textAlign: 'center' }}>
                               {url.split('/').pop()?.slice(0, 10)}
                             </span>
                           </div>
                         )}
                         <button type="button" onClick={() => setExistingUrls(prev => prev.filter((_, j) => j !== i))}
-                          style={{ position: 'absolute', top: -6, right: -6, width: 18, height: 18, borderRadius: '50%', background: '#DC2626', color: 'white', border: 'none', cursor: 'pointer', fontSize: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          style={{ position: 'absolute', top: -6, right: -6, width: 18, height: 18, borderRadius: '50%', background: '#DC2626', color: 'white', border: 'none', cursor: 'pointer', fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           ✕
                         </button>
                       </div>
@@ -381,24 +381,24 @@ export default function Calendar() {
                       ) : (
                         <div style={{ width: 64, height: 64, borderRadius: 8, border: '1px solid #E6E3DB', background: '#F9FAFB', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
                           <span style={{ fontSize: 22 }}>📄</span>
-                          <span style={{ fontSize: 9, color: '#4E6470', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 56, textAlign: 'center' }}>
+                          <span style={{ fontSize: 12, color: '#4E6470', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 56, textAlign: 'center' }}>
                             {af.name.slice(0, 10)}
                           </span>
                         </div>
                       )}
                       <button type="button" onClick={() => setAttachFiles(prev => prev.filter((_, j) => j !== i))}
-                        style={{ position: 'absolute', top: -6, right: -6, width: 18, height: 18, borderRadius: '50%', background: '#DC2626', color: 'white', border: 'none', cursor: 'pointer', fontSize: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        style={{ position: 'absolute', top: -6, right: -6, width: 18, height: 18, borderRadius: '50%', background: '#DC2626', color: 'white', border: 'none', cursor: 'pointer', fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         ✕
                       </button>
                     </div>
                   ))}
                   <button type="button" onClick={pickAttachment}
-                    style={{ width: 64, height: 64, borderRadius: 8, border: '2px dashed #D1D5DB', background: '#F9FAFB', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#5E7480', fontSize: 11, gap: 2 }}>
+                    style={{ width: 64, height: 64, borderRadius: 8, border: '2px dashed #D1D5DB', background: '#F9FAFB', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#5E7480', fontSize: 13, gap: 2 }}>
                     <span style={{ fontSize: 20 }}>📎</span>
                     Adjuntar
                   </button>
                 </div>
-                {attachError && <p className="text-xs text-orange-600 mt-1">⚠ {attachError}</p>}
+                {attachError && <p className="text-sm text-orange-600 mt-1">⚠ {attachError}</p>}
               </div>
             </div>
 
@@ -435,7 +435,7 @@ export default function Calendar() {
               >
                 {MONTHS[month]} {year}
                 <span style={{
-                  fontSize: 9, color: '#5E7480',
+                  fontSize: 12, color: '#5E7480',
                   display: 'inline-block',
                   transform: showPicker ? 'rotate(180deg)' : 'none',
                   transition: 'transform 0.2s',
@@ -456,7 +456,7 @@ export default function Calendar() {
                   }}
                 >
                   {/* Month grid 3×4 */}
-                  <p style={{ fontSize: 10, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 8px 2px' }}>
+                  <p style={{ fontSize: 12, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 8px 2px' }}>
                     Mes
                   </p>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4, marginBottom: 14 }}>
@@ -469,7 +469,7 @@ export default function Calendar() {
                           background: i === month ? '#0C6C9C' : 'transparent',
                           color: i === month ? 'white' : '#30454F',
                           fontWeight: i === month ? 700 : 400,
-                          fontSize: 12, cursor: 'pointer',
+                          fontSize: 14, cursor: 'pointer',
                           transition: 'background 0.12s',
                         }}
                       >
@@ -481,7 +481,7 @@ export default function Calendar() {
                   <div style={{ height: 1, background: '#F3F4F6', margin: '0 0 12px' }} />
 
                   {/* Year list scrollable */}
-                  <p style={{ fontSize: 10, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 8px 2px' }}>
+                  <p style={{ fontSize: 12, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 8px 2px' }}>
                     Año
                   </p>
                   <div
@@ -514,7 +514,7 @@ export default function Calendar() {
               <button onClick={nextMonth} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-600">→</button>
             </div>
             <div className="grid grid-cols-7 gap-1 mb-2">
-              {DAYS.map(d => <div key={d} className="text-center text-xs font-medium text-gray-400 py-1">{d}</div>)}
+              {DAYS.map(d => <div key={d} className="text-center text-sm font-medium text-gray-400 py-1">{d}</div>)}
             </div>
             <div className="grid grid-cols-7 gap-1">
               {cells.map((day, i) => {
@@ -564,11 +564,11 @@ export default function Calendar() {
                       <div className="flex items-start justify-between gap-2 mb-2">
                         <div className="min-w-0">
                           <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 4 }}>
-                            <span className={`inline-block text-xs px-2 py-0.5 rounded-full font-medium ${typeStyle(ev.type)}`}>
+                            <span className={`inline-block text-sm px-2 py-0.5 rounded-full font-medium ${typeStyle(ev.type)}`}>
                               {typeLabel(ev.type)}
                             </span>
                             <span style={{
-                              display: 'inline-block', fontSize: 11, padding: '2px 8px',
+                              display: 'inline-block', fontSize: 13, padding: '2px 8px',
                               borderRadius: 12, fontWeight: 600,
                               background: si.bg, color: si.color,
                             }}>
@@ -576,20 +576,20 @@ export default function Calendar() {
                             </span>
                           </div>
                           <p className="text-sm font-semibold text-gray-800 leading-tight">{ev.title}</p>
-                          {ev.time && <p className="text-xs text-gray-400 mt-0.5">⏰ {ev.time}</p>}
+                          {ev.time && <p className="text-sm text-gray-400 mt-0.5">⏰ {ev.time}</p>}
                           {ev.directory_contacts?.name && (
-                            <p className="text-xs text-gray-400">👨‍⚕️ {ev.directory_contacts.name}{ev.directory_contacts.specialty ? ` — ${ev.directory_contacts.specialty}` : ''}</p>
+                            <p className="text-sm text-gray-400">👨‍⚕️ {ev.directory_contacts.name}{ev.directory_contacts.specialty ? ` — ${ev.directory_contacts.specialty}` : ''}</p>
                           )}
-                          {ev.description && <p className="text-xs text-gray-400">{ev.description}</p>}
+                          {ev.description && <p className="text-sm text-gray-400">{ev.description}</p>}
                         </div>
                         <div className="flex items-center gap-1 flex-shrink-0">
                           {isAdmin && (
                             <button onClick={() => openEdit(ev)}
-                              className="text-gray-300 hover:text-gray-600 transition-colors text-xs p-0.5" title="Editar">✏️</button>
+                              className="text-gray-300 hover:text-gray-600 transition-colors text-sm p-0.5" title="Editar">✏️</button>
                           )}
                           {canActOn(ev) && (
                             <button onClick={() => setConfirmDialog({ onConfirm: () => handleDelete(ev.id) })}
-                              className="text-gray-200 hover:text-red-500 transition-colors text-xs p-0.5" title="Eliminar">✕</button>
+                              className="text-gray-200 hover:text-red-500 transition-colors text-sm p-0.5" title="Eliminar">✕</button>
                           )}
                         </div>
                       </div>
@@ -620,8 +620,8 @@ export default function Calendar() {
                             <img src={ev.proof_photo_url} alt="Comprobante" className="w-12 h-12 rounded-lg object-cover border border-green-200" />
                           )}
                           <div>
-                            <p className="text-xs text-primary font-semibold">✓ Asistencia confirmada</p>
-                            {ev.proof_notes && <p className="text-xs text-gray-400">{ev.proof_notes}</p>}
+                            <p className="text-sm text-primary font-semibold">✓ Asistencia confirmada</p>
+                            {ev.proof_notes && <p className="text-sm text-gray-400">{ev.proof_notes}</p>}
                           </div>
                         </div>
                       ) : !isFamiliar ? (
@@ -689,11 +689,11 @@ export default function Calendar() {
                   <img src={proofPreview} className="w-full h-40 object-cover" alt="Prueba" />
                   <div className="flex gap-2 px-3 py-2.5">
                     <button type="button" onClick={pickCamera}
-                      className="flex-1 py-2 text-xs font-semibold rounded-lg border border-primary text-primary bg-green-50 hover:bg-green-100 transition-colors">
+                      className="flex-1 py-2 text-sm font-semibold rounded-lg border border-primary text-primary bg-green-50 hover:bg-green-100 transition-colors">
                       📷 Tomar foto
                     </button>
                     <button type="button" onClick={pickGallery}
-                      className="flex-1 py-2 text-xs font-semibold rounded-lg border border-gray-200 text-gray-600 bg-gray-50 hover:bg-gray-100 transition-colors">
+                      className="flex-1 py-2 text-sm font-semibold rounded-lg border border-gray-200 text-gray-600 bg-gray-50 hover:bg-gray-100 transition-colors">
                       🖼 Elegir de galería
                     </button>
                   </div>
@@ -701,7 +701,7 @@ export default function Calendar() {
               ) : (
                 <div className="flex flex-col items-center gap-3 py-5 px-4">
                   <span className="text-3xl">📷</span>
-                  <p className="text-xs text-gray-400 text-center">Foto de la cita (sala de espera, receta...)</p>
+                  <p className="text-sm text-gray-400 text-center">Foto de la cita (sala de espera, receta...)</p>
                   <div className="flex gap-2 w-full">
                     <button type="button" onClick={pickCamera}
                       className="flex-1 py-2.5 text-sm font-semibold rounded-xl border border-primary text-primary bg-green-50 hover:bg-green-100 transition-colors">
@@ -726,7 +726,7 @@ export default function Calendar() {
             </div>
 
             {proofUploadError && (
-              <p className="text-xs text-orange-600 mb-3 px-1">⚠ {proofUploadError}</p>
+              <p className="text-sm text-orange-600 mb-3 px-1">⚠ {proofUploadError}</p>
             )}
             <div className="flex gap-3">
               <button onClick={submitProof} disabled={proofSaving || (!proofPhoto && !proofNote)}

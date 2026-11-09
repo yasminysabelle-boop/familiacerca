@@ -10,7 +10,7 @@ const F = {
 }
 const fo = e => { e.target.style.borderColor = '#0891B2'; e.target.style.boxShadow = '0 0 0 3px rgba(8,145,178,0.1)' }
 const fb = e => { e.target.style.borderColor = '#E6E3DB'; e.target.style.boxShadow = 'none' }
-const L  = { fontSize: 11, fontWeight: 700, color: '#4E6470', letterSpacing: '0.07em', textTransform: 'uppercase', display: 'block', marginBottom: 4 }
+const L  = { fontSize: 13, fontWeight: 700, color: '#4E6470', letterSpacing: '0.07em', textTransform: 'uppercase', display: 'block', marginBottom: 4 }
 
 // ── Primitive field components ────────────────────────────────────────────────
 function Inp({ label, value, onChange, type = 'text', placeholder, mb = 10 }) {
@@ -42,7 +42,7 @@ function Grid2({ children }) {
 // ── Shared UI ─────────────────────────────────────────────────────────────────
 function CatLabel({ icon, title, color }) {
   return (
-    <p style={{ fontSize: 11, fontWeight: 700, color, textTransform: 'uppercase', letterSpacing: '0.07em', margin: '18px 0 8px', display: 'flex', alignItems: 'center', gap: 5 }}>
+    <p style={{ fontSize: 13, fontWeight: 700, color, textTransform: 'uppercase', letterSpacing: '0.07em', margin: '18px 0 8px', display: 'flex', alignItems: 'center', gap: 5 }}>
       <span style={{ fontSize: 15 }}>{icon}</span>{title}
     </p>
   )
@@ -104,13 +104,13 @@ function DoctorCard({ doc, canEdit, onEdit, onDelete }) {
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           <p style={{ fontSize: 14, fontWeight: 700, color: '#14303D', margin: '0 0 2px' }}>{doc.name}</p>
-          {doc.specialty && <p style={{ fontSize: 12, color: '#0891B2', margin: '0 0 2px', fontWeight: 600 }}>{doc.specialty}</p>}
-          {doc.clinic && <p style={{ fontSize: 12, color: '#4E6470', margin: '0 0 1px' }}>🏥 {doc.clinic}</p>}
-          {doc.address && <p style={{ fontSize: 12, color: '#4E6470', margin: '0 0 1px' }}>📍 {doc.address}</p>}
-          {doc.phone && <p style={{ fontSize: 12, color: '#4E6470', margin: '0 0 1px' }}>☎ {doc.phone}</p>}
-          {doc.cellphone && <p style={{ fontSize: 12, color: '#4E6470', margin: '0 0 1px' }}>📱 {doc.cellphone}</p>}
-          {doc.email && <p style={{ fontSize: 12, color: '#4E6470', margin: '0 0 1px' }}>✉ {doc.email}</p>}
-          {doc.notes && <p style={{ fontSize: 12, color: '#5E7480', margin: '4px 0 0', fontStyle: 'italic' }}>{doc.notes}</p>}
+          {doc.specialty && <p style={{ fontSize: 14, color: '#0891B2', margin: '0 0 2px', fontWeight: 600 }}>{doc.specialty}</p>}
+          {doc.clinic && <p style={{ fontSize: 14, color: '#4E6470', margin: '0 0 1px' }}>🏥 {doc.clinic}</p>}
+          {doc.address && <p style={{ fontSize: 14, color: '#4E6470', margin: '0 0 1px' }}>📍 {doc.address}</p>}
+          {doc.phone && <p style={{ fontSize: 14, color: '#4E6470', margin: '0 0 1px' }}>☎ {doc.phone}</p>}
+          {doc.cellphone && <p style={{ fontSize: 14, color: '#4E6470', margin: '0 0 1px' }}>📱 {doc.cellphone}</p>}
+          {doc.email && <p style={{ fontSize: 14, color: '#4E6470', margin: '0 0 1px' }}>✉ {doc.email}</p>}
+          {doc.notes && <p style={{ fontSize: 14, color: '#5E7480', margin: '4px 0 0', fontStyle: 'italic' }}>{doc.notes}</p>}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
           <CallBtn phone={phone} />
@@ -146,13 +146,13 @@ function InstitutionCard({ inst, canEdit, onEdit, onDelete }) {
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
             <p style={{ fontSize: 14, fontWeight: 700, color: '#14303D', margin: 0 }}>{inst.name}</p>
-            {inst.type && <span style={{ fontSize: 10, fontWeight: 700, color: '#7C3AED', background: '#EDE9FE', padding: '2px 7px', borderRadius: 6 }}>{inst.type}</span>}
+            {inst.type && <span style={{ fontSize: 12, fontWeight: 700, color: '#7C3AED', background: '#EDE9FE', padding: '2px 7px', borderRadius: 6 }}>{inst.type}</span>}
           </div>
-          {inst.address && <p style={{ fontSize: 12, color: '#4E6470', margin: '0 0 1px' }}>📍 {inst.address}</p>}
-          {inst.phone && <p style={{ fontSize: 12, color: '#4E6470', margin: '0 0 1px' }}>☎ {inst.phone}</p>}
-          {inst.email && <p style={{ fontSize: 12, color: '#4E6470', margin: '0 0 1px' }}>✉ {inst.email}</p>}
-          {inst.hours && <p style={{ fontSize: 12, color: '#4E6470', margin: '0 0 1px' }}>🕐 {inst.hours}</p>}
-          {inst.notes && <p style={{ fontSize: 12, color: '#5E7480', margin: '4px 0 0', fontStyle: 'italic' }}>{inst.notes}</p>}
+          {inst.address && <p style={{ fontSize: 14, color: '#4E6470', margin: '0 0 1px' }}>📍 {inst.address}</p>}
+          {inst.phone && <p style={{ fontSize: 14, color: '#4E6470', margin: '0 0 1px' }}>☎ {inst.phone}</p>}
+          {inst.email && <p style={{ fontSize: 14, color: '#4E6470', margin: '0 0 1px' }}>✉ {inst.email}</p>}
+          {inst.hours && <p style={{ fontSize: 14, color: '#4E6470', margin: '0 0 1px' }}>🕐 {inst.hours}</p>}
+          {inst.notes && <p style={{ fontSize: 14, color: '#5E7480', margin: '4px 0 0', fontStyle: 'italic' }}>{inst.notes}</p>}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
           <CallBtn phone={inst.phone} />
@@ -191,11 +191,11 @@ function ContactCard({ contact, canEdit, isEmergency, onEdit, onDelete }) {
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           <p style={{ fontSize: 14, fontWeight: 700, color: '#14303D', margin: '0 0 2px' }}>{contact.name}</p>
-          {contact.relationship && <p style={{ fontSize: 12, color: relColor, margin: '0 0 2px', fontWeight: 600 }}>{contact.relationship}</p>}
-          {phone && <p style={{ fontSize: 12, color: '#4E6470', margin: '0 0 1px' }}>📱 {phone}</p>}
-          {contact.email && <p style={{ fontSize: 12, color: '#4E6470', margin: '0 0 1px' }}>✉ {contact.email}</p>}
-          {contact.address && <p style={{ fontSize: 12, color: '#4E6470', margin: '0 0 1px' }}>📍 {contact.address}</p>}
-          {contact.notes && <p style={{ fontSize: 12, color: '#5E7480', margin: '4px 0 0', fontStyle: 'italic' }}>{contact.notes}</p>}
+          {contact.relationship && <p style={{ fontSize: 14, color: relColor, margin: '0 0 2px', fontWeight: 600 }}>{contact.relationship}</p>}
+          {phone && <p style={{ fontSize: 14, color: '#4E6470', margin: '0 0 1px' }}>📱 {phone}</p>}
+          {contact.email && <p style={{ fontSize: 14, color: '#4E6470', margin: '0 0 1px' }}>✉ {contact.email}</p>}
+          {contact.address && <p style={{ fontSize: 14, color: '#4E6470', margin: '0 0 1px' }}>📍 {contact.address}</p>}
+          {contact.notes && <p style={{ fontSize: 14, color: '#5E7480', margin: '4px 0 0', fontStyle: 'italic' }}>{contact.notes}</p>}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
           <CallBtn phone={phone} big={isEmergency} />

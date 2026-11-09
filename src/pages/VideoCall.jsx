@@ -316,7 +316,7 @@ export default function VideoCall() {
                         </div>
                         <span style={{ position: 'absolute', bottom: -2, right: -2, width: 14, height: 14, borderRadius: '50%', background: dot, border: '2px solid #F7F6F2' }} />
                       </div>
-                      <span style={{ fontSize: 12, fontWeight: 600, color: '#2A4350' }}>{m.name.split(' ')[0]}</span>
+                      <span style={{ fontSize: 14, fontWeight: 600, color: '#2A4350' }}>{m.name.split(' ')[0]}</span>
                     </div>
                   )
                 })}
@@ -512,13 +512,13 @@ export default function VideoCall() {
               background: 'white', border: '1px solid #E6E3DB',
               textAlign: 'center',
             }}>
-              <p style={{ margin: 0, color: '#4E6470', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+              <p style={{ margin: 0, color: '#4E6470', fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                 La sala abre en
               </p>
               <p style={{ margin: '6px 0 0', color: '#0C6C9C', fontSize: 32, fontWeight: 800 }}>
                 {minutesUntil} min
               </p>
-              <p style={{ margin: '4px 0 0', color: '#4E6470', fontSize: 12 }}>
+              <p style={{ margin: '4px 0 0', color: '#4E6470', fontSize: 14 }}>
                 Disponible 15 minutos antes
               </p>
             </div>
@@ -527,7 +527,7 @@ export default function VideoCall() {
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
                 {callPresence.count > 0 ? (
                   <>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: '#64748B' }}>Ya están dentro:</span>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: '#64748B' }}>Ya están dentro:</span>
                     <div style={{ display: 'flex' }}>
                       {callPresence.participants.slice(0, 6).map((p, i) => (
                         <div
@@ -560,12 +560,12 @@ export default function VideoCall() {
                   <p style={{ color: '#B91C1C', fontSize: 13, fontWeight: 600, margin: '0 0 4px' }}>
                     Permisos denegados
                   </p>
-                  <p style={{ color: '#4E6470', fontSize: 12, margin: '0 0 10px', lineHeight: 1.5 }}>
+                  <p style={{ color: '#4E6470', fontSize: 14, margin: '0 0 10px', lineHeight: 1.5 }}>
                     Activa cámara y micrófono desde los ajustes de tu navegador.
                   </p>
                   <button
                     onClick={requestPermissionsAndJoin}
-                    style={{ padding: '8px 18px', borderRadius: 10, border: 'none', background: '#0C6C9C', color: 'white', fontWeight: 700, fontSize: 12, cursor: 'pointer', fontFamily: SANS }}
+                    style={{ padding: '8px 18px', borderRadius: 10, border: 'none', background: '#0C6C9C', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer', fontFamily: SANS }}
                   >
                     Intentar de nuevo
                   </button>

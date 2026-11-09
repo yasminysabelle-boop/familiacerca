@@ -41,7 +41,7 @@ function Callout({ icon, children, color = '#E3F1F8', border = '#F0C8B0' }) {
 function DataChip({ label }) {
   return (
     <span
-      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold"
+      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold"
       style={{ background: '#E3F1F8', color: '#0A4A6B', border: '1px solid #F0C8B0' }}
     >
       {label}
@@ -91,7 +91,7 @@ export default function PrivacyPolicy() {
         {/* Title block */}
         <div className="mb-8 text-center">
           <div
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold mb-4"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold mb-4"
             style={{ background: '#E3F1F8', color: '#3A6147' }}
           >
             🔒 Tu privacidad nos importa
@@ -102,7 +102,7 @@ export default function PrivacyPolicy() {
           >
             Política de Privacidad
           </h1>
-          <p className="text-xs text-gray-400">
+          <p className="text-sm text-gray-400">
             Última actualización: 1 de mayo de 2025 · Vigente a partir de esa fecha
           </p>
         </div>
@@ -120,7 +120,7 @@ export default function PrivacyPolicy() {
             <p>Recopilamos únicamente la información que tú nos proporcionas directamente:</p>
 
             <div className="bg-white rounded-2xl p-4" style={{ border: '1px solid #E6E3DB', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
-              <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">Información de cuenta</p>
+              <p className="text-sm font-bold text-gray-500 uppercase tracking-wide mb-3">Información de cuenta</p>
               <div className="flex flex-wrap gap-2">
                 <DataChip label="📛 Nombre completo" />
                 <DataChip label="📧 Correo electrónico" />
@@ -129,7 +129,7 @@ export default function PrivacyPolicy() {
             </div>
 
             <div className="bg-white rounded-2xl p-4" style={{ border: '1px solid #E6E3DB', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
-              <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">Información del familiar</p>
+              <p className="text-sm font-bold text-gray-500 uppercase tracking-wide mb-3">Información del familiar</p>
               <div className="flex flex-wrap gap-2">
                 <DataChip label="👤 Nombre del familiar" />
                 <DataChip label="📷 Fotografías" />
@@ -141,13 +141,13 @@ export default function PrivacyPolicy() {
             </div>
 
             <div className="bg-white rounded-2xl p-4" style={{ border: '1px solid #E6E3DB', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
-              <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">Datos técnicos (automáticos)</p>
+              <p className="text-sm font-bold text-gray-500 uppercase tracking-wide mb-3">Datos técnicos (automáticos)</p>
               <div className="flex flex-wrap gap-2">
                 <DataChip label="📱 Tipo de dispositivo" />
                 <DataChip label="🌐 Idioma del navegador" />
                 <DataChip label="⏰ Fecha/hora de acceso" />
               </div>
-              <p className="text-xs text-gray-400 mt-3">
+              <p className="text-sm text-gray-400 mt-3">
                 Estos datos son anónimos y se usan exclusivamente para mejorar el rendimiento de la aplicación.
               </p>
             </div>
@@ -206,7 +206,7 @@ export default function PrivacyPolicy() {
                 <p className="font-bold text-gray-900 text-sm mb-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                   Infraestructura: Supabase en AWS (EE.UU.)
                 </p>
-                <p className="text-xs text-gray-500 leading-relaxed">
+                <p className="text-sm text-gray-500 leading-relaxed">
                   Todos tus datos se almacenan en servidores de Amazon Web Services (AWS) ubicados
                   en los Estados Unidos, gestionados a través de Supabase. Supabase es un proveedor
                   de bases de datos que cumple con los estándares de seguridad SOC 2 Tipo II.
@@ -250,7 +250,7 @@ export default function PrivacyPolicy() {
               <strong>Retirar tu consentimiento</strong> para el uso de tus datos en cualquier momento,
               lo que implicará la cancelación de tu cuenta.
             </Item>
-            <p className="text-xs text-gray-500">
+            <p className="text-sm text-gray-500">
               Si estás en la Unión Europea o California, también tienes derechos adicionales bajo el
               GDPR y CCPA respectivamente. Contáctanos para ejercerlos.
             </p>
@@ -306,10 +306,10 @@ export default function PrivacyPolicy() {
               <span className="text-2xl">✉️</span>
               <div>
                 <p className="font-semibold text-gray-900 text-sm">legal@familiacerca.com</p>
-                <p className="text-xs text-gray-400 mt-0.5">Respondemos en un plazo de 5 días hábiles</p>
+                <p className="text-sm text-gray-400 mt-0.5">Respondemos en un plazo de 5 días hábiles</p>
               </div>
             </div>
-            <p className="text-xs text-gray-500">
+            <p className="text-sm text-gray-500">
               FamiliaCerca LLC · Estado de Florida, Estados Unidos
             </p>
           </Section>
@@ -321,7 +321,7 @@ export default function PrivacyPolicy() {
           className="mt-8 pt-6 flex flex-col items-center gap-3"
           style={{ borderTop: '1px solid #E6E3DB' }}
         >
-          <p className="text-xs text-gray-400 text-center leading-relaxed">
+          <p className="text-sm text-gray-400 text-center leading-relaxed">
             ¿Prefieres leer esto en inglés? Escríbenos a{' '}
             <a href="mailto:legal@familiacerca.com" className="underline" style={{ color: '#0C6C9C' }}>
               legal@familiacerca.com
@@ -330,12 +330,12 @@ export default function PrivacyPolicy() {
           </p>
           <Link
             to="/terminos"
-            className="text-xs font-semibold underline"
+            className="text-sm font-semibold underline"
             style={{ color: '#0C6C9C' }}
           >
             Ver Términos de Servicio →
           </Link>
-          <p className="text-[10px] text-gray-300 mt-1">
+          <p className="text-[12px] text-gray-300 mt-1">
             © 2025 FamiliaCerca LLC · Todos los derechos reservados
           </p>
         </div>

@@ -21,7 +21,7 @@ function RoleBadge({ role }) {
   return (
     <span style={{
       display: 'inline-flex', alignItems: 'center', padding: '5px 14px',
-      borderRadius: 20, fontSize: 12, fontWeight: 700,
+      borderRadius: 20, fontSize: 14, fontWeight: 700,
       color: cfg.color, background: cfg.bg,
     }}>
       {cfg.label}
@@ -385,7 +385,7 @@ export default function JoinFamily() {
             </button>
           </div>
 
-          <p style={{ marginTop: 20, fontSize: 11, color: '#5E7480', textAlign: 'center', lineHeight: 1.5 }}>
+          <p style={{ marginTop: 20, fontSize: 13, color: '#5E7480', textAlign: 'center', lineHeight: 1.5 }}>
             Tus datos están cifrados y protegidos.
           </p>
         </div>
@@ -512,7 +512,7 @@ export default function JoinFamily() {
               >
                 Ir al panel →
               </button>
-              <p style={{ fontSize: 11, color: '#5E7480', margin: 0, lineHeight: 1.5 }}>
+              <p style={{ fontSize: 13, color: '#5E7480', margin: 0, lineHeight: 1.5 }}>
                 Instala la app para recibir alertas en tiempo real
               </p>
             </div>
@@ -547,7 +547,7 @@ export default function JoinFamily() {
                       <WatermarkHeart heartOpacity={0.08} cutout="white" width={130} height={130} style={{ top: '50%', left: '50%', transform: 'translate(-50%,-50%)' }} />
                       <div style={{ position: 'relative', zIndex: 1 }}>
                         <p style={{ fontSize: 13, fontWeight: 700, color: '#14303D', margin: '0 0 4px' }}>Día 1 — el equipo recién está empezando</p>
-                        <p style={{ fontSize: 12.5, color: '#4E6470', margin: 0, lineHeight: 1.5 }}>
+                        <p style={{ fontSize: 14, color: '#4E6470', margin: 0, lineHeight: 1.5 }}>
                           Todavía no hay actividad registrada. Muy pronto verás aquí cómo va el día.
                         </p>
                       </div>
@@ -566,7 +566,7 @@ export default function JoinFamily() {
                     }}
                   />
                   {introActionError && (
-                    <p style={{ color: '#D63031', fontSize: 12.5, marginBottom: 10 }}>{introActionError}</p>
+                    <p style={{ color: '#D63031', fontSize: 14, marginBottom: 10 }}>{introActionError}</p>
                   )}
                   <button
                     onClick={sendFirstMessage}
@@ -598,19 +598,19 @@ export default function JoinFamily() {
                       <div style={{ position: 'relative', background: '#F7F6F2', borderRadius: 20, padding: '14px 16px', marginBottom: 16, overflow: 'hidden', textAlign: 'left' }}>
                         <WatermarkHeart heartOpacity={0.045} cutout="#F7F6F2" width={130} height={130} style={{ right: -18, bottom: -30 }} />
                         <div style={{ position: 'relative', zIndex: 1 }}>
-                          <p style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#5E7480', margin: '0 0 6px' }}>
+                          <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#5E7480', margin: '0 0 6px' }}>
                             Próxima dosis
                           </p>
                           <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 16, fontWeight: 800, color: '#14303D', margin: 0 }}>
                             {nextMed.name}
                           </p>
                           {fmtMedTime(nextMed) && (
-                            <p style={{ fontSize: 12.5, color: '#4E6470', margin: '6px 0 0' }}>{fmtMedTime(nextMed)}</p>
+                            <p style={{ fontSize: 14, color: '#4E6470', margin: '6px 0 0' }}>{fmtMedTime(nextMed)}</p>
                           )}
                         </div>
                       </div>
                       {introActionError && (
-                        <p style={{ color: '#D63031', fontSize: 12.5, marginBottom: 10 }}>{introActionError}</p>
+                        <p style={{ color: '#D63031', fontSize: 14, marginBottom: 10 }}>{introActionError}</p>
                       )}
                       <button
                         onClick={confirmFirstDose}
@@ -629,7 +629,7 @@ export default function JoinFamily() {
                         <WatermarkHeart heartOpacity={0.08} cutout="white" width={130} height={130} style={{ top: '50%', left: '50%', transform: 'translate(-50%,-50%)' }} />
                         <div style={{ position: 'relative', zIndex: 1 }}>
                           <p style={{ fontSize: 13, fontWeight: 700, color: '#14303D', margin: '0 0 4px' }}>Día 1 — todavía no hay medicamentos programados</p>
-                          <p style={{ fontSize: 12.5, color: '#4E6470', margin: 0, lineHeight: 1.5 }}>
+                          <p style={{ fontSize: 14, color: '#4E6470', margin: 0, lineHeight: 1.5 }}>
                             En cuanto {invitation.invited_by || 'el administrador'} agregue el primero, lo verás aquí para confirmarlo.
                           </p>
                         </div>

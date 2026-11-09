@@ -273,7 +273,7 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
                 fontFamily: 'Georgia, serif' }}>
                 {cfg.name}
               </p>
-              <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 11, margin: 0 }}>
+              <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 13, margin: 0 }}>
                 Tu compañero virtual
               </p>
             </div>
@@ -321,7 +321,7 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 4 }}>
                 <div>
                   <p style={{
-                    margin: '0 0 6px', fontSize: 10, fontWeight: 700,
+                    margin: '0 0 6px', fontSize: 12, fontWeight: 700,
                     color: '#0C6C9C', letterSpacing: '0.06em', textTransform: 'uppercase',
                   }}>
                     Cuidado de hoy
@@ -337,7 +337,7 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
                           border: `1.5px solid ${i % 2 === 0 ? '#0A5A82' : '#C9882A'}`,
                           background: i % 2 === 0 ? '#F0F7F3' : '#FDF6EC',
                           color: i % 2 === 0 ? '#0A4A6B' : '#9A6420',
-                          fontSize: 11, fontWeight: 600,
+                          fontSize: 13, fontWeight: 600,
                           cursor: 'pointer', textAlign: 'left',
                           lineHeight: 1.35,
                           transition: 'all 0.15s',
@@ -351,7 +351,7 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
 
                 <div>
                   <p style={{
-                    margin: '0 0 6px', fontSize: 10, fontWeight: 700,
+                    margin: '0 0 6px', fontSize: 12, fontWeight: 700,
                     color: '#5E7480', letterSpacing: '0.06em', textTransform: 'uppercase',
                   }}>
                     Soporte
@@ -367,7 +367,7 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
                           border: `1.5px solid ${i % 2 === 0 ? '#0C6C9C' : '#C9882A'}`,
                           background: i % 2 === 0 ? '#E3F1F8' : '#FDF6EC',
                           color: i % 2 === 0 ? '#1C5559' : '#9A6420',
-                          fontSize: 11, fontWeight: 600,
+                          fontSize: 13, fontWeight: 600,
                           cursor: 'pointer', textAlign: 'left',
                           lineHeight: 1.35,
                           transition: 'all 0.15s',
@@ -410,7 +410,7 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
               style={{
                 flexShrink: 0, padding: '5px 8px', borderRadius: 12,
                 border: '1px solid #E6E3DB', background: '#F7F6F2',
-                color: '#5E7480', fontSize: 10, fontWeight: 600,
+                color: '#5E7480', fontSize: 12, fontWeight: 600,
                 cursor: 'pointer', lineHeight: 1.2, whiteSpace: 'nowrap',
               }}
             >
@@ -511,7 +511,7 @@ function SelectionCard({ onPick, onClose }) {
           onClick={onClose}
           style={{
             marginTop: 14, background: 'none', border: 'none',
-            color: '#5E7480', fontSize: 12, cursor: 'pointer',
+            color: '#5E7480', fontSize: 14, cursor: 'pointer',
           }}
         >
           Ahora no

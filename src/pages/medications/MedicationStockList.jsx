@@ -147,7 +147,7 @@ export default function MedicationStockList() {
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontWeight: 700, fontSize: 15.5, color: '#14303D' }}>{med.name}{med.dosage ? ` ${med.dosage}` : ''}</div>
                     {stock && (
-                      <div style={{ fontSize: 12.5, color: '#4E6470', marginTop: 2 }}>
+                      <div style={{ fontSize: 14, color: '#4E6470', marginTop: 2 }}>
                         {stock.pills_remaining} de {stock.total_pills} dosis · {dailyConsumption % 1 === 0 ? dailyConsumption : dailyConsumption.toFixed(2)} dosis/día
                       </div>
                     )}
@@ -160,7 +160,7 @@ export default function MedicationStockList() {
                       <div style={{ width: `${pct}%`, height: '100%', borderRadius: 6, background: barColor, transition: 'width 0.4s ease' }} />
                     </div>
                     {statusText && (
-                      <div style={{ marginTop: 8, fontSize: 12.5, fontWeight: isAgotado ? 700 : 600, color }}>{statusText}</div>
+                      <div style={{ marginTop: 8, fontSize: 14, fontWeight: isAgotado ? 700 : 600, color }}>{statusText}</div>
                     )}
 
                     {isAdmin && (
@@ -192,7 +192,7 @@ export default function MedicationStockList() {
                     {!isAdmin && (
                       <button
                         onClick={() => setStockTabMed(med)}
-                        style={{ width: '100%', marginTop: 10, padding: 8, borderRadius: 10, border: '1px solid rgba(51,65,85,0.12)', background: '#FDFAF7', color: '#0C6C9C', fontWeight: 600, fontSize: 12, cursor: 'pointer' }}
+                        style={{ width: '100%', marginTop: 10, padding: 8, borderRadius: 10, border: '1px solid rgba(51,65,85,0.12)', background: '#FDFAF7', color: '#0C6C9C', fontWeight: 600, fontSize: 14, cursor: 'pointer' }}
                       >
                         📦 Ver detalles de stock
                       </button>
@@ -200,11 +200,11 @@ export default function MedicationStockList() {
                   </>
                 ) : (
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
-                    <p style={{ fontSize: 12.5, color: '#4E6470', margin: 0 }}>Stock no configurado</p>
+                    <p style={{ fontSize: 14, color: '#4E6470', margin: 0 }}>Stock no configurado</p>
                     {isAdmin && (
                       <button
                         onClick={() => setStockTabMed(med)}
-                        style={{ padding: '6px 14px', borderRadius: 10, border: '1px solid #0C6C9C', background: '#E3F1F8', color: '#0C6C9C', fontWeight: 700, fontSize: 11, cursor: 'pointer' }}
+                        style={{ padding: '6px 14px', borderRadius: 10, border: '1px solid #0C6C9C', background: '#E3F1F8', color: '#0C6C9C', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}
                       >
                         + Configurar
                       </button>

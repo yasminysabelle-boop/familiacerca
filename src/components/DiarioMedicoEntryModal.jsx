@@ -187,12 +187,12 @@ function MedList({ meds, onChange }) {
             <input
               value={m.dosis} placeholder="Dosis (ej: 10mg)"
               onChange={e => update(i, 'dosis', e.target.value)}
-              style={{ flex: 1, padding: '6px 10px', borderRadius: 8, border: '1px solid #D1C9BF', fontSize: 12 }}
+              style={{ flex: 1, padding: '6px 10px', borderRadius: 8, border: '1px solid #D1C9BF', fontSize: 14 }}
             />
             <input
               value={m.frecuencia} placeholder="Frecuencia (ej: 2x día)"
               onChange={e => update(i, 'frecuencia', e.target.value)}
-              style={{ flex: 1, padding: '6px 10px', borderRadius: 8, border: '1px solid #D1C9BF', fontSize: 12 }}
+              style={{ flex: 1, padding: '6px 10px', borderRadius: 8, border: '1px solid #D1C9BF', fontSize: 14 }}
             />
           </div>
         </div>
@@ -219,7 +219,7 @@ function StepsList({ steps, onChange }) {
         <div key={i} style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
           <span style={{
             width: 20, height: 20, borderRadius: '50%', background: '#0C6C9C',
-            color: 'white', fontSize: 11, fontWeight: 700, flexShrink: 0,
+            color: 'white', fontSize: 13, fontWeight: 700, flexShrink: 0,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>{i + 1}</span>
           <input
@@ -397,7 +397,7 @@ export default function DiarioMedicoEntryModal({ open, onClose, onSaved }) {
               <h3 style={{ margin: 0, fontSize: 17, fontWeight: 800, fontFamily: "'Plus Jakarta Sans', sans-serif", color: '#14303D' }}>
                 {step === 'review' ? 'Revisar y guardar' : 'Nueva entrada médica'}
               </h3>
-              <p style={{ margin: '2px 0 0', fontSize: 11, color: '#5E7480' }}>
+              <p style={{ margin: '2px 0 0', fontSize: 13, color: '#5E7480' }}>
                 {step === 'input' ? 'Voz o foto — la IA estructura automáticamente'
                  : step === 'processing' ? 'Analizando con IA...'
                  : 'Edita cualquier campo antes de guardar'}
@@ -456,13 +456,13 @@ export default function DiarioMedicoEntryModal({ open, onClose, onSaved }) {
                     padding: '12px', borderRadius: 12,
                     background: '#E3F1F8', border: '1px solid #BBF7D0',
                   }}>
-                    <p style={{ margin: '0 0 6px', fontSize: 11, fontWeight: 700, color: '#0C6C9C', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                    <p style={{ margin: '0 0 6px', fontSize: 13, fontWeight: 700, color: '#0C6C9C', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                       Transcripción
                     </p>
                     <p style={{ margin: 0, fontSize: 13, color: '#14303D', lineHeight: 1.6 }}>{transcript}</p>
                     <button
                       onClick={() => setTranscript('')}
-                      style={{ marginTop: 8, fontSize: 11, color: '#5E7480', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                      style={{ marginTop: 8, fontSize: 13, color: '#5E7480', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
                     >
                       Borrar y grabar de nuevo
                     </button>
@@ -470,7 +470,7 @@ export default function DiarioMedicoEntryModal({ open, onClose, onSaved }) {
                 )}
 
                 {!supported && (
-                  <p style={{ fontSize: 12, color: '#5E7480', textAlign: 'center' }}>
+                  <p style={{ fontSize: 14, color: '#5E7480', textAlign: 'center' }}>
                     Tu navegador no soporta grabación. Escribe el texto abajo.
                   </p>
                 )}
@@ -516,7 +516,7 @@ export default function DiarioMedicoEntryModal({ open, onClose, onSaved }) {
                       key={t.value}
                       onClick={() => setPhotoType(t.value)}
                       style={{
-                        padding: '6px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600,
+                        padding: '6px 12px', borderRadius: 20, fontSize: 14, fontWeight: 600,
                         border: `1.5px solid ${photoType === t.value ? '#0C6C9C' : '#D1C9BF'}`,
                         background: photoType === t.value ? '#0C6C9C' : 'white',
                         color: photoType === t.value ? 'white' : '#30454F',
@@ -562,7 +562,7 @@ export default function DiarioMedicoEntryModal({ open, onClose, onSaved }) {
                 {photoPreview && (
                   <button
                     onClick={() => fileRef.current?.click()}
-                    style={{ fontSize: 12, color: '#4E6470', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'center' }}
+                    style={{ fontSize: 14, color: '#4E6470', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'center' }}
                   >
                     Cambiar imagen
                   </button>
@@ -616,7 +616,7 @@ export default function DiarioMedicoEntryModal({ open, onClose, onSaved }) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {aiError && (
               <div style={{ padding: '10px 14px', borderRadius: 10, background: '#FFF7ED', border: '1px solid #FDE68A' }}>
-                <p style={{ margin: 0, fontSize: 12, color: '#92400E' }}>
+                <p style={{ margin: 0, fontSize: 14, color: '#92400E' }}>
                   ⚠ {aiError} — Puedes completar los campos manualmente.
                 </p>
               </div>
@@ -630,12 +630,12 @@ export default function DiarioMedicoEntryModal({ open, onClose, onSaved }) {
             {/* Date / time / location row */}
             <div style={{ display: 'flex', gap: 8 }}>
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
-                <label style={{ fontSize: 11, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Fecha</label>
+                <label style={{ fontSize: 13, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Fecha</label>
                 <input type="date" value={date} onChange={e => setDate(e.target.value)}
                   style={{ padding: '8px 10px', borderRadius: 9, border: '1.5px solid #D1C9BF', fontSize: 13 }} />
               </div>
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
-                <label style={{ fontSize: 11, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Hora</label>
+                <label style={{ fontSize: 13, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Hora</label>
                 <input type="time" value={time} onChange={e => setTime(e.target.value)}
                   style={{ padding: '8px 10px', borderRadius: 9, border: '1.5px solid #D1C9BF', fontSize: 13 }} />
               </div>
@@ -643,7 +643,7 @@ export default function DiarioMedicoEntryModal({ open, onClose, onSaved }) {
 
             {/* Location */}
             <div>
-              <label style={{ fontSize: 11, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.06em', display: 'block', marginBottom: 6 }}>
+              <label style={{ fontSize: 13, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.06em', display: 'block', marginBottom: 6 }}>
                 Dónde
               </label>
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
@@ -652,7 +652,7 @@ export default function DiarioMedicoEntryModal({ open, onClose, onSaved }) {
                     key={l.value}
                     onClick={() => setLocation(l.value)}
                     style={{
-                      padding: '6px 12px', borderRadius: 20, fontSize: 12, fontWeight: 600,
+                      padding: '6px 12px', borderRadius: 20, fontSize: 14, fontWeight: 600,
                       border: `1.5px solid ${location === l.value ? '#0C6C9C' : '#D1C9BF'}`,
                       background: location === l.value ? '#0C6C9C' : 'white',
                       color: location === l.value ? 'white' : '#30454F',
@@ -682,7 +682,7 @@ export default function DiarioMedicoEntryModal({ open, onClose, onSaved }) {
             />
 
             <div>
-              <label style={{ fontSize: 12, fontWeight: 600, color: '#30454F', display: 'block', marginBottom: 8 }}>
+              <label style={{ fontSize: 14, fontWeight: 600, color: '#30454F', display: 'block', marginBottom: 8 }}>
                 Medicamentos
               </label>
               <MedList
@@ -692,7 +692,7 @@ export default function DiarioMedicoEntryModal({ open, onClose, onSaved }) {
             </div>
 
             <div>
-              <label style={{ fontSize: 12, fontWeight: 600, color: '#30454F', display: 'block', marginBottom: 8 }}>
+              <label style={{ fontSize: 14, fontWeight: 600, color: '#30454F', display: 'block', marginBottom: 8 }}>
                 Próximos pasos / Estudios pendientes
               </label>
               <StepsList

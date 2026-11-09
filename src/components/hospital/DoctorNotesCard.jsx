@@ -35,7 +35,7 @@ export default function DoctorNotesCard() {
           Notas del médico
         </h3>
         {saved && (
-          <span style={{ marginLeft: 'auto', fontSize: 11, color: '#0A5A82', fontWeight: 700 }}>
+          <span style={{ marginLeft: 'auto', fontSize: 13, color: '#0A5A82', fontWeight: 700 }}>
             ✓ Guardado
           </span>
         )}

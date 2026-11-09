@@ -80,14 +80,14 @@ export default function HospitalInfoCard() {
         </p>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           {saved && (
-            <span style={{ fontSize: 11, color: '#16A34A', fontWeight: 700 }}>✓ Guardado</span>
+            <span style={{ fontSize: 13, color: '#16A34A', fontWeight: 700 }}>✓ Guardado</span>
           )}
           <button
             onClick={() => { setEditing(e => !e); setSaved(false) }}
             style={{
               padding: '5px 14px', borderRadius: 8,
               border: '1.5px solid #FECACA', background: editing ? '#FEE2E2' : 'white',
-              color: '#B91C1C', fontSize: 12, fontWeight: 700, cursor: 'pointer',
+              color: '#B91C1C', fontSize: 14, fontWeight: 700, cursor: 'pointer',
             }}
           >
             {editing ? 'Cancelar' : 'Editar'}
@@ -108,7 +108,7 @@ export default function HospitalInfoCard() {
             value={hospitalMode?.patient_status ?? 'Sin registrar'}
             multiline />
           {updatedAt && (
-            <p style={{ margin: '4px 0 0', fontSize: 11, color: '#5E7480', textAlign: 'right' }}>
+            <p style={{ margin: '4px 0 0', fontSize: 13, color: '#5E7480', textAlign: 'right' }}>
               Actualizado: {updatedAt}
             </p>
           )}
@@ -156,7 +156,7 @@ function InfoRow({ icon, label, value, multiline }) {
     <div style={{ display: 'flex', gap: 10, alignItems: multiline ? 'flex-start' : 'center' }}>
       <span style={{ fontSize: 16, flexShrink: 0, marginTop: multiline ? 1 : 0 }}>{icon}</span>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+        <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
           {label}
         </p>
         <p style={{
@@ -174,7 +174,7 @@ function InfoRow({ icon, label, value, multiline }) {
 function Field({ label, value, onChange, placeholder, multiline }) {
   if (multiline) return (
     <div>
-      <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#B91C1C', marginBottom: 5, letterSpacing: '0.04em' }}>
+      <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#B91C1C', marginBottom: 5, letterSpacing: '0.04em' }}>
         {label}
       </label>
       <textarea
@@ -190,7 +190,7 @@ function Field({ label, value, onChange, placeholder, multiline }) {
   )
   return (
     <div>
-      <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#B91C1C', marginBottom: 5, letterSpacing: '0.04em' }}>
+      <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#B91C1C', marginBottom: 5, letterSpacing: '0.04em' }}>
         {label}
       </label>
       <input

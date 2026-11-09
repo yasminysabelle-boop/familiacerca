@@ -21,7 +21,7 @@ function RoleBadge({ role }) {
     <span style={{
       padding: '3px 10px', borderRadius: 20,
       background: meta.bg, color: meta.color,
-      fontSize: 11, fontWeight: 700, flexShrink: 0,
+      fontSize: 13, fontWeight: 700, flexShrink: 0,
     }}>
       {meta.label}
     </span>
@@ -55,11 +55,11 @@ function MemberRow({ name, email, avatarUrl, role, isCurrentUser, isAdmin, isOwn
               {name}
             </p>
             {isCurrentUser && (
-              <span style={{ fontSize: 10, color: '#5E7480', fontWeight: 500 }}>(tú)</span>
+              <span style={{ fontSize: 12, color: '#5E7480', fontWeight: 500 }}>(tú)</span>
             )}
           </div>
           {email && (
-            <p style={{ margin: '1px 0 0', fontSize: 11, color: '#5E7480', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <p style={{ margin: '1px 0 0', fontSize: 13, color: '#5E7480', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {email}
             </p>
           )}
@@ -73,7 +73,7 @@ function MemberRow({ name, email, avatarUrl, role, isCurrentUser, isAdmin, isOwn
               style={{
                 background: 'none', border: '1px solid #E5E7EB', borderRadius: 8,
                 cursor: 'pointer', padding: '4px 10px',
-                fontSize: 12, color: '#4E6470', fontWeight: 500,
+                fontSize: 14, color: '#4E6470', fontWeight: 500,
                 WebkitTapHighlightColor: 'transparent',
               }}
             >
@@ -85,7 +85,7 @@ function MemberRow({ name, email, avatarUrl, role, isCurrentUser, isAdmin, isOwn
 
       {editing && (
         <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid #F7F6F2' }}>
-          <p style={{ margin: '0 0 10px', fontSize: 12, fontWeight: 600, color: '#4E6470' }}>
+          <p style={{ margin: '0 0 10px', fontSize: 14, fontWeight: 600, color: '#4E6470' }}>
             Cambiar rol:
           </p>
           <div style={{ display: 'flex', gap: 8 }}>
@@ -107,7 +107,7 @@ function MemberRow({ name, email, avatarUrl, role, isCurrentUser, isAdmin, isOwn
                 }}
               >
                 <span style={{ fontSize: 13, fontWeight: 700, color: '#0A4A6B' }}>{opt.label}</span>
-                <span style={{ fontSize: 11, color: '#5E7480' }}>{opt.desc}</span>
+                <span style={{ fontSize: 13, color: '#5E7480' }}>{opt.desc}</span>
               </button>
             ))}
           </div>
@@ -115,7 +115,7 @@ function MemberRow({ name, email, avatarUrl, role, isCurrentUser, isAdmin, isOwn
             onClick={onCancelEdit}
             style={{
               marginTop: 8, width: '100%', background: 'none', border: 'none',
-              cursor: 'pointer', fontSize: 12, color: '#5E7480', padding: '6px 0',
+              cursor: 'pointer', fontSize: 14, color: '#5E7480', padding: '6px 0',
             }}
           >
             Cancelar
@@ -227,10 +227,10 @@ export default function FamilyRoles() {
             const meta = ROLE_META[key]
             return (
               <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                <span style={{ padding: '2px 8px', borderRadius: 20, background: meta.bg, color: meta.color, fontSize: 10, fontWeight: 700 }}>
+                <span style={{ padding: '2px 8px', borderRadius: 20, background: meta.bg, color: meta.color, fontSize: 12, fontWeight: 700 }}>
                   {meta.label}
                 </span>
-                <span style={{ fontSize: 11, color: '#5E7480' }}>{desc}</span>
+                <span style={{ fontSize: 13, color: '#5E7480' }}>{desc}</span>
               </div>
             )
           })}
@@ -287,7 +287,7 @@ export default function FamilyRoles() {
                 border: '1px solid #F7F6F2', color: '#5E7480', fontSize: 13,
               }}>
                 No hay otros miembros en el equipo todavía.<br />
-                <span style={{ fontSize: 12 }}>Invita a tu familia desde <b>Mi Familia</b>.</span>
+                <span style={{ fontSize: 14 }}>Invita a tu familia desde <b>Mi Familia</b>.</span>
               </div>
             )}
           </div>

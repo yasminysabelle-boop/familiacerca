@@ -34,7 +34,7 @@ export default function AdminPaymentAlertsSection() {
       <div style={{ background: 'white', borderRadius: 16, border: '1px solid #E6E3DB', padding: '32px 20px', textAlign: 'center' }}>
         <div style={{ fontSize: 36, marginBottom: 10 }}>✅</div>
         <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#14303D' }}>Sin alertas</p>
-        <p style={{ margin: '4px 0 0', fontSize: 12, color: '#5E7480' }}>
+        <p style={{ margin: '4px 0 0', fontSize: 14, color: '#5E7480' }}>
           Todos los pagos de PayPal se correlacionaron con una cuenta.
         </p>
       </div>
@@ -43,7 +43,7 @@ export default function AdminPaymentAlertsSection() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-      <p style={{ fontSize: 12, color: '#5E7480', margin: '0 0 4px' }}>
+      <p style={{ fontSize: 14, color: '#5E7480', margin: '0 0 4px' }}>
         Pagos de PayPal que no se pudieron correlacionar con ninguna cuenta.
       </p>
       {alerts.map(a => (
@@ -55,8 +55,8 @@ export default function AdminPaymentAlertsSection() {
             <span style={{ fontSize: 16 }}>⚠️</span>
             <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#DC2626' }}>{a.event_type}</p>
           </div>
-          <p style={{ margin: '0 0 6px', fontSize: 12, color: '#30454F' }}>{a.detail}</p>
-          <p style={{ margin: 0, fontSize: 11, color: '#5E7480' }}>
+          <p style={{ margin: '0 0 6px', fontSize: 14, color: '#30454F' }}>{a.detail}</p>
+          <p style={{ margin: 0, fontSize: 13, color: '#5E7480' }}>
             {fmt(a.created_at)}
             {a.paypal_subscription_id && <> · suscripción: {a.paypal_subscription_id}</>}
             {a.custom_id && <> · custom_id: {a.custom_id}</>}

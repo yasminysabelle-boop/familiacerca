@@ -13,7 +13,7 @@ export default function FamilySwitcher({ isLight = false }) {
     if (!patientName) return null
     return (
       <span style={{
-        fontSize: 11, fontWeight: 600,
+        fontSize: 13, fontWeight: 600,
         color: isLight ? '#4E6470' : 'rgba(255,255,255,0.65)',
         maxWidth: 110, overflow: 'hidden',
         textOverflow: 'ellipsis', whiteSpace: 'nowrap',
@@ -39,7 +39,7 @@ export default function FamilySwitcher({ isLight = false }) {
         }}
       >
         <span style={{
-          fontSize: 11, fontWeight: 700, color: isLight ? '#2A4350' : 'white',
+          fontSize: 13, fontWeight: 700, color: isLight ? '#2A4350' : 'white',
           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
           lineHeight: 1.2,
         }}>
@@ -125,7 +125,7 @@ export default function FamilySwitcher({ isLight = false }) {
                         {fam.patientName ?? 'Mi familia'}
                       </p>
                       <span style={{
-                        fontSize: 10, fontWeight: 700,
+                        fontSize: 12, fontWeight: 700,
                         color: roleColor, background: roleBg,
                         padding: '2px 8px', borderRadius: 5,
                       }}>
@@ -136,7 +136,7 @@ export default function FamilySwitcher({ isLight = false }) {
                     {/* Action */}
                     {isActive ? (
                       <span style={{
-                        fontSize: 11, fontWeight: 700, color: '#0C6C9C',
+                        fontSize: 13, fontWeight: 700, color: '#0C6C9C',
                         flexShrink: 0,
                       }}>
                         ✓ Viendo

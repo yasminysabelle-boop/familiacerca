@@ -159,7 +159,7 @@ export default function NotasFamilia() {
               <p style={{ margin: '0 0 4px', fontSize: 15, fontWeight: 700, color: '#14303D' }}>
                 🎙️ Graba tu nota de turno
               </p>
-              <p style={{ margin: '0 0 20px', fontSize: 12, color: '#5E7480' }}>
+              <p style={{ margin: '0 0 20px', fontSize: 14, color: '#5E7480' }}>
                 El audio se convierte en texto automáticamente
               </p>
               <VoiceRecorder
@@ -200,7 +200,7 @@ export default function NotasFamilia() {
               <span style={{ fontSize: 20 }}>🩺</span>
               <span style={{ flex: 1 }}>
                 <span style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#14303D' }}>Evento agudo</span>
-                <span style={{ display: 'block', fontSize: 11, color: '#5E7480' }}>Caída, ER/hospitalización, cambio de conducta...</span>
+                <span style={{ display: 'block', fontSize: 13, color: '#5E7480' }}>Caída, ER/hospitalización, cambio de conducta...</span>
               </span>
               <span style={{
                 width: 40, height: 22, borderRadius: 20, flexShrink: 0, position: 'relative',
@@ -232,7 +232,7 @@ export default function NotasFamilia() {
                         }}
                       >
                         <span style={{ fontSize: 20 }}>{t.emoji}</span>
-                        <span style={{ fontSize: 10, fontWeight: 700, color: isSelected ? '#8C3A2A' : '#4E6470', textAlign: 'center', lineHeight: 1.2 }}>{t.label}</span>
+                        <span style={{ fontSize: 12, fontWeight: 700, color: isSelected ? '#8C3A2A' : '#4E6470', textAlign: 'center', lineHeight: 1.2 }}>{t.label}</span>
                       </button>
                     )
                   })}
@@ -242,7 +242,7 @@ export default function NotasFamilia() {
                     <img src={photoUrl} alt="Preview" style={{ width: 64, height: 64, borderRadius: 10, objectFit: 'cover', border: '1.5px solid #DDD5C8' }} />
                     <button
                       onClick={() => setPhotoUrl(null)}
-                      style={{ background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 8, padding: '4px 10px', fontSize: 12, color: '#DC2626', cursor: 'pointer', fontWeight: 600, fontFamily: 'inherit' }}
+                      style={{ background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 8, padding: '4px 10px', fontSize: 14, color: '#DC2626', cursor: 'pointer', fontWeight: 600, fontFamily: 'inherit' }}
                     >
                       Quitar foto
                     </button>
@@ -335,15 +335,15 @@ export default function NotasFamilia() {
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
-                          <span style={{ fontSize: 12, fontWeight: 700, color: '#14303D' }}>
+                          <span style={{ fontSize: 14, fontWeight: 700, color: '#14303D' }}>
                             {isOwn ? 'Tú' : authorName}
                           </span>
-                          <span style={{ fontSize: 11, color: '#5E7480' }}>·</span>
-                          <span style={{ fontSize: 11, color: '#5E7480' }}>
+                          <span style={{ fontSize: 13, color: '#5E7480' }}>·</span>
+                          <span style={{ fontSize: 13, color: '#5E7480' }}>
                             {new Date(note.created_at).toLocaleString('es', { dateStyle: 'short', timeStyle: 'short' })}
                           </span>
                           {note.is_incident && (
-                            <span style={{ fontSize: 10, fontWeight: 700, color: '#8C3A2A', background: '#FBEAE4', padding: '2px 8px', borderRadius: 20 }}>
+                            <span style={{ fontSize: 12, fontWeight: 700, color: '#8C3A2A', background: '#FBEAE4', padding: '2px 8px', borderRadius: 20 }}>
                               {incidentTypeInfo(note.incident_type).emoji} {incidentTypeInfo(note.incident_type).label}
                             </span>
                           )}
@@ -365,7 +365,7 @@ export default function NotasFamilia() {
                           </div>
                         )}
                       </div>
-                      <span style={{ fontSize: 11, color: '#5E7480', whiteSpace: 'nowrap', flexShrink: 0, marginTop: 2 }}>
+                      <span style={{ fontSize: 13, color: '#5E7480', whiteSpace: 'nowrap', flexShrink: 0, marginTop: 2 }}>
                         {timeAgoEs(note.created_at)}
                       </span>
                     </div>

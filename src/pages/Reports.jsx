@@ -108,7 +108,7 @@ export default function Reports() {
         {/* Pattern detection / wellness summary */}
         <div className="bg-white rounded-xl border border-green-100 p-6 mb-6">
           <h3 className="font-semibold text-gray-900 mb-1">Análisis de bienestar — últimos 7 días</h3>
-          <p className="text-xs text-gray-400 mb-5">Detección automática de patrones en medicamentos y notas</p>
+          <p className="text-sm text-gray-400 mb-5">Detección automática de patrones en medicamentos y notas</p>
 
           {loading ? (
             <div className="flex justify-center py-6">
@@ -128,9 +128,9 @@ export default function Reports() {
                 <div>
                   <p className="text-sm font-semibold text-gray-800">Adherencia a medicamentos</p>
                   {adherence7 === null ? (
-                    <p className="text-xs text-gray-500 mt-0.5">Sin datos de confirmación esta semana. Usa el Control de medicamentos para registrar las dosis.</p>
+                    <p className="text-sm text-gray-500 mt-0.5">Sin datos de confirmación esta semana. Usa el Control de medicamentos para registrar las dosis.</p>
                   ) : (
-                    <p className="text-xs text-gray-600 mt-0.5">
+                    <p className="text-sm text-gray-600 mt-0.5">
                       {confirmed7} confirmadas · {missed7} perdidas · <strong>{adherence7}%</strong> de adherencia
                       {missed7 >= 3 && <span className="text-red-700 font-semibold"> — Se recomienda informar al médico</span>}
                     </p>
@@ -144,9 +144,9 @@ export default function Reports() {
                 <div>
                   <p className="text-sm font-semibold text-gray-800">Observaciones en notas</p>
                   {concerns.length === 0 ? (
-                    <p className="text-xs text-gray-600 mt-0.5">Sin palabras de alerta detectadas en notas recientes. ¡Todo bien!</p>
+                    <p className="text-sm text-gray-600 mt-0.5">Sin palabras de alerta detectadas en notas recientes. ¡Todo bien!</p>
                   ) : (
-                    <p className="text-xs text-gray-700 mt-0.5">
+                    <p className="text-sm text-gray-700 mt-0.5">
                       <strong>{concerns.length} nota{concerns.length > 1 ? 's' : ''}</strong> con términos de atención:&nbsp;
                       <span className="italic">{detectedKws.join(', ')}</span>
                       {concerns.length >= 3 && <span className="text-orange-700 font-semibold"> — Considera una consulta médica</span>}
@@ -160,7 +160,7 @@ export default function Reports() {
                 <span className="text-xl flex-shrink-0 mt-0.5">📋</span>
                 <div>
                   <p className="text-sm font-semibold text-gray-800">Resumen de actividad (30 días)</p>
-                  <p className="text-xs text-gray-600 mt-0.5">
+                  <p className="text-sm text-gray-600 mt-0.5">
                     {medications.length} medicamento{medications.length !== 1 ? 's' : ''} activo{medications.length !== 1 ? 's' : ''} ·&nbsp;
                     {notes.length} nota{notes.length !== 1 ? 's' : ''} registrada{notes.length !== 1 ? 's' : ''} ·&nbsp;
                     {events.length} evento{events.length !== 1 ? 's' : ''} en el calendario
@@ -202,7 +202,7 @@ export default function Reports() {
                 ].map(({ n, label }) => (
                   <div key={label} className="bg-[#F7F6F2] rounded-xl p-3">
                     <p className="text-xl font-bold text-gray-900">{n}</p>
-                    <p className="text-xs text-gray-500 mt-0.5">{label}</p>
+                    <p className="text-sm text-gray-500 mt-0.5">{label}</p>
                   </div>
                 ))}
               </div>
@@ -213,12 +213,12 @@ export default function Reports() {
                   : <><span>📄</span> Descargar reporte PDF</>}
               </button>
               {pdfDone && (
-                <p className="text-xs mt-2 px-3 py-2 rounded-lg" style={{ color: '#15803D', background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
+                <p className="text-sm mt-2 px-3 py-2 rounded-lg" style={{ color: '#15803D', background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
                   ✓ PDF descargado correctamente
                 </p>
               )}
               {pdfError && (
-                <p className="text-xs mt-2 px-3 py-2 rounded-lg" style={{ color: '#D63031', background: '#FFF0F0', border: '1px solid #FFBABA' }}>
+                <p className="text-sm mt-2 px-3 py-2 rounded-lg" style={{ color: '#D63031', background: '#FFF0F0', border: '1px solid #FFBABA' }}>
                   ⚠ {pdfError}
                 </p>
               )}

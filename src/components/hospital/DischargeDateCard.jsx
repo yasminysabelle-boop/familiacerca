@@ -59,7 +59,7 @@ export default function DischargeDateCard() {
           onClick={() => setEditing(e => !e)}
           style={{
             padding: '5px 12px', borderRadius: 8, border: '1px solid #D1C9BF',
-            background: 'white', color: '#0A5A82', fontSize: 12,
+            background: 'white', color: '#0A5A82', fontSize: 14,
             fontWeight: 700, cursor: 'pointer',
           }}
         >
@@ -91,7 +91,7 @@ export default function DischargeDateCard() {
       {editing && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <div>
-            <label style={{ fontSize: 12, fontWeight: 600, color: '#30454F', display: 'block', marginBottom: 6 }}>
+            <label style={{ fontSize: 14, fontWeight: 600, color: '#30454F', display: 'block', marginBottom: 6 }}>
               Fecha de alta
             </label>
             <input

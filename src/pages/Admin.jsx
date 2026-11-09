@@ -118,7 +118,7 @@ export default function Admin() {
             }}>
               Panel de administración
             </p>
-            <p style={{ color: '#5E7480', fontSize: 12, margin: '4px 0 0' }}>
+            <p style={{ color: '#5E7480', fontSize: 14, margin: '4px 0 0' }}>
               {user?.user_metadata?.full_name ?? user?.email} · Administrador
             </p>
           </div>
@@ -137,7 +137,7 @@ export default function Admin() {
                 padding: '10px 4px', borderRadius: 12, border: 'none',
                 background: activeTab === t.id ? '#0C6C9C' : '#F3F4F6',
                 color: activeTab === t.id ? 'white' : '#4E6470',
-                fontWeight: 700, fontSize: 11, cursor: 'pointer',
+                fontWeight: 700, fontSize: 13, cursor: 'pointer',
                 display: 'flex', flexDirection: 'column',
                 alignItems: 'center', gap: 3,
                 transition: 'all 0.15s',

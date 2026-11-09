@@ -104,7 +104,7 @@ export default function AdminTeamSection() {
 
       {/* Active members */}
       <div>
-        <p style={{ fontSize: 11, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 10px 2px' }}>
+        <p style={{ fontSize: 13, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 10px 2px' }}>
           Miembros activos ({members.length})
         </p>
 
@@ -141,13 +141,13 @@ export default function AdminTeamSection() {
                     </p>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 3 }}>
                       <span style={{
-                        fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 6,
+                        fontSize: 12, fontWeight: 700, padding: '2px 8px', borderRadius: 6,
                         background: ROLE_COLOR[m.role] + '18',
                         color: ROLE_COLOR[m.role],
                       }}>
                         {ROLE_LABEL[m.role]}
                       </span>
-                      <span style={{ fontSize: 11, color: '#5E7480' }}>
+                      <span style={{ fontSize: 13, color: '#5E7480' }}>
                         Activo {timeAgo(m.lastSeen)}
                       </span>
                     </div>
@@ -159,7 +159,7 @@ export default function AdminTeamSection() {
                       disabled={busy === m.id}
                       title={`Cambiar a ${m.role === 'familiar' ? 'Cuidador' : 'Familiar'}`}
                       style={{
-                        padding: '5px 10px', borderRadius: 8, fontSize: 11, fontWeight: 700,
+                        padding: '5px 10px', borderRadius: 8, fontSize: 13, fontWeight: 700,
                         border: `1px solid ${ROLE_COLOR[m.role]}`,
                         background: 'white', color: ROLE_COLOR[m.role],
                         cursor: busy === m.id ? 'default' : 'pointer',
@@ -192,7 +192,7 @@ export default function AdminTeamSection() {
       {/* Pending invitations */}
       {invitations.length > 0 && (
         <div>
-          <p style={{ fontSize: 11, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 10px 2px' }}>
+          <p style={{ fontSize: 13, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 10px 2px' }}>
             Invitaciones pendientes ({invitations.length})
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -207,7 +207,7 @@ export default function AdminTeamSection() {
                   <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#14303D', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {inv.invited_email}
                   </p>
-                  <p style={{ margin: '2px 0 0', fontSize: 11, color: '#4E6470' }}>
+                  <p style={{ margin: '2px 0 0', fontSize: 13, color: '#4E6470' }}>
                     Enviada {timeAgo(inv.created_at)} · vence {new Date(inv.expires_at).toLocaleDateString('es-MX', { day: 'numeric', month: 'short' })}
                   </p>
                 </div>
@@ -215,7 +215,7 @@ export default function AdminTeamSection() {
                   onClick={() => revokeInvitation(inv)}
                   disabled={busy === inv.id}
                   style={{
-                    padding: '5px 12px', borderRadius: 8, fontSize: 12, fontWeight: 700,
+                    padding: '5px 12px', borderRadius: 8, fontSize: 14, fontWeight: 700,
                     border: '1px solid #FDE68A', background: 'white',
                     color: '#92400E', cursor: 'pointer',
                     opacity: busy === inv.id ? 0.5 : 1, flexShrink: 0,

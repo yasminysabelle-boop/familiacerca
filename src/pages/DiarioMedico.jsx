@@ -56,24 +56,24 @@ function EntryCard({ entry }) {
         {/* Top row: date, location, input type */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
           <span style={{
-            padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700,
+            padding: '3px 10px', borderRadius: 20, fontSize: 13, fontWeight: 700,
             background: locMeta.bg, color: locMeta.color,
           }}>
             {locMeta.emoji} {locMeta.label}
           </span>
           <span style={{
-            padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 700,
+            padding: '3px 10px', borderRadius: 20, fontSize: 13, fontWeight: 700,
             background: inputMeta.bg, color: inputMeta.color,
           }}>
             {inputMeta.label}
           </span>
-          <span style={{ fontSize: 11, color: '#5E7480', marginLeft: 'auto' }}>
+          <span style={{ fontSize: 13, color: '#5E7480', marginLeft: 'auto' }}>
             {fmtDate(entry.entry_date, entry.entry_time)}
           </span>
         </div>
 
         {/* Who recorded */}
-        <p style={{ margin: '0 0 10px', fontSize: 12, color: '#5E7480' }}>
+        <p style={{ margin: '0 0 10px', fontSize: 14, color: '#5E7480' }}>
           Registrado por <strong style={{ color: '#4E6470' }}>{entry.created_by_name ?? 'Familiar'}</strong>
         </p>
 
@@ -90,7 +90,7 @@ function EntryCard({ entry }) {
             margin: '0 0 10px', padding: '10px 12px',
             borderRadius: 10, background: '#F9F7F4', border: '1px solid #E6E3DB',
           }}>
-            <p style={{ margin: '0 0 3px', fontSize: 10, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            <p style={{ margin: '0 0 3px', fontSize: 12, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
               Médico indicó
             </p>
             <p style={{ margin: 0, fontSize: 13, color: '#30454F', lineHeight: 1.5 }}>
@@ -104,13 +104,13 @@ function EntryCard({ entry }) {
         {/* Medications */}
         {hasMeds && (
           <div style={{ margin: '0 0 10px' }}>
-            <p style={{ margin: '0 0 6px', fontSize: 10, fontWeight: 700, color: '#0C6C9C', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            <p style={{ margin: '0 0 6px', fontSize: 12, fontWeight: 700, color: '#0C6C9C', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
               💊 Medicamentos
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
               {entry.medicamentos.map((m, i) => (
                 <span key={i} style={{
-                  padding: '4px 10px', borderRadius: 20, fontSize: 12, fontWeight: 600,
+                  padding: '4px 10px', borderRadius: 20, fontSize: 14, fontWeight: 600,
                   background: '#E3F1F8', color: '#1A5C35',
                   border: '1px solid #BBF7D0',
                 }}>
@@ -124,14 +124,14 @@ function EntryCard({ entry }) {
         {/* Próximos pasos */}
         {hasSteps && (
           <div style={{ margin: '0 0 10px' }}>
-            <p style={{ margin: '0 0 6px', fontSize: 10, fontWeight: 700, color: '#2D86A0', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            <p style={{ margin: '0 0 6px', fontSize: 12, fontWeight: 700, color: '#2D86A0', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
               📋 Próximos pasos
             </p>
             {(expanded ? entry.proximos_pasos : entry.proximos_pasos.slice(0, 2)).map((s, i) => (
               <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 4 }}>
                 <span style={{
                   width: 18, height: 18, borderRadius: '50%', background: '#2D86A0',
-                  color: 'white', fontSize: 10, fontWeight: 700, flexShrink: 0,
+                  color: 'white', fontSize: 12, fontWeight: 700, flexShrink: 0,
                   display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 1,
                 }}>{i + 1}</span>
                 <p style={{ margin: 0, fontSize: 13, color: '#30454F', lineHeight: 1.4 }}>{s}</p>
@@ -143,7 +143,7 @@ function EntryCard({ entry }) {
         {/* Notes (expanded only) */}
         {expanded && entry.notas && (
           <div style={{ margin: '0 0 10px', padding: '8px 12px', borderRadius: 10, background: '#FFFBEB', border: '1px solid #FDE68A' }}>
-            <p style={{ margin: '0 0 2px', fontSize: 10, fontWeight: 700, color: '#92400E', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Notas</p>
+            <p style={{ margin: '0 0 2px', fontSize: 12, fontWeight: 700, color: '#92400E', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Notas</p>
             <p style={{ margin: 0, fontSize: 13, color: '#92400E', lineHeight: 1.5 }}>{entry.notas}</p>
           </div>
         )}
@@ -151,8 +151,8 @@ function EntryCard({ entry }) {
         {/* Raw transcript (expanded only) */}
         {expanded && entry.raw_transcript && (
           <div style={{ margin: '0 0 10px', padding: '8px 12px', borderRadius: 10, background: '#F5F0FF', border: '1px solid #DDD6FE' }}>
-            <p style={{ margin: '0 0 2px', fontSize: 10, fontWeight: 700, color: '#7C3AED', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Transcripción original</p>
-            <p style={{ margin: 0, fontSize: 12, color: '#4E6470', lineHeight: 1.5, fontStyle: 'italic' }}>{entry.raw_transcript}</p>
+            <p style={{ margin: '0 0 2px', fontSize: 12, fontWeight: 700, color: '#7C3AED', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Transcripción original</p>
+            <p style={{ margin: 0, fontSize: 14, color: '#4E6470', lineHeight: 1.5, fontStyle: 'italic' }}>{entry.raw_transcript}</p>
           </div>
         )}
 
@@ -161,7 +161,7 @@ function EntryCard({ entry }) {
           onClick={() => setExpanded(e => !e)}
           style={{
             background: 'none', border: 'none', cursor: 'pointer',
-            color: '#0C6C9C', fontSize: 12, fontWeight: 700, padding: '4px 0',
+            color: '#0C6C9C', fontSize: 14, fontWeight: 700, padding: '4px 0',
           }}
         >
           {expanded ? '▲ Ver menos' : '▼ Ver más detalle'}
@@ -251,7 +251,7 @@ export default function DiarioMedico() {
               <p style={{ margin: 0, fontSize: 18, fontWeight: 800, color: 'white', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                 Notas Médicas IA
               </p>
-              <p style={{ margin: '3px 0 0', fontSize: 12, color: 'rgba(255,255,255,0.8)' }}>
+              <p style={{ margin: '3px 0 0', fontSize: 14, color: 'rgba(255,255,255,0.8)' }}>
                 Habla o toma una foto y Milo organiza todo.
               </p>
             </div>
@@ -325,7 +325,7 @@ export default function DiarioMedico() {
             {Object.entries(grouped).map(([month, monthEntries]) => (
               <div key={month}>
                 <p style={{
-                  fontSize: 11, fontWeight: 700, color: '#5E7480',
+                  fontSize: 13, fontWeight: 700, color: '#5E7480',
                   textTransform: 'uppercase', letterSpacing: '0.08em',
                   margin: '0 0 10px 4px',
                 }}>
@@ -343,7 +343,7 @@ export default function DiarioMedico() {
 
         {/* Read-only notice for familiares */}
         {!canAdd && entries.length > 0 && (
-          <p style={{ textAlign: 'center', fontSize: 12, color: '#5E7480', marginTop: 20 }}>
+          <p style={{ textAlign: 'center', fontSize: 14, color: '#5E7480', marginTop: 20 }}>
             Solo el administrador y cuidadores pueden agregar entradas.
           </p>
         )}

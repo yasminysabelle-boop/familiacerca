@@ -17,7 +17,7 @@ function GroupHeader({ icon, color, label }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 12 }}>
       {icon}
-      <span style={{ fontFamily: SERIF, fontWeight: 600, fontSize: 15, color }}>{label}</span>
+      <span style={{ fontFamily: SERIF, fontWeight: 600, fontSize: 16, color }}>{label}</span>
     </div>
   )
 }
@@ -40,7 +40,7 @@ function ToolCard({ Icon, label, tint, tintBg, emphasis = false, onClick, span2 
       <span style={{ width: 38, height: 38, borderRadius: 11, background: iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
         <Icon size={19} color={iconColor} strokeWidth={1.8} />
       </span>
-      <span style={{ fontSize: 12.5, fontWeight: 600, color: '#2A4350', textAlign: 'center', lineHeight: 1.3 }}>{label}</span>
+      <span style={{ fontSize: 14, fontWeight: 600, color: '#2A4350', textAlign: 'center', lineHeight: 1.3 }}>{label}</span>
     </button>
   )
 }
@@ -51,117 +51,123 @@ export default function TodoElCuidado() {
   const [showHowIsToday, setShowHowIsToday] = useState(false)
   const { activePatientName } = useFamily()
 
-  const cuidarHoy = [
-    { Icon: Pill,          label: 'Medicamentos',        onClick: () => navigate('/medications') },
-    { Icon: Calendar,      label: 'Rutina diaria',       onClick: () => navigate('/cuidado') },
+  // Funciones en 3 niveles (UX nov 2026): lo de todos los días arriba, lo de
+  // vez en cuando después, y lo de momentos especiales plegado. Emergencia
+  // siempre visible.
+  const [showMore, setShowMore] = useState(() => {
+    try { return localStorage.getItem('fc_mas_expandido') === '1' } catch { return false }
+  })
+  function toggleMore() {
+    const v = !showMore
+    setShowMore(v)
+    try { localStorage.setItem('fc_mas_expandido', v ? '1' : '0') } catch { /* sin almacenamiento */ }
+  }
+
+  const todosLosDias = [
+    { Icon: Pill,     label: 'Medicamentos',         onClick: () => navigate('/medications') },
+    { Icon: Calendar, label: 'Rutina diaria',        onClick: () => navigate('/cuidado') },
     // Una sola puerta para todo lo que se escribe del familiar (HowIsTodaySheet)
-    { Icon: Heart,         label: '¿Cómo está hoy?',     onClick: () => setShowHowIsToday(true) },
-    { Icon: ClipboardList, label: 'Historia de cuidado', onClick: () => navigate('/historial') },
+    { Icon: Heart,    label: '¿Cómo está hoy?',      onClick: () => setShowHowIsToday(true) },
+    { Icon: Users,    label: 'Familia y cuidadores', onClick: () => navigate('/familia') },
   ]
-  const familiaConectada = [
-    { Icon: MessageCircle, label: 'Chat familiar',        onClick: () => navigate('/chat') },
-    { Icon: Video,         label: 'Videollamada',         onClick: () => navigate('/videollamada') },
-    { Icon: Users,         label: 'Familia y cuidadores', onClick: () => navigate('/familia') },
+  const organizar = [
+    { Icon: Calendar,      label: 'Citas y calendario',      onClick: () => navigate('/calendar') },
+    { Icon: FileText,      label: 'Reportes para el médico', onClick: () => navigate('/reportes') },
+    { Icon: Phone,         label: 'Contactos médicos',       onClick: () => navigate('/directorio') },
+    { Icon: Video,         label: 'Videollamada',            onClick: () => navigate('/videollamada') },
+    { Icon: ClipboardList, label: 'Historia de cuidado',     onClick: () => navigate('/historial') },
+    { Icon: MessageCircle, label: 'Chat familiar',           onClick: () => navigate('/chat') },
   ]
-  const saludEmergencias = [
-    { Icon: AlertTriangle, label: 'Modo emergencia',      tint: '#D9534F', tintBg: '#FBEAEA', emphasis: true,  onClick: () => navigate('/dashboard?sos=1') },
-    { Icon: Phone,         label: 'Contactos médicos',    tint: '#0C6C9C', tintBg: '#E3F1F8', emphasis: false, onClick: () => navigate('/directorio') },
-    { Icon: Calendar,      label: 'Citas y calendario',   tint: '#0C6C9C', tintBg: '#E3F1F8', emphasis: false, onClick: () => navigate('/calendar') },
-    { Icon: FileText,      label: 'Reportes para el médico', tint: '#0C6C9C', tintBg: '#E3F1F8', emphasis: false, onClick: () => navigate('/reportes') },
-  ]
-  const vidaRecuerdos = [
-    { Icon: Pencil,     label: 'Memorias de voz',    onClick: () => navigate('/memorias') },
+  const especiales = [
     { Icon: DollarSign, label: 'Gastos del cuidado', onClick: () => navigate('/gastos') },
+    { Icon: Pencil,     label: 'Memorias de voz',    onClick: () => navigate('/memorias') },
   ]
-  const cuentaAjustes = [
-    { Icon: Shield, label: 'Permisos de acceso',   onClick: () => navigate('/roles') },
-    { Icon: Star,   label: 'Planes y suscripción', onClick: () => navigate('/upgrade') },
+  const cuenta = [
+    { Icon: Settings, label: 'Mi cuenta y ajustes',  onClick: () => navigate('/ajustes') },
+    { Icon: Shield,   label: 'Permisos de acceso',   onClick: () => navigate('/roles') },
+    { Icon: Star,     label: 'Planes y suscripción', onClick: () => navigate('/upgrade') },
   ]
+
+  const block = (bg) => ({ margin: '12px 14px 0', padding: '16px 14px 18px', borderRadius: 22, background: bg })
+  const grid = { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }
 
   return (
     <Layout>
       <div style={{ fontFamily: SANS, color: '#2A4350' }}>
 
         {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 18px 6px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '18px 18px 6px' }}>
           <button onClick={() => navigate(-1)} aria-label="Volver" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', WebkitTapHighlightColor: 'transparent' }}>
             <ChevronLeft size={22} color="#2A4350" strokeWidth={2.2} />
           </button>
-          <h1 style={{ margin: 0, fontFamily: SERIF, fontWeight: 600, fontSize: 19, color: '#2A4350', letterSpacing: '-0.01em' }}>Todo el cuidado</h1>
-          <button aria-label="Favoritos" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', WebkitTapHighlightColor: 'transparent' }}>
-            <Heart size={19} color="#E9826E" strokeWidth={2} />
-          </button>
+          <h1 style={{ margin: 0, fontFamily: SERIF, fontWeight: 600, fontSize: 21, color: '#2A4350', letterSpacing: '-0.01em' }}>Todo el cuidado</h1>
         </div>
 
         <div style={{ padding: '8px 0 24px' }}>
 
-          {/* 1. Cuidar hoy */}
-          <div style={{ margin: '14px 14px 0', padding: '16px 14px 18px', borderRadius: 22, background: 'linear-gradient(180deg, #DCF0EA 0%, #E7F1EB 100%)' }}>
-            <GroupHeader icon={<Heart size={15} color="#0C6C9C" strokeWidth={1.9} />} color="#0C6C9C" label="Cuidar hoy" />
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-              {cuidarHoy.map(c => <ToolCard key={c.label} {...c} tint="#0C6C9C" tintBg="#E3F1F8" />)}
+          {/* Emergencia — siempre a un toque */}
+          <div style={{ margin: '10px 14px 0' }}>
+            <button
+              onClick={() => navigate('/dashboard?sos=1')}
+              style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', borderRadius: 18, border: 'none', background: '#D9534F', color: 'white', cursor: 'pointer', boxShadow: '0 8px 20px -10px rgba(217,83,79,0.7)', WebkitTapHighlightColor: 'transparent' }}
+            >
+              <AlertTriangle size={22} color="#FFFFFF" strokeWidth={2} />
+              <span style={{ flex: 1, textAlign: 'left', fontSize: 17, fontWeight: 700 }}>Emergencia</span>
+              <span style={{ fontSize: 14, opacity: 0.9 }}>Avisa a toda la familia ›</span>
+            </button>
+          </div>
+
+          {/* 1. Todos los días */}
+          <div style={block('linear-gradient(180deg, #E3F1F8 0%, #EEF6FA 100%)')}>
+            <GroupHeader icon={<Heart size={16} color="#0C6C9C" strokeWidth={1.9} />} color="#0C6C9C" label="Todos los días" />
+            <div style={grid}>
+              {todosLosDias.map(c => <ToolCard key={c.label} {...c} tint="#0C6C9C" tintBg="#E3F1F8" />)}
             </div>
           </div>
 
-          {/* 2. Familia conectada */}
-          <div style={{ margin: '12px 14px 0', padding: '16px 14px 18px', borderRadius: 22, background: 'linear-gradient(180deg, #FBEAE4 0%, #FCF0EC 100%)' }}>
-            <GroupHeader icon={<Users size={15} color="#E9826E" strokeWidth={1.9} />} color="#E9826E" label="Familia conectada" />
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-              {familiaConectada.map((c, i) => (
-                <ToolCard key={c.label} {...c} tint="#E9826E" tintBg="#FDEEEA" span2={i === familiaConectada.length - 1 && familiaConectada.length % 2 === 1} />
-              ))}
+          {/* 2. Organizar (de vez en cuando) */}
+          <div style={block('linear-gradient(180deg, #FBEAE4 0%, #FCF0EC 100%)')}>
+            <GroupHeader icon={<Calendar size={16} color="#C9654F" strokeWidth={1.9} />} color="#C9654F" label="Organizar" />
+            <div style={grid}>
+              {organizar.map(c => <ToolCard key={c.label} {...c} tint="#C9654F" tintBg="#FDEEEA" />)}
             </div>
           </div>
 
-          {/* 3. Salud y emergencias */}
-          <div style={{ margin: '12px 14px 0', padding: '16px 14px 18px', borderRadius: 22, background: 'linear-gradient(180deg, #DCEEEC 0%, #E9F3F1 100%)' }}>
-            <GroupHeader icon={<Shield size={15} color="#0C6C9C" strokeWidth={1.9} />} color="#0C6C9C" label="Salud y emergencias" />
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-              {saludEmergencias.map(c => <ToolCard key={c.label} {...c} />)}
-            </div>
-          </div>
-
-          {/* 4. Vida y recuerdos */}
-          <div style={{ margin: '12px 14px 0', padding: '16px 14px 18px', borderRadius: 22, background: 'linear-gradient(180deg, #FBF1DE 0%, #FCF4E7 100%)' }}>
-            <GroupHeader icon={<Heart size={15} color="#D99A18" strokeWidth={1.9} />} color="#D99A18" label="Vida y recuerdos" />
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-              {vidaRecuerdos.map((c, i) => (
-                <ToolCard key={c.label} {...c} tint="#D99A18" tintBg="#FDF3DF" span2={i === vidaRecuerdos.length - 1 && vidaRecuerdos.length % 2 === 1} />
-              ))}
-            </div>
-          </div>
-
-          {/* 5. Inteligencia FamiliaCerca */}
-          <div style={{ margin: '12px 14px 0', padding: '16px 14px 18px', borderRadius: 22, background: 'linear-gradient(180deg, #ECE9F9 0%, #F1EFFB 100%)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 12 }}>
-              <span style={{ fontSize: 14 }}>✨</span>
-              <span style={{ fontFamily: SERIF, fontWeight: 600, fontSize: 15, color: '#7566D8' }}>Inteligencia FamiliaCerca</span>
-            </div>
+          {/* Milo y Luna */}
+          <div style={block('linear-gradient(180deg, #ECE9F9 0%, #F1EFFB 100%)')}>
             <button
               onClick={() => setShowCompanion(true)}
-              style={{
-                width: '100%', display: 'flex', alignItems: 'center', gap: 14,
-                background: '#EDEBFA', border: 'none', borderRadius: 18, padding: '14px 14px',
-                boxShadow: '0 6px 16px -6px rgba(117,102,216,0.28)', cursor: 'pointer',
-                WebkitTapHighlightColor: 'transparent', textAlign: 'left',
-              }}
+              style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 14, background: '#EDEBFA', border: 'none', borderRadius: 18, padding: '14px 14px', cursor: 'pointer', WebkitTapHighlightColor: 'transparent', textAlign: 'left' }}
             >
               <span style={{ flexShrink: 0, width: 56, height: 56, borderRadius: 14, background: '#DDD8F5', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                 <img src="/images/milo-luna.webp" alt="Milo el perro y Luna la gata" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
               </span>
               <span style={{ flex: 1, minWidth: 0 }}>
-                <span style={{ display: 'block', fontFamily: SERIF, fontWeight: 600, fontSize: 15, color: '#2A4350', marginBottom: 2 }}>Milo y Luna</span>
-                <span style={{ display: 'block', fontSize: 12, color: '#4E6470', lineHeight: 1.35 }}>Tu asistente inteligente para el cuidado familiar</span>
+                <span style={{ display: 'block', fontFamily: SERIF, fontWeight: 600, fontSize: 17, color: '#2A4350', marginBottom: 2 }}>Milo y Luna</span>
+                <span style={{ display: 'block', fontSize: 14, color: '#4E6470', lineHeight: 1.35 }}>Pregúntales lo que necesites del cuidado</span>
               </span>
-              <span style={{ fontSize: 18, color: '#7566D8', flexShrink: 0 }}>›</span>
+              <span style={{ fontSize: 20, color: '#7566D8', flexShrink: 0 }}>›</span>
             </button>
           </div>
 
-          {/* 6. Cuenta y ajustes */}
-          <div style={{ margin: '12px 14px 0', padding: '16px 14px 18px', borderRadius: 22, background: '#EFEFEE' }}>
-            <GroupHeader icon={<Settings size={15} color="#4E6470" strokeWidth={1.9} />} color="#4E6470" label="Cuenta y ajustes" />
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-              {cuentaAjustes.map(c => <ToolCard key={c.label} {...c} tint="#4E6470" tintBg="#F0F0EF" />)}
+          {/* 3. Cuando haga falta (plegado) */}
+          <div style={block('#F4F2EC')}>
+            <button onClick={toggleMore} aria-expanded={showMore} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'none', border: 'none', padding: 0, cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}>
+              <span style={{ fontFamily: SERIF, fontWeight: 600, fontSize: 16, color: '#4E6470' }}>Cuando haga falta</span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: '#0C6C9C' }}>{showMore ? 'Ocultar ▲' : 'Ver gastos y memorias ▼'}</span>
+            </button>
+            {showMore && (
+              <div style={{ ...grid, marginTop: 12 }}>
+                {especiales.map(c => <ToolCard key={c.label} {...c} tint="#B07A12" tintBg="#FDF3DF" />)}
+              </div>
+            )}
+          </div>
+
+          {/* 4. Mi cuenta */}
+          <div style={block('#EFEFEE')}>
+            <GroupHeader icon={<Settings size={16} color="#4E6470" strokeWidth={1.9} />} color="#4E6470" label="Mi cuenta" />
+            <div style={grid}>
+              {cuenta.map((c, i) => <ToolCard key={c.label} {...c} tint="#4E6470" tintBg="#F0F0EF" span2={i === 0} />)}
             </div>
           </div>
 

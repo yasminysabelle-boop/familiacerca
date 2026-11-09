@@ -35,13 +35,13 @@ export default function MedicationsPausedCard() {
         <span style={{
           padding: '3px 10px', borderRadius: 20,
           background: '#FED7AA', color: '#92400E',
-          fontSize: 11, fontWeight: 700, letterSpacing: '0.03em',
+          fontSize: 13, fontWeight: 700, letterSpacing: '0.03em',
         }}>
           ⏸ PAUSADOS
         </span>
       </div>
 
-      <p style={{ margin: '0 0 12px', fontSize: 12, color: '#B45309' }}>
+      <p style={{ margin: '0 0 12px', fontSize: 14, color: '#B45309' }}>
         Solo lectura durante el Modo Hospital. Los recordatorios están desactivados.
       </p>
 
@@ -65,7 +65,7 @@ export default function MedicationsPausedCard() {
                   {m.name}
                 </p>
                 {m.dosage && (
-                  <p style={{ margin: '1px 0 0', fontSize: 11, color: '#B45309' }}>
+                  <p style={{ margin: '1px 0 0', fontSize: 13, color: '#B45309' }}>
                     {m.dosage}
                     {m.scheduled_times?.length > 0 && ` · ${m.scheduled_times.join(', ')}`}
                   </p>

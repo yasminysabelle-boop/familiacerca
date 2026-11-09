@@ -148,7 +148,7 @@ export default function WelcomeSlides({ onDone }) {
               <Logo size={40} />
             </div>
             <p style={{
-              color: '#4E6470', fontSize: 11, margin: '0 0 8px',
+              color: '#4E6470', fontSize: 13, margin: '0 0 8px',
               letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 700,
             }}>
               Todo en un solo lugar
@@ -185,7 +185,7 @@ export default function WelcomeSlides({ onDone }) {
                 <p style={{ fontSize: 13, fontWeight: 700, color: '#14303D', margin: '0 0 4px' }}>
                   {f.title}
                 </p>
-                <p style={{ fontSize: 11, color: '#5E7480', margin: 0, lineHeight: 1.4 }}>
+                <p style={{ fontSize: 13, color: '#5E7480', margin: 0, lineHeight: 1.4 }}>
                   {f.desc}
                 </p>
               </div>

@@ -25,7 +25,7 @@ export default function MedicationListTab({ medications = [], onOpenDetail }) {
       <div style={{ padding: '40px 0', textAlign: 'center' }}>
         <p style={{ fontSize: 40, marginBottom: 12 }}>💊</p>
         <p style={{ fontSize: 14, fontWeight: 600, color: '#14303D', fontFamily: SANS }}>Sin medicamentos aún</p>
-        <p style={{ fontSize: 12, color: '#5E7480', fontFamily: SANS }}>Agrega medicamentos desde el botón + de arriba.</p>
+        <p style={{ fontSize: 14, color: '#5E7480', fontFamily: SANS }}>Agrega medicamentos desde el botón + de arriba.</p>
       </div>
     )
   }

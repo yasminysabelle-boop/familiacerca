@@ -45,7 +45,7 @@ const F = {
   boxSizing:'border-box', color:'#1F2937', fontFamily:'system-ui,sans-serif',
 }
 const L = {
-  fontSize:11, fontWeight:700, color:'#4E6470',
+  fontSize: 13, fontWeight:700, color:'#4E6470',
   letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:5, display:'block',
 }
 const fo = e => { e.target.style.borderColor='#0C6C9C'; e.target.style.boxShadow='0 0 0 3px rgba(12,108,156,0.1)' }
@@ -93,7 +93,7 @@ function Section({ color, icon, title, badge, open, onToggle, children }) {
         <div style={{ flex:1 }}>
           <p style={{ fontSize:14, fontWeight:700, color:'#14303D', margin:0 }}>{title}</p>
           {badge>0 && (
-            <p style={{ fontSize:11, color, fontWeight:600, margin:'2px 0 0' }}>
+            <p style={{ fontSize: 13, color, fontWeight:600, margin:'2px 0 0' }}>
               {badge} campo{badge!==1?'s':''} completado{badge!==1?'s':''}
             </p>
           )}
@@ -123,7 +123,7 @@ function CheckChips({ opts, value, onChange, colorOn='#0C6C9C', bgOn='#E3F1F8' }
             color: on ? colorOn : '#4E6470',
             display:'flex', alignItems:'center', gap:5, transition:'all 0.15s',
           }}>
-            {on && <span style={{ fontSize:11 }}>✓</span>}{o}
+            {on && <span style={{ fontSize: 13 }}>✓</span>}{o}
           </button>
         )
       })}
@@ -342,7 +342,7 @@ export default function PatientProfile() {
               <ChevronLeft size={18} color="white" strokeWidth={2} />
             </button>
             <div style={{ flex:1 }}>
-              <p style={{ color:'rgba(255,255,255,0.65)', fontSize:12, margin:0 }}>Información clínica</p>
+              <p style={{ color:'rgba(255,255,255,0.65)', fontSize: 14, margin:0 }}>Información clínica</p>
               <h1 style={{ color:'white', fontFamily:'Georgia,serif', fontSize:20, fontWeight:700, margin:'2px 0 0' }}>
                 {form.nombre_completo ? `Perfil de ${form.nombre_completo.split(' ')[0]}` : 'Perfil del Paciente'}
               </h1>
@@ -368,7 +368,7 @@ export default function PatientProfile() {
                 }
                 {uploading && (
                   <div style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0.5)', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                    <span style={{ color:'white', fontSize:11 }}>...</span>
+                    <span style={{ color:'white', fontSize: 13 }}>...</span>
                   </div>
                 )}
               </div>
@@ -377,7 +377,7 @@ export default function PatientProfile() {
                   position:'absolute', bottom:0, right:0, width:22, height:22,
                   borderRadius:'50%', background:'white', border:'2px solid #0A5A82',
                   display:'flex', alignItems:'center', justifyContent:'center',
-                  fontSize:11, cursor:'pointer',
+                  fontSize: 13, cursor:'pointer',
                 }}>📷</div>
               )}
             </div>
@@ -385,7 +385,7 @@ export default function PatientProfile() {
               <p style={{ color:'white', fontFamily:'Georgia,serif', fontSize:18, fontWeight:700, margin:0 }}>
                 {loading ? '...' : (form.nombre_completo || 'Sin nombre registrado')}
               </p>
-              <p style={{ color:'rgba(255,255,255,0.65)', fontSize:12, margin:'4px 0 0' }}>
+              <p style={{ color:'rgba(255,255,255,0.65)', fontSize: 14, margin:'4px 0 0' }}>
                 {form.fecha_nacimiento
                   ? new Date(form.fecha_nacimiento+'T12:00:00').toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'})
                   : 'Fecha sin registrar'}
@@ -488,7 +488,7 @@ export default function PatientProfile() {
                   }}>
                     <span style={{ fontSize:13, fontWeight:600, color:'#D63031', flex:1 }}>⚠ {a.nombre}</span>
                     <select value={a.reaccion} onChange={e=>setReaccion(a.nombre,e.target.value)} style={{
-                      fontSize:12, border:'1px solid #E6E3DB', borderRadius:8,
+                      fontSize: 14, border:'1px solid #E6E3DB', borderRadius:8,
                       padding:'5px 8px', background:'white', color:'#30454F', outline:'none',
                     }}>
                       <option value="">Reacción...</option>
@@ -562,7 +562,7 @@ export default function PatientProfile() {
                 <p style={{ fontSize: 13, fontWeight: 700, color: '#0A4A6B', margin: 0 }}>
                   Reporte para el médico
                 </p>
-                <p style={{ fontSize: 11, color: '#5E7480', margin: '1px 0 0' }}>
+                <p style={{ fontSize: 13, color: '#5E7480', margin: '1px 0 0' }}>
                   Para descargar y llevar a la consulta
                 </p>
               </div>

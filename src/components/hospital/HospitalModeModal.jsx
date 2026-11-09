@@ -92,7 +92,7 @@ export default function HospitalModeModal({ open, onClose }) {
               <h3 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: '#14303D', fontFamily: 'Georgia, serif' }}>
                 Modo Hospital
               </h3>
-              <p style={{ margin: '2px 0 0', fontSize: 11, color: '#4E6470' }}>
+              <p style={{ margin: '2px 0 0', fontSize: 13, color: '#4E6470' }}>
                 {isHospitalMode ? 'Activo — el equipo está en alerta' : `Activa cuando ${patientName} esté hospitalizado`}
               </p>
             </div>
@@ -156,7 +156,7 @@ export default function HospitalModeModal({ open, onClose }) {
                     {hospitalMode.room_number && ` · Hab. ${hospitalMode.room_number}`}
                   </p>
                 )}
-                <p style={{ margin: 0, fontSize: 12, color: '#4E6470' }}>
+                <p style={{ margin: 0, fontSize: 14, color: '#4E6470' }}>
                   Activado por {hospitalMode?.activated_by_name ?? 'el equipo'}
                 </p>
               </div>

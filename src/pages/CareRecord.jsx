@@ -163,7 +163,7 @@ export default function CareRecord() {
           marginBottom: 20,
           boxShadow: '0 4px 20px rgba(12,108,156,0.25)',
         }}>
-          <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', margin: '0 0 4px', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+          <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', margin: '0 0 4px', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
             {dayLabel(todayKey)}
           </p>
           <h2 style={{ fontSize: 22, fontWeight: 700, color: 'white', fontFamily: 'Georgia, serif', margin: '0 0 6px' }}>
@@ -180,7 +180,7 @@ export default function CareRecord() {
               borderRadius: 20, padding: '4px 10px',
             }}>
               <CheckIcon size={11} color="#E58B73" strokeWidth={2.5} />
-              <span style={{ fontSize: 11, fontWeight: 700, color: '#E58B73' }}>Actualizar registro de hoy</span>
+              <span style={{ fontSize: 13, fontWeight: 700, color: '#E58B73' }}>Actualizar registro de hoy</span>
             </div>
           )}
         </div>
@@ -200,7 +200,7 @@ export default function CareRecord() {
                 marginBottom: 12,
                 boxShadow: '0 1px 6px rgba(0,0,0,0.04)',
               }}>
-                <p style={{ fontSize: 12, fontWeight: 700, color: '#0C6C9C', margin: '0 0 12px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                <p style={{ fontSize: 14, fontWeight: 700, color: '#0C6C9C', margin: '0 0 12px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
                   {section.label}
                 </p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
@@ -243,7 +243,7 @@ export default function CareRecord() {
               marginBottom: 20,
               boxShadow: '0 1px 6px rgba(0,0,0,0.04)',
             }}>
-              <p style={{ fontSize: 12, fontWeight: 700, color: '#0C6C9C', margin: '0 0 10px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+              <p style={{ fontSize: 14, fontWeight: 700, color: '#0C6C9C', margin: '0 0 10px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
                 Notas (opcional)
               </p>
               <VoiceInput
@@ -256,7 +256,7 @@ export default function CareRecord() {
                 placeholder="Observaciones del día, comportamiento especial, síntomas..."
                 rows={3}
               />
-              <p style={{ fontSize: 11, color: '#5E7480', margin: '4px 0 0', textAlign: 'right' }}>
+              <p style={{ fontSize: 13, color: '#5E7480', margin: '4px 0 0', textAlign: 'right' }}>
                 {form.notes.length}/300
               </p>
             </div>
@@ -317,7 +317,7 @@ export default function CareRecord() {
                 border: `1px solid ${moodStyle ? moodStyle.border : '#E6E3DB'}`,
                 borderRadius: 16, padding: '16px',
               }}>
-                <p style={{ fontSize: 12, fontWeight: 700, color: '#4E6470', margin: '0 0 10px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                <p style={{ fontSize: 14, fontWeight: 700, color: '#4E6470', margin: '0 0 10px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
                   Resumen de hoy
                 </p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
@@ -331,7 +331,7 @@ export default function CareRecord() {
                         display: 'inline-flex', alignItems: 'center', gap: 4,
                         background: 'white', border: '1px solid #E5DDD2',
                         borderRadius: 20, padding: '4px 10px',
-                        fontSize: 12, color: '#30454F', fontWeight: 500,
+                        fontSize: 14, color: '#30454F', fontWeight: 500,
                       }}>
                         {opt.emoji} {opt.label}
                       </span>

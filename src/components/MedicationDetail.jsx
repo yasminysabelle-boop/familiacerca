@@ -57,11 +57,11 @@ function DocRow({ label, url, uploadedAt, field, ownerId, medId, isAdmin, onSave
         <div style={{ flex: 1, minWidth: 0 }}>
           <p style={{ fontWeight: 700, fontSize: 14.5, color: '#14303D', margin: 0, fontFamily: SANS }}>{label}</p>
           {url ? (
-            <button onClick={() => onView(url)} style={{ border: 'none', background: 'none', cursor: 'pointer', padding: 0, fontSize: 12.5, color: '#0C6C9C', fontWeight: 700, marginTop: 2, fontFamily: SANS }}>
+            <button onClick={() => onView(url)} style={{ border: 'none', background: 'none', cursor: 'pointer', padding: 0, fontSize: 14, color: '#0C6C9C', fontWeight: 700, marginTop: 2, fontFamily: SANS }}>
               Subida{uploadedAt ? ` · ${uploadedAt}` : ''} · Ver documento
             </button>
           ) : (
-            <p style={{ fontSize: 12.5, color: '#4E6470', margin: '2px 0 0', fontFamily: SANS }}>Aún no subida</p>
+            <p style={{ fontSize: 14, color: '#4E6470', margin: '2px 0 0', fontFamily: SANS }}>Aún no subida</p>
           )}
         </div>
       </div>
@@ -74,17 +74,17 @@ function DocRow({ label, url, uploadedAt, field, ownerId, medId, isAdmin, onSave
             alwaysExpanded
             renderOptions={({ onCamera, onGallery }) => (
               <div style={{ display: 'flex', gap: 10 }}>
-                <button type="button" onClick={onCamera} style={{ flex: 1, border: 'none', cursor: 'pointer', padding: 10, borderRadius: 13, fontSize: 12.5, fontWeight: 700, fontFamily: SANS, color: '#0C6C9C', background: '#A6E3EC' }}>
+                <button type="button" onClick={onCamera} style={{ flex: 1, border: 'none', cursor: 'pointer', padding: 10, borderRadius: 13, fontSize: 14, fontWeight: 700, fontFamily: SANS, color: '#0C6C9C', background: '#A6E3EC' }}>
                   {url ? 'Volver a tomar foto' : 'Tomar foto'}
                 </button>
-                <button type="button" onClick={onGallery} style={{ flex: 1, border: 'none', cursor: 'pointer', padding: 10, borderRadius: 13, fontSize: 12.5, fontWeight: 700, fontFamily: SANS, color: '#5C6B78', background: '#F1EDE3' }}>
+                <button type="button" onClick={onGallery} style={{ flex: 1, border: 'none', cursor: 'pointer', padding: 10, borderRadius: 13, fontSize: 14, fontWeight: 700, fontFamily: SANS, color: '#5C6B78', background: '#F1EDE3' }}>
                   Elegir de galería
                 </button>
               </div>
             )}
           />
           {url && (
-            <button onClick={() => onDelete(field)} style={{ marginTop: 8, border: 'none', background: 'none', cursor: 'pointer', padding: 0, fontSize: 11.5, color: '#D9534F', fontWeight: 600, fontFamily: SANS }}>
+            <button onClick={() => onDelete(field)} style={{ marginTop: 8, border: 'none', background: 'none', cursor: 'pointer', padding: 0, fontSize: 13, color: '#D9534F', fontWeight: 600, fontFamily: SANS }}>
               Quitar documento
             </button>
           )}
@@ -162,7 +162,7 @@ export default function MedicationDetail({ med, stock, ownerId, isAdmin, onClose
               )}
             </div>
             <span style={{
-              flexShrink: 0, padding: '6px 14px', borderRadius: 999, fontSize: 12.5, fontWeight: 700,
+              flexShrink: 0, padding: '6px 14px', borderRadius: 999, fontSize: 14, fontWeight: 700,
               color: status === 'active' ? '#FFFFFF' : '#5C6B78',
               background: status === 'active' ? '#0C6C9C' : '#E7E2D6',
             }}>
@@ -172,14 +172,14 @@ export default function MedicationDetail({ med, stock, ownerId, isAdmin, onClose
           {isAdmin && (
             <button
               onClick={() => onEdit(med)}
-              style={{ marginTop: 14, display: 'inline-flex', alignItems: 'center', gap: 6, border: '1px solid rgba(51,65,85,0.12)', background: '#FDFAF7', borderRadius: 12, padding: '7px 13px', fontSize: 12.5, fontWeight: 700, color: '#2A4350', cursor: 'pointer' }}
+              style={{ marginTop: 14, display: 'inline-flex', alignItems: 'center', gap: 6, border: '1px solid rgba(51,65,85,0.12)', background: '#FDFAF7', borderRadius: 12, padding: '7px 13px', fontSize: 14, fontWeight: 700, color: '#2A4350', cursor: 'pointer' }}
             >
               <Pencil size={13} color="#2A4350" strokeWidth={2} /> Editar
             </button>
           )}
         </div>
 
-        <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: 1.2, color: '#7D8A9A', textTransform: 'uppercase', margin: '22px 0 10px', paddingLeft: 2 }}>
+        <div style={{ fontSize: 14, fontWeight: 700, letterSpacing: 1.2, color: '#7D8A9A', textTransform: 'uppercase', margin: '22px 0 10px', paddingLeft: 2 }}>
           Documentos
         </div>
 

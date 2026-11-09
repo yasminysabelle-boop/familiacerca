@@ -51,7 +51,7 @@ export default function TrialBanner() {
         <p style={{ fontSize: 13, fontWeight: 700, color: urgent ? '#92400E' : '#0C6C9C', margin: '0 0 2px' }}>
           {`✨ Te queda${daysLeft !== 1 ? 'n' : ''} ${daysLeft} día${daysLeft !== 1 ? 's' : ''} con todo incluido`}
         </p>
-        <p style={{ fontSize: 11, color: '#5E7480', margin: 0 }}>
+        <p style={{ fontSize: 13, color: '#5E7480', margin: 0 }}>
           Después sigues gratis con lo esencial. Nada se borra.
         </p>
       </div>
@@ -60,7 +60,7 @@ export default function TrialBanner() {
         style={{
           flexShrink: 0, padding: '8px 16px', borderRadius: 10, border: 'none',
           background: urgent ? '#B45309' : 'linear-gradient(135deg, #0C6C9C, #A6E3EC)',
-          color: 'white', fontWeight: 700, fontSize: 12, cursor: 'pointer',
+          color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer',
           whiteSpace: 'nowrap',
         }}
       >

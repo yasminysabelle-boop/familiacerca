@@ -75,11 +75,11 @@ export default function AdminDataSection() {
           <span style={{ fontSize: 28, flexShrink: 0 }}>📄</span>
           <div style={{ flex: 1 }}>
             <p style={{ margin: '0 0 2px', fontSize: 15, fontWeight: 700, color: '#14303D' }}>Exportar historial médico</p>
-            <p style={{ margin: '0 0 12px', fontSize: 12, color: '#4E6470', lineHeight: 1.5 }}>
+            <p style={{ margin: '0 0 12px', fontSize: 14, color: '#4E6470', lineHeight: 1.5 }}>
               PDF completo con perfil del paciente, medicamentos, registros de dosis (90 días), notas y gastos.
             </p>
             {exportError && (
-              <p style={{ margin: '0 0 10px', fontSize: 12, color: '#DC2626', padding: '6px 10px', borderRadius: 8, background: '#FEF2F2' }}>
+              <p style={{ margin: '0 0 10px', fontSize: 14, color: '#DC2626', padding: '6px 10px', borderRadius: 8, background: '#FEF2F2' }}>
                 {exportError}
               </p>
             )}
@@ -108,7 +108,7 @@ export default function AdminDataSection() {
           <span style={{ fontSize: 28, flexShrink: 0 }}>🗑️</span>
           <div style={{ flex: 1 }}>
             <p style={{ margin: '0 0 2px', fontSize: 15, fontWeight: 700, color: '#B91C1C' }}>Borrar cuenta y datos</p>
-            <p style={{ margin: '0 0 12px', fontSize: 12, color: '#4E6470', lineHeight: 1.5 }}>
+            <p style={{ margin: '0 0 12px', fontSize: 14, color: '#4E6470', lineHeight: 1.5 }}>
               Elimina permanentemente tu cuenta, todos los miembros del equipo, medicamentos, historial, notas, gastos y documentos. Esta acción no se puede deshacer.
             </p>
 
@@ -131,7 +131,7 @@ export default function AdminDataSection() {
                   padding: '10px 12px', borderRadius: 10,
                   background: 'rgba(185,28,28,0.06)', border: '1px solid rgba(185,28,28,0.2)',
                 }}>
-                  <p style={{ margin: 0, fontSize: 12, color: '#B91C1C', fontWeight: 600 }}>
+                  <p style={{ margin: 0, fontSize: 14, color: '#B91C1C', fontWeight: 600 }}>
                     Escribe ELIMINAR para confirmar:
                   </p>
                 </div>
@@ -142,7 +142,7 @@ export default function AdminDataSection() {
                   rows={1}
                 />
                 {deleteError && (
-                  <p style={{ margin: 0, fontSize: 12, color: '#DC2626', padding: '6px 10px', borderRadius: 8, background: '#FEF2F2' }}>
+                  <p style={{ margin: 0, fontSize: 14, color: '#DC2626', padding: '6px 10px', borderRadius: 8, background: '#FEF2F2' }}>
                     {deleteError}
                   </p>
                 )}

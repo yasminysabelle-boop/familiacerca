@@ -145,16 +145,22 @@ self.addEventListener('push', event => {
   let data
   try { data = event.data.json() } catch { data = { title: 'FamiliaCerca', body: event.data.text() } }
 
+  // Avisos de medicamento: botón "Ya se la di" dentro del aviso (Android y
+  // computadora; iPhone no muestra botones en apps web). El id del
+  // medicamento viene en el tag que ya manda el servidor.
+  const medMatch = /^(?:med-reminder|window-closing)-([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})-/.exec(data.tag ?? '')
+  const actions = data.actions ?? (medMatch ? [{ action: 'confirmar', title: '✅ Ya se la di' }, { action: 'ver', title: 'Ver' }] : [])
+
   event.waitUntil(
     self.registration.showNotification(data.title ?? 'FamiliaCerca', {
       body:     data.body,
       icon:     '/icon-192.png',
       badge:    '/icon-72.png',
       tag:      data.tag ?? 'fc-notification',
-      data:     { url: data.url ?? '/medications', ...(data.data ?? {}) },
+      data:     { url: data.url ?? '/medications', ...(data.data ?? {}), ...(medMatch ? { med_id: medMatch[1] } : {}) },
       requireInteraction: data.requireInteraction ?? false,
       vibrate:  data.vibrate ?? [200],
-      actions:  data.actions ?? [],
+      actions,
     })
   )
 })
@@ -167,7 +173,10 @@ self.addEventListener('notificationclick', event => {
   // in src/ currently reads `searchParams.get('action')` — this is intentionally a no-op
   // today (verified via full-repo search). Left in place in case a future screen wants
   // to branch on which notification action button was tapped.
-  const target = base + (event.action ? `?action=${event.action}` : '')
+  // "Ya se la di": abre directo el registro de esa dosis (un toque para confirmar).
+  const target = (event.action === 'confirmar' && d.med_id)
+    ? `/medications?confirmar=${d.med_id}`
+    : base + (event.action ? `?action=${event.action}` : '')
 
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {

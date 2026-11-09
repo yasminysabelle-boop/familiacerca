@@ -99,7 +99,7 @@ export default function Register() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">
+              <label className="block text-sm font-bold text-gray-600 mb-1.5 uppercase tracking-wide">
                 Tu nombre
               </label>
               <input
@@ -117,7 +117,7 @@ export default function Register() {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">
+              <label className="block text-sm font-bold text-gray-600 mb-1.5 uppercase tracking-wide">
                 Correo electrónico
               </label>
               <input
@@ -135,7 +135,7 @@ export default function Register() {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">
+              <label className="block text-sm font-bold text-gray-600 mb-1.5 uppercase tracking-wide">
                 Contraseña
               </label>
               <div style={{ position: 'relative' }}>
@@ -185,7 +185,7 @@ export default function Register() {
           {/* Benefits row */}
           <div className="flex items-center justify-center gap-3 mt-4 flex-wrap">
             {BENEFITS.map(b => (
-              <span key={b} className="flex items-center gap-1 text-[10px] text-gray-400 font-medium">
+              <span key={b} className="flex items-center gap-1 text-[12px] text-gray-400 font-medium">
                 <span style={{ color: '#0C6C9C' }}>✓</span> {b}
               </span>
             ))}
@@ -199,7 +199,7 @@ export default function Register() {
           </Link>
         </p>
 
-        <p className="mt-3 text-center text-[11px] text-gray-400 leading-relaxed">
+        <p className="mt-3 text-center text-[13px] text-gray-400 leading-relaxed">
           Al crear tu cuenta aceptas nuestros{' '}
           <Link to="/terminos" className="underline hover:text-gray-600 transition-colors">
             Términos de Servicio

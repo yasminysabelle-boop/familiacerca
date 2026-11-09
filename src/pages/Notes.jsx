@@ -197,7 +197,7 @@ export default function Notes() {
             <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 20, fontWeight: 700, color: '#14303D', marginBottom: 2 }}>
               Notas
             </h2>
-            <p style={{ fontSize: 12, color: '#5E7480' }}>Observaciones del cuidado diario</p>
+            <p style={{ fontSize: 14, color: '#5E7480' }}>Observaciones del cuidado diario</p>
           </div>
           {(isAdmin || isCuidador) && (
             <button
@@ -243,7 +243,7 @@ export default function Notes() {
             <p style={{ fontSize: 14, fontWeight: 600, color: '#14303D', marginBottom: 6 }}>
               {search ? 'Sin resultados' : 'Sin notas aún'}
             </p>
-            <p style={{ fontSize: 12, color: '#5E7480', marginBottom: 20 }}>
+            <p style={{ fontSize: 14, color: '#5E7480', marginBottom: 20 }}>
               {search ? 'Intenta con otras palabras.' : 'Registra las observaciones del cuidado diario.'}
             </p>
             {!search && (isAdmin || isCuidador) && (
@@ -277,16 +277,16 @@ export default function Notes() {
                         {note.title || note.content?.slice(0, 60) || '—'}
                       </p>
                       <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
-                        <span style={{ fontSize: 11, color: '#5E7480' }}>
+                        <span style={{ fontSize: 13, color: '#5E7480' }}>
                           {new Date(note.created_at).toLocaleDateString('es-US', { day: 'numeric', month: 'short', year: 'numeric' })}
                         </span>
                         {note.is_incident && (
-                          <span style={{ fontSize: 10, fontWeight: 700, color: '#C2410C', background: '#FDE8D8', padding: '2px 8px', borderRadius: 20 }}>
+                          <span style={{ fontSize: 12, fontWeight: 700, color: '#C2410C', background: '#FDE8D8', padding: '2px 8px', borderRadius: 20 }}>
                             {incidentTypeInfo(note.incident_type).emoji} {incidentTypeInfo(note.incident_type).label}
                           </span>
                         )}
                         {note.tags?.map(tag => (
-                          <span key={tag} style={{ fontSize: 10, fontWeight: 700, color: '#0C6C9C', background: '#E3F1F8', padding: '2px 8px', borderRadius: 20 }}>
+                          <span key={tag} style={{ fontSize: 12, fontWeight: 700, color: '#0C6C9C', background: '#E3F1F8', padding: '2px 8px', borderRadius: 20 }}>
                             {tag}
                           </span>
                         ))}
@@ -336,7 +336,7 @@ export default function Notes() {
                         {note.content}
                       </p>
                       {note.address && (
-                        <p style={{ fontSize: 11, color: '#5E7480', marginTop: 8 }}>📍 {note.address}</p>
+                        <p style={{ fontSize: 13, color: '#5E7480', marginTop: 8 }}>📍 {note.address}</p>
                       )}
                       {note.photo_url && (
                         <div style={{ marginTop: 8 }}>
@@ -373,7 +373,7 @@ export default function Notes() {
 
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-                  <p style={{ fontSize: 11, fontWeight: 700, color: '#4E6470', letterSpacing: '0.08em', textTransform: 'uppercase', margin: 0 }}>Contenido *</p>
+                  <p style={{ fontSize: 13, fontWeight: 700, color: '#4E6470', letterSpacing: '0.08em', textTransform: 'uppercase', margin: 0 }}>Contenido *</p>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <MicButton recording={recording} onStart={start} onStop={stop} size="sm" />
                   </div>
@@ -390,12 +390,12 @@ export default function Notes() {
                   onBlur={onBlur}
                 />
                 {recording && interim && (
-                  <p style={{ fontSize: 11, marginTop: 6, paddingLeft: 4, color: '#5E7480', fontStyle: 'italic' }}>
+                  <p style={{ fontSize: 13, marginTop: 6, paddingLeft: 4, color: '#5E7480', fontStyle: 'italic' }}>
                     🎤 {interim}
                   </p>
                 )}
                 {speechError && (
-                  <div style={{ marginTop: 8, padding: '10px 14px', background: '#FFF0F0', border: '1px solid #FFBABA', borderRadius: 10, fontSize: 12, color: '#D63031' }}>
+                  <div style={{ marginTop: 8, padding: '10px 14px', background: '#FFF0F0', border: '1px solid #FFBABA', borderRadius: 10, fontSize: 14, color: '#D63031' }}>
                     ⚠ {speechError}{' '}
                     <button type="button" onClick={clearError} style={{ textDecoration: 'underline', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'inherit', color: 'inherit' }}>
                       Cerrar
@@ -405,7 +405,7 @@ export default function Notes() {
               </div>
 
               <div>
-                <p style={{ fontSize: 11, fontWeight: 700, color: '#4E6470', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>Título <span style={{ fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>(opcional)</span></p>
+                <p style={{ fontSize: 13, fontWeight: 700, color: '#4E6470', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>Título <span style={{ fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>(opcional)</span></p>
                 <input
                   name="title"
                   value={form.title}
@@ -432,7 +432,7 @@ export default function Notes() {
                   <span style={{ fontSize: 20 }}>🩺</span>
                   <span style={{ flex: 1 }}>
                     <span style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#14303D' }}>Evento agudo</span>
-                    <span style={{ display: 'block', fontSize: 11, color: '#5E7480' }}>Caída, ER/hospitalización, cambio de conducta...</span>
+                    <span style={{ display: 'block', fontSize: 13, color: '#5E7480' }}>Caída, ER/hospitalización, cambio de conducta...</span>
                   </span>
                   <span style={{
                     width: 40, height: 22, borderRadius: 20, flexShrink: 0, position: 'relative',
@@ -465,7 +465,7 @@ export default function Notes() {
                             }}
                           >
                             <span style={{ fontSize: 20 }}>{t.emoji}</span>
-                            <span style={{ fontSize: 10, fontWeight: 700, color: isSelected ? '#C2410C' : '#4E6470', textAlign: 'center', lineHeight: 1.2 }}>{t.label}</span>
+                            <span style={{ fontSize: 12, fontWeight: 700, color: isSelected ? '#C2410C' : '#4E6470', textAlign: 'center', lineHeight: 1.2 }}>{t.label}</span>
                           </button>
                         )
                       })}
@@ -476,7 +476,7 @@ export default function Notes() {
                         <button
                           type="button"
                           onClick={() => setForm(f => ({ ...f, photo_url: null }))}
-                          style={{ background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 8, padding: '4px 10px', fontSize: 12, color: '#DC2626', cursor: 'pointer', fontWeight: 600 }}
+                          style={{ background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 8, padding: '4px 10px', fontSize: 14, color: '#DC2626', cursor: 'pointer', fontWeight: 600 }}
                         >
                           Quitar foto
                         </button>
@@ -494,7 +494,7 @@ export default function Notes() {
               </div>
 
               <div>
-                <p style={{ fontSize: 11, fontWeight: 700, color: '#4E6470', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8 }}>Etiquetas</p>
+                <p style={{ fontSize: 13, fontWeight: 700, color: '#4E6470', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8 }}>Etiquetas</p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                   {TAG_OPTIONS.map(tag => (
                     <button
@@ -503,7 +503,7 @@ export default function Notes() {
                       onClick={() => toggleTag(tag)}
                       style={{
                         padding: '6px 14px', borderRadius: 20,
-                        border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600,
+                        border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 600,
                         background: form.tags.includes(tag) ? '#0C6C9C' : '#F3F4F6',
                         color: form.tags.includes(tag) ? 'white' : '#4E6470',
                         transition: 'all 0.15s',

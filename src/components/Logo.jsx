@@ -35,7 +35,7 @@ export default function Logo({ showWordmark = false, size = 36, variant = 'defau
             FamiliaCerca
           </p>
           <p
-            className="text-[11px] leading-none tracking-widest uppercase mt-1"
+            className="text-[13px] leading-none tracking-widest uppercase mt-1"
             style={{ color: light ? 'rgba(255,255,255,0.8)' : '#5E7480' }}
           >
             Cuidado con amor

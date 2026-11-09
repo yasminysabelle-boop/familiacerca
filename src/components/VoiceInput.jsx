@@ -133,7 +133,7 @@ export default function VoiceInput({
 
       {/* Interim transcript hint */}
       {recording && interim && (
-        <p style={{ fontSize: 12, color: '#5E7480', margin: 0, fontStyle: 'italic' }}>
+        <p style={{ fontSize: 14, color: '#5E7480', margin: 0, fontStyle: 'italic' }}>
           {interim}...
         </p>
       )}
@@ -145,11 +145,11 @@ export default function VoiceInput({
           padding: '8px 12px', borderRadius: 8,
           background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)',
         }}>
-          <span style={{ fontSize: 12, color: '#DC2626', flex: 1 }}>{error}</span>
+          <span style={{ fontSize: 14, color: '#DC2626', flex: 1 }}>{error}</span>
           <button
             type="button"
             onClick={clearError}
-            style={{ fontSize: 11, color: '#DC2626', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+            style={{ fontSize: 13, color: '#DC2626', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
           >
             ✕
           </button>

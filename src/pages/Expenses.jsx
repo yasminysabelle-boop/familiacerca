@@ -322,7 +322,7 @@ export default function Expenses() {
             boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
           }}>
             <p style={{
-              color: '#4E6470', fontSize: 11, fontWeight: 700,
+              color: '#4E6470', fontSize: 13, fontWeight: 700,
               letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 4,
             }}>
               Total del mes
@@ -333,7 +333,7 @@ export default function Expenses() {
             }}>
               {loading ? '—' : formatCurrency(total)}
             </p>
-            <p style={{ color: '#5E7480', fontSize: 12 }}>
+            <p style={{ color: '#5E7480', fontSize: 14 }}>
               {!loading && `${expenses.length} gasto${expenses.length !== 1 ? 's' : ''} registrado${expenses.length !== 1 ? 's' : ''}`}
             </p>
           </div>
@@ -347,7 +347,7 @@ export default function Expenses() {
             border: '1px solid #E6E3DB', boxShadow: '0 2px 12px rgba(0,0,0,0.05)',
           }}>
             <p style={{
-              fontSize: 11, fontWeight: 700, color: '#4E6470',
+              fontSize: 13, fontWeight: 700, color: '#4E6470',
               letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 14,
             }}>
               Por categoría
@@ -435,7 +435,7 @@ export default function Expenses() {
                       }}>
                         {expense.description || expense.category}
                       </p>
-                      <p style={{ fontSize: 11, color: '#5E7480' }}>
+                      <p style={{ fontSize: 13, color: '#5E7480' }}>
                         {expense.paid_by} · {formatDate(expense.date)}
                       </p>
                     </div>
@@ -510,7 +510,7 @@ export default function Expenses() {
         {/* ¿Quién aportó más? */}
         {!loading && memberContributions.length > 0 && (
           <div style={{ margin: '16px 20px 0', background: 'white', borderRadius: 18, padding: '16px 18px', border: '1px solid #E6E3DB', boxShadow: '0 2px 12px rgba(0,0,0,0.05)' }}>
-            <p style={{ fontSize: 11, fontWeight: 700, color: '#4E6470', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 14 }}>
+            <p style={{ fontSize: 13, fontWeight: 700, color: '#4E6470', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 14 }}>
               ¿Quién aportó más este mes?
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -636,7 +636,7 @@ export default function Expenses() {
                 <p style={{ fontFamily: SANS, fontSize: 18, fontWeight: 700, color: '#14303D' }}>
                   {editExpense ? 'Editar gasto' : 'Nuevo gasto'}
                 </p>
-                <p style={{ fontSize: 12, color: '#5E7480', marginTop: 2 }}>
+                <p style={{ fontSize: 14, color: '#5E7480', marginTop: 2 }}>
                   Cuentas Claras
                 </p>
               </div>
@@ -653,7 +653,7 @@ export default function Expenses() {
               {/* Amount */}
               <div>
                 <label style={{
-                  display: 'block', fontSize: 11, fontWeight: 700, color: '#4E6470',
+                  display: 'block', fontSize: 13, fontWeight: 700, color: '#4E6470',
                   letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 6,
                 }}>
                   Monto *
@@ -684,7 +684,7 @@ export default function Expenses() {
               {/* Category */}
               <div>
                 <label style={{
-                  display: 'block', fontSize: 11, fontWeight: 700, color: '#4E6470',
+                  display: 'block', fontSize: 13, fontWeight: 700, color: '#4E6470',
                   letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 6,
                 }}>
                   Categoría *
@@ -713,7 +713,7 @@ export default function Expenses() {
               {/* Description */}
               <div>
                 <label style={{
-                  display: 'block', fontSize: 11, fontWeight: 700, color: '#4E6470',
+                  display: 'block', fontSize: 13, fontWeight: 700, color: '#4E6470',
                   letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 6,
                 }}>
                   Descripción
@@ -731,7 +731,7 @@ export default function Expenses() {
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
                     <label style={{
-                      fontSize: 11, fontWeight: 700, color: '#4E6470',
+                      fontSize: 13, fontWeight: 700, color: '#4E6470',
                       letterSpacing: '0.07em', textTransform: 'uppercase',
                     }}>
                       Pagó *
@@ -740,7 +740,7 @@ export default function Expenses() {
                       <button
                         type="button"
                         onClick={() => setEditingPaidBy(true)}
-                        style={{ background: 'none', border: 'none', padding: 0, fontSize: 11, fontWeight: 700, color: '#0C6C9C', cursor: 'pointer' }}
+                        style={{ background: 'none', border: 'none', padding: 0, fontSize: 13, fontWeight: 700, color: '#0C6C9C', cursor: 'pointer' }}
                       >
                         Cambiar
                       </button>
@@ -771,7 +771,7 @@ export default function Expenses() {
                 </div>
                 <div>
                   <label style={{
-                    display: 'block', fontSize: 11, fontWeight: 700, color: '#4E6470',
+                    display: 'block', fontSize: 13, fontWeight: 700, color: '#4E6470',
                     letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 6,
                   }}>
                     Fecha *
@@ -792,7 +792,7 @@ export default function Expenses() {
               {/* Receipt photo */}
               <div>
                 <label style={{
-                  display: 'block', fontSize: 11, fontWeight: 700, color: '#4E6470',
+                  display: 'block', fontSize: 13, fontWeight: 700, color: '#4E6470',
                   letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 8,
                 }}>
                   Foto del recibo (opcional)
@@ -830,7 +830,7 @@ export default function Expenses() {
                       }}
                     >
                       <span style={{ fontSize: 15 }}>📷</span>
-                      <span style={{ fontSize: 12, color: '#0C6C9C', fontWeight: 600 }}>Tomar foto</span>
+                      <span style={{ fontSize: 14, color: '#0C6C9C', fontWeight: 600 }}>Tomar foto</span>
                     </button>
                     <button
                       type="button"
@@ -843,7 +843,7 @@ export default function Expenses() {
                       }}
                     >
                       <span style={{ fontSize: 15 }}>🖼️</span>
-                      <span style={{ fontSize: 12, color: '#0C6C9C', fontWeight: 600 }}>Elegir de galería</span>
+                      <span style={{ fontSize: 14, color: '#0C6C9C', fontWeight: 600 }}>Elegir de galería</span>
                     </button>
                   </div>
                 )}

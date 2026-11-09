@@ -39,7 +39,7 @@ export default function PatientStatusCard() {
         </h3>
         {saved && (
           <span style={{
-            marginLeft: 'auto', fontSize: 11, color: '#0A5A82', fontWeight: 700,
+            marginLeft: 'auto', fontSize: 13, color: '#0A5A82', fontWeight: 700,
           }}>
             ✓ Guardado
           </span>

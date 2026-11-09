@@ -123,7 +123,7 @@ export default function CameraCapture({
             {guidance && (
               <span style={{
                 background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.12)',
-                color: 'white', fontSize: 12, fontWeight: 600, padding: '8px 14px',
+                color: 'white', fontSize: 14, fontWeight: 600, padding: '8px 14px',
                 borderRadius: 100, maxWidth: '78%', textAlign: 'center',
               }}>
                 {guidance}

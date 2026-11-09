@@ -59,7 +59,7 @@ export default function EvidencePhoto({
           <div style={{
             position: 'absolute', bottom: 2, right: 2,
             background: 'rgba(0,0,0,0.45)', borderRadius: 4,
-            padding: '1px 3px', fontSize: 9, lineHeight: 1,
+            padding: '1px 3px', fontSize: 12, lineHeight: 1,
           }}>
             📷
           </div>
@@ -172,7 +172,7 @@ export default function EvidencePhoto({
           </button>
         </div>
         {uploadError && (
-          <p style={{ fontSize: 11, color: '#DC2626', margin: '4px 0 0' }}>
+          <p style={{ fontSize: 13, color: '#DC2626', margin: '4px 0 0' }}>
             {uploadError}
           </p>
         )}
@@ -184,7 +184,7 @@ export default function EvidencePhoto({
             style={{
               padding: '7px 12px', borderRadius: 8,
               border: '1px solid #E6E3DB', background: 'white',
-              fontSize: 12, color: '#4E6470', cursor: 'pointer',
+              fontSize: 14, color: '#4E6470', cursor: 'pointer',
             }}
           >
             Cancelar
@@ -196,7 +196,7 @@ export default function EvidencePhoto({
             style={{
               padding: '7px 14px', borderRadius: 8, border: 'none',
               background: uploading ? '#C9D6DB' : '#0C6C9C',
-              color: 'white', fontSize: 12, fontWeight: 700,
+              color: 'white', fontSize: 14, fontWeight: 700,
               cursor: uploading ? 'not-allowed' : 'pointer',
             }}
           >
@@ -223,7 +223,7 @@ export default function EvidencePhoto({
               justifyContent: 'center', gap: 4,
               padding: '8px', borderRadius: 10,
               border: '1.5px dashed #C9D6DB', background: '#FDF8F4',
-              cursor: 'pointer', fontSize: 12, color: '#0C6C9C', fontWeight: 600,
+              cursor: 'pointer', fontSize: 14, color: '#0C6C9C', fontWeight: 600,
             }}
           >
             📷 Tomar foto
@@ -236,7 +236,7 @@ export default function EvidencePhoto({
               justifyContent: 'center', gap: 4,
               padding: '8px', borderRadius: 10,
               border: '1.5px dashed #C9D6DB', background: '#FDF8F4',
-              cursor: 'pointer', fontSize: 12, color: '#0C6C9C', fontWeight: 600,
+              cursor: 'pointer', fontSize: 14, color: '#0C6C9C', fontWeight: 600,
             }}
           >
             🖼️ Galería
@@ -264,7 +264,7 @@ export default function EvidencePhoto({
             display: 'inline-flex', alignItems: 'center', gap: 6,
             padding: '7px 12px', borderRadius: 10,
             border: '1.5px dashed #C9D6DB', background: '#FDF8F4',
-            cursor: 'pointer', fontSize: 12, color: '#0C6C9C', fontWeight: 600,
+            cursor: 'pointer', fontSize: 14, color: '#0C6C9C', fontWeight: 600,
             marginTop: 6,
           }}
         >
