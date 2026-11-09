@@ -129,7 +129,7 @@ export default function Login() {
       minHeight: '100svh',
       display: 'flex',
       flexDirection: 'column',
-      background: '#0A4A6B',
+      background: '#F7F6F2',
       overflow: 'hidden',
     }}>
       {/* Hero photo — caja limitada al 60% superior de la pantalla (no a
@@ -141,37 +141,14 @@ export default function Login() {
         src={imgFamilia}
         alt="Familia"
         style={{
-          position: 'absolute', top: '13vh', left: 0, right: 0,
-          width: '100%', height: '60vh',
+          position: 'absolute', top: 0, left: 0, right: 0,
+          width: '100%', height: '72vh',
           objectFit: 'cover', objectPosition: 'center top',
         }}
       />
 
-      {/* Forma orgánica decorativa — petróleo, esquina superior izquierda, asoma sutil detrás de la foto */}
-      <div style={{
-        position: 'absolute', top: -60, left: -60,
-        width: 220, height: 220,
-        background: '#0C6C9C',
-        borderRadius: '0 55% 45% 60%',
-        opacity: 0.45,
-        pointerEvents: 'none',
-        zIndex: 0,
-      }} />
-
-      {/* Gradient */}
-      <div style={{
-        position: 'absolute', inset: 0,
-        background: 'linear-gradient(to bottom, #0A4A6B 0%, #0A4A6B 13%, rgba(10,74,107,0) 21%, rgba(10,74,107,0) 38%, rgba(10,74,107,0.75) 50%, #0A4A6B 58%)',
-      }} />
-
-      {/* Logo */}
-      <div style={{
-        position: 'relative', zIndex: 1,
-        display: 'flex', flexDirection: 'column', alignItems: 'center',
-        paddingTop: 72, paddingBottom: 32,
-      }}>
-        <Logo variant="light" showWordmark size={44} />
-      </div>
+      {/* Foto completa y limpia, sin sombra ni logo encima (pedido de Yasmin,
+          nov 2026). El logo va dentro de la tarjeta blanca. */}
 
       <div style={{ flex: 1 }} />
 
@@ -193,6 +170,9 @@ export default function Login() {
         padding: '32px 24px 40px',
         boxShadow: '0 -8px 48px rgba(0,0,0,0.3)',
       }}>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 18 }}>
+          <Logo showWordmark size={34} />
+        </div>
 
         {/* ── RESET PASSWORD MODE ── */}
         {mode === 'reset' && (

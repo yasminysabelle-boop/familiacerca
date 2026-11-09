@@ -235,8 +235,8 @@ function Splash({ toLogin, onDone }) {
         src={imgFamilia}
         alt=""
         style={{
-          position: 'absolute', top: '13vh', left: 0, right: 0,
-          width: '100%', height: '60vh',
+          position: 'absolute', top: 0, left: 0, right: 0,
+          width: '100%', height: '72vh',
           objectFit: 'cover', objectPosition: 'center top',
           opacity: exiting ? 1 : 0,
           transition: 'opacity 0.65s ease-in-out',
@@ -244,7 +244,7 @@ function Splash({ toLogin, onDone }) {
       />
       <div style={{
         position: 'absolute', inset: 0,
-        background: 'linear-gradient(to bottom, #0A4A6B 0%, #0A4A6B 13%, rgba(10,74,107,0) 21%, rgba(10,74,107,0) 38%, rgba(10,74,107,0.75) 50%, #0A4A6B 58%)',
+        background: 'transparent',
         opacity: exiting ? 1 : 0,
         transition: 'opacity 0.65s ease-in-out',
       }} />
