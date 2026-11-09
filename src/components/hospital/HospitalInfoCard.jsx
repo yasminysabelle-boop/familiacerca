@@ -5,7 +5,7 @@ import { useFamily } from '../../contexts/FamilyContext'
 const fieldStyle = {
   width: '100%', padding: '10px 13px', borderRadius: 10,
   border: '1.5px solid #FECACA', background: '#FFF5F5',
-  fontSize: 14, color: '#1A1A1A', boxSizing: 'border-box',
+  fontSize: 14, color: '#14303D', boxSizing: 'border-box',
   outline: 'none', transition: 'border-color 0.15s',
 }
 const onFocus = e => { e.target.style.borderColor = '#B91C1C'; e.target.style.boxShadow = '0 0 0 3px rgba(185,28,28,0.1)' }
@@ -108,7 +108,7 @@ export default function HospitalInfoCard() {
             value={hospitalMode?.patient_status ?? 'Sin registrar'}
             multiline />
           {updatedAt && (
-            <p style={{ margin: '4px 0 0', fontSize: 11, color: '#9CA3AF', textAlign: 'right' }}>
+            <p style={{ margin: '4px 0 0', fontSize: 11, color: '#5E7480', textAlign: 'right' }}>
               Actualizado: {updatedAt}
             </p>
           )}
@@ -136,7 +136,7 @@ export default function HospitalInfoCard() {
             disabled={saving}
             style={{
               padding: '13px', borderRadius: 12, border: 'none', marginTop: 4,
-              background: saving ? '#9CA3AF' : 'linear-gradient(135deg, #B91C1C, #DC2626)',
+              background: saving ? '#5E7480' : 'linear-gradient(135deg, #B91C1C, #DC2626)',
               color: 'white', fontWeight: 700, fontSize: 14,
               cursor: saving ? 'default' : 'pointer',
               boxShadow: saving ? 'none' : '0 4px 16px rgba(185,28,28,0.3)',
@@ -156,12 +156,12 @@ function InfoRow({ icon, label, value, multiline }) {
     <div style={{ display: 'flex', gap: 10, alignItems: multiline ? 'flex-start' : 'center' }}>
       <span style={{ fontSize: 16, flexShrink: 0, marginTop: multiline ? 1 : 0 }}>{icon}</span>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+        <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
           {label}
         </p>
         <p style={{
           margin: '2px 0 0', fontSize: 14, fontWeight: empty ? 400 : 600,
-          color: empty ? '#D1D5DB' : '#1A1A1A',
+          color: empty ? '#D1D5DB' : '#14303D',
           lineHeight: 1.5, fontStyle: empty ? 'italic' : 'normal',
         }}>
           {value}

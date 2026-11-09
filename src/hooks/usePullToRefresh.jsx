@@ -52,8 +52,8 @@ export function usePullToRefresh(onRefresh) {
         }}>
           <div style={{
             width: 28, height: 28, borderRadius: '50%',
-            border: '2.5px solid #EDE5D8',
-            borderTopColor: '#0d6b63',
+            border: '2.5px solid #E6E3DB',
+            borderTopColor: '#0A5A82',
             animation: refreshing ? 'pullSpin 0.7s linear infinite' : 'none',
             opacity: Math.min(pullDistance / THRESHOLD, 1),
             transform: refreshing ? 'none' : `rotate(${(pullDistance / THRESHOLD) * 180}deg)`,

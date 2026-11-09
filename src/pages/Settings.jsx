@@ -14,8 +14,8 @@ import Layout from '../components/Layout'
 import { ChevronRight, LogOut } from '../components/Icons'
 
 const PLAN_META = {
-  free:      { label: 'Gratis',        color: '#9CA3AF', icon: '🌱' },
-  familiar:  { label: 'Plan Familiar', color: '#0d6b63', icon: '❤️' },
+  free:      { label: 'Gratis',        color: '#5E7480', icon: '🌱' },
+  familiar:  { label: 'Plan Familiar', color: '#0A5A82', icon: '❤️' },
   care_plus: { label: 'Cuidado Total',  color: '#7C3AED', icon: '⭐' },
 }
 
@@ -41,15 +41,15 @@ function ToggleRow({ icon, label, subtitle, checked, onChange }) {
     }}>
       <span style={{ fontSize: 18 }}>{icon}</span>
       <div style={{ flex: 1 }}>
-        <p style={{ fontSize: 14, fontWeight: 600, color: '#1A1A1A', margin: 0 }}>{label}</p>
-        {subtitle && <p style={{ fontSize: 11, color: '#9CA3AF', margin: '1px 0 0' }}>{subtitle}</p>}
+        <p style={{ fontSize: 14, fontWeight: 600, color: '#14303D', margin: 0 }}>{label}</p>
+        {subtitle && <p style={{ fontSize: 11, color: '#5E7480', margin: '1px 0 0' }}>{subtitle}</p>}
       </div>
       <button
         role="switch" aria-checked={checked}
         onClick={() => onChange(!checked)}
         style={{
           width: 44, height: 26, borderRadius: 13, border: 'none',
-          background: checked ? '#0d6b63' : '#D1D5DB',
+          background: checked ? '#0A5A82' : '#D1D5DB',
           position: 'relative', cursor: 'pointer',
           transition: 'background 0.2s', flexShrink: 0,
         }}
@@ -102,7 +102,7 @@ export default function Settings() {
   const plan = sub?.plan ?? 'free'
   // Durante la prueba la familia tiene todo incluido: no mostrar "Gratis".
   const meta = isTrialing
-    ? { label: 'Prueba con todo incluido', color: '#087F70', icon: '✨' }
+    ? { label: 'Prueba con todo incluido', color: '#0C6C9C', icon: '✨' }
     : (PLAN_META[plan] ?? PLAN_META.free)
   const features = PLAN_FEATURES[plan] ?? []
 
@@ -248,7 +248,7 @@ export default function Settings() {
 
         {/* Account card */}
         <div style={{
-          background: '#075F55',
+          background: '#0A5A82',
           borderRadius: 20, padding: '20px 20px', marginBottom: 16,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
@@ -297,15 +297,15 @@ export default function Settings() {
 
         {/* Mis familias — only shown when user belongs to more than one care group */}
         {hasMultiple && (
-          <div style={{ background: 'white', borderRadius: 20, border: '1px solid #EDE5D8', overflow: 'hidden', marginBottom: 12 }}>
-            <p style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', letterSpacing: '0.08em', textTransform: 'uppercase', padding: '14px 16px 8px', margin: 0 }}>
+          <div style={{ background: 'white', borderRadius: 20, border: '1px solid #E6E3DB', overflow: 'hidden', marginBottom: 12 }}>
+            <p style={{ fontSize: 11, fontWeight: 700, color: '#5E7480', letterSpacing: '0.08em', textTransform: 'uppercase', padding: '14px 16px 8px', margin: 0 }}>
               Mis familias
             </p>
             {families.map((fam, i) => {
               const isActive = fam.ownerId === activeOwnerId
               const roleLabel = fam.role === null ? 'Administrador' : fam.role === 'cuidador' ? 'Cuidador' : 'Familiar'
-              const roleColor = fam.role === null ? '#3D6B54' : fam.role === 'cuidador' ? '#1D4ED8' : '#D97706'
-              const roleBg   = fam.role === null ? '#E8F5EE' : fam.role === 'cuidador' ? '#EFF6FF' : '#FEF3C7'
+              const roleColor = fam.role === null ? '#0A4A6B' : fam.role === 'cuidador' ? '#1D4ED8' : '#D97706'
+              const roleBg   = fam.role === null ? '#E3F1F8' : fam.role === 'cuidador' ? '#EFF6FF' : '#FEF3C7'
               const initial  = (fam.patientName ?? 'F').charAt(0).toUpperCase()
               return (
                 <button
@@ -320,11 +320,11 @@ export default function Settings() {
                   }}
                 >
                   {fam.patientPhotoUrl ? (
-                    <img src={fam.patientPhotoUrl} alt="" style={{ width: 42, height: 42, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: isActive ? '2px solid #0d6b63' : '2px solid transparent' }} />
+                    <img src={fam.patientPhotoUrl} alt="" style={{ width: 42, height: 42, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: isActive ? '2px solid #0A5A82' : '2px solid transparent' }} />
                   ) : (
                     <div style={{
                       width: 42, height: 42, borderRadius: '50%', flexShrink: 0,
-                      background: isActive ? '#0d6b63' : '#C5B9A8',
+                      background: isActive ? '#0A5A82' : '#C5B9A8',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       color: 'white', fontWeight: 700, fontSize: 17,
                     }}>
@@ -332,10 +332,10 @@ export default function Settings() {
                     </div>
                   )}
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#1A1A1A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#14303D', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {fam.patientName ?? 'Sin paciente'}
                     </p>
-                    <p style={{ margin: '2px 0 0', fontSize: 11, color: '#9CA3AF' }}>
+                    <p style={{ margin: '2px 0 0', fontSize: 11, color: '#5E7480' }}>
                       {fam.role === null ? 'Tu grupo de cuidado' : 'Miembro del grupo'}
                     </p>
                   </div>
@@ -344,7 +344,7 @@ export default function Settings() {
                       {roleLabel}
                     </span>
                     {isActive && (
-                      <span style={{ color: '#0d6b63', fontSize: 16, lineHeight: 1 }}>✓</span>
+                      <span style={{ color: '#0A5A82', fontSize: 16, lineHeight: 1 }}>✓</span>
                     )}
                   </div>
                 </button>
@@ -366,11 +366,11 @@ export default function Settings() {
             cuenta, no hay nada que gestionar acá. */}
         {isAdmin ? (
         <div style={{
-          background: 'white', borderRadius: 20, border: '1px solid #EDE5D8',
+          background: 'white', borderRadius: 20, border: '1px solid #E6E3DB',
           padding: '20px', marginBottom: 12,
           boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
         }}>
-          <p style={{ fontFamily: 'Georgia, serif', fontSize: 15, fontWeight: 700, color: '#1A1A1A', margin: '0 0 16px' }}>
+          <p style={{ fontFamily: 'Georgia, serif', fontSize: 15, fontWeight: 700, color: '#14303D', margin: '0 0 16px' }}>
             Suscripción
           </p>
 
@@ -390,7 +390,7 @@ export default function Settings() {
             </div>
             <div style={{ flex: 1 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <p style={{ fontSize: 15, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>
+                <p style={{ fontSize: 15, fontWeight: 700, color: '#14303D', margin: 0 }}>
                   {meta.label}
                 </p>
                 <span style={{
@@ -402,13 +402,13 @@ export default function Settings() {
                 </span>
               </div>
               {isTrialing && (
-                <p style={{ fontSize: 12, color: daysLeft <= 3 ? '#DC2626' : '#9CA3AF', margin: '3px 0 0' }}>
+                <p style={{ fontSize: 12, color: daysLeft <= 3 ? '#DC2626' : '#5E7480', margin: '3px 0 0' }}>
                   {daysLeft <= 3 ? '⚠ ' : ''}{daysLeft} día{daysLeft !== 1 ? 's' : ''} restante{daysLeft !== 1 ? 's' : ''} de prueba
                   {trialEnd ? ` · Vence ${trialEnd}` : ''}
                 </p>
               )}
               {isPaid && periodEnd && (
-                <p style={{ fontSize: 12, color: '#9CA3AF', margin: '3px 0 0' }}>
+                <p style={{ fontSize: 12, color: '#5E7480', margin: '3px 0 0' }}>
                   Próximo cobro: {periodEnd}
                 </p>
               )}
@@ -422,14 +422,14 @@ export default function Settings() {
 
           {features.length > 0 && (
             <div style={{ marginBottom: 16 }}>
-              <p style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8 }}>
+              <p style={{ fontSize: 11, fontWeight: 700, color: '#5E7480', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8 }}>
                 {isTrialing ? 'Al terminar la prueba sigues gratis con' : 'Tu plan incluye'}
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {features.map(f => (
                   <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <span style={{ color: '#22C55E', fontSize: 13, flexShrink: 0 }}>✓</span>
-                    <span style={{ fontSize: 13, color: '#374151' }}>{f}</span>
+                    <span style={{ fontSize: 13, color: '#30454F' }}>{f}</span>
                   </div>
                 ))}
               </div>
@@ -453,8 +453,8 @@ export default function Settings() {
               onClick={openCancelFlow}
               style={{
                 width: '100%', padding: '11px', borderRadius: 12, marginTop: 8,
-                border: '1.5px solid #EDE5D8', background: 'transparent',
-                color: '#9CA3AF', fontWeight: 600, fontSize: 13, cursor: 'pointer',
+                border: '1.5px solid #E6E3DB', background: 'transparent',
+                color: '#5E7480', fontWeight: 600, fontSize: 13, cursor: 'pointer',
               }}
             >
               Cancelar suscripción
@@ -463,11 +463,11 @@ export default function Settings() {
         </div>
         ) : (
           <div style={{
-            background: 'white', borderRadius: 20, border: '1px solid #EDE5D8',
+            background: 'white', borderRadius: 20, border: '1px solid #E6E3DB',
             padding: '20px', marginBottom: 12,
             boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
           }}>
-            <p style={{ fontFamily: 'Georgia, serif', fontSize: 15, fontWeight: 700, color: '#1A1A1A', margin: '0 0 16px' }}>
+            <p style={{ fontFamily: 'Georgia, serif', fontSize: 15, fontWeight: 700, color: '#14303D', margin: '0 0 16px' }}>
               Suscripción
             </p>
             <div style={{
@@ -484,7 +484,7 @@ export default function Settings() {
               }}>
                 {(PLAN_META[familyPlan?.plan ?? 'free'] ?? PLAN_META.free).icon}
               </div>
-              <p style={{ fontSize: 14, color: '#374151', margin: 0, lineHeight: 1.4 }}>
+              <p style={{ fontSize: 14, color: '#30454F', margin: 0, lineHeight: 1.4 }}>
                 Esta familia está en{' '}
                 <strong>{{ free: 'Plan Gratis', familiar: 'Plan Familiar', care_plus: 'Cuidado Total' }[familyPlan?.plan ?? 'free']}</strong>
               </p>
@@ -493,8 +493,8 @@ export default function Settings() {
         )}
 
         {/* Preferences */}
-        <div style={{ background: 'white', borderRadius: 20, border: '1px solid #EDE5D8', overflow: 'hidden', marginBottom: 12 }}>
-          <p style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', letterSpacing: '0.08em', textTransform: 'uppercase', padding: '14px 16px 8px', margin: 0 }}>
+        <div style={{ background: 'white', borderRadius: 20, border: '1px solid #E6E3DB', overflow: 'hidden', marginBottom: 12 }}>
+          <p style={{ fontSize: 11, fontWeight: 700, color: '#5E7480', letterSpacing: '0.08em', textTransform: 'uppercase', padding: '14px 16px 8px', margin: 0 }}>
             Preferencias
           </p>
           <ToggleRow
@@ -515,11 +515,11 @@ export default function Settings() {
 
         {/* Push Notifications */}
         {supported && (
-          <div style={{ background: 'white', borderRadius: 20, border: '1px solid #EDE5D8', padding: '16px', marginBottom: 12 }}>
-            <p style={{ fontFamily: 'Georgia, serif', fontSize: 15, fontWeight: 700, color: '#1A1A1A', margin: '0 0 6px' }}>
+          <div style={{ background: 'white', borderRadius: 20, border: '1px solid #E6E3DB', padding: '16px', marginBottom: 12 }}>
+            <p style={{ fontFamily: 'Georgia, serif', fontSize: 15, fontWeight: 700, color: '#14303D', margin: '0 0 6px' }}>
               Notificaciones push
             </p>
-            <p style={{ fontSize: 12, color: '#9CA3AF', margin: '0 0 12px', lineHeight: 1.5 }}>
+            <p style={{ fontSize: 12, color: '#5E7480', margin: '0 0 12px', lineHeight: 1.5 }}>
               {permission === 'granted'
                 ? subscribed
                   ? 'Activas — recibirás recordatorios de medicamentos y alertas familiares.'
@@ -557,9 +557,9 @@ export default function Settings() {
                 onClick={requestAndSubscribe}
                 style={{
                   width: '100%', padding: '12px', borderRadius: 14, border: 'none',
-                  background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
+                  background: 'linear-gradient(135deg, #0A5A82, #0A4A6B)',
                   color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer',
-                  boxShadow: '0 4px 16px rgba(13,107,99,0.25)',
+                  boxShadow: '0 4px 16px rgba(10,90,130,0.25)',
                   marginBottom: 8,
                 }}
               >
@@ -574,8 +574,8 @@ export default function Settings() {
                 disabled={testingPush}
                 style={{
                   width: '100%', padding: '12px', borderRadius: 14,
-                  border: '1.5px solid #0d6b63', background: 'white',
-                  color: '#0d6b63', fontWeight: 700, fontSize: 14,
+                  border: '1.5px solid #0A5A82', background: 'white',
+                  color: '#0A5A82', fontWeight: 700, fontSize: 14,
                   cursor: testingPush ? 'not-allowed' : 'pointer',
                   opacity: testingPush ? 0.6 : 1,
                   transition: 'all 0.2s',
@@ -601,9 +601,9 @@ export default function Settings() {
                     onClick={() => { setTestResult(null); resubscribe() }}
                     style={{
                       width: '100%', padding: '11px', borderRadius: 14, border: 'none',
-                      background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
+                      background: 'linear-gradient(135deg, #0A5A82, #0A4A6B)',
                       color: 'white', fontWeight: 700, fontSize: 13, cursor: 'pointer',
-                      marginTop: 8, boxShadow: '0 4px 14px rgba(13,107,99,0.25)',
+                      marginTop: 8, boxShadow: '0 4px 14px rgba(10,90,130,0.25)',
                     }}
                   >
                     🔄 Reactivar suscripción
@@ -618,7 +618,7 @@ export default function Settings() {
         {isAdmin && (
           <div style={{
             borderRadius: 20, overflow: 'hidden', marginBottom: 12,
-            border: '1px solid #0B4F4A30', background: '#F0F9F4',
+            border: '1px solid #0B4F4A30', background: '#E3F1F8',
           }}>
             <button
               onClick={() => navigate('/admin')}
@@ -635,21 +635,21 @@ export default function Settings() {
                 fontSize: 22,
               }}>⚙️</div>
               <div style={{ flex: 1 }}>
-                <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#0B4F4A' }}>
+                <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#0A4A6B' }}>
                   Panel de administración
                 </p>
-                <p style={{ margin: '2px 0 0', fontSize: 12, color: '#0d6b63' }}>
+                <p style={{ margin: '2px 0 0', fontSize: 12, color: '#0A5A82' }}>
                   Equipo, cuenta, datos y actividad
                 </p>
               </div>
-              <ChevronRight size={16} color="#0d6b63" strokeWidth={2} />
+              <ChevronRight size={16} color="#0A5A82" strokeWidth={2} />
             </button>
           </div>
         )}
 
 
         {/* More options */}
-        <div style={{ background: 'white', borderRadius: 20, border: '1px solid #EDE5D8', overflow: 'hidden', marginBottom: 12 }}>
+        <div style={{ background: 'white', borderRadius: 20, border: '1px solid #E6E3DB', overflow: 'hidden', marginBottom: 12 }}>
           {[
             { label: 'Permisos de acceso',    to: '/roles',     icon: '🛡️' },
             { label: 'Planes y suscripción',  to: '/upgrade',   icon: '⭐' },
@@ -666,7 +666,7 @@ export default function Settings() {
               }}
             >
               <span style={{ fontSize: 18 }}>{icon}</span>
-              <span style={{ flex: 1, fontSize: 14, fontWeight: 600, color: '#1A1A1A' }}>{label}</span>
+              <span style={{ flex: 1, fontSize: 14, fontWeight: 600, color: '#14303D' }}>{label}</span>
               <ChevronRight size={16} color="#D1D5DB" strokeWidth={2} />
             </button>
           ))}
@@ -710,10 +710,10 @@ export default function Settings() {
             {cancelDone && (
               <div style={{ textAlign: 'center', padding: '8px 0' }}>
                 <p style={{ fontSize: 36, margin: '0 0 12px' }}>✅</p>
-                <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#1A1A1A', margin: '0 0 10px' }}>
+                <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#14303D', margin: '0 0 10px' }}>
                   Suscripción cancelada
                 </p>
-                <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.6, margin: 0 }}>
+                <p style={{ fontSize: 14, color: '#4E6470', lineHeight: 1.6, margin: 0 }}>
                   Tu plan estará activo hasta el fin del período pagado.
                 </p>
               </div>
@@ -725,15 +725,15 @@ export default function Settings() {
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 24 }}>
                   <div style={{
                     width: 80, height: 80, borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #0d6b63, #2E5240)',
+                    background: 'linear-gradient(135deg, #0A5A82, #0A4A6B)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontSize: 38, marginBottom: 16,
-                    boxShadow: '0 6px 24px rgba(13,107,99,0.28)',
+                    boxShadow: '0 6px 24px rgba(10,90,130,0.28)',
                   }}>
                     🐶
                   </div>
                   <p style={{
-                    fontSize: 15, color: '#374151', textAlign: 'center',
+                    fontSize: 15, color: '#30454F', textAlign: 'center',
                     lineHeight: 1.65, margin: 0, maxWidth: 320,
                   }}>
                     ¡Espera! ¿Seguro que quieres cancelar? Me quedaré sin poder ayudarte a cuidar a tu familia 🥺
@@ -756,8 +756,8 @@ export default function Settings() {
                   onClick={() => setCancelStep(2)}
                   style={{
                     width: '100%', padding: '12px', borderRadius: 12,
-                    border: '1.5px solid #EDE5D8', background: 'transparent',
-                    color: '#9CA3AF', fontWeight: 600, fontSize: 14, cursor: 'pointer',
+                    border: '1.5px solid #E6E3DB', background: 'transparent',
+                    color: '#5E7480', fontWeight: 600, fontSize: 14, cursor: 'pointer',
                   }}
                 >
                   Sí, quiero cancelar
@@ -770,7 +770,7 @@ export default function Settings() {
               <>
                 <p style={{
                   fontFamily: 'Georgia, serif', fontSize: 19, fontWeight: 700,
-                  color: '#1A1A1A', margin: '0 0 18px', textAlign: 'center',
+                  color: '#14303D', margin: '0 0 18px', textAlign: 'center',
                 }}>
                   ¿Por qué cancelas?
                 </p>
@@ -788,17 +788,17 @@ export default function Settings() {
                       style={{
                         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                         padding: '13px 16px', borderRadius: 14,
-                        border: cancelReason === r ? '2px solid #0d6b63' : '1.5px solid #EDE5D8',
-                        background: cancelReason === r ? '#F0F9F4' : '#FDFAF7',
+                        border: cancelReason === r ? '2px solid #0A5A82' : '1.5px solid #E6E3DB',
+                        background: cancelReason === r ? '#E3F1F8' : '#FDFAF7',
                         cursor: 'pointer', textAlign: 'left', width: '100%',
                         transition: 'all 0.15s',
                       }}
                     >
-                      <span style={{ fontSize: 14, fontWeight: 600, color: cancelReason === r ? '#0d6b63' : '#374151' }}>
+                      <span style={{ fontSize: 14, fontWeight: 600, color: cancelReason === r ? '#0A5A82' : '#30454F' }}>
                         {r}
                       </span>
                       {cancelReason === r && (
-                        <span style={{ color: '#0d6b63', fontSize: 16, flexShrink: 0 }}>✓</span>
+                        <span style={{ color: '#0A5A82', fontSize: 16, flexShrink: 0 }}>✓</span>
                       )}
                     </button>
                   ))}
@@ -831,8 +831,8 @@ export default function Settings() {
                   disabled={cancelLoading}
                   style={{
                     width: '100%', padding: '12px', borderRadius: 12,
-                    border: '1.5px solid #EDE5D8', background: 'transparent',
-                    color: '#9CA3AF', fontWeight: 600, fontSize: 14,
+                    border: '1.5px solid #E6E3DB', background: 'transparent',
+                    color: '#5E7480', fontWeight: 600, fontSize: 14,
                     cursor: cancelLoading ? 'not-allowed' : 'pointer',
                     opacity: cancelLoading ? 0.6 : 1,
                   }}
@@ -882,7 +882,7 @@ export default function Settings() {
               onClick={handleProfileCropConfirm}
               disabled={profileUploading}
               style={{
-                background: profileUploading ? '#9CA3AF' : '#0B4F4A',
+                background: profileUploading ? '#5E7480' : '#0A4A6B',
                 border: 'none', borderRadius: 999, cursor: profileUploading ? 'default' : 'pointer',
                 fontSize: 15, fontWeight: 700, color: 'white',
                 padding: '12px 32px',

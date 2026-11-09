@@ -48,18 +48,18 @@ export default function DischargeDateCard() {
       borderRadius: 16,
       padding: '16px 18px',
       boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-      border: '1px solid #F8F4ED',
+      border: '1px solid #F7F6F2',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
         <span style={{ fontSize: 20 }}>🗓️</span>
-        <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#1A1A1A', flex: 1 }}>
+        <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#14303D', flex: 1 }}>
           Fecha de alta estimada
         </h3>
         <button
           onClick={() => setEditing(e => !e)}
           style={{
             padding: '5px 12px', borderRadius: 8, border: '1px solid #D1C9BF',
-            background: 'white', color: '#0d6b63', fontSize: 12,
+            background: 'white', color: '#0A5A82', fontSize: 12,
             fontWeight: 700, cursor: 'pointer',
           }}
         >
@@ -83,7 +83,7 @@ export default function DischargeDateCard() {
       )}
 
       {!editing && !displayDate && (
-        <p style={{ margin: 0, fontSize: 13, color: '#9CA3AF', textAlign: 'center', padding: '6px 0' }}>
+        <p style={{ margin: 0, fontSize: 13, color: '#5E7480', textAlign: 'center', padding: '6px 0' }}>
           Sin fecha estimada aún
         </p>
       )}
@@ -91,7 +91,7 @@ export default function DischargeDateCard() {
       {editing && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <div>
-            <label style={{ fontSize: 12, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 6 }}>
+            <label style={{ fontSize: 12, fontWeight: 600, color: '#30454F', display: 'block', marginBottom: 6 }}>
               Fecha de alta
             </label>
             <input
@@ -100,7 +100,7 @@ export default function DischargeDateCard() {
               onChange={e => setDate(e.target.value)}
               style={{
                 width: '100%', padding: '10px 12px', borderRadius: 10,
-                border: '1.5px solid #D1C9BF', fontSize: 14, color: '#1A1A1A',
+                border: '1.5px solid #D1C9BF', fontSize: 14, color: '#14303D',
                 background: 'white', boxSizing: 'border-box',
               }}
             />
@@ -110,7 +110,7 @@ export default function DischargeDateCard() {
             disabled={saving}
             style={{
               alignSelf: 'flex-end', padding: '8px 20px', borderRadius: 10,
-              border: 'none', background: '#0d6b63', color: 'white',
+              border: 'none', background: '#0A5A82', color: 'white',
               fontWeight: 700, fontSize: 13, cursor: saving ? 'default' : 'pointer',
             }}
           >

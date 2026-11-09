@@ -16,12 +16,12 @@ function timeAgo(isoStr) {
 }
 
 const TYPE_META = {
-  med_confirmed:  { icon: '💊', color: '#087F70', label: 'Medicamento confirmado' },
+  med_confirmed:  { icon: '💊', color: '#0C6C9C', label: 'Medicamento confirmado' },
   note_added:     { icon: '📝', color: '#2D86A0', label: 'Nota agregada' },
   voice_memo:     { icon: '🎙️', color: '#7C5CBF', label: 'Memoria de voz' },
   expense_added:  { icon: '💰', color: '#C9882A', label: 'Gasto registrado' },
   hospital_doc:   { icon: '📁', color: '#B91C1C', label: 'Documento subido' },
-  visit_added:    { icon: '👥', color: '#087F70', label: 'Visita anotada' },
+  visit_added:    { icon: '👥', color: '#0C6C9C', label: 'Visita anotada' },
   videocall:      { icon: '📹', color: '#1D4ED8', label: 'Videollamada programada' },
 }
 
@@ -131,29 +131,29 @@ export default function AdminActivitySection() {
     }
   }
 
-  if (loading) return <p style={{ color: '#9CA3AF', fontSize: 14, textAlign: 'center', padding: 24 }}>Cargando actividad...</p>
+  if (loading) return <p style={{ color: '#5E7480', fontSize: 14, textAlign: 'center', padding: 24 }}>Cargando actividad...</p>
 
   if (events.length === 0) return (
     <div style={{ textAlign: 'center', padding: '32px 0' }}>
       <p style={{ fontSize: 32 }}>📋</p>
-      <p style={{ fontSize: 14, color: '#9CA3AF', marginTop: 8 }}>Sin actividad en los últimos 30 días.</p>
+      <p style={{ fontSize: 14, color: '#5E7480', marginTop: 8 }}>Sin actividad en los últimos 30 días.</p>
     </div>
   )
 
   return (
     <div>
-      <p style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 12px 2px' }}>
+      <p style={{ fontSize: 11, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 12px 2px' }}>
         Últimos 30 días ({events.length} eventos)
       </p>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
         {events.map((ev, i) => {
-          const meta = TYPE_META[ev.type] ?? { icon: '•', color: '#9CA3AF', label: ev.type }
+          const meta = TYPE_META[ev.type] ?? { icon: '•', color: '#5E7480', label: ev.type }
           const showDate = i === 0 || new Date(events[i - 1].ts).toDateString() !== new Date(ev.ts).toDateString()
           return (
             <div key={ev.id}>
               {showDate && (
                 <p style={{
-                  fontSize: 10, fontWeight: 700, color: '#9CA3AF',
+                  fontSize: 10, fontWeight: 700, color: '#5E7480',
                   textTransform: 'uppercase', letterSpacing: '0.08em',
                   margin: i === 0 ? '0 0 8px' : '16px 0 8px',
                 }}>
@@ -163,7 +163,7 @@ export default function AdminActivitySection() {
               <div style={{
                 display: 'flex', alignItems: 'flex-start', gap: 12,
                 padding: '10px 12px', borderRadius: 10,
-                background: 'white', border: '1px solid #F8F4ED',
+                background: 'white', border: '1px solid #F7F6F2',
                 marginBottom: 6,
               }}>
                 <div style={{
@@ -175,10 +175,10 @@ export default function AdminActivitySection() {
                   {meta.icon}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#1A1A1A', lineHeight: 1.3 }}>
+                  <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#14303D', lineHeight: 1.3 }}>
                     {ev.what}
                   </p>
-                  <p style={{ margin: '3px 0 0', fontSize: 11, color: '#9CA3AF' }}>
+                  <p style={{ margin: '3px 0 0', fontSize: 11, color: '#5E7480' }}>
                     {ev.who} · {timeAgo(ev.ts)}
                   </p>
                 </div>

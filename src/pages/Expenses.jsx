@@ -20,21 +20,21 @@ const SANS = "'Plus Jakarta Sans', system-ui, sans-serif"
 // Marca de agua decorativa — mismo trazo SVG que VideoCall.jsx/Familia.jsx, en teal.
 const WATERMARK_PATHS = (
   <>
-    <path d="M200 330 C 60 240, 30 140, 110 90 C 160 60, 195 90, 200 130 C 205 90, 240 60, 290 90 C 370 140, 340 240, 200 330 Z" fill="#087F70" />
-    <circle cx="165" cy="165" r="22" fill="#F8F4ED" />
-    <path d="M130 230 C 130 195, 200 195, 200 230 L 200 245 L 130 245 Z" fill="#F8F4ED" />
-    <circle cx="235" cy="165" r="22" fill="#F8F4ED" />
-    <path d="M200 230 C 200 195, 270 195, 270 230 L 270 245 L 200 245 Z" fill="#F8F4ED" />
+    <path d="M200 330 C 60 240, 30 140, 110 90 C 160 60, 195 90, 200 130 C 205 90, 240 60, 290 90 C 370 140, 340 240, 200 330 Z" fill="#0C6C9C" />
+    <circle cx="165" cy="165" r="22" fill="#F7F6F2" />
+    <path d="M130 230 C 130 195, 200 195, 200 230 L 200 245 L 130 245 Z" fill="#F7F6F2" />
+    <circle cx="235" cy="165" r="22" fill="#F7F6F2" />
+    <path d="M200 230 C 200 195, 270 195, 270 230 L 270 245 L 200 245 Z" fill="#F7F6F2" />
   </>
 )
 
 const CATEGORIES = [
-  { id: 'Medicamentos',    emoji: '💊', color: '#087F70' },
+  { id: 'Medicamentos',    emoji: '💊', color: '#0C6C9C' },
   { id: 'Citas médicas',   emoji: '🏥', color: '#2D86A0' },
-  { id: 'Transporte',      emoji: '🚗', color: '#087F70' },
+  { id: 'Transporte',      emoji: '🚗', color: '#0C6C9C' },
   { id: 'Cuidador',        emoji: '🤝', color: '#7C5CBF' },
   { id: 'Equipos médicos', emoji: '🩺', color: '#C9882A' },
-  { id: 'Otros',           emoji: '📋', color: '#9CA3AF' },
+  { id: 'Otros',           emoji: '📋', color: '#5E7480' },
 ]
 
 const MONTH_NAMES = [
@@ -265,12 +265,12 @@ export default function Expenses() {
 
   const fieldStyle = {
     width: '100%', padding: '11px 14px',
-    border: '1.5px solid #EDE5D8', borderRadius: 12,
+    border: '1.5px solid #E6E3DB', borderRadius: 12,
     fontSize: 14, outline: 'none', background: 'white',
-    boxSizing: 'border-box', color: '#1A1A1A', transition: 'all 0.15s',
+    boxSizing: 'border-box', color: '#14303D', transition: 'all 0.15s',
   }
-  const onFocus = e => { e.target.style.borderColor = '#087F70'; e.target.style.boxShadow = '0 0 0 3px rgba(8,127,112,0.1)' }
-  const onBlur  = e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.boxShadow = 'none' }
+  const onFocus = e => { e.target.style.borderColor = '#0C6C9C'; e.target.style.boxShadow = '0 0 0 3px rgba(12,108,156,0.1)' }
+  const onBlur  = e => { e.target.style.borderColor = '#E6E3DB'; e.target.style.boxShadow = 'none' }
 
   const canSave = !saving && !!form.amount && !!(form.paid_by ?? '').trim()
 
@@ -313,39 +313,39 @@ export default function Expenses() {
             onClick={prevMonth}
             style={{ padding: 8, borderRadius: 10, background: '#F3F4F6', border: 'none', cursor: 'pointer' }}
           >
-            <ChevronLeft size={18} color="#6B7280" strokeWidth={2} />
+            <ChevronLeft size={18} color="#4E6470" strokeWidth={2} />
           </button>
-          <p style={{ fontFamily: SANS, fontSize: 17, fontWeight: 700, color: '#334155' }}>
+          <p style={{ fontFamily: SANS, fontSize: 17, fontWeight: 700, color: '#2A4350' }}>
             {MONTH_NAMES[month]} {year}
           </p>
           <button
             onClick={nextMonth}
             style={{ padding: 8, borderRadius: 10, background: '#F3F4F6', border: 'none', cursor: 'pointer' }}
           >
-            <ChevronRight size={18} color="#6B7280" strokeWidth={2} />
+            <ChevronRight size={18} color="#4E6470" strokeWidth={2} />
           </button>
         </div>
 
         {/* Total card */}
         <div style={{ padding: '0 20px 16px' }}>
           <div style={{
-            background: '#FFFFFF', border: '1px solid #EDE5D8',
+            background: '#FFFFFF', border: '1px solid #E6E3DB',
             borderRadius: 22, padding: '22px 24px',
             boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
           }}>
             <p style={{
-              color: '#6B7280', fontSize: 11, fontWeight: 700,
+              color: '#4E6470', fontSize: 11, fontWeight: 700,
               letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 4,
             }}>
               Total del mes
             </p>
             <p style={{
-              color: '#087F70', fontSize: 38, fontWeight: 800,
+              color: '#0C6C9C', fontSize: 38, fontWeight: 800,
               lineHeight: 1, marginBottom: 6, fontFamily: SANS,
             }}>
               {loading ? '—' : formatCurrency(total)}
             </p>
-            <p style={{ color: '#9CA3AF', fontSize: 12 }}>
+            <p style={{ color: '#5E7480', fontSize: 12 }}>
               {!loading && `${expenses.length} gasto${expenses.length !== 1 ? 's' : ''} registrado${expenses.length !== 1 ? 's' : ''}`}
             </p>
           </div>
@@ -356,10 +356,10 @@ export default function Expenses() {
           <div style={{
             margin: '0 20px 16px', background: 'white',
             borderRadius: 18, padding: '16px 18px',
-            border: '1px solid #EDE5D8', boxShadow: '0 2px 12px rgba(0,0,0,0.05)',
+            border: '1px solid #E6E3DB', boxShadow: '0 2px 12px rgba(0,0,0,0.05)',
           }}>
             <p style={{
-              fontSize: 11, fontWeight: 700, color: '#6B7280',
+              fontSize: 11, fontWeight: 700, color: '#4E6470',
               letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 14,
             }}>
               Por categoría
@@ -368,8 +368,8 @@ export default function Expenses() {
               {categoryTotals.map(c => (
                 <div key={c.id}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
-                    <span style={{ fontSize: 13, color: '#374151' }}>{c.emoji} {c.id}</span>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: '#1A1A1A' }}>
+                    <span style={{ fontSize: 13, color: '#30454F' }}>{c.emoji} {c.id}</span>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: '#14303D' }}>
                       {formatCurrency(c.subtotal)}
                     </span>
                   </div>
@@ -397,7 +397,7 @@ export default function Expenses() {
               <p style={{ fontSize: 14, color: '#D63031', marginBottom: 12 }}>{loadError}</p>
               <button onClick={loadExpenses} style={{
                 padding: '10px 20px', borderRadius: 12, border: 'none',
-                background: '#087F70', color: 'white', fontWeight: 700, fontSize: 13, cursor: 'pointer',
+                background: '#0C6C9C', color: 'white', fontWeight: 700, fontSize: 13, cursor: 'pointer',
               }}>Reintentar</button>
             </div>
           ) : expenses.length === 0 ? (
@@ -423,7 +423,7 @@ export default function Expenses() {
                   <div key={expense.id} style={{
                     background: 'white', borderRadius: 16,
                     padding: '13px 14px',
-                    border: '1px solid #EDE5D8',
+                    border: '1px solid #E6E3DB',
                     boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
                     display: 'flex', alignItems: 'center', gap: 12,
                     position: 'relative',
@@ -441,19 +441,19 @@ export default function Expenses() {
                     {/* Info */}
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p style={{
-                        fontSize: 14, fontWeight: 600, color: '#1A1A1A',
+                        fontSize: 14, fontWeight: 600, color: '#14303D',
                         marginBottom: 2, fontFamily: SANS,
                         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                       }}>
                         {expense.description || expense.category}
                       </p>
-                      <p style={{ fontSize: 11, color: '#9CA3AF' }}>
+                      <p style={{ fontSize: 11, color: '#5E7480' }}>
                         {expense.paid_by} · {formatDate(expense.date)}
                       </p>
                     </div>
 
                     {/* Amount */}
-                    <p style={{ fontSize: 15, fontWeight: 800, color: '#1A1A1A', flexShrink: 0 }}>
+                    <p style={{ fontSize: 15, fontWeight: 800, color: '#14303D', flexShrink: 0 }}>
                       {formatCurrency(expense.amount)}
                     </p>
 
@@ -469,7 +469,7 @@ export default function Expenses() {
                         style={{
                           padding: '4px 8px', borderRadius: 8,
                           background: 'transparent', border: 'none',
-                          cursor: 'pointer', fontSize: 18, color: '#9CA3AF', lineHeight: 1,
+                          cursor: 'pointer', fontSize: 18, color: '#5E7480', lineHeight: 1,
                         }}
                       >
                         ⋮
@@ -479,7 +479,7 @@ export default function Expenses() {
                           position: 'absolute', right: 0, top: '110%', zIndex: 100,
                           background: 'white', borderRadius: 14,
                           boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
-                          border: '1px solid #EDE5D8',
+                          border: '1px solid #E6E3DB',
                           minWidth: 150, overflow: 'hidden',
                         }}>
                           <button
@@ -487,7 +487,7 @@ export default function Expenses() {
                             style={{
                               display: 'block', width: '100%', textAlign: 'left',
                               padding: '12px 16px', background: 'none', border: 'none',
-                              fontSize: 14, color: '#374151', cursor: 'pointer',
+                              fontSize: 14, color: '#30454F', cursor: 'pointer',
                               borderBottom: canActOn(expense) ? '1px solid #F3F4F6' : 'none',
                             }}
                           >
@@ -521,25 +521,25 @@ export default function Expenses() {
 
         {/* ¿Quién aportó más? */}
         {!loading && memberContributions.length > 0 && (
-          <div style={{ margin: '16px 20px 0', background: 'white', borderRadius: 18, padding: '16px 18px', border: '1px solid #EDE5D8', boxShadow: '0 2px 12px rgba(0,0,0,0.05)' }}>
-            <p style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 14 }}>
+          <div style={{ margin: '16px 20px 0', background: 'white', borderRadius: 18, padding: '16px 18px', border: '1px solid #E6E3DB', boxShadow: '0 2px 12px rgba(0,0,0,0.05)' }}>
+            <p style={{ fontSize: 11, fontWeight: 700, color: '#4E6470', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 14 }}>
               ¿Quién aportó más este mes?
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {memberContributions.map((m, i) => (
                 <div key={m.name} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: i === 0 ? '#EBF3EE' : '#F3F4F6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, flexShrink: 0, fontWeight: 700, color: i === 0 ? '#087F70' : '#9CA3AF' }}>
+                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: i === 0 ? '#E3F1F8' : '#F3F4F6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, flexShrink: 0, fontWeight: 700, color: i === 0 ? '#0C6C9C' : '#5E7480' }}>
                     {i === 0 ? '🥇' : i === 1 ? '🥈' : '🥉'}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
-                      <span style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.name}</span>
-                      <span style={{ fontSize: 13, fontWeight: 700, color: '#1A1A1A', flexShrink: 0, marginLeft: 8 }}>
-                        {formatCurrency(m.amount)} · <span style={{ color: '#087F70' }}>{m.pct}%</span>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: '#14303D', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.name}</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: '#14303D', flexShrink: 0, marginLeft: 8 }}>
+                        {formatCurrency(m.amount)} · <span style={{ color: '#0C6C9C' }}>{m.pct}%</span>
                       </span>
                     </div>
                     <div style={{ height: 4, background: '#F3F4F6', borderRadius: 2, overflow: 'hidden' }}>
-                      <div style={{ height: '100%', borderRadius: 2, background: i === 0 ? '#087F70' : '#9CA3AF', width: `${m.pct}%`, transition: 'width 0.4s ease' }} />
+                      <div style={{ height: '100%', borderRadius: 2, background: i === 0 ? '#0C6C9C' : '#5E7480', width: `${m.pct}%`, transition: 'width 0.4s ease' }} />
                     </div>
                   </div>
                 </div>
@@ -560,9 +560,9 @@ export default function Expenses() {
           style={{
             position: 'fixed', bottom: 84, right: 20, zIndex: 30,
             width: 54, height: 54, borderRadius: '50%',
-            background: '#087F70',
+            background: '#0C6C9C',
             border: 'none', cursor: 'pointer',
-            boxShadow: '0 6px 20px rgba(8,127,112,0.4)',
+            boxShadow: '0 6px 20px rgba(12,108,156,0.4)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             transition: 'transform 0.15s',
           }}
@@ -588,10 +588,10 @@ export default function Expenses() {
             maxWidth: 340, width: '100%',
             boxShadow: '0 20px 60px rgba(0,0,0,0.25)',
           }}>
-            <p style={{ fontFamily: SANS, fontSize: 17, fontWeight: 700, color: '#1A1A1A', marginBottom: 10 }}>
+            <p style={{ fontFamily: SANS, fontSize: 17, fontWeight: 700, color: '#14303D', marginBottom: 10 }}>
               ¿Eliminar este registro?
             </p>
-            <p style={{ fontSize: 13, color: '#6B7280', marginBottom: 24, lineHeight: 1.6 }}>
+            <p style={{ fontSize: 13, color: '#4E6470', marginBottom: 24, lineHeight: 1.6 }}>
               Esta acción no se puede deshacer.
             </p>
             <div style={{ display: 'flex', gap: 10 }}>
@@ -599,8 +599,8 @@ export default function Expenses() {
                 onClick={() => setConfirmDialog(null)}
                 style={{
                   flex: 1, padding: '12px', borderRadius: 12,
-                  border: '1.5px solid #EDE5D8', background: 'white',
-                  fontSize: 14, fontWeight: 600, color: '#374151', cursor: 'pointer',
+                  border: '1.5px solid #E6E3DB', background: 'white',
+                  fontSize: 14, fontWeight: 600, color: '#30454F', cursor: 'pointer',
                 }}
               >
                 Cancelar
@@ -645,10 +645,10 @@ export default function Expenses() {
               justifyContent: 'space-between', marginBottom: 22,
             }}>
               <div>
-                <p style={{ fontFamily: SANS, fontSize: 18, fontWeight: 700, color: '#1A1A1A' }}>
+                <p style={{ fontFamily: SANS, fontSize: 18, fontWeight: 700, color: '#14303D' }}>
                   {editExpense ? 'Editar gasto' : 'Nuevo gasto'}
                 </p>
-                <p style={{ fontSize: 12, color: '#9CA3AF', marginTop: 2 }}>
+                <p style={{ fontSize: 12, color: '#5E7480', marginTop: 2 }}>
                   Cuentas Claras
                 </p>
               </div>
@@ -656,7 +656,7 @@ export default function Expenses() {
                 onClick={() => setShowModal(false)}
                 style={{ padding: 8, borderRadius: 10, background: '#F3F4F6', border: 'none', cursor: 'pointer' }}
               >
-                <XIcon size={16} color="#6B7280" strokeWidth={2} />
+                <XIcon size={16} color="#4E6470" strokeWidth={2} />
               </button>
             </div>
 
@@ -665,7 +665,7 @@ export default function Expenses() {
               {/* Amount */}
               <div>
                 <label style={{
-                  display: 'block', fontSize: 11, fontWeight: 700, color: '#6B7280',
+                  display: 'block', fontSize: 11, fontWeight: 700, color: '#4E6470',
                   letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 6,
                 }}>
                   Monto *
@@ -673,7 +673,7 @@ export default function Expenses() {
                 <div style={{ position: 'relative' }}>
                   <span style={{
                     position: 'absolute', left: 14, top: '50%',
-                    transform: 'translateY(-50%)', color: '#9CA3AF', fontSize: 14, pointerEvents: 'none',
+                    transform: 'translateY(-50%)', color: '#5E7480', fontSize: 14, pointerEvents: 'none',
                   }}>
                     $
                   </span>
@@ -696,7 +696,7 @@ export default function Expenses() {
               {/* Category */}
               <div>
                 <label style={{
-                  display: 'block', fontSize: 11, fontWeight: 700, color: '#6B7280',
+                  display: 'block', fontSize: 11, fontWeight: 700, color: '#4E6470',
                   letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 6,
                 }}>
                   Categoría *
@@ -725,7 +725,7 @@ export default function Expenses() {
               {/* Description */}
               <div>
                 <label style={{
-                  display: 'block', fontSize: 11, fontWeight: 700, color: '#6B7280',
+                  display: 'block', fontSize: 11, fontWeight: 700, color: '#4E6470',
                   letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 6,
                 }}>
                   Descripción
@@ -743,7 +743,7 @@ export default function Expenses() {
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
                     <label style={{
-                      fontSize: 11, fontWeight: 700, color: '#6B7280',
+                      fontSize: 11, fontWeight: 700, color: '#4E6470',
                       letterSpacing: '0.07em', textTransform: 'uppercase',
                     }}>
                       Pagó *
@@ -752,7 +752,7 @@ export default function Expenses() {
                       <button
                         type="button"
                         onClick={() => setEditingPaidBy(true)}
-                        style={{ background: 'none', border: 'none', padding: 0, fontSize: 11, fontWeight: 700, color: '#087F70', cursor: 'pointer' }}
+                        style={{ background: 'none', border: 'none', padding: 0, fontSize: 11, fontWeight: 700, color: '#0C6C9C', cursor: 'pointer' }}
                       >
                         Cambiar
                       </button>
@@ -774,8 +774,8 @@ export default function Expenses() {
                   ) : (
                     <p style={{
                       margin: 0, padding: '11px 14px', borderRadius: 12,
-                      border: '1.5px solid #EDE5D8', background: '#F9FAFB',
-                      fontSize: 14, color: '#1A1A1A', boxSizing: 'border-box',
+                      border: '1.5px solid #E6E3DB', background: '#F9FAFB',
+                      fontSize: 14, color: '#14303D', boxSizing: 'border-box',
                     }}>
                       {form.paid_by || displayName}
                     </p>
@@ -783,7 +783,7 @@ export default function Expenses() {
                 </div>
                 <div>
                   <label style={{
-                    display: 'block', fontSize: 11, fontWeight: 700, color: '#6B7280',
+                    display: 'block', fontSize: 11, fontWeight: 700, color: '#4E6470',
                     letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 6,
                   }}>
                     Fecha *
@@ -804,7 +804,7 @@ export default function Expenses() {
               {/* Receipt photo */}
               <div>
                 <label style={{
-                  display: 'block', fontSize: 11, fontWeight: 700, color: '#6B7280',
+                  display: 'block', fontSize: 11, fontWeight: 700, color: '#4E6470',
                   letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 8,
                 }}>
                   Foto del recibo (opcional)
@@ -814,7 +814,7 @@ export default function Expenses() {
                     <img
                       src={photoPreview}
                       alt="Recibo"
-                      style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 12, border: '2px solid #EDE5D8' }}
+                      style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 12, border: '2px solid #E6E3DB' }}
                     />
                     <button
                       type="button"
@@ -837,12 +837,12 @@ export default function Expenses() {
                       style={{
                         flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                         padding: '10px 12px', borderRadius: 12,
-                        border: '1.5px dashed #C0CCC5', background: '#FDF8F4',
+                        border: '1.5px dashed #C9D6DB', background: '#FDF8F4',
                         cursor: 'pointer',
                       }}
                     >
                       <span style={{ fontSize: 15 }}>📷</span>
-                      <span style={{ fontSize: 12, color: '#087F70', fontWeight: 600 }}>Tomar foto</span>
+                      <span style={{ fontSize: 12, color: '#0C6C9C', fontWeight: 600 }}>Tomar foto</span>
                     </button>
                     <button
                       type="button"
@@ -850,12 +850,12 @@ export default function Expenses() {
                       style={{
                         flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                         padding: '10px 12px', borderRadius: 12,
-                        border: '1.5px dashed #C0CCC5', background: '#FDF8F4',
+                        border: '1.5px dashed #C9D6DB', background: '#FDF8F4',
                         cursor: 'pointer',
                       }}
                     >
                       <span style={{ fontSize: 15 }}>🖼️</span>
-                      <span style={{ fontSize: 12, color: '#087F70', fontWeight: 600 }}>Elegir de galería</span>
+                      <span style={{ fontSize: 12, color: '#0C6C9C', fontWeight: 600 }}>Elegir de galería</span>
                     </button>
                   </div>
                 )}

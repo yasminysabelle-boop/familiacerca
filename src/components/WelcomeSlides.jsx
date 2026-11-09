@@ -91,7 +91,7 @@ export default function WelcomeSlides({ onDone }) {
         {/* ── Slide 1: Bienvenida ── */}
         <div style={{
           width: '100vw', height: '100%', flexShrink: 0,
-          background: '#F8F4ED',
+          background: '#F7F6F2',
           display: 'flex', flexDirection: 'column',
           alignItems: 'center', justifyContent: 'center',
         }}>
@@ -100,7 +100,7 @@ export default function WelcomeSlides({ onDone }) {
               <Logo size={84} />
             </div>
             <h1 style={{
-              color: '#087F70',
+              color: '#0C6C9C',
               fontFamily: "'Plus Jakarta Sans', sans-serif",
               fontSize: 40, fontWeight: 700,
               margin: '0 0 10px',
@@ -110,7 +110,7 @@ export default function WelcomeSlides({ onDone }) {
               FamiliaCerca
             </h1>
             <p style={{
-              color: '#6B7280',
+              color: '#4E6470',
               fontSize: 21, fontWeight: 500,
               letterSpacing: '0.04em',
               margin: '0 0 18px',
@@ -131,7 +131,7 @@ export default function WelcomeSlides({ onDone }) {
         {/* ── Slide 2: Funciones ── */}
         <div style={{
           width: '100vw', height: '100%', flexShrink: 0,
-          background: '#F8F4ED',
+          background: '#F7F6F2',
           display: 'flex', flexDirection: 'column',
           overflow: 'hidden',
         }}>
@@ -148,13 +148,13 @@ export default function WelcomeSlides({ onDone }) {
               <Logo size={40} />
             </div>
             <p style={{
-              color: '#6B7280', fontSize: 11, margin: '0 0 8px',
+              color: '#4E6470', fontSize: 11, margin: '0 0 8px',
               letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 700,
             }}>
               Todo en un solo lugar
             </p>
             <h2 style={{
-              color: '#087F70',
+              color: '#0C6C9C',
               fontFamily: "'Plus Jakarta Sans', sans-serif",
               fontSize: 28, fontWeight: 700,
               margin: 0, lineHeight: 1.25,
@@ -175,17 +175,17 @@ export default function WelcomeSlides({ onDone }) {
             {FEATURES.map(f => (
               <div key={f.title} style={{
                 background: 'white', borderRadius: 16,
-                border: '1px solid #EDE5D8',
+                border: '1px solid #E6E3DB',
                 padding: '16px 14px',
                 boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
               }}>
                 <span style={{ fontSize: 28, display: 'block', marginBottom: 8, lineHeight: 1 }}>
                   {f.icon}
                 </span>
-                <p style={{ fontSize: 13, fontWeight: 700, color: '#1A1A1A', margin: '0 0 4px' }}>
+                <p style={{ fontSize: 13, fontWeight: 700, color: '#14303D', margin: '0 0 4px' }}>
                   {f.title}
                 </p>
-                <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0, lineHeight: 1.4 }}>
+                <p style={{ fontSize: 11, color: '#5E7480', margin: 0, lineHeight: 1.4 }}>
                   {f.desc}
                 </p>
               </div>
@@ -196,7 +196,7 @@ export default function WelcomeSlides({ onDone }) {
         {/* ── Slide 3: CTA ── */}
         <div style={{
           width: '100vw', height: '100%', flexShrink: 0,
-          background: '#F8F4ED',
+          background: '#F7F6F2',
           display: 'flex', flexDirection: 'column',
           alignItems: 'center', justifyContent: 'center',
           padding: '0 28px',
@@ -212,16 +212,16 @@ export default function WelcomeSlides({ onDone }) {
             <div style={{
               display: 'inline-flex', alignItems: 'center', gap: 7,
               background: 'white',
-              border: '1.5px solid #EDE5D8',
+              border: '1.5px solid #E6E3DB',
               borderRadius: 50, padding: '7px 18px',
               marginBottom: 24,
             }}>
               <span style={{ fontSize: 16 }}>🎁</span>
-              <span style={{ color: '#087F70', fontSize: 14, fontWeight: 700 }}>14 días gratis</span>
+              <span style={{ color: '#0C6C9C', fontSize: 14, fontWeight: 700 }}>14 días gratis</span>
             </div>
 
             <h2 style={{
-              color: '#087F70',
+              color: '#0C6C9C',
               fontFamily: "'Plus Jakarta Sans', sans-serif",
               fontSize: 36, fontWeight: 700,
               margin: '0 0 14px', lineHeight: 1.15,
@@ -229,7 +229,7 @@ export default function WelcomeSlides({ onDone }) {
               Empieza hoy<br />sin costo
             </h2>
             <p style={{
-              color: '#6B7280',
+              color: '#4E6470',
               fontSize: 15, lineHeight: 1.65,
               margin: '0 0 40px',
             }}>
@@ -242,11 +242,11 @@ export default function WelcomeSlides({ onDone }) {
               style={{
                 width: '100%', padding: '18px',
                 borderRadius: 16,
-                background: '#087F70',
+                background: '#0C6C9C',
                 color: 'white',
                 fontSize: 17, fontWeight: 800,
                 border: 'none', cursor: 'pointer',
-                boxShadow: '0 4px 20px rgba(8,127,112,0.18)',
+                boxShadow: '0 4px 20px rgba(12,108,156,0.18)',
                 marginBottom: 14,
                 letterSpacing: '-0.2px',
               }}
@@ -261,8 +261,8 @@ export default function WelcomeSlides({ onDone }) {
                 width: '100%', padding: '15px',
                 borderRadius: 16,
                 background: 'transparent',
-                border: '1.5px solid #087F70',
-                color: '#087F70',
+                border: '1.5px solid #0C6C9C',
+                color: '#0C6C9C',
                 fontSize: 15, fontWeight: 600,
                 cursor: 'pointer',
               }}
@@ -283,9 +283,9 @@ export default function WelcomeSlides({ onDone }) {
             right: 20,
             zIndex: 10,
             background: 'rgba(0,0,0,0.06)',
-            border: '1px solid #EDE5D8',
+            border: '1px solid #E6E3DB',
             borderRadius: 20,
-            color: '#6B7280',
+            color: '#4E6470',
             fontSize: 13, fontWeight: 600,
             padding: '6px 15px',
             cursor: 'pointer',
@@ -332,11 +332,11 @@ export default function WelcomeSlides({ onDone }) {
               pointerEvents: 'auto',
               padding: '15px 48px',
               borderRadius: 50,
-              background: '#087F70',
+              background: '#0C6C9C',
               color: 'white',
               fontSize: 16, fontWeight: 700,
               border: 'none', cursor: 'pointer',
-              boxShadow: '0 4px 20px rgba(8,127,112,0.18)',
+              boxShadow: '0 4px 20px rgba(12,108,156,0.18)',
               letterSpacing: '-0.2px',
             }}
           >

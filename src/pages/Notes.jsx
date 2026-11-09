@@ -18,12 +18,12 @@ const emptyForm = { title: '', content: '', tags: [], is_incident: false, incide
 
 const fieldStyle = {
   width: '100%', padding: '11px 14px', borderRadius: 12,
-  border: '1.5px solid #EDE5D8', background: '#FDFAF7',
+  border: '1.5px solid #E6E3DB', background: '#FDFAF7',
   fontSize: 14, outline: 'none', boxSizing: 'border-box',
   transition: 'all 0.15s', fontFamily: 'inherit',
 }
-const onFocus = e => { e.target.style.borderColor = '#087F70'; e.target.style.boxShadow = '0 0 0 3px rgba(8,127,112,0.1)' }
-const onBlur  = e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.boxShadow = 'none' }
+const onFocus = e => { e.target.style.borderColor = '#0C6C9C'; e.target.style.boxShadow = '0 0 0 3px rgba(12,108,156,0.1)' }
+const onBlur  = e => { e.target.style.borderColor = '#E6E3DB'; e.target.style.boxShadow = 'none' }
 
 export default function Notes() {
   const { user } = useAuth()
@@ -194,20 +194,20 @@ export default function Notes() {
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
           <div>
-            <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 20, fontWeight: 700, color: '#1A1A1A', marginBottom: 2 }}>
+            <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 20, fontWeight: 700, color: '#14303D', marginBottom: 2 }}>
               Notas
             </h2>
-            <p style={{ fontSize: 12, color: '#9CA3AF' }}>Observaciones del cuidado diario</p>
+            <p style={{ fontSize: 12, color: '#5E7480' }}>Observaciones del cuidado diario</p>
           </div>
           {(isAdmin || isCuidador) && (
             <button
               onClick={openAdd}
               style={{
                 width: 40, height: 40, borderRadius: 12,
-                background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
+                background: 'linear-gradient(135deg, #0A5A82, #0A4A6B)',
                 border: 'none', cursor: 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                boxShadow: '0 4px 12px rgba(8,127,112,0.3)',
+                boxShadow: '0 4px 12px rgba(12,108,156,0.3)',
               }}
             >
               <Plus size={20} color="white" strokeWidth={2.5} />
@@ -228,26 +228,26 @@ export default function Notes() {
         {/* Notes list */}
         {loading ? (
           <div style={{ display: 'flex', justifyContent: 'center', padding: '48px 0' }}>
-            <div style={{ width: 28, height: 28, borderRadius: '50%', border: '3px solid #EDE5D8', borderTopColor: '#087F70', animation: 'spin 0.8s linear infinite' }} />
+            <div style={{ width: 28, height: 28, borderRadius: '50%', border: '3px solid #E6E3DB', borderTopColor: '#0C6C9C', animation: 'spin 0.8s linear infinite' }} />
           </div>
         ) : loadError ? (
-          <div style={{ background: 'white', borderRadius: 20, border: '1px solid #EDE5D8', padding: '40px 24px', textAlign: 'center' }}>
+          <div style={{ background: 'white', borderRadius: 20, border: '1px solid #E6E3DB', padding: '40px 24px', textAlign: 'center' }}>
             <p style={{ fontSize: 14, color: '#D63031', marginBottom: 12 }}>{loadError}</p>
-            <button onClick={fetchNotes} style={{ padding: '10px 24px', borderRadius: 12, background: '#087F70', color: 'white', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>
+            <button onClick={fetchNotes} style={{ padding: '10px 24px', borderRadius: 12, background: '#0C6C9C', color: 'white', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>
               Reintentar
             </button>
           </div>
         ) : filtered.length === 0 ? (
-          <div style={{ background: 'white', borderRadius: 20, border: '1px solid #EDE5D8', padding: '48px 24px', textAlign: 'center', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
+          <div style={{ background: 'white', borderRadius: 20, border: '1px solid #E6E3DB', padding: '48px 24px', textAlign: 'center', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
             <div style={{ fontSize: 44, marginBottom: 12 }}>📝</div>
-            <p style={{ fontSize: 14, fontWeight: 600, color: '#1A1A1A', marginBottom: 6 }}>
+            <p style={{ fontSize: 14, fontWeight: 600, color: '#14303D', marginBottom: 6 }}>
               {search ? 'Sin resultados' : 'Sin notas aún'}
             </p>
-            <p style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 20 }}>
+            <p style={{ fontSize: 12, color: '#5E7480', marginBottom: 20 }}>
               {search ? 'Intenta con otras palabras.' : 'Registra las observaciones del cuidado diario.'}
             </p>
             {!search && (isAdmin || isCuidador) && (
-              <button onClick={openAdd} style={{ padding: '10px 24px', borderRadius: 12, background: 'linear-gradient(135deg, #0d6b63, #3A6347)', color: 'white', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>
+              <button onClick={openAdd} style={{ padding: '10px 24px', borderRadius: 12, background: 'linear-gradient(135deg, #0A5A82, #0A4A6B)', color: 'white', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>
                 + Nueva nota
               </button>
             )}
@@ -263,7 +263,7 @@ export default function Notes() {
                   style={{
                     background: note.is_incident ? '#FEF2E8' : 'white',
                     borderRadius: 16,
-                    border: note.is_incident ? '1px solid #F4A261' : '1px solid #EDE5D8',
+                    border: note.is_incident ? '1px solid #F4A261' : '1px solid #E6E3DB',
                     overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
                   }}
                 >
@@ -273,11 +273,11 @@ export default function Notes() {
                       onClick={() => setExpanded(isExpanded ? null : note.id)}
                       style={{ flex: 1, textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
                     >
-                      <p style={{ fontSize: 14, fontWeight: 600, color: '#1A1A1A', margin: '0 0 4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <p style={{ fontSize: 14, fontWeight: 600, color: '#14303D', margin: '0 0 4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {note.title || note.content?.slice(0, 60) || '—'}
                       </p>
                       <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
-                        <span style={{ fontSize: 11, color: '#9CA3AF' }}>
+                        <span style={{ fontSize: 11, color: '#5E7480' }}>
                           {new Date(note.created_at).toLocaleDateString('es-US', { day: 'numeric', month: 'short', year: 'numeric' })}
                         </span>
                         {note.is_incident && (
@@ -286,7 +286,7 @@ export default function Notes() {
                           </span>
                         )}
                         {note.tags?.map(tag => (
-                          <span key={tag} style={{ fontSize: 10, fontWeight: 700, color: '#087F70', background: '#EBF3EE', padding: '2px 8px', borderRadius: 20 }}>
+                          <span key={tag} style={{ fontSize: 10, fontWeight: 700, color: '#0C6C9C', background: '#E3F1F8', padding: '2px 8px', borderRadius: 20 }}>
                             {tag}
                           </span>
                         ))}
@@ -298,15 +298,15 @@ export default function Notes() {
                       <div style={{ position: 'relative', flexShrink: 0 }}>
                         <button
                           onClick={e => { e.stopPropagation(); setMenuOpen(menuOpen === note.id ? null : note.id) }}
-                          style={{ width: 32, height: 32, borderRadius: 8, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, color: '#9CA3AF', lineHeight: 1 }}
+                          style={{ width: 32, height: 32, borderRadius: 8, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, color: '#5E7480', lineHeight: 1 }}
                         >
                           ⋮
                         </button>
                         {menuOpen === note.id && (
-                          <div style={{ position: 'absolute', right: 0, top: '100%', zIndex: 100, background: 'white', borderRadius: 12, boxShadow: '0 4px 24px rgba(0,0,0,0.15)', border: '1px solid #EDE5D8', overflow: 'hidden', minWidth: 150 }}>
+                          <div style={{ position: 'absolute', right: 0, top: '100%', zIndex: 100, background: 'white', borderRadius: 12, boxShadow: '0 4px 24px rgba(0,0,0,0.15)', border: '1px solid #E6E3DB', overflow: 'hidden', minWidth: 150 }}>
                             <button
                               onClick={() => { openEdit(note); setMenuOpen(null) }}
-                              style={{ display: 'block', width: '100%', padding: '12px 16px', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: '#374151', fontWeight: 600 }}
+                              style={{ display: 'block', width: '100%', padding: '12px 16px', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: '#30454F', fontWeight: 600 }}
                             >
                               ✏️ Editar
                             </button>
@@ -323,7 +323,7 @@ export default function Notes() {
 
                     <button
                       onClick={() => setExpanded(isExpanded ? null : note.id)}
-                      style={{ width: 28, height: 28, flexShrink: 0, background: 'none', border: 'none', cursor: 'pointer', color: '#9CA3AF', fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                      style={{ width: 28, height: 28, flexShrink: 0, background: 'none', border: 'none', cursor: 'pointer', color: '#5E7480', fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                     >
                       {isExpanded ? '▲' : '▼'}
                     </button>
@@ -332,11 +332,11 @@ export default function Notes() {
                   {/* Expanded content */}
                   {isExpanded && (
                     <div style={{ padding: '0 16px 16px', borderTop: '1px solid #F3F4F6' }}>
-                      <p style={{ fontSize: 13, color: '#374151', marginTop: 12, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
+                      <p style={{ fontSize: 13, color: '#30454F', marginTop: 12, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
                         {note.content}
                       </p>
                       {note.address && (
-                        <p style={{ fontSize: 11, color: '#9CA3AF', marginTop: 8 }}>📍 {note.address}</p>
+                        <p style={{ fontSize: 11, color: '#5E7480', marginTop: 8 }}>📍 {note.address}</p>
                       )}
                       {note.photo_url && (
                         <div style={{ marginTop: 8 }}>
@@ -361,11 +361,11 @@ export default function Notes() {
           <div style={{ width: '100%', maxHeight: '92vh', background: 'white', borderRadius: '24px 24px 0 0', padding: '24px 20px 96px', overflowY: 'auto', boxShadow: '0 -8px 48px rgba(0,0,0,0.2)' }}>
 
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-              <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 18, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>
+              <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 18, fontWeight: 700, color: '#14303D', margin: 0 }}>
                 {editId ? 'Editar nota' : 'Nueva nota'}
               </h3>
               <button onClick={handleCancel} style={{ padding: 8, border: 'none', background: 'none', cursor: 'pointer' }}>
-                <XIcon size={20} color="#9CA3AF" strokeWidth={2} />
+                <XIcon size={20} color="#5E7480" strokeWidth={2} />
               </button>
             </div>
 
@@ -373,7 +373,7 @@ export default function Notes() {
 
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-                  <p style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', letterSpacing: '0.08em', textTransform: 'uppercase', margin: 0 }}>Contenido *</p>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: '#4E6470', letterSpacing: '0.08em', textTransform: 'uppercase', margin: 0 }}>Contenido *</p>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <MicButton recording={recording} onStart={start} onStop={stop} size="sm" />
                   </div>
@@ -390,7 +390,7 @@ export default function Notes() {
                   onBlur={onBlur}
                 />
                 {recording && interim && (
-                  <p style={{ fontSize: 11, marginTop: 6, paddingLeft: 4, color: '#9CA3AF', fontStyle: 'italic' }}>
+                  <p style={{ fontSize: 11, marginTop: 6, paddingLeft: 4, color: '#5E7480', fontStyle: 'italic' }}>
                     🎤 {interim}
                   </p>
                 )}
@@ -405,7 +405,7 @@ export default function Notes() {
               </div>
 
               <div>
-                <p style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>Título <span style={{ fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>(opcional)</span></p>
+                <p style={{ fontSize: 11, fontWeight: 700, color: '#4E6470', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>Título <span style={{ fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>(opcional)</span></p>
                 <input
                   name="title"
                   value={form.title}
@@ -424,15 +424,15 @@ export default function Notes() {
                   style={{
                     display: 'flex', alignItems: 'center', gap: 10, width: '100%',
                     padding: '12px 14px', borderRadius: 12,
-                    border: form.is_incident ? '1.5px solid #F4A261' : '1.5px solid #EDE5D8',
+                    border: form.is_incident ? '1.5px solid #F4A261' : '1.5px solid #E6E3DB',
                     background: form.is_incident ? '#FEF2E8' : '#FDFAF7',
                     cursor: 'pointer', textAlign: 'left',
                   }}
                 >
                   <span style={{ fontSize: 20 }}>🩺</span>
                   <span style={{ flex: 1 }}>
-                    <span style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#1A1A1A' }}>Evento agudo</span>
-                    <span style={{ display: 'block', fontSize: 11, color: '#9CA3AF' }}>Caída, ER/hospitalización, cambio de conducta...</span>
+                    <span style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#14303D' }}>Evento agudo</span>
+                    <span style={{ display: 'block', fontSize: 11, color: '#5E7480' }}>Caída, ER/hospitalización, cambio de conducta...</span>
                   </span>
                   <span style={{
                     width: 40, height: 22, borderRadius: 20, flexShrink: 0, position: 'relative',
@@ -465,14 +465,14 @@ export default function Notes() {
                             }}
                           >
                             <span style={{ fontSize: 20 }}>{t.emoji}</span>
-                            <span style={{ fontSize: 10, fontWeight: 700, color: isSelected ? '#C2410C' : '#6B7280', textAlign: 'center', lineHeight: 1.2 }}>{t.label}</span>
+                            <span style={{ fontSize: 10, fontWeight: 700, color: isSelected ? '#C2410C' : '#4E6470', textAlign: 'center', lineHeight: 1.2 }}>{t.label}</span>
                           </button>
                         )
                       })}
                     </div>
                     {form.photo_url ? (
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <img src={form.photo_url} alt="Preview" style={{ width: 64, height: 64, borderRadius: 10, objectFit: 'cover', border: '1.5px solid #EDE5D8' }} />
+                        <img src={form.photo_url} alt="Preview" style={{ width: 64, height: 64, borderRadius: 10, objectFit: 'cover', border: '1.5px solid #E6E3DB' }} />
                         <button
                           type="button"
                           onClick={() => setForm(f => ({ ...f, photo_url: null }))}
@@ -494,7 +494,7 @@ export default function Notes() {
               </div>
 
               <div>
-                <p style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8 }}>Etiquetas</p>
+                <p style={{ fontSize: 11, fontWeight: 700, color: '#4E6470', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8 }}>Etiquetas</p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                   {TAG_OPTIONS.map(tag => (
                     <button
@@ -504,8 +504,8 @@ export default function Notes() {
                       style={{
                         padding: '6px 14px', borderRadius: 20,
                         border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600,
-                        background: form.tags.includes(tag) ? '#087F70' : '#F3F4F6',
-                        color: form.tags.includes(tag) ? 'white' : '#6B7280',
+                        background: form.tags.includes(tag) ? '#0C6C9C' : '#F3F4F6',
+                        color: form.tags.includes(tag) ? 'white' : '#4E6470',
                         transition: 'all 0.15s',
                       }}
                     >
@@ -519,7 +519,7 @@ export default function Notes() {
                 <button
                   type="button"
                   onClick={handleCancel}
-                  style={{ flex: 1, padding: '13px', border: '1.5px solid #EDE5D8', borderRadius: 14, background: 'white', color: '#6B7280', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}
+                  style={{ flex: 1, padding: '13px', border: '1.5px solid #E6E3DB', borderRadius: 14, background: 'white', color: '#4E6470', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}
                 >
                   Cancelar
                 </button>
@@ -528,10 +528,10 @@ export default function Notes() {
                   disabled={saving || (form.is_incident && !form.incident_type)}
                   style={{
                     flex: 2, padding: '13px', borderRadius: 14, border: 'none',
-                    background: (saving || (form.is_incident && !form.incident_type)) ? '#D4C4B8' : 'linear-gradient(135deg, #0d6b63, #3A6347)',
+                    background: (saving || (form.is_incident && !form.incident_type)) ? '#D4C4B8' : 'linear-gradient(135deg, #0A5A82, #0A4A6B)',
                     color: 'white', fontWeight: 700, fontSize: 14,
                     cursor: saving ? 'not-allowed' : 'pointer',
-                    boxShadow: saving ? 'none' : '0 6px 20px rgba(8,127,112,0.3)',
+                    boxShadow: saving ? 'none' : '0 6px 20px rgba(12,108,156,0.3)',
                     transition: 'all 0.15s',
                   }}
                 >
@@ -551,10 +551,10 @@ export default function Notes() {
         >
           <div style={{ background: 'white', borderRadius: 20, padding: '28px 24px', maxWidth: 340, width: '100%', boxShadow: '0 24px 64px rgba(0,0,0,0.25)', textAlign: 'center' }}>
             <div style={{ fontSize: 40, marginBottom: 14 }}>🗑️</div>
-            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 17, fontWeight: 700, color: '#1A1A1A', marginBottom: 8 }}>¿Eliminar este registro?</p>
-            <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, marginBottom: 24 }}>Esta acción no se puede deshacer.</p>
+            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 17, fontWeight: 700, color: '#14303D', marginBottom: 8 }}>¿Eliminar este registro?</p>
+            <p style={{ fontSize: 13, color: '#4E6470', lineHeight: 1.6, marginBottom: 24 }}>Esta acción no se puede deshacer.</p>
             <div style={{ display: 'flex', gap: 10 }}>
-              <button onClick={() => setConfirmDialog(null)} style={{ flex: 1, padding: '12px', borderRadius: 12, border: '1.5px solid #EDE5D8', background: 'white', color: '#6B7280', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>
+              <button onClick={() => setConfirmDialog(null)} style={{ flex: 1, padding: '12px', borderRadius: 12, border: '1.5px solid #E6E3DB', background: 'white', color: '#4E6470', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>
                 Cancelar
               </button>
               <button onClick={() => { confirmDialog.onConfirm(); setConfirmDialog(null) }} style={{ flex: 1, padding: '12px', borderRadius: 12, border: 'none', background: '#D63031', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer', boxShadow: '0 4px 16px rgba(214,48,49,0.3)' }}>

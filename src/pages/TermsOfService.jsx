@@ -6,7 +6,7 @@ function Section({ title, children }) {
     <section className="mb-8">
       <h2
         className="text-base font-bold text-gray-900 mb-3 pb-2"
-        style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", borderBottom: '2px solid #EDE5D8' }}
+        style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", borderBottom: '2px solid #E6E3DB' }}
       >
         {title}
       </h2>
@@ -20,13 +20,13 @@ function Section({ title, children }) {
 function Item({ children }) {
   return (
     <div className="flex gap-2.5">
-      <span className="mt-1 flex-shrink-0 w-1.5 h-1.5 rounded-full" style={{ background: '#087F70', marginTop: 6 }} />
+      <span className="mt-1 flex-shrink-0 w-1.5 h-1.5 rounded-full" style={{ background: '#0C6C9C', marginTop: 6 }} />
       <p>{children}</p>
     </div>
   )
 }
 
-function Callout({ icon, children, color = '#EBF3EE', border = '#F0C8B0' }) {
+function Callout({ icon, children, color = '#E3F1F8', border = '#F0C8B0' }) {
   return (
     <div
       className="flex gap-3 px-4 py-3.5 rounded-2xl"
@@ -42,7 +42,7 @@ export default function TermsOfService() {
   const navigate = useNavigate()
 
   return (
-    <div className="min-h-screen" style={{ background: '#F7F3ED' }}>
+    <div className="min-h-screen" style={{ background: '#F7F6F2' }}>
 
       {/* ── Header ── */}
       <header
@@ -52,14 +52,14 @@ export default function TermsOfService() {
           background: 'rgba(255,248,240,0.97)',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
-          borderBottom: '1px solid #EDE5D8',
+          borderBottom: '1px solid #E6E3DB',
           boxShadow: '0 1px 12px rgba(0,0,0,0.05)',
         }}
       >
         <button
           onClick={() => navigate('/')}
           className="w-9 h-9 flex items-center justify-center rounded-full flex-shrink-0 transition-all active:scale-90"
-          style={{ background: '#EDE5D8', color: '#555' }}
+          style={{ background: '#E6E3DB', color: '#555' }}
         >
           ←
         </button>
@@ -81,7 +81,7 @@ export default function TermsOfService() {
         <div className="mb-8 text-center">
           <div
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold mb-4"
-            style={{ background: '#EBF3EE', color: '#3A6347' }}
+            style={{ background: '#E3F1F8', color: '#0A4A6B' }}
           >
             📄 Documento legal
           </div>
@@ -141,21 +141,21 @@ export default function TermsOfService() {
             <div className="space-y-3">
               <div
                 className="rounded-2xl p-4"
-                style={{ background: 'white', border: '1.5px solid #EDE5D8', boxShadow: '0 2px 12px rgba(0,0,0,0.05)' }}
+                style={{ background: 'white', border: '1.5px solid #E6E3DB', boxShadow: '0 2px 12px rgba(0,0,0,0.05)' }}
               >
                 <div className="flex items-center justify-between mb-1">
                   <p className="font-bold text-gray-900" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Plan Gratis</p>
-                  <span className="font-bold" style={{ color: '#9CA3AF' }}>$0</span>
+                  <span className="font-bold" style={{ color: '#5E7480' }}>$0</span>
                 </div>
                 <p className="text-xs text-gray-500">Coordinación familiar básica: hasta 2 cuidadores, medicamentos, chat familiar e historial de 7 días.</p>
               </div>
               <div
                 className="rounded-2xl p-4"
-                style={{ background: 'white', border: '1.5px solid #EDE5D8', boxShadow: '0 2px 12px rgba(0,0,0,0.05)' }}
+                style={{ background: 'white', border: '1.5px solid #E6E3DB', boxShadow: '0 2px 12px rgba(0,0,0,0.05)' }}
               >
                 <div className="flex items-center justify-between mb-1">
                   <p className="font-bold text-gray-900" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Plan Familiar</p>
-                  <span className="font-bold" style={{ color: '#087F70' }}>$12.99 / mes</span>
+                  <span className="font-bold" style={{ color: '#0C6C9C' }}>$12.99 / mes</span>
                 </div>
                 <p className="text-xs text-gray-500">Todo lo del Plan Gratis, más: hasta 6 cuidadores, recordatorios automáticos, foto-prueba, reportes en PDF, álbum familiar, gastos de cuidado e historial de 90 días.</p>
               </div>
@@ -272,7 +272,7 @@ export default function TermsOfService() {
             <p>Si tienes preguntas sobre estos Términos de Servicio, contáctanos en:</p>
             <div
               className="rounded-2xl p-4 flex items-center gap-3"
-              style={{ background: 'white', border: '1px solid #EDE5D8' }}
+              style={{ background: 'white', border: '1px solid #E6E3DB' }}
             >
               <span className="text-2xl">✉️</span>
               <div>
@@ -287,11 +287,11 @@ export default function TermsOfService() {
         {/* Footer links */}
         <div
           className="mt-8 pt-6 flex flex-col items-center gap-3"
-          style={{ borderTop: '1px solid #EDE5D8' }}
+          style={{ borderTop: '1px solid #E6E3DB' }}
         >
           <p className="text-xs text-gray-400 text-center leading-relaxed">
             ¿Prefieres leer esto en inglés? Escríbenos a{' '}
-            <a href="mailto:legal@familiacerca.com" className="underline" style={{ color: '#087F70' }}>
+            <a href="mailto:legal@familiacerca.com" className="underline" style={{ color: '#0C6C9C' }}>
               legal@familiacerca.com
             </a>{' '}
             y te enviamos la versión en inglés.
@@ -299,7 +299,7 @@ export default function TermsOfService() {
           <Link
             to="/privacidad"
             className="text-xs font-semibold underline"
-            style={{ color: '#087F70' }}
+            style={{ color: '#0C6C9C' }}
           >
             Ver Política de Privacidad →
           </Link>

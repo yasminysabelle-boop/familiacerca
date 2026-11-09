@@ -2,8 +2,8 @@ import { useNavigate } from 'react-router-dom'
 import { useBillingAccount } from '../../contexts/BillingAccountContext'
 
 const PLAN_META = {
-  free:      { label: 'Gratis',        color: '#9CA3AF', icon: '🌱', features: ['2 cuidadores', 'Chat familiar', 'Medicamentos básicos', 'Historial 7 días'] },
-  familiar:  { label: 'Plan Familiar',   color: '#087F70', icon: '❤️', features: ['6 cuidadores', 'Recordatorios automáticos', 'Notas de voz', 'Foto-prueba', 'Reportes PDF', 'Álbum familiar', 'Gastos de cuidado', 'Historial 90 días'] },
+  free:      { label: 'Gratis',        color: '#5E7480', icon: '🌱', features: ['2 cuidadores', 'Chat familiar', 'Medicamentos básicos', 'Historial 7 días'] },
+  familiar:  { label: 'Plan Familiar',   color: '#0C6C9C', icon: '❤️', features: ['6 cuidadores', 'Recordatorios automáticos', 'Notas de voz', 'Foto-prueba', 'Reportes PDF', 'Álbum familiar', 'Gastos de cuidado', 'Historial 90 días'] },
   care_plus: { label: 'Cuidado Total',   color: '#7C3AED', icon: '⭐', features: ['Cuidadores ilimitados', 'Alertas SOS prioritarias', 'Reporte semanal IA', 'Historial indefinido', 'Soporte prioritario'] },
 }
 
@@ -27,7 +27,7 @@ export default function AdminAccountSection() {
 
   const meta = PLAN_META[sub?.plan ?? 'free']
 
-  if (!sub) return <p style={{ color: '#9CA3AF', fontSize: 14, textAlign: 'center', padding: 24 }}>Cargando suscripción...</p>
+  if (!sub) return <p style={{ color: '#5E7480', fontSize: 14, textAlign: 'center', padding: 24 }}>Cargando suscripción...</p>
 
   const periodEnd = sub.current_period_end
     ? new Date(sub.current_period_end).toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' })
@@ -54,7 +54,7 @@ export default function AdminAccountSection() {
           }}>{meta.icon}</div>
           <div style={{ flex: 1 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <p style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#1A1A1A' }}>{meta.label}</p>
+              <p style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#14303D' }}>{meta.label}</p>
               <span style={{
                 fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 6,
                 background: meta.color + '18', color: meta.color,
@@ -62,7 +62,7 @@ export default function AdminAccountSection() {
                 {STATUS_LABEL[sub.status] ?? sub.status}
               </span>
             </div>
-            <p style={{ margin: '3px 0 0', fontSize: 12, color: trialExpired ? '#DC2626' : daysLeft <= 3 ? '#DC2626' : '#6B7280' }}>
+            <p style={{ margin: '3px 0 0', fontSize: 12, color: trialExpired ? '#DC2626' : daysLeft <= 3 ? '#DC2626' : '#4E6470' }}>
               {isTrialing && `⏳ ${daysLeft} día${daysLeft !== 1 ? 's' : ''} de prueba${trialEnd ? ` · Vence ${trialEnd}` : ''}`}
               {isPaid && periodEnd && `Próximo cobro: ${periodEnd}`}
               {trialExpired && '⚠ Prueba expirada — activa un plan'}
@@ -77,7 +77,7 @@ export default function AdminAccountSection() {
             <span key={f} style={{
               fontSize: 11, padding: '3px 10px', borderRadius: 20,
               background: 'white', border: `1px solid ${meta.color}25`,
-              color: '#374151', fontWeight: 500,
+              color: '#30454F', fontWeight: 500,
             }}>
               ✓ {f}
             </span>
@@ -86,7 +86,7 @@ export default function AdminAccountSection() {
       </div>
 
       {/* Subscription management */}
-      <div style={{ background: 'white', borderRadius: 14, border: '1px solid #EDE5D8', overflow: 'hidden' }}>
+      <div style={{ background: 'white', borderRadius: 14, border: '1px solid #E6E3DB', overflow: 'hidden' }}>
         <button
           onClick={() => navigate('/ajustes')}
           style={{
@@ -97,10 +97,10 @@ export default function AdminAccountSection() {
         >
           <span style={{ fontSize: 20, flexShrink: 0 }}>💳</span>
           <div style={{ flex: 1 }}>
-            <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#1A1A1A' }}>
+            <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#14303D' }}>
               Gestionar suscripción
             </p>
-            <p style={{ margin: '1px 0 0', fontSize: 12, color: '#9CA3AF' }}>
+            <p style={{ margin: '1px 0 0', fontSize: 12, color: '#5E7480' }}>
               Ver plan activo, próximo cobro, cancelar
             </p>
           </div>
@@ -109,7 +109,7 @@ export default function AdminAccountSection() {
 
         <div style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
           <span style={{ fontSize: 16 }}>🔒</span>
-          <p style={{ margin: 0, fontSize: 12, color: '#9CA3AF', lineHeight: 1.5 }}>
+          <p style={{ margin: 0, fontSize: 12, color: '#5E7480', lineHeight: 1.5 }}>
             Los pagos se procesan de forma segura a través de PayPal.
           </p>
         </div>
@@ -121,9 +121,9 @@ export default function AdminAccountSection() {
           onClick={() => navigate('/upgrade')}
           style={{
             padding: '14px', borderRadius: 14, border: 'none',
-            background: '#087F70',
+            background: '#0C6C9C',
             color: 'white', fontWeight: 700, fontSize: 15,
-            cursor: 'pointer', boxShadow: '0 4px 16px rgba(8,127,112,0.3)',
+            cursor: 'pointer', boxShadow: '0 4px 16px rgba(12,108,156,0.3)',
           }}
         >
           ⭐ Ver planes y precios

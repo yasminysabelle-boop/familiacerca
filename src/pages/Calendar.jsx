@@ -338,7 +338,7 @@ export default function Calendar() {
                         padding: '6px 16px', borderRadius: 20,
                         border: `1.5px solid ${form.status === opt.value ? opt.color : '#E5E7EB'}`,
                         background: form.status === opt.value ? opt.bg : 'white',
-                        color: form.status === opt.value ? opt.color : '#6B7280',
+                        color: form.status === opt.value ? opt.color : '#4E6470',
                         fontSize: 13, fontWeight: 600, cursor: 'pointer',
                         transition: 'all 0.15s',
                       }}
@@ -358,11 +358,11 @@ export default function Calendar() {
                     return (
                       <div key={url} style={{ position: 'relative' }}>
                         {isImg ? (
-                          <img src={url} alt="adjunto" style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 8, border: '1px solid #EDE5D8' }} />
+                          <img src={url} alt="adjunto" style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 8, border: '1px solid #E6E3DB' }} />
                         ) : (
-                          <div style={{ width: 64, height: 64, borderRadius: 8, border: '1px solid #EDE5D8', background: '#F9FAFB', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
+                          <div style={{ width: 64, height: 64, borderRadius: 8, border: '1px solid #E6E3DB', background: '#F9FAFB', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
                             <span style={{ fontSize: 22 }}>📄</span>
-                            <span style={{ fontSize: 9, color: '#6B7280', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 56, textAlign: 'center' }}>
+                            <span style={{ fontSize: 9, color: '#4E6470', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 56, textAlign: 'center' }}>
                               {url.split('/').pop()?.slice(0, 10)}
                             </span>
                           </div>
@@ -377,11 +377,11 @@ export default function Calendar() {
                   {attachFiles.map((af, i) => (
                     <div key={i} style={{ position: 'relative' }}>
                       {af.isImage ? (
-                        <img src={af.preview} alt={af.name} style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 8, border: '1px solid #EDE5D8' }} />
+                        <img src={af.preview} alt={af.name} style={{ width: 64, height: 64, objectFit: 'cover', borderRadius: 8, border: '1px solid #E6E3DB' }} />
                       ) : (
-                        <div style={{ width: 64, height: 64, borderRadius: 8, border: '1px solid #EDE5D8', background: '#F9FAFB', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
+                        <div style={{ width: 64, height: 64, borderRadius: 8, border: '1px solid #E6E3DB', background: '#F9FAFB', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
                           <span style={{ fontSize: 22 }}>📄</span>
-                          <span style={{ fontSize: 9, color: '#6B7280', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 56, textAlign: 'center' }}>
+                          <span style={{ fontSize: 9, color: '#4E6470', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 56, textAlign: 'center' }}>
                             {af.name.slice(0, 10)}
                           </span>
                         </div>
@@ -393,7 +393,7 @@ export default function Calendar() {
                     </div>
                   ))}
                   <button type="button" onClick={pickAttachment}
-                    style={{ width: 64, height: 64, borderRadius: 8, border: '2px dashed #D1D5DB', background: '#F9FAFB', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#9CA3AF', fontSize: 11, gap: 2 }}>
+                    style={{ width: 64, height: 64, borderRadius: 8, border: '2px dashed #D1D5DB', background: '#F9FAFB', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#5E7480', fontSize: 11, gap: 2 }}>
                     <span style={{ fontSize: 20 }}>📎</span>
                     Adjuntar
                   </button>
@@ -429,13 +429,13 @@ export default function Calendar() {
                   background: showPicker ? '#F3F4F6' : 'transparent',
                   border: 'none', cursor: 'pointer',
                   padding: '5px 12px', borderRadius: 10,
-                  fontWeight: 700, fontSize: 15, color: '#1A1A1A',
+                  fontWeight: 700, fontSize: 15, color: '#14303D',
                   transition: 'background 0.15s',
                 }}
               >
                 {MONTHS[month]} {year}
                 <span style={{
-                  fontSize: 9, color: '#9CA3AF',
+                  fontSize: 9, color: '#5E7480',
                   display: 'inline-block',
                   transform: showPicker ? 'rotate(180deg)' : 'none',
                   transition: 'transform 0.2s',
@@ -450,13 +450,13 @@ export default function Calendar() {
                     transform: 'translateX(-50%)',
                     zIndex: 50,
                     background: 'white', borderRadius: 16,
-                    border: '1px solid #EDE5D8',
+                    border: '1px solid #E6E3DB',
                     boxShadow: '0 8px 32px rgba(0,0,0,0.14)',
                     padding: 14, width: 272,
                   }}
                 >
                   {/* Month grid 3×4 */}
-                  <p style={{ fontSize: 10, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 8px 2px' }}>
+                  <p style={{ fontSize: 10, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 8px 2px' }}>
                     Mes
                   </p>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4, marginBottom: 14 }}>
@@ -466,8 +466,8 @@ export default function Calendar() {
                         onClick={() => { setMonth(i); setShowPicker(false) }}
                         style={{
                           padding: '7px 4px', borderRadius: 8, border: 'none',
-                          background: i === month ? '#087F70' : 'transparent',
-                          color: i === month ? 'white' : '#374151',
+                          background: i === month ? '#0C6C9C' : 'transparent',
+                          color: i === month ? 'white' : '#30454F',
                           fontWeight: i === month ? 700 : 400,
                           fontSize: 12, cursor: 'pointer',
                           transition: 'background 0.12s',
@@ -481,7 +481,7 @@ export default function Calendar() {
                   <div style={{ height: 1, background: '#F3F4F6', margin: '0 0 12px' }} />
 
                   {/* Year list scrollable */}
-                  <p style={{ fontSize: 10, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 8px 2px' }}>
+                  <p style={{ fontSize: 10, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 8px 2px' }}>
                     Año
                   </p>
                   <div
@@ -496,8 +496,8 @@ export default function Calendar() {
                         style={{
                           display: 'block', width: '100%',
                           padding: '7px 12px', border: 'none',
-                          background: y === year ? '#E8F6F3' : 'transparent',
-                          color: y === year ? '#087F70' : '#374151',
+                          background: y === year ? '#E3F1F8' : 'transparent',
+                          color: y === year ? '#0C6C9C' : '#30454F',
                           fontWeight: y === year ? 700 : 400,
                           fontSize: 13, textAlign: 'center',
                           cursor: 'pointer', borderRadius: 8,
@@ -601,11 +601,11 @@ export default function Calendar() {
                             const isImg = /\.(jpg|jpeg|png|gif|webp)(\?|$)/i.test(url)
                             return isImg ? (
                               <a key={i} href={url} target="_blank" rel="noreferrer">
-                                <img src={url} alt="adjunto" style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 6, border: '1px solid #EDE5D8' }} />
+                                <img src={url} alt="adjunto" style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 6, border: '1px solid #E6E3DB' }} />
                               </a>
                             ) : (
                               <a key={i} href={url} target="_blank" rel="noreferrer"
-                                style={{ width: 40, height: 40, borderRadius: 6, border: '1px solid #EDE5D8', background: '#F9FAFB', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }}>
+                                style={{ width: 40, height: 40, borderRadius: 6, border: '1px solid #E6E3DB', background: '#F9FAFB', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none' }}>
                                 <span style={{ fontSize: 18 }}>📄</span>
                               </a>
                             )
@@ -652,16 +652,16 @@ export default function Calendar() {
             maxWidth: 340, width: '100%',
             boxShadow: '0 20px 60px rgba(0,0,0,0.25)',
           }}>
-            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 17, fontWeight: 700, color: '#1A1A1A', marginBottom: 10 }}>
+            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 17, fontWeight: 700, color: '#14303D', marginBottom: 10 }}>
               ¿Eliminar este registro?
             </p>
-            <p style={{ fontSize: 13, color: '#6B7280', marginBottom: 24, lineHeight: 1.6 }}>
+            <p style={{ fontSize: 13, color: '#4E6470', marginBottom: 24, lineHeight: 1.6 }}>
               Esta acción no se puede deshacer.
             </p>
             <div style={{ display: 'flex', gap: 10 }}>
               <button
                 onClick={() => setConfirmDialog(null)}
-                style={{ flex: 1, padding: '12px', borderRadius: 12, border: '1.5px solid #EDE5D8', background: 'white', fontSize: 14, fontWeight: 600, color: '#374151', cursor: 'pointer' }}
+                style={{ flex: 1, padding: '12px', borderRadius: 12, border: '1.5px solid #E6E3DB', background: 'white', fontSize: 14, fontWeight: 600, color: '#30454F', cursor: 'pointer' }}
               >
                 Cancelar
               </button>

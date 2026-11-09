@@ -141,15 +141,15 @@ export default function VideoCallScheduleModal({ open, onClose }) {
           {/* Header */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{ width: 34, height: 34, borderRadius: 10, background: '#A8E5D6', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#065A50" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"></rect><path d="M3 10h18"></path><path d="M8 3v4"></path><path d="M16 3v4"></path></svg>
+              <div style={{ width: 34, height: 34, borderRadius: 10, background: '#A6E3EC', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0A5A82" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"></rect><path d="M3 10h18"></path><path d="M8 3v4"></path><path d="M16 3v4"></path></svg>
               </div>
-              <h2 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: '#334155', fontFamily: SANS }}>Programar llamada</h2>
+              <h2 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: '#2A4350', fontFamily: SANS }}>Programar llamada</h2>
             </div>
             <button
               onClick={onClose}
               aria-label="Cerrar"
-              style={{ width: 30, height: 30, borderRadius: '50%', border: 'none', background: '#F3F4F6', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6B7280', flexShrink: 0 }}
+              style={{ width: 30, height: 30, borderRadius: '50%', border: 'none', background: '#F3F4F6', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4E6470', flexShrink: 0 }}
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18"></path><path d="M6 6l12 12"></path></svg>
             </button>
@@ -166,22 +166,22 @@ export default function VideoCallScheduleModal({ open, onClose }) {
 
           <div style={{ display: 'flex', gap: 10 }}>
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
-              <label style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Fecha</label>
+              <label style={{ fontSize: 11, fontWeight: 700, color: '#4E6470', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Fecha</label>
               <input
                 type="date"
                 value={date}
                 min={minDate}
                 onChange={e => setDate(e.target.value)}
-                style={{ padding: '11px 13px', borderRadius: 12, border: '1.5px solid #EDE5D8', background: '#F8F4ED', fontSize: 14, color: '#334155', fontFamily: 'inherit' }}
+                style={{ padding: '11px 13px', borderRadius: 12, border: '1.5px solid #E6E3DB', background: '#F7F6F2', fontSize: 14, color: '#2A4350', fontFamily: 'inherit' }}
               />
             </div>
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
-              <label style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Hora</label>
+              <label style={{ fontSize: 11, fontWeight: 700, color: '#4E6470', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Hora</label>
               <input
                 type="time"
                 value={time}
                 onChange={e => setTime(e.target.value)}
-                style={{ padding: '11px 13px', borderRadius: 12, border: '1.5px solid #EDE5D8', background: '#F8F4ED', fontSize: 14, color: '#334155', fontFamily: 'inherit' }}
+                style={{ padding: '11px 13px', borderRadius: 12, border: '1.5px solid #E6E3DB', background: '#F7F6F2', fontSize: 14, color: '#2A4350', fontFamily: 'inherit' }}
               />
             </div>
           </div>
@@ -197,11 +197,11 @@ export default function VideoCallScheduleModal({ open, onClose }) {
             disabled={!date || !time || scheduling}
             style={{
               width: '100%', padding: 14, borderRadius: 15, border: 'none',
-              background: date && time && !scheduling ? '#087F70' : '#E5DED2',
-              color: date && time && !scheduling ? 'white' : '#9CA3AF',
+              background: date && time && !scheduling ? '#0C6C9C' : '#E5DED2',
+              color: date && time && !scheduling ? 'white' : '#5E7480',
               fontWeight: 800, fontSize: 15, fontFamily: 'inherit',
               cursor: date && time && !scheduling ? 'pointer' : 'default',
-              boxShadow: date && time && !scheduling ? '0 6px 18px rgba(8,127,112,0.35)' : 'none',
+              boxShadow: date && time && !scheduling ? '0 6px 18px rgba(12,108,156,0.35)' : 'none',
             }}
           >
             {scheduling ? 'Programando...' : 'Programar'}
@@ -215,18 +215,18 @@ export default function VideoCallScheduleModal({ open, onClose }) {
           padding: '0 20px calc(env(safe-area-inset-bottom) + 32px)',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 2 }}>
-            <div style={{ flex: 1, height: 1, background: '#EDE5D8' }} />
-            <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.08em', color: '#9CA3AF', textTransform: 'uppercase' }}>Programadas</span>
-            <div style={{ flex: 1, height: 1, background: '#EDE5D8' }} />
+            <div style={{ flex: 1, height: 1, background: '#E6E3DB' }} />
+            <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.08em', color: '#5E7480', textTransform: 'uppercase' }}>Programadas</span>
+            <div style={{ flex: 1, height: 1, background: '#E6E3DB' }} />
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {loadingCalls && (
-            <p style={{ textAlign: 'center', color: '#9CA3AF', fontSize: 13 }}>Cargando...</p>
+            <p style={{ textAlign: 'center', color: '#5E7480', fontSize: 13 }}>Cargando...</p>
           )}
           {!loadingCalls && upcomingCalls.length === 0 && (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: '26px 16px', border: '1.5px dashed #C9BFA9', borderRadius: 18 }}>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#065A50" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"></rect><path d="M3 10h18"></path><path d="M8 3v4"></path><path d="M16 3v4"></path></svg>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0A5A82" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"></rect><path d="M3 10h18"></path><path d="M8 3v4"></path><path d="M16 3v4"></path></svg>
               <span style={{ fontSize: 13.5, color: '#64748B', fontWeight: 600 }}>No hay llamadas programadas</span>
             </div>
           )}
@@ -238,17 +238,17 @@ export default function VideoCallScheduleModal({ open, onClose }) {
                 key={call.id}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 12,
-                  background: live ? '#EAF7EE' : '#F8F4ED',
-                  border: `1px solid ${live ? '#BFE5CC' : '#EDE5D8'}`,
+                  background: live ? '#EAF7EE' : '#F7F6F2',
+                  border: `1px solid ${live ? '#BFE5CC' : '#E6E3DB'}`,
                   borderRadius: 16, padding: '13px 14px',
                 }}
               >
-                <div style={{ width: 38, height: 38, borderRadius: 12, background: '#A8E5D6', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#065A50" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 8l5-3v14l-5-3"></path><rect x="2" y="6" width="13" height="12" rx="2.5"></rect></svg>
+                <div style={{ width: 38, height: 38, borderRadius: 12, background: '#A6E3EC', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#0A5A82" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 8l5-3v14l-5-3"></path><rect x="2" y="6" width="13" height="12" rx="2.5"></rect></svg>
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-                    <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#334155', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#2A4350', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {call.title}
                     </p>
                     {live && (
@@ -265,8 +265,8 @@ export default function VideoCallScheduleModal({ open, onClose }) {
                   onClick={() => joinCall(call)}
                   style={{
                     padding: '8px 15px', borderRadius: 11, border: 'none',
-                    background: (live || joinSoon) ? '#087F70' : 'transparent',
-                    color: (live || joinSoon) ? 'white' : '#9CA3AF',
+                    background: (live || joinSoon) ? '#0C6C9C' : 'transparent',
+                    color: (live || joinSoon) ? 'white' : '#5E7480',
                     fontWeight: (live || joinSoon) ? 800 : 700, fontSize: 12.5, fontFamily: 'inherit',
                     cursor: 'pointer', flexShrink: 0,
                   }}

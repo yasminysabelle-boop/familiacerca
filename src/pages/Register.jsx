@@ -57,7 +57,7 @@ export default function Register() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-[#F7F3ED] px-4 py-8">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#F7F6F2] px-4 py-8">
       <div className="w-full max-w-sm">
 
         {/* Brand */}
@@ -79,7 +79,7 @@ export default function Register() {
         {/* Form card */}
         <div
           className="bg-white rounded-3xl p-6"
-          style={{ boxShadow: '0 8px 40px rgba(0,0,0,0.09)', border: '1px solid #EDE5D8' }}
+          style={{ boxShadow: '0 8px 40px rgba(0,0,0,0.09)', border: '1px solid #E6E3DB' }}
         >
           <h2
             className="text-xl font-bold text-gray-900 mb-5"
@@ -110,9 +110,9 @@ export default function Register() {
                 onChange={handleChange}
                 placeholder="María García"
                 className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none transition-all"
-                style={{ border: '1.5px solid #EDE5D8', background: '#FDFAF7' }}
-                onFocus={e => { e.target.style.borderColor = '#087F70'; e.target.style.boxShadow = '0 0 0 3px rgba(8,127,112,0.1)' }}
-                onBlur={e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.boxShadow = 'none' }}
+                style={{ border: '1.5px solid #E6E3DB', background: '#FDFAF7' }}
+                onFocus={e => { e.target.style.borderColor = '#0C6C9C'; e.target.style.boxShadow = '0 0 0 3px rgba(12,108,156,0.1)' }}
+                onBlur={e => { e.target.style.borderColor = '#E6E3DB'; e.target.style.boxShadow = 'none' }}
               />
             </div>
 
@@ -128,9 +128,9 @@ export default function Register() {
                 onChange={handleChange}
                 placeholder="tu@correo.com"
                 className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none transition-all"
-                style={{ border: '1.5px solid #EDE5D8', background: '#FDFAF7' }}
-                onFocus={e => { e.target.style.borderColor = '#087F70'; e.target.style.boxShadow = '0 0 0 3px rgba(8,127,112,0.1)' }}
-                onBlur={e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.boxShadow = 'none' }}
+                style={{ border: '1.5px solid #E6E3DB', background: '#FDFAF7' }}
+                onFocus={e => { e.target.style.borderColor = '#0C6C9C'; e.target.style.boxShadow = '0 0 0 3px rgba(12,108,156,0.1)' }}
+                onBlur={e => { e.target.style.borderColor = '#E6E3DB'; e.target.style.boxShadow = 'none' }}
               />
             </div>
 
@@ -147,9 +147,9 @@ export default function Register() {
                   onChange={handleChange}
                   placeholder="Mínimo 6 caracteres"
                   className="w-full rounded-xl text-sm focus:outline-none transition-all"
-                  style={{ border: '1.5px solid #EDE5D8', background: '#FDFAF7', padding: '12px 44px 12px 16px', boxSizing: 'border-box', width: '100%' }}
-                  onFocus={e => { e.target.style.borderColor = '#087F70'; e.target.style.boxShadow = '0 0 0 3px rgba(8,127,112,0.1)' }}
-                  onBlur={e => { e.target.style.borderColor = '#EDE5D8'; e.target.style.boxShadow = 'none' }}
+                  style={{ border: '1.5px solid #E6E3DB', background: '#FDFAF7', padding: '12px 44px 12px 16px', boxSizing: 'border-box', width: '100%' }}
+                  onFocus={e => { e.target.style.borderColor = '#0C6C9C'; e.target.style.boxShadow = '0 0 0 3px rgba(12,108,156,0.1)' }}
+                  onBlur={e => { e.target.style.borderColor = '#E6E3DB'; e.target.style.boxShadow = 'none' }}
                 />
                 <button
                   type="button"
@@ -162,8 +162,8 @@ export default function Register() {
                   aria-label={showPw ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                 >
                   {showPw
-                    ? <EyeOff size={18} color="#9CA3AF" strokeWidth={1.5} />
-                    : <Eye    size={18} color="#9CA3AF" strokeWidth={1.5} />
+                    ? <EyeOff size={18} color="#5E7480" strokeWidth={1.5} />
+                    : <Eye    size={18} color="#5E7480" strokeWidth={1.5} />
                   }
                 </button>
               </div>
@@ -174,8 +174,8 @@ export default function Register() {
               disabled={loading}
               className="w-full py-3.5 text-white font-bold rounded-2xl text-sm transition-all active:scale-[0.97] disabled:opacity-60 mt-2"
               style={{
-                background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
-                boxShadow: '0 6px 20px rgba(8,127,112,0.35)',
+                background: 'linear-gradient(135deg, #0A5A82, #0A4A6B)',
+                boxShadow: '0 6px 20px rgba(12,108,156,0.35)',
               }}
             >
               {loading ? 'Creando cuenta...' : 'Comenzar prueba gratis →'}
@@ -186,7 +186,7 @@ export default function Register() {
           <div className="flex items-center justify-center gap-3 mt-4 flex-wrap">
             {BENEFITS.map(b => (
               <span key={b} className="flex items-center gap-1 text-[10px] text-gray-400 font-medium">
-                <span style={{ color: '#087F70' }}>✓</span> {b}
+                <span style={{ color: '#0C6C9C' }}>✓</span> {b}
               </span>
             ))}
           </div>
@@ -194,7 +194,7 @@ export default function Register() {
 
         <p className="mt-5 text-center text-sm text-gray-500">
           ¿Ya tienes cuenta?{' '}
-          <Link to="/login" className="font-semibold hover:underline" style={{ color: '#087F70' }}>
+          <Link to="/login" className="font-semibold hover:underline" style={{ color: '#0C6C9C' }}>
             Inicia sesión
           </Link>
         </p>

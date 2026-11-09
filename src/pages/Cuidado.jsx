@@ -34,11 +34,11 @@ function iconFor(key) { return ICON_BY_KEY[key] ?? Sparkle }
 
 const fieldStyle = {
   padding: '10px 14px', borderRadius: 12,
-  border: '1.5px solid rgba(51,65,85,0.12)', background: '#F8F4ED',
+  border: '1.5px solid rgba(51,65,85,0.12)', background: '#F7F6F2',
   fontSize: 14, fontWeight: 700, outline: 'none', boxSizing: 'border-box',
-  transition: 'all 0.15s', color: '#334155',
+  transition: 'all 0.15s', color: '#2A4350',
 }
-const onFocusStyle = e => { e.target.style.borderColor = '#087F70'; e.target.style.boxShadow = '0 0 0 3px rgba(8,127,112,0.12)' }
+const onFocusStyle = e => { e.target.style.borderColor = '#0C6C9C'; e.target.style.boxShadow = '0 0 0 3px rgba(12,108,156,0.12)' }
 const onBlurStyle  = e => { e.target.style.borderColor = 'rgba(51,65,85,0.12)'; e.target.style.boxShadow = 'none' }
 
 function getPeriodo(timeStr) {
@@ -268,13 +268,13 @@ export default function Cuidado() {
         @keyframes routineSpin { to { transform: rotate(360deg); } }
       `}</style>
 
-      <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', background: '#F8F4ED' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', background: '#F7F6F2' }}>
 
         {/* Header propio */}
         <header style={{
           display: 'flex', alignItems: 'center', gap: 12,
           padding: '12px 16px 13px', borderBottom: '1px solid rgba(51,65,85,0.09)',
-          flexShrink: 0, background: '#F8F4ED',
+          flexShrink: 0, background: '#F7F6F2',
         }}>
           <button
             onClick={goBack}
@@ -286,13 +286,13 @@ export default function Cuidado() {
               cursor: 'pointer', flexShrink: 0,
             }}
           >
-            <ChevronLeft size={17} color="#334155" strokeWidth={2.3} />
+            <ChevronLeft size={17} color="#2A4350" strokeWidth={2.3} />
           </button>
           <div style={{ minWidth: 0 }}>
-            <h1 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: '#334155', letterSpacing: '-0.01em' }}>
+            <h1 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: '#2A4350', letterSpacing: '-0.01em' }}>
               Rutina diaria
             </h1>
-            <p style={{ margin: '2px 0 0', fontFamily: "'Fraunces', Georgia, serif", fontStyle: 'italic', fontWeight: 500, fontSize: 14, color: '#087F70' }}>
+            <p style={{ margin: '2px 0 0', fontFamily: "'Fraunces', Georgia, serif", fontStyle: 'italic', fontWeight: 500, fontSize: 14, color: '#0C6C9C' }}>
               Cuidando a {patientFirstName}
             </p>
           </div>
@@ -304,21 +304,21 @@ export default function Cuidado() {
           <div style={{
             borderRadius: 22, padding: '18px 20px', marginBottom: 16,
             background: allDone
-              ? 'linear-gradient(135deg, #A8E5D6 0%, #F8F4ED 100%)'
-              : 'linear-gradient(135deg, #FBEAE4 0%, #F8F4ED 100%)',
+              ? 'linear-gradient(135deg, #A6E3EC 0%, #F7F6F2 100%)'
+              : 'linear-gradient(135deg, #FBEAE4 0%, #F7F6F2 100%)',
             boxShadow: allDone ? '0 8px 20px -10px #087F7055' : '0 8px 20px -10px #E9826E44',
             transition: 'background 0.4s ease',
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <span style={{
                 fontFamily: "'Fraunces', Georgia, serif", fontStyle: 'italic', fontWeight: 600,
-                fontSize: 17.5, color: '#055C51', lineHeight: 1.35,
+                fontSize: 17.5, color: '#0A5A82', lineHeight: 1.35,
               }}>
                 {bannerTitle}
               </span>
               {allDone && <Heart size={17} color="#E9826E" strokeWidth={2} filled />}
             </div>
-            <p style={{ fontSize: 13.5, color: '#334155', opacity: 0.85, marginTop: 6, lineHeight: 1.5 }}>
+            <p style={{ fontSize: 13.5, color: '#2A4350', opacity: 0.85, marginTop: 6, lineHeight: 1.5 }}>
               {bannerSub}
             </p>
           </div>
@@ -335,7 +335,7 @@ export default function Cuidado() {
                 style={{
                   flex: 1, padding: '10px 0', cursor: 'pointer', borderRadius: 999, border: 'none',
                   fontFamily: 'inherit', fontWeight: 700, fontSize: 13.5,
-                  background: activeTab === tab.id ? 'linear-gradient(148deg,#12A18C 0%,#0A8072 46%,#055C51 100%)' : 'white',
+                  background: activeTab === tab.id ? 'linear-gradient(148deg,#1677A6 0%,#0C6C9C 46%,#0A5A82 100%)' : 'white',
                   color: activeTab === tab.id ? '#FFFFFF' : '#5C6B78',
                   boxShadow: activeTab === tab.id ? '0 8px 16px -8px #087F7066' : '0 4px 10px -6px #087F7022',
                   transition: 'all 0.2s',
@@ -355,8 +355,8 @@ export default function Cuidado() {
                   background: 'white', border: '1px solid rgba(51,65,85,0.08)',
                   borderRadius: 12, padding: '10px 14px', marginBottom: 14,
                 }}>
-                  <Lock size={15} color="#6B7A88" strokeWidth={1.8} style={{ flexShrink: 0 }} />
-                  <p style={{ fontSize: 12, color: '#6B7A88', margin: 0 }}>
+                  <Lock size={15} color="#4E6470" strokeWidth={1.8} style={{ flexShrink: 0 }} />
+                  <p style={{ fontSize: 12, color: '#4E6470', margin: 0 }}>
                     Solo puedes ver el cuidado registrado por el cuidador.
                   </p>
                 </div>
@@ -366,7 +366,7 @@ export default function Cuidado() {
                 <div style={{ display: 'flex', justifyContent: 'center', padding: 48 }}>
                   <div style={{
                     width: 28, height: 28, borderRadius: '50%',
-                    border: '3px solid rgba(8,127,112,0.18)', borderTopColor: '#087F70',
+                    border: '3px solid rgba(12,108,156,0.18)', borderTopColor: '#0C6C9C',
                     animation: 'routineSpin 0.8s linear infinite',
                   }} />
                 </div>
@@ -375,7 +375,7 @@ export default function Cuidado() {
                   {retrasadas.length === 0 && proximas.length === 0 && sinHorario.length === 0 && completadas.length === 0 && (
                     <div style={{ marginTop: 8 }}>
                       <EmptyState
-                        icon={<CheckIcon size={40} color="#A8E5D6" strokeWidth={2} />}
+                        icon={<CheckIcon size={40} color="#A6E3EC" strokeWidth={2} />}
                         title="Sin rutinas registradas aún"
                         description="Las rutinas del día aparecerán aquí."
                       />
@@ -456,8 +456,8 @@ export default function Cuidado() {
                         style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8, paddingLeft: 2, cursor: 'pointer', userSelect: 'none' }}
                         onClick={() => setShowCompleted(s => !s)}
                       >
-                        <CheckIcon size={12} color="#087F70" strokeWidth={2.6} />
-                        <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#087F70' }}>
+                        <CheckIcon size={12} color="#0C6C9C" strokeWidth={2.6} />
+                        <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#0C6C9C' }}>
                           Completadas <span style={{ opacity: 0.7, fontWeight: 600 }}>({completadas.length})</span>
                         </span>
                         <span style={{ marginLeft: 'auto', color: '#94A0AD', fontSize: 13 }}>{showCompleted ? '▾' : '▸'}</span>
@@ -490,7 +490,7 @@ export default function Cuidado() {
           {/* ── HORARIOS TAB ── */}
           {activeTab === 'horarios' && (
             <div>
-              <p style={{ fontSize: 12.5, color: '#6B7A88', margin: '0 0 16px', lineHeight: 1.5 }}>
+              <p style={{ fontSize: 12.5, color: '#4E6470', margin: '0 0 16px', lineHeight: 1.5 }}>
                 Se avisa si no se marca 30 min después de la hora programada.
               </p>
 
@@ -500,8 +500,8 @@ export default function Cuidado() {
                   background: 'white', border: '1px solid rgba(51,65,85,0.08)',
                   borderRadius: 12, padding: '10px 14px', marginBottom: 16,
                 }}>
-                  <Lock size={15} color="#6B7A88" strokeWidth={1.8} style={{ flexShrink: 0 }} />
-                  <p style={{ fontSize: 12, color: '#6B7A88', margin: 0 }}>
+                  <Lock size={15} color="#4E6470" strokeWidth={1.8} style={{ flexShrink: 0 }} />
+                  <p style={{ fontSize: 12, color: '#4E6470', margin: 0 }}>
                     Solo el administrador puede cambiar los horarios.
                   </p>
                 </div>
@@ -511,7 +511,7 @@ export default function Cuidado() {
                 <div style={{ display: 'flex', justifyContent: 'center', padding: 48 }}>
                   <div style={{
                     width: 26, height: 26, borderRadius: '50%',
-                    border: '3px solid rgba(8,127,112,0.18)', borderTopColor: '#087F70',
+                    border: '3px solid rgba(12,108,156,0.18)', borderTopColor: '#0C6C9C',
                     animation: 'routineSpin 0.8s linear infinite',
                   }} />
                 </div>
@@ -525,13 +525,13 @@ export default function Cuidado() {
                           onClick={() => isAdmin && setOpenSchedKey(isOpen ? null : item.key)}
                           style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', cursor: isAdmin ? 'pointer' : 'default' }}
                         >
-                          <span style={{ width: 34, height: 34, borderRadius: 11, background: '#EAF7F3', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                            {iconFor(item.key)({ size: 16, color: '#087F70', strokeWidth: 1.8 })}
+                          <span style={{ width: 34, height: 34, borderRadius: 11, background: '#E3F1F8', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            {iconFor(item.key)({ size: 16, color: '#0C6C9C', strokeWidth: 1.8 })}
                           </span>
-                          <p style={{ flex: 1, fontSize: 14.5, fontWeight: 700, color: '#1E2C3A', margin: 0 }}>
+                          <p style={{ flex: 1, fontSize: 14.5, fontWeight: 700, color: '#14303D', margin: 0 }}>
                             {item.label}
                           </p>
-                          <span style={{ fontSize: 13.5, fontWeight: 700, color: '#08554A', background: '#EAF7F3', padding: '5px 11px', borderRadius: 999, flexShrink: 0 }}>
+                          <span style={{ fontSize: 13.5, fontWeight: 700, color: '#0A5A82', background: '#E3F1F8', padding: '5px 11px', borderRadius: 999, flexShrink: 0 }}>
                             {fmtTime(times[item.key] ?? item.scheduledTime)}
                           </span>
                         </div>
@@ -554,10 +554,10 @@ export default function Cuidado() {
 
                   <div style={{
                     display: 'flex', alignItems: 'flex-start', gap: 8,
-                    background: '#EAF7F3', borderRadius: 12, padding: '10px 14px', margin: '10px 0 20px',
+                    background: '#E3F1F8', borderRadius: 12, padding: '10px 14px', margin: '10px 0 20px',
                   }}>
-                    <Clock size={14} color="#087F70" strokeWidth={2} style={{ marginTop: 1, flexShrink: 0 }} />
-                    <p style={{ fontSize: 12, color: '#08554A', margin: 0, lineHeight: 1.5 }}>
+                    <Clock size={14} color="#0C6C9C" strokeWidth={2} style={{ marginTop: 1, flexShrink: 0 }} />
+                    <p style={{ fontSize: 12, color: '#0A5A82', margin: 0, lineHeight: 1.5 }}>
                       Los horarios aplican para toda la familia. Si un cuidado no se marca a tiempo,
                       aparece en <strong>Atrasadas</strong> dentro de Hoy.
                     </p>
@@ -575,7 +575,7 @@ export default function Cuidado() {
                       disabled={saving}
                       style={{
                         width: '100%', padding: '14px', borderRadius: 14, border: 'none', fontFamily: 'inherit',
-                        background: saved ? '#087F70' : saving ? '#C7D6D2' : 'linear-gradient(148deg,#12A18C 0%,#0A8072 46%,#055C51 100%)',
+                        background: saved ? '#0C6C9C' : saving ? '#C7D6D2' : 'linear-gradient(148deg,#1677A6 0%,#0C6C9C 46%,#0A5A82 100%)',
                         color: 'white', fontWeight: 700, fontSize: 14,
                         cursor: saving ? 'not-allowed' : 'pointer',
                         boxShadow: saving ? 'none' : '0 8px 18px -8px #087F7066',
@@ -653,7 +653,7 @@ function RoutineCard({ item, state, isToggling, isFamiliar, scheduledTime, log, 
   return (
     <div style={{
       display: 'flex', alignItems: 'center', gap: 12,
-      background: isCompletada ? '#EAF7F3' : 'white',
+      background: isCompletada ? '#E3F1F8' : 'white',
       borderRadius: 18, padding: '12px 14px',
       boxShadow: isRetrasada ? '0 6px 14px -8px #E9826E44' : isCompletada ? 'none' : '0 6px 14px -8px #087F7022',
       opacity: isToggling ? 0.6 : 1,
@@ -661,30 +661,30 @@ function RoutineCard({ item, state, isToggling, isFamiliar, scheduledTime, log, 
     }}>
       <span style={{
         width: 40, height: 40, borderRadius: 13, flexShrink: 0,
-        background: isRetrasada ? '#FBEAE4' : isCompletada ? 'rgba(8,127,112,0.14)' : '#EAF7F3',
+        background: isRetrasada ? '#FBEAE4' : isCompletada ? 'rgba(12,108,156,0.14)' : '#E3F1F8',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}>
-        {iconFor(item.key)({ size: 19, color: isRetrasada ? '#C4664F' : '#087F70', strokeWidth: 1.8 })}
+        {iconFor(item.key)({ size: 19, color: isRetrasada ? '#C4664F' : '#0C6C9C', strokeWidth: 1.8 })}
       </span>
 
       <div style={{ flex: 1, minWidth: 0 }}>
         <p style={{
           fontSize: 14.5, fontWeight: 700, margin: 0, lineHeight: 1.3,
-          color: isCompletada ? '#94A0AD' : '#1E2C3A',
+          color: isCompletada ? '#94A0AD' : '#14303D',
           textDecoration: isCompletada ? 'line-through' : 'none',
         }}>
           {item.label}
         </p>
 
         {isCompletada && checkedTime && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 3, fontSize: 11.5, fontWeight: 700, color: '#087F70' }}>
-            <CheckIcon size={11} color="#087F70" strokeWidth={2.6} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 3, fontSize: 11.5, fontWeight: 700, color: '#0C6C9C' }}>
+            <CheckIcon size={11} color="#0C6C9C" strokeWidth={2.6} />
             {checkedTime}{log?.checked_by ? ` · ${log.checked_by.split(' ')[0]}` : ''}
           </div>
         )}
         {!isCompletada && scheduledTime && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 3, fontSize: 11.5, color: '#6B7A88', fontWeight: 600 }}>
-            <Clock size={11} color="#6B7A88" strokeWidth={2.2} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 3, fontSize: 11.5, color: '#4E6470', fontWeight: 600 }}>
+            <Clock size={11} color="#4E6470" strokeWidth={2.2} />
             {fmtTime(scheduledTime)}
           </div>
         )}
@@ -717,8 +717,8 @@ function RoutineCard({ item, state, isToggling, isFamiliar, scheduledTime, log, 
         aria-label={isCompletada ? 'Desmarcar' : 'Marcar como hecho'}
         style={{
           width: 44, height: 44, borderRadius: '50%', flexShrink: 0, padding: 0,
-          border: `2.5px solid ${isCompletada ? '#087F70' : isRetrasada ? '#F0B4A2' : '#A8E5D6'}`,
-          background: isCompletada ? '#087F70' : 'white',
+          border: `2.5px solid ${isCompletada ? '#0C6C9C' : isRetrasada ? '#F0B4A2' : '#A6E3EC'}`,
+          background: isCompletada ? '#0C6C9C' : 'white',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           cursor: isFamiliar ? 'default' : 'pointer',
           position: 'relative',
@@ -727,15 +727,15 @@ function RoutineCard({ item, state, isToggling, isFamiliar, scheduledTime, log, 
       >
         {justCompleted && (
           <span style={{
-            position: 'absolute', inset: -4, borderRadius: '50%', border: '2px solid #087F70',
+            position: 'absolute', inset: -4, borderRadius: '50%', border: '2px solid #0C6C9C',
             animation: 'routinePulseRing 0.55s ease-out',
           }} />
         )}
         {isToggling ? (
           <div style={{
             width: 16, height: 16, borderRadius: '50%',
-            border: `2px solid ${isCompletada ? 'rgba(255,255,255,0.4)' : 'rgba(8,127,112,0.25)'}`,
-            borderTopColor: isCompletada ? 'white' : '#087F70',
+            border: `2px solid ${isCompletada ? 'rgba(255,255,255,0.4)' : 'rgba(12,108,156,0.25)'}`,
+            borderTopColor: isCompletada ? 'white' : '#0C6C9C',
             animation: 'routineSpin 0.6s linear infinite',
           }} />
         ) : isCompletada ? (

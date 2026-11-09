@@ -213,7 +213,7 @@ function Splash({ toLogin, onDone }) {
     <div
       style={{
         position: 'fixed', inset: 0, zIndex: 9999, overflow: 'hidden',
-        background: '#F8F4ED',
+        background: '#F7F6F2',
         opacity: phase === 'fade' ? 0 : 1,
         transition: 'opacity 0.5s ease-out',
         pointerEvents: phase === 'enter' ? 'all' : 'none',
@@ -224,7 +224,7 @@ function Splash({ toLogin, onDone }) {
           en index.css se ocupa del timing y de prefers-reduced-motion) */}
       <div className="animate-splash-bg-teal" style={{
         position: 'absolute', inset: 0,
-        background: 'linear-gradient(148deg, #12A18C 0%, #0A8072 46%, #055C51 100%)',
+        background: 'linear-gradient(148deg, #1677A6 0%, #0C6C9C 46%, #0A5A82 100%)',
       }} />
 
       {/* Foto + degradado — mismo encuadre que Login.jsx (60vh, center 42%)
@@ -260,7 +260,7 @@ function Splash({ toLogin, onDone }) {
 
           <div style={{ textAlign: 'center', marginTop: 22 }}>
             <p className="animate-splash-word" style={{
-              color: '#143C32',
+              color: '#0A4A6B',
               fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
               fontSize: 30, fontWeight: 800,
               letterSpacing: '-0.4px', lineHeight: 1,
@@ -269,7 +269,7 @@ function Splash({ toLogin, onDone }) {
               FamiliaCerca
             </p>
             <p className="animate-splash-tag" style={{
-              color: '#6B7280',
+              color: '#4E6470',
               fontSize: 16, fontWeight: 400,
               letterSpacing: '0.06em',
               margin: '12px 0 0',

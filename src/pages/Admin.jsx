@@ -15,11 +15,11 @@ const SANS = "'Plus Jakarta Sans', system-ui, sans-serif"
 // Marca de agua decorativa — mismo trazo SVG que las demás pantallas migradas.
 const WATERMARK_PATHS = (
   <>
-    <path d="M200 330 C 60 240, 30 140, 110 90 C 160 60, 195 90, 200 130 C 205 90, 240 60, 290 90 C 370 140, 340 240, 200 330 Z" fill="#087F70" />
-    <circle cx="165" cy="165" r="22" fill="#F8F4ED" />
-    <path d="M130 230 C 130 195, 200 195, 200 230 L 200 245 L 130 245 Z" fill="#F8F4ED" />
-    <circle cx="235" cy="165" r="22" fill="#F8F4ED" />
-    <path d="M200 230 C 200 195, 270 195, 270 230 L 270 245 L 200 245 Z" fill="#F8F4ED" />
+    <path d="M200 330 C 60 240, 30 140, 110 90 C 160 60, 195 90, 200 130 C 205 90, 240 60, 290 90 C 370 140, 340 240, 200 330 Z" fill="#0C6C9C" />
+    <circle cx="165" cy="165" r="22" fill="#F7F6F2" />
+    <path d="M130 230 C 130 195, 200 195, 200 230 L 200 245 L 130 245 Z" fill="#F7F6F2" />
+    <circle cx="235" cy="165" r="22" fill="#F7F6F2" />
+    <path d="M200 230 C 200 195, 270 195, 270 230 L 270 245 L 200 245 Z" fill="#F7F6F2" />
   </>
 )
 
@@ -49,7 +49,7 @@ export default function Admin() {
     return (
       <Layout>
         <div style={{ display: 'flex', justifyContent: 'center', padding: 48 }}>
-          <p style={{ color: '#9CA3AF', fontSize: 14 }}>Verificando acceso...</p>
+          <p style={{ color: '#5E7480', fontSize: 14 }}>Verificando acceso...</p>
         </div>
       </Layout>
     )
@@ -75,18 +75,18 @@ export default function Admin() {
           </div>
           <h2 style={{
             fontFamily: SANS, fontSize: 20, fontWeight: 700,
-            color: '#1A1A1A', margin: '0 0 10px',
+            color: '#14303D', margin: '0 0 10px',
           }}>
             Acceso restringido
           </h2>
-          <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.6, margin: '0 0 24px', maxWidth: 300 }}>
+          <p style={{ fontSize: 14, color: '#4E6470', lineHeight: 1.6, margin: '0 0 24px', maxWidth: 300 }}>
             El panel de administración solo está disponible para el administrador de la familia — quien creó la cuenta.
           </p>
           <button
             onClick={() => navigate('/dashboard')}
             style={{
               padding: '12px 28px', borderRadius: 12, border: 'none',
-              background: '#087F70', color: 'white', fontWeight: 700,
+              background: '#0C6C9C', color: 'white', fontWeight: 700,
               fontSize: 14, cursor: 'pointer',
             }}
           >
@@ -110,14 +110,14 @@ export default function Admin() {
 
         {/* Header */}
         <div style={{
-          background: '#FFFFFF', border: '1px solid #EDE5D8',
+          background: '#FFFFFF', border: '1px solid #E6E3DB',
           borderRadius: 20, padding: '20px', marginBottom: 20,
           boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
           display: 'flex', alignItems: 'center', gap: 14,
         }}>
           <div style={{
             width: 52, height: 52, borderRadius: '50%',
-            background: '#A8E5D6',
+            background: '#A6E3EC',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: 24, flexShrink: 0,
           }}>
@@ -125,12 +125,12 @@ export default function Admin() {
           </div>
           <div style={{ minWidth: 0 }}>
             <p style={{
-              color: '#334155', fontSize: 17, fontWeight: 800,
+              color: '#2A4350', fontSize: 17, fontWeight: 800,
               fontFamily: SANS, margin: 0, lineHeight: 1.2,
             }}>
               Panel de administración
             </p>
-            <p style={{ color: '#9CA3AF', fontSize: 12, margin: '4px 0 0' }}>
+            <p style={{ color: '#5E7480', fontSize: 12, margin: '4px 0 0' }}>
               {user?.user_metadata?.full_name ?? user?.email} · Administrador
             </p>
           </div>
@@ -147,8 +147,8 @@ export default function Admin() {
               onClick={() => setActiveTab(t.id)}
               style={{
                 padding: '10px 4px', borderRadius: 12, border: 'none',
-                background: activeTab === t.id ? '#087F70' : '#F3F4F6',
-                color: activeTab === t.id ? 'white' : '#6B7280',
+                background: activeTab === t.id ? '#0C6C9C' : '#F3F4F6',
+                color: activeTab === t.id ? 'white' : '#4E6470',
                 fontWeight: 700, fontSize: 11, cursor: 'pointer',
                 display: 'flex', flexDirection: 'column',
                 alignItems: 'center', gap: 3,

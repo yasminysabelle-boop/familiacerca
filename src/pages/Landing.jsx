@@ -11,16 +11,16 @@ const COMO_IMG = '/images/como.jpg'
 const CTA_IMG  = '/images/cta.jpg'
 const MILO_LUNA_IMG = '/images/milo-luna.webp'
 
-const PRIMARY = '#087F70'
-const ACTION  = '#087F70'
-const CREAM   = '#F8F4ED'
-const SAND    = '#EDE5D8'
+const PRIMARY = '#0C6C9C'
+const ACTION  = '#0C6C9C'
+const CREAM   = '#F7F6F2'
+const SAND    = '#E6E3DB'
 const GOLD    = '#E9826E'
 const CORAL   = '#E9826E'
-const MINT_C  = '#EBF3EE'
-const DARK    = '#087F70'
+const MINT_C  = '#E3F1F8'
+const DARK    = '#0C6C9C'
 const WHITE   = '#FFFFFF'
-const BORDER  = 'rgba(13,107,99,0.12)'
+const BORDER  = 'rgba(10,90,130,0.12)'
 const CORAL_EMERGENCY = '#D9534F'
 const AI_PURPLE = '#7566D8'
 
@@ -46,10 +46,10 @@ function CTABtn({ to, children, style = {} }) {
 
 function FAQItem({ q, a, light = false, onTrack }) {
   const [open, setOpen] = useState(false)
-  const textColor   = light ? '#087F70' : 'rgba(255,255,255,0.82)'
-  const answerColor = light ? '#6B7280' : 'rgba(255,255,255,0.50)'
-  const borderColor = light ? 'rgba(13,107,99,0.18)' : `rgba(233,130,110,0.12)`
-  const iconBorder  = light ? 'rgba(13,107,99,0.35)' : `rgba(233,130,110,0.40)`
+  const textColor   = light ? '#0C6C9C' : 'rgba(255,255,255,0.82)'
+  const answerColor = light ? '#4E6470' : 'rgba(255,255,255,0.50)'
+  const borderColor = light ? 'rgba(10,90,130,0.18)' : `rgba(233,130,110,0.12)`
+  const iconBorder  = light ? 'rgba(10,90,130,0.35)' : `rgba(233,130,110,0.40)`
   const toggle = () => {
     const next = !open
     setOpen(next)
@@ -78,24 +78,24 @@ function PriceCard({ name, price, annualPrice, period, highlight, badge, groups,
   return (
     <div
       className={`price-card-hover${highlight ? ' price-card-highlighted' : ''}`}
-      style={{ flex: '1 1 280px', borderRadius: 24, background: highlight ? '#075F55' : WHITE, padding: '44px 32px', boxShadow: highlight ? '0 32px 96px rgba(13,107,99,0.35)' : '0 4px 28px rgba(0,0,0,0.07)', border: highlight ? 'none' : `1px solid ${BORDER}`, position: 'relative', display: 'flex', flexDirection: 'column' }}
+      style={{ flex: '1 1 280px', borderRadius: 24, background: highlight ? '#0A5A82' : WHITE, padding: '44px 32px', boxShadow: highlight ? '0 32px 96px rgba(10,90,130,0.35)' : '0 4px 28px rgba(0,0,0,0.07)', border: highlight ? 'none' : `1px solid ${BORDER}`, position: 'relative', display: 'flex', flexDirection: 'column' }}
     >
       {badge && (
         <div className={highlight ? 'badge-pulse-anim' : ''} style={{ position: 'absolute', top: -16, left: '50%', transform: 'translateX(-50%)', background: GOLD, color: 'white', fontSize: 12, fontWeight: 500, letterSpacing: '0.12em', padding: '6px 22px', borderRadius: 9999, whiteSpace: 'nowrap', fontFamily: SANS }}>{badge}</div>
       )}
       <p style={{ fontSize: 'clamp(16px,1.2vw,19px)', fontWeight: 500, color: highlight ? 'rgba(255,255,255,0.8)' : ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 12px', fontFamily: SANS }}>{name}</p>
-      {tagline && <p style={{ fontSize: 14, color: highlight ? 'rgba(255,255,255,0.65)' : '#6B7280', margin: '0 0 16px', fontFamily: SANS, fontWeight: 400, lineHeight: 1.4 }}>{tagline}</p>}
+      {tagline && <p style={{ fontSize: 14, color: highlight ? 'rgba(255,255,255,0.65)' : '#4E6470', margin: '0 0 16px', fontFamily: SANS, fontWeight: 400, lineHeight: 1.4 }}>{tagline}</p>}
       <div style={{ marginBottom: 4, display: 'flex', alignItems: 'baseline', gap: 6 }}>
         <span style={{ fontSize: 52, fontWeight: 700, color: highlight ? 'white' : DARK, fontFamily: SERIF, lineHeight: 1 }}>{price === 0 ? 'Gratis' : `$${displayPrice}`}</span>
-        {price > 0 && <span style={{ fontSize: 13, color: highlight ? 'rgba(255,255,255,0.45)' : '#6B7280', fontFamily: SANS }}>/mes</span>}
+        {price > 0 && <span style={{ fontSize: 13, color: highlight ? 'rgba(255,255,255,0.45)' : '#4E6470', fontFamily: SANS }}>/mes</span>}
       </div>
       {annual && price > 0 && (
         <div style={{ marginBottom: 4, display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontSize: 12, color: highlight ? 'rgba(255,255,255,0.30)' : '#6B7280', textDecoration: 'line-through', fontFamily: SANS }}>${price}/mes</span>
+          <span style={{ fontSize: 12, color: highlight ? 'rgba(255,255,255,0.30)' : '#4E6470', textDecoration: 'line-through', fontFamily: SANS }}>${price}/mes</span>
           <span style={{ fontSize: 12, background: MINT_C, color: DARK, borderRadius: 4, padding: '2px 8px', fontFamily: SANS, fontWeight: 500 }}>2 meses gratis</span>
         </div>
       )}
-      <p style={{ fontSize: 13, color: highlight ? 'rgba(255,255,255,0.45)' : '#6B7280', margin: '0 0 28px', fontFamily: SANS, fontWeight: 300 }}>{annual && price > 0 ? `$${annualPrice} facturado al año` : period}</p>
+      <p style={{ fontSize: 13, color: highlight ? 'rgba(255,255,255,0.45)' : '#4E6470', margin: '0 0 28px', fontFamily: SANS, fontWeight: 300 }}>{annual && price > 0 ? `$${annualPrice} facturado al año` : period}</p>
       <div style={{ margin: '0 0 32px', flex: 1 }}>
         {groups.map(g => (
           <div key={g.label} style={{ marginBottom: 18 }}>
@@ -104,7 +104,7 @@ function PriceCard({ name, price, annualPrice, period, highlight, badge, groups,
               {g.items.map((item, i) => (
                 <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 'clamp(14px,1vw,16px)', lineHeight: 1.5, fontFamily: SANS, fontWeight: 300 }}>
                   <span style={{ color: highlight ? GOLD : ACTION, flexShrink: 0, fontWeight: 700 }}>✓</span>
-                  <span style={{ color: highlight ? 'rgba(255,255,255,0.80)' : '#6B7280' }}>{item}</span>
+                  <span style={{ color: highlight ? 'rgba(255,255,255,0.80)' : '#4E6470' }}>{item}</span>
                 </li>
               ))}
             </ul>
@@ -249,24 +249,24 @@ export default function Landing() {
     <div style={{ background: WHITE, color: DARK, overflowX: 'hidden', fontFamily: SANS }}>
 
       {/* ─────────────── 1. NAV ─────────────── */}
-      <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: '#F8F4ED', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(20,60,50,0.08)', boxShadow: '0 1px 8px rgba(20,60,50,0.06)' }}>
+      <nav style={{ position: 'sticky', top: 0, zIndex: 100, background: '#F7F6F2', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(20,60,50,0.08)', boxShadow: '0 1px 8px rgba(20,60,50,0.06)' }}>
         <div style={{ maxWidth: 1440, margin: '0 auto', padding: '20px 2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24 }}>
           <div style={{ display:'flex', alignItems:'center', gap:'12px', flexShrink: 0 }}>
             <img src="/logo.png" alt="FamiliaCerca" style={{ width: 44, height: 44, objectFit: 'contain', display: 'block' }} />
             <span style={{ fontFamily:"'Plus Jakarta Sans', sans-serif", fontWeight:700, margin:0, padding:0 }}>
-              <span style={{ color:'#087F70', fontSize:'26px' }}>Familia</span>
+              <span style={{ color:'#0C6C9C', fontSize:'26px' }}>Familia</span>
               <span style={{ color:'#E9826E', fontSize:'26px' }}>Cerca</span>
             </span>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 36 }} className="landing-desktop-nav">
             {navLinks.map(l => (
-              <a key={l.href} href={l.href} style={{ fontSize: 'clamp(17px,1.4vw,19px)', fontWeight: 600, color: '#087F70', textDecoration: 'none', fontFamily: SANS }}
+              <a key={l.href} href={l.href} style={{ fontSize: 'clamp(17px,1.4vw,19px)', fontWeight: 600, color: '#0C6C9C', textDecoration: 'none', fontFamily: SANS }}
                 onMouseEnter={e => e.currentTarget.style.color = '#E9826E'}
-                onMouseLeave={e => e.currentTarget.style.color = '#087F70'}
+                onMouseLeave={e => e.currentTarget.style.color = '#0C6C9C'}
               >{l.label}</a>
             ))}
-            <Link to="/login" className="btn-nav-cream" style={{ padding: '10px 28px', borderRadius: 9999, border: '1.5px solid #087F70', background: 'transparent', color: '#087F70', fontWeight: 500, fontSize: 16, textDecoration: 'none', fontFamily: SANS }}>
+            <Link to="/login" className="btn-nav-cream" style={{ padding: '10px 28px', borderRadius: 9999, border: '1.5px solid #0C6C9C', background: 'transparent', color: '#0C6C9C', fontWeight: 500, fontSize: 16, textDecoration: 'none', fontFamily: SANS }}>
               Iniciar sesión
             </Link>
           </div>
@@ -274,19 +274,19 @@ export default function Landing() {
           <button onClick={() => setMobileMenuOpen(o => !o)} className="landing-hamburger"
             style={{ display: 'none', background: 'none', border: 'none', cursor: 'pointer', padding: 8, flexDirection: 'column', gap: 5 }}
             aria-label="Menú">
-            {[0,1,2].map(i => <div key={i} style={{ width: 22, height: 1.5, background: '#087F70', borderRadius: 2 }} />)}
+            {[0,1,2].map(i => <div key={i} style={{ width: 22, height: 1.5, background: '#0C6C9C', borderRadius: 2 }} />)}
           </button>
         </div>
 
         {mobileMenuOpen && (
-          <div style={{ padding: '12px 32px 24px', display: 'flex', flexDirection: 'column', gap: 2, borderTop: '1px solid rgba(20,60,50,0.08)', background: '#F8F4ED' }}>
+          <div style={{ padding: '12px 32px 24px', display: 'flex', flexDirection: 'column', gap: 2, borderTop: '1px solid rgba(20,60,50,0.08)', background: '#F7F6F2' }}>
             {navLinks.map(l => (
               <a key={l.href} href={l.href} onClick={() => setMobileMenuOpen(false)}
-                style={{ padding: '13px 8px', fontSize: 17, color: '#087F70', textDecoration: 'none', fontFamily: SANS }}>
+                style={{ padding: '13px 8px', fontSize: 17, color: '#0C6C9C', textDecoration: 'none', fontFamily: SANS }}>
                 {l.label}
               </a>
             ))}
-            <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="btn-nav-cream" style={{ marginTop: 10, padding: '16px', borderRadius: 9999, textAlign: 'center', border: '1.5px solid #087F70', background: 'transparent', color: '#087F70', fontWeight: 500, fontSize: 16, textDecoration: 'none', fontFamily: SANS }}>
+            <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="btn-nav-cream" style={{ marginTop: 10, padding: '16px', borderRadius: 9999, textAlign: 'center', border: '1.5px solid #0C6C9C', background: 'transparent', color: '#0C6C9C', fontWeight: 500, fontSize: 16, textDecoration: 'none', fontFamily: SANS }}>
               Iniciar sesión
             </Link>
           </div>
@@ -298,10 +298,10 @@ export default function Landing() {
 
         {/* Left dark panel */}
         <div className="landing-hero-text" style={{ background: PRIMARY, position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: 'clamp(80px,8vw,120px) clamp(32px,5vw,72px)', overflow: 'hidden', textAlign: 'center' }}>
-          <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'radial-gradient(ellipse 70% 55% at 30% 55%, rgba(13,107,99,0.22) 0%, transparent 70%)' }} />
+          <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'radial-gradient(ellipse 70% 55% at 30% 55%, rgba(10,90,130,0.22) 0%, transparent 70%)' }} />
 
           <div style={{ position: 'relative', width: '100%', maxWidth: 620, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <div className="hero-reveal hero-delay-1" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, border: '1px solid rgba(13,107,99,0.40)', borderRadius: 9999, padding: '7px 18px', marginBottom: 36, background: 'rgba(13,107,99,0.14)' }}>
+            <div className="hero-reveal hero-delay-1" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, border: '1px solid rgba(10,90,130,0.40)', borderRadius: 9999, padding: '7px 18px', marginBottom: 36, background: 'rgba(10,90,130,0.14)' }}>
               <span style={{ fontSize: 13 }}>🌿</span>
               <span style={{ fontSize: 14, fontWeight: 500, color: MINT_C, letterSpacing: '0.06em', fontFamily: SANS }}>Cuidado familiar coordinado</span>
             </div>
@@ -343,18 +343,18 @@ export default function Landing() {
           {/* Floating status card */}
           <div className="hero-reveal hero-delay-4" style={{
             position:'absolute', bottom:'2.2rem', right:'1.5rem',
-            background:'#F8F4ED', borderRadius:'26px',
-            border: '1px solid rgba(8,127,112,0.15)',
+            background:'#F7F6F2', borderRadius:'26px',
+            border: '1px solid rgba(12,108,156,0.15)',
             padding:'26px 30px', boxShadow:'0 20px 60px rgba(20,60,50,0.28)',
             minWidth:'300px', maxWidth:'360px', zIndex: 4
           }}>
             <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'16px'}}>
-              <div style={{width:48,height:48,borderRadius:'50%',background:'#EBF3EE',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'22px'}}>👵</div>
+              <div style={{width:48,height:48,borderRadius:'50%',background:'#E3F1F8',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'22px'}}>👵</div>
               <div>
-                <div style={{fontWeight:700,fontSize:'17px',color:'#087F70'}}>Deborah</div>
+                <div style={{fontWeight:700,fontSize:'17px',color:'#0C6C9C'}}>Deborah</div>
                 <div style={{display:'flex',alignItems:'center',gap:'5px',marginTop:'2px'}}>
-                  <div style={{width:8,height:8,borderRadius:'50%',background:'#087F70'}}></div>
-                  <span style={{fontSize:'13px',color:'#087F70',fontWeight:600}}>Todo al día</span>
+                  <div style={{width:8,height:8,borderRadius:'50%',background:'#0C6C9C'}}></div>
+                  <span style={{fontSize:'13px',color:'#0C6C9C',fontWeight:600}}>Todo al día</span>
                 </div>
               </div>
             </div>
@@ -365,12 +365,12 @@ export default function Landing() {
             ].map((item,i)=>(
               <div key={i} style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'9px'}}>
                 <span style={{fontSize:'16px'}}>{item.icon}</span>
-                <span style={{fontSize:'13px',color:'#087F70',opacity:0.8}}>{item.text}</span>
-                <span style={{marginLeft:'auto',color:'#087F70',fontSize:'13px',fontWeight:700}}>✓</span>
+                <span style={{fontSize:'13px',color:'#0C6C9C',opacity:0.8}}>{item.text}</span>
+                <span style={{marginLeft:'auto',color:'#0C6C9C',fontSize:'13px',fontWeight:700}}>✓</span>
               </div>
             ))}
-            <div style={{borderTop:'1px solid rgba(8,127,112,0.1)',marginTop:'10px',paddingTop:'10px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-              <span style={{fontSize:'13px',color:'#087F70',opacity:0.6}}>Actualizado por Rosa</span>
+            <div style={{borderTop:'1px solid rgba(12,108,156,0.1)',marginTop:'10px',paddingTop:'10px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+              <span style={{fontSize:'13px',color:'#0C6C9C',opacity:0.6}}>Actualizado por Rosa</span>
               <span style={{fontSize:'13px',color:'#E9826E',fontWeight:600}}>Hace 15 min</span>
             </div>
           </div>
@@ -401,13 +401,13 @@ export default function Landing() {
           </div>
           <div className="antes-ahora-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 22 }}>
             {antesAhora.map((c, i) => (
-              <div key={c.title} className={`reveal reveal-delay-${i} card-hover-lift`} style={{ background: WHITE, borderRadius: 20, border: `1px solid ${BORDER}`, boxShadow: '0 4px 20px rgba(13,107,99,0.06)', overflow: 'hidden' }}>
+              <div key={c.title} className={`reveal reveal-delay-${i} card-hover-lift`} style={{ background: WHITE, borderRadius: 20, border: `1px solid ${BORDER}`, boxShadow: '0 4px 20px rgba(10,90,130,0.06)', overflow: 'hidden' }}>
                 <div style={{ fontSize: 26, padding: '22px 22px 0' }}>{c.icon}</div>
                 <p style={{ fontFamily: SERIF, fontSize: 15.5, fontWeight: 700, color: PRIMARY, padding: '8px 22px 18px', margin: 0 }}>{c.title}</p>
                 <div className="antes-ahora-split" style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'stretch' }}>
                   <div style={{ padding: '16px 18px 22px', background: 'rgba(107,114,128,0.06)' }}>
-                    <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#9CA3AF', margin: '0 0 8px' }}>Antes</p>
-                    <p style={{ fontSize: 'clamp(14px,1.3vw,17px)', color: '#6B7280', lineHeight: 1.55, margin: 0, fontFamily: SANS }}>{c.before}</p>
+                    <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#5E7480', margin: '0 0 8px' }}>Antes</p>
+                    <p style={{ fontSize: 'clamp(14px,1.3vw,17px)', color: '#4E6470', lineHeight: 1.55, margin: 0, fontFamily: SANS }}>{c.before}</p>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: CORAL, fontSize: 16, background: WHITE, padding: '0 14px' }}>→</div>
                   <div style={{ padding: '16px 18px 22px', background: MINT_C }}>
@@ -460,10 +460,10 @@ export default function Landing() {
                 <div style={{ width: 40, height: 40, borderRadius: '50%', flexShrink: 0, background: `linear-gradient(135deg, ${AI_PURPLE}, #A79AEA)`, color: WHITE, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>✨</div>
                 <div>
                   <div style={{ fontSize: 13.5, fontWeight: 700, color: '#4B3F9E', fontFamily: SANS }}>Milo</div>
-                  <div style={{ fontSize: 11, color: '#6B7280', marginTop: 1, fontFamily: SANS }}>Hoy, 7:32 AM</div>
+                  <div style={{ fontSize: 11, color: '#4E6470', marginTop: 1, fontFamily: SANS }}>Hoy, 7:32 AM</div>
                 </div>
               </div>
-              <p style={{ fontSize: 14, lineHeight: 1.75, color: '#334155', margin: '0 0 16px', fontFamily: SANS }}>
+              <p style={{ fontSize: 14, lineHeight: 1.75, color: '#2A4350', margin: '0 0 16px', fontFamily: SANS }}>
                 &ldquo;Buenos días. Ya revisé todo lo de Deborah. Esto es lo importante hoy: tomó sus tres medicamentos a tiempo. No hay eventos nuevos registrados. La cita del jueves sigue en pie.&rdquo;
               </p>
               <div style={{ marginTop: 14, paddingTop: 13, borderTop: '1px solid rgba(117,102,216,0.14)', fontSize: 11, color: '#8A80C4', textAlign: 'center', fontStyle: 'italic', lineHeight: 1.5, fontFamily: SANS }}>
@@ -476,10 +476,10 @@ export default function Landing() {
             <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(28px,3.9vw,50px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.18, margin: '0 0 18px' }}>
               Un resumen que dice exactamente lo que pasó
             </h2>
-            <p style={{ fontSize: 'clamp(16px,1.5vw,20px)', color: '#6B7280', lineHeight: 1.78, margin: '0 0 14px', fontFamily: SANS, fontWeight: 300 }}>
+            <p style={{ fontSize: 'clamp(16px,1.5vw,20px)', color: '#4E6470', lineHeight: 1.78, margin: '0 0 14px', fontFamily: SANS, fontWeight: 300 }}>
               Cada mañana, Milo revisa la actividad real del día — medicamentos, rutinas, notas, citas e historial — y te la resume con sus propias palabras.
             </p>
-            <p style={{ fontSize: 'clamp(16px,1.5vw,20px)', color: '#6B7280', lineHeight: 1.78, margin: 0, fontFamily: SANS, fontWeight: 300 }}>
+            <p style={{ fontSize: 'clamp(16px,1.5vw,20px)', color: '#4E6470', lineHeight: 1.78, margin: 0, fontFamily: SANS, fontWeight: 300 }}>
               Nunca un diagnóstico, nunca un juicio de cómo &ldquo;está&rdquo; tu familiar — solo los hechos que tu familia registró. Leerlos y decidir qué significan es siempre cosa tuya.
             </p>
           </div>
@@ -548,12 +548,12 @@ export default function Landing() {
             </h2>
           </div>
           <div className="solution-steps-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 32, marginBottom: 60, position: 'relative' }}>
-            <div className="solution-steps-line" style={{ position: 'absolute', top: 34, left: '16.6%', right: '16.6%', height: 2, background: `linear-gradient(to right, ${ACTION}, #A8E5D6, ${ACTION})` }} />
+            <div className="solution-steps-line" style={{ position: 'absolute', top: 34, left: '16.6%', right: '16.6%', height: 2, background: `linear-gradient(to right, ${ACTION}, #A6E3EC, ${ACTION})` }} />
             {solutionSteps.map((s, i) => (
               <div key={s.n} className={`reveal reveal-delay-${i}`} style={{ position: 'relative', textAlign: 'center' }}>
-                <div style={{ width: 68, height: 68, borderRadius: '50%', margin: '0 auto 20px', background: `linear-gradient(135deg, ${ACTION}, #A8E5D6)`, color: WHITE, fontFamily: SERIF, fontWeight: 700, fontSize: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 10px 30px rgba(8,127,112,0.28)', position: 'relative', zIndex: 1 }}>{s.n}</div>
+                <div style={{ width: 68, height: 68, borderRadius: '50%', margin: '0 auto 20px', background: `linear-gradient(135deg, ${ACTION}, #A6E3EC)`, color: WHITE, fontFamily: SERIF, fontWeight: 700, fontSize: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 10px 30px rgba(12,108,156,0.28)', position: 'relative', zIndex: 1 }}>{s.n}</div>
                 <h3 style={{ fontFamily: SERIF, fontSize: 18, color: PRIMARY, fontWeight: 700, margin: '0 0 8px' }}>{s.title}</h3>
-                <p style={{ fontSize: 'clamp(14px,1.3vw,17px)', color: '#6B7280', lineHeight: 1.6, maxWidth: 260, margin: '0 auto', fontFamily: SANS, fontWeight: 300 }}>{s.desc}</p>
+                <p style={{ fontSize: 'clamp(14px,1.3vw,17px)', color: '#4E6470', lineHeight: 1.6, maxWidth: 260, margin: '0 auto', fontFamily: SANS, fontWeight: 300 }}>{s.desc}</p>
               </div>
             ))}
           </div>
@@ -567,14 +567,14 @@ export default function Landing() {
 
       {/* ─────────────── 7. FEATURES ─────────────── */}
       <section id="funciones" style={{ padding: '110px 32px', background: CREAM, position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: 800, height: 400, pointerEvents: 'none', background: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(13,107,99,0.05) 0%, transparent 70%)' }} />
+        <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: 800, height: 400, pointerEvents: 'none', background: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(10,90,130,0.05) 0%, transparent 70%)' }} />
         <div style={{ maxWidth: 1440, margin: '0 auto', position: 'relative' }}>
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 64 }}>
             <p style={{ fontSize: 13, fontWeight: 500, color: ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>Funciones</p>
             <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(32px,4.8vw,64px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.1, margin: '0 0 20px' }}>
               Todo lo que tu familia necesita, en un solo lugar
             </h2>
-            <p style={{ fontSize: 'clamp(18px,1.7vw,22px)', color: '#6B7280', lineHeight: 1.78, maxWidth: 540, margin: '0 auto', fontFamily: SANS, fontWeight: 300 }}>
+            <p style={{ fontSize: 'clamp(18px,1.7vw,22px)', color: '#4E6470', lineHeight: 1.78, maxWidth: 540, margin: '0 auto', fontFamily: SANS, fontWeight: 300 }}>
               Sin funciones de más — solo lo que de verdad ayuda a coordinar el cuidado.
             </p>
           </div>
@@ -583,12 +583,12 @@ export default function Landing() {
               <div key={f.title} className={`reveal reveal-delay-${i % 3} card-hover-lift`} style={{
                 background: f.emergency ? 'linear-gradient(180deg, #FFF5F4 0%, #FFFFFF 60%)' : WHITE,
                 borderRadius: 20,
-                border: f.emergency ? '1px solid rgba(217,83,79,0.30)' : `1px solid rgba(13,107,99,0.16)`,
-                padding: '30px 26px', boxShadow: '0 4px 20px rgba(13,107,99,0.06)',
+                border: f.emergency ? '1px solid rgba(217,83,79,0.30)' : `1px solid rgba(10,90,130,0.16)`,
+                padding: '30px 26px', boxShadow: '0 4px 20px rgba(10,90,130,0.06)',
               }}>
-                <div style={{ width: 52, height: 52, borderRadius: 14, background: f.emergency ? 'rgba(217,83,79,0.10)' : 'rgba(8,127,112,0.08)', border: f.emergency ? '1px solid rgba(217,83,79,0.22)' : '1px solid rgba(8,127,112,0.14)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, marginBottom: 16 }}>{f.icon}</div>
+                <div style={{ width: 52, height: 52, borderRadius: 14, background: f.emergency ? 'rgba(217,83,79,0.10)' : 'rgba(12,108,156,0.08)', border: f.emergency ? '1px solid rgba(217,83,79,0.22)' : '1px solid rgba(12,108,156,0.14)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, marginBottom: 16 }}>{f.icon}</div>
                 <h3 style={{ fontFamily: SERIF, fontSize: 18, fontWeight: 700, color: f.emergency ? CORAL_EMERGENCY : PRIMARY, margin: '0 0 8px' }}>{f.title}</h3>
-                <p style={{ fontSize: 'clamp(14px,1.3vw,17px)', color: '#6B7280', lineHeight: 1.65, margin: 0, fontFamily: SANS, fontWeight: 300 }}>{f.desc}</p>
+                <p style={{ fontSize: 'clamp(14px,1.3vw,17px)', color: '#4E6470', lineHeight: 1.65, margin: 0, fontFamily: SANS, fontWeight: 300 }}>{f.desc}</p>
               </div>
             ))}
           </div>
@@ -618,7 +618,7 @@ export default function Landing() {
               Listo en 3 minutos. Diseñado para acompañarte todos los días.
             </h2>
             <div style={{ display: 'flex', flexDirection: 'column', position: 'relative' }}>
-              <div className="como-line" style={{ position: 'absolute', left: 39, top: 64, bottom: 64, width: 2, background: `linear-gradient(to bottom, ${ACTION}, rgba(13,107,99,0.08))` }} />
+              <div className="como-line" style={{ position: 'absolute', left: 39, top: 64, bottom: 64, width: 2, background: `linear-gradient(to bottom, ${ACTION}, rgba(10,90,130,0.08))` }} />
               {[
                 { n: '1', title: 'Crea tu cuenta gratis', desc: 'Sin tarjeta de crédito, sin descarga en tienda de apps.' },
                 { n: '2', title: 'Agrega a tu familiar y los cuidadores', desc: 'Cada uno con su propio acceso y rol.' },
@@ -627,11 +627,11 @@ export default function Landing() {
               ].map((s, i, arr) => (
                 <div key={s.n} className={`reveal reveal-delay-${i}`} style={{ display: 'flex', gap: 24, marginBottom: i < arr.length - 1 ? 32 : 0 }}>
                   <div style={{ flexShrink: 0, zIndex: 1 }}>
-                    <div style={{ width: 80, height: 80, borderRadius: '50%', background: `linear-gradient(135deg, ${ACTION} 0%, #A8E5D6 100%)`, color: WHITE, fontWeight: 700, fontSize: 28, fontFamily: SERIF, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 12px 40px rgba(8,127,112,0.28)' }}>{s.n}</div>
+                    <div style={{ width: 80, height: 80, borderRadius: '50%', background: `linear-gradient(135deg, ${ACTION} 0%, #A6E3EC 100%)`, color: WHITE, fontWeight: 700, fontSize: 28, fontFamily: SERIF, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 12px 40px rgba(12,108,156,0.28)' }}>{s.n}</div>
                   </div>
                   <div style={{ paddingTop: 22 }}>
                     <h3 style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 600, color: PRIMARY, margin: '0 0 8px' }}>{s.title}</h3>
-                    <p style={{ fontSize: 'clamp(17px,1.6vw,21px)', color: '#6B7280', lineHeight: 1.78, margin: 0, fontFamily: SANS, fontWeight: 300 }}>{s.desc}</p>
+                    <p style={{ fontSize: 'clamp(17px,1.6vw,21px)', color: '#4E6470', lineHeight: 1.78, margin: 0, fontFamily: SANS, fontWeight: 300 }}>{s.desc}</p>
                   </div>
                 </div>
               ))}
@@ -641,7 +641,7 @@ export default function Landing() {
             </div>
           </div>
           <div style={{ flex: '1 1 360px', display: 'flex', justifyContent: 'center' }} className="como-img">
-            <img src={COMO_IMG} alt="Cómo funciona FamiliaCerca" style={{ width: '100%', borderRadius: 24, boxShadow: `0 16px 64px rgba(13,107,99,0.16)`, border: `1px solid rgba(13,107,99,0.10)` }} />
+            <img src={COMO_IMG} alt="Cómo funciona FamiliaCerca" style={{ width: '100%', borderRadius: 24, boxShadow: `0 16px 64px rgba(10,90,130,0.16)`, border: `1px solid rgba(10,90,130,0.10)` }} />
           </div>
         </div>
       </section>
@@ -710,7 +710,7 @@ export default function Landing() {
       </section>
 
       {/* ─────────────── EMOTIONAL QUOTE 2 ─────────────── */}
-      <section style={{ padding: '128px 32px', background: '#087F70' }}>
+      <section style={{ padding: '128px 32px', background: '#0C6C9C' }}>
         <div style={{ maxWidth: 860, margin: '0 auto', textAlign: 'center' }}>
           <div style={{ fontFamily: SERIF, fontSize: 110, color: GOLD, lineHeight: 0.7, marginBottom: 20, opacity: 0.22 }}>"</div>
           <blockquote className="reveal" style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 'clamp(28px,4.7vw,62px)', fontWeight: 500, color: CREAM, lineHeight: 1.45, margin: '0 0 36px' }}>
@@ -728,13 +728,13 @@ export default function Landing() {
           <div className="reveal" style={{ textAlign: 'center', marginBottom: 52 }}>
             <p style={{ fontSize: 13, fontWeight: 500, color: ACTION, textTransform: 'uppercase', letterSpacing: '0.16em', margin: '0 0 16px', fontFamily: SANS }}>Precios</p>
             <h2 style={{ fontFamily: SERIF, fontSize: 'clamp(32px,5.1vw,68px)', fontWeight: 600, color: PRIMARY, lineHeight: 1.1, margin: '0 0 16px' }}>Simple y transparente</h2>
-            <p style={{ fontSize: 'clamp(18px,1.7vw,22px)', color: '#6B7280', lineHeight: 1.75, maxWidth: 520, margin: '0 auto 36px', fontFamily: SANS, fontWeight: 300 }}>
+            <p style={{ fontSize: 'clamp(18px,1.7vw,22px)', color: '#4E6470', lineHeight: 1.75, maxWidth: 520, margin: '0 auto 36px', fontFamily: SANS, fontWeight: 300 }}>
               Empieza gratis. Cambia de plan solo cuando tu familia necesite más herramientas.
             </p>
             {ANNUAL_ENABLED && (
             <div style={{ display: 'inline-flex', background: WHITE, borderRadius: 9999, padding: 4, border: `1px solid ${BORDER}`, boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
-              <button onClick={() => setAnnual(false)} style={{ padding: '10px 28px', borderRadius: 9999, border: 'none', cursor: 'pointer', background: !annual ? ACTION : 'transparent', color: !annual ? WHITE : '#6B7280', fontSize: 14, fontFamily: SANS, fontWeight: 500, transition: 'background 0.2s, color 0.2s' }}>Mensual</button>
-              <button onClick={() => setAnnual(true)} style={{ padding: '10px 28px', borderRadius: 9999, border: 'none', cursor: 'pointer', background: annual ? ACTION : 'transparent', color: annual ? WHITE : '#6B7280', fontSize: 14, fontFamily: SANS, fontWeight: 500, transition: 'background 0.2s, color 0.2s', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <button onClick={() => setAnnual(false)} style={{ padding: '10px 28px', borderRadius: 9999, border: 'none', cursor: 'pointer', background: !annual ? ACTION : 'transparent', color: !annual ? WHITE : '#4E6470', fontSize: 14, fontFamily: SANS, fontWeight: 500, transition: 'background 0.2s, color 0.2s' }}>Mensual</button>
+              <button onClick={() => setAnnual(true)} style={{ padding: '10px 28px', borderRadius: 9999, border: 'none', cursor: 'pointer', background: annual ? ACTION : 'transparent', color: annual ? WHITE : '#4E6470', fontSize: 14, fontFamily: SANS, fontWeight: 500, transition: 'background 0.2s, color 0.2s', display: 'flex', alignItems: 'center', gap: 8 }}>
                 Anual
                 <span style={{ background: MINT_C, color: PRIMARY, fontSize: 11, padding: '2px 8px', borderRadius: 9999, fontWeight: 600 }}>-20%</span>
               </button>
@@ -798,14 +798,14 @@ export default function Landing() {
           </div>
           {/* Phone mockup */}
           <div style={{ flex: '0 0 280px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            <div style={{ width: 260, height: 520, background: '#1A1A1A', borderRadius: 40, padding: 10, boxShadow: '0 32px 80px rgba(0,0,0,0.50)', position: 'relative', flexShrink: 0 }}>
-              <div style={{ position: 'absolute', top: 10, left: '50%', transform: 'translateX(-50%)', width: 56, height: 18, background: '#1A1A1A', borderRadius: '0 0 12px 12px', zIndex: 2 }} />
+            <div style={{ width: 260, height: 520, background: '#14303D', borderRadius: 40, padding: 10, boxShadow: '0 32px 80px rgba(0,0,0,0.50)', position: 'relative', flexShrink: 0 }}>
+              <div style={{ position: 'absolute', top: 10, left: '50%', transform: 'translateX(-50%)', width: 56, height: 18, background: '#14303D', borderRadius: '0 0 12px 12px', zIndex: 2 }} />
               <div style={{ width: '100%', height: '100%', borderRadius: 32, background: 'linear-gradient(160deg, #1C1C2E 0%, #0F0F1A 100%)', overflow: 'hidden', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '32px 16px 16px' }}>
                 <p style={{ margin: '0 0 3px', fontSize: 11, color: 'rgba(255,255,255,0.35)', fontFamily: SANS }}>9:41</p>
                 <p style={{ margin: '0 0 24px', fontSize: 9, color: 'rgba(255,255,255,0.18)', fontFamily: SANS }}>sábado, 23 mayo</p>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, width: '100%' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-                    <div style={{ width: 44, height: 44, borderRadius: 12, overflow: 'hidden', boxShadow: '0 6px 20px rgba(13,107,99,0.50)', flexShrink: 0 }}>
+                    <div style={{ width: 44, height: 44, borderRadius: 12, overflow: 'hidden', boxShadow: '0 6px 20px rgba(10,90,130,0.50)', flexShrink: 0 }}>
                       <img src="/icon-192.png" alt="FamiliaCerca" style={{ width: 44, height: 44, display: 'block' }} />
                     </div>
                     <span style={{ fontSize: 8, color: WHITE, fontFamily: SANS, textAlign: 'center', lineHeight: 1.2 }}>Familia Cerca</span>
@@ -868,18 +868,18 @@ export default function Landing() {
       </section>
 
       {/* ─────────────── 16. FOOTER ─────────────── */}
-      <footer style={{ background: '#F8F4ED', padding: '64px 32px 48px', borderTop: `1px solid rgba(8,127,112,0.08)` }}>
+      <footer style={{ background: '#F7F6F2', padding: '64px 32px 48px', borderTop: `1px solid rgba(12,108,156,0.08)` }}>
         <div className="reveal" style={{ maxWidth: 1440, margin: '0 auto' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 48, marginBottom: 52 }}>
             <div style={{ flex: '0 0 auto', maxWidth: 280 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, padding: '4px 0' }}>
                 <img src="/logo.png" alt="FamiliaCerca" style={{ width: 44, height: 44, objectFit: 'contain', display: 'block' }} />
                 <span style={{ fontFamily: SERIF, fontWeight: 700, margin: 0, padding: 0 }}>
-                  <span style={{ color: '#087F70', fontSize: 26 }}>Familia</span>
+                  <span style={{ color: '#0C6C9C', fontSize: 26 }}>Familia</span>
                   <span style={{ color: '#E9826E', fontSize: 26 }}>Cerca</span>
                 </span>
               </div>
-              <p style={{ fontSize: 15, color: '#6B7280', lineHeight: 1.7, fontFamily: SANS, fontWeight: 300, margin: '0 0 24px' }}>
+              <p style={{ fontSize: 15, color: '#4E6470', lineHeight: 1.7, fontFamily: SANS, fontWeight: 300, margin: '0 0 24px' }}>
                 Cuidado familiar coordinado para la comunidad hispana. Medicamentos, rutinas y amor — todo en un solo lugar.
               </p>
               <div style={{ display: 'flex', gap: 10 }}>
@@ -889,47 +889,47 @@ export default function Landing() {
                   { label: 'WhatsApp', href: 'https://wa.me/?text=Te%20comparto%20FamiliaCerca%2C%20una%20app%20para%20coordinar%20el%20cuidado%20familiar%20%F0%9F%92%9A%20familiacerca.com', icon: <svg width={17} height={17} viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zm-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884z"/></svg> },
                 ].map(s => (
                   <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label}
-                    style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(8,127,112,0.06)', border: '1px solid rgba(8,127,112,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6B7280', textDecoration: 'none' }}
+                    style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(12,108,156,0.06)', border: '1px solid rgba(12,108,156,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4E6470', textDecoration: 'none' }}
                     onMouseEnter={e => { e.currentTarget.style.color = GOLD; e.currentTarget.style.background = `rgba(233,130,110,0.10)` }}
-                    onMouseLeave={e => { e.currentTarget.style.color = '#6B7280'; e.currentTarget.style.background = 'rgba(8,127,112,0.06)' }}
+                    onMouseLeave={e => { e.currentTarget.style.color = '#4E6470'; e.currentTarget.style.background = 'rgba(12,108,156,0.06)' }}
                   >{s.icon}</a>
                 ))}
               </div>
             </div>
             <div style={{ display: 'flex', gap: 56, flexWrap: 'wrap' }}>
               <div>
-                <p style={{ fontSize: 13, fontWeight: 500, color: '#087F70', textTransform: 'uppercase', letterSpacing: '0.12em', margin: '0 0 18px', fontFamily: SANS }}>Contacto</p>
+                <p style={{ fontSize: 13, fontWeight: 500, color: '#0C6C9C', textTransform: 'uppercase', letterSpacing: '0.12em', margin: '0 0 18px', fontFamily: SANS }}>Contacto</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                   {[
                     { label: 'hola@familiacerca.com', href: 'mailto:hola@familiacerca.com' },
                     { label: '@familia.cerca', href: 'https://www.instagram.com/familia.cerca/' },
                   ].map(l => (
                     <a key={l.href} href={l.href} target={l.href.startsWith('http') ? '_blank' : undefined} rel={l.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-                      style={{ fontSize: 15, color: '#6B7280', textDecoration: 'none', fontFamily: SANS, fontWeight: 300 }}
-                      onMouseEnter={e => e.currentTarget.style.color = '#087F70'}
-                      onMouseLeave={e => e.currentTarget.style.color = '#6B7280'}
+                      style={{ fontSize: 15, color: '#4E6470', textDecoration: 'none', fontFamily: SANS, fontWeight: 300 }}
+                      onMouseEnter={e => e.currentTarget.style.color = '#0C6C9C'}
+                      onMouseLeave={e => e.currentTarget.style.color = '#4E6470'}
                     >{l.label}</a>
                   ))}
                 </div>
               </div>
               <div>
-                <p style={{ fontSize: 13, fontWeight: 500, color: '#087F70', textTransform: 'uppercase', letterSpacing: '0.12em', margin: '0 0 18px', fontFamily: SANS }}>Producto</p>
+                <p style={{ fontSize: 13, fontWeight: 500, color: '#0C6C9C', textTransform: 'uppercase', letterSpacing: '0.12em', margin: '0 0 18px', fontFamily: SANS }}>Producto</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                   {[{label:'Funciones',href:'#funciones'},{label:'Precios',href:'#precios'},{label:'Cómo funciona',href:'#como'},{label:'Preguntas',href:'#faq'}].map(l => (
-                    <a key={l.href} href={l.href} style={{ fontSize: 15, color: '#6B7280', textDecoration: 'none', fontFamily: SANS, fontWeight: 300 }}
-                      onMouseEnter={e => e.currentTarget.style.color = '#087F70'}
-                      onMouseLeave={e => e.currentTarget.style.color = '#6B7280'}
+                    <a key={l.href} href={l.href} style={{ fontSize: 15, color: '#4E6470', textDecoration: 'none', fontFamily: SANS, fontWeight: 300 }}
+                      onMouseEnter={e => e.currentTarget.style.color = '#0C6C9C'}
+                      onMouseLeave={e => e.currentTarget.style.color = '#4E6470'}
                     >{l.label}</a>
                   ))}
                 </div>
               </div>
               <div>
-                <p style={{ fontSize: 13, fontWeight: 500, color: '#087F70', textTransform: 'uppercase', letterSpacing: '0.12em', margin: '0 0 18px', fontFamily: SANS }}>Legal</p>
+                <p style={{ fontSize: 13, fontWeight: 500, color: '#0C6C9C', textTransform: 'uppercase', letterSpacing: '0.12em', margin: '0 0 18px', fontFamily: SANS }}>Legal</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                   {[{label:'Términos de uso',to:'/terminos'},{label:'Privacidad',to:'/privacidad'},{label:'Iniciar sesión',to:'/login'},{label:'Crear cuenta',to:'/register'}].map(l => (
-                    <Link key={l.label} to={l.to} style={{ fontSize: 15, color: '#6B7280', textDecoration: 'none', fontFamily: SANS, fontWeight: 300 }}
-                      onMouseEnter={e => e.currentTarget.style.color = '#087F70'}
-                      onMouseLeave={e => e.currentTarget.style.color = '#6B7280'}
+                    <Link key={l.label} to={l.to} style={{ fontSize: 15, color: '#4E6470', textDecoration: 'none', fontFamily: SANS, fontWeight: 300 }}
+                      onMouseEnter={e => e.currentTarget.style.color = '#0C6C9C'}
+                      onMouseLeave={e => e.currentTarget.style.color = '#4E6470'}
                     >{l.label}</Link>
                   ))}
                 </div>
@@ -937,8 +937,8 @@ export default function Landing() {
             </div>
           </div>
           <div style={{ borderTop: '1px solid rgba(20,60,50,0.08)', paddingTop: 24, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
-            <p style={{ fontSize: 12, color: '#6B7280', margin: 0, fontFamily: SANS, fontWeight: 300 }}>© {new Date().getFullYear()} FamiliaCerca. Todos los derechos reservados.</p>
-            <p style={{ fontSize: 12, color: '#6B7280', margin: 0, fontFamily: SANS, fontWeight: 300 }}>Hecho con ❤️ para familias hispanohablantes</p>
+            <p style={{ fontSize: 12, color: '#4E6470', margin: 0, fontFamily: SANS, fontWeight: 300 }}>© {new Date().getFullYear()} FamiliaCerca. Todos los derechos reservados.</p>
+            <p style={{ fontSize: 12, color: '#4E6470', margin: 0, fontFamily: SANS, fontWeight: 300 }}>Hecho con ❤️ para familias hispanohablantes</p>
           </div>
         </div>
       </footer>
@@ -1029,12 +1029,12 @@ export default function Landing() {
         .faq-dark-item { transition: background 0.18s ease; border-radius: 8px; }
         .faq-dark-item:hover { background: rgba(233,130,110,0.04); }
         .faq-light-item { transition: background 0.18s ease; border-radius: 8px; }
-        .faq-light-item:hover { background: rgba(13,107,99,0.05); }
+        .faq-light-item:hover { background: rgba(10,90,130,0.05); }
 
         .cta-coral { transition: background 0.2s ease !important; }
         .cta-coral:hover { background: #D86F5A !important; }
         .btn-nav-cream { transition: background 0.2s ease, color 0.2s ease; }
-        .btn-nav-cream:hover { background: #087F70 !important; color: #F8F4ED !important; }
+        .btn-nav-cream:hover { background: #0C6C9C !important; color: #F7F6F2 !important; }
 
         @media (max-width: 1024px) {
           .para-quien-grid { grid-template-columns: repeat(2, 1fr) !important; }

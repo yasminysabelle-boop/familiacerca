@@ -15,7 +15,7 @@ if (import.meta.env.PROD && 'serviceWorker' in navigator) {
     banner.id = 'sw-update-banner'
     banner.style.cssText = [
       'position:fixed', 'bottom:80px', 'left:50%', 'transform:translateX(-50%)',
-      'background:#1A1A1A', 'color:#fff', 'padding:12px 14px 12px 16px',
+      'background:#14303D', 'color:#fff', 'padding:12px 14px 12px 16px',
       'border-radius:16px', 'display:flex', 'align-items:center', 'gap:12px',
       'z-index:99999', 'font-family:system-ui,sans-serif', 'font-size:14px',
       'box-shadow:0 4px 24px rgba(0,0,0,0.35)', 'max-width:calc(100vw - 32px)',
@@ -26,7 +26,7 @@ if (import.meta.env.PROD && 'serviceWorker' in navigator) {
     btn.textContent = 'Actualizar'
     btn.style.cssText = [
       'padding:7px 14px', 'border-radius:10px', 'border:none',
-      'background:#0d6b63', 'color:#fff', 'font-size:13px', 'font-weight:700',
+      'background:#0A5A82', 'color:#fff', 'font-size:13px', 'font-weight:700',
       'cursor:pointer', 'white-space:nowrap', 'flex-shrink:0',
     ].join(';')
     btn.addEventListener('click', () => window.location.reload())

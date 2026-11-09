@@ -14,7 +14,7 @@ export default function FamilySwitcher({ isLight = false }) {
     return (
       <span style={{
         fontSize: 11, fontWeight: 600,
-        color: isLight ? '#6B7280' : 'rgba(255,255,255,0.65)',
+        color: isLight ? '#4E6470' : 'rgba(255,255,255,0.65)',
         maxWidth: 110, overflow: 'hidden',
         textOverflow: 'ellipsis', whiteSpace: 'nowrap',
         display: 'block',
@@ -32,20 +32,20 @@ export default function FamilySwitcher({ isLight = false }) {
         style={{
           display: 'flex', alignItems: 'center', gap: 5,
           background: isLight ? '#F3F4F6' : 'rgba(255,255,255,0.12)',
-          border: isLight ? '1px solid #EDE5D8' : '1px solid rgba(255,255,255,0.18)',
+          border: isLight ? '1px solid #E6E3DB' : '1px solid rgba(255,255,255,0.18)',
           borderRadius: 20, padding: '5px 10px 5px 9px',
           cursor: 'pointer', maxWidth: 140,
           fontFamily: 'inherit',
         }}
       >
         <span style={{
-          fontSize: 11, fontWeight: 700, color: isLight ? '#334155' : 'white',
+          fontSize: 11, fontWeight: 700, color: isLight ? '#2A4350' : 'white',
           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
           lineHeight: 1.2,
         }}>
           {displayLabel}
         </span>
-        <span style={{ fontSize: 7, color: isLight ? '#9CA3AF' : 'rgba(255,255,255,0.8)', flexShrink: 0, marginTop: 1 }}>▼</span>
+        <span style={{ fontSize: 7, color: isLight ? '#5E7480' : 'rgba(255,255,255,0.8)', flexShrink: 0, marginTop: 1 }}>▼</span>
       </button>
 
       {/* Sheet */}
@@ -66,7 +66,7 @@ export default function FamilySwitcher({ isLight = false }) {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
               <p style={{
                 fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 17, fontWeight: 700,
-                color: '#1A1A1A', margin: 0,
+                color: '#14303D', margin: 0,
               }}>
                 Tus familias:
               </p>
@@ -74,7 +74,7 @@ export default function FamilySwitcher({ isLight = false }) {
                 onClick={() => setOpen(false)}
                 style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 6 }}
               >
-                <XIcon size={18} color="#9CA3AF" strokeWidth={2} />
+                <XIcon size={18} color="#5E7480" strokeWidth={2} />
               </button>
             </div>
 
@@ -83,8 +83,8 @@ export default function FamilySwitcher({ isLight = false }) {
                 const isActive = fam.ownerId === activeOwnerId
                 const initials = fam.patientName?.charAt(0)?.toUpperCase() ?? '?'
                 const roleLabel = fam.role === null ? 'Administrador' : fam.role === 'cuidador' ? 'Cuidador' : 'Familiar'
-                const roleColor = fam.role === null ? '#087F70' : fam.role === 'cuidador' ? '#2563EB' : '#6B7280'
-                const roleBg   = fam.role === null ? '#EBF3EE' : fam.role === 'cuidador' ? '#DBEAFE' : '#F3F4F6'
+                const roleColor = fam.role === null ? '#0C6C9C' : fam.role === 'cuidador' ? '#2563EB' : '#4E6470'
+                const roleBg   = fam.role === null ? '#E3F1F8' : fam.role === 'cuidador' ? '#DBEAFE' : '#F3F4F6'
 
                 return (
                   <div
@@ -92,8 +92,8 @@ export default function FamilySwitcher({ isLight = false }) {
                     style={{
                       display: 'flex', alignItems: 'center', gap: 14,
                       padding: '14px 16px', borderRadius: 16,
-                      border: `1.5px solid ${isActive ? '#087F70' : '#EDE5D8'}`,
-                      background: isActive ? '#EBF3EE' : '#FDFAF7',
+                      border: `1.5px solid ${isActive ? '#0C6C9C' : '#E6E3DB'}`,
+                      background: isActive ? '#E3F1F8' : '#FDFAF7',
                     }}
                   >
                     {/* Avatar */}
@@ -101,15 +101,15 @@ export default function FamilySwitcher({ isLight = false }) {
                       <img
                         src={fam.patientPhotoUrl} alt={fam.patientName}
                         style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover',
-                          border: '2px solid #EDE5D8', flexShrink: 0 }}
+                          border: '2px solid #E6E3DB', flexShrink: 0 }}
                       />
                     ) : (
                       <div style={{
                         width: 44, height: 44, borderRadius: '50%', flexShrink: 0,
-                        background: isActive ? '#087F70' : '#E5E7EB',
+                        background: isActive ? '#0C6C9C' : '#E5E7EB',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         fontSize: 18, fontWeight: 700,
-                        color: isActive ? 'white' : '#9CA3AF',
+                        color: isActive ? 'white' : '#5E7480',
                       }}>
                         {initials}
                       </div>
@@ -118,7 +118,7 @@ export default function FamilySwitcher({ isLight = false }) {
                     {/* Info */}
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p style={{
-                        fontSize: 15, fontWeight: 700, color: '#1A1A1A',
+                        fontSize: 15, fontWeight: 700, color: '#14303D',
                         margin: '0 0 4px', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
                         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                       }}>
@@ -136,7 +136,7 @@ export default function FamilySwitcher({ isLight = false }) {
                     {/* Action */}
                     {isActive ? (
                       <span style={{
-                        fontSize: 11, fontWeight: 700, color: '#087F70',
+                        fontSize: 11, fontWeight: 700, color: '#0C6C9C',
                         flexShrink: 0,
                       }}>
                         ✓ Viendo
@@ -146,7 +146,7 @@ export default function FamilySwitcher({ isLight = false }) {
                         onClick={() => { switchFamily(fam.ownerId); setOpen(false) }}
                         style={{
                           padding: '8px 14px', borderRadius: 10,
-                          background: '#087F70', color: 'white',
+                          background: '#0C6C9C', color: 'white',
                           border: 'none', cursor: 'pointer',
                           fontSize: 13, fontWeight: 700,
                           flexShrink: 0, fontFamily: 'inherit',

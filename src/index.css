@@ -1,15 +1,15 @@
 @import "tailwindcss";
 
 @theme {
-  /* Verde bosque — primary brand */
-  --color-primary:       #0d6b63;
-  --color-primary-dark:  #3A6347;
-  --color-primary-light: #EBF3EE;
+  /* Azul Caribe — primary brand (nov 2026) */
+  --color-primary:       #0C6C9C;
+  --color-primary-dark:  #0A4A6B;
+  --color-primary-light: #E3F1F8;
 
-  /* Sage green — secondary (mantener para compatibilidad) */
-  --color-sage:          #0d6b63;
-  --color-sage-dark:     #3A6347;
-  --color-sage-light:    #EBF3EE;
+  /* Alias de compatibilidad (antes verde sage) */
+  --color-sage:          #0C6C9C;
+  --color-sage-dark:     #0A4A6B;
+  --color-sage-light:    #E3F1F8;
 
   /* Golden amber — accent */
   --color-accent:        #C9882A;
@@ -20,16 +20,16 @@
   --color-emergency-light:  #FDECEA;
 
   /* Warm neutrals */
-  --color-green-50:  #F7F3ED;
-  --color-green-100: #EBF3EE;
-  --color-green-200: #C8DDD0;
+  --color-green-50:  #F7F6F2;
+  --color-green-100: #E3F1F8;
+  --color-green-200: #A6E3EC;
 }
 
 body {
-  background-color: #F8F4ED;
+  background-color: #F7F6F2;
   padding-bottom: env(safe-area-inset-bottom);
   -webkit-font-smoothing: antialiased;
-  color: #1A1A1A;
+  color: #14303D;
 }
 
 #root {
@@ -39,14 +39,14 @@ body {
 
 /* ── Dark mode ────────────────────────────────────────────────────── */
 [data-theme="dark"] body {
-  background-color: #0F1A12;
-  color: #E8F0EA;
+  background-color: #14303D;
+  color: #E3F1F8;
 }
 [data-theme="dark"] .bg-white         { background-color: #1A2E1F !important; }
 [data-theme="dark"] .bg-gray-50       { background-color: #142010 !important; }
-[data-theme="dark"] .border-green-100 { border-color: #1E3A28 !important; }
-[data-theme="dark"] .text-gray-900    { color: #E8F0EA !important; }
-[data-theme="dark"] .text-gray-700    { color: #C8DDD0 !important; }
+[data-theme="dark"] .border-green-100 { border-color: #14303D !important; }
+[data-theme="dark"] .text-gray-900    { color: #E3F1F8 !important; }
+[data-theme="dark"] .text-gray-700    { color: #A6E3EC !important; }
 [data-theme="dark"] .text-gray-600    { color: #A8C8B4 !important; }
 [data-theme="dark"] .text-gray-500    { color: #7AAA8A !important; }
 [data-theme="dark"] .text-gray-400    { color: #5A8A6A !important; }

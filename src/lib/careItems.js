@@ -1,6 +1,6 @@
 export const CARE_CATEGORIES = [
-  { id: 'daily',    label: 'Rutina diaria',  icon: '📋', color: '#0d6b63', bg: '#EBF3EE' },
-  { id: 'optional', label: 'Otros cuidados', icon: '✨', color: '#6B7280', bg: '#F9FAFB' },
+  { id: 'daily',    label: 'Rutina diaria',  icon: '📋', color: '#0A5A82', bg: '#E3F1F8' },
+  { id: 'optional', label: 'Otros cuidados', icon: '✨', color: '#4E6470', bg: '#F9FAFB' },
 ]
 
 export const CARE_ITEMS = [

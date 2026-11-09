@@ -125,10 +125,10 @@ export default function Permissions() {
               boxShadow: '0 24px 64px rgba(0,0,0,0.35)',
             }}>
               <div style={{ fontSize: 56, marginBottom: 16 }}>✅</div>
-              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 20, fontWeight: 700, color: '#1A1A1A', marginBottom: 8 }}>
+              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 20, fontWeight: 700, color: '#14303D', marginBottom: 8 }}>
                 ¡Permisos activados!
               </p>
-              <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6 }}>
+              <p style={{ fontSize: 13, color: '#4E6470', lineHeight: 1.6 }}>
                 Todo listo para cuidar a tu familiar.
               </p>
             </div>
@@ -144,10 +144,10 @@ export default function Permissions() {
             }}>
               <div style={{ textAlign: 'center', marginBottom: 22 }}>
                 <div style={{ fontSize: 48, marginBottom: 12 }}>🔒</div>
-                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 18, fontWeight: 700, color: '#1A1A1A', marginBottom: 8 }}>
+                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 18, fontWeight: 700, color: '#14303D', marginBottom: 8 }}>
                   Permisos no activados
                 </p>
-                <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6 }}>
+                <p style={{ fontSize: 13, color: '#4E6470', lineHeight: 1.6 }}>
                   Bloqueaste el acceso. Puedes activarlos más tarde desde la configuración de tu navegador.
                 </p>
               </div>
@@ -156,19 +156,19 @@ export default function Permissions() {
                 background: '#F9F5F1', borderRadius: 14,
                 padding: '14px 16px', marginBottom: 20,
               }}>
-                <p style={{ fontSize: 12, fontWeight: 700, color: '#6B7280', marginBottom: 10, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                <p style={{ fontSize: 12, fontWeight: 700, color: '#4E6470', marginBottom: 10, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
                   Cómo habilitarlos
                 </p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
                     <span style={{ fontSize: 14, flexShrink: 0 }}>📱</span>
-                    <p style={{ fontSize: 12, color: '#374151', lineHeight: 1.5 }}>
+                    <p style={{ fontSize: 12, color: '#30454F', lineHeight: 1.5 }}>
                       <strong>iPhone / Safari:</strong> Ajustes → Safari → Cámara y Micrófono → Permitir
                     </p>
                   </div>
                   <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
                     <span style={{ fontSize: 14, flexShrink: 0 }}>🌐</span>
-                    <p style={{ fontSize: 12, color: '#374151', lineHeight: 1.5 }}>
+                    <p style={{ fontSize: 12, color: '#30454F', lineHeight: 1.5 }}>
                       <strong>Chrome / Android:</strong> Toca el candado 🔒 en la barra de dirección → Permisos
                     </p>
                   </div>
@@ -179,10 +179,10 @@ export default function Permissions() {
                 onClick={markAndGo}
                 style={{
                   width: '100%', padding: '13px',
-                  background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
+                  background: 'linear-gradient(135deg, #0A5A82, #0A4A6B)',
                   color: 'white', fontWeight: 700, fontSize: 14,
                   borderRadius: 14, border: 'none', cursor: 'pointer',
-                  boxShadow: '0 6px 20px rgba(8,127,112,0.3)',
+                  boxShadow: '0 6px 20px rgba(12,108,156,0.3)',
                 }}
               >
                 Continuar sin permisos →
@@ -202,16 +202,16 @@ export default function Permissions() {
               <div style={{ textAlign: 'center', marginBottom: 24 }}>
                 <div style={{
                   width: 56, height: 56, borderRadius: '50%',
-                  background: 'rgba(8,127,112,0.1)',
+                  background: 'rgba(12,108,156,0.1)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   margin: '0 auto 14px', fontSize: 26,
                 }}>
                   🔓
                 </div>
-                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 19, fontWeight: 700, color: '#1A1A1A', marginBottom: 6 }}>
+                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 19, fontWeight: 700, color: '#14303D', marginBottom: 6 }}>
                   Necesitamos tu permiso
                 </p>
-                <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.5 }}>
+                <p style={{ fontSize: 13, color: '#4E6470', lineHeight: 1.5 }}>
                   Para ofrecerte la mejor experiencia de cuidado, necesitamos acceso a:
                 </p>
               </div>
@@ -223,16 +223,16 @@ export default function Permissions() {
                     display: 'flex', alignItems: 'flex-start', gap: 14,
                     padding: '12px 14px',
                     background: 'white', borderRadius: 14,
-                    border: '1px solid #EDE5D8',
+                    border: '1px solid #E6E3DB',
                   }}>
                     <span style={{ fontSize: 26, flexShrink: 0, lineHeight: 1 }}>
                       {item.emoji}
                     </span>
                     <div>
-                      <p style={{ fontSize: 14, fontWeight: 700, color: '#1A1A1A', marginBottom: 2 }}>
+                      <p style={{ fontSize: 14, fontWeight: 700, color: '#14303D', marginBottom: 2 }}>
                         {item.title}
                       </p>
-                      <p style={{ fontSize: 12, color: '#6B7280', lineHeight: 1.5 }}>
+                      <p style={{ fontSize: 12, color: '#4E6470', lineHeight: 1.5 }}>
                         {item.desc}
                       </p>
                     </div>
@@ -242,7 +242,7 @@ export default function Permissions() {
 
               {/* Privacy note */}
               <p style={{
-                fontSize: 11, color: '#9CA3AF', textAlign: 'center',
+                fontSize: 11, color: '#5E7480', textAlign: 'center',
                 lineHeight: 1.6, marginBottom: 18,
               }}>
                 🔒 Tus permisos son solo para esta app. Nunca accedemos a tu cámara o micrófono sin que tú lo actives.
@@ -256,11 +256,11 @@ export default function Permissions() {
                   width: '100%', padding: '14px',
                   background: status === 'requesting'
                     ? '#D4C4B8'
-                    : 'linear-gradient(135deg, #0d6b63, #3A6347)',
+                    : 'linear-gradient(135deg, #0A5A82, #0A4A6B)',
                   color: 'white', fontWeight: 700, fontSize: 15,
                   borderRadius: 16, border: 'none',
                   cursor: status === 'requesting' ? 'not-allowed' : 'pointer',
-                  boxShadow: status === 'requesting' ? 'none' : '0 8px 24px rgba(8,127,112,0.35)',
+                  boxShadow: status === 'requesting' ? 'none' : '0 8px 24px rgba(12,108,156,0.35)',
                   transition: 'all 0.2s',
                 }}
               >
@@ -273,7 +273,7 @@ export default function Permissions() {
                 style={{
                   display: 'block', width: '100%', marginTop: 12,
                   padding: '10px', background: 'none', border: 'none',
-                  fontSize: 13, color: '#9CA3AF', cursor: 'pointer',
+                  fontSize: 13, color: '#5E7480', cursor: 'pointer',
                 }}
               >
                 Ahora no

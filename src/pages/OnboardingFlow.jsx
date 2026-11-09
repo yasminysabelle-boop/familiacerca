@@ -55,13 +55,13 @@ function computeComplexity(caregiverCount, focusAreas, frequency) {
 const INPUT = {
   width: '100%', padding: '14px 16px', borderRadius: 14,
   border: '1.5px solid #E8E4DC', background: 'white',
-  fontSize: 15, color: '#1A1A1A', outline: 'none',
+  fontSize: 15, color: '#14303D', outline: 'none',
   boxSizing: 'border-box', boxShadow: '0 2px 0px #E0DBD2',
   fontFamily: 'inherit',
 }
 
 const LABEL = {
-  display: 'block', fontSize: 11, fontWeight: 700, color: '#9CA3AF',
+  display: 'block', fontSize: 11, fontWeight: 700, color: '#5E7480',
   textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6,
 }
 
@@ -75,10 +75,10 @@ function PrimaryBtn({ children, onClick, disabled, pressed, onPD, onPU, onPL }) 
       onPointerLeave={onPL}
       style={{
         width: '100%', padding: '16px', borderRadius: 16, border: 'none',
-        background: disabled ? '#C5C9C4' : '#087F70',
+        background: disabled ? '#C5C9C4' : '#0C6C9C',
         color: 'white', fontSize: 16, fontWeight: 700,
         cursor: disabled ? 'not-allowed' : 'pointer',
-        boxShadow: pressed || disabled ? 'none' : '0 3px 0px rgba(8,127,112,0.35)',
+        boxShadow: pressed || disabled ? 'none' : '0 3px 0px rgba(12,108,156,0.35)',
         transform: pressed ? 'translateY(3px)' : 'none',
         transition: 'transform 0.08s ease, box-shadow 0.08s ease',
         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
@@ -95,21 +95,21 @@ function Chip({ label, sub, selected, onClick }) {
       onClick={onClick}
       style={{
         padding: '10px 16px', borderRadius: 20,
-        border: `1.5px solid ${selected ? '#087F70' : '#D1C9BF'}`,
-        background: selected ? '#087F70' : 'white',
+        border: `1.5px solid ${selected ? '#0C6C9C' : '#D1C9BF'}`,
+        background: selected ? '#0C6C9C' : 'white',
         cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left',
         display: 'flex', flexDirection: 'column', gap: 2,
         WebkitTapHighlightColor: 'transparent',
       }}
     >
-      <span style={{ fontSize: 13, fontWeight: 700, color: selected ? 'white' : '#374151' }}>{label}</span>
-      {sub && <span style={{ fontSize: 11, fontWeight: 500, color: selected ? 'white' : '#9CA3AF' }}>{sub}</span>}
+      <span style={{ fontSize: 13, fontWeight: 700, color: selected ? 'white' : '#30454F' }}>{label}</span>
+      {sub && <span style={{ fontSize: 11, fontWeight: 500, color: selected ? 'white' : '#5E7480' }}>{sub}</span>}
     </button>
   )
 }
 
 const QUESTION = {
-  fontSize: 15, fontWeight: 700, color: '#1A1A1A', margin: '0 0 10px', lineHeight: 1.35,
+  fontSize: 15, fontWeight: 700, color: '#14303D', margin: '0 0 10px', lineHeight: 1.35,
 }
 
 function SkipBtn({ onClick, label = 'Hacer esto después' }) {
@@ -117,7 +117,7 @@ function SkipBtn({ onClick, label = 'Hacer esto después' }) {
     <button
       onClick={onClick}
       style={{
-        background: 'none', border: 'none', color: '#9CA3AF',
+        background: 'none', border: 'none', color: '#5E7480',
         fontSize: 13, cursor: 'pointer', padding: '10px',
         fontFamily: 'inherit', width: '100%',
       }}
@@ -356,10 +356,10 @@ export default function OnboardingFlow() {
 
   // ── RENDER ─────────────────────────────────────────────────────────────
   return (
-    <div style={{ minHeight: '100dvh', background: '#F8F4ED', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ minHeight: '100dvh', background: '#F7F6F2', display: 'flex', flexDirection: 'column' }}>
 
       {/* ── Header con barra de progreso ── */}
-      <div style={{ background: '#075F55', padding: '0 20px', paddingTop: 'calc(env(safe-area-inset-top) + 14px)' }}>
+      <div style={{ background: '#0A5A82', padding: '0 20px', paddingTop: 'calc(env(safe-area-inset-top) + 14px)' }}>
         <Logo showWordmark size={28} variant="light" />
         <div style={{ marginTop: 16, height: 4, background: 'rgba(255,255,255,0.15)', borderRadius: 4 }}>
           <div style={{
@@ -380,7 +380,7 @@ export default function OnboardingFlow() {
           <>
             <div style={{ textAlign: 'center', marginBottom: 32 }}>
               <div style={{ fontSize: 56, marginBottom: 16, lineHeight: 1 }}>🏠</div>
-              <p style={{ fontSize: 28, fontWeight: 800, color: '#1A1A1A', fontFamily: 'Georgia, serif', lineHeight: 1.2, margin: '0 0 12px' }}>
+              <p style={{ fontSize: 28, fontWeight: 800, color: '#14303D', fontFamily: 'Georgia, serif', lineHeight: 1.2, margin: '0 0 12px' }}>
                 Bienvenido a FamiliaCerca
               </p>
               <p style={{ fontSize: 16, color: '#718096', margin: 0, lineHeight: 1.6 }}>
@@ -400,7 +400,7 @@ export default function OnboardingFlow() {
                   borderRadius: 16, border: '1.5px solid #E8E4DC',
                 }}>
                   <span style={{ fontSize: 24, flexShrink: 0 }}>{emoji}</span>
-                  <p style={{ fontSize: 14, color: '#374151', margin: 0, lineHeight: 1.4 }}>{text}</p>
+                  <p style={{ fontSize: 14, color: '#30454F', margin: 0, lineHeight: 1.4 }}>{text}</p>
                 </div>
               ))}
             </div>
@@ -414,7 +414,7 @@ export default function OnboardingFlow() {
         {/* ════ PASO 2 — PERFIL BÁSICO ════ */}
         {step === 2 && (
           <>
-            <p style={{ fontSize: 26, fontWeight: 800, color: '#1A1A1A', fontFamily: 'Georgia, serif', lineHeight: 1.25, margin: '0 0 6px' }}>
+            <p style={{ fontSize: 26, fontWeight: 800, color: '#14303D', fontFamily: 'Georgia, serif', lineHeight: 1.25, margin: '0 0 6px' }}>
               Cuéntanos sobre tu familiar
             </p>
             <p style={{ fontSize: 14, color: '#718096', margin: '0 0 28px' }}>
@@ -430,8 +430,8 @@ export default function OnboardingFlow() {
                 onClick={() => setPhotoMenuOpen(o => !o)}
                 style={{
                   width: 88, height: 88, borderRadius: '50%',
-                  background: photoPreview ? 'transparent' : '#A8E5D6',
-                  border: '2px dashed #087F70',
+                  background: photoPreview ? 'transparent' : '#A6E3EC',
+                  border: '2px dashed #0C6C9C',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   overflow: 'hidden', cursor: 'pointer',
                 }}
@@ -440,18 +440,18 @@ export default function OnboardingFlow() {
                   ? <img src={photoPreview} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="foto" />
                   : <span style={{ fontSize: 30 }}>📷</span>}
               </div>
-              <p style={{ fontSize: 11, color: '#9CA3AF', margin: '6px 0 0' }}>
+              <p style={{ fontSize: 11, color: '#5E7480', margin: '6px 0 0' }}>
                 {photoPreview ? 'Cambiar foto' : 'Foto (opcional)'}
               </p>
 
               {photoMenuOpen && (
                 <div style={{ display: 'flex', gap: 10, marginTop: 12 }}>
                   <button onClick={() => { cameraRef.current.click(); setPhotoMenuOpen(false) }}
-                    style={{ padding: '10px 18px', borderRadius: 12, border: '1.5px solid #087F70', background: 'white', color: '#087F70', fontWeight: 700, fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'inherit' }}>
+                    style={{ padding: '10px 18px', borderRadius: 12, border: '1.5px solid #0C6C9C', background: 'white', color: '#0C6C9C', fontWeight: 700, fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'inherit' }}>
                     📷 Cámara
                   </button>
                   <button onClick={() => { galleryRef.current.click(); setPhotoMenuOpen(false) }}
-                    style={{ padding: '10px 18px', borderRadius: 12, border: '1.5px solid #087F70', background: 'white', color: '#087F70', fontWeight: 700, fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'inherit' }}>
+                    style={{ padding: '10px 18px', borderRadius: 12, border: '1.5px solid #0C6C9C', background: 'white', color: '#0C6C9C', fontWeight: 700, fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'inherit' }}>
                     🖼️ Galería
                   </button>
                 </div>
@@ -490,7 +490,7 @@ export default function OnboardingFlow() {
         {/* ════ PASO 3 — SOBRE EL CUIDADO ════ */}
         {step === 3 && (
           <>
-            <p style={{ fontSize: 26, fontWeight: 800, color: '#1A1A1A', fontFamily: 'Georgia, serif', lineHeight: 1.25, margin: '0 0 24px' }}>
+            <p style={{ fontSize: 26, fontWeight: 800, color: '#14303D', fontFamily: 'Georgia, serif', lineHeight: 1.25, margin: '0 0 24px' }}>
               Sobre el cuidado
             </p>
 
@@ -539,7 +539,7 @@ export default function OnboardingFlow() {
         {/* ════ PASO 4 — PRIMER MEDICAMENTO ════ */}
         {step === 4 && (
           <>
-            <p style={{ fontSize: 26, fontWeight: 800, color: '#1A1A1A', fontFamily: 'Georgia, serif', lineHeight: 1.25, margin: '0 0 8px' }}>
+            <p style={{ fontSize: 26, fontWeight: 800, color: '#14303D', fontFamily: 'Georgia, serif', lineHeight: 1.25, margin: '0 0 8px' }}>
               Hagamos algo juntos
             </p>
             <p style={{ fontSize: 14, color: '#718096', margin: '0 0 20px', lineHeight: 1.5 }}>
@@ -547,8 +547,8 @@ export default function OnboardingFlow() {
             </p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              <div style={{ padding: '12px 14px', background: '#A8E5D6', borderRadius: 12 }}>
-                <p style={{ margin: 0, fontSize: 13, color: '#087F70', fontWeight: 600 }}>
+              <div style={{ padding: '12px 14px', background: '#A6E3EC', borderRadius: 12 }}>
+                <p style={{ margin: 0, fontSize: 13, color: '#0C6C9C', fontWeight: 600 }}>
                   💊 Primer medicamento de {patientFirst}
                 </p>
               </div>
@@ -566,7 +566,7 @@ export default function OnboardingFlow() {
                     <option value="">Seleccionar...</option>
                     {FREQ_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                   </select>
-                  <span style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#9CA3AF', fontSize: 12 }}>▼</span>
+                  <span style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#5E7480', fontSize: 12 }}>▼</span>
                 </div>
               </div>
               <div>
@@ -591,7 +591,7 @@ export default function OnboardingFlow() {
         {/* ════ PASO 5 — INVITA AL EQUIPO ════ */}
         {step === 5 && (
           <>
-            <p style={{ fontSize: 26, fontWeight: 800, color: '#1A1A1A', fontFamily: 'Georgia, serif', lineHeight: 1.25, margin: '0 0 8px' }}>
+            <p style={{ fontSize: 26, fontWeight: 800, color: '#14303D', fontFamily: 'Georgia, serif', lineHeight: 1.25, margin: '0 0 8px' }}>
               Invita a alguien del equipo
             </p>
             <p style={{ fontSize: 14, color: '#718096', margin: '0 0 28px', lineHeight: 1.5 }}>
@@ -633,7 +633,7 @@ export default function OnboardingFlow() {
               >
                 <span style={{ fontSize: 26, flexShrink: 0 }}>💬</span>
                 <div style={{ textAlign: 'left' }}>
-                  <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#1A1A1A' }}>Invitar por SMS</p>
+                  <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#14303D' }}>Invitar por SMS</p>
                   <p style={{ margin: '2px 0 0', fontSize: 12, color: '#718096' }}>Mensaje de texto directo</p>
                 </div>
               </button>
@@ -651,7 +651,7 @@ export default function OnboardingFlow() {
               >
                 <span style={{ fontSize: 26, flexShrink: 0 }}>📧</span>
                 <div style={{ textAlign: 'left' }}>
-                  <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#1A1A1A' }}>Invitar por correo</p>
+                  <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#14303D' }}>Invitar por correo</p>
                   <p style={{ margin: '2px 0 0', fontSize: 12, color: '#718096' }}>Asunto y mensaje prellenado</p>
                 </div>
               </button>
@@ -664,7 +664,7 @@ export default function OnboardingFlow() {
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                     padding: '13px', borderRadius: 14,
                     border: '1.5px solid #E8E4DC', background: 'white', cursor: 'pointer',
-                    color: '#087F70', fontSize: 14, fontWeight: 700, fontFamily: 'inherit',
+                    color: '#0C6C9C', fontSize: 14, fontWeight: 700, fontFamily: 'inherit',
                   }}
                 >
                   {copied ? '✓ ¡Enlace copiado!' : '🔗 Copiar enlace de invitación'}
@@ -686,7 +686,7 @@ export default function OnboardingFlow() {
           <>
             <div style={{ textAlign: 'center', marginBottom: 32 }}>
               <div style={{ fontSize: 56, marginBottom: 14, lineHeight: 1 }}>🎉</div>
-              <p style={{ fontSize: 26, fontWeight: 800, color: '#1A1A1A', fontFamily: 'Georgia, serif', lineHeight: 1.25, margin: '0 0 10px' }}>
+              <p style={{ fontSize: 26, fontWeight: 800, color: '#14303D', fontFamily: 'Georgia, serif', lineHeight: 1.25, margin: '0 0 10px' }}>
                 {patientName.trim()
                   ? `¡Listo! Ya están organizados para cuidar a ${patientName.trim()}.`
                   : '¡Todo listo!'}

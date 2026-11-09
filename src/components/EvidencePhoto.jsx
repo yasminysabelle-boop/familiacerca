@@ -53,7 +53,7 @@ export default function EvidencePhoto({
             style={{
               width: '100%', height: '100%',
               objectFit: 'cover', borderRadius: 10,
-              border: '1.5px solid #EDE5D8',
+              border: '1.5px solid #E6E3DB',
             }}
           />
           <div style={{
@@ -153,7 +153,7 @@ export default function EvidencePhoto({
             alt="Vista previa"
             style={{
               width: 80, height: 80, objectFit: 'cover',
-              borderRadius: 10, border: '2px solid #EDE5D8',
+              borderRadius: 10, border: '2px solid #E6E3DB',
             }}
           />
           <button
@@ -163,7 +163,7 @@ export default function EvidencePhoto({
             style={{
               position: 'absolute', top: -6, right: -6,
               width: 20, height: 20, borderRadius: '50%',
-              background: '#9CA3AF', border: 'none',
+              background: '#5E7480', border: 'none',
               cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}
@@ -183,8 +183,8 @@ export default function EvidencePhoto({
             disabled={uploading}
             style={{
               padding: '7px 12px', borderRadius: 8,
-              border: '1px solid #EDE5D8', background: 'white',
-              fontSize: 12, color: '#6B7280', cursor: 'pointer',
+              border: '1px solid #E6E3DB', background: 'white',
+              fontSize: 12, color: '#4E6470', cursor: 'pointer',
             }}
           >
             Cancelar
@@ -195,7 +195,7 @@ export default function EvidencePhoto({
             disabled={uploading}
             style={{
               padding: '7px 14px', borderRadius: 8, border: 'none',
-              background: uploading ? '#C0CCC5' : '#087F70',
+              background: uploading ? '#C9D6DB' : '#0C6C9C',
               color: 'white', fontSize: 12, fontWeight: 700,
               cursor: uploading ? 'not-allowed' : 'pointer',
             }}
@@ -222,8 +222,8 @@ export default function EvidencePhoto({
               flex: 1, display: 'flex', alignItems: 'center',
               justifyContent: 'center', gap: 4,
               padding: '8px', borderRadius: 10,
-              border: '1.5px dashed #C0CCC5', background: '#FDF8F4',
-              cursor: 'pointer', fontSize: 12, color: '#087F70', fontWeight: 600,
+              border: '1.5px dashed #C9D6DB', background: '#FDF8F4',
+              cursor: 'pointer', fontSize: 12, color: '#0C6C9C', fontWeight: 600,
             }}
           >
             📷 Tomar foto
@@ -235,8 +235,8 @@ export default function EvidencePhoto({
               flex: 1, display: 'flex', alignItems: 'center',
               justifyContent: 'center', gap: 4,
               padding: '8px', borderRadius: 10,
-              border: '1.5px dashed #C0CCC5', background: '#FDF8F4',
-              cursor: 'pointer', fontSize: 12, color: '#087F70', fontWeight: 600,
+              border: '1.5px dashed #C9D6DB', background: '#FDF8F4',
+              cursor: 'pointer', fontSize: 12, color: '#0C6C9C', fontWeight: 600,
             }}
           >
             🖼️ Galería
@@ -251,7 +251,7 @@ export default function EvidencePhoto({
                 display: 'flex', alignItems: 'center',
               }}
             >
-              <XIcon size={13} color="#9CA3AF" strokeWidth={2} />
+              <XIcon size={13} color="#5E7480" strokeWidth={2} />
             </button>
           )}
         </div>
@@ -263,8 +263,8 @@ export default function EvidencePhoto({
           style={{
             display: 'inline-flex', alignItems: 'center', gap: 6,
             padding: '7px 12px', borderRadius: 10,
-            border: '1.5px dashed #C0CCC5', background: '#FDF8F4',
-            cursor: 'pointer', fontSize: 12, color: '#087F70', fontWeight: 600,
+            border: '1.5px dashed #C9D6DB', background: '#FDF8F4',
+            cursor: 'pointer', fontSize: 12, color: '#0C6C9C', fontWeight: 600,
             marginTop: 6,
           }}
         >

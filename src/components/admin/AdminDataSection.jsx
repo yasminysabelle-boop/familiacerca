@@ -70,12 +70,12 @@ export default function AdminDataSection() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
       {/* Export PDF */}
-      <div style={{ background: 'white', borderRadius: 14, padding: '16px', border: '1px solid #EDE5D8' }}>
+      <div style={{ background: 'white', borderRadius: 14, padding: '16px', border: '1px solid #E6E3DB' }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: exportError ? 12 : 0 }}>
           <span style={{ fontSize: 28, flexShrink: 0 }}>📄</span>
           <div style={{ flex: 1 }}>
-            <p style={{ margin: '0 0 2px', fontSize: 15, fontWeight: 700, color: '#1A1A1A' }}>Exportar historial médico</p>
-            <p style={{ margin: '0 0 12px', fontSize: 12, color: '#6B7280', lineHeight: 1.5 }}>
+            <p style={{ margin: '0 0 2px', fontSize: 15, fontWeight: 700, color: '#14303D' }}>Exportar historial médico</p>
+            <p style={{ margin: '0 0 12px', fontSize: 12, color: '#4E6470', lineHeight: 1.5 }}>
               PDF completo con perfil del paciente, medicamentos, registros de dosis (90 días), notas y gastos.
             </p>
             {exportError && (
@@ -88,7 +88,7 @@ export default function AdminDataSection() {
               disabled={exporting}
               style={{
                 padding: '10px 20px', borderRadius: 10, border: 'none',
-                background: exporting ? '#9CA3AF' : '#087F70',
+                background: exporting ? '#5E7480' : '#0C6C9C',
                 color: 'white', fontWeight: 700, fontSize: 13,
                 cursor: exporting ? 'default' : 'pointer',
               }}
@@ -108,7 +108,7 @@ export default function AdminDataSection() {
           <span style={{ fontSize: 28, flexShrink: 0 }}>🗑️</span>
           <div style={{ flex: 1 }}>
             <p style={{ margin: '0 0 2px', fontSize: 15, fontWeight: 700, color: '#B91C1C' }}>Borrar cuenta y datos</p>
-            <p style={{ margin: '0 0 12px', fontSize: 12, color: '#6B7280', lineHeight: 1.5 }}>
+            <p style={{ margin: '0 0 12px', fontSize: 12, color: '#4E6470', lineHeight: 1.5 }}>
               Elimina permanentemente tu cuenta, todos los miembros del equipo, medicamentos, historial, notas, gastos y documentos. Esta acción no se puede deshacer.
             </p>
 
@@ -151,8 +151,8 @@ export default function AdminDataSection() {
                     onClick={() => { setDeletePhase('idle'); setConfirmText(''); setDeleteError('') }}
                     style={{
                       flex: 1, padding: '10px', borderRadius: 10,
-                      border: '1px solid #EDE5D8', background: 'white',
-                      color: '#6B7280', fontWeight: 600, fontSize: 13, cursor: 'pointer',
+                      border: '1px solid #E6E3DB', background: 'white',
+                      color: '#4E6470', fontWeight: 600, fontSize: 13, cursor: 'pointer',
                     }}
                   >
                     Cancelar
@@ -162,7 +162,7 @@ export default function AdminDataSection() {
                     disabled={confirmText.trim().toUpperCase() !== 'ELIMINAR'}
                     style={{
                       flex: 1, padding: '10px', borderRadius: 10, border: 'none',
-                      background: confirmText.trim().toUpperCase() === 'ELIMINAR' ? '#DC2626' : '#9CA3AF',
+                      background: confirmText.trim().toUpperCase() === 'ELIMINAR' ? '#DC2626' : '#5E7480',
                       color: 'white', fontWeight: 700, fontSize: 13,
                       cursor: confirmText.trim().toUpperCase() === 'ELIMINAR' ? 'pointer' : 'default',
                     }}
@@ -178,7 +178,7 @@ export default function AdminDataSection() {
             )}
 
             {deletePhase === 'done' && (
-              <p style={{ fontSize: 13, color: '#087F70', fontWeight: 700 }}>✓ Cuenta eliminada. Redirigiendo...</p>
+              <p style={{ fontSize: 13, color: '#0C6C9C', fontWeight: 700 }}>✓ Cuenta eliminada. Redirigiendo...</p>
             )}
           </div>
         </div>

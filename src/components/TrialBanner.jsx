@@ -42,16 +42,16 @@ export default function TrialBanner() {
         margin: '0 16px 16px', borderRadius: 16, padding: '14px 16px',
         background: urgent
           ? 'linear-gradient(135deg, #FFFBEB, #FEF3C7)'
-          : 'linear-gradient(135deg, #F7F3ED, #EBF3EE)',
-        border: `1.5px solid ${urgent ? '#FDE68A' : '#EDE5D8'}`,
+          : 'linear-gradient(135deg, #F7F6F2, #E3F1F8)',
+        border: `1.5px solid ${urgent ? '#FDE68A' : '#E6E3DB'}`,
         display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
       }}
     >
       <div>
-        <p style={{ fontSize: 13, fontWeight: 700, color: urgent ? '#92400E' : '#087F70', margin: '0 0 2px' }}>
+        <p style={{ fontSize: 13, fontWeight: 700, color: urgent ? '#92400E' : '#0C6C9C', margin: '0 0 2px' }}>
           {`✨ Te queda${daysLeft !== 1 ? 'n' : ''} ${daysLeft} día${daysLeft !== 1 ? 's' : ''} con todo incluido`}
         </p>
-        <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>
+        <p style={{ fontSize: 11, color: '#5E7480', margin: 0 }}>
           Después sigues gratis con lo esencial. Nada se borra.
         </p>
       </div>
@@ -59,7 +59,7 @@ export default function TrialBanner() {
         onClick={() => navigate('/upgrade')}
         style={{
           flexShrink: 0, padding: '8px 16px', borderRadius: 10, border: 'none',
-          background: urgent ? '#B45309' : 'linear-gradient(135deg, #087F70, #A8E5D6)',
+          background: urgent ? '#B45309' : 'linear-gradient(135deg, #0C6C9C, #A6E3EC)',
           color: 'white', fontWeight: 700, fontSize: 12, cursor: 'pointer',
           whiteSpace: 'nowrap',
         }}

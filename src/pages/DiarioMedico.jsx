@@ -11,14 +11,14 @@ import CompanionChat from '../components/CompanionChat'
 const LOCATION_META = {
   hospital: { label: 'Hospital',  emoji: '🏥', bg: '#FFF0F0', color: '#B91C1C' },
   consulta: { label: 'Consulta',  emoji: '🏪', bg: '#EFF6FF', color: '#1D4ED8' },
-  casa:     { label: 'Casa',      emoji: '🏠', bg: '#F0F9F4', color: '#15803D' },
-  otro:     { label: 'Otro',      emoji: '📍', bg: '#F9F7F4', color: '#6B7280' },
+  casa:     { label: 'Casa',      emoji: '🏠', bg: '#E3F1F8', color: '#15803D' },
+  otro:     { label: 'Otro',      emoji: '📍', bg: '#F9F7F4', color: '#4E6470' },
 }
 
 const INPUT_META = {
   voice: { label: '🎙️ Voz', bg: '#F5F0FF', color: '#7C3AED' },
   photo: { label: '📷 Foto', bg: '#FFF7ED', color: '#C9882A' },
-  text:  { label: '✏️ Texto', bg: '#F3F4F6', color: '#6B7280' },
+  text:  { label: '✏️ Texto', bg: '#F3F4F6', color: '#4E6470' },
 }
 
 function fmtDate(d, t) {
@@ -39,7 +39,7 @@ function EntryCard({ entry }) {
   return (
     <div style={{
       background: 'white', borderRadius: 16, overflow: 'hidden',
-      boxShadow: '0 2px 12px rgba(0,0,0,0.06)', border: '1px solid #EDE5D8',
+      boxShadow: '0 2px 12px rgba(0,0,0,0.06)', border: '1px solid #E6E3DB',
     }}>
       {/* Photo header */}
       {entry.photo_url && (
@@ -67,19 +67,19 @@ function EntryCard({ entry }) {
           }}>
             {inputMeta.label}
           </span>
-          <span style={{ fontSize: 11, color: '#9CA3AF', marginLeft: 'auto' }}>
+          <span style={{ fontSize: 11, color: '#5E7480', marginLeft: 'auto' }}>
             {fmtDate(entry.entry_date, entry.entry_time)}
           </span>
         </div>
 
         {/* Who recorded */}
-        <p style={{ margin: '0 0 10px', fontSize: 12, color: '#9CA3AF' }}>
-          Registrado por <strong style={{ color: '#6B7280' }}>{entry.created_by_name ?? 'Familiar'}</strong>
+        <p style={{ margin: '0 0 10px', fontSize: 12, color: '#5E7480' }}>
+          Registrado por <strong style={{ color: '#4E6470' }}>{entry.created_by_name ?? 'Familiar'}</strong>
         </p>
 
         {/* Estado general */}
         {entry.estado_general && (
-          <p style={{ margin: '0 0 10px', fontSize: 14, fontWeight: 600, color: '#1A1A1A', lineHeight: 1.5 }}>
+          <p style={{ margin: '0 0 10px', fontSize: 14, fontWeight: 600, color: '#14303D', lineHeight: 1.5 }}>
             {entry.estado_general}
           </p>
         )}
@@ -88,12 +88,12 @@ function EntryCard({ entry }) {
         {entry.que_dijo_el_medico && (
           <div style={{
             margin: '0 0 10px', padding: '10px 12px',
-            borderRadius: 10, background: '#F9F7F4', border: '1px solid #EDE5D8',
+            borderRadius: 10, background: '#F9F7F4', border: '1px solid #E6E3DB',
           }}>
-            <p style={{ margin: '0 0 3px', fontSize: 10, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            <p style={{ margin: '0 0 3px', fontSize: 10, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
               Médico indicó
             </p>
-            <p style={{ margin: 0, fontSize: 13, color: '#374151', lineHeight: 1.5 }}>
+            <p style={{ margin: 0, fontSize: 13, color: '#30454F', lineHeight: 1.5 }}>
               {expanded || entry.que_dijo_el_medico.length < 100
                 ? entry.que_dijo_el_medico
                 : entry.que_dijo_el_medico.slice(0, 100) + '...'}
@@ -104,14 +104,14 @@ function EntryCard({ entry }) {
         {/* Medications */}
         {hasMeds && (
           <div style={{ margin: '0 0 10px' }}>
-            <p style={{ margin: '0 0 6px', fontSize: 10, fontWeight: 700, color: '#087F70', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            <p style={{ margin: '0 0 6px', fontSize: 10, fontWeight: 700, color: '#0C6C9C', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
               💊 Medicamentos
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
               {entry.medicamentos.map((m, i) => (
                 <span key={i} style={{
                   padding: '4px 10px', borderRadius: 20, fontSize: 12, fontWeight: 600,
-                  background: '#F0F9F4', color: '#1A5C35',
+                  background: '#E3F1F8', color: '#1A5C35',
                   border: '1px solid #BBF7D0',
                 }}>
                   {m.nombre}{m.dosis ? ` ${m.dosis}` : ''}{m.frecuencia ? ` · ${m.frecuencia}` : ''}
@@ -134,7 +134,7 @@ function EntryCard({ entry }) {
                   color: 'white', fontSize: 10, fontWeight: 700, flexShrink: 0,
                   display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 1,
                 }}>{i + 1}</span>
-                <p style={{ margin: 0, fontSize: 13, color: '#374151', lineHeight: 1.4 }}>{s}</p>
+                <p style={{ margin: 0, fontSize: 13, color: '#30454F', lineHeight: 1.4 }}>{s}</p>
               </div>
             ))}
           </div>
@@ -152,7 +152,7 @@ function EntryCard({ entry }) {
         {expanded && entry.raw_transcript && (
           <div style={{ margin: '0 0 10px', padding: '8px 12px', borderRadius: 10, background: '#F5F0FF', border: '1px solid #DDD6FE' }}>
             <p style={{ margin: '0 0 2px', fontSize: 10, fontWeight: 700, color: '#7C3AED', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Transcripción original</p>
-            <p style={{ margin: 0, fontSize: 12, color: '#6B7280', lineHeight: 1.5, fontStyle: 'italic' }}>{entry.raw_transcript}</p>
+            <p style={{ margin: 0, fontSize: 12, color: '#4E6470', lineHeight: 1.5, fontStyle: 'italic' }}>{entry.raw_transcript}</p>
           </div>
         )}
 
@@ -161,7 +161,7 @@ function EntryCard({ entry }) {
           onClick={() => setExpanded(e => !e)}
           style={{
             background: 'none', border: 'none', cursor: 'pointer',
-            color: '#087F70', fontSize: 12, fontWeight: 700, padding: '4px 0',
+            color: '#0C6C9C', fontSize: 12, fontWeight: 700, padding: '4px 0',
           }}
         >
           {expanded ? '▲ Ver menos' : '▼ Ver más detalle'}
@@ -241,7 +241,7 @@ export default function DiarioMedico() {
 
         {/* Header */}
         <div style={{
-          background: '#075F55',
+          background: '#0A5A82',
           borderRadius: 20, padding: '20px 18px', marginBottom: 20,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         }}>
@@ -286,7 +286,7 @@ export default function DiarioMedico() {
 
         {/* Loading */}
         {loading && (
-          <p style={{ textAlign: 'center', color: '#9CA3AF', fontSize: 14, padding: '32px 0' }}>
+          <p style={{ textAlign: 'center', color: '#5E7480', fontSize: 14, padding: '32px 0' }}>
             Cargando entradas...
           </p>
         )}
@@ -295,10 +295,10 @@ export default function DiarioMedico() {
         {!loading && entries.length === 0 && (
           <div style={{ textAlign: 'center', padding: '48px 24px' }}>
             <p style={{ fontSize: 48, margin: '0 0 12px' }}>📓</p>
-            <p style={{ fontSize: 16, fontWeight: 700, color: '#1A1A1A', fontFamily: "'Plus Jakarta Sans', sans-serif", margin: '0 0 8px' }}>
+            <p style={{ fontSize: 16, fontWeight: 700, color: '#14303D', fontFamily: "'Plus Jakarta Sans', sans-serif", margin: '0 0 8px' }}>
               Sin entradas aún
             </p>
-            <p style={{ fontSize: 13, color: '#9CA3AF', lineHeight: 1.6, margin: '0 0 20px' }}>
+            <p style={{ fontSize: 13, color: '#5E7480', lineHeight: 1.6, margin: '0 0 20px' }}>
               {canAdd
                 ? 'Agrega la primera entrada con voz o foto de una receta, historia clínica o indicaciones.'
                 : 'El administrador o cuidador puede agregar entradas del diario médico.'}
@@ -308,9 +308,9 @@ export default function DiarioMedico() {
                 onClick={openEntry}
                 style={{
                   padding: '12px 24px', borderRadius: 12, border: 'none',
-                  background: '#087F70', color: 'white', fontWeight: 700,
+                  background: '#0C6C9C', color: 'white', fontWeight: 700,
                   fontSize: 14, cursor: 'pointer',
-                  boxShadow: '0 4px 16px rgba(8,127,112,0.3)',
+                  boxShadow: '0 4px 16px rgba(12,108,156,0.3)',
                 }}
               >
                 Agregar primera entrada →
@@ -325,7 +325,7 @@ export default function DiarioMedico() {
             {Object.entries(grouped).map(([month, monthEntries]) => (
               <div key={month}>
                 <p style={{
-                  fontSize: 11, fontWeight: 700, color: '#9CA3AF',
+                  fontSize: 11, fontWeight: 700, color: '#5E7480',
                   textTransform: 'uppercase', letterSpacing: '0.08em',
                   margin: '0 0 10px 4px',
                 }}>
@@ -343,7 +343,7 @@ export default function DiarioMedico() {
 
         {/* Read-only notice for familiares */}
         {!canAdd && entries.length > 0 && (
-          <p style={{ textAlign: 'center', fontSize: 12, color: '#9CA3AF', marginTop: 20 }}>
+          <p style={{ textAlign: 'center', fontSize: 12, color: '#5E7480', marginTop: 20 }}>
             Solo el administrador y cuidadores pueden agregar entradas.
           </p>
         )}

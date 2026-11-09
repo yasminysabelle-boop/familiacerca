@@ -31,8 +31,8 @@ export const SECTIONS = {
 // ── Paleta real de la app (antes varios generadores tenian comentarios de
 // color que no coincidian con el valor RGB real -- ver hallazgo en
 // project_familiacerca_reports_audit) ──────────────────────────────────────
-const TEAL  = [8, 127, 112]   // #087F70
-const CREMA = [248, 244, 237] // #F8F4ED
+const TEAL  = [12, 108, 156]  // #0C6C9C azul Caribe
+const CREMA = [247, 246, 242] // #F7F6F2
 const CORAL = [233, 130, 110] // #E9826E -- mismo uso que CORAL_ACTION en
                                // MedicationTimeline.jsx: acento de alerta/
                                // urgencia, no un rojo generico

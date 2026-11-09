@@ -99,9 +99,9 @@ export default function MedicationStockTab({ med, ownerId, isFamiliar, onClose }
   const isAgotado  = days != null && days <= 0
   const isCritico  = !isAgotado && days != null && days <= 3
   const isBajo     = !isAgotado && !isCritico && days != null && days <= 7
-  const urgColor = isAgotado ? '#D9534F' : isCritico ? '#C4664F' : isBajo ? '#A87A0F' : '#087F70'
-  const urgBg    = isAgotado ? '#F7DEDD' : isCritico ? '#FBEAE4' : isBajo ? '#F6E4B8' : '#EAF7F3'
-  const barColor = isAgotado ? '#D9534F' : isCritico ? '#E9826E' : isBajo ? '#D99A18' : '#087F70'
+  const urgColor = isAgotado ? '#D9534F' : isCritico ? '#C4664F' : isBajo ? '#A87A0F' : '#0C6C9C'
+  const urgBg    = isAgotado ? '#F7DEDD' : isCritico ? '#FBEAE4' : isBajo ? '#F6E4B8' : '#E3F1F8'
+  const barColor = isAgotado ? '#D9534F' : isCritico ? '#E9826E' : isBajo ? '#D99A18' : '#0C6C9C'
 
   return (
     <div
@@ -109,7 +109,7 @@ export default function MedicationStockTab({ med, ownerId, isFamiliar, onClose }
       onClick={e => { if (e.target === e.currentTarget) onClose() }}
     >
       <div style={{
-        width: '100%', maxWidth: 480, background: '#F8F4ED',
+        width: '100%', maxWidth: 480, background: '#F7F6F2',
         borderRadius: '28px 28px 0 0', padding: '24px 20px 96px',
         maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 -12px 30px -12px #08554A55',
         fontFamily: SANS,
@@ -120,25 +120,25 @@ export default function MedicationStockTab({ med, ownerId, isFamiliar, onClose }
             <p style={{ fontSize: 11, fontWeight: 700, color: '#7D8A9A', letterSpacing: '0.08em', textTransform: 'uppercase', margin: '0 0 4px' }}>
               Stock y renovación
             </p>
-            <p style={{ fontFamily: SANS, fontSize: 19, fontWeight: 800, color: '#1E2C3A', margin: 0 }}>
+            <p style={{ fontFamily: SANS, fontSize: 19, fontWeight: 800, color: '#14303D', margin: 0 }}>
               {med.name}
             </p>
-            {med.dosage && <p style={{ fontSize: 12, color: '#6B7A88', margin: '2px 0 0' }}>{med.dosage}</p>}
+            {med.dosage && <p style={{ fontSize: 12, color: '#4E6470', margin: '2px 0 0' }}>{med.dosage}</p>}
           </div>
           <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 11, border: 'none', background: '#FFFFFF', boxShadow: '0 4px 10px -6px #087F7033', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}>
-            <XIcon size={16} color="#6B7A88" strokeWidth={2.2} />
+            <XIcon size={16} color="#4E6470" strokeWidth={2.2} />
           </button>
         </div>
 
         {loading ? (
           <div style={{ display: 'flex', justifyContent: 'center', padding: 48 }}>
-            <div style={{ width: 28, height: 28, borderRadius: '50%', border: '3px solid #EAF7F3', borderTopColor: '#087F70', animation: 'spin 0.8s linear infinite' }} />
+            <div style={{ width: 28, height: 28, borderRadius: '50%', border: '3px solid #E3F1F8', borderTopColor: '#0C6C9C', animation: 'spin 0.8s linear infinite' }} />
           </div>
         ) : !stock ? (
           <div style={{ textAlign: 'center', padding: '32px 0' }}>
             <p style={{ fontSize: 40, marginBottom: 12 }}>📦</p>
-            <p style={{ fontSize: 14, fontWeight: 600, color: '#1E2C3A', marginBottom: 6 }}>Sin datos de stock</p>
-            <p style={{ fontSize: 12, color: '#6B7A88', lineHeight: 1.5 }}>
+            <p style={{ fontSize: 14, fontWeight: 600, color: '#14303D', marginBottom: 6 }}>Sin datos de stock</p>
+            <p style={{ fontSize: 12, color: '#4E6470', lineHeight: 1.5 }}>
               Configura el stock al agregar o editar el medicamento.
             </p>
           </div>
@@ -164,7 +164,7 @@ export default function MedicationStockTab({ med, ownerId, isFamiliar, onClose }
             {/* Pill bar */}
             <div style={{ background: 'white', borderRadius: 20, padding: 16, marginBottom: 14, boxShadow: '0 6px 14px -8px #087F7022' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                <p style={{ fontSize: 13, fontWeight: 700, color: '#1E2C3A', margin: 0 }}>Pastillas restantes</p>
+                <p style={{ fontSize: 13, fontWeight: 700, color: '#14303D', margin: 0 }}>Pastillas restantes</p>
                 <span style={{ fontSize: 13, fontWeight: 700, color: urgColor }}>
                   {stock.pills_remaining} / {stock.total_pills}
                 </span>
@@ -174,15 +174,15 @@ export default function MedicationStockTab({ med, ownerId, isFamiliar, onClose }
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <div>
-                  <p style={{ fontSize: 10, color: '#6B7A88', margin: 0 }}>Inicio del conteo</p>
-                  <p style={{ fontSize: 12, fontWeight: 600, color: '#334155', margin: '1px 0 0' }}>{fmtDate(stock.start_date)}</p>
+                  <p style={{ fontSize: 10, color: '#4E6470', margin: 0 }}>Inicio del conteo</p>
+                  <p style={{ fontSize: 12, fontWeight: 600, color: '#2A4350', margin: '1px 0 0' }}>{fmtDate(stock.start_date)}</p>
                 </div>
                 <div style={{ textAlign: 'right' }}>
-                  <p style={{ fontSize: 10, color: '#6B7A88', margin: 0 }}>Agotamiento estimado</p>
+                  <p style={{ fontSize: 10, color: '#4E6470', margin: 0 }}>Agotamiento estimado</p>
                   <p style={{ fontSize: 12, fontWeight: 700, color: urgColor, margin: '1px 0 0' }}>
                     {fmtDate(stock.estimated_end_date)}
                     {days !== null && (
-                      <span style={{ fontWeight: 400, color: '#6B7A88' }}>
+                      <span style={{ fontWeight: 400, color: '#4E6470' }}>
                         {' · '}{days <= 0 ? 'hoy' : `en ${days} día${days !== 1 ? 's' : ''}`}
                       </span>
                     )}
@@ -197,21 +197,21 @@ export default function MedicationStockTab({ med, ownerId, isFamiliar, onClose }
                 <p style={{ fontSize: 11, fontWeight: 700, color: '#7D8A9A', letterSpacing: '0.08em', textTransform: 'uppercase', margin: '0 0 8px' }}>
                   Método de renovación
                 </p>
-                <p style={{ fontSize: 14, fontWeight: 600, color: '#1E2C3A', margin: 0 }}>
+                <p style={{ fontSize: 14, fontWeight: 600, color: '#14303D', margin: 0 }}>
                   {RENEWAL_LABELS[stock.renewal_method] ?? stock.renewal_method}
                 </p>
                 {stock.pharmacy_name && (
-                  <p style={{ fontSize: 12, color: '#6B7A88', margin: '4px 0 0' }}>📍 {stock.pharmacy_name}</p>
+                  <p style={{ fontSize: 12, color: '#4E6470', margin: '4px 0 0' }}>📍 {stock.pharmacy_name}</p>
                 )}
                 {stock.refills_remaining != null && (
-                  <p style={{ fontSize: 12, color: stock.refills_remaining === 0 ? '#D9534F' : '#6B7A88', margin: '4px 0 0' }}>
+                  <p style={{ fontSize: 12, color: stock.refills_remaining === 0 ? '#D9534F' : '#4E6470', margin: '4px 0 0' }}>
                     Refills disponibles: <strong>
                       {stock.refills_remaining === 0 ? 'Ninguno — se necesita cita' : stock.refills_remaining}
                     </strong>
                   </p>
                 )}
                 {stock.last_mail_date && (
-                  <p style={{ fontSize: 12, color: '#6B7A88', margin: '4px 0 0' }}>
+                  <p style={{ fontSize: 12, color: '#4E6470', margin: '4px 0 0' }}>
                     Último envío: {fmtDate(stock.last_mail_date)}
                   </p>
                 )}
@@ -224,7 +224,7 @@ export default function MedicationStockTab({ med, ownerId, isFamiliar, onClose }
                 onClick={() => setShowRenewModal(true)}
                 style={{
                   width: '100%', padding: 14, borderRadius: 16, border: 'none', marginBottom: 20,
-                  background: 'linear-gradient(148deg,#12A18C 0%,#0A8072 46%,#055C51 100%)',
+                  background: 'linear-gradient(148deg,#1677A6 0%,#0C6C9C 46%,#0A5A82 100%)',
                   color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer',
                   boxShadow: '0 8px 18px -8px #087F7066',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
@@ -245,13 +245,13 @@ export default function MedicationStockTab({ med, ownerId, isFamiliar, onClose }
                     <div key={r.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', background: 'white', borderRadius: 16, boxShadow: '0 4px 10px -6px #087F7022' }}>
                       <span style={{ fontSize: 16 }}>📦</span>
                       <div style={{ flex: 1 }}>
-                        <p style={{ fontSize: 13, fontWeight: 600, color: '#1E2C3A', margin: 0 }}>+{r.pill_count} pastillas</p>
-                        <p style={{ fontSize: 11, color: '#6B7A88', margin: '2px 0 0' }}>
+                        <p style={{ fontSize: 13, fontWeight: 600, color: '#14303D', margin: 0 }}>+{r.pill_count} pastillas</p>
+                        <p style={{ fontSize: 11, color: '#4E6470', margin: '2px 0 0' }}>
                           {fmtDate(r.renewed_at?.split('T')[0])}
                           {r.renewed_by_name ? ` · Renovado por: ${r.renewed_by_name.split(' ')[0]}` : ''}
                         </p>
                       </div>
-                      <span style={{ fontSize: 11, fontWeight: 700, color: '#087F70', background: '#EAF7F3', padding: '2px 8px', borderRadius: 6 }}>✓</span>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: '#0C6C9C', background: '#E3F1F8', padding: '2px 8px', borderRadius: 6 }}>✓</span>
                     </div>
                   ))}
                 </div>
@@ -268,10 +268,10 @@ export default function MedicationStockTab({ med, ownerId, isFamiliar, onClose }
           onClick={e => { if (e.target === e.currentTarget) { setShowRenewModal(false); setNewPillCount('') } }}
         >
           <div style={{ background: 'white', borderRadius: 20, padding: '28px 24px', maxWidth: 340, width: '100%', boxShadow: '0 24px 64px -16px #08554A55', fontFamily: SANS }}>
-            <p style={{ fontFamily: SANS, fontSize: 18, fontWeight: 800, color: '#1E2C3A', margin: '0 0 6px' }}>
+            <p style={{ fontFamily: SANS, fontSize: 18, fontWeight: 800, color: '#14303D', margin: '0 0 6px' }}>
               Nueva caja
             </p>
-            <p style={{ fontSize: 13, color: '#6B7A88', margin: '0 0 20px', lineHeight: 1.5 }}>
+            <p style={{ fontSize: 13, color: '#4E6470', margin: '0 0 20px', lineHeight: 1.5 }}>
               ¿Cuántas pastillas trae la nueva caja de <strong>{med.name}</strong>?
             </p>
             <input
@@ -294,7 +294,7 @@ export default function MedicationStockTab({ med, ownerId, isFamiliar, onClose }
                 disabled={!newPillCount || parseInt(newPillCount) <= 0 || renewing}
                 style={{
                   flex: 2, padding: 12, borderRadius: 12, border: 'none',
-                  background: (!newPillCount || renewing) ? '#C0CCC5' : 'linear-gradient(148deg,#12A18C 0%,#0A8072 46%,#055C51 100%)',
+                  background: (!newPillCount || renewing) ? '#C9D6DB' : 'linear-gradient(148deg,#1677A6 0%,#0C6C9C 46%,#0A5A82 100%)',
                   color: 'white', fontWeight: 700, fontSize: 14,
                   cursor: (!newPillCount || renewing) ? 'not-allowed' : 'pointer',
                 }}

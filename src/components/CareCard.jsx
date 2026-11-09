@@ -1,7 +1,7 @@
 import { Heart, Pill, Calendar, Users } from './Icons'
 
-const TEAL            = '#087F70'
-const TEAL_LIGHT       = '#A8E5D6'
+const TEAL            = '#0C6C9C'
+const TEAL_LIGHT       = '#A6E3EC'
 const CORAL_EMERGENCY  = '#D9534F'
 const CORAL_HEART      = '#F5836E'
 const GOLD             = '#D99A18'
@@ -10,7 +10,7 @@ const SERIF = "'Fraunces', Georgia, serif"
 const SANS  = "'Plus Jakarta Sans', system-ui, sans-serif"
 
 const STATUS = {
-  ok:       { label: 'Todo al día',          dot: '#7BE0A0', glow: 'rgba(123,224,160,.28)' },
+  ok:       { label: 'Todo al día',          dot: '#4FD0E0', glow: 'rgba(79,208,224,.30)' },
   warning:  { label: 'Algo pendiente',       dot: '#FBBF24', glow: 'rgba(251,191,36,.28)' },
   critical: { label: 'Pendientes de hoy',    dot: CORAL_EMERGENCY, glow: 'rgba(217,83,79,.28)' },
 }
@@ -68,7 +68,7 @@ export default function CareCard({
         position: 'relative',
         borderRadius: 30,
         overflow: 'hidden',
-        background: 'linear-gradient(148deg, #12A18C 0%, #0A8072 46%, #055C51 100%)',
+        background: 'linear-gradient(148deg, #1677A6 0%, #0C6C9C 46%, #0A5A82 100%)',
         boxShadow: '0 22px 44px -18px rgba(6,90,80,0.6)',
         padding: '24px 18px 20px',
         cursor: onClick ? 'pointer' : 'default',
@@ -78,8 +78,8 @@ export default function CareCard({
       {/* Marca de agua — logo FamiliaCerca (corazón + 2 personas) */}
       <svg width="230" height="230" viewBox="0 0 100 100" style={{ position: 'absolute', right: -38, top: 6, opacity: 0.12, pointerEvents: 'none' }} fill="#fff">
         <path d="M50 88C22 68 8 54 8 34 8 22 17 13 29 13c8 0 15 5 21 13 6-8 13-13 21-13 12 0 21 9 21 21 0 20-14 34-42 54Z" />
-        <circle cx="40" cy="40" r="7" fill="#055C51" /><path d="M28 62c0-8 5-13 12-13s12 5 12 13Z" fill="#055C51" />
-        <circle cx="60" cy="45" r="5.5" fill="#0A8072" /><path d="M50 62c0-7 4-11 10-11s10 4 10 11Z" fill="#0A8072" />
+        <circle cx="40" cy="40" r="7" fill="#0A5A82" /><path d="M28 62c0-8 5-13 12-13s12 5 12 13Z" fill="#0A5A82" />
+        <circle cx="60" cy="45" r="5.5" fill="#0C6C9C" /><path d="M50 62c0-7 4-11 10-11s10 4 10 11Z" fill="#0C6C9C" />
       </svg>
       {/* Menú de puntos decorativo */}
       <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff" style={{ position: 'absolute', right: 18, top: 20, opacity: 0.5 }}>
@@ -95,7 +95,7 @@ export default function CareCard({
             flex: 'none', width: 106, height: 106, borderRadius: '50%',
             border: '3px solid rgba(255,255,255,0.55)',
             boxShadow: '0 8px 20px rgba(0,0,0,0.22)',
-            overflow: 'hidden', background: photoUrl ? 'rgba(255,255,255,0.25)' : 'rgba(8,127,112,0.90)',
+            overflow: 'hidden', background: photoUrl ? 'rgba(255,255,255,0.25)' : 'rgba(12,108,156,0.90)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}>
             {photoUrl ? (

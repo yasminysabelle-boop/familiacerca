@@ -20,9 +20,9 @@ export default function LoadingButton({
 
   const variants = {
     primary: {
-      background: '#087F70',
+      background: '#0C6C9C',
       color: 'white',
-      boxShadow: loading || disabled ? 'none' : '0 4px 14px rgba(8,127,112,0.3)',
+      boxShadow: loading || disabled ? 'none' : '0 4px 14px rgba(12,108,156,0.3)',
     },
     danger: {
       background: 'linear-gradient(135deg, #D63031, #B82020)',
@@ -31,8 +31,8 @@ export default function LoadingButton({
     },
     secondary: {
       background: 'white',
-      color: '#374151',
-      border: '1.5px solid #EDE5D8',
+      color: '#30454F',
+      border: '1.5px solid #E6E3DB',
       boxShadow: 'none',
     },
   }
@@ -55,7 +55,7 @@ export default function LoadingButton({
           <span style={{
             width: 14, height: 14, borderRadius: '50%',
             border: '2px solid rgba(255,255,255,0.35)',
-            borderTopColor: variant === 'secondary' ? '#087F70' : 'white',
+            borderTopColor: variant === 'secondary' ? '#0C6C9C' : 'white',
             flexShrink: 0,
             animation: 'btnSpin 0.65s linear infinite',
             display: 'inline-block',

@@ -44,7 +44,7 @@ function DocRow({ label, url, uploadedAt, field, ownerId, medId, isAdmin, onSave
           {url ? (
             <>
               <img src={url} alt={label} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              <div style={{ position: 'absolute', top: -4, right: -4, width: 18, height: 18, borderRadius: 999, background: '#087F70', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 6px -2px #087F7088' }}>
+              <div style={{ position: 'absolute', top: -4, right: -4, width: 18, height: 18, borderRadius: 999, background: '#0C6C9C', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 6px -2px #087F7088' }}>
                 <CheckIcon size={10} color="#FFFFFF" strokeWidth={3} />
               </div>
             </>
@@ -55,13 +55,13 @@ function DocRow({ label, url, uploadedAt, field, ownerId, medId, isAdmin, onSave
           )}
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ fontWeight: 700, fontSize: 14.5, color: '#1E2C3A', margin: 0, fontFamily: SANS }}>{label}</p>
+          <p style={{ fontWeight: 700, fontSize: 14.5, color: '#14303D', margin: 0, fontFamily: SANS }}>{label}</p>
           {url ? (
-            <button onClick={() => onView(url)} style={{ border: 'none', background: 'none', cursor: 'pointer', padding: 0, fontSize: 12.5, color: '#087F70', fontWeight: 700, marginTop: 2, fontFamily: SANS }}>
+            <button onClick={() => onView(url)} style={{ border: 'none', background: 'none', cursor: 'pointer', padding: 0, fontSize: 12.5, color: '#0C6C9C', fontWeight: 700, marginTop: 2, fontFamily: SANS }}>
               Subida{uploadedAt ? ` · ${uploadedAt}` : ''} · Ver documento
             </button>
           ) : (
-            <p style={{ fontSize: 12.5, color: '#6B7A88', margin: '2px 0 0', fontFamily: SANS }}>Aún no subida</p>
+            <p style={{ fontSize: 12.5, color: '#4E6470', margin: '2px 0 0', fontFamily: SANS }}>Aún no subida</p>
           )}
         </div>
       </div>
@@ -74,7 +74,7 @@ function DocRow({ label, url, uploadedAt, field, ownerId, medId, isAdmin, onSave
             alwaysExpanded
             renderOptions={({ onCamera, onGallery }) => (
               <div style={{ display: 'flex', gap: 10 }}>
-                <button type="button" onClick={onCamera} style={{ flex: 1, border: 'none', cursor: 'pointer', padding: 10, borderRadius: 13, fontSize: 12.5, fontWeight: 700, fontFamily: SANS, color: '#087F70', background: '#A8E5D6' }}>
+                <button type="button" onClick={onCamera} style={{ flex: 1, border: 'none', cursor: 'pointer', padding: 10, borderRadius: 13, fontSize: 12.5, fontWeight: 700, fontFamily: SANS, color: '#0C6C9C', background: '#A6E3EC' }}>
                   {url ? 'Volver a tomar foto' : 'Tomar foto'}
                 </button>
                 <button type="button" onClick={onGallery} style={{ flex: 1, border: 'none', cursor: 'pointer', padding: 10, borderRadius: 13, fontSize: 12.5, fontWeight: 700, fontFamily: SANS, color: '#5C6B78', background: '#F1EDE3' }}>
@@ -142,29 +142,29 @@ export default function MedicationDetail({ med, stock, ownerId, isAdmin, onClose
   }
 
   return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 260, background: '#F8F4ED', overflowY: 'auto', fontFamily: SANS }}>
+    <div style={{ position: 'fixed', inset: 0, zIndex: 260, background: '#F7F6F2', overflowY: 'auto', fontFamily: SANS }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '22px 20px 8px' }}>
         <button onClick={onClose} style={{ width: 38, height: 38, borderRadius: 14, border: 'none', background: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 6px 14px -8px #087F7055', cursor: 'pointer', flexShrink: 0 }}>
-          <ChevronLeft size={19} color="#334155" strokeWidth={2.2} />
+          <ChevronLeft size={19} color="#2A4350" strokeWidth={2.2} />
         </button>
-        <div style={{ fontWeight: 800, fontSize: 19, color: '#1E2C3A' }}>Detalle del medicamento</div>
+        <div style={{ fontWeight: 800, fontSize: 19, color: '#14303D' }}>Detalle del medicamento</div>
       </div>
 
       <div style={{ padding: '14px 20px 40px' }}>
         <div style={{ background: '#FFFFFF', borderRadius: 22, padding: 20, boxShadow: '0 6px 14px -8px #087F7033' }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10 }}>
             <div style={{ minWidth: 0 }}>
-              <div style={{ fontWeight: 800, fontSize: 18, color: '#1E2C3A' }}>
+              <div style={{ fontWeight: 800, fontSize: 18, color: '#14303D' }}>
                 {med.name}{med.dosage ? ` ${med.dosage}` : ''}{med.form ? ` · ${med.form}` : ''}
               </div>
               {scheduleLine && (
-                <div style={{ fontSize: 13.5, color: '#6B7A88', marginTop: 6, lineHeight: 1.5 }}>{scheduleLine}</div>
+                <div style={{ fontSize: 13.5, color: '#4E6470', marginTop: 6, lineHeight: 1.5 }}>{scheduleLine}</div>
               )}
             </div>
             <span style={{
               flexShrink: 0, padding: '6px 14px', borderRadius: 999, fontSize: 12.5, fontWeight: 700,
               color: status === 'active' ? '#FFFFFF' : '#5C6B78',
-              background: status === 'active' ? '#087F70' : '#E7E2D6',
+              background: status === 'active' ? '#0C6C9C' : '#E7E2D6',
             }}>
               {status === 'active' ? 'Activo' : 'Pausado'}
             </span>
@@ -172,9 +172,9 @@ export default function MedicationDetail({ med, stock, ownerId, isAdmin, onClose
           {isAdmin && (
             <button
               onClick={() => onEdit(med)}
-              style={{ marginTop: 14, display: 'inline-flex', alignItems: 'center', gap: 6, border: '1px solid rgba(51,65,85,0.12)', background: '#FDFAF7', borderRadius: 12, padding: '7px 13px', fontSize: 12.5, fontWeight: 700, color: '#334155', cursor: 'pointer' }}
+              style={{ marginTop: 14, display: 'inline-flex', alignItems: 'center', gap: 6, border: '1px solid rgba(51,65,85,0.12)', background: '#FDFAF7', borderRadius: 12, padding: '7px 13px', fontSize: 12.5, fontWeight: 700, color: '#2A4350', cursor: 'pointer' }}
             >
-              <Pencil size={13} color="#334155" strokeWidth={2} /> Editar
+              <Pencil size={13} color="#2A4350" strokeWidth={2} /> Editar
             </button>
           )}
         </div>
@@ -220,11 +220,11 @@ export default function MedicationDetail({ med, stock, ownerId, isAdmin, onClose
         <div style={{ position: 'fixed', inset: 0, zIndex: 300, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 24px' }} onClick={e => { if (e.target === e.currentTarget && !deleting) setConfirmingDelete(false) }}>
           <div style={{ background: 'white', borderRadius: 20, padding: '28px 24px', maxWidth: 340, width: '100%', textAlign: 'center', boxShadow: '0 24px 64px -16px #08554A55' }}>
             <p style={{ fontSize: 36, marginBottom: 12 }}>🗑️</p>
-            <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 17, fontWeight: 700, color: '#1E2C3A', marginBottom: 8 }}>¿Eliminar {med.name}?</p>
-            <p style={{ fontSize: 13, color: '#6B7A88', lineHeight: 1.6, marginBottom: 24 }}>Esta acción no se puede deshacer. Se eliminarán todos los registros del medicamento.</p>
+            <p style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 17, fontWeight: 700, color: '#14303D', marginBottom: 8 }}>¿Eliminar {med.name}?</p>
+            <p style={{ fontSize: 13, color: '#4E6470', lineHeight: 1.6, marginBottom: 24 }}>Esta acción no se puede deshacer. Se eliminarán todos los registros del medicamento.</p>
             <div style={{ display: 'flex', gap: 10 }}>
               <button onClick={() => setConfirmingDelete(false)} disabled={deleting} style={{ flex: 1, padding: 12, borderRadius: 12, border: 'none', background: '#F1EDE3', color: '#5C6B78', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>Cancelar</button>
-              <button onClick={confirmDelete} disabled={deleting} style={{ flex: 1, padding: 12, borderRadius: 12, border: 'none', background: deleting ? '#C0CCC5' : '#D9534F', color: 'white', fontWeight: 700, fontSize: 14, cursor: deleting ? 'not-allowed' : 'pointer', boxShadow: deleting ? 'none' : '0 4px 16px rgba(217,83,79,0.3)' }}>
+              <button onClick={confirmDelete} disabled={deleting} style={{ flex: 1, padding: 12, borderRadius: 12, border: 'none', background: deleting ? '#C9D6DB' : '#D9534F', color: 'white', fontWeight: 700, fontSize: 14, cursor: deleting ? 'not-allowed' : 'pointer', boxShadow: deleting ? 'none' : '0 4px 16px rgba(217,83,79,0.3)' }}>
                 {deleting ? 'Eliminando...' : 'Eliminar'}
               </button>
             </div>

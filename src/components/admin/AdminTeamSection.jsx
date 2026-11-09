@@ -3,7 +3,7 @@ import { supabase } from '../../lib/supabase'
 import { useFamily } from '../../contexts/FamilyContext'
 
 const ROLE_LABEL = { familiar: 'Familiar', cuidador: 'Cuidador' }
-const ROLE_COLOR = { familiar: '#087F70', cuidador: '#2D86A0' }
+const ROLE_COLOR = { familiar: '#0C6C9C', cuidador: '#2D86A0' }
 
 function timeAgo(isoStr) {
   if (!isoStr) return 'Nunca'
@@ -97,19 +97,19 @@ export default function AdminTeamSection() {
     setBusy(null)
   }
 
-  if (loading) return <p style={{ color: '#9CA3AF', fontSize: 14, textAlign: 'center', padding: 24 }}>Cargando equipo...</p>
+  if (loading) return <p style={{ color: '#5E7480', fontSize: 14, textAlign: 'center', padding: 24 }}>Cargando equipo...</p>
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
       {/* Active members */}
       <div>
-        <p style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 10px 2px' }}>
+        <p style={{ fontSize: 11, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 10px 2px' }}>
           Miembros activos ({members.length})
         </p>
 
         {members.length === 0 ? (
-          <p style={{ fontSize: 14, color: '#9CA3AF', textAlign: 'center', padding: '16px 0' }}>
+          <p style={{ fontSize: 14, color: '#5E7480', textAlign: 'center', padding: '16px 0' }}>
             No hay miembros en el equipo aún.
           </p>
         ) : (
@@ -117,7 +117,7 @@ export default function AdminTeamSection() {
             {members.map(m => (
               <div key={m.id} style={{
                 background: 'white', borderRadius: 14, padding: '12px 14px',
-                border: '1px solid #EDE5D8',
+                border: '1px solid #E6E3DB',
                 boxShadow: '0 1px 6px rgba(0,0,0,0.04)',
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -136,7 +136,7 @@ export default function AdminTeamSection() {
                   </div>
 
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#1A1A1A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#14303D', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {m.name}
                     </p>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 3 }}>
@@ -147,7 +147,7 @@ export default function AdminTeamSection() {
                       }}>
                         {ROLE_LABEL[m.role]}
                       </span>
-                      <span style={{ fontSize: 11, color: '#9CA3AF' }}>
+                      <span style={{ fontSize: 11, color: '#5E7480' }}>
                         Activo {timeAgo(m.lastSeen)}
                       </span>
                     </div>
@@ -192,7 +192,7 @@ export default function AdminTeamSection() {
       {/* Pending invitations */}
       {invitations.length > 0 && (
         <div>
-          <p style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 10px 2px' }}>
+          <p style={{ fontSize: 11, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 10px 2px' }}>
             Invitaciones pendientes ({invitations.length})
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -204,10 +204,10 @@ export default function AdminTeamSection() {
               }}>
                 <span style={{ fontSize: 20, flexShrink: 0 }}>✉️</span>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#1A1A1A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#14303D', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {inv.invited_email}
                   </p>
-                  <p style={{ margin: '2px 0 0', fontSize: 11, color: '#6B7280' }}>
+                  <p style={{ margin: '2px 0 0', fontSize: 11, color: '#4E6470' }}>
                     Enviada {timeAgo(inv.created_at)} · vence {new Date(inv.expires_at).toLocaleDateString('es-MX', { day: 'numeric', month: 'short' })}
                   </p>
                 </div>
@@ -241,16 +241,16 @@ export default function AdminTeamSection() {
             boxShadow: '0 24px 64px rgba(0,0,0,0.2)',
           }}>
             <p style={{ fontSize: 36, margin: '0 0 12px' }}>⚠️</p>
-            <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 17, fontWeight: 700, color: '#1A1A1A', margin: '0 0 8px' }}>
+            <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 17, fontWeight: 700, color: '#14303D', margin: '0 0 8px' }}>
               ¿Eliminar a {confirmRemove.name}?
             </p>
-            <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, margin: '0 0 24px' }}>
+            <p style={{ fontSize: 13, color: '#4E6470', lineHeight: 1.6, margin: '0 0 24px' }}>
               Perderá acceso a la familia inmediatamente. Sus datos no se borran.
             </p>
             <div style={{ display: 'flex', gap: 10 }}>
               <button onClick={() => setConfirmRemove(null)} style={{
-                flex: 1, padding: 12, borderRadius: 12, border: '1px solid #EDE5D8',
-                background: 'white', color: '#6B7280', fontWeight: 600, fontSize: 14, cursor: 'pointer',
+                flex: 1, padding: 12, borderRadius: 12, border: '1px solid #E6E3DB',
+                background: 'white', color: '#4E6470', fontWeight: 600, fontSize: 14, cursor: 'pointer',
               }}>
                 Cancelar
               </button>

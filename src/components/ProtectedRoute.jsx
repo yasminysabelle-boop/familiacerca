@@ -7,19 +7,19 @@ function Bone({ style }) {
   return (
     <div
       className="animate-pulse"
-      style={{ background: '#EDE5D8', borderRadius: 10, ...style }}
+      style={{ background: '#E6E3DB', borderRadius: 10, ...style }}
     />
   )
 }
 
 function PageSkeleton() {
   return (
-    <div style={{ background: '#F7F3ED', minHeight: '100dvh' }}>
+    <div style={{ background: '#F7F6F2', minHeight: '100dvh' }}>
       {/* Header */}
       <div style={{
         position: 'fixed', top: 0, left: 0, right: 0, height: 56, zIndex: 40,
         background: 'rgba(255,248,240,0.97)',
-        borderBottom: '1px solid #EDE5D8',
+        borderBottom: '1px solid #E6E3DB',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: '0 16px',
       }}>
@@ -45,7 +45,7 @@ function PageSkeleton() {
             key={i}
             style={{
               background: 'white', borderRadius: 16, padding: '14px 14px',
-              marginBottom: 10, border: '1px solid #EDE5D8',
+              marginBottom: 10, border: '1px solid #E6E3DB',
               display: 'flex', alignItems: 'center', gap: 12,
             }}
           >
@@ -63,7 +63,7 @@ function PageSkeleton() {
       <div style={{
         position: 'fixed', bottom: 0, left: 0, right: 0, height: 68,
         background: 'rgba(255,255,255,0.97)',
-        borderTop: '1px solid #EDE5D8',
+        borderTop: '1px solid #E6E3DB',
         display: 'flex', alignItems: 'center', justifyContent: 'space-around',
         padding: '0 8px',
       }}>
@@ -81,11 +81,11 @@ function PageSkeleton() {
 function ConnectingScreen({ onRetry, hasError }) {
   return (
     <div style={{
-      minHeight: '100dvh', background: '#F8F4ED',
+      minHeight: '100dvh', background: '#F7F6F2',
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12,
     }}>
       <img src="/logo.png" alt="FamiliaCerca" style={{ width: 72, objectFit: 'contain', marginBottom: 4 }} />
-      <p style={{ fontSize: 17, fontWeight: 700, color: '#334155', margin: 0, fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}>
+      <p style={{ fontSize: 17, fontWeight: 700, color: '#2A4350', margin: 0, fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}>
         {hasError ? 'No pudimos conectar' : 'Conectando…'}
       </p>
       <p style={{ fontSize: 13, color: '#9AA89E', margin: 0 }}>
@@ -93,7 +93,7 @@ function ConnectingScreen({ onRetry, hasError }) {
       </p>
       <button
         onClick={onRetry}
-        style={{ marginTop: 8, padding: '10px 24px', borderRadius: 12, border: 'none', background: '#087F70', color: 'white', fontWeight: 600, fontSize: 13, cursor: 'pointer' }}
+        style={{ marginTop: 8, padding: '10px 24px', borderRadius: 12, border: 'none', background: '#0C6C9C', color: 'white', fontWeight: 600, fontSize: 13, cursor: 'pointer' }}
       >
         Reintentar
       </button>

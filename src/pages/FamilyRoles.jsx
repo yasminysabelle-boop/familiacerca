@@ -6,7 +6,7 @@ import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 
 const ROLE_META = {
-  admin:    { label: 'Admin',    color: '#3D6B54', bg: '#E8F5EE' },
+  admin:    { label: 'Admin',    color: '#0A4A6B', bg: '#E3F1F8' },
   cuidador: { label: 'Cuidador', color: '#1D4ED8', bg: '#EFF6FF' },
   familiar: { label: 'Familiar', color: '#7C3AED', bg: '#F5F3FF' },
 }
@@ -32,7 +32,7 @@ function MemberRow({ name, email, avatarUrl, role, isCurrentUser, isAdmin, isOwn
   return (
     <div style={{
       background: 'white', borderRadius: 16, padding: '14px 16px',
-      boxShadow: '0 1px 8px rgba(0,0,0,0.06)', border: '1px solid #F8F4ED',
+      boxShadow: '0 1px 8px rgba(0,0,0,0.06)', border: '1px solid #F7F6F2',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         {avatarUrl ? (
@@ -41,7 +41,7 @@ function MemberRow({ name, email, avatarUrl, role, isCurrentUser, isAdmin, isOwn
         ) : (
           <div style={{
             width: 40, height: 40, borderRadius: '50%', flexShrink: 0,
-            background: isOwner ? '#0B4F4A' : '#3D6B54',
+            background: isOwner ? '#0A4A6B' : '#0A4A6B',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             color: 'white', fontWeight: 700, fontSize: 16,
           }}>
@@ -51,15 +51,15 @@ function MemberRow({ name, email, avatarUrl, role, isCurrentUser, isAdmin, isOwn
 
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-            <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#1E2D26', lineHeight: 1.3 }}>
+            <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#0A4A6B', lineHeight: 1.3 }}>
               {name}
             </p>
             {isCurrentUser && (
-              <span style={{ fontSize: 10, color: '#9CA3AF', fontWeight: 500 }}>(tú)</span>
+              <span style={{ fontSize: 10, color: '#5E7480', fontWeight: 500 }}>(tú)</span>
             )}
           </div>
           {email && (
-            <p style={{ margin: '1px 0 0', fontSize: 11, color: '#9CA3AF', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <p style={{ margin: '1px 0 0', fontSize: 11, color: '#5E7480', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {email}
             </p>
           )}
@@ -73,7 +73,7 @@ function MemberRow({ name, email, avatarUrl, role, isCurrentUser, isAdmin, isOwn
               style={{
                 background: 'none', border: '1px solid #E5E7EB', borderRadius: 8,
                 cursor: 'pointer', padding: '4px 10px',
-                fontSize: 12, color: '#6B7280', fontWeight: 500,
+                fontSize: 12, color: '#4E6470', fontWeight: 500,
                 WebkitTapHighlightColor: 'transparent',
               }}
             >
@@ -84,8 +84,8 @@ function MemberRow({ name, email, avatarUrl, role, isCurrentUser, isAdmin, isOwn
       </div>
 
       {editing && (
-        <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid #F8F4ED' }}>
-          <p style={{ margin: '0 0 10px', fontSize: 12, fontWeight: 600, color: '#6B7280' }}>
+        <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid #F7F6F2' }}>
+          <p style={{ margin: '0 0 10px', fontSize: 12, fontWeight: 600, color: '#4E6470' }}>
             Cambiar rol:
           </p>
           <div style={{ display: 'flex', gap: 8 }}>
@@ -99,15 +99,15 @@ function MemberRow({ name, email, avatarUrl, role, isCurrentUser, isAdmin, isOwn
                 disabled={saving || opt.value === role}
                 style={{
                   flex: 1, padding: '10px 8px', borderRadius: 12, border: 'none',
-                  background: opt.value === role ? '#E8F5EE' : '#F8F6F2',
+                  background: opt.value === role ? '#E3F1F8' : '#F8F6F2',
                   cursor: saving || opt.value === role ? 'default' : 'pointer',
                   opacity: saving ? 0.6 : 1,
                   display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
                   WebkitTapHighlightColor: 'transparent',
                 }}
               >
-                <span style={{ fontSize: 13, fontWeight: 700, color: '#1E2D26' }}>{opt.label}</span>
-                <span style={{ fontSize: 11, color: '#9CA3AF' }}>{opt.desc}</span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: '#0A4A6B' }}>{opt.label}</span>
+                <span style={{ fontSize: 11, color: '#5E7480' }}>{opt.desc}</span>
               </button>
             ))}
           </div>
@@ -115,7 +115,7 @@ function MemberRow({ name, email, avatarUrl, role, isCurrentUser, isAdmin, isOwn
             onClick={onCancelEdit}
             style={{
               marginTop: 8, width: '100%', background: 'none', border: 'none',
-              cursor: 'pointer', fontSize: 12, color: '#9CA3AF', padding: '6px 0',
+              cursor: 'pointer', fontSize: 12, color: '#5E7480', padding: '6px 0',
             }}
           >
             Cancelar
@@ -200,7 +200,7 @@ export default function FamilyRoles() {
           style={{
             display: 'flex', alignItems: 'center', gap: 6,
             background: 'none', border: 'none', cursor: 'pointer',
-            color: '#3D6B54', fontWeight: 600, fontSize: 14,
+            color: '#0A4A6B', fontWeight: 600, fontSize: 14,
             padding: '4px 0', marginBottom: 16,
             WebkitTapHighlightColor: 'transparent',
           }}
@@ -208,10 +208,10 @@ export default function FamilyRoles() {
           ← Mi cuenta
         </button>
 
-        <h1 style={{ margin: '0 0 4px', fontSize: 20, fontWeight: 700, color: '#1E2D26', fontFamily: 'Georgia, serif' }}>
+        <h1 style={{ margin: '0 0 4px', fontSize: 20, fontWeight: 700, color: '#0A4A6B', fontFamily: 'Georgia, serif' }}>
           Permisos de acceso
         </h1>
-        <p style={{ margin: '0 0 20px', fontSize: 13, color: '#9CA3AF', lineHeight: 1.5 }}>
+        <p style={{ margin: '0 0 20px', fontSize: 13, color: '#5E7480', lineHeight: 1.5 }}>
           {isAdmin
             ? 'Administra los roles de tu equipo de cuidado.'
             : 'Roles y accesos del equipo de cuidado.'}
@@ -230,14 +230,14 @@ export default function FamilyRoles() {
                 <span style={{ padding: '2px 8px', borderRadius: 20, background: meta.bg, color: meta.color, fontSize: 10, fontWeight: 700 }}>
                   {meta.label}
                 </span>
-                <span style={{ fontSize: 11, color: '#9CA3AF' }}>{desc}</span>
+                <span style={{ fontSize: 11, color: '#5E7480' }}>{desc}</span>
               </div>
             )
           })}
         </div>
 
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '40px 0', color: '#9CA3AF', fontSize: 14 }}>
+          <div style={{ textAlign: 'center', padding: '40px 0', color: '#5E7480', fontSize: 14 }}>
             Cargando...
           </div>
         ) : (
@@ -284,7 +284,7 @@ export default function FamilyRoles() {
               <div style={{
                 textAlign: 'center', padding: '32px 16px',
                 background: 'white', borderRadius: 16,
-                border: '1px solid #F8F4ED', color: '#9CA3AF', fontSize: 13,
+                border: '1px solid #F7F6F2', color: '#5E7480', fontSize: 13,
               }}>
                 No hay otros miembros en el equipo todavía.<br />
                 <span style={{ fontSize: 12 }}>Invita a tu familia desde <b>Mi Familia</b>.</span>

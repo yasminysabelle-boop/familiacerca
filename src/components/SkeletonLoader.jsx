@@ -34,7 +34,7 @@ export function SkeletonAvatar({ size = 44, style = {} }) {
 
 export function SkeletonMedCard() {
   return (
-    <div style={{ background: 'white', borderRadius: 16, border: '1px solid #EDE5D8', padding: '14px 16px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+    <div style={{ background: 'white', borderRadius: 16, border: '1px solid #E6E3DB', padding: '14px 16px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
         <SkeletonAvatar size={12} />
         <SkeletonLine width={140} height={15} />
@@ -47,7 +47,7 @@ export function SkeletonMedCard() {
 
 export function SkeletonEventCard() {
   return (
-    <div style={{ background: 'white', borderRadius: 16, border: '1px solid #EDE5D8', padding: '13px 15px', display: 'flex', gap: 12 }}>
+    <div style={{ background: 'white', borderRadius: 16, border: '1px solid #E6E3DB', padding: '13px 15px', display: 'flex', gap: 12 }}>
       <SkeletonAvatar size={38} style={{ borderRadius: 10 }} />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 7 }}>
         <SkeletonLine width={80} height={11} />
@@ -60,7 +60,7 @@ export function SkeletonEventCard() {
 
 export function SkeletonExpenseCard() {
   return (
-    <div style={{ background: 'white', borderRadius: 16, border: '1px solid #EDE5D8', padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
+    <div style={{ background: 'white', borderRadius: 16, border: '1px solid #E6E3DB', padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
       <SkeletonAvatar size={40} style={{ borderRadius: 10 }} />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 7 }}>
         <SkeletonLine width={120} height={14} />
@@ -73,7 +73,7 @@ export function SkeletonExpenseCard() {
 
 export function SkeletonDashSummary() {
   return (
-    <div style={{ background: 'white', borderRadius: 20, border: '1px solid #EDE5D8', padding: '16px 18px', marginBottom: 12 }}>
+    <div style={{ background: 'white', borderRadius: 20, border: '1px solid #E6E3DB', padding: '16px 18px', marginBottom: 12 }}>
       <SkeletonLine width={120} height={14} style={{ marginBottom: 14 }} />
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         {[...Array(3)].map((_, i) => (

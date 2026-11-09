@@ -1,20 +1,20 @@
 export default function EmptyState({ icon, title, description, actionLabel, onAction }) {
   return (
     <div style={{
-      background: 'white', borderRadius: 20, border: '1px solid #EDE5D8',
+      background: 'white', borderRadius: 20, border: '1px solid #E6E3DB',
       padding: '48px 24px', textAlign: 'center',
       boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
     }}>
       <div style={{ fontSize: 48, marginBottom: 14, lineHeight: 1 }}>{icon}</div>
       <p style={{
         fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 16, fontWeight: 700,
-        color: '#0B4F4A', margin: '0 0 8px',
+        color: '#0A4A6B', margin: '0 0 8px',
       }}>
         {title}
       </p>
       {description && (
         <p style={{
-          fontSize: 13, color: '#9CA3AF', lineHeight: 1.6,
+          fontSize: 13, color: '#5E7480', lineHeight: 1.6,
           margin: actionLabel ? '0 0 20px' : 0,
         }}>
           {description}
@@ -26,9 +26,9 @@ export default function EmptyState({ icon, title, description, actionLabel, onAc
           style={{
             display: 'inline-flex', alignItems: 'center', gap: 6,
             padding: '10px 22px', borderRadius: 12, border: 'none',
-            background: '#087F70',
+            background: '#0C6C9C',
             color: 'white', fontWeight: 700, fontSize: 13,
-            cursor: 'pointer', boxShadow: '0 4px 12px rgba(8,127,112,0.25)',
+            cursor: 'pointer', boxShadow: '0 4px 12px rgba(12,108,156,0.25)',
           }}
         >
           {actionLabel}

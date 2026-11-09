@@ -34,7 +34,7 @@ export default function HospitalDashboard({ onManageMode, onSOS, onVideoCall }) 
   return (
     <div style={{
       position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999,
-      backgroundColor: '#F8F4ED', overflowY: 'auto',
+      backgroundColor: '#F7F6F2', overflowY: 'auto',
       padding: '12px 16px 32px', display: 'flex', flexDirection: 'column', gap: 14,
     }}>
 
@@ -47,7 +47,7 @@ export default function HospitalDashboard({ onManageMode, onSOS, onVideoCall }) 
           onError={e => { e.currentTarget.style.display = 'none' }}
         />
         <span style={{ fontFamily: 'Georgia, serif', fontSize: 19, fontWeight: 700, lineHeight: 1 }}>
-          <span style={{ color: '#1E2D26' }}>Familia</span>
+          <span style={{ color: '#0A4A6B' }}>Familia</span>
           <span style={{ color: '#E58B73' }}>Cerca</span>
         </span>
       </div>
@@ -77,8 +77,8 @@ export default function HospitalDashboard({ onManageMode, onSOS, onVideoCall }) 
         emoji="💬"
         title="Chat familiar"
         subtitle="Mantente comunicado con el equipo"
-        color="#0d6b63"
-        bg="#F0F9F4"
+        color="#0A5A82"
+        bg="#E3F1F8"
         border="#BBF7D0"
       />
 
@@ -87,16 +87,16 @@ export default function HospitalDashboard({ onManageMode, onSOS, onVideoCall }) 
         onClick={onVideoCall}
         style={{
           width: '100%', background: 'white', borderRadius: 16, padding: '16px 18px',
-          boxShadow: '0 2px 12px rgba(0,0,0,0.06)', border: '1px solid #F8F4ED',
+          boxShadow: '0 2px 12px rgba(0,0,0,0.06)', border: '1px solid #F7F6F2',
           cursor: 'pointer', textAlign: 'left', display: 'flex', alignItems: 'center', gap: 12,
         }}
       >
         <span style={{ fontSize: 28, flexShrink: 0 }}>📹</span>
         <div style={{ flex: 1 }}>
-          <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#1A1A1A' }}>Videollamadas</p>
-          <p style={{ margin: '2px 0 0', fontSize: 12, color: '#6B7280' }}>Programar o unirse a la sala familiar</p>
+          <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#14303D' }}>Videollamadas</p>
+          <p style={{ margin: '2px 0 0', fontSize: 12, color: '#4E6470' }}>Programar o unirse a la sala familiar</p>
         </div>
-        <span style={{ color: '#0d6b63', fontSize: 18, flexShrink: 0 }}>›</span>
+        <span style={{ color: '#0A5A82', fontSize: 18, flexShrink: 0 }}>›</span>
       </button>
 
       {/* ── Emergencia ────────────────────────────────────── */}
@@ -143,7 +143,7 @@ export default function HospitalDashboard({ onManageMode, onSOS, onVideoCall }) 
           <p style={{ margin: 0, fontSize: 14, color: '#B91C1C', fontWeight: 700, textAlign: 'center' }}>
             ¿Confirmar alta hospitalaria?
           </p>
-          <p style={{ margin: 0, fontSize: 13, color: '#6B7280', textAlign: 'center', lineHeight: 1.5 }}>
+          <p style={{ margin: 0, fontSize: 13, color: '#4E6470', textAlign: 'center', lineHeight: 1.5 }}>
             Los medicamentos y rutinas se reanudan. El equipo será notificado.
           </p>
           {deactivateError && (
@@ -156,8 +156,8 @@ export default function HospitalDashboard({ onManageMode, onSOS, onVideoCall }) 
               onClick={() => setConfirmDeactivate(false)}
               style={{
                 flex: 1, padding: '12px', borderRadius: 12,
-                border: '1.5px solid #EDE5D8', background: 'white',
-                color: '#6B7280', fontWeight: 700, fontSize: 14, cursor: 'pointer',
+                border: '1.5px solid #E6E3DB', background: 'white',
+                color: '#4E6470', fontWeight: 700, fontSize: 14, cursor: 'pointer',
               }}
             >
               Cancelar
@@ -168,10 +168,10 @@ export default function HospitalDashboard({ onManageMode, onSOS, onVideoCall }) 
               style={{
                 flex: 1, padding: '12px', borderRadius: 12,
                 border: 'none',
-                background: deactivating ? '#9CA3AF' : 'linear-gradient(135deg, #0d6b63, #3A6347)',
+                background: deactivating ? '#5E7480' : 'linear-gradient(135deg, #0A5A82, #0A4A6B)',
                 color: 'white', fontWeight: 700, fontSize: 14,
                 cursor: deactivating ? 'default' : 'pointer',
-                boxShadow: deactivating ? 'none' : '0 4px 14px rgba(13,107,99,0.3)',
+                boxShadow: deactivating ? 'none' : '0 4px 14px rgba(10,90,130,0.3)',
               }}
             >
               {deactivating ? 'Desactivando...' : '✅ Confirmar alta'}
@@ -196,8 +196,8 @@ function QuickLink({ to, emoji, title, subtitle, color, bg, border }) {
     >
       <span style={{ fontSize: 24, flexShrink: 0 }}>{emoji}</span>
       <div style={{ flex: 1 }}>
-        <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#1A1A1A' }}>{title}</p>
-        <p style={{ margin: '2px 0 0', fontSize: 12, color: '#6B7280' }}>{subtitle}</p>
+        <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#14303D' }}>{title}</p>
+        <p style={{ margin: '2px 0 0', fontSize: 12, color: '#4E6470' }}>{subtitle}</p>
       </div>
       <span style={{ color: color, fontSize: 18, flexShrink: 0 }}>›</span>
     </Link>

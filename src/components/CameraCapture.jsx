@@ -96,7 +96,7 @@ export default function CameraCapture({
           boxShadow: status === 'denied' ? '0 4px 10px -6px rgba(30,44,58,0.25)' : 'none',
         }}
       >
-        <XIcon size={16} color={status === 'denied' ? '#6B7A88' : 'white'} strokeWidth={2.2} />
+        <XIcon size={16} color={status === 'denied' ? '#4E6470' : 'white'} strokeWidth={2.2} />
       </button>
 
       {/* Montado siempre desde el primer render — la ref debe existir antes
@@ -112,7 +112,7 @@ export default function CameraCapture({
 
       {status === 'requesting' && (
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
-          <div style={{ width: 34, height: 34, borderRadius: '50%', border: '3px solid rgba(255,255,255,0.15)', borderTopColor: '#087F70', animation: 'camCaptureSpin 0.85s linear infinite' }} />
+          <div style={{ width: 34, height: 34, borderRadius: '50%', border: '3px solid rgba(255,255,255,0.15)', borderTopColor: '#0C6C9C', animation: 'camCaptureSpin 0.85s linear infinite' }} />
           <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: 13.5, fontWeight: 600, margin: 0 }}>Abriendo cámara…</p>
         </div>
       )}
@@ -144,7 +144,7 @@ export default function CameraCapture({
                 cursor: 'pointer',
               }}
             >
-              <span style={{ width: 56, height: 56, borderRadius: '50%', background: '#087F70' }} />
+              <span style={{ width: 56, height: 56, borderRadius: '50%', background: '#0C6C9C' }} />
             </button>
           </div>
         </>
@@ -153,23 +153,23 @@ export default function CameraCapture({
       {status === 'denied' && (
         <div style={{
           flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-          gap: 18, background: '#F8F4ED', padding: '0 30px', textAlign: 'center',
+          gap: 18, background: '#F7F6F2', padding: '0 30px', textAlign: 'center',
         }}>
           <div style={{ width: 56, height: 56, borderRadius: 18, background: '#FBEAE4', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Camera size={26} color="#C4664F" strokeWidth={1.8} />
           </div>
-          <h3 style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 16.5, fontWeight: 800, color: '#1E2C3A', margin: 0 }}>
+          <h3 style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 16.5, fontWeight: 800, color: '#14303D', margin: 0 }}>
             {deniedTitle}
           </h3>
-          <p style={{ fontSize: 13, lineHeight: 1.55, color: '#6B7A88', margin: 0, maxWidth: '27ch' }}>
+          <p style={{ fontSize: 13, lineHeight: 1.55, color: '#4E6470', margin: 0, maxWidth: '27ch' }}>
             {deniedDescription}
           </p>
           <button
             onClick={onManualFallback}
             style={{
               width: '100%', marginTop: 4, padding: 13, border: 'none', borderRadius: 14,
-              background: '#087F70', color: 'white', fontSize: 14, fontWeight: 700, cursor: 'pointer',
-              boxShadow: '0 4px 14px rgba(8,127,112,0.3)',
+              background: '#0C6C9C', color: 'white', fontSize: 14, fontWeight: 700, cursor: 'pointer',
+              boxShadow: '0 4px 14px rgba(12,108,156,0.3)',
             }}
           >
             {deniedButtonLabel}

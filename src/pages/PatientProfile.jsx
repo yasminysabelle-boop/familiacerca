@@ -40,16 +40,16 @@ const EMPTY = {
 
 // ── Style tokens ─────────────────────────────────────────────────────────────
 const F = {
-  width:'100%', padding:'11px 13px', border:'1.5px solid #EDE5D8',
+  width:'100%', padding:'11px 13px', border:'1.5px solid #E6E3DB',
   borderRadius:12, fontSize:14, outline:'none', background:'#FDFAF7',
   boxSizing:'border-box', color:'#1F2937', fontFamily:'system-ui,sans-serif',
 }
 const L = {
-  fontSize:11, fontWeight:700, color:'#6B7280',
+  fontSize:11, fontWeight:700, color:'#4E6470',
   letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:5, display:'block',
 }
-const fo = e => { e.target.style.borderColor='#087F70'; e.target.style.boxShadow='0 0 0 3px rgba(8,127,112,0.1)' }
-const fb = e => { e.target.style.borderColor='#EDE5D8'; e.target.style.boxShadow='none' }
+const fo = e => { e.target.style.borderColor='#0C6C9C'; e.target.style.boxShadow='0 0 0 3px rgba(12,108,156,0.1)' }
+const fb = e => { e.target.style.borderColor='#E6E3DB'; e.target.style.boxShadow='none' }
 
 // ── Helper components ─────────────────────────────────────────────────────────
 function Fld({ label, children, mb=14 }) {
@@ -65,7 +65,7 @@ function VoiceArea({ id, value, onChange, placeholder, lf, onVoice, rows=3 }) {
       <button type="button" onClick={() => onVoice(id)} style={{
         position:'absolute', top:8, right:8, width:28, height:28,
         borderRadius:8, border:'none', cursor:'pointer',
-        background: lf===id ? '#D63031' : '#EBF3EE',
+        background: lf===id ? '#D63031' : '#E3F1F8',
         fontSize:14, display:'flex', alignItems:'center', justifyContent:'center',
         transition:'background 0.15s', animation: lf===id ? 'mic-pulse 1s ease-in-out infinite' : 'none',
       }}>🎙️</button>
@@ -91,7 +91,7 @@ function Section({ color, icon, title, badge, open, onToggle, children }) {
           justifyContent:'center', fontSize:20,
         }}>{icon}</span>
         <div style={{ flex:1 }}>
-          <p style={{ fontSize:14, fontWeight:700, color:'#1A1A1A', margin:0 }}>{title}</p>
+          <p style={{ fontSize:14, fontWeight:700, color:'#14303D', margin:0 }}>{title}</p>
           {badge>0 && (
             <p style={{ fontSize:11, color, fontWeight:600, margin:'2px 0 0' }}>
               {badge} campo{badge!==1?'s':''} completado{badge!==1?'s':''}
@@ -99,7 +99,7 @@ function Section({ color, icon, title, badge, open, onToggle, children }) {
           )}
         </div>
         <span style={{
-          fontSize:13, color:'#9CA3AF',
+          fontSize:13, color:'#5E7480',
           display:'inline-block', transform: open?'rotate(180deg)':'none',
           transition:'transform 0.2s',
         }}>▾</span>
@@ -109,7 +109,7 @@ function Section({ color, icon, title, badge, open, onToggle, children }) {
   )
 }
 
-function CheckChips({ opts, value, onChange, colorOn='#087F70', bgOn='#EBF3EE' }) {
+function CheckChips({ opts, value, onChange, colorOn='#0C6C9C', bgOn='#E3F1F8' }) {
   const toggle = o => onChange(value.includes(o) ? value.filter(x=>x!==o) : [...value, o])
   return (
     <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
@@ -118,9 +118,9 @@ function CheckChips({ opts, value, onChange, colorOn='#087F70', bgOn='#EBF3EE' }
         return (
           <button key={o} type="button" onClick={() => toggle(o)} style={{
             padding:'7px 13px', borderRadius:20, fontWeight:600, fontSize:13, cursor:'pointer',
-            border:`1.5px solid ${on ? colorOn : '#EDE5D8'}`,
+            border:`1.5px solid ${on ? colorOn : '#E6E3DB'}`,
             background: on ? bgOn : 'white',
-            color: on ? colorOn : '#6B7280',
+            color: on ? colorOn : '#4E6470',
             display:'flex', alignItems:'center', gap:5, transition:'all 0.15s',
           }}>
             {on && <span style={{ fontSize:11 }}>✓</span>}{o}
@@ -330,7 +330,7 @@ export default function PatientProfile() {
       <div style={{ paddingBottom:100 }}>
         {/* ── Header ── */}
         <div style={{
-          background:'linear-gradient(135deg, #0d6b63 0%, #2E5240 100%)',
+          background:'linear-gradient(135deg, #0A5A82 0%, #0A4A6B 100%)',
           padding:'20px 16px 32px',
         }}>
           <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:20 }}>
@@ -375,7 +375,7 @@ export default function PatientProfile() {
               {canEdit && (
                 <div onClick={() => fileRef.current?.click()} style={{
                   position:'absolute', bottom:0, right:0, width:22, height:22,
-                  borderRadius:'50%', background:'white', border:'2px solid #0d6b63',
+                  borderRadius:'50%', background:'white', border:'2px solid #0A5A82',
                   display:'flex', alignItems:'center', justifyContent:'center',
                   fontSize:11, cursor:'pointer',
                 }}>📷</div>
@@ -399,12 +399,12 @@ export default function PatientProfile() {
         <input ref={fileRef} type="file" accept="image/*" style={{ display:'none' }} onChange={handlePhoto} />
 
         {loading ? (
-          <div style={{ padding:'40px', textAlign:'center', color:'#9CA3AF', fontSize:14 }}>Cargando perfil...</div>
+          <div style={{ padding:'40px', textAlign:'center', color:'#5E7480', fontSize:14 }}>Cargando perfil...</div>
         ) : (
           <form onSubmit={handleSave} style={{ padding:'16px 16px 0' }}>
 
             {/* ══ S1: Información básica ═══════════════════════════════════ */}
-            <Section color="#0d6b63" icon="📋" title="Información básica" badge={b1}
+            <Section color="#0A5A82" icon="📋" title="Información básica" badge={b1}
               open={open.s1} onToggle={() => setOpen(p=>({...p,s1:!p.s1}))}>
 
               <Fld label="Nombre completo">
@@ -427,9 +427,9 @@ export default function PatientProfile() {
                       onClick={() => set('sexo', form.sexo===o.v ? '' : o.v)}
                       style={{
                         flex:1, padding:'12px 0', borderRadius:12, fontWeight:700, fontSize:14, cursor:'pointer',
-                        border:`1.5px solid ${form.sexo===o.v ? '#087F70' : '#EDE5D8'}`,
-                        background: form.sexo===o.v ? '#EBF3EE' : 'white',
-                        color: form.sexo===o.v ? '#2E5240' : '#6B7280',
+                        border:`1.5px solid ${form.sexo===o.v ? '#0C6C9C' : '#E6E3DB'}`,
+                        background: form.sexo===o.v ? '#E3F1F8' : 'white',
+                        color: form.sexo===o.v ? '#0A4A6B' : '#4E6470',
                         transition:'all 0.15s',
                       }}>{o.label}</button>
                   ))}
@@ -443,9 +443,9 @@ export default function PatientProfile() {
                     return (
                       <button key={s} type="button" onClick={() => set('tipo_sangre', on?'':s)} style={{
                         padding:'8px 14px', borderRadius:20, fontWeight:700, fontSize:13, cursor:'pointer',
-                        border:`1.5px solid ${on ? '#D63031' : '#EDE5D8'}`,
+                        border:`1.5px solid ${on ? '#D63031' : '#E6E3DB'}`,
                         background: on ? '#FFF0F0' : 'white',
-                        color: on ? '#D63031' : '#6B7280',
+                        color: on ? '#D63031' : '#4E6470',
                         transition:'all 0.15s',
                       }}>{s}</button>
                     )
@@ -473,9 +473,9 @@ export default function PatientProfile() {
                     return (
                       <button key={a} type="button" onClick={() => toggleAlergia(a)} style={{
                         padding:'7px 13px', borderRadius:20, fontWeight:600, fontSize:13, cursor:'pointer',
-                        border:`1.5px solid ${on ? '#D63031' : '#EDE5D8'}`,
+                        border:`1.5px solid ${on ? '#D63031' : '#E6E3DB'}`,
                         background: on ? '#FFF0F0' : 'white',
-                        color: on ? '#D63031' : '#6B7280', transition:'all 0.15s',
+                        color: on ? '#D63031' : '#4E6470', transition:'all 0.15s',
                       }}>{on?'⚠ ':''}{a}</button>
                     )
                   })}
@@ -488,14 +488,14 @@ export default function PatientProfile() {
                   }}>
                     <span style={{ fontSize:13, fontWeight:600, color:'#D63031', flex:1 }}>⚠ {a.nombre}</span>
                     <select value={a.reaccion} onChange={e=>setReaccion(a.nombre,e.target.value)} style={{
-                      fontSize:12, border:'1px solid #EDE5D8', borderRadius:8,
-                      padding:'5px 8px', background:'white', color:'#374151', outline:'none',
+                      fontSize:12, border:'1px solid #E6E3DB', borderRadius:8,
+                      padding:'5px 8px', background:'white', color:'#30454F', outline:'none',
                     }}>
                       <option value="">Reacción...</option>
                       {REACCIONES.map(r=><option key={r} value={r}>{r}</option>)}
                     </select>
                     <button type="button" onClick={() => toggleAlergia(a.nombre)} style={{
-                      background:'none', border:'none', cursor:'pointer', color:'#9CA3AF', fontSize:16, padding:'0 2px',
+                      background:'none', border:'none', cursor:'pointer', color:'#5E7480', fontSize:16, padding:'0 2px',
                     }}>✕</button>
                   </div>
                 ))}
@@ -550,23 +550,23 @@ export default function PatientProfile() {
               disabled={generatingPDF}
               style={{
                 width: '100%', marginBottom: 12, padding: '13px 16px',
-                borderRadius: 16, border: '1.5px solid #0B4F4A',
-                background: generatingPDF ? '#F0F9F4' : 'white',
+                borderRadius: 16, border: '1.5px solid #0A4A6B',
+                background: generatingPDF ? '#E3F1F8' : 'white',
                 display: 'flex', alignItems: 'center', gap: 10,
                 cursor: generatingPDF ? 'not-allowed' : 'pointer',
-                boxShadow: '0 2px 8px rgba(11,79,74,0.08)',
+                boxShadow: '0 2px 8px rgba(10,74,107,0.08)',
               }}
             >
               <span style={{ fontSize: 20 }}>{generatingPDF ? '⏳' : '📄'}</span>
               <div style={{ flex: 1, textAlign: 'left' }}>
-                <p style={{ fontSize: 13, fontWeight: 700, color: '#0B4F4A', margin: 0 }}>
+                <p style={{ fontSize: 13, fontWeight: 700, color: '#0A4A6B', margin: 0 }}>
                   Reporte para el médico
                 </p>
-                <p style={{ fontSize: 11, color: '#9CA3AF', margin: '1px 0 0' }}>
+                <p style={{ fontSize: 11, color: '#5E7480', margin: '1px 0 0' }}>
                   Para descargar y llevar a la consulta
                 </p>
               </div>
-              <span style={{ color: '#087F70', fontSize: 16 }}>›</span>
+              <span style={{ color: '#0C6C9C', fontSize: 16 }}>›</span>
             </button>
 
             {/* ══ S3: Preferencias ═══════════════════════════════════════════ */}
@@ -580,9 +580,9 @@ export default function PatientProfile() {
                     return (
                       <button key={m.v} type="button" onClick={() => set('movilidad', on?'':m.v)} style={{
                         padding:'12px 8px', borderRadius:14, cursor:'pointer', textAlign:'center',
-                        border:`1.5px solid ${on ? '#EA8C00' : '#EDE5D8'}`,
+                        border:`1.5px solid ${on ? '#EA8C00' : '#E6E3DB'}`,
                         background: on ? '#FFFBEB' : 'white',
-                        color: on ? '#7C5000' : '#6B7280',
+                        color: on ? '#7C5000' : '#4E6470',
                         fontWeight:600, fontSize:13, transition:'all 0.15s',
                       }}>
                         <div style={{ fontSize:22, marginBottom:4 }}>{m.icon}</div>
@@ -600,9 +600,9 @@ export default function PatientProfile() {
                     return (
                       <button key={c} type="button" onClick={() => set('estado_cognitivo', on?'':c)} style={{
                         padding:'8px 14px', borderRadius:20, fontWeight:600, fontSize:13, cursor:'pointer',
-                        border:`1.5px solid ${on ? '#EA8C00' : '#EDE5D8'}`,
+                        border:`1.5px solid ${on ? '#EA8C00' : '#E6E3DB'}`,
                         background: on ? '#FFFBEB' : 'white',
-                        color: on ? '#7C5000' : '#6B7280', transition:'all 0.15s',
+                        color: on ? '#7C5000' : '#4E6470', transition:'all 0.15s',
                       }}>{c}</button>
                     )
                   })}
@@ -669,7 +669,7 @@ export default function PatientProfile() {
             <Section color="#7C3AED" icon="📖" title="Historia personal" badge={b5}
               open={open.s5} onToggle={() => setOpen(p=>({...p,s5:!p.s5}))}>
 
-              <p style={{ fontSize:13, color:'#9CA3AF', margin:'0 0 16px', lineHeight:1.5 }}>
+              <p style={{ fontSize:13, color:'#5E7480', margin:'0 0 16px', lineHeight:1.5 }}>
                 Ayuda a los cuidadores a conocer a la persona más allá de su condición médica.
               </p>
 

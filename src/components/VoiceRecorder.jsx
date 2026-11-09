@@ -167,7 +167,7 @@ export default function VoiceRecorder({
         {(active ? [0, 0.5, 1] : [0, 0.7, 1.4]).map((delay, i) => (
           <div key={i} style={{
             position: 'absolute', inset: 0, borderRadius: '50%',
-            background: active ? 'rgba(220,38,38,0.18)' : 'rgba(8,127,112,0.12)',
+            background: active ? 'rgba(220,38,38,0.18)' : 'rgba(12,108,156,0.12)',
             animation: `${active ? 'vr-rec 1.6s' : 'vr-idle 2.1s'} ease-out infinite ${delay}s`,
             pointerEvents: 'none',
           }} />
@@ -178,12 +178,12 @@ export default function VoiceRecorder({
             position: 'absolute', inset: 0, borderRadius: '50%', border: 'none',
             background: active
               ? 'linear-gradient(135deg, #DC2626, #B91C1C)'
-              : 'linear-gradient(135deg, #087F70, #087F70)',
+              : 'linear-gradient(135deg, #0C6C9C, #0C6C9C)',
             cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             boxShadow: active
               ? '0 0 0 4px rgba(220,38,38,0.2), 0 6px 20px rgba(185,28,28,0.4)'
-              : '0 6px 20px rgba(8,127,112,0.35)',
+              : '0 6px 20px rgba(12,108,156,0.35)',
             transition: 'background 0.2s, box-shadow 0.2s',
           }}
         >
@@ -196,19 +196,19 @@ export default function VoiceRecorder({
 
       {/* Timer */}
       {active && (
-        <p style={{ margin: 0, fontSize: 28, fontWeight: 700, fontFamily: 'monospace', color: '#1A1A1A' }}>
+        <p style={{ margin: 0, fontSize: 28, fontWeight: 700, fontFamily: 'monospace', color: '#14303D' }}>
           {fmt(elapsed)}
         </p>
       )}
 
       {/* Status text */}
-      <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: active ? '#DC2626' : '#087F70' }}>
+      <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: active ? '#DC2626' : '#0C6C9C' }}>
         {active ? 'Grabando... toca para detener' : placeholder}
       </p>
 
       {/* Live interim text (transcribe mode) */}
       {active && mode === 'transcribe' && interim && (
-        <p style={{ margin: 0, fontSize: 12, color: '#9CA3AF', fontStyle: 'italic', textAlign: 'center', maxWidth: 280 }}>
+        <p style={{ margin: 0, fontSize: 12, color: '#5E7480', fontStyle: 'italic', textAlign: 'center', maxWidth: 280 }}>
           {interim}...
         </p>
       )}

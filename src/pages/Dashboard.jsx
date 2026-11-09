@@ -150,7 +150,7 @@ function PendingCard({ evt, confirming, onConfirm, todayKey, isFamiliar }) {
       background: '#FFFBEB', borderRadius: 16,
       border: '1.5px solid #FDE68A',
       padding: '12px 14px',
-      boxShadow: '0 2px 8px rgba(13,107,99,0.06)',
+      boxShadow: '0 2px 8px rgba(10,90,130,0.06)',
     }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
         <span style={{ fontSize: 20, flexShrink: 0, marginTop: 1 }}>⚠️</span>
@@ -172,7 +172,7 @@ function PendingCard({ evt, confirming, onConfirm, todayKey, isFamiliar }) {
           disabled={busy}
           style={{
             marginTop: 10, width: '100%', padding: '9px 0',
-            background: busy ? '#C0CCC5' : 'linear-gradient(135deg, #22C55E, #16A34A)',
+            background: busy ? '#C9D6DB' : 'linear-gradient(135deg, #22C55E, #16A34A)',
             color: 'white', fontWeight: 700, fontSize: 13,
             borderRadius: 10, border: 'none',
             cursor: busy ? 'not-allowed' : 'pointer',
@@ -206,7 +206,7 @@ function MissedCard({ evt }) {
           {medLabel} — no se dio
         </p>
         {evt.medTime && (
-          <p style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>
+          <p style={{ fontSize: 11, color: '#5E7480', marginTop: 2 }}>
             Programado a las {fmtTime(evt.medTime)}
           </p>
         )}
@@ -228,7 +228,7 @@ function ConfirmedCard({ evt, onTap }) {
         <span style={{ fontSize: 16, flexShrink: 0 }}>💊</span>
         <div style={{ flex: 1, minWidth: 0 }}>
           <p style={{ fontSize: 13, fontWeight: 600, color: '#15803D', margin: 0, lineHeight: 1.4 }}>
-            {time && <span style={{ fontWeight: 400, color: '#4B7A5D' }}>{time} — </span>}
+            {time && <span style={{ fontWeight: 400, color: '#0A4A6B' }}>{time} — </span>}
             {name ? `${name} dio ${medLabel}` : medLabel}
           </p>
           {evt.latitude && (
@@ -262,13 +262,13 @@ function ReactionBar({ eventKey, reactions, userId, onToggle }) {
             style={{
               display: 'flex', alignItems: 'center', gap: 3,
               padding: '3px 8px', borderRadius: 20,
-              background: mine ? '#EBF3EE' : '#F3F4F6',
-              border: mine ? '1px solid #0d6b63' : '1px solid #E5E7EB',
+              background: mine ? '#E3F1F8' : '#F3F4F6',
+              border: mine ? '1px solid #0A5A82' : '1px solid #E5E7EB',
               cursor: 'pointer', fontSize: 13, lineHeight: 1,
               transition: 'all 0.15s',
             }}>
             <span>{emoji}</span>
-            {count > 0 && <span style={{ fontSize: 11, color: mine ? '#0d6b63' : '#6B7280', fontWeight: 600 }}>{count}</span>}
+            {count > 0 && <span style={{ fontSize: 11, color: mine ? '#0A5A82' : '#4E6470', fontWeight: 600 }}>{count}</span>}
           </button>
         )
       })}
@@ -285,7 +285,7 @@ function MemoryCard({ evt, onTap }) {
       onClick={onTap}
       style={{
         background: 'white', borderRadius: 16,
-        border: '1px solid #EDE5D8',
+        border: '1px solid #E6E3DB',
         borderLeft: `3px solid ${color}`,
         padding: '12px 14px',
         cursor: 'pointer',
@@ -295,20 +295,20 @@ function MemoryCard({ evt, onTap }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         <span style={{ fontSize: 16, flexShrink: 0 }}>🎙️</span>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', margin: 0 }}>
+          <p style={{ fontSize: 13, fontWeight: 600, color: '#14303D', margin: 0 }}>
             {name ? `${name} dejó una memoria` : 'Memoria de voz'}
             {evt.mood && <span style={{ marginLeft: 5 }}>{emoji}</span>}
           </p>
           {evt.transcription && (
             <p style={{
-              fontSize: 11, color: '#9CA3AF', marginTop: 2,
+              fontSize: 11, color: '#5E7480', marginTop: 2,
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
             }}>
               {evt.transcription}
             </p>
           )}
         </div>
-        <span style={{ fontSize: 11, color: '#9CA3AF', flexShrink: 0 }}>▶ Escuchar</span>
+        <span style={{ fontSize: 11, color: '#5E7480', flexShrink: 0 }}>▶ Escuchar</span>
       </div>
     </div>
   )
@@ -320,7 +320,7 @@ function SosCard({ evt, onTap }) {
     <div onClick={onTap} style={{
       background: evt.resolved ? '#F9FAFB' : '#FFF0F0',
       borderRadius: 16,
-      border: `1px solid ${evt.resolved ? '#EDE5D8' : '#FFBABA'}`,
+      border: `1px solid ${evt.resolved ? '#E6E3DB' : '#FFBABA'}`,
       padding: '12px 14px',
       display: 'flex', alignItems: 'center', gap: 10,
       boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
@@ -328,11 +328,11 @@ function SosCard({ evt, onTap }) {
     }}>
       <span style={{ fontSize: 18, flexShrink: 0 }}>{evt.resolved ? '✅' : '🚨'}</span>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ fontSize: 13, fontWeight: 700, color: evt.resolved ? '#374151' : '#D63031', margin: 0 }}>
+        <p style={{ fontSize: 13, fontWeight: 700, color: evt.resolved ? '#30454F' : '#D63031', margin: 0 }}>
           {evt.resolved ? 'Emergencia resuelta' : `EMERGENCIA — ${name}`}
         </p>
         {evt.address && (
-          <p style={{ fontSize: 11, color: '#6B7280', marginTop: 2 }}>📍 {evt.address}</p>
+          <p style={{ fontSize: 11, color: '#4E6470', marginTop: 2 }}>📍 {evt.address}</p>
         )}
       </div>
       {evt.latitude && evt.longitude && !evt.resolved && (
@@ -359,7 +359,7 @@ function ExpenseCard({ evt, onTap }) {
   return (
     <div onClick={onTap} style={{
       background: 'white', borderRadius: 16,
-      border: '1px solid #EDE5D8',
+      border: '1px solid #E6E3DB',
       padding: '12px 14px',
       display: 'flex', alignItems: 'center', gap: 10,
       boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
@@ -367,12 +367,12 @@ function ExpenseCard({ evt, onTap }) {
     }}>
       <span style={{ fontSize: 16, flexShrink: 0 }}>💰</span>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', margin: 0 }}>
+        <p style={{ fontSize: 13, fontWeight: 600, color: '#14303D', margin: 0 }}>
           {name ? `${name} pagó ${evt.description}` : evt.description}
         </p>
       </div>
       {evt.amount != null && (
-        <span style={{ fontSize: 14, fontWeight: 700, color: '#0d6b63', flexShrink: 0 }}>
+        <span style={{ fontSize: 14, fontWeight: 700, color: '#0A5A82', flexShrink: 0 }}>
           ${Number(evt.amount).toFixed(2)}
         </span>
       )}
@@ -401,7 +401,7 @@ function AppointmentCard({ evt, todayKey, tomorrowKey }) {
     >
       <span style={{ fontSize: 16, flexShrink: 0 }}>📅</span>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', margin: 0 }}>
+        <p style={{ fontSize: 13, fontWeight: 600, color: '#14303D', margin: 0 }}>
           {evt.appointmentTitle}
         </p>
         <p style={{ fontSize: 11, color: '#3B82F6', marginTop: 2 }}>{timeText}</p>
@@ -434,7 +434,7 @@ function AppointmentProofCard({ evt, onTap }) {
         <span style={{ fontSize: 22, flexShrink: 0 }}>📅</span>
       )}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', margin: 0 }}>
+        <p style={{ fontSize: 13, fontWeight: 600, color: '#14303D', margin: 0 }}>
           {evt.appointmentTitle}
         </p>
         <p style={{ fontSize: 11, color: '#16A34A', marginTop: 2, fontWeight: 600 }}>
@@ -442,7 +442,7 @@ function AppointmentProofCard({ evt, onTap }) {
           {evt.appointmentTime ? ` · ${fmtTime(evt.appointmentTime)}` : ''}
         </p>
         {evt.proofNotes && (
-          <p style={{ fontSize: 11, color: '#6B7280', marginTop: 2 }}>{evt.proofNotes}</p>
+          <p style={{ fontSize: 11, color: '#4E6470', marginTop: 2 }}>{evt.proofNotes}</p>
         )}
       </div>
     </div>
@@ -476,8 +476,8 @@ function DetailRow({ icon, label, value }) {
     <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
       <span style={{ fontSize: 16, flexShrink: 0, marginTop: 1 }}>{icon}</span>
       <div>
-        <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>{label}</p>
-        <p style={{ fontSize: 13, color: '#1A1A1A', fontWeight: 500, margin: '1px 0 0' }}>{value}</p>
+        <p style={{ fontSize: 11, color: '#5E7480', margin: 0 }}>{label}</p>
+        <p style={{ fontSize: 13, color: '#14303D', fontWeight: 500, margin: '1px 0 0' }}>{value}</p>
       </div>
     </div>
   )
@@ -563,7 +563,7 @@ function MedConfirmedDetail({ evt }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
         <span style={{ fontSize: 28 }}>💊</span>
         <div>
-          <p style={{ fontSize: 18, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>
+          <p style={{ fontSize: 18, fontWeight: 700, color: '#14303D', margin: 0 }}>
             {[evt.medName, evt.medDosage].filter(Boolean).join(' · ')}
           </p>
           <p style={{ fontSize: 12, color: '#22C55E', fontWeight: 600, margin: '3px 0 0' }}>Medicamento dado ✅</p>
@@ -576,7 +576,7 @@ function MedConfirmedDetail({ evt }) {
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
             <span style={{ fontSize: 16, flexShrink: 0, marginTop: 1 }}>📍</span>
             <div>
-              <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>Ubicación</p>
+              <p style={{ fontSize: 11, color: '#5E7480', margin: 0 }}>Ubicación</p>
               <a href={mapsUrl(evt.latitude, evt.longitude)} target="_blank" rel="noopener noreferrer"
                 style={{ fontSize: 13, color: '#3B82F6', textDecoration: 'none', fontWeight: 500 }}>
                 {evt.address ?? 'Ver en mapa'} →
@@ -602,8 +602,8 @@ function MedConfirmedDetail({ evt }) {
         {!editing && photoUrl && (
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-              <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0 }}>Foto de prueba</p>
-              <button onClick={() => setEditing(true)} style={{ padding: '4px 10px', background: 'none', border: '1px solid #D1D5DB', borderRadius: 7, fontSize: 12, fontWeight: 600, color: '#374151', cursor: 'pointer' }}>
+              <p style={{ fontSize: 11, color: '#5E7480', margin: 0 }}>Foto de prueba</p>
+              <button onClick={() => setEditing(true)} style={{ padding: '4px 10px', background: 'none', border: '1px solid #D1D5DB', borderRadius: 7, fontSize: 12, fontWeight: 600, color: '#30454F', cursor: 'pointer' }}>
                 Cambiar
               </button>
             </div>
@@ -614,7 +614,7 @@ function MedConfirmedDetail({ evt }) {
         {/* Photo — upload form */}
         {editing && (
           <div>
-            <p style={{ fontSize: 11, color: '#9CA3AF', margin: '0 0 8px' }}>
+            <p style={{ fontSize: 11, color: '#5E7480', margin: '0 0 8px' }}>
               {photoUrl ? 'Reemplazar foto de prueba' : 'Agregar foto de prueba'}
             </p>
             <input ref={attachFileRef} type="file" accept="image/*" capture="environment" style={{ display: 'none' }} onChange={handleAttachPhotoChange} />
@@ -625,25 +625,25 @@ function MedConfirmedDetail({ evt }) {
               style={{ width: '100%', border: '1.5px dashed #D1D5DB', borderRadius: 12, background: 'none', cursor: attachStamping ? 'default' : 'pointer', overflow: 'hidden', marginBottom: 10 }}
             >
               {attachStamping ? (
-                <div style={{ height: 110, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, color: '#9CA3AF' }}>
-                  <div style={{ width: 20, height: 20, border: '2px solid #0d6b63', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
+                <div style={{ height: 110, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, color: '#5E7480' }}>
+                  <div style={{ width: 20, height: 20, border: '2px solid #0A5A82', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
                   <span style={{ fontSize: 12 }}>Aplicando sello...</span>
                 </div>
               ) : attachPreview ? (
                 <div>
                   <img src={attachPreview} style={{ width: '100%', maxHeight: 180, objectFit: 'cover' }} alt="Nueva prueba" />
-                  <p style={{ fontSize: 11, color: '#9CA3AF', textAlign: 'center', padding: '6px 0 8px', margin: 0 }}>Toca para cambiar</p>
+                  <p style={{ fontSize: 11, color: '#5E7480', textAlign: 'center', padding: '6px 0 8px', margin: 0 }}>Toca para cambiar</p>
                 </div>
               ) : photoUrl ? (
                 <div style={{ position: 'relative' }}>
                   <img src={photoUrl} style={{ width: '100%', maxHeight: 180, objectFit: 'cover', opacity: 0.35 }} alt="Foto actual" />
                   <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
                     <span style={{ fontSize: 24 }}>📷</span>
-                    <span style={{ fontSize: 12, fontWeight: 600, color: '#374151' }}>Toca para reemplazar</span>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: '#30454F' }}>Toca para reemplazar</span>
                   </div>
                 </div>
               ) : (
-                <div style={{ height: 110, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, color: '#9CA3AF' }}>
+                <div style={{ height: 110, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, color: '#5E7480' }}>
                   <span style={{ fontSize: 28 }}>📷</span>
                   <span style={{ fontSize: 12 }}>Toca para tomar foto</span>
                 </div>
@@ -658,13 +658,13 @@ function MedConfirmedDetail({ evt }) {
               <button
                 onClick={submitAttachPhoto}
                 disabled={attachSaving || attachStamping}
-                style={{ flex: 1, padding: '11px', borderRadius: 12, border: 'none', background: '#0d6b63', color: 'white', fontWeight: 700, fontSize: 13, cursor: (attachSaving || attachStamping) ? 'default' : 'pointer', opacity: (attachSaving || attachStamping) ? 0.6 : 1 }}
+                style={{ flex: 1, padding: '11px', borderRadius: 12, border: 'none', background: '#0A5A82', color: 'white', fontWeight: 700, fontSize: 13, cursor: (attachSaving || attachStamping) ? 'default' : 'pointer', opacity: (attachSaving || attachStamping) ? 0.6 : 1 }}
               >
                 {attachSaving ? 'Guardando...' : '✓ Guardar foto'}
               </button>
               <button
                 onClick={() => { setEditing(false); setAttachFile(null); setAttachPreview(null); setAttachError('') }}
-                style={{ flex: 1, padding: '11px', borderRadius: 12, border: '1px solid #E5E7EB', background: 'none', color: '#374151', fontWeight: 600, fontSize: 13, cursor: 'pointer' }}
+                style={{ flex: 1, padding: '11px', borderRadius: 12, border: '1px solid #E5E7EB', background: 'none', color: '#30454F', fontWeight: 600, fontSize: 13, cursor: 'pointer' }}
               >
                 Cancelar
               </button>
@@ -685,7 +685,7 @@ function VoiceMemoryDetail({ evt }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
         <span style={{ fontSize: 28 }}>🎙️</span>
         <div>
-          <p style={{ fontSize: 18, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>Memoria de voz</p>
+          <p style={{ fontSize: 18, fontWeight: 700, color: '#14303D', margin: 0 }}>Memoria de voz</p>
           {evt.mood && (
             <span style={{
               display: 'inline-block', marginTop: 4,
@@ -702,13 +702,13 @@ function VoiceMemoryDetail({ evt }) {
         {time && <DetailRow icon="🕐" label="Hora" value={time} />}
         {evt.audioUrl && (
           <div>
-            <p style={{ fontSize: 11, color: '#9CA3AF', margin: '0 0 8px' }}>Reproducir</p>
+            <p style={{ fontSize: 11, color: '#5E7480', margin: '0 0 8px' }}>Reproducir</p>
             <audio src={evt.audioUrl} controls style={{ width: '100%', height: 40, borderRadius: 8 }} />
           </div>
         )}
         {evt.transcription && (
           <div style={{ padding: '12px 14px', background: '#F9FAFB', borderRadius: 12, border: '1px solid #E5E7EB' }}>
-            <p style={{ fontSize: 13, color: '#374151', lineHeight: 1.6, margin: 0, fontStyle: 'italic' }}>
+            <p style={{ fontSize: 13, color: '#30454F', lineHeight: 1.6, margin: 0, fontStyle: 'italic' }}>
               "{evt.transcription}"
             </p>
           </div>
@@ -724,19 +724,19 @@ function NoteDetail({ evt }) {
     <div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
         <span style={{ fontSize: 28 }}>📝</span>
-        <p style={{ fontSize: 18, fontWeight: 700, color: '#1A1A1A', margin: 0 }}>Nota</p>
+        <p style={{ fontSize: 18, fontWeight: 700, color: '#14303D', margin: 0 }}>Nota</p>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
         {evt.noteText && (
           <div style={{ padding: '12px 14px', background: '#F9FAFB', borderRadius: 12, border: '1px solid #E5E7EB' }}>
-            <p style={{ fontSize: 13, color: '#374151', lineHeight: 1.6, margin: 0 }}>{evt.noteText}</p>
+            <p style={{ fontSize: 13, color: '#30454F', lineHeight: 1.6, margin: 0 }}>{evt.noteText}</p>
           </div>
         )}
         {evt.authorName && <DetailRow icon="👤" label="Escrito por" value={evt.authorName} />}
         {time && <DetailRow icon="🕐" label="Hora" value={time} />}
         {evt.photoUrl && (
           <div>
-            <p style={{ fontSize: 11, color: '#9CA3AF', margin: '0 0 8px' }}>Foto adjunta</p>
+            <p style={{ fontSize: 11, color: '#5E7480', margin: '0 0 8px' }}>Foto adjunta</p>
             <img src={evt.photoUrl} alt="Adjunto" style={{ width: '100%', borderRadius: 12, maxHeight: 220, objectFit: 'cover' }} />
           </div>
         )}
@@ -752,10 +752,10 @@ function ExpenseDetail({ evt }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
         <span style={{ fontSize: 28 }}>💰</span>
         <div>
-          <p style={{ fontSize: 22, fontWeight: 700, color: '#0d6b63', margin: 0 }}>
+          <p style={{ fontSize: 22, fontWeight: 700, color: '#0A5A82', margin: 0 }}>
             ${evt.amount != null ? Number(evt.amount).toFixed(2) : '—'}
           </p>
-          <p style={{ fontSize: 13, color: '#6B7280', margin: '2px 0 0' }}>{evt.description}</p>
+          <p style={{ fontSize: 13, color: '#4E6470', margin: '2px 0 0' }}>{evt.description}</p>
         </div>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -763,7 +763,7 @@ function ExpenseDetail({ evt }) {
         {time && <DetailRow icon="🕐" label="Hora" value={time} />}
         {evt.receiptUrl && (
           <div>
-            <p style={{ fontSize: 11, color: '#9CA3AF', margin: '0 0 8px' }}>Recibo</p>
+            <p style={{ fontSize: 11, color: '#5E7480', margin: '0 0 8px' }}>Recibo</p>
             <img src={evt.receiptUrl} alt="Recibo" style={{ width: '100%', borderRadius: 12, maxHeight: 220, objectFit: 'cover' }} />
           </div>
         )}
@@ -781,14 +781,14 @@ function SosDetail({ evt }) {
         padding: '14px 16px',
         background: evt.resolved ? '#F9FAFB' : '#FFF0F0',
         borderRadius: 16,
-        border: `1px solid ${evt.resolved ? '#EDE5D8' : '#FFBABA'}`,
+        border: `1px solid ${evt.resolved ? '#E6E3DB' : '#FFBABA'}`,
       }}>
         <span style={{ fontSize: 28 }}>{evt.resolved ? '✅' : '🚨'}</span>
         <div>
-          <p style={{ fontSize: 16, fontWeight: 700, color: evt.resolved ? '#374151' : '#D63031', margin: 0 }}>
+          <p style={{ fontSize: 16, fontWeight: 700, color: evt.resolved ? '#30454F' : '#D63031', margin: 0 }}>
             {evt.resolved ? 'Emergencia resuelta' : 'EMERGENCIA'}
           </p>
-          <p style={{ fontSize: 12, color: '#6B7280', margin: '2px 0 0' }}>
+          <p style={{ fontSize: 12, color: '#4E6470', margin: '2px 0 0' }}>
             {evt.resolved ? 'Esta alerta fue atendida' : 'Alerta activa'}
           </p>
         </div>
@@ -806,7 +806,7 @@ function SosDetail({ evt }) {
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
               padding: '14px', borderRadius: 16, marginTop: 4,
               background: evt.resolved ? '#F3F4F6' : 'linear-gradient(135deg, #D63031, #B82020)',
-              color: evt.resolved ? '#374151' : 'white',
+              color: evt.resolved ? '#30454F' : 'white',
               fontWeight: 700, fontSize: 14, textDecoration: 'none',
               boxShadow: evt.resolved ? 'none' : '0 6px 20px rgba(214,48,49,0.35)',
             }}
@@ -851,7 +851,7 @@ function EventDetailSheet({ evt, onClose, onAttachProof, isFamiliar }) {
           <div style={{ width: 40, height: 4, borderRadius: 2, background: '#E5E7EB' }} />
         </div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 20px 0' }}>
-          <p style={{ fontSize: 11, color: '#9CA3AF', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>
+          <p style={{ fontSize: 11, color: '#5E7480', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>
             {TITLES[evt.type] ?? 'Detalle'}
           </p>
           <button
@@ -862,7 +862,7 @@ function EventDetailSheet({ evt, onClose, onAttachProof, isFamiliar }) {
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}
           >
-            <XIcon size={14} color="#6B7280" strokeWidth={2} />
+            <XIcon size={14} color="#4E6470" strokeWidth={2} />
           </button>
         </div>
         <div style={{ padding: '16px 20px 0' }}>
@@ -873,7 +873,7 @@ function EventDetailSheet({ evt, onClose, onAttachProof, isFamiliar }) {
           {evt.type === 'SOS_ALERT' && <SosDetail evt={evt} />}
           {evt.type === 'APPOINTMENT' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              <p style={{ fontSize: 17, fontWeight: 700, color: '#1A1A1A', fontFamily: 'Georgia, serif', margin: 0 }}>
+              <p style={{ fontSize: 17, fontWeight: 700, color: '#14303D', fontFamily: 'Georgia, serif', margin: 0 }}>
                 {evt.appointmentTitle}
               </p>
               {evt.appointmentTime && (
@@ -894,7 +894,7 @@ function EventDetailSheet({ evt, onClose, onAttachProof, isFamiliar }) {
                   )}
                   {evt.proofPhotoUrl && (
                     <div>
-                      <p style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
+                      <p style={{ fontSize: 11, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
                         Comprobante
                       </p>
                       <img
@@ -911,9 +911,9 @@ function EventDetailSheet({ evt, onClose, onAttachProof, isFamiliar }) {
                   style={{
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                     padding: '14px', borderRadius: 14, border: 'none',
-                    background: 'linear-gradient(135deg, #087F70, #0d6b63)',
+                    background: 'linear-gradient(135deg, #0C6C9C, #0A5A82)',
                     color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer',
-                    boxShadow: '0 4px 14px rgba(8,127,112,0.3)',
+                    boxShadow: '0 4px 14px rgba(12,108,156,0.3)',
                   }}
                 >
                   📎 Adjuntar comprobante
@@ -925,7 +925,7 @@ function EventDetailSheet({ evt, onClose, onAttachProof, isFamiliar }) {
           )}
           {evt.type === 'APPOINTMENT_PROOF' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              <p style={{ fontSize: 17, fontWeight: 700, color: '#1A1A1A', fontFamily: 'Georgia, serif', margin: 0 }}>
+              <p style={{ fontSize: 17, fontWeight: 700, color: '#14303D', fontFamily: 'Georgia, serif', margin: 0 }}>
                 {evt.appointmentTitle}
               </p>
               {evt.appointmentTime && (
@@ -937,7 +937,7 @@ function EventDetailSheet({ evt, onClose, onAttachProof, isFamiliar }) {
               )}
               {evt.proofPhotoUrl && (
                 <div>
-                  <p style={{ fontSize: 11, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
+                  <p style={{ fontSize: 11, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
                     Foto de prueba
                   </p>
                   <img
@@ -989,17 +989,17 @@ function TimelineEvent({ evt, confirming, expandedAudio, onConfirm, onToggleAudi
 function EmptyState({ profile }) {
   return (
     <div style={{
-      background: 'white', borderRadius: 20, border: '1px solid #EDE5D8',
+      background: 'white', borderRadius: 20, border: '1px solid #E6E3DB',
       padding: '48px 24px', textAlign: 'center',
       boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
     }}>
       <div style={{ fontSize: 44, marginBottom: 12 }}>
         {profile ? '💊' : '🌱'}
       </div>
-      <p style={{ fontSize: 14, fontWeight: 600, color: '#1A1A1A', marginBottom: 6 }}>
+      <p style={{ fontSize: 14, fontWeight: 600, color: '#14303D', marginBottom: 6 }}>
         {profile ? 'Todo tranquilo por aquí' : 'Bienvenido a FamiliaCerca'}
       </p>
-      <p style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 20, lineHeight: 1.6 }}>
+      <p style={{ fontSize: 12, color: '#5E7480', marginBottom: 20, lineHeight: 1.6 }}>
         {profile
           ? 'El historial de cuidado aparecerá aquí. Agrega medicamentos para comenzar.'
           : 'Configura el perfil familiar para comenzar a registrar el cuidado.'}
@@ -1009,7 +1009,7 @@ function EmptyState({ profile }) {
         style={{
           display: 'inline-flex', alignItems: 'center', gap: 6,
           padding: '10px 20px', borderRadius: 12,
-          background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
+          background: 'linear-gradient(135deg, #0A5A82, #0A4A6B)',
           color: 'white', fontWeight: 700, fontSize: 13,
           textDecoration: 'none',
         }}
@@ -1055,7 +1055,7 @@ function DaySection({
     green:  { dot: '🟢', border: '#22C55E', bg: '#F0FDF4' },
     yellow: { dot: '🟡', border: '#F59E0B', bg: '#FFFBEB' },
     red:    { dot: '🔴', border: '#D63031', bg: '#FFF0F0' },
-    none:   { dot: '',   border: '#EDE5D8', bg: 'white'   },
+    none:   { dot: '',   border: '#E6E3DB', bg: 'white'   },
   }
   const ss = STATUS_STYLE[status]
 
@@ -1094,7 +1094,7 @@ function DaySection({
         <div style={{ flex: 1, minWidth: 0 }}>
           <span style={{
             fontSize: 12, fontWeight: 700,
-            color: isExpanded ? '#9CA3AF' : '#374151',
+            color: isExpanded ? '#5E7480' : '#30454F',
             display: 'block',
             transition: 'color 0.2s ease',
           }}>
@@ -1102,7 +1102,7 @@ function DaySection({
           </span>
           {!isExpanded && lastUpdateText && (
             <span style={{
-              fontSize: 11, color: '#9CA3AF',
+              fontSize: 11, color: '#5E7480',
               display: 'block', marginTop: 2,
             }}>
               última actualización {lastUpdateText}
@@ -1138,7 +1138,7 @@ function DaySection({
                 padding: '14px 4px',
               }}>
                 <span style={{ fontSize: 16, opacity: 0.4 }}>🗓️</span>
-                <p style={{ fontSize: 13, color: '#9CA3AF', margin: 0 }}>Sin actividad registrada</p>
+                <p style={{ fontSize: 13, color: '#5E7480', margin: 0 }}>Sin actividad registrada</p>
               </div>
             ) : CATEGORY_GROUPS.map(group => {
               const groupEvts = section.events.filter(e => group.types.includes(e.type))
@@ -1151,7 +1151,7 @@ function DaySection({
                     borderBottom: '1px solid #F3F4F6',
                   }}>
                     <span style={{ fontSize: 13 }}>{group.emoji}</span>
-                    <span style={{ fontSize: 10, fontWeight: 700, color: '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                    <span style={{ fontSize: 10, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                       {group.label}
                     </span>
                     <span style={{ fontSize: 10, color: '#9AADA3' }}>{groupEvts.length}</span>
@@ -1232,7 +1232,7 @@ function StatusCard({ icon, title, subtitle, status, statusType, to, onClick, pu
     ok:      { bg: '#F0FDF4', border: '#86EFAC', statusColor: '#15803D', statusIcon: '✅' },
     warning: { bg: '#FFFBEB', border: '#FDE68A', statusColor: '#7A5A18', statusIcon: '⚠️' },
     urgent:  { bg: '#FFF0F0', border: '#FECACA', statusColor: '#D63031', statusIcon: '🔴' },
-    info:    { bg: '#FFFFFF', border: '#C8BEB4', statusColor: '#6B7280', statusIcon: '💙' },
+    info:    { bg: '#FFFFFF', border: '#C8BEB4', statusColor: '#4E6470', statusIcon: '💙' },
   }
   const s = styles[statusType ?? 'info']
   const inner = (
@@ -1247,9 +1247,9 @@ function StatusCard({ icon, title, subtitle, status, statusType, to, onClick, pu
       overflow: 'hidden', minWidth: 0,
     }}>
       <span style={{ fontSize: 34, lineHeight: 1, display: 'block' }}>{icon}</span>
-      <p style={{ fontSize: 14, fontWeight: 700, color: '#1A1A1A', margin: 0, lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</p>
+      <p style={{ fontSize: 14, fontWeight: 700, color: '#14303D', margin: 0, lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</p>
       {subtitle && (
-        <p style={{ fontSize: 11, color: '#9CA3AF', margin: 0, lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{subtitle}</p>
+        <p style={{ fontSize: 11, color: '#5E7480', margin: 0, lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{subtitle}</p>
       )}
       <p style={{ fontSize: 11, fontWeight: 700, color: s.statusColor, margin: 'auto 0 0', paddingTop: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {s.statusIcon} {status}
@@ -1292,15 +1292,15 @@ function SosConfirmSheet({ open, onClose, onConfirm, patientProfile, patientName
       `}</style>
       <div style={{ width: '100%', maxWidth: 480, maxHeight: '85vh', background: 'white', borderRadius: '24px 24px 0 0', boxShadow: '0 -8px 48px rgba(0,0,0,0.2)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {/* header fijo */}
-        <div style={{ flexShrink: 0, padding: '14px 20px 12px', borderBottom: '1px solid #EDE5D8' }}>
-          <div style={{ width: 36, height: 4, borderRadius: 4, background: '#EDE5D8', margin: '0 auto 14px' }} />
+        <div style={{ flexShrink: 0, padding: '14px 20px 12px', borderBottom: '1px solid #E6E3DB' }}>
+          <div style={{ width: 36, height: 4, borderRadius: 4, background: '#E6E3DB', margin: '0 auto 14px' }} />
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
             <div>
               <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#D9534F', margin: '0 0 4px' }}>Emergencia para</p>
-              <h3 style={{ fontSize: 20, fontWeight: 800, color: '#1A1A1A', margin: 0 }}>{patientName}</h3>
+              <h3 style={{ fontSize: 20, fontWeight: 800, color: '#14303D', margin: 0 }}>{patientName}</h3>
             </div>
             <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: '50%', background: '#F3F4F6', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <XIcon size={14} color="#6B7280" strokeWidth={2} />
+              <XIcon size={14} color="#4E6470" strokeWidth={2} />
             </button>
           </div>
         </div>
@@ -1315,7 +1315,7 @@ function SosConfirmSheet({ open, onClose, onConfirm, patientProfile, patientName
               Alergias y diagnóstico
             </p>
             {diagnosis && (
-              <p style={{ fontSize: 18, fontWeight: 700, color: '#334155', margin: '0 0 12px', lineHeight: 1.3 }}>{diagnosis}</p>
+              <p style={{ fontSize: 18, fontWeight: 700, color: '#2A4350', margin: '0 0 12px', lineHeight: 1.3 }}>{diagnosis}</p>
             )}
             {allergies.length > 0 ? (
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
@@ -1327,15 +1327,15 @@ function SosConfirmSheet({ open, onClose, onConfirm, patientProfile, patientName
                 ))}
               </div>
             ) : (
-              <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.5, margin: 0 }}>
+              <p style={{ fontSize: 14, color: '#4E6470', lineHeight: 1.5, margin: 0 }}>
                 Sin alergias registradas — nadie ha reportado ninguna todavía.
               </p>
             )}
           </div>
 
           {/* 2. Medicamentos activos */}
-          <div style={{ background: 'white', border: '1px solid #EDE5D8', borderRadius: 18, padding: 16 }}>
-            <p style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#6B7280', margin: '0 0 10px' }}>
+          <div style={{ background: 'white', border: '1px solid #E6E3DB', borderRadius: 18, padding: 16 }}>
+            <p style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#4E6470', margin: '0 0 10px' }}>
               Medicamentos activos
             </p>
             {meds.length > 0 ? (
@@ -1344,10 +1344,10 @@ function SosConfirmSheet({ open, onClose, onConfirm, patientProfile, patientName
                   {meds.map(med => {
                     const times = med.scheduled_times?.length ? [...med.scheduled_times].sort() : (med.time ? [med.time] : [])
                     return (
-                      <tr key={med.id} style={{ borderBottom: '1px solid #EDE5D8' }}>
-                        <td style={{ padding: '10px 0', fontSize: 15, fontWeight: 700, color: '#334155', width: '42%' }}>{med.name}</td>
-                        <td style={{ padding: '10px 8px 10px 0', fontSize: 14.5, fontWeight: 700, color: '#087F70', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>{med.dosage || '—'}</td>
-                        <td style={{ padding: '10px 0', fontSize: 12.5, color: '#6B7280', textAlign: 'right', fontVariantNumeric: 'tabular-nums', lineHeight: 1.4 }}>
+                      <tr key={med.id} style={{ borderBottom: '1px solid #E6E3DB' }}>
+                        <td style={{ padding: '10px 0', fontSize: 15, fontWeight: 700, color: '#2A4350', width: '42%' }}>{med.name}</td>
+                        <td style={{ padding: '10px 8px 10px 0', fontSize: 14.5, fontWeight: 700, color: '#0C6C9C', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>{med.dosage || '—'}</td>
+                        <td style={{ padding: '10px 0', fontSize: 12.5, color: '#4E6470', textAlign: 'right', fontVariantNumeric: 'tabular-nums', lineHeight: 1.4 }}>
                           {times.length > 1 && <>{times.length}×/día<br /></>}
                           {times.length > 0 ? times.map(fmtTime).join(' · ') : ''}
                         </td>
@@ -1357,29 +1357,29 @@ function SosConfirmSheet({ open, onClose, onConfirm, patientProfile, patientName
                 </tbody>
               </table>
             ) : (
-              <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.5, margin: 0 }}>Sin medicamentos activos registrados.</p>
+              <p style={{ fontSize: 14, color: '#4E6470', lineHeight: 1.5, margin: 0 }}>Sin medicamentos activos registrados.</p>
             )}
           </div>
 
           {/* 3. Contacto de emergencia */}
           {emergencyContact ? (
-            <a href={`tel:${emergencyContact.phone}`} style={{ display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none', color: 'inherit', background: 'white', border: '1px solid #EDE5D8', borderRadius: 18, padding: '14px 14px' }}>
-              <div style={{ width: 44, height: 44, borderRadius: 13, flexShrink: 0, background: '#087F70', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <a href={`tel:${emergencyContact.phone}`} style={{ display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none', color: 'inherit', background: 'white', border: '1px solid #E6E3DB', borderRadius: 18, padding: '14px 14px' }}>
+              <div style={{ width: 44, height: 44, borderRadius: 13, flexShrink: 0, background: '#0C6C9C', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Phone size={20} color="white" strokeWidth={2} />
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#6B7280', margin: '0 0 2px' }}>Contacto de emergencia</p>
-                <p style={{ fontSize: 16, fontWeight: 700, margin: 0, color: '#334155' }}>
-                  {emergencyContact.name}{emergencyContact.relationship ? <span style={{ fontWeight: 500, color: '#6B7280' }}> · {emergencyContact.relationship}</span> : null}
+                <p style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#4E6470', margin: '0 0 2px' }}>Contacto de emergencia</p>
+                <p style={{ fontSize: 16, fontWeight: 700, margin: 0, color: '#2A4350' }}>
+                  {emergencyContact.name}{emergencyContact.relationship ? <span style={{ fontWeight: 500, color: '#4E6470' }}> · {emergencyContact.relationship}</span> : null}
                 </p>
-                {emergencyContact.phone && <p style={{ fontSize: 12.5, color: '#087F70', fontWeight: 600, margin: '2px 0 0', fontVariantNumeric: 'tabular-nums' }}>{emergencyContact.phone} — toca para llamar</p>}
+                {emergencyContact.phone && <p style={{ fontSize: 12.5, color: '#0C6C9C', fontWeight: 600, margin: '2px 0 0', fontVariantNumeric: 'tabular-nums' }}>{emergencyContact.phone} — toca para llamar</p>}
               </div>
-              <ChevronRight size={17} color="#6B7280" strokeWidth={2} />
+              <ChevronRight size={17} color="#4E6470" strokeWidth={2} />
             </a>
           ) : (
-            <div style={{ background: '#E9F5F1', border: '1px solid rgba(8,127,112,0.14)', borderRadius: 18, padding: 16 }}>
-              <p style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#087F70', margin: '0 0 10px' }}>Contacto de emergencia</p>
-              <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.5, margin: 0 }}>
+            <div style={{ background: '#E3F1F8', border: '1px solid rgba(12,108,156,0.14)', borderRadius: 18, padding: 16 }}>
+              <p style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#0C6C9C', margin: '0 0 10px' }}>Contacto de emergencia</p>
+              <p style={{ fontSize: 14, color: '#4E6470', lineHeight: 1.5, margin: 0 }}>
                 Aún no hay nadie marcado como contacto de emergencia — la familia recibe la alerta de todas formas al activar.
               </p>
             </div>
@@ -1387,23 +1387,23 @@ function SosConfirmSheet({ open, onClose, onConfirm, patientProfile, patientName
 
           {/* 4. Médico tratante */}
           {primaryDoctor ? (
-            <a href={`tel:${primaryDoctor.phone}`} style={{ display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none', color: 'inherit', background: 'white', border: '1px solid #EDE5D8', borderRadius: 18, padding: '14px 14px' }}>
-              <div style={{ width: 44, height: 44, borderRadius: 13, flexShrink: 0, background: '#A8E5D6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Stethoscope size={20} color="#087F70" strokeWidth={2} />
+            <a href={`tel:${primaryDoctor.phone}`} style={{ display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none', color: 'inherit', background: 'white', border: '1px solid #E6E3DB', borderRadius: 18, padding: '14px 14px' }}>
+              <div style={{ width: 44, height: 44, borderRadius: 13, flexShrink: 0, background: '#A6E3EC', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Stethoscope size={20} color="#0C6C9C" strokeWidth={2} />
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#6B7280', margin: '0 0 2px' }}>Médico tratante</p>
-                <p style={{ fontSize: 16, fontWeight: 700, margin: 0, color: '#334155' }}>{primaryDoctor.name}</p>
+                <p style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#4E6470', margin: '0 0 2px' }}>Médico tratante</p>
+                <p style={{ fontSize: 16, fontWeight: 700, margin: 0, color: '#2A4350' }}>{primaryDoctor.name}</p>
                 {(primaryDoctor.specialty || primaryDoctor.clinic) && (
-                  <p style={{ fontSize: 12.5, color: '#6B7280', margin: '2px 0 0' }}>{[primaryDoctor.specialty, primaryDoctor.clinic].filter(Boolean).join(' · ')}</p>
+                  <p style={{ fontSize: 12.5, color: '#4E6470', margin: '2px 0 0' }}>{[primaryDoctor.specialty, primaryDoctor.clinic].filter(Boolean).join(' · ')}</p>
                 )}
               </div>
-              {primaryDoctor.phone && <ChevronRight size={17} color="#6B7280" strokeWidth={2} />}
+              {primaryDoctor.phone && <ChevronRight size={17} color="#4E6470" strokeWidth={2} />}
             </a>
           ) : (
-            <div style={{ background: '#E9F5F1', border: '1px solid rgba(8,127,112,0.14)', borderRadius: 18, padding: 16 }}>
-              <p style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#087F70', margin: '0 0 10px' }}>Médico tratante</p>
-              <p style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.5, margin: 0 }}>
+            <div style={{ background: '#E3F1F8', border: '1px solid rgba(12,108,156,0.14)', borderRadius: 18, padding: 16 }}>
+              <p style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#0C6C9C', margin: '0 0 10px' }}>Médico tratante</p>
+              <p style={{ fontSize: 14, color: '#4E6470', lineHeight: 1.5, margin: 0 }}>
                 Sin médico marcado como principal todavía — la familia sabrá a quién más avisar.
               </p>
             </div>
@@ -1411,7 +1411,7 @@ function SosConfirmSheet({ open, onClose, onConfirm, patientProfile, patientName
         </div>
 
         {/* footer fijo — fuera del área con scroll, siempre visible */}
-        <div style={{ flexShrink: 0, padding: '14px 16px calc(16px + env(safe-area-inset-bottom, 0px))', background: 'white', borderTop: '1px solid #EDE5D8', boxShadow: '0 -6px 16px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div style={{ flexShrink: 0, padding: '14px 16px calc(16px + env(safe-area-inset-bottom, 0px))', background: 'white', borderTop: '1px solid #E6E3DB', boxShadow: '0 -6px 16px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', gap: 8 }}>
           <button
             onClick={onConfirm}
             style={{
@@ -1427,7 +1427,7 @@ function SosConfirmSheet({ open, onClose, onConfirm, patientProfile, patientName
             <Siren size={21} color="white" strokeWidth={2.3} style={{ position: 'relative', zIndex: 1 }} />
             <span style={{ position: 'relative', zIndex: 1 }}>Activar emergencia</span>
           </button>
-          <button onClick={onClose} style={{ width: '100%', border: 'none', background: 'transparent', color: '#6B7280', fontSize: 13.5, fontWeight: 600, padding: 6, cursor: 'pointer' }}>
+          <button onClick={onClose} style={{ width: '100%', border: 'none', background: 'transparent', color: '#4E6470', fontSize: 13.5, fontWeight: 600, padding: 6, cursor: 'pointer' }}>
             Cancelar — fue un error
           </button>
         </div>
@@ -1439,23 +1439,23 @@ function SosConfirmSheet({ open, onClose, onConfirm, patientProfile, patientName
 const RECENT_EVENT_CONFIG = {
   MED_CONFIRMED:     { icon: '💊', color: '#15803D', label: e => `${e.medName ?? 'Medicamento'} dado${e.confirmedBy ? ` por ${e.confirmedBy.split(' ')[0]}` : ''}` },
   VOICE_MEMORY:      { icon: '🎙️', color: '#7C5CBF', label: e => `Memoria de voz${e.recorderName ? ` de ${e.recorderName.split(' ')[0]}` : ''}` },
-  EXPENSE:           { icon: '💰', color: '#0d6b63', label: e => e.description ?? 'Gasto registrado' },
+  EXPENSE:           { icon: '💰', color: '#0A5A82', label: e => e.description ?? 'Gasto registrado' },
   SOS_ALERT:         { icon: '🚨', color: '#D63031', label: () => 'Alerta de emergencia' },
   APPOINTMENT:       { icon: '📅', color: '#3B82F6', label: e => e.appointmentTitle ?? 'Cita médica' },
   APPOINTMENT_PROOF: { icon: '✅', color: '#15803D', label: e => `Cita: ${e.appointmentTitle ?? 'médica'}` },
-  NOTE:              { icon: '📝', color: '#6B7280', label: () => 'Nota registrada' },
+  NOTE:              { icon: '📝', color: '#4E6470', label: () => 'Nota registrada' },
   INCIDENT:          { icon: '🤕', color: '#DC2626', label: e => incidentTypeInfo(e.incidentType).label },
 }
 
 function RecentEventRow({ evt, onTap }) {
-  const c = RECENT_EVENT_CONFIG[evt.type] ?? { icon: '📌', color: '#9CA3AF', label: () => 'Evento' }
+  const c = RECENT_EVENT_CONFIG[evt.type] ?? { icon: '📌', color: '#5E7480', label: () => 'Evento' }
   const time = evt.timestamp ? fmtTimestamp(evt.timestamp) : ''
   return (
     <div
       onClick={() => onTap(evt)}
       style={{
         background: 'white', borderRadius: 14,
-        border: '1px solid #EDE5D8',
+        border: '1px solid #E6E3DB',
         padding: '12px 14px',
         display: 'flex', alignItems: 'center', gap: 12,
         cursor: 'pointer',
@@ -1471,11 +1471,11 @@ function RecentEventRow({ evt, onTap }) {
         {c.icon}
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ fontSize: 14, fontWeight: 600, color: '#1A1A1A', margin: 0, lineHeight: 1.3 }}>
+        <p style={{ fontSize: 14, fontWeight: 600, color: '#14303D', margin: 0, lineHeight: 1.3 }}>
           {c.label(evt)}
         </p>
         {time && (
-          <p style={{ fontSize: 11, color: '#9CA3AF', margin: '2px 0 0' }}>{time}</p>
+          <p style={{ fontSize: 11, color: '#5E7480', margin: '2px 0 0' }}>{time}</p>
         )}
       </div>
       <span style={{ fontSize: 16, color: '#D4C0B0', flexShrink: 0 }}>›</span>
@@ -1496,7 +1496,7 @@ const DASH_STATUS = {
   ok:      { color: '#15803D', bg: '#DCFCE7' },
   warning: { color: '#92400E', bg: '#FEF3C7' },
   urgent:  { color: '#DC2626', bg: '#FEE2E2' },
-  info:    { color: '#6B7280', bg: '#F3F4F6' },
+  info:    { color: '#4E6470', bg: '#F3F4F6' },
 }
 
 function DashCard({ Icon, title, subtitle, status, statusType, to, onClick }) {
@@ -1534,7 +1534,7 @@ function DashCard({ Icon, title, subtitle, status, statusType, to, onClick }) {
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           flexShrink: 0,
         }}>
-          <Icon size={20} color="#0d6b63" strokeWidth={1.75} />
+          <Icon size={20} color="#0A5A82" strokeWidth={1.75} />
         </div>
         {status && (
           <div style={{
@@ -1576,7 +1576,7 @@ function VideoCallDashCard({ onInstant, onSchedule, starting, error }) {
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           flexShrink: 0,
         }}>
-          <Camera size={20} color="#0d6b63" strokeWidth={1.75} />
+          <Camera size={20} color="#0A5A82" strokeWidth={1.75} />
         </div>
       </div>
       <div style={{ flex: 1 }}>
@@ -1591,12 +1591,12 @@ function VideoCallDashCard({ onInstant, onSchedule, starting, error }) {
         onPointerLeave={() => setPressed(false)}
         style={{
           width: '100%', padding: '8px 0', borderRadius: 10, border: 'none',
-          background: starting ? '#C0CCC5' : 'linear-gradient(135deg, #0d6b63, #3A6347)',
+          background: starting ? '#C9D6DB' : 'linear-gradient(135deg, #0A5A82, #0A4A6B)',
           color: 'white', fontWeight: 700, fontSize: 12,
           cursor: starting ? 'default' : 'pointer',
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
           transform: pressed ? 'translateY(1px)' : 'none',
-          boxShadow: starting ? 'none' : '0 3px 10px rgba(13,107,99,0.3)',
+          boxShadow: starting ? 'none' : '0 3px 10px rgba(10,90,130,0.3)',
           transition: 'all 0.1s',
           WebkitTapHighlightColor: 'transparent',
         }}
@@ -1612,7 +1612,7 @@ function VideoCallDashCard({ onInstant, onSchedule, starting, error }) {
         onClick={onSchedule}
         style={{
           background: 'none', border: 'none', cursor: 'pointer',
-          fontSize: 11, color: '#9CA3AF', padding: 0, textAlign: 'center',
+          fontSize: 11, color: '#5E7480', padding: 0, textAlign: 'center',
           WebkitTapHighlightColor: 'transparent',
         }}
       >
@@ -1639,11 +1639,11 @@ function CareDaySection({ title, emoji, count, children }) {
         borderBottom: '1px solid #F3F4F6',
       }}>
         <span style={{ fontSize: 13 }}>{emoji}</span>
-        <span style={{ fontSize: 10, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+        <span style={{ fontSize: 10, fontWeight: 700, color: '#4E6470', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
           {title}
         </span>
         <span style={{
-          fontSize: 10, fontWeight: 700, color: '#9CA3AF',
+          fontSize: 10, fontWeight: 700, color: '#5E7480',
           background: '#F3F4F6', borderRadius: 10, padding: '1px 7px', marginLeft: 2,
         }}>
           {count}
@@ -1676,11 +1676,11 @@ function MedDetailRow({ evt, isToday, confirming, onConfirm, isFamiliar }) {
     }}>
       <span style={{ fontSize: 18, flexShrink: 0 }}>💊</span>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', margin: 0, lineHeight: 1.3 }}>
+        <p style={{ fontSize: 13, fontWeight: 600, color: '#14303D', margin: 0, lineHeight: 1.3 }}>
           {medLabel}
         </p>
         {timeStr && (
-          <p style={{ fontSize: 11, color: '#9CA3AF', margin: '2px 0 0' }}>
+          <p style={{ fontSize: 11, color: '#5E7480', margin: '2px 0 0' }}>
             {isConfirmed ? `Dado a las ${timeStr}` : `Programado ${timeStr}`}
           </p>
         )}
@@ -1695,7 +1695,7 @@ function MedDetailRow({ evt, isToday, confirming, onConfirm, isFamiliar }) {
           disabled={busy}
           style={{
             padding: '6px 11px', borderRadius: 8, border: 'none',
-            background: busy ? '#C0CCC5' : '#22C55E',
+            background: busy ? '#C9D6DB' : '#22C55E',
             color: 'white', fontSize: 11, fontWeight: 700,
             cursor: busy ? 'not-allowed' : 'pointer', flexShrink: 0,
           }}
@@ -1724,7 +1724,7 @@ function CareEventRow({ evt, onTap }) {
     <div
       onClick={tappable ? () => onTap(evt) : undefined}
       style={{
-        background: 'white', borderRadius: 12, border: '1px solid #EDE5D8',
+        background: 'white', borderRadius: 12, border: '1px solid #E6E3DB',
         padding: '10px 12px', display: 'flex', alignItems: 'center', gap: 10,
         cursor: tappable ? 'pointer' : 'default',
         boxShadow: '0 1px 4px rgba(0,0,0,0.03)',
@@ -1738,13 +1738,13 @@ function CareEventRow({ evt, onTap }) {
         {cfg.icon}
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ fontSize: 13, fontWeight: 600, color: '#1A1A1A', margin: 0, lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <p style={{ fontSize: 13, fontWeight: 600, color: '#14303D', margin: 0, lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {cfg.label(evt)}
         </p>
         <div style={{ display: 'flex', gap: 8, marginTop: 2, alignItems: 'center' }}>
-          {time && <span style={{ fontSize: 11, color: '#9CA3AF' }}>{time}</span>}
+          {time && <span style={{ fontSize: 11, color: '#5E7480' }}>{time}</span>}
           {cfg.sub(evt) && (
-            <span style={{ fontSize: 11, color: evt.type === 'APPOINTMENT_PROOF' ? '#15803D' : '#6B7280', fontWeight: evt.type === 'APPOINTMENT_PROOF' ? 600 : 400 }}>
+            <span style={{ fontSize: 11, color: evt.type === 'APPOINTMENT_PROOF' ? '#15803D' : '#4E6470', fontWeight: evt.type === 'APPOINTMENT_PROOF' ? 600 : 400 }}>
               {cfg.sub(evt)}
             </span>
           )}
@@ -1770,12 +1770,12 @@ function AlertDetailRow({ evt, onTap }) {
     >
       <span style={{ fontSize: 18, flexShrink: 0 }}>{evt.resolved ? '✅' : '🚨'}</span>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ fontSize: 13, fontWeight: 700, color: evt.resolved ? '#374151' : '#D63031', margin: 0 }}>
+        <p style={{ fontSize: 13, fontWeight: 700, color: evt.resolved ? '#30454F' : '#D63031', margin: 0 }}>
           {evt.resolved ? 'Emergencia resuelta' : 'SOS Familiar'}
         </p>
         <div style={{ display: 'flex', gap: 8, marginTop: 2 }}>
-          {evt.triggeredBy && <span style={{ fontSize: 11, color: '#6B7280' }}>{evt.triggeredBy.split(' ')[0]}</span>}
-          {time && <span style={{ fontSize: 11, color: '#9CA3AF' }}>{time}</span>}
+          {evt.triggeredBy && <span style={{ fontSize: 11, color: '#4E6470' }}>{evt.triggeredBy.split(' ')[0]}</span>}
+          {time && <span style={{ fontSize: 11, color: '#5E7480' }}>{time}</span>}
         </div>
       </div>
       <span style={{ fontSize: 14, color: '#D4C0B0', flexShrink: 0 }}>›</span>
@@ -1805,19 +1805,19 @@ function CareDayDetail({ section, todayKey, confirming, onConfirm, isFamiliar, o
   if (medEvents.length === 0 && careEvents.length === 0 && alertEvents.length === 0) {
     return (
       <div style={{
-        background: 'white', borderRadius: 16, border: '1px solid #EDE5D8',
+        background: 'white', borderRadius: 16, border: '1px solid #E6E3DB',
         padding: '32px 16px', textAlign: 'center',
         boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
       }}>
         <span style={{ fontSize: 32, display: 'block', marginBottom: 10 }}>🗓️</span>
-        <p style={{ fontSize: 13, color: '#9CA3AF', margin: 0 }}>Sin actividad registrada este día</p>
+        <p style={{ fontSize: 13, color: '#5E7480', margin: 0 }}>Sin actividad registrada este día</p>
       </div>
     )
   }
 
   return (
     <div style={{
-      background: 'white', borderRadius: 16, border: '1px solid #EDE5D8',
+      background: 'white', borderRadius: 16, border: '1px solid #E6E3DB',
       padding: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
     }}>
       <CareDaySection title="Medicamentos" emoji="💊" count={medEvents.length}>
@@ -1872,9 +1872,9 @@ function QuickCard({ emoji, label, subtitle, statusColor, onClick, index, size =
     >
       <span style={{ fontSize: isLarge ? 26 : isSmall ? 18 : 22 }}>{emoji}</span>
       <div>
-        <p style={{ margin: 0, fontSize: isLarge ? 14 : isSmall ? 11 : 13, fontWeight: 700, color: '#1E2D26', lineHeight: 1.2 }}>{label}</p>
+        <p style={{ margin: 0, fontSize: isLarge ? 14 : isSmall ? 11 : 13, fontWeight: 700, color: '#0A4A6B', lineHeight: 1.2 }}>{label}</p>
         {subtitle && (
-          <p style={{ margin: isSmall ? '2px 0 0' : '3px 0 0', fontSize: isSmall ? 10 : 11, color: statusColor ?? '#9CA3AF', fontWeight: statusColor ? 600 : 400 }}>
+          <p style={{ margin: isSmall ? '2px 0 0' : '3px 0 0', fontSize: isSmall ? 10 : 11, color: statusColor ?? '#5E7480', fontWeight: statusColor ? 600 : 400 }}>
             {subtitle}
           </p>
         )}
@@ -1896,7 +1896,7 @@ function AttentionCard({ medName, medDosage, medTime, windowLabel, isExpired, on
             <Pill size={34} color="#E9826E" strokeWidth={1.8} />
           </span>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <p style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#334155', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{medName}{medDosage ? ` ${medDosage}` : ''}</p>
+            <p style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#2A4350', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{medName}{medDosage ? ` ${medDosage}` : ''}</p>
             <p style={{ margin: '6px 0 0', display: 'flex', alignItems: 'center', gap: 6, fontSize: 14, fontWeight: 600, color: '#64748B' }}>
               <Clock size={15} color="#64748B" strokeWidth={2} /> Hoy {medTime}
             </p>
@@ -1945,14 +1945,14 @@ function RecentActivity({ items, onViewAll, onSelect, firstName, summaryText, su
   return (
     <section aria-label="Actividad reciente" style={{ borderRadius: 26, background: 'white', padding: 20, boxShadow: '0 6px 24px -12px rgba(51,65,85,0.18)' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-        <h2 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 9, fontFamily: "'Fraunces', Georgia, serif", fontSize: 18, fontWeight: 600, color: '#334155' }}>
-          <Heart size={19} color="#087F70" strokeWidth={2} /> Actividad reciente
+        <h2 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 9, fontFamily: "'Fraunces', Georgia, serif", fontSize: 18, fontWeight: 600, color: '#2A4350' }}>
+          <Heart size={19} color="#0C6C9C" strokeWidth={2} /> Actividad reciente
         </h2>
-        <button onClick={onViewAll} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, color: '#087F70', fontWeight: 700, padding: 0, WebkitTapHighlightColor: 'transparent' }}>Ver todo</button>
+        <button onClick={onViewAll} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, color: '#0C6C9C', fontWeight: 700, padding: 0, WebkitTapHighlightColor: 'transparent' }}>Ver todo</button>
       </div>
       {(summaryEmpty || summaryText) && (
-        <div style={{ background: '#EAF7F3', borderRadius: 14, padding: '12px 14px', marginBottom: 14 }}>
-          <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: '#087F70', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Resumen del día</p>
+        <div style={{ background: '#E3F1F8', borderRadius: 14, padding: '12px 14px', marginBottom: 14 }}>
+          <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: '#0C6C9C', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Resumen del día</p>
           <p style={{ margin: '4px 0 0', fontSize: 13.5, color: '#475569', lineHeight: 1.5 }}>
             {summaryEmpty ? 'Aún no hay registros del día.' : summaryText}
           </p>
@@ -1987,11 +1987,11 @@ function RecentActivity({ items, onViewAll, onSelect, firstName, summaryText, su
             const isLast = i === items.length - 1
             return (
               <li key={evt.id ?? i} onClick={() => onSelect?.(evt)} style={{ display: 'flex', alignItems: 'flex-start', gap: 13, padding: `${isFirst ? 0 : 13}px 0 ${isLast ? 0 : 13}px`, borderBottom: isLast ? 'none' : '1px solid #EEF2F6', cursor: onSelect ? 'pointer' : 'default' }}>
-                <span style={{ width: 44, height: 44, borderRadius: '50%', flexShrink: 0, background: 'linear-gradient(135deg, #A8E5D6, #087F70)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: 16 }}>
+                <span style={{ width: 44, height: 44, borderRadius: '50%', flexShrink: 0, background: 'linear-gradient(135deg, #A6E3EC, #0C6C9C)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: 16 }}>
                   {avatarLetter}
                 </span>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ margin: 0, fontSize: 15, color: '#334155', lineHeight: 1.3 }}>
+                  <p style={{ margin: 0, fontSize: 15, color: '#2A4350', lineHeight: 1.3 }}>
                     <span style={{ fontWeight: 700 }}>{actor}</span> {meta.text}
                   </p>
                   {meta.sub && (
@@ -2004,8 +2004,8 @@ function RecentActivity({ items, onViewAll, onSelect, firstName, summaryText, su
                     <Chat size={16} color="#94A3B8" strokeWidth={1.9} />
                   </span>
                 ) : (
-                  <span style={{ width: 32, height: 32, borderRadius: '50%', flexShrink: 0, background: '#E3F4EF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <CheckIcon size={16} color="#087F70" strokeWidth={2.6} />
+                  <span style={{ width: 32, height: 32, borderRadius: '50%', flexShrink: 0, background: '#E3F1F8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <CheckIcon size={16} color="#0C6C9C" strokeWidth={2.6} />
                   </span>
                 )}
               </li>
@@ -3441,7 +3441,7 @@ export default function Dashboard() {
         onTouchStart={pullStart}
         onTouchMove={pullMove}
         onTouchEnd={pullEnd}
-        style={{ background: '#F8F4ED', minHeight: '100svh', paddingBottom: 80, overflowY: 'auto', width: '100%', maxWidth: '100%', overflowX: 'hidden', boxSizing: 'border-box', margin: '0 auto' }}
+        style={{ background: '#F7F6F2', minHeight: '100svh', paddingBottom: 80, overflowY: 'auto', width: '100%', maxWidth: '100%', overflowX: 'hidden', boxSizing: 'border-box', margin: '0 auto' }}
       >
         <PullIndicator />
         <style>{`
@@ -3450,7 +3450,7 @@ export default function Dashboard() {
         `}</style>
 
         {/* ═══ HEADER ═══ */}
-        <div style={{ background: '#F8F4ED', padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ background: '#F7F6F2', padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
           {/* Left: Logo */}
           <img
             src="/logo.png"
@@ -3462,7 +3462,7 @@ export default function Dashboard() {
             onClick={() => setShowFamilySwitcher(true)}
             style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 5, background: 'rgba(20,60,50,0.06)', border: 'none', borderRadius: 20, padding: '6px 14px', cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}
           >
-            <span style={{ fontSize: 13, fontWeight: 600, color: '#334155', maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <span style={{ fontSize: 13, fontWeight: 600, color: '#2A4350', maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {(patientProfile?.nombre_completo || activePatientName || profile?.name || 'Paciente').split(' ')[0]}
             </span>
             <span style={{ fontSize: 10, color: '#6D7B74', lineHeight: 1 }}>▼</span>
@@ -3477,7 +3477,7 @@ export default function Dashboard() {
                     aria-label={`Notificaciones${totalBadge > 0 ? `, ${totalBadge} sin leer` : ''}`}
                     style={{ position: 'relative', background: 'white', border: 'none', cursor: 'pointer', width: 44, height: 44, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', WebkitTapHighlightColor: 'transparent', flexShrink: 0, boxShadow: '0 2px 8px rgba(20,35,30,0.08)' }}
                   >
-                    <Bell size={20} color="#334155" strokeWidth={2} />
+                    <Bell size={20} color="#2A4350" strokeWidth={2} />
                     {totalBadge > 0 && (
                       <span style={{ position: 'absolute', top: -2, right: -2, background: '#E9826E', color: 'white', fontSize: 11, fontWeight: 700, borderRadius: '50%', width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1 }}>
                         {totalBadge > 9 ? '9+' : totalBadge}
@@ -3517,12 +3517,12 @@ export default function Dashboard() {
           </div>
         )}
         {permission !== 'granted' && !notifDismissed && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '12px 16px 0', padding: '10px 14px', background: 'white', border: '1px solid #EDE5D8', borderRadius: 16, boxShadow: '0 2px 8px rgba(20,35,30,0.05)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '12px 16px 0', padding: '10px 14px', background: 'white', border: '1px solid #E6E3DB', borderRadius: 16, boxShadow: '0 2px 8px rgba(20,35,30,0.05)' }}>
             <span style={{ fontSize: 17, flexShrink: 0 }}>🔔</span>
-            <p style={{ flex: 1, fontSize: 13, color: '#143C32', margin: 0, fontWeight: 500, lineHeight: 1.3 }}>Activa las notificaciones para estar al tanto</p>
+            <p style={{ flex: 1, fontSize: 13, color: '#0A4A6B', margin: 0, fontWeight: 500, lineHeight: 1.3 }}>Activa las notificaciones para estar al tanto</p>
             <button onClick={requestAndSubscribe} style={{ padding: '6px 13px', borderRadius: 9, background: '#E9826E', color: 'white', fontSize: 12, fontWeight: 700, border: 'none', cursor: 'pointer', flexShrink: 0 }}>Activar</button>
             <button onClick={dismissNotifBanner} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, flexShrink: 0, display: 'flex' }} aria-label="Cerrar">
-              <XIcon size={14} color="#9CA3AF" strokeWidth={2} />
+              <XIcon size={14} color="#5E7480" strokeWidth={2} />
             </button>
           </div>
         )}
@@ -3564,7 +3564,7 @@ export default function Dashboard() {
               <span style={{ fontSize: 20, flexShrink: 0 }}>{emoji}</span>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <p style={{ fontSize: 13, fontWeight: 700, color: textColor, margin: 0, lineHeight: 1.3 }}>{title}</p>
-                <p style={{ fontSize: 11, color: '#9CA3AF', margin: '2px 0 0' }}>{subtitle}</p>
+                <p style={{ fontSize: 11, color: '#5E7480', margin: '2px 0 0' }}>{subtitle}</p>
               </div>
               <button onClick={() => navigate('/medications')} style={{ padding: '6px 12px', borderRadius: 10, border: 'none', flexShrink: 0, background: btnBg, color: 'white', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>
                 {kind === 'silent' ? 'Ver' : 'Renovar'}
@@ -3589,7 +3589,7 @@ export default function Dashboard() {
             const recentMembers = familyMembers.filter(m => m.last_seen && Date.now() - new Date(m.last_seen).getTime() < 24 * 60 * 60 * 1000)
             const participacion = recentMembers.length >= 2 ? 'Alta' : recentMembers.length === 1 ? 'Moderada' : 'Baja'
 
-            const PALETTE = ['#0B4F4A', '#C9882A', '#7C3AED', '#E58B73', '#0EA5E9']
+            const PALETTE = ['#0A4A6B', '#C9882A', '#7C3AED', '#E58B73', '#0EA5E9']
 
             const pendingMedWindowMinutes = nextPendingMed
               ? (medsList.find(m => m.id === nextPendingMed.medicationId)?.time_window_minutes ?? 60)
@@ -3661,15 +3661,15 @@ export default function Dashboard() {
                     ACCIONES RÁPIDAS + MÁS HERRAMIENTAS — directo sobre el fondo crema
                     ════════════════════════════════════ */}
                 <div>
-                  <p style={{ margin: '0 0 14px', display: 'flex', alignItems: 'center', gap: 9, fontFamily: "'Fraunces', Georgia, serif", fontSize: 18, fontWeight: 600, color: '#334155' }}>
-                    <Zap size={18} color="#087F70" filled /> Acciones rápidas
+                  <p style={{ margin: '0 0 14px', display: 'flex', alignItems: 'center', gap: 9, fontFamily: "'Fraunces', Georgia, serif", fontSize: 18, fontWeight: 600, color: '#2A4350' }}>
+                    <Zap size={18} color="#0C6C9C" filled /> Acciones rápidas
                   </p>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 11 }}>
                     {[
-                      { Icon: Pill,          label: 'Medicamentos', onClick: () => navigate('/medications'),  circleBg: '#E3F4EF', iconColor: '#087F70', bold: false },
+                      { Icon: Pill,          label: 'Medicamentos', onClick: () => navigate('/medications'),  circleBg: '#E3F1F8', iconColor: '#0C6C9C', bold: false },
                       { Icon: Siren,         label: 'Emergencia',   onClick: prepareSOS,                      circleBg: 'rgba(217,83,79,0.12)', iconColor: '#D9534F', bold: true },
-                      { Icon: MessageCircle, label: 'Chat familiar', onClick: () => navigate('/chat'),        circleBg: '#E3F4EF', iconColor: '#087F70', bold: false },
-                      { Icon: Video,         label: 'Videollamada', onClick: () => navigate('/videollamada'), circleBg: '#E3F4EF', iconColor: '#087F70', bold: false },
+                      { Icon: MessageCircle, label: 'Chat familiar', onClick: () => navigate('/chat'),        circleBg: '#E3F1F8', iconColor: '#0C6C9C', bold: false },
+                      { Icon: Video,         label: 'Videollamada', onClick: () => navigate('/videollamada'), circleBg: '#E3F1F8', iconColor: '#0C6C9C', bold: false },
                     ].map(({ Icon, label, onClick, circleBg, iconColor, bold }) => (
                       <button
                         key={label} onClick={onClick}
@@ -3689,7 +3689,7 @@ export default function Dashboard() {
                         }}>
                           <Icon size={23} color={iconColor} strokeWidth={1.9} />
                         </span>
-                        <span style={{ fontSize: 11, fontWeight: bold ? 700 : 600, color: bold ? '#334155' : '#475569', lineHeight: 1.2, textAlign: 'center' }}>{label}</span>
+                        <span style={{ fontSize: 11, fontWeight: bold ? 700 : 600, color: bold ? '#2A4350' : '#475569', lineHeight: 1.2, textAlign: 'center' }}>{label}</span>
                       </button>
                     ))}
                   </div>
@@ -3700,15 +3700,15 @@ export default function Dashboard() {
                     ════════════════════════════════════ */}
                 {(() => {
                   const featuredTools = [
-                    { Icon: Users,    label: 'Equipo',   onClick: () => navigate('/familia'),          circleBg: '#EFF6F0', iconColor: '#0d6b63' },
+                    { Icon: Users,    label: 'Equipo',   onClick: () => navigate('/familia'),          circleBg: '#EFF6F0', iconColor: '#0A5A82' },
                     { Icon: Building2, label: 'Hospital', onClick: () => setShowHospitalModal(true),   circleBg: '#FEF0ED', iconColor: '#E9826E' },
                     { Icon: Calendar, label: 'Citas',    onClick: () => navigate('/calendar'),         circleBg: '#FFF8EC', iconColor: '#D99A18' },
                   ]
                   return (
                     <div>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-                        <p style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 9, fontFamily: "'Fraunces', Georgia, serif", fontSize: 18, fontWeight: 600, color: '#334155' }}>Todo el cuidado</p>
-                        <button onClick={() => navigate('/mas')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, color: '#087F70', fontWeight: 700, padding: 0, WebkitTapHighlightColor: 'transparent' }}>Ver todas</button>
+                        <p style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 9, fontFamily: "'Fraunces', Georgia, serif", fontSize: 18, fontWeight: 600, color: '#2A4350' }}>Todo el cuidado</p>
+                        <button onClick={() => navigate('/mas')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, color: '#0C6C9C', fontWeight: 700, padding: 0, WebkitTapHighlightColor: 'transparent' }}>Ver todas</button>
                       </div>
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 11 }}>
                         {featuredTools.map(({ Icon, label, onClick, circleBg, iconColor }) => (
@@ -3767,19 +3767,19 @@ export default function Dashboard() {
         >
           <div style={{ background: 'white', borderRadius: 20, padding: '28px 24px', maxWidth: 340, width: '100%', boxShadow: '0 24px 64px rgba(0,0,0,0.25)', textAlign: 'center' }}>
             <div style={{ fontSize: 40, marginBottom: 14 }}>⚠️</div>
-            <p style={{ fontFamily: 'Georgia, serif', fontSize: 17, fontWeight: 700, color: '#1A1A1A', marginBottom: 8 }}>
+            <p style={{ fontFamily: 'Georgia, serif', fontSize: 17, fontWeight: 700, color: '#14303D', marginBottom: 8 }}>
               Confirmar como administrador
             </p>
             <p style={{ fontSize: 13, color: '#7A5A18', lineHeight: 1.6, marginBottom: 8, background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 12, padding: '10px 14px' }}>
               Confirmando como administrador — solo en caso de emergencia
             </p>
-            <p style={{ fontSize: 12, color: '#6B7280', lineHeight: 1.6, marginBottom: 24 }}>
+            <p style={{ fontSize: 12, color: '#4E6470', lineHeight: 1.6, marginBottom: 24 }}>
               {adminConfirmEvt.medName} · Esta acción se registrará con tu nombre.
             </p>
             <div style={{ display: 'flex', gap: 10 }}>
               <button
                 onClick={() => setAdminConfirmEvt(null)}
-                style={{ flex: 1, padding: '12px', borderRadius: 12, border: '1.5px solid #EDE5D8', background: 'white', color: '#6B7280', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}
+                style={{ flex: 1, padding: '12px', borderRadius: 12, border: '1.5px solid #E6E3DB', background: 'white', color: '#4E6470', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}
               >
                 Cancelar
               </button>
@@ -3840,11 +3840,11 @@ export default function Dashboard() {
             maxHeight: '75vh', display: 'flex', flexDirection: 'column',
           }}>
             {/* Sheet header */}
-            <div style={{ padding: '16px 20px 12px', borderBottom: '1px solid #F8F4ED', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
-              <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#1E2D26' }}>🔔 Notificaciones</p>
+            <div style={{ padding: '16px 20px 12px', borderBottom: '1px solid #F7F6F2', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+              <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#0A4A6B' }}>🔔 Notificaciones</p>
               <button
                 onClick={() => setShowNotifSheet(false)}
-                style={{ background: 'rgba(0,0,0,0.06)', border: 'none', borderRadius: '50%', width: 28, height: 28, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, color: '#6B7280', flexShrink: 0 }}
+                style={{ background: 'rgba(0,0,0,0.06)', border: 'none', borderRadius: '50%', width: 28, height: 28, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, color: '#4E6470', flexShrink: 0 }}
               >
                 ✕
               </button>
@@ -3855,11 +3855,11 @@ export default function Dashboard() {
 
               {/* ── MENSAJES ── */}
               <div style={{ padding: '14px 20px 8px' }}>
-                <p style={{ margin: '0 0 10px', fontSize: 11, fontWeight: 700, color: '#9CA3AF', letterSpacing: '0.06em' }}>
+                <p style={{ margin: '0 0 10px', fontSize: 11, fontWeight: 700, color: '#5E7480', letterSpacing: '0.06em' }}>
                   💬 MENSAJES
                 </p>
                 {notifMessages.length === 0 ? (
-                  <p style={{ margin: 0, fontSize: 13, color: '#9CA3AF', padding: '4px 0' }}>No hay mensajes nuevos</p>
+                  <p style={{ margin: 0, fontSize: 13, color: '#5E7480', padding: '4px 0' }}>No hay mensajes nuevos</p>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                     {notifMessages.map(msg => (
@@ -3877,14 +3877,14 @@ export default function Dashboard() {
                           💬
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <p style={{ margin: '0 0 2px', fontSize: 12, fontWeight: 700, color: '#1E2D26' }}>
+                          <p style={{ margin: '0 0 2px', fontSize: 12, fontWeight: 700, color: '#0A4A6B' }}>
                             {msg.user_name ?? 'Familiar'}
                           </p>
                           <p style={{ margin: 0, fontSize: 12, color: '#4B5563', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: 1.4 }}>
                             {msg.message}
                           </p>
                         </div>
-                        <span style={{ fontSize: 10, color: '#9CA3AF', whiteSpace: 'nowrap', flexShrink: 0, marginTop: 2 }}>
+                        <span style={{ fontSize: 10, color: '#5E7480', whiteSpace: 'nowrap', flexShrink: 0, marginTop: 2 }}>
                           {timeAgo(new Date(msg.created_at))}
                         </span>
                       </button>
@@ -3899,17 +3899,17 @@ export default function Dashboard() {
                   onClick={() => { setShowNotifSheet(false); navigate('/paciente/notas-familia') }}
                   style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, marginBottom: 10, display: 'flex', alignItems: 'center', gap: 4, WebkitTapHighlightColor: 'transparent' }}
                 >
-                  <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: '#9CA3AF', letterSpacing: '0.06em' }}>
+                  <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: '#5E7480', letterSpacing: '0.06em' }}>
                     📓 NOTAS DE LA FAMILIA
                   </p>
-                  <span style={{ fontSize: 10, color: '#9CA3AF' }}>›</span>
+                  <span style={{ fontSize: 10, color: '#5E7480' }}>›</span>
                 </button>
                 {notifNotes.length === 0 ? (
                   <button
                     onClick={() => { setShowNotifSheet(false); navigate('/paciente/notas-familia') }}
                     style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0', textAlign: 'left', WebkitTapHighlightColor: 'transparent' }}
                   >
-                    <p style={{ margin: 0, fontSize: 13, color: '#9CA3AF' }}>No hay notas sin leer</p>
+                    <p style={{ margin: 0, fontSize: 13, color: '#5E7480' }}>No hay notas sin leer</p>
                   </button>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
@@ -3928,14 +3928,14 @@ export default function Dashboard() {
                           📝
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <p style={{ margin: '0 0 2px', fontSize: 12, fontWeight: 700, color: '#1E2D26' }}>
+                          <p style={{ margin: '0 0 2px', fontSize: 12, fontWeight: 700, color: '#0A4A6B' }}>
                             {note.authorName}
                           </p>
                           <p style={{ margin: 0, fontSize: 12, color: '#4B5563', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: 1.4 }}>
                             {note.title ? `${note.title}: ` : ''}{note.content}
                           </p>
                         </div>
-                        <span style={{ fontSize: 10, color: '#9CA3AF', whiteSpace: 'nowrap', flexShrink: 0, marginTop: 2 }}>
+                        <span style={{ fontSize: 10, color: '#5E7480', whiteSpace: 'nowrap', flexShrink: 0, marginTop: 2 }}>
                           {timeAgo(new Date(note.created_at))}
                         </span>
                       </button>
@@ -3966,10 +3966,10 @@ export default function Dashboard() {
               {/* Header: patient name + close */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
                 <div>
-                  <p style={{ margin: 0, fontSize: 13, fontWeight: 500, color: '#9CA3AF', letterSpacing: '0.03em', textTransform: 'uppercase' }}>
+                  <p style={{ margin: 0, fontSize: 13, fontWeight: 500, color: '#5E7480', letterSpacing: '0.03em', textTransform: 'uppercase' }}>
                     Cuidando a
                   </p>
-                  <p style={{ margin: '2px 0 0', fontSize: 18, fontWeight: 700, color: '#1E2D26', fontFamily: 'Georgia, serif' }}>
+                  <p style={{ margin: '2px 0 0', fontSize: 18, fontWeight: 700, color: '#0A4A6B', fontFamily: 'Georgia, serif' }}>
                     {activePatientName || activeFamilyLabel || 'Mi familiar'}
                   </p>
                 </div>
@@ -3977,12 +3977,12 @@ export default function Dashboard() {
                   onClick={() => setShowFamilySwitcher(false)}
                   style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', alignItems: 'center' }}
                 >
-                  <XIcon size={18} color="#9CA3AF" strokeWidth={2} />
+                  <XIcon size={18} color="#5E7480" strokeWidth={2} />
                 </button>
               </div>
 
               {/* Section 1: Care team */}
-              <p style={{ margin: '0 0 10px', fontSize: 12, fontWeight: 700, color: '#9CA3AF', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+              <p style={{ margin: '0 0 10px', fontSize: 12, fontWeight: 700, color: '#5E7480', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
                 Equipo de cuidado
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxHeight: '40vh', overflowY: 'auto' }}>
@@ -3996,7 +3996,7 @@ export default function Dashboard() {
                   const displayName = m.full_name?.trim() || (m.email ? m.email.split('@')[0] : 'Sin nombre')
                   const initial = displayName.charAt(0).toUpperCase()
                   const presence = (() => {
-                    if (!m.last_seen) return { dot: '⚫', label: 'Sin actividad', color: '#9CA3AF' }
+                    if (!m.last_seen) return { dot: '⚫', label: 'Sin actividad', color: '#5E7480' }
                     const diffMs = Date.now() - new Date(m.last_seen).getTime()
                     const diffMin = diffMs / 60000
                     const diffH = diffMs / 3600000
@@ -4006,21 +4006,21 @@ export default function Dashboard() {
                       return { dot: '🟡', label, color: '#D97706' }
                     }
                     const diffDays = Math.floor(diffH / 24)
-                    return { dot: '⚫', label: diffDays <= 1 ? 'Hace 1 día' : `Hace ${diffDays} días`, color: '#9CA3AF' }
+                    return { dot: '⚫', label: diffDays <= 1 ? 'Hace 1 día' : `Hace ${diffDays} días`, color: '#5E7480' }
                   })()
                   return (
                     <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                       <div style={{
                         width: 40, height: 40, borderRadius: '50%', flexShrink: 0,
-                        background: isMe ? 'linear-gradient(135deg,#0B4F4A,#0d6b63)' : 'linear-gradient(135deg,#0d6b63,#2D6A4F)',
+                        background: isMe ? 'linear-gradient(135deg,#0A4A6B,#0A5A82)' : 'linear-gradient(135deg,#0A5A82,#0A4A6B)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         fontSize: 16, fontWeight: 700, color: 'white',
                       }}>
                         {initial}
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#1E2D26', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {displayName}{isMe && <span style={{ fontWeight: 400, color: '#9CA3AF', fontSize: 13 }}> · Tú</span>}
+                        <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#0A4A6B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {displayName}{isMe && <span style={{ fontWeight: 400, color: '#5E7480', fontSize: 13 }}> · Tú</span>}
                         </p>
                         <p style={{ margin: '2px 0 0', fontSize: 11, color: presence.color }}>{presence.dot} {presence.label}</p>
                       </div>
@@ -4038,7 +4038,7 @@ export default function Dashboard() {
                 if (!otherFamilies.length) return null
                 return (
                   <>
-                    <p style={{ margin: '18px 0 10px', fontSize: 12, fontWeight: 700, color: '#9CA3AF', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                    <p style={{ margin: '18px 0 10px', fontSize: 12, fontWeight: 700, color: '#5E7480', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
                       Otras familias
                     </p>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -4055,18 +4055,18 @@ export default function Dashboard() {
                             style={{
                               display: 'flex', alignItems: 'center', gap: 12,
                               padding: '10px 12px', borderRadius: 14,
-                              background: '#FDFAF7', border: '1.5px solid #EDE5D8',
+                              background: '#FDFAF7', border: '1.5px solid #E6E3DB',
                               cursor: 'pointer', textAlign: 'left', width: '100%',
                               WebkitTapHighlightColor: 'transparent',
                             }}
                           >
                             {fam.patientPhotoUrl ? (
                               <img src={fam.patientPhotoUrl} alt={fam.patientName ?? ''}
-                                style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '2px solid #EDE5D8' }} />
+                                style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '2px solid #E6E3DB' }} />
                             ) : (
                               <div style={{
                                 width: 40, height: 40, borderRadius: '50%', flexShrink: 0,
-                                background: 'linear-gradient(135deg,#9CA3AF,#6B7280)',
+                                background: 'linear-gradient(135deg,#5E7480,#4E6470)',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                                 fontSize: 15, fontWeight: 700, color: 'white',
                               }}>
@@ -4074,14 +4074,14 @@ export default function Dashboard() {
                               </div>
                             )}
                             <div style={{ flex: 1, minWidth: 0 }}>
-                              <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#1E2D26', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#0A4A6B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                 {fam.patientName ?? 'Mi familiar'}
                               </p>
                               <span style={{ fontSize: 11, fontWeight: 600, color: famRoleColor, background: famRoleBg, borderRadius: 20, padding: '2px 8px' }}>
                                 {famRoleLabel}
                               </span>
                             </div>
-                            <span style={{ fontSize: 13, color: '#9CA3AF', flexShrink: 0 }}>›</span>
+                            <span style={{ fontSize: 13, color: '#5E7480', flexShrink: 0 }}>›</span>
                           </button>
                         )
                       })}

@@ -51,9 +51,9 @@ export default function HospitalModeModal({ open, onClose }) {
   }
 
   // ── Shared styles ──────────────────────────────────────────────────────────
-  const btnPrimary = (color = '#0d6b63') => ({
+  const btnPrimary = (color = '#0A5A82') => ({
     width: '100%', padding: '15px', borderRadius: 14, border: 'none',
-    background: saving ? '#C0CCC5' : color,
+    background: saving ? '#C9D6DB' : color,
     color: 'white', fontWeight: 700, fontSize: 15,
     cursor: saving ? 'not-allowed' : 'pointer',
   })
@@ -89,10 +89,10 @@ export default function HospitalModeModal({ open, onClose }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <span style={{ fontSize: 26 }}>🏥</span>
             <div>
-              <h3 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: '#1A1A1A', fontFamily: 'Georgia, serif' }}>
+              <h3 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: '#14303D', fontFamily: 'Georgia, serif' }}>
                 Modo Hospital
               </h3>
-              <p style={{ margin: '2px 0 0', fontSize: 11, color: '#6B7280' }}>
+              <p style={{ margin: '2px 0 0', fontSize: 11, color: '#4E6470' }}>
                 {isHospitalMode ? 'Activo — el equipo está en alerta' : `Activa cuando ${patientName} esté hospitalizado`}
               </p>
             </div>
@@ -103,7 +103,7 @@ export default function HospitalModeModal({ open, onClose }) {
               width: 32, height: 32, borderRadius: '50%', border: 'none',
               background: '#F3F4F6', cursor: 'pointer', flexShrink: 0,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 16, color: '#6B7280',
+              fontSize: 16, color: '#4E6470',
             }}
           >
             ✕
@@ -156,7 +156,7 @@ export default function HospitalModeModal({ open, onClose }) {
                     {hospitalMode.room_number && ` · Hab. ${hospitalMode.room_number}`}
                   </p>
                 )}
-                <p style={{ margin: 0, fontSize: 12, color: '#6B7280' }}>
+                <p style={{ margin: 0, fontSize: 12, color: '#4E6470' }}>
                   Activado por {hospitalMode?.activated_by_name ?? 'el equipo'}
                 </p>
               </div>
@@ -178,15 +178,15 @@ export default function HospitalModeModal({ open, onClose }) {
 
           {step === 'confirmDeactivate' && (
             <>
-              <button onClick={handleDeactivate} disabled={saving} style={btnPrimary('#0d6b63')}>
+              <button onClick={handleDeactivate} disabled={saving} style={btnPrimary('#0A5A82')}>
                 {saving ? 'Desactivando...' : '✅ Sí, desactivar Modo Hospital'}
               </button>
               <button
                 onClick={() => setStep('main')}
                 style={{
                   width: '100%', padding: '13px', borderRadius: 14,
-                  border: '1px solid #EDE5D8', background: 'white',
-                  color: '#6B7280', fontWeight: 600, fontSize: 14, cursor: 'pointer',
+                  border: '1px solid #E6E3DB', background: 'white',
+                  color: '#4E6470', fontWeight: 600, fontSize: 14, cursor: 'pointer',
                 }}
               >
                 Cancelar
@@ -200,7 +200,7 @@ export default function HospitalModeModal({ open, onClose }) {
               disabled={saving}
               style={{
                 ...btnPrimary(),
-                background: saving ? '#C0CCC5' : 'linear-gradient(135deg, #B91C1C, #DC2626)',
+                background: saving ? '#C9D6DB' : 'linear-gradient(135deg, #B91C1C, #DC2626)',
                 fontWeight: 800,
                 boxShadow: saving ? 'none' : '0 4px 20px rgba(185,28,28,0.35)',
               }}
@@ -211,7 +211,7 @@ export default function HospitalModeModal({ open, onClose }) {
 
           {step === 'main' && isHospitalMode && (
             <>
-              <button onClick={handleUpdate} disabled={saving} style={btnPrimary('#0d6b63')}>
+              <button onClick={handleUpdate} disabled={saving} style={btnPrimary('#0A5A82')}>
                 {saving ? 'Guardando...' : 'Actualizar información'}
               </button>
               <button

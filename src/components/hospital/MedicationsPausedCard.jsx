@@ -46,7 +46,7 @@ export default function MedicationsPausedCard() {
       </p>
 
       {meds.length === 0 ? (
-        <p style={{ margin: 0, fontSize: 13, color: '#9CA3AF' }}>Sin medicamentos registrados</p>
+        <p style={{ margin: 0, fontSize: 13, color: '#5E7480' }}>Sin medicamentos registrados</p>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {meds.map(m => (

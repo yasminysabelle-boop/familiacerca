@@ -18,24 +18,24 @@ import {
 } from '../components/Icons'
 
 // ── paleta del sistema (CLAUDE.md) ──────────────────────────────────────────
-const TEAL             = '#087F70'
-const TEAL_DEEP         = '#055C51'
-const TEAL_CHIP         = '#EAF7F3'
-const TEAL_INK          = '#08554A'
+const TEAL             = '#0C6C9C'
+const TEAL_DEEP         = '#0A5A82'
+const TEAL_CHIP         = '#E3F1F8'
+const TEAL_INK          = '#0A5A82'
 const CORAL_ACTION      = '#E9826E'
 const CORAL_ACTION_INK  = '#8C3A2A'
 const CORAL_EMERGENCY   = '#D9534F'
 const PEACH             = '#FBEAE4'
 const GOLD              = '#D99A18'
 const GOLD_INK          = '#7A5510'
-const INK               = '#334155'
-const INK_2             = '#1E2C3A'
-const INK_SOFT          = '#6B7A88'
+const INK               = '#2A4350'
+const INK_2             = '#14303D'
+const INK_SOFT          = '#4E6470'
 const INK_FAINT         = '#94A0AD'
 const HAIRLINE          = 'rgba(51,65,85,0.09)'
 const SHADOW_CARD       = '0 6px 14px -8px #087F7022'
 const SHADOW_CORAL      = '0 6px 14px -8px #E9826E44'
-const GRADIENT_BRAND    = 'linear-gradient(148deg,#12A18C 0%,#0A8072 46%,#055C51 100%)'
+const GRADIENT_BRAND    = 'linear-gradient(148deg,#1677A6 0%,#0C6C9C 46%,#0A5A82 100%)'
 const SERIF             = "'Fraunces', Georgia, serif"
 
 // Tono de categoría — mismo lenguaje que los pills del Chat (teal/coral/gold/cool),
@@ -45,7 +45,7 @@ const CAT = {
   coral:    { bg: PEACH,                    ink: CORAL_ACTION_INK,  sel: CORAL_ACTION },
   gold:     { bg: 'rgba(217,154,24,0.15)',  ink: GOLD_INK,          sel: GOLD },
   goldSoft: { bg: 'rgba(217,154,24,0.08)',  ink: GOLD_INK,          sel: GOLD },
-  cool:     { bg: 'rgba(168,229,214,0.32)', ink: TEAL_INK,          sel: TEAL_DEEP },
+  cool:     { bg: 'rgba(166,227,236,0.32)', ink: TEAL_INK,          sel: TEAL_DEEP },
   sos:      { bg: 'rgba(217,83,64,0.14)',   ink: CORAL_EMERGENCY,   sel: CORAL_EMERGENCY },
 }
 
@@ -148,7 +148,7 @@ function eventIcon(event) {
 // Placa de foto con carga real + respaldo elegante si la imagen falla.
 function PhotoThumb({ url, tone }) {
   const [failed, setFailed] = useState(false)
-  const gradient = tone === 'coral' ? 'linear-gradient(150deg,#F0977F,#C4664F)' : 'linear-gradient(150deg,#12A18C,#055C51)'
+  const gradient = tone === 'coral' ? 'linear-gradient(150deg,#F0977F,#C4664F)' : 'linear-gradient(150deg,#1677A6,#0A5A82)'
   if (!url || failed) {
     return (
       <div style={{ width: 50, height: 50, borderRadius: 12, flexShrink: 0, marginTop: 1, background: gradient, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -431,13 +431,13 @@ export default function MedicationTimeline() {
 
   return (
     <Layout>
-      <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', background: '#F8F4ED' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden', background: '#F7F6F2' }}>
 
         {/* Header propio */}
         <header style={{
           display: 'flex', alignItems: 'center', gap: 12,
           padding: '12px 16px 13px', borderBottom: `1px solid ${HAIRLINE}`,
-          flexShrink: 0, background: '#F8F4ED',
+          flexShrink: 0, background: '#F7F6F2',
         }}>
           <button
             onClick={goBack}
@@ -657,7 +657,7 @@ export default function MedicationTimeline() {
             <div style={{ position: 'relative' }}>
               {/* Ancorada al final de la lista, mayormente en el espacio abierto bajo
                   la última tarjeta — detrás de tarjetas opacas casi no se percibía. */}
-              <WatermarkHeart heartOpacity={0.045} cutout="#F8F4ED" width={220} height={220} style={{ right: -36, bottom: -140 }} />
+              <WatermarkHeart heartOpacity={0.045} cutout="#F7F6F2" width={220} height={220} style={{ right: -36, bottom: -140 }} />
               <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {days.map(([dateKey, dayEvents]) => {
                   const isExpanded = expandedDays.has(dateKey)
@@ -672,7 +672,7 @@ export default function MedicationTimeline() {
                   return (
                     <div key={dateKey} style={{
                       background: 'white', borderRadius: 18,
-                      border: `1px solid ${isToday ? 'rgba(8,127,112,0.18)' : HAIRLINE}`,
+                      border: `1px solid ${isToday ? 'rgba(12,108,156,0.18)' : HAIRLINE}`,
                       overflow: 'hidden', boxShadow: SHADOW_CARD,
                     }}>
                       <button
@@ -680,9 +680,9 @@ export default function MedicationTimeline() {
                         style={{
                           width: '100%', display: 'flex', alignItems: 'center', gap: 10,
                           padding: '13px 16px',
-                          background: isToday ? `linear-gradient(135deg, ${TEAL_CHIP} 0%, #F8F4ED 75%)` : '#F8F4ED',
+                          background: isToday ? `linear-gradient(135deg, ${TEAL_CHIP} 0%, #F7F6F2 75%)` : '#F7F6F2',
                           border: 'none', cursor: 'pointer',
-                          borderBottom: isExpanded ? `1px solid ${isToday ? 'rgba(8,127,112,0.12)' : HAIRLINE}` : 'none',
+                          borderBottom: isExpanded ? `1px solid ${isToday ? 'rgba(12,108,156,0.12)' : HAIRLINE}` : 'none',
                           WebkitTapHighlightColor: 'transparent',
                         }}
                       >
@@ -690,7 +690,7 @@ export default function MedicationTimeline() {
                           <p style={{ fontSize: 13.5, fontWeight: 800, color: INK_2, margin: 0 }}>
                             {dayLabel(dateKey)}
                             {isToday && (
-                              <span style={{ marginLeft: 7, fontSize: 10, fontWeight: 800, color: TEAL_DEEP, background: 'rgba(8,127,112,0.12)', padding: '2px 8px', borderRadius: 6 }}>
+                              <span style={{ marginLeft: 7, fontSize: 10, fontWeight: 800, color: TEAL_DEEP, background: 'rgba(12,108,156,0.12)', padding: '2px 8px', borderRadius: 6 }}>
                                 Hoy
                               </span>
                             )}

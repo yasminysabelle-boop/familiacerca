@@ -34,9 +34,9 @@ function formatDate(ts) {
 // Identidad de avatares — variedad para distinguir personas, nunca los
 // colores reservados (coral emergencia, morado IA).
 const AVATAR_PALETTE = [
-  { bg: '#A8E5D6', ink: '#05463D' },
+  { bg: '#A6E3EC', ink: '#0A4A6B' },
   { bg: '#FBEAE4', ink: '#8A5A44' },
-  { bg: '#087F70', ink: '#FFFFFF' },
+  { bg: '#0C6C9C', ink: '#FFFFFF' },
   { bg: '#D99A18', ink: '#FFFFFF' },
   { bg: '#E9826E', ink: '#FFFFFF' },
 ]
@@ -80,12 +80,12 @@ function Avatar({ name, photoUrl, size = 32 }) {
 const CATEGORY_META = {
   aviso:        { label: 'Aviso',        icon: Bell,          bg: 'rgba(217,154,24,0.15)',  ink: '#7A5510', border: 'rgba(217,154,24,0.35)',  solid: '#D99A18' },
   incidente:    { label: 'Incidente',    icon: AlertTriangle, bg: 'rgba(233,130,110,0.17)', ink: '#8C3A2A', border: 'rgba(233,130,110,0.36)', solid: '#E9826E' },
-  evidencia:    { label: 'Evidencia',    icon: Camera,        bg: 'rgba(168,229,214,0.45)', ink: '#05463D', border: 'rgba(5,70,61,0.25)',     solid: '#05463D' },
-  medicamentos: { label: 'Medicamentos', icon: Pill,          bg: '#087F70',                ink: '#FFFFFF', border: '#087F70',                solid: '#087F70' },
+  evidencia:    { label: 'Evidencia',    icon: Camera,        bg: 'rgba(166,227,236,0.45)', ink: '#0A4A6B', border: 'rgba(5,70,61,0.25)',     solid: '#0A4A6B' },
+  medicamentos: { label: 'Medicamentos', icon: Pill,          bg: '#0C6C9C',                ink: '#FFFFFF', border: '#0C6C9C',                solid: '#0C6C9C' },
   cuidados:     { label: 'Cuidados',     icon: ClipboardList, bg: '#FBEAE4',                ink: '#8A5A44', border: 'rgba(138,90,68,0.25)',   solid: '#8A5A44' },
-  citas:        { label: 'Citas',        icon: Calendar,      bg: 'rgba(5,92,81,0.14)',      ink: '#055C51', border: 'rgba(5,92,81,0.32)',     solid: '#055C51' },
+  citas:        { label: 'Citas',        icon: Calendar,      bg: 'rgba(5,92,81,0.14)',      ink: '#0A5A82', border: 'rgba(5,92,81,0.32)',     solid: '#0A5A82' },
 }
-const ALL_META = { label: 'Todos', icon: MessageCircle, bg: 'rgba(8,127,112,0.12)', ink: '#055C51', border: 'rgba(8,127,112,0.3)', solid: '#087F70' }
+const ALL_META = { label: 'Todos', icon: MessageCircle, bg: 'rgba(12,108,156,0.12)', ink: '#0A5A82', border: 'rgba(12,108,156,0.3)', solid: '#0C6C9C' }
 const FILTER_IDS = ['all', 'aviso', 'incidente', 'evidencia', 'medicamentos', 'cuidados', 'citas']
 const COMPOSE_IDS = ['aviso', 'incidente', 'evidencia', 'medicamentos', 'cuidados', 'citas']
 
@@ -399,7 +399,7 @@ ${lines}`
       <div style={{
         display: 'flex', flexDirection: 'column',
         height: '100%', overflow: 'hidden',
-        background: '#F8F4ED',
+        background: '#F7F6F2',
       }}>
 
         {/* Header propio — flecha + título + subtítulo del paciente */}
@@ -407,7 +407,7 @@ ${lines}`
           display: 'flex', alignItems: 'center', gap: 12,
           padding: '12px 16px 13px',
           borderBottom: '1px solid rgba(51,65,85,0.09)',
-          flexShrink: 0, background: '#F8F4ED',
+          flexShrink: 0, background: '#F7F6F2',
         }}>
           <button
             onClick={goBack}
@@ -419,15 +419,15 @@ ${lines}`
               cursor: 'pointer', flexShrink: 0,
             }}
           >
-            <ChevronLeft size={17} color="#334155" strokeWidth={2.3} />
+            <ChevronLeft size={17} color="#2A4350" strokeWidth={2.3} />
           </button>
           <div style={{ minWidth: 0 }}>
-            <h1 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: '#334155', letterSpacing: '-0.01em' }}>
+            <h1 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: '#2A4350', letterSpacing: '-0.01em' }}>
               Chat familiar
             </h1>
             <p style={{
               margin: '2px 0 0', fontFamily: "'Fraunces', Georgia, serif",
-              fontStyle: 'italic', fontWeight: 500, fontSize: 14, color: '#087F70',
+              fontStyle: 'italic', fontWeight: 500, fontSize: 14, color: '#0C6C9C',
             }}>
               {patientFirstName ? `Cuidando a ${patientFirstName}` : 'Cuidando a tu familiar'}
             </p>
@@ -450,7 +450,7 @@ ${lines}`
                 return (
                   <div key={msg.id} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <Clock size={13} color="#94A0AD" strokeWidth={2.2} style={{ flexShrink: 0 }} />
-                    <p style={{ flex: 1, fontSize: 12, color: '#334155', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <p style={{ flex: 1, fontSize: 12, color: '#2A4350', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {msgText}
                     </p>
                     {canUnpin && (
@@ -467,7 +467,7 @@ ${lines}`
 
         {/* Barra de filtros */}
         <div style={{
-          background: '#F8F4ED', borderBottom: '1px solid rgba(51,65,85,0.07)',
+          background: '#F7F6F2', borderBottom: '1px solid rgba(51,65,85,0.07)',
           padding: '9px 12px', flexShrink: 0,
           display: 'flex', gap: 6, overflowX: 'auto',
           scrollbarWidth: 'none',
@@ -519,14 +519,14 @@ ${lines}`
               </div>
               <button
                 onClick={() => togglePin(contextMsg)}
-                style={{ width: '100%', padding: '14px 16px', border: 'none', background: 'none', cursor: 'pointer', textAlign: 'left', fontSize: 14, fontWeight: 700, color: contextMsg.is_pinned ? '#D9534F' : '#087F70', display: 'flex', alignItems: 'center', gap: 10 }}
+                style={{ width: '100%', padding: '14px 16px', border: 'none', background: 'none', cursor: 'pointer', textAlign: 'left', fontSize: 14, fontWeight: 700, color: contextMsg.is_pinned ? '#D9534F' : '#0C6C9C', display: 'flex', alignItems: 'center', gap: 10 }}
               >
-                <Clock size={16} color={contextMsg.is_pinned ? '#D9534F' : '#087F70'} strokeWidth={2.2} />
+                <Clock size={16} color={contextMsg.is_pinned ? '#D9534F' : '#0C6C9C'} strokeWidth={2.2} />
                 {contextMsg.is_pinned ? 'Desfijar mensaje' : 'Fijar mensaje'}
               </button>
               <button
                 onClick={() => setContextMsg(null)}
-                style={{ width: '100%', padding: '12px 16px', border: 'none', background: '#F8F4ED', cursor: 'pointer', textAlign: 'center', fontSize: 13, fontWeight: 700, color: '#94A0AD' }}
+                style={{ width: '100%', padding: '12px 16px', border: 'none', background: '#F7F6F2', cursor: 'pointer', textAlign: 'center', fontSize: 13, fontWeight: 700, color: '#94A0AD' }}
               >
                 Cancelar
               </button>
@@ -548,14 +548,14 @@ ${lines}`
             }}>
               <div style={{
                 width: 68, height: 68, borderRadius: 24,
-                background: '#A8E5D6', display: 'flex',
+                background: '#A6E3EC', display: 'flex',
                 alignItems: 'center', justifyContent: 'center', marginBottom: 2,
               }}>
-                <MessageCircle size={32} color="#05463D" strokeWidth={1.8} />
+                <MessageCircle size={32} color="#0A4A6B" strokeWidth={1.8} />
               </div>
               <p style={{
                 fontFamily: "'Fraunces', Georgia, serif", fontStyle: 'italic', fontWeight: 500,
-                fontSize: 20, color: '#087F70', margin: 0, maxWidth: 240,
+                fontSize: 20, color: '#0C6C9C', margin: 0, maxWidth: 240,
               }}>
                 Aquí la familia se mantiene cerca.
               </p>
@@ -641,8 +641,8 @@ ${lines}`
                         <div style={{
                           padding: '10px 14px',
                           borderRadius: mine ? '18px 18px 6px 18px' : '18px 18px 18px 6px',
-                          background: mine ? 'linear-gradient(148deg, #12A18C 0%, #0A8072 46%, #055C51 100%)' : 'white',
-                          color: mine ? 'white' : '#334155',
+                          background: mine ? 'linear-gradient(148deg, #1677A6 0%, #0C6C9C 46%, #0A5A82 100%)' : 'white',
+                          color: mine ? 'white' : '#2A4350',
                           fontSize: 14.5,
                           lineHeight: 1.48,
                           boxShadow: mine ? '0 6px 14px -8px rgba(5,92,81,0.55)' : '0 6px 14px -8px rgba(51,65,85,0.35)',
@@ -674,7 +674,7 @@ ${lines}`
         </div>
 
         {/* Input area */}
-        <div style={{ padding: '8px 12px 16px', background: '#F8F4ED', flexShrink: 0 }}>
+        <div style={{ padding: '8px 12px 16px', background: '#F7F6F2', flexShrink: 0 }}>
           {sendError && (
             <p style={{ fontSize: 12, color: '#D9534F', marginBottom: 8 }}>{sendError}</p>
           )}
@@ -735,7 +735,7 @@ ${lines}`
                     style={{
                       flex: 1, padding: '9px 13px', borderRadius: 12,
                       border: '1.5px solid rgba(117,102,216,0.35)', fontSize: 13.5,
-                      outline: 'none', background: 'white', fontFamily: 'inherit', color: '#334155',
+                      outline: 'none', background: 'white', fontFamily: 'inherit', color: '#2A4350',
                     }}
                   />
                   <button
@@ -770,7 +770,7 @@ ${lines}`
                     </p>
                   )}
                   <div style={{ padding: '11px 13px', background: 'white', borderRadius: 12, border: '1px solid rgba(117,102,216,0.18)' }}>
-                    <p style={{ fontSize: 13.5, color: '#334155', lineHeight: 1.58, margin: 0 }}>
+                    <p style={{ fontSize: 13.5, color: '#2A4350', lineHeight: 1.58, margin: 0 }}>
                       {assistantCard.text}
                     </p>
                   </div>
@@ -832,11 +832,11 @@ ${lines}`
                   flex: 1, padding: '11px 16px',
                   border: '1px solid rgba(51,65,85,0.12)', borderRadius: 999,
                   fontSize: 14, outline: 'none', resize: 'none',
-                  background: '#F8F4ED', lineHeight: 1.4,
-                  fontFamily: 'inherit', color: '#334155',
+                  background: '#F7F6F2', lineHeight: 1.4,
+                  fontFamily: 'inherit', color: '#2A4350',
                   transition: 'border-color 0.15s',
                 }}
-                onFocus={e => { e.target.style.borderColor = '#087F70' }}
+                onFocus={e => { e.target.style.borderColor = '#0C6C9C' }}
                 onBlur={e => { e.target.style.borderColor = 'rgba(51,65,85,0.12)' }}
               />
               <MicButton recording={recording} onStart={start} onStop={stop} />
@@ -862,7 +862,7 @@ ${lines}`
                 loadingText="..."
                 style={{
                   padding: '11px 18px', borderRadius: 999, fontSize: 13, flexShrink: 0,
-                  background: '#087F70', boxShadow: sending || !input.trim() ? 'none' : '0 6px 14px -6px rgba(8,127,112,0.5)',
+                  background: '#0C6C9C', boxShadow: sending || !input.trim() ? 'none' : '0 6px 14px -6px rgba(12,108,156,0.5)',
                 }}
               >
                 Enviar
@@ -913,7 +913,7 @@ ${lines}`
                   <Clock size={19} color="#5B4BC4" strokeWidth={2} />
                 </span>
                 <span>
-                  <p style={{ fontSize: 14.5, fontWeight: 800, color: '#334155', margin: '0 0 2px' }}>Ponte al día</p>
+                  <p style={{ fontSize: 14.5, fontWeight: 800, color: '#2A4350', margin: '0 0 2px' }}>Ponte al día</p>
                   <p style={{ fontSize: 12, color: '#6B7686', margin: 0, lineHeight: 1.35 }}>Te resumimos lo que pasó en el chat desde tu última visita.</p>
                 </span>
               </button>
@@ -931,7 +931,7 @@ ${lines}`
                   <MessageCircle size={19} color="#5B4BC4" strokeWidth={2} />
                 </span>
                 <span>
-                  <p style={{ fontSize: 14.5, fontWeight: 800, color: '#334155', margin: '0 0 2px' }}>Preguntar a Milo y Luna</p>
+                  <p style={{ fontSize: 14.5, fontWeight: 800, color: '#2A4350', margin: '0 0 2px' }}>Preguntar a Milo y Luna</p>
                   <p style={{ fontSize: 12, color: '#6B7686', margin: 0, lineHeight: 1.35 }}>
                     Escribe lo que quieras saber sobre el cuidado de {patientFirstName ?? 'tu familiar'}.
                   </p>

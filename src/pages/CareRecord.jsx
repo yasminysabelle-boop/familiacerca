@@ -158,10 +158,10 @@ export default function CareRecord() {
 
         {/* Header */}
         <div style={{
-          background: 'linear-gradient(148deg, #12A18C 0%, #0A8072 46%, #055C51 100%)',
+          background: 'linear-gradient(148deg, #1677A6 0%, #0C6C9C 46%, #0A5A82 100%)',
           borderRadius: 20, padding: '20px 20px 18px',
           marginBottom: 20,
-          boxShadow: '0 4px 20px rgba(8,127,112,0.25)',
+          boxShadow: '0 4px 20px rgba(12,108,156,0.25)',
         }}>
           <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', margin: '0 0 4px', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
             {dayLabel(todayKey)}
@@ -186,7 +186,7 @@ export default function CareRecord() {
         </div>
 
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '40px 0', color: '#9CA3AF', fontSize: 14 }}>
+          <div style={{ textAlign: 'center', padding: '40px 0', color: '#5E7480', fontSize: 14 }}>
             Cargando...
           </div>
         ) : (
@@ -195,12 +195,12 @@ export default function CareRecord() {
             {SECTIONS.map(section => (
               <div key={section.key} style={{
                 background: 'white', borderRadius: 16,
-                border: '1px solid #EDE5D8',
+                border: '1px solid #E6E3DB',
                 padding: '16px 16px 14px',
                 marginBottom: 12,
                 boxShadow: '0 1px 6px rgba(0,0,0,0.04)',
               }}>
-                <p style={{ fontSize: 12, fontWeight: 700, color: '#087F70', margin: '0 0 12px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                <p style={{ fontSize: 12, fontWeight: 700, color: '#0C6C9C', margin: '0 0 12px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
                   {section.label}
                 </p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
@@ -215,15 +215,15 @@ export default function CareRecord() {
                           display: 'flex', alignItems: 'center', gap: 6,
                           padding: '8px 14px',
                           borderRadius: 24,
-                          border: isSelected ? '2px solid #087F70' : '1.5px solid #E5DDD2',
-                          background: isSelected ? '#A8E5D6' : 'white',
-                          color: isSelected ? '#087F70' : '#4B5563',
+                          border: isSelected ? '2px solid #0C6C9C' : '1.5px solid #E5DDD2',
+                          background: isSelected ? '#A6E3EC' : 'white',
+                          color: isSelected ? '#0C6C9C' : '#4B5563',
                           fontSize: 13, fontWeight: isSelected ? 700 : 500,
                           cursor: isFamiliar ? 'default' : 'pointer',
                           transition: 'all 0.15s',
                           WebkitTapHighlightColor: 'transparent',
                           opacity: isFamiliar ? 0.7 : 1,
-                          boxShadow: isSelected ? '0 2px 8px rgba(8,127,112,0.3)' : 'none',
+                          boxShadow: isSelected ? '0 2px 8px rgba(12,108,156,0.3)' : 'none',
                         }}
                       >
                         <span style={{ fontSize: 16, lineHeight: 1 }}>{opt.emoji}</span>
@@ -238,12 +238,12 @@ export default function CareRecord() {
             {/* Notes */}
             <div style={{
               background: 'white', borderRadius: 16,
-              border: '1px solid #EDE5D8',
+              border: '1px solid #E6E3DB',
               padding: '16px',
               marginBottom: 20,
               boxShadow: '0 1px 6px rgba(0,0,0,0.04)',
             }}>
-              <p style={{ fontSize: 12, fontWeight: 700, color: '#087F70', margin: '0 0 10px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+              <p style={{ fontSize: 12, fontWeight: 700, color: '#0C6C9C', margin: '0 0 10px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
                 Notas (opcional)
               </p>
               <VoiceInput
@@ -256,7 +256,7 @@ export default function CareRecord() {
                 placeholder="Observaciones del día, comportamiento especial, síntomas..."
                 rows={3}
               />
-              <p style={{ fontSize: 11, color: '#9CA3AF', margin: '4px 0 0', textAlign: 'right' }}>
+              <p style={{ fontSize: 11, color: '#5E7480', margin: '4px 0 0', textAlign: 'right' }}>
                 {form.notes.length}/300
               </p>
             </div>
@@ -284,12 +284,12 @@ export default function CareRecord() {
                     ? 'linear-gradient(135deg, #22C55E, #16A34A)'
                     : (!hasAnySelection || saving)
                       ? '#D1D5DB'
-                      : 'linear-gradient(148deg, #12A18C 0%, #0A8072 46%, #055C51 100%)',
+                      : 'linear-gradient(148deg, #1677A6 0%, #0C6C9C 46%, #0A5A82 100%)',
                   color: 'white', fontWeight: 700, fontSize: 15,
                   cursor: (!hasAnySelection || saving) ? 'not-allowed' : 'pointer',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                   transition: 'all 0.2s',
-                  boxShadow: hasAnySelection && !saving ? '0 4px 16px rgba(8,127,112,0.35)' : 'none',
+                  boxShadow: hasAnySelection && !saving ? '0 4px 16px rgba(12,108,156,0.35)' : 'none',
                   WebkitTapHighlightColor: 'transparent',
                 }}
               >
@@ -301,9 +301,9 @@ export default function CareRecord() {
 
             {isFamiliar && (
               <div style={{
-                background: '#F9F7F4', border: '1px solid #EDE5D8',
+                background: '#F9F7F4', border: '1px solid #E6E3DB',
                 borderRadius: 12, padding: '12px 16px',
-                textAlign: 'center', fontSize: 13, color: '#9CA3AF',
+                textAlign: 'center', fontSize: 13, color: '#5E7480',
               }}>
                 Solo el cuidador puede editar el registro diario
               </div>
@@ -314,10 +314,10 @@ export default function CareRecord() {
               <div style={{
                 marginTop: 20,
                 background: moodStyle ? moodStyle.bg : '#F9F7F4',
-                border: `1px solid ${moodStyle ? moodStyle.border : '#EDE5D8'}`,
+                border: `1px solid ${moodStyle ? moodStyle.border : '#E6E3DB'}`,
                 borderRadius: 16, padding: '16px',
               }}>
-                <p style={{ fontSize: 12, fontWeight: 700, color: '#6B7280', margin: '0 0 10px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                <p style={{ fontSize: 12, fontWeight: 700, color: '#4E6470', margin: '0 0 10px', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
                   Resumen de hoy
                 </p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
@@ -331,7 +331,7 @@ export default function CareRecord() {
                         display: 'inline-flex', alignItems: 'center', gap: 4,
                         background: 'white', border: '1px solid #E5DDD2',
                         borderRadius: 20, padding: '4px 10px',
-                        fontSize: 12, color: '#374151', fontWeight: 500,
+                        fontSize: 12, color: '#30454F', fontWeight: 500,
                       }}>
                         {opt.emoji} {opt.label}
                       </span>
@@ -339,7 +339,7 @@ export default function CareRecord() {
                   })}
                 </div>
                 {form.notes.trim() && (
-                  <p style={{ fontSize: 13, color: '#6B7280', margin: '10px 0 0', lineHeight: 1.6, fontStyle: 'italic' }}>
+                  <p style={{ fontSize: 13, color: '#4E6470', margin: '10px 0 0', lineHeight: 1.6, fontStyle: 'italic' }}>
                     "{form.notes.trim()}"
                   </p>
                 )}

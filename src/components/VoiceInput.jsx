@@ -41,8 +41,8 @@ export default function VoiceInput({
     ? value + (value ? ' ' : '') + interim
     : value
 
-  const micColor   = recording ? '#EF4444' : '#087F70'
-  const micBg      = recording ? 'rgba(239,68,68,0.08)' : 'rgba(8,127,112,0.08)'
+  const micColor   = recording ? '#EF4444' : '#0C6C9C'
+  const micBg      = recording ? 'rgba(239,68,68,0.08)' : 'rgba(12,108,156,0.08)'
   const inputStyle = {
     width: '100%',
     padding: '10px 44px 10px 12px',
@@ -50,7 +50,7 @@ export default function VoiceInput({
     border: `1.5px solid ${recording ? '#FCA5A5' : '#D1C9BF'}`,
     fontSize: 14,
     lineHeight: 1.5,
-    color: recording ? '#6B7280' : '#1A1A1A',
+    color: recording ? '#4E6470' : '#14303D',
     background: disabled ? '#F9F5F0' : 'white',
     resize: 'vertical',
     fontFamily: 'inherit',
@@ -61,7 +61,7 @@ export default function VoiceInput({
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
       {label && (
-        <label style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>
+        <label style={{ fontSize: 13, fontWeight: 600, color: '#30454F' }}>
           {label}
         </label>
       )}
@@ -133,7 +133,7 @@ export default function VoiceInput({
 
       {/* Interim transcript hint */}
       {recording && interim && (
-        <p style={{ fontSize: 12, color: '#9CA3AF', margin: 0, fontStyle: 'italic' }}>
+        <p style={{ fontSize: 12, color: '#5E7480', margin: 0, fontStyle: 'italic' }}>
           {interim}...
         </p>
       )}
@@ -167,7 +167,7 @@ export default function VoiceInput({
             padding: '8px 20px',
             borderRadius: 10,
             border: 'none',
-            background: saving ? '#9CA3AF' : '#087F70',
+            background: saving ? '#5E7480' : '#0C6C9C',
             color: 'white',
             fontWeight: 700,
             fontSize: 13,
@@ -188,7 +188,7 @@ export default function VoiceInput({
   )
 }
 
-function MicIcon({ color = '#087F70', size = 16 }) {
+function MicIcon({ color = '#0C6C9C', size = 16 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
       <rect x="9" y="2" width="6" height="11" rx="3" />

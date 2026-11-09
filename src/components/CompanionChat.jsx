@@ -205,8 +205,8 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
           style={{
             position: 'fixed', bottom: bottomOffset, right: 16, zIndex: 42,
             width: 52, height: 52, borderRadius: '50%', border: 'none',
-            background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
-            boxShadow: '0 4px 16px rgba(13,107,99,0.4)',
+            background: 'linear-gradient(135deg, #0A5A82, #0A4A6B)',
+            boxShadow: '0 4px 16px rgba(10,90,130,0.4)',
             cursor: 'pointer', fontSize: 22,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}
@@ -261,7 +261,7 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
         >
           {/* Header */}
           <div style={{
-            background: 'linear-gradient(135deg, #0d6b63, #3A6347)',
+            background: 'linear-gradient(135deg, #0A5A82, #0A4A6B)',
             padding: '12px 14px',
             display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0,
           }}>
@@ -307,8 +307,8 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
                   borderRadius: msg.role === 'user'
                     ? '16px 16px 4px 16px'
                     : '16px 16px 16px 4px',
-                  background: msg.role === 'user' ? '#F0F0F0' : '#0d6b63',
-                  color: msg.role === 'user' ? '#1A1A1A' : 'white',
+                  background: msg.role === 'user' ? '#F0F0F0' : '#0A5A82',
+                  color: msg.role === 'user' ? '#14303D' : 'white',
                   fontSize: 13, lineHeight: 1.55,
                 }}>
                   {msg.text}
@@ -322,7 +322,7 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
                 <div>
                   <p style={{
                     margin: '0 0 6px', fontSize: 10, fontWeight: 700,
-                    color: '#087F70', letterSpacing: '0.06em', textTransform: 'uppercase',
+                    color: '#0C6C9C', letterSpacing: '0.06em', textTransform: 'uppercase',
                   }}>
                     Cuidado de hoy
                   </p>
@@ -334,9 +334,9 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
                         style={{
                           padding: '7px 10px',
                           borderRadius: 20,
-                          border: `1.5px solid ${i % 2 === 0 ? '#0d6b63' : '#C9882A'}`,
+                          border: `1.5px solid ${i % 2 === 0 ? '#0A5A82' : '#C9882A'}`,
                           background: i % 2 === 0 ? '#F0F7F3' : '#FDF6EC',
-                          color: i % 2 === 0 ? '#3A6347' : '#9A6420',
+                          color: i % 2 === 0 ? '#0A4A6B' : '#9A6420',
                           fontSize: 11, fontWeight: 600,
                           cursor: 'pointer', textAlign: 'left',
                           lineHeight: 1.35,
@@ -352,7 +352,7 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
                 <div>
                   <p style={{
                     margin: '0 0 6px', fontSize: 10, fontWeight: 700,
-                    color: '#9CA3AF', letterSpacing: '0.06em', textTransform: 'uppercase',
+                    color: '#5E7480', letterSpacing: '0.06em', textTransform: 'uppercase',
                   }}>
                     Soporte
                   </p>
@@ -364,8 +364,8 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
                         style={{
                           padding: '7px 10px',
                           borderRadius: 20,
-                          border: `1.5px solid ${i % 2 === 0 ? '#087F70' : '#C9882A'}`,
-                          background: i % 2 === 0 ? '#E8F6F3' : '#FDF6EC',
+                          border: `1.5px solid ${i % 2 === 0 ? '#0C6C9C' : '#C9882A'}`,
+                          background: i % 2 === 0 ? '#E3F1F8' : '#FDF6EC',
                           color: i % 2 === 0 ? '#1C5559' : '#9A6420',
                           fontSize: 11, fontWeight: 600,
                           cursor: 'pointer', textAlign: 'left',
@@ -386,7 +386,7 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
                 <div style={{
                   padding: '10px 14px',
                   borderRadius: '16px 16px 16px 4px',
-                  background: '#087F70',
+                  background: '#0C6C9C',
                 }}>
                   <TypingDots />
                 </div>
@@ -397,7 +397,7 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
 
           {/* Input */}
           <div style={{
-            padding: '10px 12px', borderTop: '1px solid #EDE5D8',
+            padding: '10px 12px', borderTop: '1px solid #E6E3DB',
             display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0,
           }}>
             <button
@@ -409,8 +409,8 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
               title="Volver al menú"
               style={{
                 flexShrink: 0, padding: '5px 8px', borderRadius: 12,
-                border: '1px solid #EDE5D8', background: '#F7F3ED',
-                color: '#9CA3AF', fontSize: 10, fontWeight: 600,
+                border: '1px solid #E6E3DB', background: '#F7F6F2',
+                color: '#5E7480', fontSize: 10, fontWeight: 600,
                 cursor: 'pointer', lineHeight: 1.2, whiteSpace: 'nowrap',
               }}
             >
@@ -424,8 +424,8 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
               placeholder={`Escríbele a ${cfg.name}…`}
               style={{
                 flex: 1, padding: '8px 12px', borderRadius: 20,
-                border: '1px solid #EDE5D8', fontSize: 13,
-                outline: 'none', background: '#FAFAF9', color: '#1A1A1A',
+                border: '1px solid #E6E3DB', fontSize: 13,
+                outline: 'none', background: '#FAFAF9', color: '#14303D',
               }}
             />
             <button
@@ -434,7 +434,7 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
               aria-label="Enviar mensaje"
               style={{
                 width: 36, height: 36, borderRadius: '50%', border: 'none', flexShrink: 0,
-                background: input.trim() && !loading ? '#087F70' : '#E5E7EB',
+                background: input.trim() && !loading ? '#0C6C9C' : '#E5E7EB',
                 cursor: input.trim() && !loading ? 'pointer' : 'default',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 transition: 'background 0.2s',
@@ -476,11 +476,11 @@ function SelectionCard({ onPick, onClose }) {
         />
         <p style={{
           fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 18, fontWeight: 700,
-          color: '#1A1A1A', margin: '0 0 8px',
+          color: '#14303D', margin: '0 0 8px',
         }}>
           ¿Quién quieres que te acompañe?
         </p>
-        <p style={{ fontSize: 13, color: '#6B7280', margin: '0 0 20px', lineHeight: 1.5 }}>
+        <p style={{ fontSize: 13, color: '#4E6470', margin: '0 0 20px', lineHeight: 1.5 }}>
           Tu compañero estará aquí para escucharte siempre.
         </p>
         <div style={{ display: 'flex', gap: 12 }}>
@@ -490,17 +490,17 @@ function SelectionCard({ onPick, onClose }) {
               onClick={() => onPick(key)}
               style={{
                 flex: 1, padding: '14px 8px', borderRadius: 16,
-                border: '2px solid #EDE5D8', background: '#F7F3ED',
-                cursor: 'pointer', fontSize: 14, fontWeight: 700, color: '#1A1A1A',
+                border: '2px solid #E6E3DB', background: '#F7F6F2',
+                cursor: 'pointer', fontSize: 14, fontWeight: 700, color: '#14303D',
                 transition: 'border-color 0.15s, background 0.15s',
               }}
               onMouseEnter={e => {
-                e.currentTarget.style.borderColor = '#087F70'
-                e.currentTarget.style.background = '#E8F6F3'
+                e.currentTarget.style.borderColor = '#0C6C9C'
+                e.currentTarget.style.background = '#E3F1F8'
               }}
               onMouseLeave={e => {
-                e.currentTarget.style.borderColor = '#EDE5D8'
-                e.currentTarget.style.background = '#F7F3ED'
+                e.currentTarget.style.borderColor = '#E6E3DB'
+                e.currentTarget.style.background = '#F7F6F2'
               }}
             >
               {c.emoji} {c.name}
@@ -511,7 +511,7 @@ function SelectionCard({ onPick, onClose }) {
           onClick={onClose}
           style={{
             marginTop: 14, background: 'none', border: 'none',
-            color: '#9CA3AF', fontSize: 12, cursor: 'pointer',
+            color: '#5E7480', fontSize: 12, cursor: 'pointer',
           }}
         >
           Ahora no
@@ -545,7 +545,7 @@ function TypingDots() {
 }
 
 function SendIcon({ active }) {
-  const c = active ? 'white' : '#9CA3AF'
+  const c = active ? 'white' : '#5E7480'
   return (
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
       <path d="M22 2L11 13" stroke={c} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />

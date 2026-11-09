@@ -6,7 +6,7 @@ function Section({ title, children }) {
     <section className="mb-8">
       <h2
         className="text-base font-bold text-gray-900 mb-3 pb-2"
-        style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", borderBottom: '2px solid #EDE5D8' }}
+        style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", borderBottom: '2px solid #E6E3DB' }}
       >
         {title}
       </h2>
@@ -20,13 +20,13 @@ function Section({ title, children }) {
 function Item({ children }) {
   return (
     <div className="flex gap-2.5">
-      <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full" style={{ background: '#087F70', marginTop: 6 }} />
+      <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full" style={{ background: '#0C6C9C', marginTop: 6 }} />
       <p>{children}</p>
     </div>
   )
 }
 
-function Callout({ icon, children, color = '#EBF3EE', border = '#F0C8B0' }) {
+function Callout({ icon, children, color = '#E3F1F8', border = '#F0C8B0' }) {
   return (
     <div
       className="flex gap-3 px-4 py-3.5 rounded-2xl"
@@ -42,7 +42,7 @@ function DataChip({ label }) {
   return (
     <span
       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold"
-      style={{ background: '#EBF3EE', color: '#3A6347', border: '1px solid #F0C8B0' }}
+      style={{ background: '#E3F1F8', color: '#0A4A6B', border: '1px solid #F0C8B0' }}
     >
       {label}
     </span>
@@ -53,7 +53,7 @@ export default function PrivacyPolicy() {
   const navigate = useNavigate()
 
   return (
-    <div className="min-h-screen" style={{ background: '#F7F3ED' }}>
+    <div className="min-h-screen" style={{ background: '#F7F6F2' }}>
 
       {/* ── Header ── */}
       <header
@@ -63,14 +63,14 @@ export default function PrivacyPolicy() {
           background: 'rgba(255,248,240,0.97)',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
-          borderBottom: '1px solid #EDE5D8',
+          borderBottom: '1px solid #E6E3DB',
           boxShadow: '0 1px 12px rgba(0,0,0,0.05)',
         }}
       >
         <button
           onClick={() => navigate('/')}
           className="w-9 h-9 flex items-center justify-center rounded-full flex-shrink-0 transition-all active:scale-90"
-          style={{ background: '#EDE5D8', color: '#555' }}
+          style={{ background: '#E6E3DB', color: '#555' }}
         >
           ←
         </button>
@@ -92,7 +92,7 @@ export default function PrivacyPolicy() {
         <div className="mb-8 text-center">
           <div
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold mb-4"
-            style={{ background: '#EBF3EE', color: '#3A6147' }}
+            style={{ background: '#E3F1F8', color: '#3A6147' }}
           >
             🔒 Tu privacidad nos importa
           </div>
@@ -107,7 +107,7 @@ export default function PrivacyPolicy() {
           </p>
         </div>
 
-        <Callout icon="🤝" color="#EBF3EE" border="#B8D8C0">
+        <Callout icon="🤝" color="#E3F1F8" border="#B8D8C0">
           En FamiliaCerca entendemos que la información de tu familia es profundamente personal.
           Este documento explica de forma clara y directa qué datos recopilamos, cómo los usamos
           y cuáles son tus derechos.
@@ -119,7 +119,7 @@ export default function PrivacyPolicy() {
           <Section title="1. Datos que Recopilamos">
             <p>Recopilamos únicamente la información que tú nos proporcionas directamente:</p>
 
-            <div className="bg-white rounded-2xl p-4" style={{ border: '1px solid #EDE5D8', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
+            <div className="bg-white rounded-2xl p-4" style={{ border: '1px solid #E6E3DB', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
               <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">Información de cuenta</p>
               <div className="flex flex-wrap gap-2">
                 <DataChip label="📛 Nombre completo" />
@@ -128,7 +128,7 @@ export default function PrivacyPolicy() {
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl p-4" style={{ border: '1px solid #EDE5D8', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
+            <div className="bg-white rounded-2xl p-4" style={{ border: '1px solid #E6E3DB', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
               <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">Información del familiar</p>
               <div className="flex flex-wrap gap-2">
                 <DataChip label="👤 Nombre del familiar" />
@@ -140,7 +140,7 @@ export default function PrivacyPolicy() {
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl p-4" style={{ border: '1px solid #EDE5D8', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
+            <div className="bg-white rounded-2xl p-4" style={{ border: '1px solid #E6E3DB', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
               <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">Datos técnicos (automáticos)</p>
               <div className="flex flex-wrap gap-2">
                 <DataChip label="📱 Tipo de dispositivo" />
@@ -152,7 +152,7 @@ export default function PrivacyPolicy() {
               </p>
             </div>
 
-            <Callout icon="🚫" color="#F0FAF2" border="#C0E4C8">
+            <Callout icon="🚫" color="#E3F1F8" border="#A6E3EC">
               <strong>No recopilamos:</strong> números de seguro social, números de tarjetas de crédito (gestionados
               directamente por el procesador de pagos), historial de navegación externo ni ubicación GPS.
             </Callout>
@@ -174,7 +174,7 @@ export default function PrivacyPolicy() {
 
           {/* 3. No vendemos datos */}
           <Section title="3. No Vendemos tu Información">
-            <Callout icon="🛡️" color="#F0FAF2" border="#C0E4C8">
+            <Callout icon="🛡️" color="#E3F1F8" border="#A6E3EC">
               <strong>FamiliaCerca no vende, alquila, presta ni comparte tu información personal
               con terceros con fines comerciales. Nunca. Sin excepciones.</strong>
             </Callout>
@@ -199,7 +199,7 @@ export default function PrivacyPolicy() {
           <Section title="4. Almacenamiento y Seguridad de tus Datos">
             <div
               className="rounded-2xl p-4 flex items-start gap-4"
-              style={{ background: 'white', border: '1.5px solid #EDE5D8', boxShadow: '0 2px 12px rgba(0,0,0,0.05)' }}
+              style={{ background: 'white', border: '1.5px solid #E6E3DB', boxShadow: '0 2px 12px rgba(0,0,0,0.05)' }}
             >
               <span className="text-3xl">🏗️</span>
               <div>
@@ -301,7 +301,7 @@ export default function PrivacyPolicy() {
             </p>
             <div
               className="rounded-2xl p-4 flex items-center gap-3"
-              style={{ background: 'white', border: '1px solid #EDE5D8' }}
+              style={{ background: 'white', border: '1px solid #E6E3DB' }}
             >
               <span className="text-2xl">✉️</span>
               <div>
@@ -319,11 +319,11 @@ export default function PrivacyPolicy() {
         {/* Footer links */}
         <div
           className="mt-8 pt-6 flex flex-col items-center gap-3"
-          style={{ borderTop: '1px solid #EDE5D8' }}
+          style={{ borderTop: '1px solid #E6E3DB' }}
         >
           <p className="text-xs text-gray-400 text-center leading-relaxed">
             ¿Prefieres leer esto en inglés? Escríbenos a{' '}
-            <a href="mailto:legal@familiacerca.com" className="underline" style={{ color: '#087F70' }}>
+            <a href="mailto:legal@familiacerca.com" className="underline" style={{ color: '#0C6C9C' }}>
               legal@familiacerca.com
             </a>{' '}
             y te enviamos la versión en inglés.
@@ -331,7 +331,7 @@ export default function PrivacyPolicy() {
           <Link
             to="/terminos"
             className="text-xs font-semibold underline"
-            style={{ color: '#087F70' }}
+            style={{ color: '#0C6C9C' }}
           >
             Ver Términos de Servicio →
           </Link>

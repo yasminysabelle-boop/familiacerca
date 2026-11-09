@@ -180,13 +180,13 @@ export default function Memorias() {
             display: 'flex', alignItems: 'center', gap: 12,
           }}>
             <span style={{ fontSize: 22 }}>👁️</span>
-            <p style={{ fontSize: 13, color: '#6B7280', margin: 0 }}>
+            <p style={{ fontSize: 13, color: '#4E6470', margin: 0 }}>
               Solo puedes escuchar las memorias grabadas por el cuidador.
             </p>
           </div>
         ) : (
         <div style={{
-          background: 'white', borderRadius: 20, border: '1px solid #EDE5D8',
+          background: 'white', borderRadius: 20, border: '1px solid #E6E3DB',
           padding: '20px', marginBottom: 16,
           boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
         }}>
@@ -196,7 +196,7 @@ export default function Memorias() {
             <div style={{ textAlign: 'center', padding: '12px 0 8px' }}>
               <p style={{
                 fontSize: 12, fontWeight: 600, letterSpacing: '0.06em',
-                textTransform: 'uppercase', color: '#9CA3AF', marginBottom: 24,
+                textTransform: 'uppercase', color: '#5E7480', marginBottom: 24,
               }}>
                 Memoria de {patientName}
               </p>
@@ -227,10 +227,10 @@ export default function Memorias() {
             <div style={{ textAlign: 'center', padding: '24px 0' }}>
               <div style={{
                 width: 32, height: 32, borderRadius: '50%', margin: '0 auto 12px',
-                border: '3px solid #EDE5D8', borderTopColor: '#7C5CBF',
+                border: '3px solid #E6E3DB', borderTopColor: '#7C5CBF',
                 animation: 'spin 0.8s linear infinite',
               }} />
-              <p style={{ fontSize: 14, color: '#6B7280' }}>Guardando memoria...</p>
+              <p style={{ fontSize: 14, color: '#4E6470' }}>Guardando memoria...</p>
             </div>
           )}
         </div>
@@ -241,20 +241,20 @@ export default function Memorias() {
           <div style={{ display: 'flex', justifyContent: 'center', padding: 48 }}>
             <div style={{
               width: 28, height: 28, borderRadius: '50%',
-              border: '3px solid #EDE5D8', borderTopColor: '#7C5CBF',
+              border: '3px solid #E6E3DB', borderTopColor: '#7C5CBF',
               animation: 'spin 0.8s linear infinite',
             }} />
           </div>
         ) : recordings.length === 0 ? (
           <div style={{
-            background: 'white', borderRadius: 20, border: '1px solid #EDE5D8',
+            background: 'white', borderRadius: 20, border: '1px solid #E6E3DB',
             padding: '48px 24px', textAlign: 'center',
           }}>
             <div style={{ fontSize: 44, marginBottom: 12 }}>🎙️</div>
-            <p style={{ fontSize: 14, fontWeight: 600, color: '#1A1A1A', marginBottom: 6 }}>
+            <p style={{ fontSize: 14, fontWeight: 600, color: '#14303D', marginBottom: 6 }}>
               Sin memorias aún
             </p>
-            <p style={{ fontSize: 12, color: '#9CA3AF' }}>
+            <p style={{ fontSize: 12, color: '#5E7480' }}>
               Graba la primera memoria de cómo estuvo hoy {patientName}.
             </p>
           </div>
@@ -263,7 +263,7 @@ export default function Memorias() {
             <div key={key} style={{ marginBottom: 8 }}>
               <p style={{
                 fontSize: 11, fontWeight: 700, letterSpacing: '0.08em',
-                textTransform: 'uppercase', color: '#9CA3AF',
+                textTransform: 'uppercase', color: '#5E7480',
                 marginBottom: 8, paddingLeft: 2,
               }}>
                 {label}
@@ -279,7 +279,7 @@ export default function Memorias() {
                       onClick={() => setPlaying(isOpen ? null : rec.id)}
                       style={{
                         background: 'white', borderRadius: 16,
-                        border: '1px solid #EDE5D8',
+                        border: '1px solid #E6E3DB',
                         borderLeft: `4px solid ${moodObj?.color ?? '#7C5CBF'}`,
                         padding: '14px 16px', cursor: 'pointer',
                         boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
@@ -291,20 +291,20 @@ export default function Memorias() {
                         </span>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
-                            <p style={{ fontSize: 13, fontWeight: 700, color: '#1A1A1A', margin: 0, lineHeight: 1.4 }}>
+                            <p style={{ fontSize: 13, fontWeight: 700, color: '#14303D', margin: 0, lineHeight: 1.4 }}>
                               {rec.title}
                             </p>
                             {rec.user_id === user.id && (
                               <button
                                 onClick={e => { e.stopPropagation(); deleteRecording(rec.id) }}
                                 style={{
-                                  background: 'none', border: 'none', color: '#C0CCC5',
+                                  background: 'none', border: 'none', color: '#C9D6DB',
                                   cursor: 'pointer', padding: 2, flexShrink: 0, fontSize: 14,
                                 }}
                               >✕</button>
                             )}
                           </div>
-                          <p style={{ fontSize: 11, color: '#9CA3AF', margin: '4px 0 0' }}>
+                          <p style={{ fontSize: 11, color: '#5E7480', margin: '4px 0 0' }}>
                             {name} · {new Date(rec.created_at).toLocaleTimeString('es-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
                             {rec.duration_seconds ? ` · ⏱ ${fmt(rec.duration_seconds)}` : ''}
                           </p>
@@ -323,7 +323,7 @@ export default function Memorias() {
                       </div>
                       {rec.transcription && (
                         <p style={{
-                          fontSize: 12, color: '#6B7280', lineHeight: 1.5,
+                          fontSize: 12, color: '#4E6470', lineHeight: 1.5,
                           marginTop: 8, fontStyle: 'italic',
                         }}>
                           "{rec.transcription}"

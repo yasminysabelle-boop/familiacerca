@@ -27,15 +27,15 @@ export default function DoctorNotesCard() {
       borderRadius: 16,
       padding: '16px 18px',
       boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-      border: '1px solid #F8F4ED',
+      border: '1px solid #F7F6F2',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
         <span style={{ fontSize: 20 }}>📋</span>
-        <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#1A1A1A' }}>
+        <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#14303D' }}>
           Notas del médico
         </h3>
         {saved && (
-          <span style={{ marginLeft: 'auto', fontSize: 11, color: '#0d6b63', fontWeight: 700 }}>
+          <span style={{ marginLeft: 'auto', fontSize: 11, color: '#0A5A82', fontWeight: 700 }}>
             ✓ Guardado
           </span>
         )}

@@ -70,19 +70,19 @@ function CopyableSubscriptionId({ subscriptionId }) {
       style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         width: '100%', gap: 8, padding: '10px 12px', marginTop: 8,
-        background: '#F8F4ED', border: '1px solid #EDE5D8', borderRadius: 10,
+        background: '#F7F6F2', border: '1px solid #E6E3DB', borderRadius: 10,
         cursor: 'pointer', textAlign: 'left',
       }}
     >
       <span style={{
-        fontFamily: 'monospace', fontSize: 12.5, color: '#374151',
+        fontFamily: 'monospace', fontSize: 12.5, color: '#30454F',
         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
       }}>
         {subscriptionId}
       </span>
       <span style={{
         flexShrink: 0, fontSize: 11.5, fontWeight: 700,
-        color: copied ? '#087F70' : '#9CA3AF',
+        color: copied ? '#0C6C9C' : '#5E7480',
       }}>
         {copied ? 'Copiado ✓' : 'Copiar'}
       </span>
@@ -102,10 +102,10 @@ function PayPalSection({
   if (success === planKey) {
     return (
       <div style={{
-        background: '#E0F0EF', border: '1.5px solid #0B4F4A',
+        background: '#E3F1F8', border: '1.5px solid #0A4A6B',
         borderRadius: 14, padding: '14px', textAlign: 'center',
       }}>
-        <p style={{ color: '#0B4F4A', fontWeight: 700, fontSize: 15, margin: 0 }}>
+        <p style={{ color: '#0A4A6B', fontWeight: 700, fontSize: 15, margin: 0 }}>
           ✅ ¡Plan activado! Redirigiendo...
         </p>
       </div>
@@ -114,16 +114,16 @@ function PayPalSection({
   if (timedOut?.planKey === planKey) {
     return (
       <div style={{
-        background: '#F8F4ED', border: '1.5px solid #E9826E',
+        background: '#F7F6F2', border: '1.5px solid #E9826E',
         borderRadius: 14, padding: '16px',
       }}>
-        <p style={{ color: '#087F70', fontWeight: 700, fontSize: 15, margin: '0 0 4px', lineHeight: 1.4 }}>
+        <p style={{ color: '#0C6C9C', fontWeight: 700, fontSize: 15, margin: '0 0 4px', lineHeight: 1.4 }}>
           ✅ Tu pago se completó en PayPal.
         </p>
-        <p style={{ color: '#374151', fontSize: 13, margin: '0 0 12px', lineHeight: 1.5 }}>
+        <p style={{ color: '#30454F', fontSize: 13, margin: '0 0 12px', lineHeight: 1.5 }}>
           Estamos activando tu plan — puede tardar unos minutos.
         </p>
-        <p style={{ color: '#6B7280', fontSize: 12.5, margin: '0 0 4px', lineHeight: 1.5 }}>
+        <p style={{ color: '#4E6470', fontSize: 12.5, margin: '0 0 4px', lineHeight: 1.5 }}>
           Si al volver no ves el cambio, escribinos a <strong>hola@familiacerca.com</strong> con este número:
         </p>
         <CopyableSubscriptionId subscriptionId={timedOut.subscriptionId} />
@@ -131,7 +131,7 @@ function PayPalSection({
           onClick={onBackToSettings}
           style={{
             width: '100%', marginTop: 12, padding: '11px', borderRadius: 12,
-            border: 'none', background: '#087F70', color: 'white',
+            border: 'none', background: '#0C6C9C', color: 'white',
             fontWeight: 700, fontSize: 13.5, cursor: 'pointer',
             fontFamily: "'Plus Jakarta Sans', sans-serif",
           }}
@@ -144,10 +144,10 @@ function PayPalSection({
   if (pending?.planKey === planKey) {
     return (
       <div style={{
-        background: '#E0F0EF', border: '1.5px solid #0B4F4A',
+        background: '#E3F1F8', border: '1.5px solid #0A4A6B',
         borderRadius: 14, padding: '16px', textAlign: 'center',
       }}>
-        <p style={{ color: '#0B4F4A', fontWeight: 700, fontSize: 14, margin: 0 }}>
+        <p style={{ color: '#0A4A6B', fontWeight: 700, fontSize: 14, margin: 0 }}>
           Confirmando tu pago...
         </p>
         <p style={{ color: '#3A6B65', fontSize: 12.5, margin: '4px 0 0' }}>
@@ -177,7 +177,7 @@ function PayPalSection({
     return (
       <button disabled style={{
         width: '100%', padding: '13px', borderRadius: 14, border: 'none',
-        background: '#E5E7EB', color: '#9CA3AF',
+        background: '#E5E7EB', color: '#5E7480',
         fontWeight: 600, fontSize: 14, cursor: 'default',
       }}>
         Tu plan actual
@@ -193,7 +193,7 @@ function PayPalSection({
   }
   if (!isResolved) {
     return (
-      <div style={{ textAlign: 'center', padding: '16px 0', color: '#9CA3AF', fontSize: 13 }}>
+      <div style={{ textAlign: 'center', padding: '16px 0', color: '#5E7480', fontSize: 13 }}>
         Cargando opciones de pago...
       </div>
     )
@@ -347,27 +347,27 @@ function UpgradeContent() {
     return (
       <Layout>
         <div style={{
-          background: '#F8F4ED', minHeight: '100svh',
+          background: '#F7F6F2', minHeight: '100svh',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           padding: '24px',
         }}>
           <div style={{
-            background: 'white', borderRadius: 20, border: '1px solid #EDE5D8',
+            background: 'white', borderRadius: 20, border: '1px solid #E6E3DB',
             padding: '32px 24px', textAlign: 'center', maxWidth: 340,
             boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
           }}>
             <p style={{ fontSize: 32, marginBottom: 12 }}>🔒</p>
-            <p style={{ fontFamily: 'Georgia, serif', fontSize: 17, fontWeight: 700, color: '#1A1A1A', marginBottom: 8 }}>
+            <p style={{ fontFamily: 'Georgia, serif', fontSize: 17, fontWeight: 700, color: '#14303D', marginBottom: 8 }}>
               Solo quien creó la familia puede cambiar el plan.
             </p>
-            <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.5, marginBottom: 20 }}>
+            <p style={{ fontSize: 13, color: '#4E6470', lineHeight: 1.5, marginBottom: 20 }}>
               Si necesitas más cuidadores, historial o funciones, pídele al dueño de la familia que actualice el plan desde su cuenta.
             </p>
             <button
               onClick={() => navigate('/ajustes')}
               style={{
                 padding: '11px 24px', borderRadius: 12, border: 'none',
-                background: '#087F70', color: 'white', fontWeight: 700, fontSize: 13, cursor: 'pointer',
+                background: '#0C6C9C', color: 'white', fontWeight: 700, fontSize: 13, cursor: 'pointer',
               }}
             >
               Volver a Ajustes
@@ -380,10 +380,10 @@ function UpgradeContent() {
 
   return (
     <Layout>
-      <div style={{ background: '#F8F4ED', minHeight: '100svh' }}>
+      <div style={{ background: '#F7F6F2', minHeight: '100svh' }}>
 
         {/* Header */}
-        <div style={{ background: '#0B4F4A', padding: '36px 24px 32px', textAlign: 'center' }}>
+        <div style={{ background: '#0A4A6B', padding: '36px 24px 32px', textAlign: 'center' }}>
           <h1 style={{
             color: 'white', fontSize: 26, fontWeight: 700,
             fontFamily: "'Plus Jakarta Sans', sans-serif", margin: '0 0 8px',
@@ -406,14 +406,14 @@ function UpgradeContent() {
           {/* Card 1 — Gratis */}
           <div style={{
             background: 'white', borderRadius: 20,
-            border: activePlan === null ? '2px solid #9CA3AF' : '1.5px solid #E8DFD0',
+            border: activePlan === null ? '2px solid #5E7480' : '1.5px solid #E8DFD0',
             padding: '22px 20px 20px', position: 'relative',
             boxShadow: activePlan === null ? '0 8px 28px rgba(156,163,175,0.2)' : '0 2px 10px rgba(0,0,0,0.05)',
           }}>
             {activePlan === null && (
               <div style={{
                 position: 'absolute', top: -1, right: 18,
-                background: '#9CA3AF', color: 'white',
+                background: '#5E7480', color: 'white',
                 fontSize: 11, fontWeight: 700,
                 padding: '4px 12px', borderRadius: '0 0 10px 10px',
               }}>
@@ -421,22 +421,22 @@ function UpgradeContent() {
               </div>
             )}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
-              <p style={{ fontSize: 18, fontWeight: 700, color: '#1A1A1A', margin: 0, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              <p style={{ fontSize: 18, fontWeight: 700, color: '#14303D', margin: 0, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                 Plan Gratis
               </p>
-              <span style={{ fontSize: 24, fontWeight: 800, color: '#9CA3AF' }}>$0</span>
+              <span style={{ fontSize: 24, fontWeight: 800, color: '#5E7480' }}>$0</span>
             </div>
             <div style={{ marginBottom: 18 }}>
               {FREE_FEATURES.map(f => (
                 <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 7 }}>
                   <span style={{ color: '#22C55E', fontSize: 13, flexShrink: 0, marginTop: 1 }}>✓</span>
-                  <span style={{ fontSize: 13, color: '#374151', lineHeight: 1.4 }}>{f}</span>
+                  <span style={{ fontSize: 13, color: '#30454F', lineHeight: 1.4 }}>{f}</span>
                 </div>
               ))}
             </div>
             <button disabled style={{
               width: '100%', padding: '13px', borderRadius: 14, border: 'none',
-              background: '#E5E7EB', color: '#9CA3AF',
+              background: '#E5E7EB', color: '#5E7480',
               fontWeight: 600, fontSize: 14, cursor: 'default',
             }}>
               {activePlan === null ? (isTrialing ? 'Sigues aquí si no eliges plan' : 'Tu plan actual') : 'Plan básico'}
@@ -446,32 +446,32 @@ function UpgradeContent() {
           {/* Card 2 — Familiar */}
           <div style={{
             background: 'white', borderRadius: 20,
-            border: `2px solid #0B4F4A`,
+            border: `2px solid #0A4A6B`,
             padding: '22px 20px 20px', position: 'relative',
-            boxShadow: '0 8px 28px rgba(11,79,74,0.15)',
+            boxShadow: '0 8px 28px rgba(10,74,107,0.15)',
           }}>
             <div style={{
               position: 'absolute', top: -1, right: 18,
-              background: activePlan === 'familiar' ? '#0B4F4A' : '#E58B73',
+              background: activePlan === 'familiar' ? '#0A4A6B' : '#E58B73',
               color: 'white', fontSize: 11, fontWeight: 700,
               padding: '4px 12px', borderRadius: '0 0 10px 10px',
             }}>
               {activePlan === 'familiar' ? 'Tu plan actual' : 'Recomendado para la mayoría de las familias'}
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
-              <p style={{ fontSize: 18, fontWeight: 700, color: '#1A1A1A', margin: 0, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              <p style={{ fontSize: 18, fontWeight: 700, color: '#14303D', margin: 0, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                 Plan Familiar
               </p>
-              <span style={{ fontSize: 24, fontWeight: 800, color: '#0B4F4A' }}>${PLANS.familiar.price}/mes</span>
+              <span style={{ fontSize: 24, fontWeight: 800, color: '#0A4A6B' }}>${PLANS.familiar.price}/mes</span>
             </div>
-            <p style={{ fontSize: 12, color: '#0B4F4A', fontWeight: 600, margin: '0 0 14px' }}>
+            <p style={{ fontSize: 12, color: '#0A4A6B', fontWeight: 600, margin: '0 0 14px' }}>
               {PLANS.familiar.tagline}
             </p>
             <div style={{ marginBottom: 18 }}>
               {FAMILIAR_FEATURES.map(f => (
                 <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 7 }}>
                   <span style={{ color: '#22C55E', fontSize: 13, flexShrink: 0, marginTop: 1 }}>✓</span>
-                  <span style={{ fontSize: 13, color: '#374151', lineHeight: 1.4 }}>{f}</span>
+                  <span style={{ fontSize: 13, color: '#30454F', lineHeight: 1.4 }}>{f}</span>
                 </div>
               ))}
             </div>
@@ -486,14 +486,14 @@ function UpgradeContent() {
           {/* Card 3 — Cuidado Total */}
           <div style={{
             background: 'white', borderRadius: 20,
-            border: activePlan === 'care_plus' ? '2px solid #0B4F4A' : '1.5px solid #E8DFD0',
+            border: activePlan === 'care_plus' ? '2px solid #0A4A6B' : '1.5px solid #E8DFD0',
             padding: '22px 20px 20px', position: 'relative',
-            boxShadow: activePlan === 'care_plus' ? '0 8px 28px rgba(11,79,74,0.15)' : '0 2px 10px rgba(0,0,0,0.05)',
+            boxShadow: activePlan === 'care_plus' ? '0 8px 28px rgba(10,74,107,0.15)' : '0 2px 10px rgba(0,0,0,0.05)',
           }}>
             {activePlan === 'care_plus' && (
               <div style={{
                 position: 'absolute', top: -1, right: 18,
-                background: '#0B4F4A', color: 'white',
+                background: '#0A4A6B', color: 'white',
                 fontSize: 11, fontWeight: 700,
                 padding: '4px 12px', borderRadius: '0 0 10px 10px',
               }}>
@@ -501,19 +501,19 @@ function UpgradeContent() {
               </div>
             )}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
-              <p style={{ fontSize: 18, fontWeight: 700, color: '#1A1A1A', margin: 0, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              <p style={{ fontSize: 18, fontWeight: 700, color: '#14303D', margin: 0, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                 Plan Cuidado Total
               </p>
-              <span style={{ fontSize: 24, fontWeight: 800, color: '#0B4F4A' }}>${PLANS.care_plus.price}/mes</span>
+              <span style={{ fontSize: 24, fontWeight: 800, color: '#0A4A6B' }}>${PLANS.care_plus.price}/mes</span>
             </div>
-            <p style={{ fontSize: 12, color: '#0B4F4A', fontWeight: 600, margin: '0 0 14px' }}>
+            <p style={{ fontSize: 12, color: '#0A4A6B', fontWeight: 600, margin: '0 0 14px' }}>
               {PLANS.care_plus.tagline}
             </p>
             <div style={{ marginBottom: 18 }}>
               {TOTAL_FEATURES.map(f => (
                 <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 7 }}>
                   <span style={{ color: '#22C55E', fontSize: 13, flexShrink: 0, marginTop: 1 }}>✓</span>
-                  <span style={{ fontSize: 13, color: '#374151', lineHeight: 1.4 }}>{f}</span>
+                  <span style={{ fontSize: 13, color: '#30454F', lineHeight: 1.4 }}>{f}</span>
                 </div>
               ))}
             </div>
