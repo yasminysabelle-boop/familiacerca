@@ -300,8 +300,8 @@ export default function Landing() {
           (pedido de Yasmin, nov 2026). Degradado azul de la marca para que
           el texto se lea sin tapar las caras. */}
       <section className="hero3" style={{ position: 'relative', overflow: 'hidden', minHeight: '100vh', display: 'flex', alignItems: 'center', background: '#0A4A6B' }}>
-        <img className="hero3-img" src={HERO_IMG} alt="Abuela con su hija y su nieta riéndose frente a una tableta" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: '70% center' }} />
-        <div className="hero3-shade" aria-hidden="true" style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, rgba(10,74,107,0.94) 0%, rgba(10,74,107,0.82) 30%, rgba(10,74,107,0.35) 52%, rgba(10,74,107,0) 68%)' }} />
+        <img className="hero3-img" src={HERO_IMG} alt="Abuela con su hija y su nieta riéndose frente a una tableta" style={{ position: 'absolute', top: 0, bottom: 0, left: '30%', width: '70%', height: '100%', objectFit: 'cover', objectPosition: '30% center' }} />
+        <div className="hero3-shade" aria-hidden="true" style={{ position: 'absolute', inset: 0, background: 'linear-gradient(90deg, #0A4A6B 0%, #0A4A6B 30%, rgba(10,74,107,0.55) 38%, rgba(10,74,107,0) 50%)' }} />
         <div aria-hidden="true" style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 160, background: 'linear-gradient(to top, rgba(10,74,107,0.55), rgba(10,74,107,0))' }} />
 
         <div className="hero3-inner" style={{ position: 'relative', width: '100%', maxWidth: 1360, margin: '0 auto', padding: '140px 40px 110px' }}>
@@ -831,7 +831,7 @@ export default function Landing() {
         }
         @media (max-width: 900px) {
           .hero3 { min-height: auto !important; align-items: flex-end !important; }
-          .hero3-img { height: 62vh !important; bottom: auto !important; object-position: 60% center !important; }
+          .hero3-img { height: 62vh !important; bottom: auto !important; left: 0 !important; width: 100% !important; object-position: 60% center !important; }
           .hero3-shade { background: linear-gradient(to bottom, rgba(10,74,107,0) 0%, rgba(10,74,107,0) 32vh, rgba(10,74,107,0.85) 52vh, #0A4A6B 62vh) !important; }
           .hero3-inner { padding: 50vh 20px 56px !important; text-align: center; }
           .hero3-text { margin: 0 auto; display: flex; flex-direction: column; align-items: center; }
