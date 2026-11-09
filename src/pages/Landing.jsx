@@ -10,6 +10,7 @@ const PROB_IMG = '/images/familia-telefonos-noche.webp'
 const COMO_IMG = '/images/como.jpg'
 const CTA_IMG  = '/images/cta.jpg'
 const MILO_LUNA_IMG = '/images/milo-luna.webp'
+const APP_IMG = '/images/app-inicio.webp'
 
 const PRIMARY = '#0C6C9C'
 const ACTION  = '#0C6C9C'
@@ -352,18 +353,24 @@ export default function Landing() {
               Todo lo del cuidado, sin perseguir a nadie
             </h2>
           </div>
-          <div className="lugar-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 22 }}>
+          <div className="lugar-wrap" style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: 56, alignItems: 'center', maxWidth: 960, margin: '0 auto' }}>
+          {/* Pantalla real de la app (Inicio), con datos de ejemplo */}
+          <div className="lugar-phone reveal" style={{ width: 290, margin: '0 auto', borderRadius: 44, background: '#0E1E26', padding: 10, boxShadow: '0 30px 70px rgba(10,74,107,0.30)' }}>
+            <img src={APP_IMG} alt="Pantalla de inicio de FamiliaCerca: Carmen, hoy todo va al día" style={{ width: '100%', display: 'block', borderRadius: 34 }} />
+          </div>
+          <div className="lugar-grid" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 16 }}>
             {[
               { icon: '💊', title: 'Cada dosis, confirmada', desc: 'Quien la da, la marca. Los demás lo ven al instante, con la hora.' },
               { icon: '📅', title: 'Citas sin confusiones', desc: 'Fecha, hora y quién acompaña, a la vista de todos.' },
               { icon: '👨‍👩‍👧', title: 'Toda la familia al tanto', desc: 'Desde la casa o desde lejos: hermanos, nietos y cuidadores.' },
             ].map((it, i) => (
-              <div key={it.title} className={`reveal reveal-delay-${i}`} style={{ background: CREAM, borderRadius: 22, padding: '28px 26px', border: `1px solid ${BORDER}` }}>
-                <div style={{ width: 56, height: 56, borderRadius: 16, background: '#E3F1F8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, marginBottom: 16 }}>{it.icon}</div>
+              <div key={it.title} className={`reveal reveal-delay-${i}`} style={{ background: CREAM, borderRadius: 22, padding: '22px 24px', border: `1px solid ${BORDER}`, display: 'grid', gridTemplateColumns: '56px 1fr', columnGap: 18, alignItems: 'start' }}>
+                <div style={{ gridRow: 'span 2', width: 56, height: 56, borderRadius: 16, background: '#E3F1F8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28 }}>{it.icon}</div>
                 <h3 style={{ fontFamily: SERIF, fontSize: 20, fontWeight: 700, color: '#14303D', margin: '0 0 8px' }}>{it.title}</h3>
                 <p style={{ fontSize: 16, color: '#4E6470', lineHeight: 1.6, margin: 0, fontFamily: SANS }}>{it.desc}</p>
               </div>
             ))}
+          </div>
           </div>
         </div>
       </section>
@@ -755,24 +762,12 @@ export default function Landing() {
 
       {/* ─────────────── 17. STICKY BAR ─────────────── */}
       <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 9000, background: ACTION, padding: '14px 24px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, boxShadow: '0 -4px 24px rgba(0,0,0,0.22)', opacity: showBar && !dismissed ? 1 : 0, transform: showBar && !dismissed ? 'translateY(0)' : 'translateY(100%)', transition: 'opacity 0.35s ease, transform 0.35s cubic-bezier(0.16,1,0.3,1)', pointerEvents: showBar && !dismissed ? 'all' : 'none' }}>
-        {canPrompt && !installed ? (
-          <button
-            onClick={async () => {
-              track('sticky_bar_click', { action: 'install_prompt' })
-              const outcome = await install()
-              if (outcome === 'accepted') setDismissed(true)
-            }}
-            style={{ color: WHITE, fontFamily: SANS, fontWeight: 500, fontSize: 'clamp(14px, 2vw, 16px)', background: 'none', border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 10, letterSpacing: '0.01em' }}
-          >
-            📲 Instalar FamiliaCerca — es gratis
-            <span style={{ fontSize: 18, opacity: 0.85 }}>→</span>
-          </button>
-        ) : (
-          <Link to="/register" onClick={() => track('sticky_bar_click', { action: 'register' })} style={{ color: WHITE, fontFamily: SANS, fontWeight: 500, fontSize: 'clamp(14px, 2vw, 16px)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 10, letterSpacing: '0.01em' }}>
-            Instalar FamiliaCerca — es gratis
-            <span style={{ fontSize: 18, opacity: 0.85 }}>→</span>
-          </Link>
-        )}
+        {/* Un solo botón en toda la landing: "Empezar gratis" (antes competía
+            con "Instalar"). La instalación se explica después del registro. */}
+        <Link to="/register" onClick={() => track('sticky_bar_click', { action: 'register' })} className="cta-coral" style={{ color: WHITE, background: CORAL, borderRadius: 9999, padding: '10px 26px', fontFamily: SANS, fontWeight: 700, fontSize: 'clamp(15px, 2vw, 17px)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 8, boxShadow: '0 8px 22px rgba(0,0,0,0.18)' }}>
+          Empezar gratis
+          <span aria-hidden="true">→</span>
+        </Link>
         <button
           onClick={() => { setDismissed(true); track('sticky_bar_click', { action: 'dismiss' }) }}
           aria-label="Cerrar"
@@ -850,7 +845,7 @@ export default function Landing() {
         @keyframes hero2float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
         @media (prefers-reduced-motion: reduce) { .hero2-phone, .hero2-toast { animation: none !important; } }
         .wa-tag { display: none; }
-        @media (max-width: 760px) { .lugar-grid { grid-template-columns: 1fr !important; } }
+        @media (max-width: 820px) { .lugar-wrap { grid-template-columns: 1fr !important; gap: 36px !important; } .lugar-phone { width: 250px !important; } }
         @media (max-width: 760px) {
           .wa-row { grid-template-columns: 1fr !important; }
           .wa-head { display: none !important; }
