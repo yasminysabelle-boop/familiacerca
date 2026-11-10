@@ -71,8 +71,8 @@ export default function CareCard({
     // Solo hechos registrados, nunca un estado de ánimo inventado
     // (auditoría nov 2026: decía "tranquila y de buen ánimo" sin datos).
     : status === 'setup' ? `Empieza agregando el primer medicamento de ${name}.` :
-      status === 'critical' ? `Hay cosas pendientes de hoy con ${name}.` :
-      status === 'warning'  ? `Hoy queda algo pendiente con ${name}.` :
+      status === 'critical' ? 'Hay cosas atrasadas hoy. Lo primero:' :
+      status === 'warning'  ? 'Esto es lo que falta hoy:' :
       `Hoy todo va al día con ${name}.`
 
   return (

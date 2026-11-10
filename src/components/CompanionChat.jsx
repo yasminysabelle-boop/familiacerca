@@ -227,9 +227,9 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
           style={{
             position: 'fixed', bottom: bottomOffset, right: 16, zIndex: 42,
             width: 52, height: 52, borderRadius: '50%', border: 'none',
-            background: 'linear-gradient(135deg, #0A5A82, #0A4A6B)',
-            boxShadow: '0 4px 16px rgba(10,90,130,0.4)',
-            cursor: 'pointer', fontSize: 22,
+            background: 'white', outline: '2px solid #0C6C9C',
+            boxShadow: '0 4px 16px rgba(10,90,130,0.35)',
+            cursor: 'pointer', fontSize: 24,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}
         >
