@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { FamilyProvider, useFamily } from './contexts/FamilyContext'
@@ -12,32 +12,32 @@ import WelcomeSlides from './components/WelcomeSlides'
 import MemberOnboarding from './components/MemberOnboarding'
 import Login from './pages/Login'
 import Register from './pages/Register'
-import Dashboard from './pages/Dashboard'
-import Medications from './pages/Medications'
-import MedicationTimeline from './pages/MedicationTimeline'
-import Calendar from './pages/Calendar'
-import Notes from './pages/Notes'
-import Chat from './pages/Chat'
-import Memorias from './pages/Memorias'
-import Familia from './pages/Familia'
-import Reports from './pages/Reports'
-import TodoElCuidado from './pages/TodoElCuidado'
-import Expenses from './pages/Expenses'
-import TermsOfService from './pages/TermsOfService'
-import PrivacyPolicy from './pages/PrivacyPolicy'
-import JoinFamily from './pages/JoinFamily'
-import Permissions from './pages/Permissions'
-import Directory from './pages/Directory'
-import Settings from './pages/Settings'
-import Cuidado from './pages/Cuidado'
-import PatientProfile from './pages/PatientProfile'
-import Landing from './pages/Landing'
-import Upgrade from './pages/Upgrade'
-import VideoCall from './pages/VideoCall'
-import Admin from './pages/Admin'
-import DiarioMedico from './pages/DiarioMedico'
-import CareRecord from './pages/CareRecord'
-import FamilyRoles from './pages/FamilyRoles'
+const Dashboard = lazy(() => import('./pages/Dashboard'))
+const Medications = lazy(() => import('./pages/Medications'))
+const MedicationTimeline = lazy(() => import('./pages/MedicationTimeline'))
+const Calendar = lazy(() => import('./pages/Calendar'))
+const Notes = lazy(() => import('./pages/Notes'))
+const Chat = lazy(() => import('./pages/Chat'))
+const Memorias = lazy(() => import('./pages/Memorias'))
+const Familia = lazy(() => import('./pages/Familia'))
+const Reports = lazy(() => import('./pages/Reports'))
+const TodoElCuidado = lazy(() => import('./pages/TodoElCuidado'))
+const Expenses = lazy(() => import('./pages/Expenses'))
+const TermsOfService = lazy(() => import('./pages/TermsOfService'))
+const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'))
+const JoinFamily = lazy(() => import('./pages/JoinFamily'))
+const Permissions = lazy(() => import('./pages/Permissions'))
+const Directory = lazy(() => import('./pages/Directory'))
+const Settings = lazy(() => import('./pages/Settings'))
+const Cuidado = lazy(() => import('./pages/Cuidado'))
+const PatientProfile = lazy(() => import('./pages/PatientProfile'))
+const Landing = lazy(() => import('./pages/Landing'))
+const Upgrade = lazy(() => import('./pages/Upgrade'))
+const VideoCall = lazy(() => import('./pages/VideoCall'))
+const Admin = lazy(() => import('./pages/Admin'))
+const DiarioMedico = lazy(() => import('./pages/DiarioMedico'))
+const CareRecord = lazy(() => import('./pages/CareRecord'))
+const FamilyRoles = lazy(() => import('./pages/FamilyRoles'))
 import { supabase } from './lib/supabase'
 import imgFamilia from './assets/images/familia-inicio.webp'
 
@@ -118,6 +118,7 @@ function AppShell() {
         </div>
       )}
       {showMemberOnboarding && <MemberOnboarding onDone={handleMemberOnboardingDone} />}
+      <Suspense fallback={<div style={{ minHeight: '100dvh', background: '#F7F6F2' }} />}>
       <Routes>
         <Route path="/"            element={<HomeRoute />} />
         <Route path="/login"       element={<Login />} />
@@ -163,6 +164,7 @@ function AppShell() {
         <Route path="/privacidad"  element={<PrivacyPolicy />} />
         <Route path="*"            element={<Navigate to="/login" replace />} />
       </Routes>
+      </Suspense>
     </>
   )
 }
