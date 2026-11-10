@@ -631,6 +631,28 @@ export default function Settings() {
           </div>
         )}
 
+        {/* Tus datos (confianza nov 2026): descargar y borrar a la vista */}
+        <div style={{ background: 'white', borderRadius: 20, border: '1px solid #E6E3DB', padding: 16, marginBottom: 12 }}>
+          <p style={{ margin: '0 0 4px', fontSize: 16, fontWeight: 800, color: '#14303D' }}>🔒 Tus datos son de tu familia</p>
+          <p style={{ margin: '0 0 14px', fontSize: 14, color: '#4E6470', lineHeight: 1.5 }}>
+            No vendemos tu información ni la compartimos con nadie. Puedes llevártela o borrarla cuando quieras.
+          </p>
+          {isAdmin ? (
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button onClick={() => navigate('/admin?tab=data')} style={{ flex: 1, padding: '13px 10px', borderRadius: 14, border: '1.5px solid #0C6C9C', background: 'white', color: '#0C6C9C', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}>
+                Descargar mis datos
+              </button>
+              <button onClick={() => navigate('/admin?tab=data')} style={{ flex: 1, padding: '13px 10px', borderRadius: 14, border: '1.5px solid #E6E3DB', background: 'white', color: '#B42318', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}>
+                Borrar mi cuenta
+              </button>
+            </div>
+          ) : (
+            <a href="mailto:hola@familiacerca.com?subject=Borrar%20mi%20cuenta" style={{ display: 'block', textAlign: 'center', padding: '13px 10px', borderRadius: 14, border: '1.5px solid #E6E3DB', color: '#B42318', fontWeight: 700, fontSize: 15, textDecoration: 'none' }}>
+              Pedir que borren mi cuenta
+            </a>
+          )}
+        </div>
+
         {/* Admin panel link — only for owners */}
         {isAdmin && (
           <div style={{

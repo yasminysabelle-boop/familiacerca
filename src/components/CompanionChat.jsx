@@ -424,7 +424,7 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
               placeholder={`Escríbele a ${cfg.name}…`}
               style={{
                 flex: 1, padding: '8px 12px', borderRadius: 20,
-                border: '1px solid #E6E3DB', fontSize: 13,
+                border: '1px solid #E6E3DB', fontSize: 16,
                 outline: 'none', background: '#FAFAF9', color: '#14303D',
               }}
             />
@@ -443,6 +443,9 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
               <SendIcon active={!!input.trim() && !loading} />
             </button>
           </div>
+          <p style={{ margin: '6px 0 0', fontSize: 12, color: '#5E7480', textAlign: 'center' }}>
+            {cfg.name} ayuda a organizar el cuidado. No reemplaza a tu médico.
+          </p>
         </div>
       )}
     </>

@@ -5,7 +5,7 @@ import Logo from '../components/Logo'
 import { Eye, EyeOff } from '../components/Icons'
 import { track } from '../lib/analytics'
 
-const BENEFITS = ['14 días gratis', 'Sin tarjeta de crédito', 'Cancela cuando quieras']
+const BENEFITS = ['14 días gratis', 'Sin tarjeta de crédito', 'Tus datos solo para tu familia']
 
 export default function Register() {
   const { signUp } = useAuth()
@@ -185,7 +185,7 @@ export default function Register() {
           {/* Benefits row */}
           <div className="flex items-center justify-center gap-3 mt-4 flex-wrap">
             {BENEFITS.map(b => (
-              <span key={b} className="flex items-center gap-1 text-[12px] text-gray-500 font-medium">
+              <span key={b} className="flex items-center gap-1 text-[14px] text-gray-600 font-medium">
                 <span style={{ color: '#0C6C9C' }}>✓</span> {b}
               </span>
             ))}

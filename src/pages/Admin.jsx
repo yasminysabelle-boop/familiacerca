@@ -32,7 +32,7 @@ export default function Admin() {
   const { ownerId, memberRole, loading: familyLoading } = useFamily()
   const { isAppAdmin } = useBillingAccount()
   const navigate = useNavigate()
-  const [activeTab, setActiveTab] = useState('team')
+  const [activeTab, setActiveTab] = useState(() => new URLSearchParams(window.location.search).get('tab') || 'team')
   const TABS = isAppAdmin ? [...BASE_TABS, PAYMENT_ALERTS_TAB] : BASE_TABS
 
   // Show loading while family context resolves

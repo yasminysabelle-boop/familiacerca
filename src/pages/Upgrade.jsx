@@ -303,7 +303,7 @@ function UpgradeContent() {
 
   function onError(planKey) {
     setPending(null)
-    setErrors(prev => ({ ...prev, [planKey]: 'Error con PayPal. Intenta de nuevo.' }))
+    setErrors(prev => ({ ...prev, [planKey]: 'PayPal no respondió. Intenta de nuevo en un momento.' }))
   }
 
   function onBackToSettings() {

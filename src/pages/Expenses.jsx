@@ -219,7 +219,7 @@ export default function Expenses() {
     setSaving(false)
 
     if (error) {
-      setSaveError('Error al guardar: ' + error.message)
+      setSaveError(navigator.onLine ? 'No se pudo guardar. Intenta de nuevo en un momento.' : 'No hay internet. Revisa la conexión e intenta de nuevo.')
       return
     }
 

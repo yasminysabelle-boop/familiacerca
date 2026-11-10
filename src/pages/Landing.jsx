@@ -253,7 +253,7 @@ export default function Landing() {
     { q: '¿Cuántas personas pueden usar la misma cuenta familiar?', a: 'El plan Gratis permite hasta 2 miembros. El plan Familiar soporta hasta 6 cuidadores y el plan Cuidado Total es ilimitado. Todos ven actualizaciones en tiempo real.' },
     { q: '¿Funciona sin conexión a internet?', a: 'FamiliaCerca es una PWA (app web progresiva). Una vez instalada, muchas funciones como el checklist del día y los medicamentos están disponibles sin conexión. Los cambios se sincronizan cuando vuelve la señal.' },
     { q: '¿Cómo se instala en el celular si no está en la App Store?', a: 'En iPhone: abre la página en Safari, toca el botón de compartir (cuadro con flecha) y selecciona "Agregar a inicio". En Android: toca el menú de tres puntos del navegador y selecciona "Instalar aplicación".' },
-    { q: '¿Mis datos médicos están protegidos?', a: 'Sí. Tus datos se almacenan cifrados en infraestructura de nivel empresarial — la misma tecnología que usan bancos y hospitales. Solo los familiares que tú invites tienen acceso. Nunca vendemos ni compartimos tu información.' },
+    { q: '¿Mis datos médicos están protegidos?', a: 'Sí. Tus datos se guardan cifrados y solo los ven los familiares que tú invites. Nunca vendemos ni compartimos tu información, y puedes descargarla o borrarla cuando quieras desde Mi cuenta.' },
     { q: '¿Puedo cancelar mi suscripción en cualquier momento?', a: 'Por supuesto. Puedes cancelar desde Ajustes > Suscripción en cualquier momento. No hay penalizaciones ni contratos. Tu plan baja a Gratis al terminar el período pagado.' },
     { q: '¿Qué pasa cuando terminan los 14 días de prueba?', a: 'Si no eliges un plan, tu familia sigue gratis con lo esencial: medicamentos, rutina, chat, notas y hasta 2 personas. Nada se borra. Solo se pausan los extras, como la videollamada, los gastos y los reportes PDF ilimitados.' },
   ]
@@ -337,7 +337,7 @@ export default function Landing() {
               <a href="#como" style={{ color: WHITE, fontSize: 16, fontWeight: 600, fontFamily: SANS, textDecoration: 'underline', textUnderlineOffset: 4 }}>Ver cómo funciona</a>
             </div>
             <p className="hero-reveal hero-delay-5" style={{ fontSize: 15, color: WHITE, margin: '20px 0 0', fontFamily: SANS, opacity: 0.9 }}>
-              ✓ Sin tarjeta &nbsp;·&nbsp; ✓ 14 días con todo incluido &nbsp;·&nbsp; ✓ iPhone y Android
+              ✓ Sin tarjeta &nbsp;·&nbsp; ✓ 14 días con todo incluido &nbsp;·&nbsp; 🔒 Tus datos solo para tu familia
             </p>
           </div>
         </div>

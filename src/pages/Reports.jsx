@@ -91,7 +91,7 @@ export default function Reports() {
         p_owner_id: exportId, p_actor_name: user?.user_metadata?.full_name ?? null,
       }).then(() => {}, () => {})
     } catch (err) {
-      setPdfError('Error al generar el PDF: ' + (err.message ?? 'Intenta de nuevo.'))
+      setPdfError(navigator.onLine ? 'No se pudo crear el PDF. Intenta de nuevo en un momento.' : 'No hay internet. Revisa la conexión e intenta de nuevo.')
     } finally {
       setGeneratingPdf(false)
     }
@@ -102,7 +102,8 @@ export default function Reports() {
       <div className="p-4 md:p-8 max-w-3xl pb-24">
         <div className="mb-8">
           <h2 className="text-lg font-bold text-gray-900">Resumen para el médico</h2>
-          <p className="text-gray-500 mt-1">Bienestar semanal y documentos para el médico</p>
+          <p className="text-gray-600 mt-1">Un resumen de la semana para llevar a la cita.</p>
+          <p className="text-sm text-gray-600 mt-2" style={{ background: '#EEF6FA', borderRadius: 12, padding: '10px 12px' }}>ℹ️ Esta información la anota la familia. Sirve para conversar con el médico, pero no es un diagnóstico ni reemplaza su opinión.</p>
         </div>
 
         {/* Pattern detection / wellness summary */}

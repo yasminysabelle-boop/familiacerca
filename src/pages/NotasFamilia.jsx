@@ -65,7 +65,7 @@ export default function NotasFamilia() {
       photo_url: isIncident ? photoUrl : null,
     })
     setSaving(false)
-    if (error) { setSaveError('Error al guardar. Intenta de nuevo.'); return }
+    if (error) { setSaveError(navigator.onLine ? 'No se pudo guardar. Intenta de nuevo.' : 'No hay internet. Revisa la conexión e intenta de nuevo.'); return }
     setContent(''); setIsIncident(false); setIncidentType(null); setPhotoUrl(null)
     setSaved(true)
     setTimeout(() => setSaved(false), 2500)

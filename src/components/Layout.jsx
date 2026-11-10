@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
@@ -96,8 +96,21 @@ export default function Layout({ children }) {
 
   const hospitalBarHeight = isHospitalMode ? 40 : 0
 
+  // Aviso amable cuando se va el internet (UX nov 2026)
+  const [offline, setOffline] = useState(typeof navigator !== 'undefined' && !navigator.onLine)
+  useEffect(() => {
+    const on = () => setOffline(false), off = () => setOffline(true)
+    window.addEventListener('online', on); window.addEventListener('offline', off)
+    return () => { window.removeEventListener('online', on); window.removeEventListener('offline', off) }
+  }, [])
+
   return (
     <div style={{ background: bg }}>
+      {offline && (
+        <div role="status" style={{ position: 'fixed', left: 12, right: 12, bottom: 88, zIndex: 60, background: '#14303D', color: 'white', borderRadius: 14, padding: '12px 14px', fontSize: 15, fontWeight: 600, textAlign: 'center', boxShadow: '0 8px 24px rgba(0,0,0,0.3)' }}>
+          📶 Sin internet. Lo que veas puede no estar al día; en cuanto vuelva la conexión se actualiza.
+        </div>
+      )}
       {/* Hospital mode alert bar — fixed, above the main header */}
       {isHospitalMode && (
         <Link

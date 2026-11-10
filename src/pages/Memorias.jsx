@@ -99,7 +99,7 @@ export default function Memorias() {
 
     if (uploadError) {
       const errMsg = uploadError.message ?? ''
-      let friendlyMsg = 'Error al subir el audio.'
+      let friendlyMsg = navigator.onLine ? 'No se pudo guardar el audio. Intenta de nuevo.' : 'No hay internet. Tu grabación no se envió; inténtalo cuando vuelva la conexión.'
       if (errMsg.toLowerCase().includes('bucket') || uploadError.statusCode === '404') {
         friendlyMsg = 'El bucket de almacenamiento no existe. Pide al administrador que lo cree en Supabase.'
       } else if (uploadError.statusCode === '403' || errMsg.toLowerCase().includes('policy') || errMsg.toLowerCase().includes('permission')) {
