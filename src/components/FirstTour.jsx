@@ -58,7 +58,7 @@ export default function FirstTour() {
   const vh = window.innerHeight
   const below = rect ? rect.top + rect.height + 190 < vh : true
   const cardTop = rect
-    ? (below ? rect.top + rect.height + pad + 14 : Math.max(16, rect.top - pad - 14 - 176))
+    ? (below ? rect.top + rect.height + pad + 14 : Math.max(16, rect.top - pad - 14 - 240))
     : vh / 2 - 90
 
   return (
