@@ -59,7 +59,7 @@ const ROUTINE_ICON = {
 
 // Metadatos por tipo de evento — reemplaza EVENT_CONFIG (emoji) del código anterior.
 const TYPE_META = {
-  med_confirmed:        { label: 'Medicamentos',      Icon: Pill,           cat: 'teal',     route: '/medications' },
+  med_confirmed:        { label: 'Medicinas',         Icon: Pill,           cat: 'teal',     route: '/medications' },
   med_missed:            { label: 'Dosis omitidas',    Icon: Pill,           cat: 'coral',    route: '/medications' },
   care_routine:           { label: 'Rutinas',            Icon: ClipboardCheck, cat: 'teal',     route: '/cuidado' },
   care_routine_missed:   { label: 'Rutinas omitidas',   Icon: ClipboardCheck, cat: 'coral',    route: '/cuidado' },
@@ -79,9 +79,9 @@ const TYPE_META = {
 
 // Los 12 tipos reales tienen su propio pill (+ "Todo") = 13.
 const FILTER_OPTIONS = [
-  'all', 'note', 'care_record', 'medical_visit', 'med_confirmed', 'med_missed', 'care_routine', 'care_routine_missed',
-  'hospital_mode_on', 'hospital_discharge', 'doctor_note', 'appointment', 'sos',
-  'expense', 'caregiver_assigned', 'incident',
+  // Menos botones (UX nov 2026): lo que la familia busca de verdad
+  'all', 'med_confirmed', 'care_routine', 'note', 'care_record', 'medical_visit',
+  'appointment', 'expense', 'incident', 'sos',
 ]
 
 const PERIOD_OPTIONS = [
@@ -482,7 +482,7 @@ export default function MedicationTimeline() {
           </button>
           <div style={{ minWidth: 0 }}>
             <h1 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: INK, letterSpacing: '-0.01em' }}>
-              Historia de cuidado
+              Historial
             </h1>
             <p style={{ margin: '2px 0 0', fontFamily: SERIF, fontWeight: 500, fontSize: 15, color: TEAL }}>
               Cuidando a {patientFirstName}
