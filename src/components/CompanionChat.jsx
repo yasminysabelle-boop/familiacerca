@@ -119,6 +119,19 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
     catch { return [] }
   })
   const [input,   setInput]   = useState('')
+  // Se esconde al bajar y vuelve al subir, para no tapar lo de abajo (UX nov 2026)
+  const [tucked, setTucked] = useState(false)
+  useEffect(() => {
+    let last = window.scrollY
+    const onScroll = () => {
+      const y = window.scrollY
+      if (Math.abs(y - last) < 8) return
+      setTucked(y > last && y > 120)
+      last = y
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
   const [loading, setLoading] = useState(false)
 
   const bottomRef          = useRef(null)
@@ -225,7 +238,7 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
           onClick={() => setSelecting(true)}
           aria-label="Elegir compañero virtual"
           style={{
-            position: 'fixed', bottom: bottomOffset, right: 16, zIndex: 42,
+            position: 'fixed', bottom: bottomOffset, right: 16, zIndex: 42, transform: tucked && !open ? 'translateX(90px)' : 'none', transition: 'transform .25s ease',
             width: 52, height: 52, borderRadius: '50%', border: 'none',
             background: 'white', outline: '2px solid #0C6C9C',
             boxShadow: '0 4px 16px rgba(10,90,130,0.35)',
@@ -249,7 +262,7 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
         onClick={() => setOpen(v => !v)}
         aria-label={`Abrir chat con ${cfg.name}`}
         style={{
-          position: 'fixed', bottom: bottomOffset, right: 16, zIndex: 42,
+          position: 'fixed', bottom: bottomOffset, right: 16, zIndex: 42, transform: tucked && !open ? 'translateX(90px)' : 'none', transition: 'transform .25s ease',
           width: 52, height: 52, borderRadius: '50%',
           border: 'none', padding: 0, cursor: 'pointer', overflow: 'hidden',
           boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
@@ -296,7 +309,7 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
                 {cfg.name}
               </p>
               <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: 14, margin: 0 }}>
-                {companion === 'milo' ? 'Tu compañero virtual' : 'Tu compañera virtual'}
+                Ayuda · pregúntame lo que necesites
               </p>
             </div>
             {/* Cambiar de compañero en cualquier momento (antes no se podía) */}

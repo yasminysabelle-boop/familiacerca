@@ -421,91 +421,7 @@ export default function Familia() {
           </div>
         )}
 
-        {/* ¿Quién cuida hoy? — Care shift rotation */}
-        {(() => {
-          const weekDays = getWeekDays()
-          const todayShift = shifts[todayKey]
-          const DAY_LABELS = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom']
-          return (
-            <div style={{
-              background: 'white', borderRadius: 20, border: '1px solid #E6E3DB',
-              padding: '16px 18px', marginBottom: 12,
-              boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
-            }}>
-              <p style={{ fontFamily: SANS, fontSize: 16, fontWeight: 700, color: '#14303D', margin: '0 0 12px' }}>
-                ¿Quién cuida hoy?
-              </p>
-              {/* Today's caregiver highlight */}
-              <div style={{
-                background: todayShift ? 'linear-gradient(135deg, #E3F1F8, #F7F6F2)' : '#F9F5F1',
-                borderRadius: 14, border: `1.5px solid ${todayShift ? '#0C6C9C' : '#E6E3DB'}`,
-                padding: '12px 14px', marginBottom: 12,
-                display: 'flex', alignItems: 'center', gap: 10,
-              }}>
-                <span style={{ fontSize: 24 }}>{todayShift ? '👤' : '❓'}</span>
-                <div style={{ flex: 1 }}>
-                  <p style={{ fontSize: 14, fontWeight: 700, color: todayShift ? '#0C6C9C' : '#5E7480', margin: 0 }}>
-                    {todayShift ? todayShift.caregiver_name : 'Sin asignar'}
-                  </p>
-                  <p style={{ fontSize: 14, color: '#5E7480', margin: '2px 0 0' }}>Cuidador de hoy</p>
-                </div>
-                {isAdmin && (
-                  <button
-                    onClick={() => { setShiftModal(todayKey); setShiftName(todayShift?.caregiver_name ?? '') }}
-                    style={{
-                      padding: '6px 12px', borderRadius: 10, fontSize: 14, fontWeight: 700,
-                      border: '1.5px solid #0C6C9C', background: 'white', color: '#0C6C9C', cursor: 'pointer',
-                    }}
-                  >
-                    {todayShift ? 'Cambiar' : 'Asignar'}
-                  </button>
-                )}
-              </div>
-              {/* Weekly mini-calendar */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4 }}>
-                {weekDays.map((day, i) => {
-                  const dk = getDatePR(day)
-                  const isToday = dk === todayKey
-                  const shift = shifts[dk]
-                  const initials = shift?.caregiver_name?.charAt(0)?.toUpperCase() ?? '·'
-                  return (
-                    <button
-                      key={dk}
-                      onClick={isAdmin ? () => { setShiftModal(dk); setShiftName(shift?.caregiver_name ?? '') } : undefined}
-                      style={{
-                        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
-                        padding: '6px 2px', borderRadius: 10, border: 'none',
-                        background: isToday ? '#E3F1F8' : shift ? '#E3F1F8' : '#F9F5F1',
-                        cursor: isAdmin ? 'pointer' : 'default', transition: 'all 0.15s',
-                      }}
-                    >
-                      <span style={{ fontSize: 14, fontWeight: 700, color: '#5E7480', letterSpacing: '0.04em' }}>
-                        {DAY_LABELS[i]}
-                      </span>
-                      <span style={{ fontSize: 14, fontWeight: 700, color: '#4E6470' }}>
-                        {day.getDate()}
-                      </span>
-                      <div style={{
-                        width: 22, height: 22, borderRadius: '50%',
-                        background: isToday ? '#0C6C9C' : shift ? '#0C6C9C' : '#E5E7EB',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: 14, fontWeight: 700,
-                        color: (isToday || shift) ? 'white' : '#5E7480',
-                      }}>
-                        {initials}
-                      </div>
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
-          )
-        })()}
-
-        {/* Tareas repartidas y quién hizo qué (familias en varios países, nov 2026) */}
-        {ownerId && <FamilyTasks ownerId={ownerId} />}
-        {ownerId && <WeeklyContributions ownerId={ownerId} />}
-
+        {/* Equipo arriba (UX nov 2026): lo primero es ver quién está en la familia */}
         {/* Members section */}
         <div style={{
           background: 'white', borderRadius: 20, border: '1px solid #E6E3DB',
@@ -699,6 +615,92 @@ export default function Familia() {
             </div>
           )}
         </div>
+
+        {/* ¿Quién cuida hoy? — Care shift rotation */}
+        {(() => {
+          const weekDays = getWeekDays()
+          const todayShift = shifts[todayKey]
+          const DAY_LABELS = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom']
+          return (
+            <div style={{
+              background: 'white', borderRadius: 20, border: '1px solid #E6E3DB',
+              padding: '16px 18px', marginBottom: 12,
+              boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
+            }}>
+              <p style={{ fontFamily: SANS, fontSize: 16, fontWeight: 700, color: '#14303D', margin: '0 0 12px' }}>
+                ¿Quién cuida hoy?
+              </p>
+              {/* Today's caregiver highlight */}
+              <div style={{
+                background: todayShift ? 'linear-gradient(135deg, #E3F1F8, #F7F6F2)' : '#F9F5F1',
+                borderRadius: 14, border: `1.5px solid ${todayShift ? '#0C6C9C' : '#E6E3DB'}`,
+                padding: '12px 14px', marginBottom: 12,
+                display: 'flex', alignItems: 'center', gap: 10,
+              }}>
+                <span style={{ fontSize: 24 }}>{todayShift ? '👤' : '❓'}</span>
+                <div style={{ flex: 1 }}>
+                  <p style={{ fontSize: 14, fontWeight: 700, color: todayShift ? '#0C6C9C' : '#5E7480', margin: 0 }}>
+                    {todayShift ? todayShift.caregiver_name : 'Sin asignar'}
+                  </p>
+                  <p style={{ fontSize: 14, color: '#5E7480', margin: '2px 0 0' }}>Cuidador de hoy</p>
+                </div>
+                {isAdmin && (
+                  <button
+                    onClick={() => { setShiftModal(todayKey); setShiftName(todayShift?.caregiver_name ?? '') }}
+                    style={{
+                      padding: '6px 12px', borderRadius: 10, fontSize: 14, fontWeight: 700,
+                      border: '1.5px solid #0C6C9C', background: 'white', color: '#0C6C9C', cursor: 'pointer',
+                    }}
+                  >
+                    {todayShift ? 'Cambiar' : 'Asignar'}
+                  </button>
+                )}
+              </div>
+              {/* Weekly mini-calendar */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4 }}>
+                {weekDays.map((day, i) => {
+                  const dk = getDatePR(day)
+                  const isToday = dk === todayKey
+                  const shift = shifts[dk]
+                  const initials = shift?.caregiver_name?.charAt(0)?.toUpperCase() ?? '·'
+                  return (
+                    <button
+                      key={dk}
+                      onClick={isAdmin ? () => { setShiftModal(dk); setShiftName(shift?.caregiver_name ?? '') } : undefined}
+                      style={{
+                        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
+                        padding: '6px 2px', borderRadius: 10, border: 'none',
+                        background: isToday ? '#E3F1F8' : shift ? '#E3F1F8' : '#F9F5F1',
+                        cursor: isAdmin ? 'pointer' : 'default', transition: 'all 0.15s',
+                      }}
+                    >
+                      <span style={{ fontSize: 14, fontWeight: 700, color: '#5E7480', letterSpacing: '0.04em' }}>
+                        {DAY_LABELS[i]}
+                      </span>
+                      <span style={{ fontSize: 14, fontWeight: 700, color: '#4E6470' }}>
+                        {day.getDate()}
+                      </span>
+                      <div style={{
+                        width: 22, height: 22, borderRadius: '50%',
+                        background: isToday ? '#0C6C9C' : shift ? '#0C6C9C' : '#E5E7EB',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: 14, fontWeight: 700,
+                        color: (isToday || shift) ? 'white' : '#5E7480',
+                      }}>
+                        {initials}
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          )
+        })()}
+
+        {/* Tareas repartidas y quién hizo qué (familias en varios países, nov 2026) */}
+        {ownerId && <FamilyTasks ownerId={ownerId} />}
+        {ownerId && <WeeklyContributions ownerId={ownerId} />}
+
 
       </div>
 

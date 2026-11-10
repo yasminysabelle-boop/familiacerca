@@ -453,7 +453,7 @@ export default function Landing() {
             ))}
           </div>
           <p className="reveal" style={{ textAlign: 'center', fontSize: 'clamp(17px,1.6vw,20px)', color: '#30454F', margin: '32px auto 0', maxWidth: 620, lineHeight: 1.6, fontFamily: SANS }}>
-            Sigan usando WhatsApp para hablar. <strong style={{ color: PRIMARY }}>FamiliaCerca es para que el cuidado no se pierda en el chat.</strong>
+            Sigan usando su grupo de WhatsApp, pero sin el caos. <strong style={{ color: PRIMARY }}>El cuidado se organiza en FamiliaCerca y el resumen del día llega al grupo con un toque.</strong>
           </p>
         </div>
       </section>

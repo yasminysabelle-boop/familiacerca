@@ -266,7 +266,7 @@ export default function Calendar() {
               onClick={() => { setEditEvent(null); resetForm(); setShowForm(!showForm) }}
               className="px-4 py-2 bg-primary hover:bg-primary-dark text-white text-sm font-medium rounded-lg transition-colors"
             >
-              + Agregar evento
+              + Agregar cita
             </button>
           )}
         </div>
