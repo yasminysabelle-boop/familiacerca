@@ -801,47 +801,62 @@ export default function Landing() {
         >×</button>
       </div>
 
-      {/* Cómo instalar la app en el teléfono (sin tiendas) */}
+      {/* Descargar la app (sin tiendas) — vista agradable, sin pasos técnicos (nov 2026) */}
       {installHelp && (
-        <div role="dialog" aria-label="Descargar la app" onClick={() => setInstallHelp(false)} style={{ position: 'fixed', inset: 0, zIndex: 9500, background: 'rgba(8,30,42,0.5)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
-          <div onClick={e => e.stopPropagation()} style={{ width: '100%', maxWidth: 480, background: WHITE, borderRadius: '24px 24px 0 0', padding: '22px 22px calc(22px + env(safe-area-inset-bottom, 0px))', fontFamily: SANS, color: '#14303D' }}>
-            <h2 style={{ margin: 0, fontSize: 21, fontWeight: 800 }}>Descarga FamiliaCerca en tu teléfono</h2>
-            <p style={{ margin: '6px 0 14px', fontSize: 16, color: '#4E6470', lineHeight: 1.5 }}>
-              Queda con su ícono como cualquier app, sin pasar por la tienda. Es gratis.
-            </p>
-            {!isMobile && (
-              <div style={{ display: 'flex', gap: 16, alignItems: 'center', margin: '0 0 16px', padding: 14, borderRadius: 16, background: '#EEF6FA', flexWrap: 'wrap' }}>
-                <img src="/images/qr-instalar.svg" alt="Código QR para abrir FamiliaCerca en el teléfono" width="150" height="150" style={{ background: WHITE, borderRadius: 10, padding: 6, flexShrink: 0 }} />
-                <div style={{ flex: 1, minWidth: 180 }}>
-                  <p style={{ margin: '0 0 6px', fontSize: 17, fontWeight: 800 }}>Escanéalo con tu teléfono</p>
-                  <p style={{ margin: '0 0 10px', fontSize: 15, lineHeight: 1.45, color: '#30454F' }}>
-                    Abre la <strong>cámara</strong> del teléfono y apúntala a este código. Toca el enlace que aparece y luego "Descargar la app".
-                  </p>
-                  <a href={`https://wa.me/?text=${encodeURIComponent('Descarga FamiliaCerca en tu teléfono: https://familiacerca.com/?instalar=1')}`} target="_blank" rel="noopener noreferrer"
-                    onClick={() => track('install_send_whatsapp')}
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '9px 14px', borderRadius: 999, background: '#1E7E43', color: WHITE, fontSize: 15, fontWeight: 700, textDecoration: 'none' }}>
-                    Enviarme el enlace por WhatsApp
-                  </a>
+        <div role="dialog" aria-label="Descargar la app" onClick={() => setInstallHelp(false)} style={{ position: 'fixed', inset: 0, zIndex: 9500, background: 'rgba(8,30,42,0.55)', display: 'flex', alignItems: isMobile ? 'flex-end' : 'center', justifyContent: 'center', padding: isMobile ? 0 : 16 }}>
+          <div onClick={e => e.stopPropagation()} style={{ position: 'relative', width: '100%', maxWidth: isMobile ? 480 : 640, background: WHITE, borderRadius: isMobile ? '28px 28px 0 0' : 28, overflow: 'hidden', fontFamily: SANS, color: '#14303D', boxShadow: '0 30px 80px rgba(0,0,0,0.35)' }}>
+            <button onClick={() => setInstallHelp(false)} aria-label="Cerrar" style={{ position: 'absolute', top: 12, right: 12, zIndex: 2, width: 36, height: 36, borderRadius: '50%', border: 'none', background: 'rgba(255,255,255,0.22)', color: WHITE, fontSize: 18, cursor: 'pointer' }}>×</button>
+
+            {/* Cabecera azul con el ícono y el teléfono */}
+            <div style={{ background: 'linear-gradient(160deg, #0C6C9C 0%, #0A4A6B 100%)', color: WHITE, padding: '26px 24px 0', display: 'flex', gap: 20, alignItems: 'flex-end' }}>
+              <div style={{ flex: 1, minWidth: 0, paddingBottom: 24 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
+                  <img src="/icon-192.png" alt="" width="56" height="56" style={{ borderRadius: 14, background: WHITE, boxShadow: '0 6px 16px rgba(0,0,0,0.25)' }} />
+                  <div>
+                    <p style={{ margin: 0, fontSize: 19, fontWeight: 800 }}>FamiliaCerca</p>
+                    <p style={{ margin: '2px 0 0', fontSize: 14, opacity: 0.9 }}>Gratis · sin pasar por la tienda</p>
+                  </div>
                 </div>
+                <h2 style={{ margin: 0, fontSize: 'clamp(21px, 3vw, 26px)', fontWeight: 800, lineHeight: 1.2 }}>Tenla a un toque en tu teléfono</h2>
+                <ul style={{ listStyle: 'none', margin: '12px 0 0', padding: 0, fontSize: 15, lineHeight: 1.7 }}>
+                  <li>✓ Su ícono en tu pantalla, como cualquier app</li>
+                  <li>✓ Avisos de medicinas y emergencias</li>
+                  <li>✓ Toda la familia al día</li>
+                </ul>
               </div>
-            )}
-            {canPrompt && (
-              <button onClick={async () => { track('install_sheet_prompt'); const o = await install(); if (o === 'accepted') setInstallHelp(false) }}
-                style={{ width: '100%', marginBottom: 14, padding: 14, borderRadius: 14, border: 'none', background: CORAL, color: WHITE, fontSize: 17, fontWeight: 800, cursor: 'pointer', fontFamily: SANS }}>
-                📲 Descargar ahora
-              </button>
-            )}
-            {isMobile && !canPrompt && (
-              <p style={{ margin: 0, fontSize: 16, lineHeight: 1.5 }}>
-                Abre <strong>familiacerca.com</strong> en <strong>Chrome</strong> y toca <strong>"📲 Descargar la app"</strong>. Si ya la tienes en tu teléfono, búscala en tu pantalla de inicio.
+              <div style={{ width: isMobile ? 110 : 150, flexShrink: 0, borderRadius: '22px 22px 0 0', background: '#0E1E26', padding: '8px 8px 0', boxShadow: '0 -10px 30px rgba(0,0,0,0.25)' }}>
+                <img src="/images/app-inicio.webp" alt="" style={{ width: '100%', display: 'block', borderRadius: '16px 16px 0 0' }} />
+              </div>
+            </div>
+
+            <div style={{ padding: '22px 24px calc(22px + env(safe-area-inset-bottom, 0px))' }}>
+              {canPrompt ? (
+                <button onClick={async () => { track('install_sheet_prompt'); const o = await install(); if (o === 'accepted') setInstallHelp(false) }}
+                  style={{ width: '100%', padding: 16, borderRadius: 16, border: 'none', background: CORAL, color: WHITE, fontSize: 18, fontWeight: 800, cursor: 'pointer', fontFamily: SANS, boxShadow: '0 10px 24px -10px rgba(191,81,60,0.8)' }}>
+                  📲 Descargar ahora
+                </button>
+              ) : !isMobile ? (
+                <div style={{ display: 'flex', gap: 18, alignItems: 'center', flexWrap: 'wrap' }}>
+                  <img src="/images/qr-instalar.svg" alt="Código QR para abrir FamiliaCerca en el teléfono" width="132" height="132" style={{ borderRadius: 14, border: '1px solid #E6E3DB', padding: 6, flexShrink: 0 }} />
+                  <div style={{ flex: 1, minWidth: 200 }}>
+                    <p style={{ margin: '0 0 4px', fontSize: 18, fontWeight: 800 }}>Apunta la cámara de tu teléfono aquí</p>
+                    <p style={{ margin: '0 0 12px', fontSize: 15, lineHeight: 1.45, color: '#4E6470' }}>Se abre FamiliaCerca en tu teléfono y la descargas con un toque.</p>
+                    <a href={`https://wa.me/?text=${encodeURIComponent('Descarga FamiliaCerca en tu teléfono: https://familiacerca.com/?instalar=1')}`} target="_blank" rel="noopener noreferrer"
+                      onClick={() => track('install_send_whatsapp')}
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '10px 16px', borderRadius: 999, background: '#1E7E43', color: WHITE, fontSize: 15, fontWeight: 700, textDecoration: 'none' }}>
+                      O mándatelo por WhatsApp
+                    </a>
+                  </div>
+                </div>
+              ) : (
+                <p style={{ margin: 0, padding: '14px 16px', borderRadius: 16, background: '#EEF6FA', fontSize: 16, lineHeight: 1.5 }}>
+                  Parece que ya tienes FamiliaCerca en este teléfono. Búscala en tu pantalla de inicio. 💙
+                </p>
+              )}
+              <p style={{ margin: '16px 0 0', fontSize: 15, color: '#4E6470', lineHeight: 1.45, textAlign: 'center' }}>
+                ¿Todavía no tienes cuenta? <Link to="/register" onClick={() => setInstallHelp(false)} style={{ color: '#0C6C9C', fontWeight: 700 }}>Créala gratis</Link>
               </p>
-            )}
-            <p style={{ margin: '14px 0 0', fontSize: 15, color: '#4E6470', lineHeight: 1.45 }}>
-              ¿Todavía no tienes cuenta? Puedes descargarla primero y registrarte desde la app.
-            </p>
-            <button onClick={() => setInstallHelp(false)} style={{ marginTop: 16, width: '100%', padding: 14, borderRadius: 14, border: 'none', background: '#0C6C9C', color: WHITE, fontSize: 17, fontWeight: 700, cursor: 'pointer', fontFamily: SANS }}>
-              Entendido
-            </button>
+            </div>
           </div>
         </div>
       )}
