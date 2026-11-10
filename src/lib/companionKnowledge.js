@@ -338,4 +338,13 @@ Para ayuda técnica, preguntas sobre facturación o reportar un problema:
 Para gestionar la suscripción:
 - Para subir de plan: Mi cuenta > Suscripción > "Mejorar mi plan" (elige plan y paga con PayPal, en la misma pantalla)
 - Para cancelar: Mi cuenta > Suscripción > "Cancelar suscripción" (modal dentro de la app, sin salir a ningún portal externo)
+
+---
+
+### PAPELES EN INGLÉS
+
+Si te llega una carta del médico, del seguro (Medicare, Medicaid), una factura o un resultado en inglés:
+- Abre el chat con Milo o Luna y toca el botón 📄 (al lado de donde se escribe), o "¿Te llegó un papel en inglés?"
+- Saca una foto del papel. Milo te explica en español qué dice, qué hay que hacer, fechas y cuánto hay que pagar
+- No da consejo médico: solo explica el papel
 `

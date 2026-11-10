@@ -5,6 +5,7 @@ import { buildCareContext, CONTEXT_RULES, CONTEXT_DEPTH } from '../lib/careConte
 import { useFamily } from '../contexts/FamilyContext'
 import { useFamilyPlan } from '../contexts/FamilyPlanContext'
 import { FAMILIACERCA_KNOWLEDGE } from '../lib/companionKnowledge'
+import { explainPaper, paperToText } from '../lib/explainPaper'
 import miloLunaImg  from '../assets/companions/milo-luna.png'
 import miloAvatarImg from '../assets/companions/milo-avatar.png'
 import lunaAvatarImg from '../assets/companions/luna-avatar.png'
@@ -228,6 +229,22 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
     setLoading(false)
   }
 
+  const paperRef = useRef(null)
+  async function onPaper(e) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file || loading) return
+    setMessages(prev => [...prev, { role: 'user', text: '📄 Te mandé la foto de un papel. ¿Qué dice?' }])
+    setLoading(true)
+    try {
+      const d = await explainPaper(file)
+      setMessages(prev => [...prev, { role: 'companion', text: paperToText(d) }])
+    } catch (err) {
+      setMessages(prev => [...prev, { role: 'companion', text: err.message }])
+    }
+    setLoading(false)
+  }
+
   const showQuickOptions = messages.length > 0 && !messages.some(m => m.role === 'user')
 
   // ─── No companion chosen yet ──────────────────────────────────────────────
@@ -352,7 +369,7 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
                     : '16px 16px 16px 4px',
                   background: msg.role === 'user' ? '#F0F0F0' : '#0A5A82',
                   color: msg.role === 'user' ? '#14303D' : 'white',
-                  fontSize: 14, lineHeight: 1.55,
+                  fontSize: 15, lineHeight: 1.55, whiteSpace: 'pre-wrap',
                 }}>
                   {msg.text}
                 </div>
@@ -362,6 +379,14 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
             {/* Quick option chips — only when no user message yet */}
             {showQuickOptions && !loading && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 4 }}>
+                <button onClick={() => paperRef.current?.click()} style={{
+                  display: 'flex', alignItems: 'center', gap: 10, width: '100%', textAlign: 'left',
+                  padding: '12px 14px', borderRadius: 16, border: '1.5px solid #0C6C9C', background: '#E3F1F8',
+                  color: '#0A4A6B', cursor: 'pointer', fontSize: 15, fontWeight: 700, lineHeight: 1.35,
+                }}>
+                  <span style={{ fontSize: 22 }}>📄</span>
+                  <span>¿Te llegó un papel en inglés?<br /><span style={{ fontWeight: 500, fontSize: 14 }}>Sácale foto y te explico qué dice</span></span>
+                </button>
                 <div>
                   <p style={{
                     margin: '0 0 6px', fontSize: 14, fontWeight: 700,
@@ -458,6 +483,11 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
               }}
             >
               🏠 Menú
+            </button>
+            <input ref={paperRef} type="file" accept="image/*" capture="environment" onChange={onPaper} style={{ display: 'none' }} />
+            <button onClick={() => paperRef.current?.click()} disabled={loading} aria-label="Explícame un papel (foto)" title="Explícame un papel"
+              style={{ flexShrink: 0, width: 36, height: 36, borderRadius: '50%', border: '1px solid #E6E3DB', background: '#F7F6F2', fontSize: 17, cursor: 'pointer' }}>
+              📄
             </button>
             <input
               ref={inputRef}
