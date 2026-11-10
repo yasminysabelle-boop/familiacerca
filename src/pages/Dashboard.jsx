@@ -1943,7 +1943,7 @@ function activityAction(evt) {
   return (ACTIVITY_ACTIONS[evt.type] ?? (() => 'registró actividad'))(evt)
 }
 
-function RecentActivity({ items, onViewAll, onSelect, firstName, summaryText, summaryEmpty, summaryStale }) {
+function RecentActivity({ items, onViewAll, onSelect, firstName, summaryText, summaryEmpty, summaryStale, shareText }) {
   return (
     <section aria-label="Actividad reciente" style={{ borderRadius: 26, background: 'white', padding: 20, boxShadow: '0 6px 24px -12px rgba(51,65,85,0.18)' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
@@ -2018,6 +2018,17 @@ function RecentActivity({ items, onViewAll, onSelect, firstName, summaryText, su
             )
           })}
         </ul>
+      )}
+      {shareText && (
+        <a
+          href={`https://wa.me/?text=${encodeURIComponent(shareText)}`}
+          target="_blank" rel="noopener noreferrer"
+          onClick={() => track('share_whatsapp_today')}
+          style={{ marginTop: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, width: '100%', padding: '14px 16px', borderRadius: 14, background: '#075E54', color: 'white', fontSize: 16, fontWeight: 700, textDecoration: 'none', boxSizing: 'border-box' }}
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="white" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.7.3-.2.3-.9.9-.9 2.1s.9 2.4 1 2.6c.1.2 1.8 2.7 4.3 3.8 1.6.7 2.2.7 3 .6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z"/></svg>
+          Compartir en el grupo de WhatsApp
+        </a>
       )}
     </section>
   )
@@ -3239,6 +3250,28 @@ export default function Dashboard() {
 
   const nextAppointment = sections.flatMap(s => s.events).find(e => e.type === 'APPOINTMENT') ?? null
 
+  // Compartir en el grupo de WhatsApp (nov 2026): el resumen de hoy, listo para
+  // mandar desde el WhatsApp de quien lo toca. FamiliaCerca no necesita números.
+  const shareText = (() => {
+    const who = (patientProfile?.nombre_completo || profile?.name || 'nuestro familiar').split(' ')[0]
+    const hora = d => (d instanceof Date ? d : new Date(d)).toLocaleTimeString('es', { hour: 'numeric', minute: '2-digit' })
+    const evts = todaySection?.events ?? []
+    const lines = []
+    for (const e of evts.filter(e => e.type === 'MED_CONFIRMED')) {
+      lines.push(`✅ ${e.medName}${e.timestamp ? ` ${hora(e.timestamp)}` : ''}${e.confirmedBy ? ` (${e.confirmedBy.split(' ')[0]})` : ''}`)
+    }
+    for (const e of evts.filter(e => e.type === 'MED_PENDING')) {
+      lines.push(`⏳ Falta: ${e.medName}${e.medTime ? ` ${e.medTime}` : ''}`)
+    }
+    const daily = buildCareItems(careRows).filter(i => i.category === 'daily')
+    if (daily.length && (careLogRows.length || routineActive)) {
+      const done = daily.filter(i => careLogsToday[i.key]).length
+      lines.push(`📋 Cuidados del día: ${done} de ${daily.length}`)
+    }
+    const body = lines.length ? lines.join('\n') : 'Todavía no se ha marcado nada hoy.'
+    return `Así va ${who} hoy 💙\n${body}\n\nVer todo en FamiliaCerca: https://familiacerca.com/dashboard`
+  })()
+
   // Recent activity feed — cross-day, includes care logs, excludes SOS/pending
   const recentActivityItems = (() => {
     const evts = sections
@@ -3827,6 +3860,7 @@ export default function Dashboard() {
                   summaryText={loading ? null : activitySummaryText}
                   summaryEmpty={!loading && !hasSignal}
                   summaryStale={!loading && activitySummaryStale}
+                  shareText={loading ? null : shareText}
                 />
 
 
