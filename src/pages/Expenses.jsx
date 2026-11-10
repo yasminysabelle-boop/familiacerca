@@ -23,7 +23,7 @@ const CATEGORIES = [
   { id: 'Medicamentos',    emoji: '💊', color: '#0C6C9C' },
   { id: 'Citas médicas',   emoji: '🏥', color: '#2D86A0' },
   { id: 'Transporte',      emoji: '🚗', color: '#0C6C9C' },
-  { id: 'Cuidador',        emoji: '🤝', color: '#7C5CBF' },
+  { id: 'Cuidador',        emoji: '🤝', color: '#0C6C9C' },
   { id: 'Equipos médicos', emoji: '🩺', color: '#C9882A' },
   { id: 'Otros',           emoji: '📋', color: '#5E7480' },
 ]
@@ -391,8 +391,12 @@ export default function Expenses() {
           ) : expenses.length === 0 ? (
             <EmptyState
               icon="💰"
-              title="Sin gastos este mes"
-              description="Registra los gastos médicos y de cuidado del familiar."
+              title="Todavía no hay gastos este mes"
+              description="Anota lo que se gasta en el cuidado y la familia ve el total del mes, sin cuentas en papelitos."
+              example={[
+                { icon: '💊', title: 'Farmacia — $42.50', sub: 'Pagó: Carlos' },
+                { icon: '🚕', title: 'Transporte a la cita — $18', sub: 'Pagó: Ana' },
+              ]}
               actionLabel="+ Registrar gasto"
               onAction={() => openModal()}
             />

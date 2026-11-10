@@ -325,68 +325,70 @@ export default function JoinFamily() {
           justifyContent: 'center', padding: '32px 24px 52px',
           width: '100%', maxWidth: 420,
         }}>
-          {/* Patient avatar */}
-          <PatientAvatar photo={patientPhoto} name={patientName} size={80} />
+          {/* Pantalla del invitado (UX nov 2026): quién te invita, a quién cuidas y qué podrás hacer */}
+          {(() => {
+            const inviter = (invitation.invited_by || '').split(/[ @]/)[0]
+            const inviterName = inviter ? inviter.charAt(0).toUpperCase() + inviter.slice(1) : ''
+            const who = patientName || 'tu familiar'
+            return (
+              <>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {inviterName && (
+                    <span style={{ width: 64, height: 64, borderRadius: '50%', background: '#0C6C9C', color: 'white', fontSize: 26, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '3px solid white', marginRight: -14, zIndex: 1, fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}>
+                      {inviterName.charAt(0)}
+                    </span>
+                  )}
+                  <span style={{ borderRadius: '50%', border: '3px solid white', display: 'inline-flex' }}>
+                    <PatientAvatar photo={patientPhoto} name={patientName} size={80} />
+                  </span>
+                </div>
+                <h1 style={{ margin: '20px 0 8px', fontSize: 26, fontWeight: 800, color: '#14303D', textAlign: 'center', lineHeight: 1.25, letterSpacing: '-0.02em', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}>
+                  {inviterName ? `${inviterName} te invitó a cuidar a ${who}` : `Te invitaron a cuidar a ${who}`}
+                </h1>
+                <RoleBadge role={invitation.role} />
+                <ul style={{ listStyle: 'none', padding: 0, margin: '22px 0 0', width: '100%', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  {[
+                    ['💊', `Ver y marcar las medicinas de ${who}`],
+                    ['📅', 'Saber cuándo son las citas'],
+                    ['💬', 'Hablar con la familia en un solo lugar'],
+                  ].map(([e, t]) => (
+                    <li key={t} style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'white', borderRadius: 14, padding: '12px 14px', fontSize: 16, color: '#30454F' }}>
+                      <span style={{ fontSize: 20 }}>{e}</span>{t}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )
+          })()}
 
-          {/* Caption */}
-          <p style={{
-            marginTop: 20, marginBottom: 6,
-            fontSize: 14, color: '#6F7A72',
-            textAlign: 'center', lineHeight: 1.4,
-          }}>
-            Te invitaron a unirte al cuidado de
-          </p>
-
-          {/* Patient name */}
-          <p style={{
-            margin: '0 0 14px',
-            fontFamily: '"Cormorant Garamond", Georgia, serif',
-            fontSize: 28, fontWeight: 700, color: '#0A4A6B',
-            textAlign: 'center', lineHeight: 1.2,
-          }}>
-            {patientName || 'tu familiar'}
-          </p>
-
-          {/* Role badge */}
-          <RoleBadge role={invitation.role} />
-
-          {/* Invited by */}
-          {invitation.invited_by && (
-            <p style={{ marginTop: 14, fontSize: 13, color: '#6F7A72', textAlign: 'center' }}>
-              Invitado por{' '}
-              <strong style={{ color: '#0A4A6B' }}>{invitation.invited_by}</strong>
-            </p>
-          )}
-
-          {/* Auth buttons */}
-          <div style={{ width: '100%', marginTop: 40, display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {/* Botones: crear cuenta primero (la mayoría de invitados es nueva) */}
+          <div style={{ width: '100%', marginTop: 28, display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <button
+              onClick={() => navigate('/register?redirect=invite')}
+              style={{
+                width: '100%', padding: '16px',
+                background: '#0C6C9C',
+                color: 'white', fontWeight: 700, fontSize: 17,
+                borderRadius: 16, border: 'none', cursor: 'pointer',
+              }}
+            >
+              Unirme gratis
+            </button>
             <button
               onClick={() => navigate('/login?redirect=invite')}
               style={{
                 width: '100%', padding: '15px',
-                background: 'linear-gradient(135deg, #0A5A82, #0A4A6B)',
-                color: 'white', fontWeight: 700, fontSize: 15,
-                borderRadius: 16, border: 'none', cursor: 'pointer',
-                boxShadow: '0 8px 24px rgba(10,90,130,0.28)',
+                background: 'white', color: '#0A4A6B',
+                fontWeight: 700, fontSize: 16,
+                borderRadius: 16, border: '1.5px solid #D8D0C4', cursor: 'pointer',
               }}
             >
               Ya tengo cuenta
             </button>
-            <button
-              onClick={() => navigate('/register?redirect=invite')}
-              style={{
-                width: '100%', padding: '15px',
-                background: 'white', color: '#0A4A6B',
-                fontWeight: 700, fontSize: 15,
-                borderRadius: 16, border: '1.5px solid #D8D0C4', cursor: 'pointer',
-              }}
-            >
-              Crear cuenta nueva
-            </button>
           </div>
 
           <p style={{ marginTop: 20, fontSize: 13, color: '#5E7480', textAlign: 'center', lineHeight: 1.5 }}>
-            Tus datos están cifrados y protegidos.
+            🔒 Lo que compartes aquí es solo para tu familia.
           </p>
         </div>
       </div>

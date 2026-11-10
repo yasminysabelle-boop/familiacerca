@@ -548,8 +548,12 @@ export default function Calendar() {
             ) : (selected ? selectedEvents : events.slice(0, 5)).length === 0 ? (
               <EmptyState
                 icon="📅"
-                title="Sin citas programadas"
-                description="Agrega una cita médica para hacer seguimiento."
+                title="Todavía no hay citas"
+                description="Anota las citas y toda la familia sabrá cuándo son y quién acompaña."
+                example={[
+                  { icon: '🩺', title: 'Cardiólogo — Dr. Rivera', sub: 'Martes 10:30 · Acompaña: Ana' },
+                  { icon: '🧪', title: 'Laboratorio', sub: 'Jueves 7:00 · En ayunas' },
+                ]}
                 actionLabel={isAdmin ? '+ Agregar cita' : undefined}
                 onAction={isAdmin ? () => { setEditEvent(null); resetForm(); setShowForm(true) } : undefined}
               />

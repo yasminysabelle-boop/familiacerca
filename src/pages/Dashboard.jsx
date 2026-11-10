@@ -41,7 +41,7 @@ const MOOD_MAP = {
 }
 
 function getMoodEmoji(val) { return MOOD_MAP[val]?.emoji ?? '🎙️' }
-function getMoodColor(val) { return MOOD_MAP[val]?.color ?? '#7C5CBF' }
+function getMoodColor(val) { return MOOD_MAP[val]?.color ?? '#0C6C9C' }
 
 const MOOD_OPTIONS = [
   { mood: 'good',    emoji: '😊', label: 'Buen día', bg: '#FEF3C7',               border: '#E58B73',                   shadow: '0 3px 0px #E58B73' },
@@ -1440,7 +1440,7 @@ function SosConfirmSheet({ open, onClose, onConfirm, patientProfile, patientName
 
 const RECENT_EVENT_CONFIG = {
   MED_CONFIRMED:     { icon: '💊', color: '#0A4A6B', label: e => `${e.medName ?? 'Medicamento'} dado${e.confirmedBy ? ` por ${e.confirmedBy.split(' ')[0]}` : ''}` },
-  VOICE_MEMORY:      { icon: '🎙️', color: '#7C5CBF', label: e => `Memoria de voz${e.recorderName ? ` de ${e.recorderName.split(' ')[0]}` : ''}` },
+  VOICE_MEMORY:      { icon: '🎙️', color: '#0C6C9C', label: e => `Memoria de voz${e.recorderName ? ` de ${e.recorderName.split(' ')[0]}` : ''}` },
   EXPENSE:           { icon: '💰', color: '#0A5A82', label: e => e.description ?? 'Gasto registrado' },
   SOS_ALERT:         { icon: '🚨', color: '#D63031', label: () => 'Alerta de emergencia' },
   APPOINTMENT:       { icon: '📅', color: '#3B82F6', label: e => e.appointmentTitle ?? 'Cita médica' },

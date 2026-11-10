@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import EmptyState from '../components/EmptyState'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { supabase } from '../lib/supabase'
@@ -227,7 +228,7 @@ export default function Memorias() {
             <div style={{ textAlign: 'center', padding: '24px 0' }}>
               <div style={{
                 width: 32, height: 32, borderRadius: '50%', margin: '0 auto 12px',
-                border: '3px solid #E6E3DB', borderTopColor: '#7C5CBF',
+                border: '3px solid #E6E3DB', borderTopColor: '#0C6C9C',
                 animation: 'spin 0.8s linear infinite',
               }} />
               <p style={{ fontSize: 14, color: '#4E6470' }}>Guardando memoria...</p>
@@ -241,23 +242,20 @@ export default function Memorias() {
           <div style={{ display: 'flex', justifyContent: 'center', padding: 48 }}>
             <div style={{
               width: 28, height: 28, borderRadius: '50%',
-              border: '3px solid #E6E3DB', borderTopColor: '#7C5CBF',
+              border: '3px solid #E6E3DB', borderTopColor: '#0C6C9C',
               animation: 'spin 0.8s linear infinite',
             }} />
           </div>
         ) : recordings.length === 0 ? (
-          <div style={{
-            background: 'white', borderRadius: 20, border: '1px solid #E6E3DB',
-            padding: '48px 24px', textAlign: 'center',
-          }}>
-            <div style={{ fontSize: 44, marginBottom: 12 }}>🎙️</div>
-            <p style={{ fontSize: 14, fontWeight: 600, color: '#14303D', marginBottom: 6 }}>
-              Sin memorias aún
-            </p>
-            <p style={{ fontSize: 14, color: '#5E7480' }}>
-              Graba la primera memoria de cómo estuvo hoy {patientName}.
-            </p>
-          </div>
+          <EmptyState
+            icon="🎙️"
+            title="Todavía no hay memorias"
+            description={`Graba con tu voz cómo estuvo ${patientName || 'tu familiar'} hoy. Queda guardado para toda la familia.`}
+            example={[
+              { icon: '🎙️', title: 'Hoy comió bien y salió al patio', sub: 'Ana · 0:42' },
+              { icon: '🎙️', title: 'Se acordó de la canción de la boda', sub: 'Carlos · 1:15' },
+            ]}
+          />
         ) : (
           grouped.map(({ key, label, items }) => (
             <div key={key} style={{ marginBottom: 8 }}>
@@ -280,7 +278,7 @@ export default function Memorias() {
                       style={{
                         background: 'white', borderRadius: 16,
                         border: '1px solid #E6E3DB',
-                        borderLeft: `4px solid ${moodObj?.color ?? '#7C5CBF'}`,
+                        borderLeft: `4px solid ${moodObj?.color ?? '#0C6C9C'}`,
                         padding: '14px 16px', cursor: 'pointer',
                         boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
                       }}
@@ -338,7 +336,7 @@ export default function Memorias() {
                           onClick={e => e.stopPropagation()}
                         />
                       ) : (
-                        <p style={{ fontSize: 13, color: '#7C5CBF', marginTop: 8, fontWeight: 600 }}>
+                        <p style={{ fontSize: 13, color: '#0C6C9C', marginTop: 8, fontWeight: 600 }}>
                           ▶ Tap para escuchar
                         </p>
                       )}

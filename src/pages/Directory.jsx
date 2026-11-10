@@ -36,7 +36,7 @@ const CONTACT_RELATIONSHIPS = [
 ]
 const INST_TYPE_COLORS = {
   Hospital: '#D63031', Clínica: '#2D86A0', Consultorio: '#0C6C9C',
-  Laboratorio: '#7C5CBF', Farmacia: '#0C6C9C', Otro: '#5E7480',
+  Laboratorio: '#0C6C9C', Farmacia: '#0C6C9C', Otro: '#5E7480',
 }
 
 const F = {
@@ -293,7 +293,7 @@ function ContactCard({ con, onEdit, onToggleEmergency, onDeleteRequest, canDelet
 
 function JoinedMemberCard({ member, inDirectory, onClick }) {
   const roleLabel  = member.role === 'cuidador' ? 'Cuidador' : 'Familiar'
-  const roleColor  = member.role === 'cuidador' ? '#0C6C9C' : '#7C5CBF'
+  const roleColor  = member.role === 'cuidador' ? '#0C6C9C' : '#0C6C9C'
   const roleBg     = member.role === 'cuidador' ? '#E3F1F8' : '#EDE9FE'
   const roleBorder = member.role === 'cuidador' ? '#A6E3EC' : '#C4B5FD'
   return (
