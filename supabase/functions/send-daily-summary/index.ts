@@ -28,7 +28,7 @@ function summaryEmailHtml(
 
   const rows = details.map(d => {
     const icon = d.taken ? '✅' : '⏳'
-    const timeStr = d.time ? ` <span style="color:#9CA3AF;font-size:12px;">· ${d.time}</span>` : ''
+    const timeStr = d.time ? ` <span style="color:#5E7480;font-size:12px;">· ${d.time}</span>` : ''
     return `<tr>
       <td style="padding:10px 0;border-bottom:1px solid #F3EEE8;font-size:14px;color:${d.taken ? '#6B7280' : '#1A1A1A'};${d.taken ? 'text-decoration:line-through;' : ''}">
         ${icon} ${d.name}${timeStr}
@@ -53,7 +53,7 @@ function summaryEmailHtml(
       <table style="width:100%;border-collapse:collapse;">
         ${rows}
       </table>
-    </div>` : '<p style="color:#9CA3AF;text-align:center;font-size:14px;">No hay medicamentos configurados.</p>'}
+    </div>` : '<p style="color:#5E7480;text-align:center;font-size:14px;">No hay medicamentos configurados.</p>'}
     <div style="margin-top:20px;text-align:center;">
       <a href="https://familiacerca.com/medications" style="display:inline-block;padding:12px 28px;background:#E9826E;color:white;font-weight:700;font-size:15px;border-radius:10px;text-decoration:none;">
         Ver detalles en la app
@@ -61,7 +61,7 @@ function summaryEmailHtml(
     </div>
   </div>
   <div style="padding:16px 24px;border-top:1px solid #F3EEE8;text-align:center;">
-    <p style="font-size:11px;color:#9CA3AF;margin:0;">FamiliaCerca · Cuidado familiar con amor</p>
+    <p style="font-size:13px;color:#5E7480;margin:0;">FamiliaCerca · Cuidado familiar con amor</p>
   </div>
 </div>
 </body></html>`

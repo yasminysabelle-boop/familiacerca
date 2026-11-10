@@ -33,7 +33,7 @@ function shell(title: string, inner: string, ctaLabel: string, ctaUrl: string): 
     </p>
   </div>
   <div style="padding:16px 24px;border-top:1px solid #F3EEE8;text-align:center;">
-    <p style="margin:0;font-size:12px;color:#9CA3AF;">FamiliaCerca · hola@familiacerca.com</p>
+    <p style="margin:0;font-size:12px;color:#5E7480;">FamiliaCerca · hola@familiacerca.com</p>
   </div>
 </div>
 </body></html>`

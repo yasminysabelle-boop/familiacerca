@@ -12,34 +12,39 @@ const corsHeaders = {
 }
 
 function sosEmailHtml(name: string, address: string | null, lat: number | null, lng: number | null): string {
+  // Correo de emergencia con la marca (nov 2026): rojo solo para la alerta,
+  // pasos claros de qué hacer y botones grandes.
   const mapsUrl = lat && lng ? `https://www.google.com/maps?q=${lat},${lng}` : null
   const locationBlock = address
-    ? `<p style="margin:0 0 8px;font-size:14px;color:#374151;">📍 ${address}</p>`
+    ? `<p style="margin:0 0 4px;font-size:13px;font-weight:700;color:#4E6470;text-transform:uppercase;letter-spacing:.06em;">Dónde</p><p style="margin:0 0 16px;font-size:16px;color:#14303D;">📍 ${address}</p>`
     : mapsUrl
-    ? `<p style="margin:0 0 8px;font-size:14px;color:#374151;">📍 Coordenadas: ${lat?.toFixed(5)}, ${lng?.toFixed(5)}</p>`
+    ? `<p style="margin:0 0 4px;font-size:13px;font-weight:700;color:#4E6470;text-transform:uppercase;letter-spacing:.06em;">Dónde</p><p style="margin:0 0 16px;font-size:16px;color:#14303D;">📍 ${lat?.toFixed(5)}, ${lng?.toFixed(5)}</p>`
     : ''
   const mapsButton = mapsUrl
-    ? `<a href="${mapsUrl}" style="display:inline-block;margin-top:16px;padding:12px 24px;background:#C4623A;color:white;font-weight:700;font-size:14px;border-radius:10px;text-decoration:none;">Ver ubicación en mapa</a>`
+    ? `<a href="${mapsUrl}" style="display:block;margin-top:10px;padding:14px 20px;background:#ffffff;color:#B42318;border:2px solid #B42318;font-weight:700;font-size:16px;border-radius:12px;text-decoration:none;text-align:center;">Ver dónde está en el mapa</a>`
     : ''
 
-  return `<!DOCTYPE html><html><head><meta charset="utf-8"></head>
-<body style="margin:0;padding:20px;background:#F9F5F1;font-family:Arial,sans-serif;">
-<div style="max-width:480px;margin:0 auto;background:white;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
-  <div style="background:#D63031;padding:28px 24px;text-align:center;">
-    <p style="margin:0;font-size:36px;">🚨</p>
-    <h1 style="color:white;font-family:Georgia,serif;margin:8px 0 0;font-size:22px;">EMERGENCIA</h1>
-    <p style="color:rgba(255,255,255,0.85);margin:6px 0 0;font-size:15px;">${name} necesita ayuda ahora mismo</p>
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:20px;background:#F7F6F2;font-family:'Plus Jakarta Sans',Arial,sans-serif;">
+<div style="max-width:480px;margin:0 auto;background:#ffffff;border-radius:18px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+  <div style="background:#B42318;padding:26px 24px;text-align:center;">
+    <img src="https://familiacerca.com/logo.png" width="48" height="48" alt="FamiliaCerca" style="display:block;margin:0 auto 12px;width:48px;height:48px;background:#ffffff;border-radius:50%;padding:7px;">
+    <p style="margin:0;color:#ffffff;font-size:14px;font-weight:700;letter-spacing:.12em;">🚨 EMERGENCIA</p>
+    <h1 style="color:#ffffff;margin:8px 0 0;font-size:24px;line-height:1.25;">${name} necesita ayuda ahora</h1>
   </div>
-  <div style="padding:28px 24px;">
-    <p style="margin:0 0 16px;font-size:15px;color:#1A1A1A;font-weight:600;">Se ha activado una alerta de emergencia.</p>
+  <div style="padding:24px;">
     ${locationBlock}
+    <p style="margin:0 0 8px;font-size:13px;font-weight:700;color:#4E6470;text-transform:uppercase;letter-spacing:.06em;">Qué hacer ahora</p>
+    <ol style="margin:0 0 18px;padding-left:20px;font-size:16px;line-height:1.6;color:#14303D;">
+      <li>Llama a ${name} o a quien esté con su familiar.</li>
+      <li>Si es grave, llama al <strong>911</strong> o al número de emergencias de tu país.</li>
+      <li>Avisa en la app que vas en camino, para que la familia se organice.</li>
+    </ol>
+    <a href="https://familiacerca.com/dashboard" style="display:block;padding:15px 20px;background:#0C6C9C;color:#ffffff;font-weight:700;font-size:16px;border-radius:12px;text-decoration:none;text-align:center;">Abrir FamiliaCerca</a>
     ${mapsButton}
-    <div style="margin-top:24px;padding:14px;background:#FFF0F0;border-radius:10px;border:1px solid #FFBABA;">
-      <p style="margin:0;font-size:13px;color:#D63031;font-weight:600;">Abre la app para más detalles y para marcar la emergencia como resuelta.</p>
-    </div>
   </div>
-  <div style="padding:16px 24px;border-top:1px solid #F3EEE8;text-align:center;">
-    <p style="font-size:11px;color:#9CA3AF;margin:0;">FamiliaCerca · Cuidado familiar con amor</p>
+  <div style="padding:16px 24px;border-top:1px solid #E6E3DB;text-align:center;">
+    <p style="font-size:13px;color:#5E7480;margin:0;">FamiliaCerca · Cuidado familiar con amor</p>
   </div>
 </div>
 </body></html>`

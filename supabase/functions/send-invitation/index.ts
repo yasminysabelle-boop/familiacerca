@@ -41,13 +41,13 @@ function invitationEmailHtml(
         Aceptar invitación
       </a>
     </div>
-    <p style="margin:20px 0 0;font-size:12px;color:#9CA3AF;text-align:center;line-height:1.6;">
+    <p style="margin:20px 0 0;font-size:12px;color:#5E7480;text-align:center;line-height:1.6;">
       Si no esperabas esta invitación, puedes ignorar este correo.<br>
       El enlace expirará en 7 días.
     </p>
   </div>
   <div style="padding:16px 24px;border-top:1px solid #E6E3DB;text-align:center;">
-    <p style="font-size:11px;color:#9CA3AF;margin:0;">FamiliaCerca · Cuidado familiar con amor</p>
+    <p style="font-size:13px;color:#5E7480;margin:0;">FamiliaCerca · Cuidado familiar con amor</p>
   </div>
 </div>
 </body></html>`
