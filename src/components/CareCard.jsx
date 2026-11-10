@@ -76,6 +76,7 @@ export default function CareCard({
 
   return (
     <div
+      data-tour="card"
       onClick={onClick}
       style={{
         position: 'relative',

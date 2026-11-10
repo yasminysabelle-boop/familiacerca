@@ -9,6 +9,7 @@ import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
 import CareCard from '../components/CareCard'
 import HowIsTodaySheet from '../components/HowIsTodaySheet'
+import FirstTour from '../components/FirstTour'
 import { SkeletonDashSummary, SkeletonCard } from '../components/SkeletonLoader'
 import SuccessAnimation, { useSuccessAnimation } from '../components/SuccessAnimation'
 import { usePullToRefresh } from '../hooks/usePullToRefresh.jsx'
@@ -4176,6 +4177,7 @@ export default function Dashboard() {
         document.body
       )}
 
+      {!loading && <FirstTour />}
       <HowIsTodaySheet open={showHowIsToday} onClose={() => setShowHowIsToday(false)} patientName={(patientProfile?.nombre_completo || profile?.name || '').split(' ')[0] || undefined} />
     </Layout>
   )

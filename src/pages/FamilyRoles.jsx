@@ -209,7 +209,7 @@ export default function FamilyRoles() {
         </button>
 
         <h1 style={{ margin: '0 0 4px', fontSize: 20, fontWeight: 700, color: '#0A4A6B', fontFamily: 'Georgia, serif' }}>
-          Permisos de acceso
+          Quién ve qué
         </h1>
         <p style={{ margin: '0 0 20px', fontSize: 13, color: '#5E7480', lineHeight: 1.5 }}>
           {isAdmin

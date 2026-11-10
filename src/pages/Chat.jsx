@@ -79,8 +79,8 @@ function Avatar({ name, photoUrl, size = 32 }) {
 // sólido / profundo suave), nunca los colores reservados de emergencia o IA.
 const CATEGORY_META = {
   aviso:        { label: 'Aviso',        icon: Bell,          bg: 'rgba(217,154,24,0.15)',  ink: '#7A5510', border: 'rgba(217,154,24,0.35)',  solid: '#D99A18' },
-  incidente:    { label: 'Incidente',    icon: AlertTriangle, bg: 'rgba(233,130,110,0.17)', ink: '#8C3A2A', border: 'rgba(233,130,110,0.36)', solid: '#E9826E' },
-  evidencia:    { label: 'Evidencia',    icon: Camera,        bg: 'rgba(166,227,236,0.45)', ink: '#0A4A6B', border: 'rgba(5,70,61,0.25)',     solid: '#0A4A6B' },
+  incidente:    { label: 'Algo pasó',    icon: AlertTriangle, bg: 'rgba(233,130,110,0.17)', ink: '#8C3A2A', border: 'rgba(233,130,110,0.36)', solid: '#E9826E' },
+  evidencia:    { label: 'Foto',    icon: Camera,        bg: 'rgba(166,227,236,0.45)', ink: '#0A4A6B', border: 'rgba(5,70,61,0.25)',     solid: '#0A4A6B' },
   medicamentos: { label: 'Medicamentos', icon: Pill,          bg: '#0C6C9C',                ink: '#FFFFFF', border: '#0C6C9C',                solid: '#0C6C9C' },
   cuidados:     { label: 'Cuidados',     icon: ClipboardList, bg: '#FBEAE4',                ink: '#8A5A44', border: 'rgba(138,90,68,0.25)',   solid: '#8A5A44' },
   citas:        { label: 'Citas',        icon: Calendar,      bg: 'rgba(5,92,81,0.14)',      ink: '#0A5A82', border: 'rgba(5,92,81,0.32)',     solid: '#0A5A82' },
@@ -105,6 +105,7 @@ export default function Chat() {
   const [pinError, setPinError] = useState('')
   const [activeCategory, setActiveCategory] = useState('all')
   const [msgCategory, setMsgCategory] = useState('general')
+  const [showTags, setShowTags] = useState(false)
 
   // Asistente ✨ — sheet de Milo y Luna + panel de seguimiento (ask/catchup)
   const [sheetOpen, setSheetOpen] = useState(false)
@@ -791,7 +792,14 @@ ${lines}`
             boxShadow: '0 6px 14px -8px rgba(51,65,85,0.35)',
             padding: '10px 12px 10px',
           }}>
-            {/* Compact category picker */}
+            {/* Etiquetas plegadas: para escribir solo hace falta la caja (UX nov 2026) */}
+            {!showTags && (
+              <button type="button" onClick={() => setShowTags(true)}
+                style={{ background: 'none', border: 'none', padding: '0 4px 8px', cursor: 'pointer', fontSize: 13, fontWeight: 600, color: msgCategory !== 'general' ? '#0A4A6B' : '#5E7480' }}>
+                {msgCategory !== 'general' ? `🏷️ Marcado como: ${metaFor(msgCategory).label} · cambiar` : '🏷️ Marcar como aviso, algo pasó o foto'}
+              </button>
+            )}
+            {showTags && (
             <div style={{ display: 'flex', gap: 6, marginBottom: 8, overflowX: 'auto', scrollbarWidth: 'none' }}>
               {COMPOSE_IDS.map(id => {
                 const m = metaFor(id)
@@ -801,7 +809,7 @@ ${lines}`
                   <button
                     key={id}
                     type="button"
-                    onClick={() => setMsgCategory(selected ? 'general' : id)}
+                    onClick={() => { setMsgCategory(selected ? 'general' : id); setShowTags(false) }}
                     style={{
                       display: 'inline-flex', alignItems: 'center', gap: 5,
                       padding: '5px 11px', borderRadius: 999,
@@ -819,6 +827,7 @@ ${lines}`
                 )
               })}
             </div>
+            )}
 
             <form onSubmit={handleSend} style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
               <textarea

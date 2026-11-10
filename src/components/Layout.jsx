@@ -36,7 +36,7 @@ const PAGE_TITLES = {
   '/directorio':     'Directorio',
   '/permisos':       'Permisos',
   '/cuidado':        'Rutina diaria',
-  '/roles':          'Permisos de acceso',
+  '/roles':          'Quién ve qué',
   '/ajustes':        'Mi Cuenta',
   '/upgrade':        'Planes',
   '/paciente/perfil': 'Perfil del familiar',
@@ -276,7 +276,7 @@ export default function Layout({ children }) {
           </Link>
 
           {/* Medicamentos */}
-          <button onClick={() => navigate('/medications', { replace: location.pathname !== '/dashboard' })} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, background: 'none', border: 'none', cursor: 'pointer', padding: 0, WebkitTapHighlightColor: 'transparent' }}>
+          <button data-tour="nav-meds" onClick={() => navigate('/medications', { replace: location.pathname !== '/dashboard' })} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, background: 'none', border: 'none', cursor: 'pointer', padding: 0, WebkitTapHighlightColor: 'transparent' }}>
             <span style={{ width: location.pathname === '/medications' ? 52 : 36, height: 32, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: location.pathname === '/medications' ? '#0C6C9C' : 'transparent', transition: 'width 0.15s ease' }}>
               <Pill size={18} color={location.pathname === '/medications' ? 'white' : '#7C8698'} strokeWidth={2} />
             </span>
@@ -292,7 +292,7 @@ export default function Layout({ children }) {
           </Link>
 
           {/* Chat */}
-          <Link to="/chat" replace={location.pathname !== '/dashboard'} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, textDecoration: 'none' }}>
+          <Link data-tour="nav-chat" to="/chat" replace={location.pathname !== '/dashboard'} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, textDecoration: 'none' }}>
             <span style={{ position: 'relative', width: location.pathname === '/chat' ? 52 : 36, height: 32, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: location.pathname === '/chat' ? '#0C6C9C' : 'transparent', transition: 'width 0.15s ease' }}>
               <Chat size={18} color={location.pathname === '/chat' ? 'white' : '#7C8698'} strokeWidth={2} />
               {familyBadge > 0 && (
