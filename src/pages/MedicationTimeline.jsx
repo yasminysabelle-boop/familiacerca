@@ -93,7 +93,7 @@ const EVENT_ROUTES = Object.fromEntries(
 )
 
 function careItemLabel(key) {
-  return CARE_ITEMS.find(i => i.key === key)?.label ?? key
+  return CARE_ITEMS.find(i => i.key === key)?.label ?? (key?.startsWith('custom_') ? 'Rutina' : key)
 }
 
 function fmtTime(isoStr) {

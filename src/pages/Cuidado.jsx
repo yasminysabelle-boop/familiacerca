@@ -9,7 +9,7 @@ import {
   ChevronLeft, CheckIcon, Clock, Lock, Heart,
   Bath, Tooth, Shirt, Utensils, Bed, Sparkle, Footsteps, Scissors, Lotus,
 } from '../components/Icons'
-import { CARE_ITEMS } from '../lib/careItems'
+import { CARE_ITEMS, CUSTOM_ICONS, buildCareItems } from '../lib/careItems'
 import { scheduledBeforeStart } from '../lib/medTiming'
 import EvidencePhoto from '../components/EvidencePhoto'
 import EmptyState from '../components/EmptyState'
@@ -31,6 +31,10 @@ const ICON_BY_KEY = {
   home_therapy: Lotus,
 }
 function iconFor(key) { return ICON_BY_KEY[key] ?? Sparkle }
+function renderIcon(item, props) {
+  if (item.custom) return <span style={{ fontSize: props.size + 2, lineHeight: 1 }}>{item.icon}</span>
+  return iconFor(item.key)(props)
+}
 
 const fieldStyle = {
   padding: '10px 14px', borderRadius: 12,
@@ -89,6 +93,10 @@ export default function Cuidado() {
 
   const [careLogs, setCareLogs] = useState({})
   const [careSchedules, setCareSchedules] = useState({})
+  // Rutinas de esta familia: sugeridas que se usan + rutinas propias (nov 2026)
+  const [scheduleRows, setScheduleRows] = useState([])
+  const [hasCustomCols, setHasCustomCols] = useState(true)
+  const [newRoutine, setNewRoutine] = useState(null) // { label, icon, time } cuando se está agregando
   // La rutina viene con cuidados sugeridos. Mientras la familia no la haya
   // usado (ningún cuidado marcado nunca y ningún horario propio), no se marca
   // nada como "Atrasada": el primer día no debe regañar (UX nov 2026).
@@ -129,10 +137,18 @@ export default function Cuidado() {
     setLoading(true)
     const fetchDate = toLocalDate()
     try {
-      const [{ data: careRows }, { data: scheduleRows }] = await Promise.all([
+      const [{ data: careRows }, scheduleRes] = await Promise.all([
         supabase.from('daily_care_logs').select('*').eq('user_id', ownerId).eq('log_date', fetchDate),
-        supabase.from('care_item_schedules').select('item_key,scheduled_time').eq('user_id', ownerId),
+        supabase.from('care_item_schedules').select('item_key,scheduled_time,label,icon,active').eq('user_id', ownerId),
       ])
+      if (scheduleRes.error) {
+        // La base todavía no tiene las columnas de rutinas propias: seguir como antes
+        setHasCustomCols(false)
+        const old = await supabase.from('care_item_schedules').select('item_key,scheduled_time').eq('user_id', ownerId)
+        scheduleRes.data = old.data
+      }
+      const scheduleRows = scheduleRes.data
+      setScheduleRows(scheduleRows ?? [])
       const cmap = {}
       for (const row of (careRows ?? [])) {
         if (row.status === 'no_completado') continue
@@ -227,11 +243,12 @@ export default function Cuidado() {
     setSaving(true)
     setSaveError('')
     try {
-      const rows = DAILY_ITEMS.map(i => ({
+      const rows = scheduleItems.map(i => ({
         user_id:        ownerId,
         item_key:       i.key,
         scheduled_time: times[i.key] || i.scheduledTime,
         updated_at:     new Date().toISOString(),
+        ...(hasCustomCols ? { active: i.active, label: i.custom ? i.label : null, icon: i.custom ? i.icon : null } : {}),
       }))
       const { error: err } = await supabase
         .from('care_item_schedules')
@@ -239,6 +256,7 @@ export default function Cuidado() {
       if (err) throw err
       setSaved(true)
       setTimeout(() => setSaved(false), 2500)
+      fetchData()
     } catch {
       setSaveError('No se pudo guardar. Verifica tu conexión.')
     } finally {
@@ -246,27 +264,51 @@ export default function Cuidado() {
     }
   }
 
+  // Encender/apagar una rutina sugerida, o quitar una propia (se guarda con "Guardar")
+  function setActive(item, active) {
+    setScheduleRows(prev => {
+      const others = prev.filter(r => r.item_key !== item.key)
+      const cur = prev.find(r => r.item_key === item.key) ?? { item_key: item.key, scheduled_time: times[item.key] ?? item.scheduledTime, label: item.custom ? item.label : null, icon: item.custom ? item.icon : null }
+      return [...others, { ...cur, active }]
+    })
+  }
+  function addRoutine() {
+    const label = newRoutine?.label?.trim()
+    if (!label) return
+    const key = 'custom_' + Date.now().toString(36)
+    setScheduleRows(prev => [...prev, { item_key: key, scheduled_time: newRoutine.time || '10:00', label, icon: newRoutine.icon || '✨', active: true }])
+    setTimes(prev => ({ ...prev, [key]: newRoutine.time || '10:00' }))
+    setNewRoutine(null)
+  }
+
   function switchTab(tab) {
     setActiveTab(tab)
     setSearchParams(tab === 'horarios' ? { tab: 'horarios' } : {}, { replace: true })
   }
 
+  const ITEMS = buildCareItems(scheduleRows)
+  const rowFor = k => scheduleRows.find(r => r.item_key === k)
+  // En Horarios se ven todas las sugeridas (también las apagadas) y las propias
+  const scheduleItems = [
+    ...DAILY_ITEMS.map(i => ({ ...i, active: rowFor(i.key)?.active !== false })),
+    ...ITEMS.filter(i => i.custom).map(i => ({ ...i, active: true })),
+  ]
   const isFromTomorrow = i => scheduledBeforeStart(careSchedules[i.key] ?? i.scheduledTime, familyStart)
-  const requiredItems = CARE_ITEMS.filter(i => i.category === 'daily' && !isFromTomorrow(i))
+  const requiredItems = ITEMS.filter(i => i.category === 'daily' && !isFromTomorrow(i))
   const completedRequired = requiredItems.filter(i => !!careLogs[i.key]).length
   const allDone = requiredItems.length > 0 && completedRequired === requiredItems.length
 
   const timeOf = i => careSchedules[i.key] ?? i.scheduledTime ?? '99:99'
   const byTime = (a, b) => timeOf(a).localeCompare(timeOf(b))
   const routineActive = routineStarted || Object.keys(careLogs).length > 0 || Object.keys(careSchedules).length > 0
-  const retrasadas  = !routineActive ? [] : CARE_ITEMS.filter(i => !careLogs[i.key] && !isFromTomorrow(i) && calcularEstadoCuidado(i, false, careSchedules[i.key]) === 'tarde').sort(byTime)
-  const desdeManana = CARE_ITEMS.filter(i => !careLogs[i.key] && isFromTomorrow(i))
+  const retrasadas  = !routineActive ? [] : ITEMS.filter(i => !careLogs[i.key] && !isFromTomorrow(i) && calcularEstadoCuidado(i, false, careSchedules[i.key]) === 'tarde').sort(byTime)
+  const desdeManana = ITEMS.filter(i => !careLogs[i.key] && isFromTomorrow(i))
   const proximas    = (!routineActive
-    ? CARE_ITEMS.filter(i => !careLogs[i.key] && !!(careSchedules[i.key] ?? i.scheduledTime))
-    : CARE_ITEMS.filter(i => !careLogs[i.key] && ['programado', 'pendiente'].includes(calcularEstadoCuidado(i, false, careSchedules[i.key])) && !!(careSchedules[i.key] ?? i.scheduledTime))
+    ? ITEMS.filter(i => !careLogs[i.key] && !!(careSchedules[i.key] ?? i.scheduledTime))
+    : ITEMS.filter(i => !careLogs[i.key] && ['programado', 'pendiente'].includes(calcularEstadoCuidado(i, false, careSchedules[i.key])) && !!(careSchedules[i.key] ?? i.scheduledTime))
   ).sort(byTime)
-  const sinHorario  = CARE_ITEMS.filter(i => !careLogs[i.key] && !(careSchedules[i.key] ?? i.scheduledTime))
-  const completadas = CARE_ITEMS.filter(i => !!careLogs[i.key])
+  const sinHorario  = ITEMS.filter(i => !careLogs[i.key] && !(careSchedules[i.key] ?? i.scheduledTime))
+  const completadas = ITEMS.filter(i => !!careLogs[i.key])
 
   const bannerTitle = allDone
     ? `¡La rutina de ${patientFirstName} está completa!`
@@ -536,7 +578,7 @@ export default function Cuidado() {
                 </div>
               ) : (
                 <>
-                  {DAILY_ITEMS.map(item => {
+                  {scheduleItems.map(item => {
                     const isOpen = openSchedKey === item.key
                     return (
                       <div key={item.key} style={{ background: 'white', borderRadius: 18, marginBottom: 8, boxShadow: '0 6px 14px -8px #087F7022', overflow: 'hidden' }}>
@@ -545,16 +587,20 @@ export default function Cuidado() {
                           style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', cursor: isAdmin ? 'pointer' : 'default' }}
                         >
                           <span style={{ width: 34, height: 34, borderRadius: 11, background: '#E3F1F8', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                            {iconFor(item.key)({ size: 16, color: '#0C6C9C', strokeWidth: 1.8 })}
+                            {renderIcon(item, { size: 16, color: '#0C6C9C', strokeWidth: 1.8 })}
                           </span>
                           <p style={{ flex: 1, fontSize: 14.5, fontWeight: 700, color: '#14303D', margin: 0 }}>
                             {item.label}
                           </p>
-                          <span style={{ fontSize: 13.5, fontWeight: 700, color: '#0A5A82', background: '#E3F1F8', padding: '5px 11px', borderRadius: 999, flexShrink: 0 }}>
-                            {fmtTime(times[item.key] ?? item.scheduledTime)}
-                          </span>
+                          {item.active ? (
+                            <span style={{ fontSize: 13.5, fontWeight: 700, color: '#0A5A82', background: '#E3F1F8', padding: '5px 11px', borderRadius: 999, flexShrink: 0 }}>
+                              {fmtTime(times[item.key] ?? item.scheduledTime)}
+                            </span>
+                          ) : (
+                            <span style={{ fontSize: 13, fontWeight: 600, color: '#5E7480', flexShrink: 0 }}>No se usa</span>
+                          )}
                         </div>
-                        <div style={{ maxHeight: isOpen ? 90 : 0, overflow: 'hidden', transition: 'max-height 0.25s ease' }}>
+                        <div style={{ maxHeight: isOpen ? 160 : 0, overflow: 'hidden', transition: 'max-height 0.25s ease' }}>
                           <div style={{ padding: '0 14px 14px' }}>
                             <input
                               type="time"
@@ -565,11 +611,51 @@ export default function Cuidado() {
                               onFocus={!isAdmin ? undefined : onFocusStyle}
                               onBlur={!isAdmin ? undefined : onBlurStyle}
                             />
+                            {isAdmin && hasCustomCols && (
+                              <button
+                                onClick={() => { setActive(item, !item.active); setOpenSchedKey(null) }}
+                                style={{ marginTop: 10, width: '100%', padding: '11px', borderRadius: 12, border: '1.5px solid #E6E3DB', background: 'white', color: item.active ? '#A3452F' : '#0C6C9C', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}
+                              >
+                                {item.custom ? 'Quitar esta rutina' : item.active ? 'No usamos esta rutina' : 'Sí la usamos'}
+                              </button>
+                            )}
                           </div>
                         </div>
                       </div>
                     )
                   })}
+
+                  {/* Rutina propia */}
+                  {isAdmin && hasCustomCols && (newRoutine ? (
+                    <div style={{ background: 'white', borderRadius: 18, padding: 14, marginTop: 4, boxShadow: '0 6px 14px -8px #087F7022' }}>
+                      <p style={{ margin: '0 0 10px', fontSize: 16, fontWeight: 800, color: '#14303D' }}>Nueva rutina</p>
+                      <input
+                        autoFocus
+                        placeholder="Ej.: Tomar la presión"
+                        value={newRoutine.label}
+                        onChange={e => setNewRoutine(r => ({ ...r, label: e.target.value }))}
+                        style={{ ...fieldStyle, width: '100%', marginBottom: 10 }}
+                      />
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 10 }}>
+                        {CUSTOM_ICONS.map(ic => (
+                          <button key={ic} aria-label={`Ícono ${ic}`} onClick={() => setNewRoutine(r => ({ ...r, icon: ic }))}
+                            style={{ width: 44, height: 44, borderRadius: 12, fontSize: 22, cursor: 'pointer', background: newRoutine.icon === ic ? '#E3F1F8' : 'white', border: newRoutine.icon === ic ? '2px solid #0C6C9C' : '1.5px solid #E6E3DB' }}>
+                            {ic}
+                          </button>
+                        ))}
+                      </div>
+                      <input type="time" value={newRoutine.time} onChange={e => setNewRoutine(r => ({ ...r, time: e.target.value }))} style={{ ...fieldStyle, width: '100%', marginBottom: 12 }} />
+                      <div style={{ display: 'flex', gap: 10 }}>
+                        <button onClick={() => setNewRoutine(null)} style={{ flex: 1, padding: 12, borderRadius: 12, border: '1.5px solid #E6E3DB', background: 'white', color: '#4E6470', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}>Cancelar</button>
+                        <button onClick={addRoutine} disabled={!newRoutine.label.trim()} style={{ flex: 1, padding: 12, borderRadius: 12, border: 'none', background: newRoutine.label.trim() ? '#0C6C9C' : '#C9D6DB', color: 'white', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}>Agregar</button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button onClick={() => setNewRoutine({ label: '', icon: '🚶', time: '10:00' })}
+                      style={{ width: '100%', padding: 14, borderRadius: 16, border: '2px dashed #0C6C9C', background: 'transparent', color: '#0C6C9C', fontWeight: 700, fontSize: 16, cursor: 'pointer', marginTop: 4 }}>
+                      ＋ Agregar una rutina propia
+                    </button>
+                  ))}
 
                   <div style={{
                     display: 'flex', alignItems: 'flex-start', gap: 8,
@@ -610,9 +696,9 @@ export default function Cuidado() {
                       ) : saved ? (
                         <>
                           <CheckIcon size={16} color="white" strokeWidth={2.6} />
-                          Horarios guardados
+                          Cambios guardados
                         </>
-                      ) : 'Guardar horarios'}
+                      ) : 'Guardar cambios'}
                     </button>
                   )}
                 </>
@@ -683,7 +769,7 @@ function RoutineCard({ item, state, isToggling, isFamiliar, scheduledTime, log, 
         background: isRetrasada ? '#FBEAE4' : isCompletada ? 'rgba(12,108,156,0.14)' : '#E3F1F8',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}>
-        {iconFor(item.key)({ size: 19, color: isRetrasada ? '#C4664F' : '#0C6C9C', strokeWidth: 1.8 })}
+        {renderIcon(item, { size: 19, color: isRetrasada ? '#C4664F' : '#0C6C9C', strokeWidth: 1.8 })}
       </span>
 
       <div style={{ flex: 1, minWidth: 0 }}>

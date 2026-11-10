@@ -18,3 +18,18 @@ export const CARE_ITEMS = [
   { key: 'haircut',          label: 'Corte de cabello',         icon: '✂️', category: 'optional' },
   { key: 'home_therapy',     label: 'Terapia en casa',          icon: '🧘', category: 'optional' },
 ]
+
+// Rutinas propias (nov 2026): combina las rutinas sugeridas con lo que la familia
+// guardó en care_item_schedules (hora, si se usa o no, y rutinas propias "custom_*").
+export const CUSTOM_ICONS = ['🚶', '💧', '🩺', '🧘', '📖', '🌞', '🛌', '❤️']
+
+export function buildCareItems(rows = []) {
+  const byKey = Object.fromEntries((rows ?? []).map(r => [r.item_key, r]))
+  const base = CARE_ITEMS
+    .filter(i => byKey[i.key]?.active !== false)
+    .map(i => ({ ...i, scheduledTime: byKey[i.key]?.scheduled_time ?? i.scheduledTime }))
+  const custom = (rows ?? [])
+    .filter(r => r.item_key?.startsWith('custom_') && r.active !== false && r.label)
+    .map(r => ({ key: r.item_key, label: r.label, icon: r.icon || '✨', category: 'daily', scheduledTime: r.scheduled_time, custom: true }))
+  return [...base, ...custom]
+}

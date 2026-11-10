@@ -16,7 +16,7 @@ import { usePullToRefresh } from '../hooks/usePullToRefresh.jsx'
 import { AlertTriangle, CheckIcon, User, XIcon, Pill, ClipboardCheck, Chat, Calendar, Receipt, Users, Camera, Clock, MessageCircle, Video, Hospital, Building2, Heart, Bell, ChevronRight, Siren, Zap, Phone, Stethoscope } from '../components/Icons'
 import { geminiGenerate } from '../lib/gemini'
 import { getActivitySummary } from '../lib/activitySummary'
-import { CARE_ITEMS } from '../lib/careItems'
+import { buildCareItems } from '../lib/careItems'
 import { incidentPhrase, incidentTypeInfo } from '../lib/incidentTypes'
 import { submitAppointmentProof as saveAppointmentProof } from '../lib/appointmentProof'
 import CameraCapture from '../components/CameraCapture'
@@ -1933,7 +1933,7 @@ const ACTIVITY_ACTIONS = {
   EXPENSE:           () => 'registró un gasto',
   APPOINTMENT:       evt => `agregó una cita${evt.appointmentTitle ? `: ${evt.appointmentTitle}` : ''}`,
   APPOINTMENT_PROOF: () => 'confirmó una cita',
-  CARE_LOG:          () => 'completó una rutina',
+  CARE_LOG:          evt => evt.careLabel ? `marcó ${evt.careLabel.toLowerCase()}` : 'completó una rutina',
   INCIDENT:          evt => `registró ${incidentPhrase(evt.incidentType)}`,
 }
 function activityActor(evt, firstName) {
@@ -1947,8 +1947,8 @@ function RecentActivity({ items, onViewAll, onSelect, firstName, summaryText, su
   return (
     <section aria-label="Actividad reciente" style={{ borderRadius: 26, background: 'white', padding: 20, boxShadow: '0 6px 24px -12px rgba(51,65,85,0.18)' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-        <h2 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 9, fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 18, fontWeight: 600, color: '#2A4350' }}>
-          <Heart size={19} color="#0C6C9C" strokeWidth={2} /> Actividad reciente
+        <h2 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 9, fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 18, fontWeight: 800, color: '#14303D' }}>
+          <Heart size={19} color="#0C6C9C" strokeWidth={2} /> Hoy en casa
         </h2>
         <button onClick={onViewAll} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, color: '#0C6C9C', fontWeight: 700, padding: 0, WebkitTapHighlightColor: 'transparent' }}>Ver todo</button>
       </div>
@@ -1967,8 +1967,8 @@ function RecentActivity({ items, onViewAll, onSelect, firstName, summaryText, su
       )}
       {items.length === 0 ? (
         <div style={{ padding: '6px 0 2px' }}>
-          <p style={{ color: '#7C8698', fontSize: 13, margin: '0 0 4px', fontWeight: 500 }}>Aún no hay actividad reciente</p>
-          <p style={{ color: '#B0A898', fontSize: 14, margin: 0, lineHeight: 1.6 }}>
+          <p style={{ color: '#7C8698', fontSize: 13, margin: '0 0 4px', fontWeight: 500 }}>Todavía no hay nada marcado hoy</p>
+          <p style={{ color: '#5E7480', fontSize: 14, margin: 0, lineHeight: 1.6 }}>
             Cuando alguien confirme un medicamento,<br />suba una foto o escriba una nota,<br />aparecerá aquí.
           </p>
         </div>
@@ -1983,7 +1983,11 @@ function RecentActivity({ items, onViewAll, onSelect, firstName, summaryText, su
             }
             const meta = { text: activityAction(evt), sub: ACTIVITY_SUB[evt.type] ?? '' }
             const isNote = evt.type === 'NOTE'
-            const time = evt.timestamp ? timeAgo(evt.timestamp instanceof Date ? evt.timestamp : new Date(evt.timestamp)) : ''
+            const ts = evt.timestamp ? (evt.timestamp instanceof Date ? evt.timestamp : new Date(evt.timestamp)) : null
+            // Hoy: la hora exacta ("8:05 a. m."), que responde "¿ya le dieron?". Otros días: hace cuánto.
+            const time = !ts ? '' : ts.toDateString() === new Date().toDateString()
+              ? ts.toLocaleTimeString('es', { hour: 'numeric', minute: '2-digit' })
+              : timeAgo(ts)
             const avatarLetter = actor.charAt(0).toUpperCase()
             const isFirst = i === 0
             const isLast = i === items.length - 1
@@ -1997,7 +2001,7 @@ function RecentActivity({ items, onViewAll, onSelect, firstName, summaryText, su
                     <span style={{ fontWeight: 700 }}>{actor}</span> {meta.text}
                   </p>
                   {meta.sub && (
-                    <p style={{ margin: '3px 0 0', fontSize: 14, fontStyle: isNote ? 'italic' : 'normal', color: isNote ? '#475569' : '#94A3B8', lineHeight: 1.4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{isNote ? `"${meta.sub}"` : meta.sub}</p>
+                    <p style={{ margin: '3px 0 0', fontSize: 14, fontStyle: isNote ? 'italic' : 'normal', color: isNote ? '#475569' : '#5E7480', lineHeight: 1.4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{isNote ? `"${meta.sub}"` : meta.sub}</p>
                   )}
                   <p style={{ margin: '3px 0 0', fontSize: 13, color: '#64748B', fontWeight: 600 }}>{time}</p>
                 </div>
@@ -2092,6 +2096,15 @@ export default function Dashboard() {
   const [emergencyContact, setEmergencyContact] = useState(null)
   const [primaryDoctor, setPrimaryDoctor] = useState(null)
   const [careLogsToday, setCareLogsToday] = useState({})
+  // Rutinas de la familia (sugeridas que se usan + propias). Si la base aún no
+  // tiene las columnas nuevas, se queda con las sugeridas.
+  const [careRows, setCareRows] = useState([])
+  const [careLogRows, setCareLogRows] = useState([])
+  useEffect(() => {
+    if (!ownerId) return
+    supabase.from('care_item_schedules').select('item_key,scheduled_time,label,icon,active').eq('user_id', ownerId)
+      .then(({ data, error }) => { if (!error) setCareRows(data ?? []) })
+  }, [ownerId])
   // ¿La familia ya empezó a usar la rutina? (algún cuidado marcado alguna vez
   // o algún horario configurado). Si no, la rutina NO cuenta como pendiente:
   // el primer día no debe regañar por cuidados que nadie eligió (UX nov 2026).
@@ -2568,7 +2581,7 @@ export default function Dashboard() {
         .limit(10),
 
       supabase.from('daily_care_logs')
-        .select('item_key, status')
+        .select('item_key, status, checked_by, checked_at')
         .eq('user_id', ownerId)
         .eq('log_date', todayKey),
 
@@ -2597,6 +2610,7 @@ export default function Dashboard() {
     const careLogMap = {}
     ;(careLogsData ?? []).forEach(r => { if (r.status !== 'no_completado') careLogMap[r.item_key] = true })
     setCareLogsToday(careLogMap)
+    setCareLogRows((careLogsData ?? []).filter(r => r.status !== 'no_completado'))
 
     const todayLogMap = {}
     ;(todayLogs ?? []).forEach(l => { todayLogMap[l.medication_id] = l })
@@ -3181,7 +3195,7 @@ export default function Dashboard() {
 
   const todaySection = sections.find(s => s.dateKey === todayKey)
   const pendingCount = todaySection?.events.filter(e => e.type === 'MED_PENDING').length ?? 0
-  const dailyItems = CARE_ITEMS.filter(i => i.category === 'daily')
+  const dailyItems = buildCareItems(careRows).filter(i => i.category === 'daily')
   // Primer día: cuidados cuya hora pasó antes de registrarse empiezan mañana
   // (mismo criterio que Cuidado.jsx, lib/medTiming.js).
   const routineActive = routineStarted || Object.keys(careLogsToday).length > 0
@@ -3219,12 +3233,14 @@ export default function Dashboard() {
     const evts = sections
       .flatMap(s => s.events)
       .filter(e => !['MED_PENDING', 'CAREGIVER_CARD', 'SOS_ALERT', 'MED_MISSED'].includes(e.type))
-    const careLogEvts = Object.keys(careLogsToday)
-      .filter(k => ['sleep', 'nutrition', 'hygiene'].includes(k))
-      .map(k => ({ id: `carelog-${k}`, type: 'CARE_LOG', timestamp: new Date(todayKey + 'T12:00:00'), dateKey: todayKey, careLogKey: k }))
+    // Hoy en casa (nov 2026): cada rutina marcada hoy, con quién y a qué hora
+    const careLabels = Object.fromEntries(buildCareItems(careRows).map(i => [i.key, i.label]))
+    const careLogEvts = careLogRows
+      .filter(r => r.checked_at)
+      .map(r => ({ id: `carelog-${r.item_key}`, type: 'CARE_LOG', timestamp: new Date(r.checked_at), dateKey: todayKey, careLogKey: r.item_key, careLabel: careLabels[r.item_key], confirmedBy: r.checked_by }))
     return [...evts, ...careLogEvts]
       .sort((a, b) => (b.timestamp?.getTime() ?? 0) - (a.timestamp?.getTime() ?? 0))
-      .slice(0, 3)
+      .slice(0, 5)
   })()
 
   // Fase 2 — resumen narrado: lo "hecho" sale de eventos que ya se muestran
