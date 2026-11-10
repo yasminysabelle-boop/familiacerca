@@ -778,7 +778,7 @@ export default function Landing() {
           {!installed && (
             <button
               onClick={async () => {
-                if (canPrompt && isMobile) {
+                if (canPrompt) {
                   track('sticky_bar_click', { action: 'install_prompt' })
                   // Igual que antes: un toque y Chrome la descarga sola
                   await install()
@@ -815,7 +815,7 @@ export default function Landing() {
                 <div style={{ flex: 1, minWidth: 180 }}>
                   <p style={{ margin: '0 0 6px', fontSize: 17, fontWeight: 800 }}>Escanéalo con tu teléfono</p>
                   <p style={{ margin: '0 0 10px', fontSize: 15, lineHeight: 1.45, color: '#30454F' }}>
-                    Abre la <strong>cámara</strong> del teléfono y apúntala a este código. Toca el enlace que aparece y te mostramos cómo descargarla.
+                    Abre la <strong>cámara</strong> del teléfono y apúntala a este código. Toca el enlace que aparece y luego "Descargar la app".
                   </p>
                   <a href={`https://wa.me/?text=${encodeURIComponent('Descarga FamiliaCerca en tu teléfono: https://familiacerca.com/?instalar=1')}`} target="_blank" rel="noopener noreferrer"
                     onClick={() => track('install_send_whatsapp')}
@@ -825,21 +825,17 @@ export default function Landing() {
                 </div>
               </div>
             )}
-            {canPrompt && isMobile && (
+            {canPrompt && (
               <button onClick={async () => { track('install_sheet_prompt'); const o = await install(); if (o === 'accepted') setInstallHelp(false) }}
                 style={{ width: '100%', marginBottom: 14, padding: 14, borderRadius: 14, border: 'none', background: CORAL, color: WHITE, fontSize: 17, fontWeight: 800, cursor: 'pointer', fontFamily: SANS }}>
                 📲 Descargar ahora
               </button>
             )}
-            <p style={{ margin: '0 0 8px', fontSize: 15, fontWeight: 700, color: '#4E6470' }}>
-              {!isMobile ? 'Después, en el teléfono:' : canPrompt ? 'O si prefieres hacerlo a mano:' : 'Tu teléfono no la descargó solo. Hazlo así:'}
-            </p>
-            <ol style={{ margin: 0, paddingLeft: 22, fontSize: 16, lineHeight: 1.6 }}>
-              <li>Abre <strong>familiacerca.com</strong> en <strong>Chrome</strong>.</li>
-              <li>Toca los <strong>tres puntitos</strong> de arriba a la derecha.</li>
-              <li>Toca <strong>"Instalar aplicación"</strong> o <strong>"Agregar a pantalla principal"</strong>.</li>
-              <li>Confirma. Listo, ya está en tu pantalla.</li>
-            </ol>
+            {isMobile && !canPrompt && (
+              <p style={{ margin: 0, fontSize: 16, lineHeight: 1.5 }}>
+                Abre <strong>familiacerca.com</strong> en <strong>Chrome</strong> y toca <strong>"📲 Descargar la app"</strong>. Si ya la tienes en tu teléfono, búscala en tu pantalla de inicio.
+              </p>
+            )}
             <p style={{ margin: '14px 0 0', fontSize: 15, color: '#4E6470', lineHeight: 1.45 }}>
               ¿Todavía no tienes cuenta? Puedes descargarla primero y registrarte desde la app.
             </p>
