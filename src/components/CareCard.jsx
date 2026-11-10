@@ -90,10 +90,10 @@ export default function CareCard({
       }}
     >
       {/* Marca de agua — logo FamiliaCerca (corazón + 2 personas) */}
-      <svg width="230" height="230" viewBox="0 0 100 100" style={{ position: 'absolute', right: -38, top: 6, opacity: 0.12, pointerEvents: 'none' }} fill="#fff">
-        <path d="M50 88C22 68 8 54 8 34 8 22 17 13 29 13c8 0 15 5 21 13 6-8 13-13 21-13 12 0 21 9 21 21 0 20-14 34-42 54Z" />
-        <circle cx="40" cy="40" r="7" fill="#0A5A82" /><path d="M28 62c0-8 5-13 12-13s12 5 12 13Z" fill="#0A5A82" />
-        <circle cx="60" cy="45" r="5.5" fill="#0C6C9C" /><path d="M50 62c0-7 4-11 10-11s10 4 10 11Z" fill="#0C6C9C" />
+      <svg width="230" height="230" viewBox="0 0 200 200" style={{ position: 'absolute', right: -38, top: 6, opacity: 0.12, pointerEvents: 'none' }} fill="#fff">
+        {/* Marca de agua — logo nuevo (dos personas que forman un corazón) */}
+        <circle cx="66" cy="38" r="19" /><circle cx="134" cy="38" r="19" />
+        <path d="M96 184 L30 114 A38 38 0 0 1 96 82 Z" /><path d="M104 184 L170 114 A38 38 0 0 0 104 82 Z" />
       </svg>
       {/* Menú de puntos decorativo */}
       <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff" style={{ position: 'absolute', right: 18, top: 20, opacity: 0.5 }}>
