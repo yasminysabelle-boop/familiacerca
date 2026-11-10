@@ -258,11 +258,11 @@ function Splash({ toLogin, onDone }) {
         <div className="animate-splash-in" style={{
           display: 'flex', flexDirection: 'column', alignItems: 'center',
         }}>
-          <div style={{ position: 'relative', width: 100, height: 100 }}>
+          <div style={{ position: 'relative', width: 118, height: 118, borderRadius: '50%', background: 'white', boxShadow: '0 10px 30px rgba(10,74,107,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <span className="logo-glow" />
             <span className="logo-ripple logo-ripple-1" />
             <span className="logo-ripple logo-ripple-2" />
-            <img className="animate-logo-heartbeat" src="/logo.png" alt="FamiliaCerca" style={{ position: 'relative', width: 100, height: 100, objectFit: 'contain' }} />
+            <img className="animate-logo-heartbeat" src="/logo.png" alt="FamiliaCerca" style={{ position: 'relative', width: 84, height: 84, objectFit: 'contain' }} />
           </div>
 
           <div style={{ textAlign: 'center', marginTop: 22 }}>
