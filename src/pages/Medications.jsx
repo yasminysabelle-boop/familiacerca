@@ -98,7 +98,7 @@ const MED_STATUS = {
   programado: { label: 'Programado', color: '#4E6470', bg: '#F1EDE3' },
   pendiente:  { label: 'A tiempo',   color: '#0C6C9C', bg: '#E3F1F8' },
   dar_pronto: { label: 'Dar pronto', color: '#A87A0F', bg: '#F6E4B8' },
-  tarde:      { label: 'Tarde',      color: '#C4664F', bg: '#FBEAE4' },
+  tarde:      { label: 'Tarde',      color: '#A3452F', bg: '#FBEAE4' },
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -1040,7 +1040,7 @@ export default function Medications() {
       {/* Header propio — back + título + "Cuidando a X" + agregar */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '22px 16px 4px', maxWidth: 600 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
-          <button
+          <button aria-label="Volver"
             onClick={goBack}
             style={{ width: 38, height: 38, borderRadius: 14, border: 'none', background: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 6px 14px -8px #087F7055', cursor: 'pointer', flexShrink: 0 }}
           >
@@ -1054,7 +1054,7 @@ export default function Medications() {
           </div>
         </div>
         {isAdmin && (
-          <button
+          <button aria-label="Agregar medicamento"
             onClick={openAdd}
             style={{
               width: 44, height: 44, borderRadius: 16, flexShrink: 0,
@@ -1114,7 +1114,7 @@ export default function Medications() {
               <p style={{ fontSize: 13, fontWeight: 600, color: '#2A4350', marginBottom: 1 }}>Recordatorios de medicamentos</p>
               <p style={{ fontSize: 13, color: '#4E6470' }}>Activa las notificaciones para no olvidar ninguna dosis.</p>
             </div>
-            <button onClick={requestAndSubscribe} style={{ padding: '7px 16px', borderRadius: 999, background: '#E9826E', color: 'white', fontWeight: 700, fontSize: 14, border: 'none', cursor: 'pointer', flexShrink: 0 }}>
+            <button onClick={requestAndSubscribe} style={{ padding: '7px 16px', borderRadius: 999, background: '#BF513C', color: 'white', fontWeight: 700, fontSize: 14, border: 'none', cursor: 'pointer', flexShrink: 0 }}>
               Activar
             </button>
           </div>
@@ -1172,7 +1172,7 @@ export default function Medications() {
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <div style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontStyle: 'italic', fontWeight: 600, fontSize: 17.5, color: '#0A5A82', lineHeight: 1.35 }}>{title}</div>
-                    {isAllDone && <Heart size={17} color="#E9826E" strokeWidth={2} filled />}
+                    {isAllDone && <Heart size={17} color="#A3452F" strokeWidth={2} filled />}
                   </div>
                   <div style={{ fontSize: 13.5, color: '#3E5A54', marginTop: 6, lineHeight: 1.5 }}>{subtitle}</div>
                 </div>
@@ -1217,12 +1217,12 @@ export default function Medications() {
                 >
                   <span style={{ flexShrink: 0, display: 'flex' }}><Camera size={17} color="#C4664F" strokeWidth={1.9} /></span>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ fontSize: 13, fontWeight: 700, color: '#C4664F', margin: 0 }}>
+                    <p style={{ fontSize: 13, fontWeight: 700, color: '#A3452F', margin: 0 }}>
                       ¿Quieres agregar una foto? (opcional)
                     </p>
                     <p style={{ fontSize: 13, color: '#8A5A4A', margin: '2px 0 0' }}>{med.name}</p>
                   </div>
-                  <span style={{ fontSize: 13, color: '#C4664F', fontWeight: 700, flexShrink: 0 }}>Agregar</span>
+                  <span style={{ fontSize: 13, color: '#A3452F', fontWeight: 700, flexShrink: 0 }}>Agregar</span>
                 </button>
               )
             })}
@@ -1307,7 +1307,7 @@ export default function Medications() {
                                   disabled={notYetOpen}
                                   style={{
                                     width: '100%', padding: '10px', borderRadius: 999, border: 'none',
-                                    background: notYetOpen ? '#E5E1D6' : '#E9826E',
+                                    background: notYetOpen ? '#E5E1D6' : '#BF513C',
                                     color: notYetOpen ? '#8A8F85' : 'white',
                                     fontWeight: 700, fontSize: 14,
                                     cursor: notYetOpen ? 'not-allowed' : 'pointer',
@@ -1362,7 +1362,7 @@ export default function Medications() {
                               </p>
                             </div>
                             {!isFamiliar && (
-                              <button onClick={() => handleTapAdministrar(med)} style={{ width: '100%', padding: '10px', borderRadius: 999, border: 'none', background: '#E9826E', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer', boxShadow: '0 4px 12px rgba(233,130,110,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 8 }}>
+                              <button onClick={() => handleTapAdministrar(med)} style={{ width: '100%', padding: '10px', borderRadius: 999, border: 'none', background: '#BF513C', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer', boxShadow: '0 4px 12px rgba(233,130,110,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 8 }}>
                                 <CheckIcon size={15} color="white" strokeWidth={2.6} /> Registrar ahora
                               </button>
                             )}
@@ -1370,7 +1370,7 @@ export default function Medications() {
                               href={`https://wa.me/?text=${waText}`}
                               target="_blank"
                               rel="noreferrer"
-                              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, width: '100%', padding: '8px', borderRadius: 10, border: '1px solid #E9826E', background: 'transparent', color: '#C4664F', fontWeight: 600, fontSize: 14, textDecoration: 'none' }}
+                              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, width: '100%', padding: '8px', borderRadius: 10, border: '1px solid #E9826E', background: 'transparent', color: '#A3452F', fontWeight: 600, fontSize: 14, textDecoration: 'none' }}
                             >
                               Notificar al médico
                             </a>
@@ -1458,7 +1458,7 @@ export default function Medications() {
                               </span>
                             )}
                             {isOmitted && !isFamiliar && (
-                              <button onClick={() => handleTapAdministrar(med)} style={{ marginTop: 6, width: '100%', padding: '9px', borderRadius: 999, border: 'none', background: '#E9826E', color: 'white', fontWeight: 700, fontSize: 13, cursor: 'pointer', boxShadow: '0 4px 12px rgba(233,130,110,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                              <button onClick={() => handleTapAdministrar(med)} style={{ marginTop: 6, width: '100%', padding: '9px', borderRadius: 999, border: 'none', background: '#BF513C', color: 'white', fontWeight: 700, fontSize: 13, cursor: 'pointer', boxShadow: '0 4px 12px rgba(233,130,110,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
                                 <CheckIcon size={14} color="white" strokeWidth={2.4} /> Registrar ahora
                               </button>
                             )}
@@ -1566,7 +1566,7 @@ export default function Medications() {
                   : editId                      ? 'Editar medicamento'
                   : 'Nuevo medicamento'}
               </h3>
-              <button onClick={closeForm} style={{ width: 32, height: 32, borderRadius: 11, border: 'none', background: '#FFFFFF', boxShadow: '0 4px 10px -6px #087F7033', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}>
+              <button aria-label="Cerrar" onClick={closeForm} style={{ width: 32, height: 32, borderRadius: 11, border: 'none', background: '#FFFFFF', boxShadow: '0 4px 10px -6px #087F7033', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}>
                 <XIcon size={16} color="#4E6470" strokeWidth={2.2} />
               </button>
             </div>
@@ -1659,7 +1659,7 @@ export default function Medications() {
 
                   {addAiError ? (
                     <div style={{ background: '#FBEAE4', borderRadius: 20, padding: '12px 14px', boxShadow: '0 6px 14px -8px #D9534F33' }}>
-                      <p style={{ fontSize: 13, color: '#C4664F', margin: 0 }}>⚠️ {addAiError}</p>
+                      <p style={{ fontSize: 13, color: '#A3452F', margin: 0 }}>⚠️ {addAiError}</p>
                     </div>
                   ) : addAiExtracted ? (
                     <>
@@ -1939,7 +1939,7 @@ export default function Medications() {
                 </div>
 
                 {saveError && (
-                  <p style={{ color: '#C4664F', fontSize: 13, margin: '0', textAlign: 'center', padding: '8px', background: '#FBEAE4', borderRadius: 12 }}>
+                  <p style={{ color: '#A3452F', fontSize: 13, margin: '0', textAlign: 'center', padding: '8px', background: '#FBEAE4', borderRadius: 12 }}>
                     {saveError}
                   </p>
                 )}
@@ -2030,12 +2030,12 @@ export default function Medications() {
               )}
             </div>
 
-            {adminError && <div style={{ background: '#FBEAE4', borderRadius: 16, padding: '10px 12px', marginBottom: 12 }}><p style={{ fontSize: 14, color: '#C4664F', margin: 0 }}>⚠️ {adminError}</p></div>}
+            {adminError && <div style={{ background: '#FBEAE4', borderRadius: 16, padding: '10px 12px', marginBottom: 12 }}><p style={{ fontSize: 14, color: '#A3452F', margin: 0 }}>⚠️ {adminError}</p></div>}
 
             <button
               onClick={handleAdministrar}
               disabled={adminSaving || adminPhotoStamping}
-              style={{ width: '100%', padding: 16, borderRadius: 999, border: 'none', background: (adminSaving || adminPhotoStamping) ? '#C9D6DB' : '#E9826E', color: 'white', fontWeight: 800, fontSize: 16, cursor: (adminSaving || adminPhotoStamping) ? 'not-allowed' : 'pointer', boxShadow: (adminSaving || adminPhotoStamping) ? 'none' : '0 8px 18px -6px rgba(233,130,110,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+              style={{ width: '100%', padding: 16, borderRadius: 999, border: 'none', background: (adminSaving || adminPhotoStamping) ? '#C9D6DB' : '#BF513C', color: 'white', fontWeight: 800, fontSize: 16, cursor: (adminSaving || adminPhotoStamping) ? 'not-allowed' : 'pointer', boxShadow: (adminSaving || adminPhotoStamping) ? 'none' : '0 8px 18px -6px rgba(233,130,110,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
             >
               {adminSaving
                 ? <><div style={{ width: 18, height: 18, borderRadius: '50%', border: '2.5px solid rgba(255,255,255,0.4)', borderTopColor: 'white', animation: 'spin 0.7s linear infinite' }} /> Guardando...</>
@@ -2125,7 +2125,7 @@ export default function Medications() {
                     {proofSheet.med.name} — {minLeft > 0 ? `${minLeft} min restantes` : 'Tiempo agotado'}
                   </p>
                 </div>
-                <button onClick={closeProofSheet} disabled={proofUploading} style={{ width: 32, height: 32, borderRadius: 11, background: '#FFFFFF', border: 'none', cursor: proofUploading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, opacity: proofUploading ? 0.4 : 1 }}>
+                <button aria-label="Cerrar" onClick={closeProofSheet} disabled={proofUploading} style={{ width: 32, height: 32, borderRadius: 11, background: '#FFFFFF', border: 'none', cursor: proofUploading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, opacity: proofUploading ? 0.4 : 1 }}>
                   <XIcon size={16} color="#4E6470" strokeWidth={2.2} />
                 </button>
               </div>
@@ -2171,7 +2171,7 @@ export default function Medications() {
 
               {proofError && (
                 <div style={{ background: '#FBEAE4', borderRadius: 14, padding: '10px 12px', marginBottom: 12 }}>
-                  <p style={{ fontSize: 14, color: '#C4664F', margin: 0 }}>⚠️ {proofError}</p>
+                  <p style={{ fontSize: 14, color: '#A3452F', margin: 0 }}>⚠️ {proofError}</p>
                 </div>
               )}
 

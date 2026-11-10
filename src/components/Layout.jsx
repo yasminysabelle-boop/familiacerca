@@ -208,7 +208,7 @@ export default function Layout({ children }) {
             <Link to="/terminos" style={{ fontSize: 13, color: '#5E7480', textDecoration: 'none' }}>
               Términos de servicio
             </Link>
-            <span style={{ color: '#D1D5DB', fontSize: 13 }}>·</span>
+            <span style={{ color: '#6B7280', fontSize: 13 }}>·</span>
             <Link to="/privacidad" style={{ fontSize: 13, color: '#5E7480', textDecoration: 'none' }}>
               Política de privacidad
             </Link>

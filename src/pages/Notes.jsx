@@ -200,7 +200,7 @@ export default function Notes() {
             <p style={{ fontSize: 14, color: '#5E7480' }}>Observaciones del cuidado diario</p>
           </div>
           {(isAdmin || isCuidador) && (
-            <button
+            <button aria-label="Agregar nota"
               onClick={openAdd}
               style={{
                 width: 40, height: 40, borderRadius: 12,
@@ -364,7 +364,7 @@ export default function Notes() {
               <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 18, fontWeight: 700, color: '#14303D', margin: 0 }}>
                 {editId ? 'Editar nota' : 'Nueva nota'}
               </h3>
-              <button onClick={handleCancel} style={{ padding: 8, border: 'none', background: 'none', cursor: 'pointer' }}>
+              <button aria-label="Cerrar" onClick={handleCancel} style={{ padding: 8, border: 'none', background: 'none', cursor: 'pointer' }}>
                 <XIcon size={20} color="#5E7480" strokeWidth={2} />
               </button>
             </div>

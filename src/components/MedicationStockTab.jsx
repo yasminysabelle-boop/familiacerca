@@ -125,7 +125,7 @@ export default function MedicationStockTab({ med, ownerId, isFamiliar, onClose }
             </p>
             {med.dosage && <p style={{ fontSize: 14, color: '#4E6470', margin: '2px 0 0' }}>{med.dosage}</p>}
           </div>
-          <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 11, border: 'none', background: '#FFFFFF', boxShadow: '0 4px 10px -6px #087F7033', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}>
+          <button aria-label="Cerrar" onClick={onClose} style={{ width: 32, height: 32, borderRadius: 11, border: 'none', background: '#FFFFFF', boxShadow: '0 4px 10px -6px #087F7033', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}>
             <XIcon size={16} color="#4E6470" strokeWidth={2.2} />
           </button>
         </div>

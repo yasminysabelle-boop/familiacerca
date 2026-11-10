@@ -78,7 +78,7 @@ export default function FirstTour() {
         background: 'white', borderRadius: 20, padding: '18px 18px 14px',
         boxShadow: '0 18px 40px rgba(0,0,0,0.3)', fontFamily: SANS,
       }}>
-        <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#E9826E' }}>Paso {step + 1} de {STEPS.length}</p>
+        <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#A3452F' }}>Paso {step + 1} de {STEPS.length}</p>
         <p style={{ margin: '4px 0 6px', fontSize: 19, fontWeight: 800, color: '#14303D' }}>{s.title}</p>
         <p style={{ margin: 0, fontSize: 16, lineHeight: 1.5, color: '#30454F' }}>{s.text}</p>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 16 }}>

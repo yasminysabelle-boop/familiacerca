@@ -335,7 +335,7 @@ export default function Cuidado() {
               }}>
                 {bannerTitle}
               </span>
-              {allDone && <Heart size={17} color="#E9826E" strokeWidth={2} filled />}
+              {allDone && <Heart size={17} color="#A3452F" strokeWidth={2} filled />}
             </div>
             <p style={{ fontSize: 13.5, color: '#2A4350', opacity: 0.85, marginTop: 6, lineHeight: 1.5 }}>
               {bannerSub}
@@ -583,7 +583,7 @@ export default function Cuidado() {
                   </div>
 
                   {saveError && (
-                    <p style={{ fontSize: 14, color: '#C4664F', textAlign: 'center', marginBottom: 12 }}>
+                    <p style={{ fontSize: 14, color: '#A3452F', textAlign: 'center', marginBottom: 12 }}>
                       {saveError}
                     </p>
                   )}

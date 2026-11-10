@@ -108,7 +108,7 @@ export default function Reports() {
         {/* Pattern detection / wellness summary */}
         <div className="bg-white rounded-xl border border-green-100 p-6 mb-6">
           <h3 className="font-semibold text-gray-900 mb-1">Análisis de bienestar — últimos 7 días</h3>
-          <p className="text-sm text-gray-400 mb-5">Detección automática de patrones en medicamentos y notas</p>
+          <p className="text-sm text-gray-500 mb-5">Detección automática de patrones en medicamentos y notas</p>
 
           {loading ? (
             <div className="flex justify-center py-6">

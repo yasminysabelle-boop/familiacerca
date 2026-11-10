@@ -77,8 +77,8 @@ function CallBtn({ phone, big = false }) {
 function EditDeleteBtns({ onEdit, onDelete }) {
   return (
     <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
-      <button type="button" onClick={onEdit}   style={{ padding: '5px 8px', borderRadius: 8, border: '1px solid #E6E3DB', background: 'white', cursor: 'pointer', fontSize: 13, lineHeight: 1 }}>✏️</button>
-      <button type="button" onClick={onDelete} style={{ padding: '5px 8px', borderRadius: 8, border: '1px solid #FFCDD2', background: '#FFF8F8', cursor: 'pointer', fontSize: 13, lineHeight: 1 }}>🗑️</button>
+      <button aria-label="Editar" type="button" onClick={onEdit}   style={{ padding: '5px 8px', borderRadius: 8, border: '1px solid #E6E3DB', background: 'white', cursor: 'pointer', fontSize: 13, lineHeight: 1 }}>✏️</button>
+      <button aria-label="Eliminar" type="button" onClick={onDelete} style={{ padding: '5px 8px', borderRadius: 8, border: '1px solid #FFCDD2', background: '#FFF8F8', cursor: 'pointer', fontSize: 13, lineHeight: 1 }}>🗑️</button>
     </div>
   )
 }

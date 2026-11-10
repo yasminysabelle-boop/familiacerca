@@ -345,8 +345,8 @@ export default function VideoCall() {
                     style={{
                       display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 14,
                       border: '1.5px solid #E9826E',
-                      background: reminderSet ? '#E9826E' : '#FDF0EC',
-                      color: reminderSet ? '#FFFFFF' : '#E9826E',
+                      background: reminderSet ? '#BF513C' : '#FDF0EC',
+                      color: reminderSet ? '#FFFFFF' : '#A3452F',
                       fontSize: 13, fontWeight: 700, fontFamily: SANS, cursor: 'pointer', flexShrink: 0,
                     }}
                   >
@@ -545,7 +545,7 @@ export default function VideoCall() {
                     </div>
                   </>
                 ) : (
-                  <span style={{ fontSize: 13, fontWeight: 700, color: '#E9826E', background: '#FDF0EC', padding: '8px 16px', borderRadius: 999 }}>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: '#BF513C', background: '#FDF0EC', padding: '8px 16px', borderRadius: 999 }}>
                     Sé la primera en unirte
                   </span>
                 )}

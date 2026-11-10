@@ -144,7 +144,7 @@ export default function MedicationDetail({ med, stock, ownerId, isAdmin, onClose
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 260, background: '#F7F6F2', overflowY: 'auto', fontFamily: SANS }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '22px 20px 8px' }}>
-        <button onClick={onClose} style={{ width: 38, height: 38, borderRadius: 14, border: 'none', background: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 6px 14px -8px #087F7055', cursor: 'pointer', flexShrink: 0 }}>
+        <button aria-label="Volver" onClick={onClose} style={{ width: 38, height: 38, borderRadius: 14, border: 'none', background: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 6px 14px -8px #087F7055', cursor: 'pointer', flexShrink: 0 }}>
           <ChevronLeft size={19} color="#2A4350" strokeWidth={2.2} />
         </button>
         <div style={{ fontWeight: 800, fontSize: 19, color: '#14303D' }}>Detalle del medicamento</div>
@@ -201,7 +201,7 @@ export default function MedicationDetail({ med, stock, ownerId, isAdmin, onClose
             <button
               onClick={togglePausado}
               disabled={toggling}
-              style={{ width: '100%', marginTop: 24, border: 'none', cursor: toggling ? 'default' : 'pointer', padding: 15, borderRadius: 16, fontSize: 14.5, fontWeight: 700, fontFamily: SANS, color: '#C4664F', background: '#FBEAE4', opacity: toggling ? 0.7 : 1 }}
+              style={{ width: '100%', marginTop: 24, border: 'none', cursor: toggling ? 'default' : 'pointer', padding: 15, borderRadius: 16, fontSize: 14.5, fontWeight: 700, fontFamily: SANS, color: '#A3452F', background: '#FBEAE4', opacity: toggling ? 0.7 : 1 }}
             >
               {status === 'active' ? 'Pausar medicamento' : 'Reanudar medicamento'}
             </button>

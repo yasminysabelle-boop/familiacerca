@@ -172,7 +172,7 @@ export default function VoiceRecorder({
             pointerEvents: 'none',
           }} />
         ))}
-        <button
+        <button aria-label="Grabar o detener"
           onClick={handleTap}
           style={{
             position: 'absolute', inset: 0, borderRadius: '50%', border: 'none',

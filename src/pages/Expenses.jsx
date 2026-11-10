@@ -297,7 +297,7 @@ export default function Expenses() {
           display: 'flex', alignItems: 'center',
           justifyContent: 'space-between', padding: '16px 20px 12px',
         }}>
-          <button
+          <button aria-label="Mes anterior"
             onClick={prevMonth}
             style={{ padding: 8, borderRadius: 10, background: '#F3F4F6', border: 'none', cursor: 'pointer' }}
           >
@@ -306,7 +306,7 @@ export default function Expenses() {
           <p style={{ fontFamily: SANS, fontSize: 17, fontWeight: 700, color: '#2A4350' }}>
             {MONTH_NAMES[month]} {year}
           </p>
-          <button
+          <button aria-label="Mes siguiente"
             onClick={nextMonth}
             style={{ padding: 8, borderRadius: 10, background: '#F3F4F6', border: 'none', cursor: 'pointer' }}
           >

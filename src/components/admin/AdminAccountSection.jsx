@@ -104,7 +104,7 @@ export default function AdminAccountSection() {
               Ver plan activo, próximo cobro, cancelar
             </p>
           </div>
-          <span style={{ color: '#D1D5DB', fontSize: 18, flexShrink: 0 }}>›</span>
+          <span style={{ color: '#6B7280', fontSize: 18, flexShrink: 0 }}>›</span>
         </button>
 
         <div style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>

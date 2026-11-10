@@ -3,6 +3,9 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
 
+// Letra grande (Mi cuenta → Preferencias)
+try { if (localStorage.getItem('fc_letra_grande') === '1') document.documentElement.classList.add('letra-grande') } catch { /* sin almacenamiento */ }
+
 if (import.meta.env.PROD && 'serviceWorker' in navigator) {
   // Snapshot before any SW registration runs — true only when an existing SW
   // was already controlling this page, i.e. this is a returning session.

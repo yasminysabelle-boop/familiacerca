@@ -586,7 +586,7 @@ export default function Familia() {
                       <span style={{ fontSize: 12, fontWeight: 700, color: '#0C6C9C', background: '#E3F1F8', padding: '3px 10px', borderRadius: 6 }}>
                         Admin
                       </span>
-                      <span style={{ color: '#D1D5DB', fontSize: 18, lineHeight: 1 }}>›</span>
+                      <span style={{ color: '#6B7280', fontSize: 18, lineHeight: 1 }}>›</span>
                     </div>
                   </div>
                 )
@@ -657,7 +657,7 @@ export default function Familia() {
                         }}>
                           {isPending ? 'Invitación pendiente' : isCuidador ? 'Cuidador' : 'Familiar'}
                         </span>
-                        <span style={{ color: '#D1D5DB', fontSize: 18, lineHeight: 1 }}>›</span>
+                        <span style={{ color: '#6B7280', fontSize: 18, lineHeight: 1 }}>›</span>
                       </div>
                       {isAdmin && (
                         <button
@@ -998,7 +998,7 @@ export default function Familia() {
                 href={waLink ? `https://wa.me/?text=${encodeURIComponent(`Te invito a FamiliaCerca para coordinar juntos el cuidado de ${activePatientName || profile?.name || 'nuestro familiar'}: ${waLink}`)}` : undefined}
                 target="_blank" rel="noopener noreferrer"
                 onClick={e => { if (!waLink) e.preventDefault(); else track('family_member_invited', { channel: 'whatsapp' }) }}
-                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, width: '100%', padding: 15, borderRadius: 14, background: waLink ? '#25D366' : '#C9D6DB', color: 'white', fontWeight: 800, fontSize: 16, textDecoration: 'none', boxSizing: 'border-box' }}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, width: '100%', padding: 15, borderRadius: 14, background: waLink ? '#075E54' : '#C9D6DB', color: 'white', fontWeight: 800, fontSize: 16, textDecoration: 'none', boxSizing: 'border-box' }}
               >
                 💬 {waLink ? 'Invitar por WhatsApp' : 'Preparando enlace…'}
               </a>

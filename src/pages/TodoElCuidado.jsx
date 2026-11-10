@@ -127,7 +127,7 @@ export default function TodoElCuidado() {
 
           {/* 2. Organizar (de vez en cuando) */}
           <div style={block('linear-gradient(180deg, #FBEAE4 0%, #FCF0EC 100%)')}>
-            <GroupHeader icon={<Calendar size={16} color="#C9654F" strokeWidth={1.9} />} color="#C9654F" label="Organizar" />
+            <GroupHeader icon={<Calendar size={16} color="#A3452F" strokeWidth={1.9} />} color="#A3452F" label="Organizar" />
             <div style={grid}>
               {organizar.map(c => <ToolCard key={c.label} {...c} tint="#C9654F" tintBg="#FDEEEA" />)}
             </div>

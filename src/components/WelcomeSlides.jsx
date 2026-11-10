@@ -318,7 +318,7 @@ export default function WelcomeSlides({ onDone }) {
                   borderRadius: 4,
                   padding: 0, border: 'none', cursor: 'pointer',
                   transition: 'all 0.3s',
-                  background: i === slide ? '#E9826E' : '#D4C9BB',
+                  background: i === slide ? '#BF513C' : '#D4C9BB',
                   boxShadow: 'none',
                 }}
               />

@@ -146,7 +146,7 @@ export default function VoiceInput({
           background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)',
         }}>
           <span style={{ fontSize: 14, color: '#DC2626', flex: 1 }}>{error}</span>
-          <button
+          <button aria-label="Cerrar"
             type="button"
             onClick={clearError}
             style={{ fontSize: 13, color: '#DC2626', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}

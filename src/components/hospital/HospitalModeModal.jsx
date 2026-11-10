@@ -97,7 +97,7 @@ export default function HospitalModeModal({ open, onClose }) {
               </p>
             </div>
           </div>
-          <button
+          <button aria-label="Cerrar"
             onClick={onClose}
             style={{
               width: 32, height: 32, borderRadius: '50%', border: 'none',

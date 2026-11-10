@@ -17,7 +17,7 @@ const ACTION  = '#0C6C9C'
 const CREAM   = '#F7F6F2'
 const SAND    = '#E6E3DB'
 const GOLD    = '#E9826E'
-const CORAL   = '#E9826E'
+const CORAL   = '#BF513C'  // coral con buen contraste (accesibilidad nov 2026)
 const MINT_C  = '#E3F1F8'
 const DARK    = '#0C6C9C'
 const WHITE   = '#FFFFFF'
@@ -33,7 +33,7 @@ function CTABtn({ to, children, style = {} }) {
     <Link to={to} className="cta-coral" style={{
       display: 'inline-flex', alignItems: 'center', gap: 10,
       padding: '18px 52px', borderRadius: 9999,
-      background: '#E9826E',
+      background: '#BF513C',
       color: 'white', fontWeight: 500, fontSize: 'clamp(18px,1.6vw,21px)',
       textDecoration: 'none', fontFamily: SANS, letterSpacing: '0.025em',
       boxShadow: '0 12px 40px rgba(233,130,110,0.38)',
@@ -344,7 +344,7 @@ export default function Landing() {
 
         {/* Aviso flotante: lo que la familia ve en la app */}
         <div className="hero3-toast" aria-hidden="true" style={{ position: 'absolute', right: '4%', bottom: '9%', display: 'flex', alignItems: 'center', gap: 12, background: WHITE, borderRadius: 18, padding: '12px 16px', boxShadow: '0 18px 44px rgba(0,0,0,0.30)', fontFamily: SANS, animation: 'hero2float 5s ease-in-out infinite' }}>
-          <span style={{ width: 38, height: 38, borderRadius: '50%', background: '#2BB8CC', color: WHITE, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 800 }}>✓</span>
+          <span style={{ width: 38, height: 38, borderRadius: '50%', background: '#0C6C9C', color: WHITE, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 800 }}>✓</span>
           <div>
             <div style={{ fontSize: 15, fontWeight: 700, color: '#14303D' }}>Rosa confirmó la dosis de las 8:00</div>
             <div style={{ fontSize: 13, color: '#4E6470' }}>Toda la familia lo vio · hace 2 min</div>
@@ -703,7 +703,7 @@ export default function Landing() {
                 <img src="/logo.png" alt="FamiliaCerca" style={{ width: 44, height: 44, objectFit: 'contain', display: 'block' }} />
                 <span style={{ fontFamily: SERIF, fontWeight: 700, margin: 0, padding: 0 }}>
                   <span style={{ color: '#0C6C9C', fontSize: 26 }}>Familia</span>
-                  <span style={{ color: '#E9826E', fontSize: 26 }}>Cerca</span>
+                  <span style={{ color: '#A3452F', fontSize: 26 }}>Cerca</span>
                 </span>
               </div>
               <p style={{ fontSize: 15, color: '#4E6470', lineHeight: 1.7, fontFamily: SANS, fontWeight: 300, margin: '0 0 24px' }}>

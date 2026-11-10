@@ -367,7 +367,7 @@ export default function OnboardingFlow() {
         <Logo showWordmark size={28} variant="light" />
         <div style={{ marginTop: 16, height: 4, background: 'rgba(255,255,255,0.15)', borderRadius: 4 }}>
           <div style={{
-            height: '100%', width: `${progress}%`, background: '#E9826E', borderRadius: 4,
+            height: '100%', width: `${progress}%`, background: '#BF513C', borderRadius: 4,
             transition: 'width 0.4s cubic-bezier(0.4,0,0.2,1)',
           }} />
         </div>
@@ -610,7 +610,7 @@ export default function OnboardingFlow() {
                 style={{
                   display: 'flex', alignItems: 'center', gap: 14,
                   padding: '16px 18px', borderRadius: 16, border: 'none',
-                  background: '#25D366', color: 'white', cursor: 'pointer',
+                  background: '#075E54', color: 'white', cursor: 'pointer',
                   boxShadow: pressed ? 'none' : '0 3px 0px #1da653',
                   transform: pressed ? 'translateY(3px)' : 'none',
                   transition: 'transform 0.08s ease, box-shadow 0.08s ease',

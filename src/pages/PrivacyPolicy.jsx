@@ -102,7 +102,7 @@ export default function PrivacyPolicy() {
           >
             Política de Privacidad
           </h1>
-          <p className="text-sm text-gray-400">
+          <p className="text-sm text-gray-500">
             Última actualización: 1 de mayo de 2025 · Vigente a partir de esa fecha
           </p>
         </div>
@@ -147,7 +147,7 @@ export default function PrivacyPolicy() {
                 <DataChip label="🌐 Idioma del navegador" />
                 <DataChip label="⏰ Fecha/hora de acceso" />
               </div>
-              <p className="text-sm text-gray-400 mt-3">
+              <p className="text-sm text-gray-500 mt-3">
                 Estos datos son anónimos y se usan exclusivamente para mejorar el rendimiento de la aplicación.
               </p>
             </div>
@@ -306,7 +306,7 @@ export default function PrivacyPolicy() {
               <span className="text-2xl">✉️</span>
               <div>
                 <p className="font-semibold text-gray-900 text-sm">legal@familiacerca.com</p>
-                <p className="text-sm text-gray-400 mt-0.5">Respondemos en un plazo de 5 días hábiles</p>
+                <p className="text-sm text-gray-500 mt-0.5">Respondemos en un plazo de 5 días hábiles</p>
               </div>
             </div>
             <p className="text-sm text-gray-500">
@@ -321,7 +321,7 @@ export default function PrivacyPolicy() {
           className="mt-8 pt-6 flex flex-col items-center gap-3"
           style={{ borderTop: '1px solid #E6E3DB' }}
         >
-          <p className="text-sm text-gray-400 text-center leading-relaxed">
+          <p className="text-sm text-gray-500 text-center leading-relaxed">
             ¿Prefieres leer esto en inglés? Escríbenos a{' '}
             <a href="mailto:legal@familiacerca.com" className="underline" style={{ color: '#0C6C9C' }}>
               legal@familiacerca.com
@@ -335,7 +335,7 @@ export default function PrivacyPolicy() {
           >
             Ver Términos de Servicio →
           </Link>
-          <p className="text-[12px] text-gray-300 mt-1">
+          <p className="text-[12px] text-gray-500 mt-1">
             © 2025 FamiliaCerca LLC · Todos los derechos reservados
           </p>
         </div>

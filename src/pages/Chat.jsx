@@ -37,8 +37,8 @@ const AVATAR_PALETTE = [
   { bg: '#A6E3EC', ink: '#0A4A6B' },
   { bg: '#FBEAE4', ink: '#8A5A44' },
   { bg: '#0C6C9C', ink: '#FFFFFF' },
-  { bg: '#D99A18', ink: '#FFFFFF' },
-  { bg: '#E9826E', ink: '#FFFFFF' },
+  { bg: '#D99A18', ink: '#2E2004' },
+  { bg: '#BF513C', ink: '#FFFFFF' },
 ]
 function avatarStyle(name = '') {
   const code = name.charCodeAt(0) || 0

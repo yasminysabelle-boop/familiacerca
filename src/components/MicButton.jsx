@@ -10,7 +10,7 @@ export default function MicButton({ onStart, onStop, recording, size = 'md' }) {
   }
 
   return (
-    <button
+    <button aria-label="Dictar con la voz"
       type="button"
       onClick={handleClick}
       className={recording ? 'animate-mic-pulse' : ''}

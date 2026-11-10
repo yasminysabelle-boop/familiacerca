@@ -504,7 +504,7 @@ export default function PatientProfile() {
                   <input value={otraAlergia} onChange={e=>setOtraAlergia(e.target.value)}
                     onKeyDown={e=>{if(e.key==='Enter'){e.preventDefault();addOtra()}}}
                     placeholder="Otra alergia..." style={{ ...F, flex:1 }} onFocus={fo} onBlur={fb} />
-                  <button type="button" onClick={addOtra} style={{
+                  <button aria-label="Agregar" type="button" onClick={addOtra} style={{
                     padding:'0 16px', borderRadius:12, border:'none', background:'#D63031',
                     color:'white', fontWeight:700, fontSize:20, cursor:'pointer', flexShrink:0,
                   }}>+</button>

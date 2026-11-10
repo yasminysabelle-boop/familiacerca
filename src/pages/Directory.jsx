@@ -104,11 +104,11 @@ function FormSelect({ label, value, onChange, options, placeholder }) {
 function CardActions({ onEdit, onDeleteRequest, canDelete }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
-      <button onClick={onEdit} style={{ width: 28, height: 28, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F3F4F6', border: 'none', cursor: 'pointer' }}>
+      <button aria-label="Editar" onClick={onEdit} style={{ width: 28, height: 28, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F3F4F6', border: 'none', cursor: 'pointer' }}>
         <Pencil size={13} color="#4E6470" strokeWidth={1.75} />
       </button>
       {canDelete && (
-        <button onClick={onDeleteRequest} style={{ width: 28, height: 28, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#FFF0F0', border: 'none', cursor: 'pointer' }}>
+        <button aria-label="Eliminar" onClick={onDeleteRequest} style={{ width: 28, height: 28, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#FFF0F0', border: 'none', cursor: 'pointer' }}>
           <Trash size={13} color="#D63031" strokeWidth={1.75} />
         </button>
       )}
@@ -152,7 +152,7 @@ function SheetModal({ title, subtitle, onClose, onSave, saveLabel, saving, child
             <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 18, fontWeight: 700, color: '#14303D', margin: 0 }}>{title}</p>
             {subtitle && <p style={{ fontSize: 14, color: '#5E7480', marginTop: 4 }}>{subtitle}</p>}
           </div>
-          <button onClick={onClose} style={{ padding: 8, borderRadius: 10, background: '#F3F4F6', border: 'none', cursor: 'pointer' }}>
+          <button aria-label="Cerrar" onClick={onClose} style={{ padding: 8, borderRadius: 10, background: '#F3F4F6', border: 'none', cursor: 'pointer' }}>
             <XIcon size={16} color="#4E6470" strokeWidth={2} />
           </button>
         </div>
@@ -808,7 +808,7 @@ export default function Directory() {
                           style={{
                             position: 'absolute', bottom: 0, right: 0,
                             width: 22, height: 22, borderRadius: '50%',
-                            background: photoUploading ? '#5E7480' : '#E9826E',
+                            background: photoUploading ? '#5E7480' : '#BF513C',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                             fontSize: 13, cursor: 'pointer', border: '2px solid white',
                           }}

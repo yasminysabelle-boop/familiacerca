@@ -80,6 +80,16 @@ export default function Settings() {
   const { sub, isPaid, isTrialing, trialExpired, daysLeft } = useBillingAccount()
   const { familyPlan } = useFamilyPlan()
   const { dark, toggleDark } = useDarkMode()
+  // Letra grande (accesibilidad nov 2026): agranda toda la app un 15 %
+  const [bigText, setBigText] = useState(() => {
+    try { return localStorage.getItem('fc_letra_grande') === '1' } catch { return false }
+  })
+  function toggleBigText() {
+    const v = !bigText
+    setBigText(v)
+    document.documentElement.classList.toggle('letra-grande', v)
+    try { localStorage.setItem('fc_letra_grande', v ? '1' : '0') } catch { /* sin almacenamiento */ }
+  }
   const { permission, subscribed, supported, subscribeError, requestAndSubscribe, resubscribe } = usePushNotifications()
   const navigate = useNavigate()
   const [locationOn, setLocationOn] = useState(() => isLocationEnabled())
@@ -498,6 +508,13 @@ export default function Settings() {
             Preferencias
           </p>
           <ToggleRow
+            icon="🔠"
+            label="Letra grande"
+            subtitle="Todo se ve más grande y fácil de leer"
+            checked={bigText}
+            onChange={toggleBigText}
+          />
+          <ToggleRow
             icon="🌙"
             label="Modo oscuro"
             subtitle="Colores cálidos oscuros, sin azules"
@@ -684,7 +701,7 @@ export default function Settings() {
           </button>
         </div>
 
-        <p style={{ textAlign: 'center', fontSize: 13, color: '#D1D5DB', marginTop: 8 }}>
+        <p style={{ textAlign: 'center', fontSize: 13, color: '#6B7280', marginTop: 8 }}>
           © 2025 FamiliaCerca LLC · v1.0
         </p>
       </div>

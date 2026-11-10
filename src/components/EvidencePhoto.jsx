@@ -156,7 +156,7 @@ export default function EvidencePhoto({
               borderRadius: 10, border: '2px solid #E6E3DB',
             }}
           />
-          <button
+          <button aria-label="Cerrar"
             type="button"
             onClick={handleCancel}
             disabled={uploading}

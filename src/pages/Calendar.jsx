@@ -418,7 +418,7 @@ export default function Calendar() {
           {/* Calendar grid */}
           <div className="lg:col-span-2 bg-white rounded-xl border border-green-100 p-5">
             <div className="flex items-center justify-between mb-4" style={{ position: 'relative' }}>
-              <button onClick={prevMonth} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-600">←</button>
+              <button aria-label="Mes anterior" onClick={prevMonth} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-600">←</button>
 
               {/* Clickable month+year — opens grid+year picker */}
               <button
@@ -510,10 +510,10 @@ export default function Calendar() {
                 </div>
               )}
 
-              <button onClick={nextMonth} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-600">→</button>
+              <button aria-label="Mes siguiente" onClick={nextMonth} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-600">→</button>
             </div>
             <div className="grid grid-cols-7 gap-1 mb-2">
-              {DAYS.map(d => <div key={d} className="text-center text-sm font-medium text-gray-400 py-1">{d}</div>)}
+              {DAYS.map(d => <div key={d} className="text-center text-sm font-medium text-gray-500 py-1">{d}</div>)}
             </div>
             <div className="grid grid-cols-7 gap-1">
               {cells.map((day, i) => {
@@ -575,16 +575,16 @@ export default function Calendar() {
                             </span>
                           </div>
                           <p className="text-sm font-semibold text-gray-800 leading-tight">{ev.title}</p>
-                          {ev.time && <p className="text-sm text-gray-400 mt-0.5">⏰ {ev.time}</p>}
+                          {ev.time && <p className="text-sm text-gray-500 mt-0.5">⏰ {ev.time}</p>}
                           {ev.directory_contacts?.name && (
-                            <p className="text-sm text-gray-400">👨‍⚕️ {ev.directory_contacts.name}{ev.directory_contacts.specialty ? ` — ${ev.directory_contacts.specialty}` : ''}</p>
+                            <p className="text-sm text-gray-500">👨‍⚕️ {ev.directory_contacts.name}{ev.directory_contacts.specialty ? ` — ${ev.directory_contacts.specialty}` : ''}</p>
                           )}
-                          {ev.description && <p className="text-sm text-gray-400">{ev.description}</p>}
+                          {ev.description && <p className="text-sm text-gray-500">{ev.description}</p>}
                         </div>
                         <div className="flex items-center gap-1 flex-shrink-0">
                           {isAdmin && (
                             <button onClick={() => openEdit(ev)}
-                              className="text-gray-300 hover:text-gray-600 transition-colors text-sm p-0.5" title="Editar">✏️</button>
+                              className="text-gray-500 hover:text-gray-600 transition-colors text-sm p-0.5" title="Editar">✏️</button>
                           )}
                           {canActOn(ev) && (
                             <button onClick={() => setConfirmDialog({ onConfirm: () => handleDelete(ev.id) })}
@@ -620,7 +620,7 @@ export default function Calendar() {
                           )}
                           <div>
                             <p className="text-sm text-primary font-semibold">✓ Asistencia confirmada</p>
-                            {ev.proof_notes && <p className="text-sm text-gray-400">{ev.proof_notes}</p>}
+                            {ev.proof_notes && <p className="text-sm text-gray-500">{ev.proof_notes}</p>}
                           </div>
                         </div>
                       ) : !isFamiliar ? (
@@ -700,7 +700,7 @@ export default function Calendar() {
               ) : (
                 <div className="flex flex-col items-center gap-3 py-5 px-4">
                   <span className="text-3xl">📷</span>
-                  <p className="text-sm text-gray-400 text-center">Foto de la cita (sala de espera, receta...)</p>
+                  <p className="text-sm text-gray-500 text-center">Foto de la cita (sala de espera, receta...)</p>
                   <div className="flex gap-2 w-full">
                     <button type="button" onClick={pickCamera}
                       className="flex-1 py-2.5 text-sm font-semibold rounded-xl border border-primary text-primary bg-green-50 hover:bg-green-100 transition-colors">

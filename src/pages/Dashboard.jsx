@@ -856,7 +856,7 @@ function EventDetailSheet({ evt, onClose, onAttachProof, isFamiliar }) {
           <p style={{ fontSize: 13, color: '#5E7480', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>
             {TITLES[evt.type] ?? 'Detalle'}
           </p>
-          <button
+          <button aria-label="Cerrar"
             onClick={onClose}
             style={{
               width: 32, height: 32, borderRadius: '50%',
@@ -1301,7 +1301,7 @@ function SosConfirmSheet({ open, onClose, onConfirm, patientProfile, patientName
               <p style={{ fontSize: 14, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#D9534F', margin: '0 0 4px' }}>Emergencia para</p>
               <h3 style={{ fontSize: 20, fontWeight: 800, color: '#14303D', margin: 0 }}>{patientName}</h3>
             </div>
-            <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: '50%', background: '#F3F4F6', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <button aria-label="Cerrar" onClick={onClose} style={{ width: 32, height: 32, borderRadius: '50%', background: '#F3F4F6', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <XIcon size={14} color="#4E6470" strokeWidth={2} />
             </button>
           </div>
@@ -1697,7 +1697,7 @@ function MedDetailRow({ evt, isToday, confirming, onConfirm, isFamiliar }) {
           disabled={busy}
           style={{
             padding: '6px 11px', borderRadius: 8, border: 'none',
-            background: busy ? '#C9D6DB' : '#2BB8CC',
+            background: busy ? '#C9D6DB' : '#0C6C9C',
             color: 'white', fontSize: 13, fontWeight: 700,
             cursor: busy ? 'not-allowed' : 'pointer', flexShrink: 0,
           }}
@@ -1890,25 +1890,25 @@ function AttentionCard({ medName, medDosage, medTime, windowLabel, isExpired, on
     <section aria-label="Necesita tu atención" style={{ background: '#FBEAE4', borderRadius: 26, overflow: 'hidden', boxShadow: '0 8px 24px -12px rgba(233,130,110,0.45)' }}>
       <div style={{ padding: '18px 18px 20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 16 }}>
-          <Bell size={19} color="#E9826E" strokeWidth={2} />
-          <h2 style={{ margin: 0, fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 18, fontWeight: 600, color: '#E9826E' }}>Necesita tu atención</h2>
+          <Bell size={19} color="#A3452F" strokeWidth={2} />
+          <h2 style={{ margin: 0, fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 18, fontWeight: 600, color: '#A3452F' }}>Necesita tu atención</h2>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           <span style={{ width: 70, height: 70, borderRadius: '50%', background: 'rgba(233,130,110,0.16)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <Pill size={34} color="#E9826E" strokeWidth={1.8} />
+            <Pill size={34} color="#A3452F" strokeWidth={1.8} />
           </span>
           <div style={{ flex: 1, minWidth: 0 }}>
             <p style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#2A4350', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{medName}{medDosage ? ` ${medDosage}` : ''}</p>
             <p style={{ margin: '6px 0 0', display: 'flex', alignItems: 'center', gap: 6, fontSize: 14, fontWeight: 600, color: '#64748B' }}>
               <Clock size={15} color="#64748B" strokeWidth={2} /> Hoy {medTime}
             </p>
-            <p style={{ margin: '5px 0 0', display: 'flex', alignItems: 'center', gap: 6, fontSize: 13.5, fontWeight: 600, color: '#E9826E' }}>
+            <p style={{ margin: '5px 0 0', display: 'flex', alignItems: 'center', gap: 6, fontSize: 13.5, fontWeight: 600, color: '#A3452F' }}>
               {isExpired
-                ? <><Clock size={13} color="#E9826E" strokeWidth={2.4} /> ¿Se administró? Puedes registrarlo</>
-                : <><AlertTriangle size={13} color="#E9826E" strokeWidth={2.4} /> Pendiente de confirmar</>}
+                ? <><Clock size={13} color="#A3452F" strokeWidth={2.4} /> ¿Se administró? Puedes registrarlo</>
+                : <><AlertTriangle size={13} color="#A3452F" strokeWidth={2.4} /> Pendiente de confirmar</>}
             </p>
           </div>
-          <button onClick={isExpired ? onLate : onConfirm} style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 7, borderRadius: 15, background: '#E9826E', padding: '13px 17px', border: 'none', cursor: 'pointer', color: 'white', fontWeight: 700, fontSize: 14.5, boxShadow: '0 8px 18px -6px rgba(233,130,110,0.7)', WebkitTapHighlightColor: 'transparent' }}>
+          <button onClick={isExpired ? onLate : onConfirm} style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 7, borderRadius: 15, background: '#BF513C', padding: '13px 17px', border: 'none', cursor: 'pointer', color: 'white', fontWeight: 700, fontSize: 14.5, boxShadow: '0 8px 18px -6px rgba(233,130,110,0.7)', WebkitTapHighlightColor: 'transparent' }}>
             {isExpired ? 'Registrar' : 'Confirmar'} <CheckIcon size={17} color="white" strokeWidth={2.6} />
           </button>
         </div>
@@ -1999,7 +1999,7 @@ function RecentActivity({ items, onViewAll, onSelect, firstName, summaryText, su
                   {meta.sub && (
                     <p style={{ margin: '3px 0 0', fontSize: 14, fontStyle: isNote ? 'italic' : 'normal', color: isNote ? '#475569' : '#94A3B8', lineHeight: 1.4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{isNote ? `"${meta.sub}"` : meta.sub}</p>
                   )}
-                  <p style={{ margin: '3px 0 0', fontSize: 13, color: '#94A3B8', fontWeight: 600 }}>{time}</p>
+                  <p style={{ margin: '3px 0 0', fontSize: 13, color: '#64748B', fontWeight: 600 }}>{time}</p>
                 </div>
                 {isNote ? (
                   <span style={{ width: 32, height: 32, borderRadius: '50%', flexShrink: 0, background: '#EEF2F6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -3518,7 +3518,7 @@ export default function Dashboard() {
                   >
                     <Bell size={20} color="#2A4350" strokeWidth={2} />
                     {totalBadge > 0 && (
-                      <span style={{ position: 'absolute', top: -2, right: -2, background: '#E9826E', color: 'white', fontSize: 13, fontWeight: 700, borderRadius: '50%', width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1 }}>
+                      <span style={{ position: 'absolute', top: -2, right: -2, background: '#BF513C', color: 'white', fontSize: 13, fontWeight: 700, borderRadius: '50%', width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1 }}>
                         {totalBadge > 9 ? '9+' : totalBadge}
                       </span>
                     )}
@@ -3566,8 +3566,8 @@ export default function Dashboard() {
                 : 'Activa las notificaciones para saber si falta un medicamento'}
             </p>
             {iosNeedsInstall
-              ? !showIosHelp && <button onClick={() => setShowIosHelp(true)} style={{ padding: '7px 13px', borderRadius: 9, background: '#E9826E', color: 'white', fontSize: 13, fontWeight: 700, border: 'none', cursor: 'pointer', flexShrink: 0 }}>Cómo</button>
-              : <button onClick={requestAndSubscribe} style={{ padding: '7px 13px', borderRadius: 9, background: '#E9826E', color: 'white', fontSize: 13, fontWeight: 700, border: 'none', cursor: 'pointer', flexShrink: 0 }}>Activar</button>}
+              ? !showIosHelp && <button onClick={() => setShowIosHelp(true)} style={{ padding: '7px 13px', borderRadius: 9, background: '#BF513C', color: 'white', fontSize: 13, fontWeight: 700, border: 'none', cursor: 'pointer', flexShrink: 0 }}>Cómo</button>
+              : <button onClick={requestAndSubscribe} style={{ padding: '7px 13px', borderRadius: 9, background: '#BF513C', color: 'white', fontSize: 13, fontWeight: 700, border: 'none', cursor: 'pointer', flexShrink: 0 }}>Activar</button>}
             <button onClick={dismissNotifBanner} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, flexShrink: 0, display: 'flex' }} aria-label="Cerrar">
               <XIcon size={14} color="#5E7480" strokeWidth={2} />
             </button>
@@ -3707,7 +3707,7 @@ export default function Dashboard() {
                       <p style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#14303D' }}>Solo tú por ahora</p>
                       <p style={{ margin: '2px 0 0', fontSize: 14, color: '#4E6470', lineHeight: 1.4 }}>Invita a tu familia para que todos vean el cuidado y reciban los avisos.</p>
                     </div>
-                    <button onClick={() => navigate('/familia?invitar=1')} style={{ flex: 'none', padding: '10px 14px', borderRadius: 12, background: '#E9826E', color: 'white', fontSize: 14, fontWeight: 700, border: 'none', cursor: 'pointer' }}>Invitar</button>
+                    <button onClick={() => navigate('/familia?invitar=1')} style={{ flex: 'none', padding: '10px 14px', borderRadius: 12, background: '#BF513C', color: 'white', fontSize: 14, fontWeight: 700, border: 'none', cursor: 'pointer' }}>Invitar</button>
                   </div>
                 )}
 
@@ -3722,7 +3722,7 @@ export default function Dashboard() {
                       {familyMembers.map((m, i) => {
                         const name = m.id === user?.id ? 'Tú' : (m.full_name?.split(' ')[0] || m.email?.split('@')[0] || 'Familiar')
                         const active = m.last_seen && Date.now() - new Date(m.last_seen).getTime() < 24 * 60 * 60 * 1000
-                        const colors = ['#0C6C9C', '#E9826E', '#2BB8CC', '#0A4A6B', '#C9654F']
+                        const colors = ['#0C6C9C', '#BF513C', '#127A8A', '#0A4A6B', '#A3452F']
                         return (
                           <div key={m.id || i} style={{ flex: 'none', width: 62, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
                             <span style={{ position: 'relative', width: 52, height: 52, borderRadius: '50%', background: colors[i % colors.length], color: 'white', fontSize: 21, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', border: active ? '3px solid #4FD0E0' : '3px solid #E6E3DB' }}>
@@ -3807,7 +3807,7 @@ export default function Dashboard() {
                   </div>
                 </div>
 
-                <button onClick={() => navigate('/mas')} style={{ alignSelf: 'center', background: 'none', border: 'none', padding: '4px 8px', fontSize: 15, fontWeight: 700, color: '#0C6C9C', cursor: 'pointer' }}>
+                <button onClick={() => navigate('/mas')} style={{ alignSelf: 'center', background: 'none', border: 'none', padding: '12px 16px', minHeight: 44, fontSize: 15, fontWeight: 700, color: '#0C6C9C', cursor: 'pointer' }}>
                   Ver todo el cuidado ›
                 </button>
               </>
