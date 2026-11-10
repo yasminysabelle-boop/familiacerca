@@ -854,7 +854,7 @@ export default function Landing() {
                 </p>
               )}
               <p style={{ margin: '16px 0 0', fontSize: 15, color: '#4E6470', lineHeight: 1.45, textAlign: 'center' }}>
-                ¿Todavía no tienes cuenta? <Link to="/register" onClick={() => setInstallHelp(false)} style={{ color: '#0C6C9C', fontWeight: 700 }}>Créala gratis</Link>
+                Al abrir la app te pedirá entrar o crear tu cuenta gratis.
               </p>
             </div>
           </div>
