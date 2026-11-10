@@ -26,7 +26,7 @@ const CORAL_EMERGENCY = '#D9534F'
 const AI_PURPLE = '#7566D8'
 
 const SERIF = "'Plus Jakarta Sans', sans-serif"
-const SANS  = "'Inter', system-ui, sans-serif"
+const SANS  = "'Plus Jakarta Sans', system-ui, sans-serif"  // una sola letra, igual que la app
 
 function CTABtn({ to, children, style = {} }) {
   return (
@@ -127,14 +127,7 @@ export default function Landing() {
   const [showBar, setShowBar] = useState(false)
   const [dismissed, setDismissed] = useState(false)
 
-  useEffect(() => {
-    if (document.getElementById('landing-gfonts')) return
-    const pc1 = document.createElement('link'); pc1.rel = 'preconnect'; pc1.href = 'https://fonts.googleapis.com'; document.head.appendChild(pc1)
-    const pc2 = document.createElement('link'); pc2.rel = 'preconnect'; pc2.href = 'https://fonts.gstatic.com'; pc2.crossOrigin = 'anonymous'; document.head.appendChild(pc2)
-    const lk = document.createElement('link'); lk.id = 'landing-gfonts'; lk.rel = 'stylesheet'
-    lk.href = 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Inter:wght@300;400;500;600&display=swap'
-    document.head.appendChild(lk)
-  }, [])
+  // (Ya no se cargan Cormorant ni Inter: toda la web usa Plus Jakarta Sans, que viene en index.html)
 
   // Animación de entrada. Respaldo por scroll: si el IntersectionObserver no
   // dispara (algunos navegadores/webviews), las secciones nunca aparecían.

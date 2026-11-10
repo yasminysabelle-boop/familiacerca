@@ -525,7 +525,7 @@ function UpgradeContent() {
             />
           </div>
 
-          <p style={{ fontSize: 14, color: '#B0A898', textAlign: 'center', margin: '4px 0 0', lineHeight: 1.6 }}>
+          <p style={{ fontSize: 14, color: '#5E7480', textAlign: 'center', margin: '4px 0 0', lineHeight: 1.6 }}>
             Pago seguro procesado por PayPal · Cancela en cualquier momento
           </p>
         </div>

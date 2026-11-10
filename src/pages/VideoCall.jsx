@@ -307,7 +307,7 @@ export default function VideoCall() {
                   const initial = m.name.charAt(0).toUpperCase()
                   const bg = online ? '#A6E3EC' : '#E7E1D2'
                   const fg = online ? '#0A5A82' : '#8A8270'
-                  const dot = online ? '#2BB8CC' : '#94A3B8'
+                  const dot = online ? '#2BB8CC' : '#64748B'
                   return (
                     <div key={m.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, flexShrink: 0, width: 64 }}>
                       <div style={{ position: 'relative', width: 56, height: 56 }}>

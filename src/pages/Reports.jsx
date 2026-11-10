@@ -107,7 +107,7 @@ export default function Reports() {
         </div>
 
         {/* Pattern detection / wellness summary */}
-        <div className="bg-white rounded-xl border border-green-100 p-6 mb-6">
+        <div className="bg-white rounded-xl border border-[#E6E3DB] p-6 mb-6">
           <h3 className="font-semibold text-gray-900 mb-1">Análisis de bienestar — últimos 7 días</h3>
           <p className="text-sm text-gray-500 mb-5">Detección automática de patrones en medicamentos y notas</p>
 
@@ -173,7 +173,7 @@ export default function Reports() {
         </div>
 
         {/* PDF Report */}
-        <div className="bg-white rounded-xl border border-green-100 p-6">
+        <div className="bg-white rounded-xl border border-[#E6E3DB] p-6">
           <div className="flex gap-4 mb-5">
             <div className="w-12 h-12 bg-primary-light rounded-xl flex items-center justify-center text-2xl flex-shrink-0">📄</div>
             <div>

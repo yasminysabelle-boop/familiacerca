@@ -8,7 +8,7 @@ import Layout from '../components/Layout'
 const ROLE_META = {
   admin:    { label: 'Admin',    color: '#0A4A6B', bg: '#E3F1F8' },
   cuidador: { label: 'Cuidador', color: '#1D4ED8', bg: '#EFF6FF' },
-  familiar: { label: 'Familiar', color: '#1677A6', bg: '#F5F3FF' },
+  familiar: { label: 'Familiar', color: '#1677A6', bg: '#EEF6FA' },
 }
 
 function roleKey(role) {

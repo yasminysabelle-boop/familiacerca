@@ -430,7 +430,7 @@ function AppointmentProofCard({ evt, onTap }) {
         <img
           src={evt.proofPhotoUrl}
           alt="Prueba"
-          style={{ width: 44, height: 44, borderRadius: 10, objectFit: 'cover', flexShrink: 0, border: '1px solid #D1FAE5' }}
+          style={{ width: 44, height: 44, borderRadius: 10, objectFit: 'cover', flexShrink: 0, border: '1px solid #CDE8F3' }}
         />
       ) : (
         <span style={{ fontSize: 22, flexShrink: 0 }}>📅</span>
@@ -454,15 +454,15 @@ function AppointmentProofCard({ evt, onTap }) {
 function CaregiverCard({ evt }) {
   return (
     <div style={{
-      background: 'linear-gradient(135deg, #EDE9FE, #DDD6FE)',
-      borderRadius: 16, border: '1px solid #C4B5FD',
+      background: 'linear-gradient(135deg, #E3F1F8, #CDE8F3)',
+      borderRadius: 16, border: '1px solid #A6E3EC',
       padding: '14px 16px',
-      boxShadow: '0 2px 8px rgba(124,92,191,0.12)',
+      boxShadow: '0 2px 8px rgba(12,108,156,0.12)',
     }}>
-      <p style={{ fontSize: 15, fontWeight: 700, color: '#5B21B6', margin: '0 0 4px' }}>
+      <p style={{ fontSize: 15, fontWeight: 700, color: '#0A4A6B', margin: '0 0 4px' }}>
         💙 Reconocimiento semanal
       </p>
-      <p style={{ fontSize: 14, color: '#6D28D9', lineHeight: 1.5, margin: 0 }}>
+      <p style={{ fontSize: 14, color: '#0A4A6B', lineHeight: 1.5, margin: 0 }}>
         {evt.caregiverName.split(' ')[0]} coordinó{' '}
         <strong>{evt.weekCount} dosis</strong> esta semana.
         El cuidado invisible merece ser visto. 💙
@@ -902,7 +902,7 @@ function EventDetailSheet({ evt, onClose, onAttachProof, isFamiliar }) {
                       <img
                         src={evt.proofPhotoUrl}
                         alt="Comprobante de cita"
-                        style={{ width: '100%', borderRadius: 12, objectFit: 'cover', maxHeight: 260, border: '1px solid #D1FAE5' }}
+                        style={{ width: '100%', borderRadius: 12, objectFit: 'cover', maxHeight: 260, border: '1px solid #CDE8F3' }}
                       />
                     </div>
                   )}
@@ -945,7 +945,7 @@ function EventDetailSheet({ evt, onClose, onAttachProof, isFamiliar }) {
                   <img
                     src={evt.proofPhotoUrl}
                     alt="Prueba de cita"
-                    style={{ width: '100%', borderRadius: 12, objectFit: 'cover', maxHeight: 260, border: '1px solid #D1FAE5' }}
+                    style={{ width: '100%', borderRadius: 12, objectFit: 'cover', maxHeight: 260, border: '1px solid #CDE8F3' }}
                   />
                 </div>
               )}
@@ -1200,9 +1200,9 @@ function weekKey(d = new Date()) {
 
 const AI_CARD_CONFIGS = {
   morning: { gradient: 'linear-gradient(135deg, #FEF3C7, #FFFBEB)', border: '#FDE68A',   icon: '🌅', label: 'Tu momento del día',  textColor: '#5A4010' },
-  evening: { gradient: 'linear-gradient(135deg, #EDE9FE, #F5F3FF)', border: '#C4B5FD',   icon: '🌙', label: 'Resumen del día',      textColor: '#5B21B6' },
+  evening: { gradient: 'linear-gradient(135deg, #E3F1F8, #EEF6FA)', border: '#A6E3EC',   icon: '🌙', label: 'Resumen del día',      textColor: '#0A4A6B' },
   burnout: { gradient: 'linear-gradient(135deg, #FEE2E2, #FFF5F5)', border: '#FECACA',   icon: '💙', label: 'Un mensaje para ti',   textColor: '#7F1D1D' },
-  weekly:  { gradient: 'linear-gradient(135deg, #D1FAE5, #ECFDF5)', border: '#6EE7B7',   icon: '🌿', label: 'Resumen semanal',      textColor: '#064E3B' },
+  weekly:  { gradient: 'linear-gradient(135deg, #CDE8F3, #EEF6FA)', border: '#A6E3EC',   icon: '🌿', label: 'Resumen semanal',      textColor: '#0A4A6B' },
 }
 
 function AiCard({ type, text }) {
@@ -1495,7 +1495,7 @@ function calcAge(dateStr) {
 // ── Unified DashCard ─────────────────────────────────────────────────────────
 
 const DASH_STATUS = {
-  ok:      { color: '#0A4A6B', bg: '#DCFCE7' },
+  ok:      { color: '#0A4A6B', bg: '#E3F1F8' },
   warning: { color: '#92400E', bg: '#FEF3C7' },
   urgent:  { color: '#DC2626', bg: '#FEE2E2' },
   info:    { color: '#4E6470', bg: '#F3F4F6' },
@@ -1959,7 +1959,7 @@ function RecentActivity({ items, onViewAll, onSelect, firstName, summaryText, su
             {summaryEmpty ? 'Aún no hay registros del día.' : summaryText}
           </p>
           {!summaryEmpty && summaryStale && (
-            <p style={{ margin: '6px 0 0', fontSize: 14, color: '#7C8698', lineHeight: 1.4, fontStyle: 'italic' }}>
+            <p style={{ margin: '6px 0 0', fontSize: 14, color: '#5E7480', lineHeight: 1.4, fontStyle: 'italic' }}>
               Este resumen es de hoy, generado más temprano. Mañana Milo lo actualiza con lo último.
             </p>
           )}
@@ -1967,7 +1967,7 @@ function RecentActivity({ items, onViewAll, onSelect, firstName, summaryText, su
       )}
       {items.length === 0 ? (
         <div style={{ padding: '6px 0 2px' }}>
-          <p style={{ color: '#7C8698', fontSize: 14, margin: '0 0 4px', fontWeight: 500 }}>Todavía no hay nada marcado hoy</p>
+          <p style={{ color: '#5E7480', fontSize: 14, margin: '0 0 4px', fontWeight: 500 }}>Todavía no hay nada marcado hoy</p>
           <p style={{ color: '#5E7480', fontSize: 15, margin: 0, lineHeight: 1.6 }}>
             Cuando alguien dé una medicina,<br />suba una foto o escriba una nota,<br />aparecerá aquí.
           </p>
@@ -2007,7 +2007,7 @@ function RecentActivity({ items, onViewAll, onSelect, firstName, summaryText, su
                 </div>
                 {isNote ? (
                   <span style={{ width: 32, height: 32, borderRadius: '50%', flexShrink: 0, background: '#EEF2F6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Chat size={16} color="#94A3B8" strokeWidth={2.1} />
+                    <Chat size={16} color="#64748B" strokeWidth={2.1} />
                   </span>
                 ) : (
                   <span style={{ width: 32, height: 32, borderRadius: '50%', flexShrink: 0, background: '#E3F1F8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -3726,9 +3726,9 @@ export default function Dashboard() {
                 {isAdmin && !!realPatientName && (medTotal === 0 || !routineActive || familyCount <= 1) && (() => {
                   const who = patientFirstName || 'tu familiar'
                   const steps = [
-                    { done: medTotal > 0,     emoji: '💊', title: `Agrega las medicinas de ${who}`, sub: 'Con una foto de la receta es más rápido', go: () => navigate('/medications?add=1') },
-                    { done: routineActive,    emoji: '📋', title: 'Marca el primer cuidado del día', sub: 'Baño, comidas, dientes… lo que toque', go: () => navigate('/cuidado') },
-                    { done: familyCount > 1,  emoji: '👨‍👩‍👧', title: 'Invita a tu familia', sub: 'Para que todos vean y reciban los avisos', go: () => navigate('/familia?invitar=1') },
+                    { done: medTotal > 0,     Ic: Pill, title: `Agrega las medicinas de ${who}`, sub: 'Con una foto de la receta es más rápido', go: () => navigate('/medications?add=1') },
+                    { done: routineActive,    Ic: ClipboardCheck, title: 'Marca el primer cuidado del día', sub: 'Baño, comidas, dientes… lo que toque', go: () => navigate('/cuidado') },
+                    { done: familyCount > 1,  Ic: Users, title: 'Invita a tu familia', sub: 'Para que todos vean y reciban los avisos', go: () => navigate('/familia?invitar=1') },
                   ]
                   const doneCount = steps.filter(x => x.done).length
                   const nextIdx = steps.findIndex(x => !x.done)
@@ -3748,7 +3748,7 @@ export default function Dashboard() {
                             style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, textAlign: 'left', padding: '12px 12px', marginTop: k ? 8 : 0, borderRadius: 14, cursor: st.done ? 'default' : 'pointer',
                               background: isNext ? '#E3F1F8' : 'white', border: isNext ? '2px solid #0C6C9C' : '1px solid #E6E3DB', opacity: st.done ? 0.65 : 1 }}>
                             <span style={{ flex: 'none', width: 40, height: 40, borderRadius: '50%', background: st.done ? '#0C6C9C' : 'white', border: st.done ? 'none' : '2px solid #CDE8F3', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: st.done ? 20 : 20, fontWeight: 800 }}>
-                              {st.done ? '✓' : st.emoji}
+                              {st.done ? <CheckIcon size={20} color="white" strokeWidth={2.8} /> : <st.Ic size={20} color="#0C6C9C" strokeWidth={2.1} />}
                             </span>
                             <span style={{ flex: 1, minWidth: 0 }}>
                               <span style={{ display: 'block', fontSize: 16, fontWeight: 700, color: '#14303D', textDecoration: st.done ? 'line-through' : 'none' }}>{st.title}</span>
@@ -4115,7 +4115,7 @@ export default function Dashboard() {
                   const isCuid = m.role === 'cuidador'
                   const roleLabel = isAdm ? 'Admin' : isCuid ? 'Cuidador' : 'Familiar'
                   const roleColor = isAdm ? '#0A4A6B' : isCuid ? '#1D4ED8' : '#D97706'
-                  const roleBg = isAdm ? '#DCFCE7' : isCuid ? '#DBEAFE' : '#FEF3C7'
+                  const roleBg = isAdm ? '#E3F1F8' : isCuid ? '#DBEAFE' : '#FEF3C7'
                   const displayName = m.full_name?.trim() || (m.email ? m.email.split('@')[0] : 'Sin nombre')
                   const initial = displayName.charAt(0).toUpperCase()
                   const presence = (() => {
@@ -4169,7 +4169,7 @@ export default function Dashboard() {
                         const isCuid = fam.role === 'cuidador'
                         const famRoleLabel = fam.role === null ? 'Admin' : isCuid ? 'Cuidador' : 'Familiar'
                         const famRoleColor = fam.role === null ? '#0A4A6B' : isCuid ? '#1D4ED8' : '#D97706'
-                        const famRoleBg = fam.role === null ? '#DCFCE7' : isCuid ? '#DBEAFE' : '#FEF3C7'
+                        const famRoleBg = fam.role === null ? '#E3F1F8' : isCuid ? '#DBEAFE' : '#FEF3C7'
                         const famInitial = (fam.patientName ?? 'F').charAt(0).toUpperCase()
                         return (
                           <button

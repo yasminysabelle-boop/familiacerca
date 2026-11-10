@@ -37,19 +37,15 @@ body {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-/* ── Dark mode ────────────────────────────────────────────────────── */
-[data-theme="dark"] body {
-  background-color: #14303D;
-  color: #E3F1F8;
-}
-[data-theme="dark"] .bg-white         { background-color: #1A2E1F !important; }
-[data-theme="dark"] .bg-gray-50       { background-color: #142010 !important; }
-[data-theme="dark"] .border-green-100 { border-color: #14303D !important; }
-[data-theme="dark"] .text-gray-900    { color: #E3F1F8 !important; }
-[data-theme="dark"] .text-gray-700    { color: #A6E3EC !important; }
-[data-theme="dark"] .text-gray-600    { color: #A8C8B4 !important; }
-[data-theme="dark"] .text-gray-500    { color: #7AAA8A !important; }
-[data-theme="dark"] .text-gray-400    { color: #5A8A6A !important; }
+/* ── Modo oscuro (nov 2026) ─────────────────────────────────────────
+   La app usa estilos en línea, así que el modo oscuro invierte la página
+   entera y vuelve a invertir fotos e imágenes para que se vean normales. */
+/* El filtro va en <html> (la raíz no rompe los elementos fijos: barra de abajo, ventanas). */
+html[data-theme="dark"] { filter: invert(0.92) hue-rotate(180deg); background: #F7F6F2; }
+html[data-theme="dark"] img,
+html[data-theme="dark"] video,
+html[data-theme="dark"] picture,
+html[data-theme="dark"] [style*="background-image"] { filter: invert(1) hue-rotate(180deg); }
 
 /* Serif for all headings */
 h1, h2, h3 {

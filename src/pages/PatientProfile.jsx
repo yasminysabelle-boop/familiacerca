@@ -455,7 +455,7 @@ export default function PatientProfile() {
             </Section>
 
             {/* ══ S2: Información médica ════════════════════════════════════ */}
-            <Section color="#2563EB" icon="🏥" title="Información médica" badge={b2}
+            <Section color="#0C6C9C" icon="🏥" title="Información médica" badge={b2}
               open={open.s2} onToggle={() => setOpen(p=>({...p,s2:!p.s2}))}>
 
               <Fld label="Diagnóstico principal">
@@ -518,7 +518,7 @@ export default function PatientProfile() {
 
               <Fld label="Antecedentes familiares">
                 <CheckChips opts={CONDICION} value={form.antecedentes_familiares}
-                  onChange={v=>set('antecedentes_familiares',v)} colorOn="#1677A6" bgOn="#F5F3FF" />
+                  onChange={v=>set('antecedentes_familiares',v)} colorOn="#1677A6" bgOn="#EEF6FA" />
               </Fld>
 
               <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>

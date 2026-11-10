@@ -146,7 +146,7 @@ function InstitutionCard({ inst, canEdit, onEdit, onDelete }) {
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
             <p style={{ fontSize: 15, fontWeight: 700, color: '#14303D', margin: 0 }}>{inst.name}</p>
-            {inst.type && <span style={{ fontSize: 14, fontWeight: 700, color: '#1677A6', background: '#EDE9FE', padding: '2px 7px', borderRadius: 6 }}>{inst.type}</span>}
+            {inst.type && <span style={{ fontSize: 14, fontWeight: 700, color: '#1677A6', background: '#E3F1F8', padding: '2px 7px', borderRadius: 6 }}>{inst.type}</span>}
           </div>
           {inst.address && <p style={{ fontSize: 15, color: '#4E6470', margin: '0 0 1px' }}>📍 {inst.address}</p>}
           {inst.phone && <p style={{ fontSize: 15, color: '#4E6470', margin: '0 0 1px' }}>☎ {inst.phone}</p>}
@@ -209,7 +209,7 @@ function ContactCard({ contact, canEdit, isEmergency, onEdit, onDelete }) {
 function ContactForm({ data, onChange, onSave, onCancel, saving, isEmergency }) {
   const color  = isEmergency ? '#D63031' : '#1677A6'
   const bg     = isEmergency ? '#FFF5F5' : '#FAF5FF'
-  const border = isEmergency ? '#FECACA' : '#C4B5FD'
+  const border = isEmergency ? '#FECACA' : '#A6E3EC'
   return (
     <div style={{ background: bg, borderRadius: 14, padding: 14, marginBottom: 8, border: `1.5px solid ${border}` }}>
       <Inp label="Nombre completo" value={data.name} onChange={v => onChange('name', v)} placeholder="Nombre completo" />

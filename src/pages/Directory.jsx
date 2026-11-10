@@ -294,8 +294,8 @@ function ContactCard({ con, onEdit, onToggleEmergency, onDeleteRequest, canDelet
 function JoinedMemberCard({ member, inDirectory, onClick }) {
   const roleLabel  = member.role === 'cuidador' ? 'Cuidador' : 'Familiar'
   const roleColor  = member.role === 'cuidador' ? '#0C6C9C' : '#0C6C9C'
-  const roleBg     = member.role === 'cuidador' ? '#E3F1F8' : '#EDE9FE'
-  const roleBorder = member.role === 'cuidador' ? '#A6E3EC' : '#C4B5FD'
+  const roleBg     = member.role === 'cuidador' ? '#E3F1F8' : '#E3F1F8'
+  const roleBorder = member.role === 'cuidador' ? '#A6E3EC' : '#A6E3EC'
   return (
     <div
       onClick={onClick}
@@ -311,7 +311,7 @@ function JoinedMemberCard({ member, inDirectory, onClick }) {
           width: 38, height: 38, borderRadius: '50%', flexShrink: 0,
           background: 'linear-gradient(135deg, #DBEAFE, #BFDBFE)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 16, fontWeight: 700, color: '#2563EB',
+          fontSize: 16, fontWeight: 700, color: '#0C6C9C',
         }}>
           {member.name?.charAt(0)?.toUpperCase() ?? '?'}
         </div>
@@ -904,17 +904,17 @@ export default function Directory() {
 
                 {/* Médico tratante */}
                 {patientProfile.medico_tratante && (
-                  <div style={{ background: 'white', border: '1px solid #E6E3DB', borderTop: '3px solid #2563EB', borderRadius: 14, padding: '14px 16px', marginBottom: 10 }}>
+                  <div style={{ background: 'white', border: '1px solid #E6E3DB', borderTop: '3px solid #0C6C9C', borderRadius: 14, padding: '14px 16px', marginBottom: 10 }}>
                     <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 15, fontWeight: 700, color: '#14303D', margin: '0 0 2px' }}>
                       {patientProfile.medico_tratante}
                     </p>
                     {patientProfile.especialidad_medico && (
-                      <p style={{ fontSize: 15, color: '#2563EB', fontWeight: 600, margin: '0 0 6px' }}>{patientProfile.especialidad_medico}</p>
+                      <p style={{ fontSize: 15, color: '#0C6C9C', fontWeight: 600, margin: '0 0 6px' }}>{patientProfile.especialidad_medico}</p>
                     )}
                     {patientProfile.telefono_medico && (
                       <a href={`tel:${patientProfile.telefono_medico}`} style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 6, textDecoration: 'none' }}>
-                        <Phone size={13} color="#2563EB" strokeWidth={2} />
-                        <span style={{ fontSize: 15, color: '#2563EB', fontWeight: 600 }}>{patientProfile.telefono_medico}</span>
+                        <Phone size={13} color="#0C6C9C" strokeWidth={2} />
+                        <span style={{ fontSize: 15, color: '#0C6C9C', fontWeight: 600 }}>{patientProfile.telefono_medico}</span>
                       </a>
                     )}
                   </div>

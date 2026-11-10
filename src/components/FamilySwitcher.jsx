@@ -83,7 +83,7 @@ export default function FamilySwitcher({ isLight = false }) {
                 const isActive = fam.ownerId === activeOwnerId
                 const initials = fam.patientName?.charAt(0)?.toUpperCase() ?? '?'
                 const roleLabel = fam.role === null ? 'Administrador' : fam.role === 'cuidador' ? 'Cuidador' : 'Familiar'
-                const roleColor = fam.role === null ? '#0C6C9C' : fam.role === 'cuidador' ? '#2563EB' : '#4E6470'
+                const roleColor = fam.role === null ? '#0C6C9C' : fam.role === 'cuidador' ? '#0C6C9C' : '#4E6470'
                 const roleBg   = fam.role === null ? '#E3F1F8' : fam.role === 'cuidador' ? '#DBEAFE' : '#F3F4F6'
 
                 return (

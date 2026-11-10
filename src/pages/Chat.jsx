@@ -450,13 +450,13 @@ ${lines}`
                 const canUnpin = isOwner || msg.user_id === user?.id
                 return (
                   <div key={msg.id} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <Clock size={13} color="#94A0AD" strokeWidth={2.2} style={{ flexShrink: 0 }} />
+                    <Clock size={13} color="#5E7480" strokeWidth={2.2} style={{ flexShrink: 0 }} />
                     <p style={{ flex: 1, fontSize: 15, color: '#2A4350', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {msgText}
                     </p>
                     {canUnpin && (
-                      <button onClick={() => togglePin(msg)} aria-label="Desfijar" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94A0AD', flexShrink: 0, padding: 0, display: 'flex' }}>
-                        <XIcon size={13} color="#94A0AD" strokeWidth={2.2} />
+                      <button onClick={() => togglePin(msg)} aria-label="Desfijar" style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#5E7480', flexShrink: 0, padding: 0, display: 'flex' }}>
+                        <XIcon size={13} color="#5E7480" strokeWidth={2.2} />
                       </button>
                     )}
                   </div>
@@ -514,7 +514,7 @@ ${lines}`
               onClick={e => e.stopPropagation()}
             >
               <div style={{ padding: '12px 16px', borderBottom: '1px solid rgba(51,65,85,0.08)' }}>
-                <p style={{ fontSize: 15, color: '#94A0AD', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <p style={{ fontSize: 15, color: '#5E7480', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   "{(contextMsg.content ?? contextMsg.message ?? '').slice(0, 50)}"
                 </p>
               </div>
@@ -527,7 +527,7 @@ ${lines}`
               </button>
               <button
                 onClick={() => setContextMsg(null)}
-                style={{ width: '100%', padding: '12px 16px', border: 'none', background: '#F7F6F2', cursor: 'pointer', textAlign: 'center', fontSize: 14, fontWeight: 700, color: '#94A0AD' }}
+                style={{ width: '100%', padding: '12px 16px', border: 'none', background: '#F7F6F2', cursor: 'pointer', textAlign: 'center', fontSize: 14, fontWeight: 700, color: '#5E7480' }}
               >
                 Cancelar
               </button>
@@ -571,7 +571,7 @@ ${lines}`
               {/* Date separator */}
               <div style={{ display: 'flex', justifyContent: 'center', margin: '14px 0 12px' }}>
                 <span style={{
-                  fontSize: 14, fontWeight: 700, color: '#94A0AD',
+                  fontSize: 14, fontWeight: 700, color: '#5E7480',
                   background: 'rgba(51,65,85,0.07)', padding: '5px 14px', borderRadius: 999,
                 }}>
                   {date}
@@ -654,13 +654,13 @@ ${lines}`
 
                         {/* Timestamp + pin indicator */}
                         <span style={{
-                          fontSize: 14, color: '#94A0AD',
+                          fontSize: 14, color: '#5E7480',
                           marginTop: 3,
                           marginLeft: mine ? 0 : 4,
                           marginRight: mine ? 4 : 0,
                           display: 'flex', alignItems: 'center', gap: 4,
                         }}>
-                          {msg.is_pinned && <Clock size={9} color="#94A0AD" strokeWidth={2.4} />}
+                          {msg.is_pinned && <Clock size={9} color="#5E7480" strokeWidth={2.4} />}
                           {formatTime(msg.created_at)}
                         </span>
                       </div>
@@ -703,15 +703,15 @@ ${lines}`
           {/* Panel del asistente — "Preguntar" o "Ponte al día" */}
           {assistantCard && (
             <div style={{
-              background: 'linear-gradient(178deg, #EFEDFC 0%, #FFFFFF 60%)',
+              background: 'linear-gradient(178deg, #EEF6FA 0%, #FFFFFF 60%)',
               border: '1px solid rgba(12,108,156,0.22)',
               borderRadius: 18, padding: '14px 16px', marginBottom: 12,
               boxShadow: '0 6px 14px -8px rgba(12,108,156,0.35)',
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
                 <span style={{ display: 'flex' }}>
-                  <img src={miloAvatarImg} alt="" style={{ width: 22, height: 22, borderRadius: '50%', objectFit: 'cover', marginRight: -8, border: '2px solid #EFEDFC' }} />
-                  <img src={lunaAvatarImg} alt="" style={{ width: 22, height: 22, borderRadius: '50%', objectFit: 'cover', border: '2px solid #EFEDFC' }} />
+                  <img src={miloAvatarImg} alt="" style={{ width: 22, height: 22, borderRadius: '50%', objectFit: 'cover', marginRight: -8, border: '2px solid #EEF6FA' }} />
+                  <img src={lunaAvatarImg} alt="" style={{ width: 22, height: 22, borderRadius: '50%', objectFit: 'cover', border: '2px solid #EEF6FA' }} />
                 </span>
                 <p style={{ fontSize: 15, fontWeight: 800, color: '#0A4A6B', margin: 0, flex: 1 }}>
                   {assistantCard.type === 'catchup' ? 'Ponte al día' : 'Preguntar a Milo y Luna'}
@@ -719,9 +719,9 @@ ${lines}`
                 <button
                   onClick={dismissAssistantCard}
                   aria-label="Cerrar"
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94A0AD', display: 'flex', padding: 0 }}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#5E7480', display: 'flex', padding: 0 }}
                 >
-                  <XIcon size={15} color="#94A0AD" strokeWidth={2.2} />
+                  <XIcon size={15} color="#5E7480" strokeWidth={2.2} />
                 </button>
               </div>
 
@@ -888,7 +888,7 @@ ${lines}`
           >
             <div
               style={{
-                width: '100%', background: 'linear-gradient(178deg, #EFEDFC 0%, #FFFFFF 34%)',
+                width: '100%', background: 'linear-gradient(178deg, #EEF6FA 0%, #FFFFFF 34%)',
                 borderRadius: '28px 28px 0 0', padding: '10px 20px calc(24px + env(safe-area-inset-bottom))',
                 boxShadow: '0 -14px 34px -12px rgba(75,60,160,0.4)',
               }}
@@ -897,8 +897,8 @@ ${lines}`
               <div style={{ width: 38, height: 4, borderRadius: 4, background: 'rgba(12,108,156,0.3)', margin: '6px auto 16px' }} />
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 18 }}>
                 <span style={{ display: 'flex' }}>
-                  <img src={miloAvatarImg} alt="Milo" style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', marginRight: -10, border: '2.5px solid #EFEDFC' }} />
-                  <img src={lunaAvatarImg} alt="Luna" style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', border: '2.5px solid #EFEDFC' }} />
+                  <img src={miloAvatarImg} alt="Milo" style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', marginRight: -10, border: '2.5px solid #EEF6FA' }} />
+                  <img src={lunaAvatarImg} alt="Luna" style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', border: '2.5px solid #EEF6FA' }} />
                 </span>
                 <div>
                   <h2 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: '#0A4A6B' }}>Milo y Luna</h2>
@@ -918,7 +918,7 @@ ${lines}`
                   marginBottom: 10,
                 }}
               >
-                <span style={{ width: 38, height: 38, borderRadius: 13, flexShrink: 0, background: '#EFEDFC', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ width: 38, height: 38, borderRadius: 13, flexShrink: 0, background: '#EEF6FA', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Clock size={19} color="#0A4A6B" strokeWidth={2} />
                 </span>
                 <span>
@@ -936,7 +936,7 @@ ${lines}`
                   borderRadius: 18, padding: '13px 14px', cursor: 'pointer', fontFamily: 'inherit',
                 }}
               >
-                <span style={{ width: 38, height: 38, borderRadius: 13, flexShrink: 0, background: '#EFEDFC', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ width: 38, height: 38, borderRadius: 13, flexShrink: 0, background: '#EEF6FA', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <MessageCircle size={19} color="#0A4A6B" strokeWidth={2} />
                 </span>
                 <span>

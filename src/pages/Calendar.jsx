@@ -22,7 +22,7 @@ const typeStyle = t => EVENT_TYPES.find(x => x.value === t)?.color ?? 'bg-gray-1
 const typeLabel = t => EVENT_TYPES.find(x => x.value === t)?.label ?? t
 
 const STATUS_OPTIONS = [
-  { value: 'programada', label: 'Programada', color: '#2563EB', bg: '#EFF6FF' },
+  { value: 'programada', label: 'Programada', color: '#0C6C9C', bg: '#EFF6FF' },
   { value: 'realizada',  label: 'Realizada',  color: '#0C6C9C', bg: '#E3F1F8' },
   { value: 'cancelada',  label: 'Cancelada',  color: '#DC2626', bg: '#FEF2F2' },
 ]
@@ -272,7 +272,7 @@ export default function Calendar() {
         </div>
 
         {showForm && (
-          <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-green-100 p-6 mb-6 space-y-4">
+          <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-[#E6E3DB] p-6 mb-6 space-y-4">
             <h3 className="font-semibold text-gray-900">{editEvent ? 'Editar evento' : 'Nuevo evento'}</h3>
             <div className="grid grid-cols-2 gap-4">
               <div className="col-span-2">
@@ -416,7 +416,7 @@ export default function Calendar() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Calendar grid */}
-          <div className="lg:col-span-2 bg-white rounded-xl border border-green-100 p-5">
+          <div className="lg:col-span-2 bg-white rounded-xl border border-[#E6E3DB] p-5">
             <div className="flex items-center justify-between mb-4" style={{ position: 'relative' }}>
               <button aria-label="Mes anterior" onClick={prevMonth} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-600">←</button>
 
@@ -536,7 +536,7 @@ export default function Calendar() {
           </div>
 
           {/* Events panel */}
-          <div className="bg-white rounded-xl border border-green-100 p-5">
+          <div className="bg-white rounded-xl border border-[#E6E3DB] p-5">
             <h3 className="font-semibold text-gray-900 mb-4">
               {selected ? `${selected} de ${MONTHS[month]}` : 'Próximos eventos'}
             </h3>
@@ -620,7 +620,7 @@ export default function Calendar() {
                       {ev.attended ? (
                         <div className="flex items-center gap-2 mt-2">
                           {ev.proof_photo_url && (
-                            <img src={ev.proof_photo_url} alt="Comprobante" className="w-12 h-12 rounded-lg object-cover border border-green-200" />
+                            <img src={ev.proof_photo_url} alt="Comprobante" className="w-12 h-12 rounded-lg object-cover border border-[#CDE8F3]" />
                           )}
                           <div>
                             <p className="text-sm text-primary font-semibold">✓ Asistencia confirmada</p>
@@ -686,13 +686,13 @@ export default function Calendar() {
             <h3 className="font-bold text-gray-900 mb-0.5">Prueba de asistencia</h3>
             <p className="text-sm text-gray-500 mb-4">{proofEvent.title}</p>
 
-            <div className="w-full mb-3 border-2 border-dashed border-green-200 rounded-xl overflow-hidden">
+            <div className="w-full mb-3 border-2 border-dashed border-[#CDE8F3] rounded-xl overflow-hidden">
               {proofPreview ? (
                 <div>
                   <img src={proofPreview} className="w-full h-40 object-cover" alt="Prueba" />
                   <div className="flex gap-2 px-3 py-2.5">
                     <button type="button" onClick={pickCamera}
-                      className="flex-1 py-2 text-sm font-semibold rounded-lg border border-primary text-primary bg-green-50 hover:bg-green-100 transition-colors">
+                      className="flex-1 py-2 text-sm font-semibold rounded-lg border border-primary text-primary bg-[#E3F1F8] hover:bg-[#CDE8F3] transition-colors">
                       📷 Tomar foto
                     </button>
                     <button type="button" onClick={pickGallery}
@@ -707,7 +707,7 @@ export default function Calendar() {
                   <p className="text-sm text-gray-500 text-center">Foto de la cita (sala de espera, receta...)</p>
                   <div className="flex gap-2 w-full">
                     <button type="button" onClick={pickCamera}
-                      className="flex-1 py-2.5 text-sm font-semibold rounded-xl border border-primary text-primary bg-green-50 hover:bg-green-100 transition-colors">
+                      className="flex-1 py-2.5 text-sm font-semibold rounded-xl border border-primary text-primary bg-[#E3F1F8] hover:bg-[#CDE8F3] transition-colors">
                       📷 Tomar foto
                     </button>
                     <button type="button" onClick={pickGallery}

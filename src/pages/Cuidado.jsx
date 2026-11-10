@@ -521,7 +521,7 @@ export default function Cuidado() {
                         <span style={{ fontSize: 14, fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#0C6C9C' }}>
                           Completadas <span style={{ opacity: 0.7, fontWeight: 600 }}>({completadas.length})</span>
                         </span>
-                        <span style={{ marginLeft: 'auto', color: '#94A0AD', fontSize: 14 }}>{showCompleted ? '▾' : '▸'}</span>
+                        <span style={{ marginLeft: 'auto', color: '#5E7480', fontSize: 14 }}>{showCompleted ? '▾' : '▸'}</span>
                       </div>
                       {showCompleted && (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -734,7 +734,7 @@ export default function Cuidado() {
 
 // ── Sub-componentes ─────────────────────────────────────────────────────────
 
-function RoutineSection({ label, color = '#94A0AD', children }) {
+function RoutineSection({ label, color = '#5E7480', children }) {
   return (
     <div style={{ marginBottom: 16 }}>
       <p style={{ fontSize: 14, fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color, margin: '0 0 8px 2px' }}>
@@ -775,7 +775,7 @@ function RoutineCard({ item, state, isToggling, isFamiliar, scheduledTime, log, 
       <div style={{ flex: 1, minWidth: 0 }}>
         <p style={{
           fontSize: 16, fontWeight: 700, margin: 0, lineHeight: 1.3,
-          color: isCompletada ? '#94A0AD' : '#14303D',
+          color: isCompletada ? '#5E7480' : '#14303D',
           textDecoration: isCompletada ? 'line-through' : 'none',
         }}>
           {item.label}

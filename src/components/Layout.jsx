@@ -74,7 +74,8 @@ export default function Layout({ children }) {
   const isAdmin = memberRole === null
   const userAvatar = user?.user_metadata?.avatar_url ?? null
   const userInitial = (user?.user_metadata?.full_name ?? user?.email ?? '?').charAt(0).toUpperCase()
-  const { dark } = useDarkMode()
+  // El modo oscuro se hace con un filtro en index.css; aquí los colores no cambian
+  const dark = false; useDarkMode()
   const { isHospitalMode, hospitalMode } = useHospitalMode() ?? {}
   const { homeBadge, familyBadge } = useBadgeCounts()
   const location = useLocation()
@@ -283,7 +284,7 @@ export default function Layout({ children }) {
           {/* Inicio */}
           <Link to="/dashboard" replace={location.pathname !== '/dashboard'} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, textDecoration: 'none' }}>
             <span style={{ width: location.pathname === '/dashboard' ? 52 : 36, height: 32, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: location.pathname === '/dashboard' ? '#0C6C9C' : 'transparent', transition: 'width 0.15s ease' }}>
-              <Home size={18} color={location.pathname === '/dashboard' ? 'white' : '#7C8698'} strokeWidth={2} />
+              <Home size={18} color={location.pathname === '/dashboard' ? 'white' : '#5E7480'} strokeWidth={2} />
             </span>
             <span style={{ fontSize: 13, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: location.pathname === '/dashboard' ? '#0C6C9C' : '#5E7480' }}>Inicio</span>
           </Link>
@@ -291,7 +292,7 @@ export default function Layout({ children }) {
           {/* Medicamentos */}
           <button data-tour="nav-meds" onClick={() => navigate('/medications', { replace: location.pathname !== '/dashboard' })} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, background: 'none', border: 'none', cursor: 'pointer', padding: 0, WebkitTapHighlightColor: 'transparent' }}>
             <span style={{ width: location.pathname === '/medications' ? 52 : 36, height: 32, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: location.pathname === '/medications' ? '#0C6C9C' : 'transparent', transition: 'width 0.15s ease' }}>
-              <Pill size={18} color={location.pathname === '/medications' ? 'white' : '#7C8698'} strokeWidth={2} />
+              <Pill size={18} color={location.pathname === '/medications' ? 'white' : '#5E7480'} strokeWidth={2} />
             </span>
             <span style={{ fontSize: 13, fontWeight: 700, color: location.pathname === '/medications' ? '#0C6C9C' : '#5E7480' }}>Medicinas</span>
           </button>
@@ -299,7 +300,7 @@ export default function Layout({ children }) {
           {/* Rutina */}
           <Link to="/cuidado" replace={location.pathname !== '/dashboard'} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, textDecoration: 'none' }}>
             <span style={{ width: location.pathname === '/cuidado' ? 52 : 36, height: 32, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: location.pathname === '/cuidado' ? '#0C6C9C' : 'transparent', transition: 'width 0.15s ease' }}>
-              <ClipboardList size={18} color={location.pathname === '/cuidado' ? 'white' : '#7C8698'} strokeWidth={2} />
+              <ClipboardList size={18} color={location.pathname === '/cuidado' ? 'white' : '#5E7480'} strokeWidth={2} />
             </span>
             <span style={{ fontSize: 13, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: location.pathname === '/cuidado' ? '#0C6C9C' : '#5E7480' }}>Rutina</span>
           </Link>
@@ -307,7 +308,7 @@ export default function Layout({ children }) {
           {/* Chat */}
           <Link data-tour="nav-chat" to="/chat" replace={location.pathname !== '/dashboard'} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, textDecoration: 'none' }}>
             <span style={{ position: 'relative', width: location.pathname === '/chat' ? 52 : 36, height: 32, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: location.pathname === '/chat' ? '#0C6C9C' : 'transparent', transition: 'width 0.15s ease' }}>
-              <Chat size={18} color={location.pathname === '/chat' ? 'white' : '#7C8698'} strokeWidth={2} />
+              <Chat size={18} color={location.pathname === '/chat' ? 'white' : '#5E7480'} strokeWidth={2} />
               {familyBadge > 0 && (
                 <span style={{ position: 'absolute', top: 0, right: 0, width: 7, height: 7, borderRadius: '50%', background: '#D99A18', display: 'block' }} />
               )}
@@ -318,7 +319,7 @@ export default function Layout({ children }) {
           {/* Más */}
           <Link to="/mas" replace={location.pathname !== '/dashboard'} style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 3, textDecoration: 'none' }}>
             <span style={{ width: location.pathname === '/mas' ? 52 : 36, height: 32, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: location.pathname === '/mas' ? '#0C6C9C' : 'transparent', transition: 'width 0.15s ease' }}>
-              <Menu size={18} color={location.pathname === '/mas' ? 'white' : '#7C8698'} strokeWidth={2} />
+              <Menu size={18} color={location.pathname === '/mas' ? 'white' : '#5E7480'} strokeWidth={2} />
             </span>
             <span style={{ fontSize: 13, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: location.pathname === '/mas' ? '#0C6C9C' : '#5E7480' }}>Más</span>
           </Link>
@@ -344,10 +345,10 @@ export default function Layout({ children }) {
             <p style={{ margin: '0 0 12px', fontSize: 15, fontWeight: 700, color: '#0A4A6B', textAlign: 'center' }}>Acción rápida</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {[
-                { emoji: '💊', label: 'Registrar medicamento', path: '/medications' },
-                { emoji: '✅', label: 'Registrar rutina',       path: '/cuidado' },
-                { emoji: '📝', label: 'Notas de la familia',    path: '/paciente/notas-familia' },
-              ].map(({ emoji, label, path }) => (
+                { Ic: Pill,          label: 'Dar una medicina',     path: '/medications' },
+                { Ic: ClipboardList, label: 'Marcar un cuidado',    path: '/cuidado' },
+                { Ic: Chat,          label: 'Notas de la familia',  path: '/paciente/notas-familia' },
+              ].map(({ Ic, label, path }) => (
                 <button
                   key={path}
                   onClick={() => { setShowQuickActions(false); navigate(path) }}
@@ -359,8 +360,8 @@ export default function Layout({ children }) {
                     WebkitTapHighlightColor: 'transparent',
                   }}
                 >
-                  <span style={{ fontSize: 20 }}>{emoji}</span>
-                  <span style={{ fontSize: 15, fontWeight: 500, color: '#0A4A6B' }}>{label}</span>
+                  <span style={{ width: 36, height: 36, borderRadius: 10, background: '#E3F1F8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Ic size={19} color="#0C6C9C" strokeWidth={2.1} /></span>
+                  <span style={{ fontSize: 16, fontWeight: 600, color: '#14303D' }}>{label}</span>
                 </button>
               ))}
             </div>

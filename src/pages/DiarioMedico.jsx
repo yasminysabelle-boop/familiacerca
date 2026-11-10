@@ -150,7 +150,7 @@ function EntryCard({ entry }) {
 
         {/* Raw transcript (expanded only) */}
         {expanded && entry.raw_transcript && (
-          <div style={{ margin: '0 0 10px', padding: '8px 12px', borderRadius: 10, background: '#F5F0FF', border: '1px solid #DDD6FE' }}>
+          <div style={{ margin: '0 0 10px', padding: '8px 12px', borderRadius: 10, background: '#F5F0FF', border: '1px solid #CDE8F3' }}>
             <p style={{ margin: '0 0 2px', fontSize: 14, fontWeight: 700, color: '#1677A6', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Transcripción original</p>
             <p style={{ margin: 0, fontSize: 15, color: '#4E6470', lineHeight: 1.5, fontStyle: 'italic' }}>{entry.raw_transcript}</p>
           </div>

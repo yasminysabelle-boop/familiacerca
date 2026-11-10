@@ -158,14 +158,14 @@ export default function Memorias() {
         {/* "1 year ago" banner */}
         {yearAgoMemory && (
           <div style={{
-            background: 'linear-gradient(135deg, #F5F3FF, #EDE9FE)',
-            border: '1px solid #C4B5FD', borderRadius: 16,
+            background: 'linear-gradient(135deg, #EEF6FA, #E3F1F8)',
+            border: '1px solid #A6E3EC', borderRadius: 16,
             padding: '12px 16px', marginBottom: 14,
             display: 'flex', alignItems: 'center', gap: 12,
           }}>
             <span style={{ fontSize: 24, flexShrink: 0 }}>🎙️</span>
             <div>
-              <p style={{ fontSize: 15, fontWeight: 700, color: '#6D28D9', margin: '0 0 2px' }}>
+              <p style={{ fontSize: 15, fontWeight: 700, color: '#0A4A6B', margin: '0 0 2px' }}>
                 En este día, hace un año...
               </p>
               <p style={{ fontSize: 15, color: '#1677A6', margin: 0 }}>{yearAgoMemory.title}</p>

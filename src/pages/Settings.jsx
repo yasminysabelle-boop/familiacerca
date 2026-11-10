@@ -362,7 +362,7 @@ export default function Settings() {
             })}
             <p style={{
               margin: 0, padding: '10px 16px 14px',
-              fontSize: 14, color: '#B0A898', lineHeight: 1.5, textAlign: 'center',
+              fontSize: 14, color: '#5E7480', lineHeight: 1.5, textAlign: 'center',
             }}>
               Para unirte a otra familia, pide al administrador que te envíe una invitación.
             </p>
@@ -517,7 +517,7 @@ export default function Settings() {
           <ToggleRow
             icon="🌙"
             label="Modo oscuro"
-            subtitle="Colores cálidos oscuros, sin azules"
+            subtitle="Fondo oscuro para usar de noche"
             checked={dark}
             onChange={toggleDark}
           />
