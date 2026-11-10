@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import CaregiverShift from '../components/CaregiverShift'
 import { createPortal } from 'react-dom'
 import { Link, useSearchParams, useNavigate as useNav } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
@@ -3841,6 +3842,8 @@ export default function Dashboard() {
                     : medTotal === 0 ? '/medications?add=1'
                     : '/medications')}
                 />
+
+                {memberRole === 'cuidador' && ownerId && <CaregiverShift ownerId={ownerId} compact />}
 
                 {/* ══ PRIMEROS PASOS (UX nov 2026): una lista clara de 3 cosas, con la siguiente resaltada ══ */}
                 {isAdmin && !!realPatientName && (medTotal === 0 || !routineActive || familyCount <= 1) && (() => {

@@ -507,7 +507,7 @@ export default function Settings() {
         {/* Preferences */}
         <div style={{ background: 'white', borderRadius: 20, border: '1px solid #E6E3DB', overflow: 'hidden', marginBottom: 12 }}>
           <p style={{ fontSize: 14, fontWeight: 700, color: '#5E7480', letterSpacing: '0.08em', textTransform: 'uppercase', padding: '14px 16px 8px', margin: 0 }}>
-            Preferencias
+            Cómo se ve la app
           </p>
           <ToggleRow
             icon="Aa"
@@ -655,44 +655,39 @@ export default function Settings() {
           )}
         </div>
 
-        {/* Admin panel link — only for owners */}
-        {isAdmin && (
-          <div style={{
-            borderRadius: 20, overflow: 'hidden', marginBottom: 12,
-            border: '1px solid #0B4F4A30', background: '#E3F1F8',
-          }}>
-            <button
-              onClick={() => navigate('/admin')}
-              style={{
-                width: '100%', display: 'flex', alignItems: 'center', gap: 12,
-                padding: '16px', background: 'none', border: 'none',
-                cursor: 'pointer', textAlign: 'left',
-              }}
-            >
-              <div style={{
-                width: 44, height: 44, borderRadius: 12, flexShrink: 0,
-                background: '#0B4F4A18',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 22,
-              }}>⚙️</div>
-              <div style={{ flex: 1 }}>
-                <p style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#0A4A6B' }}>
-                  Panel de administración
-                </p>
-                <p style={{ margin: '2px 0 0', fontSize: 15, color: '#0A5A82' }}>
-                  Equipo, cuenta, datos y actividad
-                </p>
-              </div>
-              <ChevronRight size={16} color="#0A5A82" strokeWidth={2} />
+        {/* Tu familia (nov 2026): todo lo de la familia en un solo lugar —
+            antes estaba repartido entre Panel de administración, Quién ve qué
+            y Familia. */}
+        <div style={{ background: 'white', borderRadius: 20, border: '1px solid #E6E3DB', overflow: 'hidden', marginBottom: 12 }}>
+          <p style={{ fontSize: 16, fontWeight: 800, color: '#14303D', padding: '14px 16px 6px', margin: 0 }}>
+            Tu familia
+          </p>
+          {[
+            { label: 'Equipo e invitaciones', sub: 'Quién está en la familia, invitar o quitar', to: isAdmin ? '/admin?tab=team' : '/familia', icon: '👥' },
+            { label: 'Quién ve qué', sub: 'Lo que puede ver y hacer cada rol', to: '/roles', icon: '🛡️' },
+            ...(isAdmin ? [
+              { label: 'Actividad', sub: 'Lo último que hizo cada quien', to: '/admin?tab=activity', icon: '📋' },
+              { label: 'Plan y pagos', sub: 'Tu plan, facturas y método de pago', to: '/admin?tab=account', icon: '💳' },
+            ] : []),
+          ].map(({ label, sub, to, icon }) => (
+            <button key={to} onClick={() => navigate(to)} style={{
+              width: '100%', display: 'flex', alignItems: 'center', gap: 12,
+              padding: '12px 16px', background: 'none', border: 'none',
+              borderTop: '1px solid #F5F0EA', cursor: 'pointer', textAlign: 'left',
+            }}>
+              <span style={{ flex: 'none', width: 36, height: 36, borderRadius: 10, background: '#E3F1F8', fontSize: 17, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{icon}</span>
+              <span style={{ flex: 1, minWidth: 0 }}>
+                <span style={{ display: 'block', fontSize: 16, fontWeight: 700, color: '#14303D' }}>{label}</span>
+                <span style={{ display: 'block', fontSize: 14, color: '#4E6470', marginTop: 1 }}>{sub}</span>
+              </span>
+              <ChevronRight size={16} color="#5E7480" strokeWidth={2} />
             </button>
-          </div>
-        )}
-
+          ))}
+        </div>
 
         {/* More options */}
         <div style={{ background: 'white', borderRadius: 20, border: '1px solid #E6E3DB', overflow: 'hidden', marginBottom: 12 }}>
           {[
-            { label: 'Quién ve qué',          to: '/roles',     icon: '🛡️' },
             { label: 'Planes y suscripción',  to: '/upgrade',   icon: '⭐' },
             { label: 'Privacidad y seguridad', to: '/privacidad', icon: '🔒' },
             { label: 'Términos de servicio',  to: '/terminos',  icon: '📄' },

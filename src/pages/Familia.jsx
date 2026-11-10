@@ -12,6 +12,7 @@ import PaywallModal from '../components/PaywallModal'
 import { getTodayPR, getDatePR } from '../lib/utils'
 import { otherTimeLabel } from '../lib/zonas'
 import FamilyTasks from '../components/FamilyTasks'
+import CaregiverShift from '../components/CaregiverShift'
 import WeeklyContributions from '../components/WeeklyContributions'
 
 // Espejo mínimo de calcMedStatus() en Medications.jsx — solo necesitamos
@@ -30,7 +31,7 @@ const SANS = "'Plus Jakarta Sans', system-ui, sans-serif"
 
 export default function Familia() {
   const { user } = useAuth()
-  const { profile, ownerId, activePatientName } = useFamily()
+  const { profile, ownerId, activePatientName, memberRole } = useFamily()
   const onlineIds = usePresence()
   const { familyPlan, familyTrialExpired, familyCaregiverLimit } = useFamilyPlan()
   const navigate = useNavigate()
@@ -698,6 +699,7 @@ export default function Familia() {
         })()}
 
         {/* Tareas repartidas y quién hizo qué (familias en varios países, nov 2026) */}
+        {ownerId && <CaregiverShift ownerId={ownerId} canClock={memberRole !== 'familiar'} />}
         {ownerId && <FamilyTasks ownerId={ownerId} />}
         {ownerId && <WeeklyContributions ownerId={ownerId} />}
 
