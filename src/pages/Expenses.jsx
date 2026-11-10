@@ -62,6 +62,14 @@ export default function Expenses() {
   const [month, setMonth] = useState(now.getMonth())
 
   const [expenses, setExpenses] = useState([])
+  const [teamSize, setTeamSize] = useState(0)
+  const [splitN, setSplitN] = useState(null)
+
+  useEffect(() => {
+    if (!ownerId) return
+    supabase.from('family_members').select('id', { count: 'exact', head: true }).eq('user_id', ownerId)
+      .then(({ count }) => setTeamSize((count ?? 0) + 1))
+  }, [ownerId])
   const [loading,  setLoading]  = useState(true)
   const [loadError, setLoadError] = useState('')
 
@@ -253,6 +261,12 @@ export default function Expenses() {
   const memberContributions = Object.entries(memberMap)
     .map(([name, amount]) => ({ name, amount, pct: total > 0 ? Math.round((amount / total) * 100) : 0 }))
     .sort((a, b) => b.amount - a.amount)
+
+  // Para quedar parejos: cada quien debería poner total / n
+  const splitDefault = Math.max(memberContributions.length, teamSize, 2)
+  const nSplit = Math.max(splitN ?? splitDefault, memberContributions.length, 1)
+  const share = nSplit > 0 ? total / nSplit : 0
+  const nonPayers = nSplit - memberContributions.length
 
   const fieldStyle = {
     width: '100%', padding: '11px 14px',
@@ -511,31 +525,59 @@ export default function Expenses() {
           )}
         </div>
 
-        {/* ¿Quién aportó más? */}
+        {/* Lo que puso cada uno + para quedar parejos */}
         {!loading && memberContributions.length > 0 && (
-          <div style={{ margin: '16px 20px 0', background: 'white', borderRadius: 18, padding: '16px 18px', border: '1px solid #E6E3DB', boxShadow: '0 2px 12px rgba(0,0,0,0.05)' }}>
-            <p style={{ fontSize: 14, fontWeight: 700, color: '#4E6470', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 14 }}>
-              ¿Quién aportó más este mes?
-            </p>
+          <div style={{ margin: '16px 20px 0', background: 'white', borderRadius: 20, padding: '16px 18px', border: '1px solid #E6E3DB' }}>
+            <h2 style={{ fontSize: 18, fontWeight: 800, color: '#14303D', margin: '0 0 4px' }}>Lo que puso cada uno</h2>
+            <p style={{ fontSize: 15, color: '#4E6470', margin: '0 0 14px' }}>Este mes, sin contar quién puso más. Todo suma.</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {memberContributions.map((m, i) => (
-                <div key={m.name} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: i === 0 ? '#E3F1F8' : '#F3F4F6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, flexShrink: 0, fontWeight: 700, color: i === 0 ? '#0C6C9C' : '#5E7480' }}>
-                    {i === 0 ? '🥇' : i === 1 ? '🥈' : '🥉'}
+              {memberContributions.map(m => (
+                <div key={m.name}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                    <span style={{ fontSize: 16, fontWeight: 700, color: '#14303D', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.name}</span>
+                    <span style={{ fontSize: 15, fontWeight: 700, color: '#14303D', flexShrink: 0, marginLeft: 8 }}>{formatCurrency(m.amount)}</span>
                   </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
-                      <span style={{ fontSize: 14, fontWeight: 600, color: '#14303D', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.name}</span>
-                      <span style={{ fontSize: 14, fontWeight: 700, color: '#14303D', flexShrink: 0, marginLeft: 8 }}>
-                        {formatCurrency(m.amount)} · <span style={{ color: '#0C6C9C' }}>{m.pct}%</span>
-                      </span>
-                    </div>
-                    <div style={{ height: 4, background: '#F3F4F6', borderRadius: 2, overflow: 'hidden' }}>
-                      <div style={{ height: '100%', borderRadius: 2, background: i === 0 ? '#0C6C9C' : '#5E7480', width: `${m.pct}%`, transition: 'width 0.4s ease' }} />
-                    </div>
+                  <div style={{ height: 8, background: '#EEF6FA', borderRadius: 6, overflow: 'hidden' }}>
+                    <div style={{ height: '100%', borderRadius: 6, background: '#0C6C9C', width: `${Math.max(4, m.pct)}%` }} />
                   </div>
                 </div>
               ))}
+            </div>
+
+            <div style={{ marginTop: 18, paddingTop: 16, borderTop: '1px solid #E6E3DB' }}>
+              <h3 style={{ fontSize: 16, fontWeight: 800, color: '#14303D', margin: '0 0 10px' }}>Para quedar parejos</h3>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginBottom: 12 }}>
+                <span style={{ fontSize: 15, color: '#4E6470' }}>¿Entre cuántos se reparte?</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <button aria-label="Uno menos" onClick={() => setSplitN(Math.max(memberContributions.length, 1, nSplit - 1))} disabled={nSplit <= Math.max(memberContributions.length, 1)}
+                    style={{ width: 40, height: 40, borderRadius: 12, border: '1.5px solid #E6E3DB', background: 'white', fontSize: 20, fontWeight: 700, color: '#0C6C9C', cursor: 'pointer' }}>−</button>
+                  <span aria-live="polite" style={{ minWidth: 28, textAlign: 'center', fontSize: 18, fontWeight: 800, color: '#14303D' }}>{nSplit}</span>
+                  <button aria-label="Uno más" onClick={() => setSplitN(Math.min(20, nSplit + 1))}
+                    style={{ width: 40, height: 40, borderRadius: 12, border: '1.5px solid #E6E3DB', background: 'white', fontSize: 20, fontWeight: 700, color: '#0C6C9C', cursor: 'pointer' }}>+</button>
+                </div>
+              </div>
+              <p style={{ fontSize: 15, color: '#14303D', margin: '0 0 10px' }}>
+                A cada uno le toca <strong>{formatCurrency(share)}</strong> este mes.
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {memberContributions.map(m => {
+                  const diff = m.amount - share
+                  const even = Math.abs(diff) < 0.5
+                  return (
+                    <p key={m.name} style={{ margin: 0, padding: '10px 12px', borderRadius: 12, background: even ? '#F7F6F2' : diff > 0 ? '#EEF6FA' : '#FBEAE4', fontSize: 15, color: '#14303D' }}>
+                      <strong>{m.name}</strong> puso {formatCurrency(m.amount)} → {even ? 'ya está parejo' : diff > 0 ? `le deben ${formatCurrency(diff)}` : `le toca poner ${formatCurrency(-diff)} más`}
+                    </p>
+                  )
+                })}
+                {nonPayers > 0 && share > 0 && (
+                  <p style={{ margin: 0, padding: '10px 12px', borderRadius: 12, background: '#FBEAE4', fontSize: 15, color: '#14303D' }}>
+                    {nonPayers === 1 ? 'La otra persona' : `Los otros ${nonPayers}`} todavía no han puesto: {formatCurrency(share)} {nonPayers === 1 ? '' : 'cada uno'}
+                  </p>
+                )}
+              </div>
+              <p style={{ fontSize: 14, color: '#5E7480', margin: '10px 0 0', lineHeight: 1.45 }}>
+                Es solo una cuenta para ayudar. Cada familia decide cómo se reparte.
+              </p>
             </div>
           </div>
         )}
