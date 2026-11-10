@@ -24,7 +24,7 @@ const PAGE_TITLES = {
   '/memorias':       'Memorias de voz',
   '/diario-voz':     'Memorias de voz',
   '/familia':        'Mi Familia',
-  '/medications':    'Medicamentos',
+  '/medications':    'Medicinas',
   '/historial':      'Historial',
   '/diario-medico':  'Información médica',
   '/calendar':       'Calendario',

@@ -1047,7 +1047,7 @@ export default function Medications() {
             <ChevronLeft size={19} color="#2A4350" strokeWidth={2.2} />
           </button>
           <div style={{ minWidth: 0 }}>
-            <div style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontWeight: 800, fontSize: 22, color: '#14303D', letterSpacing: '-0.3px' }}>Medicamentos</div>
+            <div style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontWeight: 800, fontSize: 22, color: '#14303D', letterSpacing: '-0.3px' }}>Medicinas</div>
             <div style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontWeight: 500, fontSize: 15, color: '#0C6C9C', marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               Cuidando a {activePatientName || profile?.name || 'tu familiar'}
             </div>

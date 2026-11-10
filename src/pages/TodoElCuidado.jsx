@@ -64,7 +64,7 @@ export default function TodoElCuidado() {
   }
 
   const todosLosDias = [
-    { Icon: Pill,     label: 'Medicamentos',         onClick: () => navigate('/medications') },
+    { Icon: Pill,     label: 'Medicinas',         onClick: () => navigate('/medications') },
     { Icon: Calendar, label: 'Rutina diaria',        onClick: () => navigate('/cuidado') },
     // Una sola puerta para todo lo que se escribe del familiar (HowIsTodaySheet)
     { Icon: Heart,    label: '¿Cómo está hoy?',      onClick: () => setShowHowIsToday(true) },

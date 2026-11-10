@@ -3791,7 +3791,7 @@ export default function Dashboard() {
                   <p style={{ margin: '0 0 14px', display: 'flex', alignItems: 'center', gap: 9, fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 18, fontWeight: 600, color: '#2A4350' }}>
                     <Zap size={18} color="#0C6C9C" filled /> Acciones rápidas
                   </p>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 11 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                     {[
                       // Lo diario que no está en la barra de abajo (UX nov 2026).
                       { Icon: Heart,         label: '¿Cómo está hoy?', onClick: () => setShowHowIsToday(true), circleBg: '#E3F1F8', iconColor: '#0C6C9C', bold: false },
@@ -3802,9 +3802,9 @@ export default function Dashboard() {
                       <button
                         key={label} onClick={onClick}
                         style={{
-                          background: 'white', border: '1px solid rgba(51,65,85,0.05)',
-                          borderRadius: 20, padding: '15px 6px 12px', cursor: 'pointer',
-                          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 9,
+                          background: 'white', border: '1px solid #E6E3DB',
+                          borderRadius: 18, padding: '12px 12px', cursor: 'pointer', minHeight: 64,
+                          display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 12, textAlign: 'left',
                           boxShadow: '0 5px 18px -10px rgba(51,65,85,0.18)',
                           WebkitTapHighlightColor: 'transparent',
                         }}
@@ -3817,7 +3817,7 @@ export default function Dashboard() {
                         }}>
                           <Icon size={23} color={iconColor} strokeWidth={2.1} />
                         </span>
-                        <span style={{ fontSize: 14, fontWeight: bold ? 700 : 600, color: bold ? '#2A4350' : '#475569', lineHeight: 1.2, textAlign: 'center' }}>{label}</span>
+                        <span style={{ fontSize: 16, fontWeight: 700, color: bold ? '#B42318' : '#14303D', lineHeight: 1.2 }}>{label}</span>
                       </button>
                     ))}
                   </div>
