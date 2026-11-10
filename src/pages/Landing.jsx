@@ -122,7 +122,9 @@ export default function Landing() {
   const { installed, isIOS, isAndroid, canPrompt, install, isMobile } = usePWAInstall()
   const [pwaTab, setPwaTab] = useState(() => isAndroid ? 'android' : 'iphone')
   const [pwaInstallClicked, setPwaInstallClicked] = useState(false)
-  const [installHelp, setInstallHelp] = useState(false)
+  const [installHelp, setInstallHelp] = useState(() => {
+    try { return new URLSearchParams(window.location.search).get('instalar') === '1' } catch { return false }
+  })
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [annual, setAnnual] = useState(false)
   const [showBar, setShowBar] = useState(false)
@@ -777,7 +779,7 @@ export default function Landing() {
           {!installed && (
             <button
               onClick={async () => {
-                if (canPrompt) {
+                if (canPrompt && isMobile) {
                   track('sticky_bar_click', { action: 'install_prompt' })
                   const outcome = await install()
                   if (outcome === 'accepted') return
@@ -809,10 +811,28 @@ export default function Landing() {
               Queda con su ícono como cualquier app, sin pasar por la tienda. Es gratis.
             </p>
             {!isMobile && (
-              <p style={{ margin: '0 0 14px', padding: '10px 12px', borderRadius: 12, background: '#EEF6FA', fontSize: 15, lineHeight: 1.45 }}>
-                Estás en una computadora. Abre <strong>familiacerca.com</strong> en tu teléfono y sigue estos pasos.
-              </p>
+              <div style={{ display: 'flex', gap: 16, alignItems: 'center', margin: '0 0 16px', padding: 14, borderRadius: 16, background: '#EEF6FA', flexWrap: 'wrap' }}>
+                <img src="/images/qr-instalar.svg" alt="Código QR para abrir FamiliaCerca en el teléfono" width="150" height="150" style={{ background: WHITE, borderRadius: 10, padding: 6, flexShrink: 0 }} />
+                <div style={{ flex: 1, minWidth: 180 }}>
+                  <p style={{ margin: '0 0 6px', fontSize: 17, fontWeight: 800 }}>Escanéalo con tu teléfono</p>
+                  <p style={{ margin: '0 0 10px', fontSize: 15, lineHeight: 1.45, color: '#30454F' }}>
+                    Abre la <strong>cámara</strong> del teléfono y apúntala a este código. Toca el enlace que aparece y te mostramos cómo instalarla.
+                  </p>
+                  <a href={`https://wa.me/?text=${encodeURIComponent('Instala FamiliaCerca en tu teléfono: https://familiacerca.com/?instalar=1')}`} target="_blank" rel="noopener noreferrer"
+                    onClick={() => track('install_send_whatsapp')}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '9px 14px', borderRadius: 999, background: '#1E7E43', color: WHITE, fontSize: 15, fontWeight: 700, textDecoration: 'none' }}>
+                    Enviarme el enlace por WhatsApp
+                  </a>
+                </div>
+              </div>
             )}
+            {canPrompt && isMobile && (
+              <button onClick={async () => { track('install_sheet_prompt'); const o = await install(); if (o === 'accepted') setInstallHelp(false) }}
+                style={{ width: '100%', marginBottom: 14, padding: 14, borderRadius: 14, border: 'none', background: CORAL, color: WHITE, fontSize: 17, fontWeight: 800, cursor: 'pointer', fontFamily: SANS }}>
+                📲 Instalar ahora
+              </button>
+            )}
+            {!isMobile && <p style={{ margin: '0 0 8px', fontSize: 15, fontWeight: 700, color: '#4E6470' }}>Después, en el teléfono:</p>}
             <div role="tablist" style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
               {[['iphone', 'iPhone'], ['android', 'Android']].map(([id, label]) => (
                 <button key={id} role="tab" aria-selected={pwaTab === id} onClick={() => setPwaTab(id)}
