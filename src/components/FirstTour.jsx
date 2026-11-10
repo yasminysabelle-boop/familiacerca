@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 
 // Recorrido de bienvenida: 3 globitos que salen UNA sola vez la primera vez
 // que alguien abre el Inicio (UX nov 2026). Ilumina cada parte y explica en
@@ -37,7 +38,7 @@ export default function FirstTour() {
     const measure = () => {
       const el = document.querySelector(STEPS[step].sel)
       if (!el) { setRect(null); return }
-      if (step === 0) el.scrollIntoView({ block: 'center' })
+      if (step === 0) el.scrollIntoView({ block: 'start' })
       const r = el.getBoundingClientRect()
       setRect({ top: r.top, left: r.left, width: r.width, height: r.height })
     }
@@ -62,25 +63,35 @@ export default function FirstTour() {
   const s = STEPS[step]
   const pad = 6
   const vh = window.innerHeight
-  const below = rect ? rect.top + rect.height + 190 < vh : true
-  const cardTop = rect
-    ? (below ? rect.top + rect.height + pad + 14 : Math.max(16, rect.top - pad - 14 - 240))
-    : vh / 2 - 90
+  const next = () => (step + 1 < STEPS.length ? setStep(step + 1) : finish())
+  // El globito va siempre pegado arriba o abajo de la pantalla (nunca fuera de
+  // ella): abajo si lo iluminado está arriba, y al revés. Antes se calculaba
+  // al lado de lo iluminado y con letra grande o una tarjeta alta quedaba
+  // fuera de la pantalla y la persona no podía seguir (nov 2026).
+  const targetMid = rect ? rect.top + rect.height / 2 : vh / 2
+  const cardAtBottom = targetMid < vh / 2
 
-  return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 900 }} role="dialog" aria-label="Recorrido de bienvenida">
+  // Se monta en <body>, fuera de #root: así no le afecta el zoom de "letra
+  // grande" ni ningún contenedor de la página.
+  return createPortal(
+    <div style={{ position: 'fixed', inset: 0, zIndex: 3000 }} role="dialog" aria-label="Recorrido de bienvenida">
+      {/* Tocar lo oscuro también avanza: nadie se queda atrapado */}
+      <div onClick={next} style={{ position: 'fixed', inset: 0 }} />
       {rect ? (
         <div style={{
-          position: 'fixed', top: rect.top - pad, left: rect.left - pad,
-          width: rect.width + pad * 2, height: rect.height + pad * 2,
+          position: 'fixed', top: Math.max(4, rect.top - pad), left: rect.left - pad,
+          width: rect.width + pad * 2, height: Math.min(rect.height + pad * 2, vh - 8),
           borderRadius: 20, boxShadow: '0 0 0 9999px rgba(8, 30, 42, 0.62)',
           border: '3px solid #4FD0E0', pointerEvents: 'none', transition: 'all 0.3s ease',
         }} />
       ) : (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(8, 30, 42, 0.62)' }} />
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(8, 30, 42, 0.62)', pointerEvents: 'none' }} />
       )}
       <div style={{
-        position: 'fixed', left: 16, right: 16, top: cardTop, maxWidth: 420, margin: '0 auto',
+        position: 'fixed', left: 16, right: 16, maxWidth: 420, margin: '0 auto',
+        ...(cardAtBottom
+          ? { bottom: 'calc(16px + env(safe-area-inset-bottom, 0px))' }
+          : { top: 'calc(16px + env(safe-area-inset-top, 0px))' }),
         background: 'white', borderRadius: 20, padding: '18px 18px 14px',
         boxShadow: '0 18px 40px rgba(0,0,0,0.3)', fontFamily: SANS,
       }}>
@@ -88,17 +99,18 @@ export default function FirstTour() {
         <p style={{ margin: '4px 0 6px', fontSize: 19, fontWeight: 800, color: '#14303D' }}>{s.title}</p>
         <p style={{ margin: 0, fontSize: 16, lineHeight: 1.5, color: '#30454F' }}>{s.text}</p>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 16 }}>
-          <button onClick={finish} style={{ background: 'none', border: 'none', padding: '10px 4px', fontSize: 16, color: '#5E7480', cursor: 'pointer' }}>
+          <button onClick={finish} style={{ background: 'none', border: 'none', padding: '10px 4px', minHeight: 44, fontSize: 16, color: '#5E7480', cursor: 'pointer' }}>
             Saltar
           </button>
           <button
-            onClick={() => (step + 1 < STEPS.length ? setStep(step + 1) : finish())}
-            style={{ padding: '12px 26px', borderRadius: 14, border: 'none', background: '#0C6C9C', color: 'white', fontSize: 16, fontWeight: 700, cursor: 'pointer' }}
+            onClick={next}
+            style={{ padding: '12px 26px', minHeight: 48, borderRadius: 14, border: 'none', background: '#0C6C9C', color: 'white', fontSize: 16, fontWeight: 700, cursor: 'pointer' }}
           >
             {step + 1 < STEPS.length ? 'Siguiente →' : '¡Entendido!'}
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
