@@ -46,7 +46,7 @@ export default function Register() {
         ? 'No pudimos crear tu cuenta en este momento. Intenta de nuevo en unos minutos.'
         : msg)
     } else {
-      track('user_registered', { email: form.email })
+      track('user_registered')
       const pending = localStorage.getItem('pendingInviteToken')
       if (pending) {
         navigate('/join?token=' + pending, { replace: true })

@@ -76,6 +76,25 @@ Deno.serve(async (req: Request) => {
     })
   }
 
+  // Límite server-side (nov 2026): una cuenta no puede usar este correo para
+  // mandar invitaciones sin fin (spam). 20 por día, 8 por hora alcanza de
+  // sobra para invitar a toda una familia. Reusa el contador de IA.
+  const userClient = createClient(
+    Deno.env.get('SUPABASE_URL')!,
+    Deno.env.get('SUPABASE_ANON_KEY')!,
+    { global: { headers: { Authorization: authHeader } } }
+  )
+  const { data: allowed, error: rlErr } = await userClient.rpc('check_and_increment_ai_usage', {
+    p_function_name: 'send-invitation', p_daily_limit: 20, p_hourly_limit: 8,
+  })
+  if (rlErr) console.error('[send-invitation] rate limit check failed:', rlErr)
+  else if (!allowed) {
+    return new Response(JSON.stringify({
+      error: 'rate_limited',
+      message: 'Ya mandaste muchas invitaciones hoy. Puedes compartir el enlace por WhatsApp o intentarlo mañana.',
+    }), { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+  }
+
   const resendApiKey = Deno.env.get('RESEND_API_KEY')
   if (!resendApiKey) {
     return new Response(JSON.stringify({ error: 'RESEND_API_KEY not configured' }), {

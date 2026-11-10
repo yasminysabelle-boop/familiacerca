@@ -244,7 +244,7 @@ export default function Familia() {
       p_invited_by: displayName,
     })
     if (error) { setInviteStatus('error'); return }
-    track('family_member_invited', { email: inviteEmail.trim() })
+    track('family_member_invited')
     const link = `${window.location.origin}/join?token=${token}`
     setInviteLink(link)
     const { error: sendErr } = await supabase.functions.invoke('send-invitation', {

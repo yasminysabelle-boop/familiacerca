@@ -103,12 +103,16 @@ Deno.serve(async (req: Request) => {
   }
 
   let authorized = false
+  // Seguridad (nov 2026): un usuario con sesión solo puede pedir el resumen
+  // de SU familia. Antes cualquier JWT disparaba el envío a todas.
+  let callerId: string | null = null
 
   if (cronSecret && cronHeader === cronSecret) {
     authorized = true
   } else {
     const { data: { user } } = await supabase.auth.getUser(token)
     authorized = !!user
+    callerId = user?.id ?? null
   }
 
   if (!authorized) {
@@ -127,7 +131,7 @@ Deno.serve(async (req: Request) => {
 
   // Optional: target a single family for testing
   const body = req.method === 'POST' ? await req.json().catch(() => ({})) : {}
-  const targetOwnerId: string | null = body.ownerId ?? null
+  const targetOwnerId: string | null = callerId ?? body.ownerId ?? null
 
   const today = new Date().toISOString().split('T')[0]
   console.log(`[send-daily-summary] Running for date ${today}${targetOwnerId ? `, family ${targetOwnerId}` : ', all families'}`)
