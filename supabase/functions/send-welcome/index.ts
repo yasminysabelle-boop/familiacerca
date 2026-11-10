@@ -18,17 +18,18 @@ const corsHeaders = {
 
 function shell(title: string, inner: string, ctaLabel: string, ctaUrl: string): string {
   return `<!DOCTYPE html><html><head><meta charset="utf-8"></head>
-<body style="margin:0;padding:24px 12px;background:#F7F3ED;font-family:Arial,Helvetica,sans-serif;">
-<div style="max-width:480px;margin:0 auto;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #EDE5D8;">
-  <div style="background:#087F70;padding:24px;text-align:center;">
+<body style="margin:0;padding:24px 12px;background:#F7F6F2;font-family:Arial,Helvetica,sans-serif;">
+<div style="max-width:480px;margin:0 auto;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #E6E3DB;">
+  <div style="background:#0C6C9C;background:linear-gradient(135deg,#1677A6,#0A4A6B);padding:26px 24px;text-align:center;">
+    <img src="https://familiacerca.com/logo.png" width="56" height="56" alt="FamiliaCerca" style="display:block;margin:0 auto 10px;width:56px;height:56px;background:#ffffff;border-radius:50%;padding:8px;">
     <p style="margin:0;color:#ffffff;font-size:22px;font-weight:bold;">FamiliaCerca</p>
-    <p style="margin:4px 0 0;color:#D7F0EA;font-size:13px;">Cuidado con amor</p>
+    <p style="margin:4px 0 0;color:#A6E3EC;font-size:13px;letter-spacing:2px;">CUIDADO CON AMOR</p>
   </div>
   <div style="padding:28px 24px;">
-    <h1 style="margin:0 0 12px;font-size:20px;color:#1A1A1A;">${title}</h1>
+    <h1 style="margin:0 0 12px;font-size:21px;color:#14303D;">${title}</h1>
     ${inner}
     <p style="margin:24px 0 0;text-align:center;">
-      <a href="${ctaUrl}" style="display:inline-block;padding:14px 28px;background:#087F70;color:#ffffff;font-size:16px;font-weight:bold;border-radius:12px;text-decoration:none;">${ctaLabel}</a>
+      <a href="${ctaUrl}" style="display:inline-block;padding:14px 28px;background:#E9826E;color:#ffffff;font-size:16px;font-weight:bold;border-radius:12px;text-decoration:none;">${ctaLabel}</a>
     </p>
   </div>
   <div style="padding:16px 24px;border-top:1px solid #F3EEE8;text-align:center;">

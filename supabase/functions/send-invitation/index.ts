@@ -21,23 +21,23 @@ function invitationEmailHtml(
     : 'Podrás ver el estado de salud y el cuidado diario.'
 
   return `<!DOCTYPE html><html><head><meta charset="utf-8"></head>
-<body style="margin:0;padding:20px;background:#F7F3ED;font-family:Arial,sans-serif;">
+<body style="margin:0;padding:20px;background:#F7F6F2;font-family:Arial,sans-serif;">
 <div style="max-width:480px;margin:0 auto;background:white;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
-  <div style="background:linear-gradient(135deg,#4A7C59,#3A6347);padding:28px 24px;text-align:center;">
-    <p style="margin:0;font-size:36px;">💙</p>
-    <h1 style="color:white;font-family:Georgia,serif;margin:8px 0 0;font-size:22px;">FamiliaCerca</h1>
+  <div style="background:#0C6C9C;background:linear-gradient(135deg,#1677A6,#0A4A6B);padding:28px 24px;text-align:center;">
+    <img src="https://familiacerca.com/logo.png" width="56" height="56" alt="FamiliaCerca" style="display:block;margin:0 auto 10px;width:56px;height:56px;background:#ffffff;border-radius:50%;padding:8px;">
+    <h1 style="color:white;font-family:Arial,sans-serif;margin:0;font-size:22px;">FamiliaCerca</h1>
     <p style="color:rgba(255,255,255,0.85);margin:6px 0 0;font-size:14px;">Te han invitado a unirte</p>
   </div>
   <div style="padding:28px 24px;">
-    <p style="margin:0 0 16px;font-size:15px;color:#1A1A1A;line-height:1.6;">
+    <p style="margin:0 0 16px;font-size:15px;color:#14303D;line-height:1.6;">
       <strong>${inviterName}</strong> te ha invitado a unirte al cuidado de <strong>${relativeName}</strong> en FamiliaCerca como <strong>${roleLabel}</strong>.
     </p>
-    <div style="background:#EBF3EE;border-radius:10px;padding:14px 16px;margin-bottom:20px;">
-      <p style="margin:0;font-size:13px;color:#3A6347;font-weight:600;">¿Qué podrás hacer?</p>
+    <div style="background:#E3F1F8;border-radius:10px;padding:14px 16px;margin-bottom:20px;">
+      <p style="margin:0;font-size:13px;color:#0A4A6B;font-weight:600;">¿Qué podrás hacer?</p>
       <p style="margin:6px 0 0;font-size:13px;color:#374151;">${roleDesc}</p>
     </div>
     <div style="text-align:center;margin-top:24px;">
-      <a href="${invitationLink}" style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,#4A7C59,#3A6347);color:white;font-weight:700;font-size:15px;border-radius:12px;text-decoration:none;">
+      <a href="${invitationLink}" style="display:inline-block;padding:14px 32px;background:#E9826E;color:white;font-weight:700;font-size:16px;border-radius:12px;text-decoration:none;">
         Aceptar invitación
       </a>
     </div>
@@ -46,7 +46,7 @@ function invitationEmailHtml(
       El enlace expirará en 7 días.
     </p>
   </div>
-  <div style="padding:16px 24px;border-top:1px solid #EDE8DF;text-align:center;">
+  <div style="padding:16px 24px;border-top:1px solid #E6E3DB;text-align:center;">
     <p style="font-size:11px;color:#9CA3AF;margin:0;">FamiliaCerca · Cuidado familiar con amor</p>
   </div>
 </div>

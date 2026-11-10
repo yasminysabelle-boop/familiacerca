@@ -20,7 +20,7 @@ function summaryEmailHtml(
   details: { name: string; taken: boolean; time: string | null }[]
 ): string {
   const allDone = taken === total && total > 0
-  const headerBg = allDone ? '#16A34A' : '#C4623A'
+  const headerBg = allDone ? '#0C6C9C' : '#0A4A6B'
   const headerIcon = allDone ? '✅' : '💊'
   const headerMsg = allDone
     ? `¡${relativeName} tomó todos sus medicamentos hoy!`
@@ -37,11 +37,12 @@ function summaryEmailHtml(
   }).join('')
 
   return `<!DOCTYPE html><html><head><meta charset="utf-8"></head>
-<body style="margin:0;padding:20px;background:#F9F5F1;font-family:Arial,sans-serif;">
+<body style="margin:0;padding:20px;background:#F7F6F2;font-family:Arial,sans-serif;">
 <div style="max-width:480px;margin:0 auto;background:white;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
   <div style="background:${headerBg};padding:28px 24px;text-align:center;">
-    <p style="margin:0;font-size:32px;">${headerIcon}</p>
-    <h1 style="color:white;font-family:Georgia,serif;margin:8px 0 0;font-size:20px;">${headerMsg}</h1>
+    <img src="https://familiacerca.com/logo.png" width="56" height="56" alt="FamiliaCerca" style="display:block;margin:0 auto 10px;width:56px;height:56px;background:#ffffff;border-radius:50%;padding:8px;">
+    <p style="margin:0;font-size:28px;">${headerIcon}</p>
+    <h1 style="color:white;font-family:Arial,sans-serif;margin:8px 0 0;font-size:20px;">${headerMsg}</h1>
   </div>
   <div style="padding:28px 24px;">
     <p style="margin:0 0 20px;font-size:13px;color:#6B7280;text-align:center;">
@@ -54,7 +55,7 @@ function summaryEmailHtml(
       </table>
     </div>` : '<p style="color:#9CA3AF;text-align:center;font-size:14px;">No hay medicamentos configurados.</p>'}
     <div style="margin-top:20px;text-align:center;">
-      <a href="https://app.familiacerca.com/medications" style="display:inline-block;padding:12px 28px;background:#C4623A;color:white;font-weight:700;font-size:14px;border-radius:10px;text-decoration:none;">
+      <a href="https://familiacerca.com/medications" style="display:inline-block;padding:12px 28px;background:#E9826E;color:white;font-weight:700;font-size:15px;border-radius:10px;text-decoration:none;">
         Ver detalles en la app
       </a>
     </div>
