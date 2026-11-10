@@ -844,8 +844,8 @@ export default function Landing() {
             <ol style={{ margin: 0, paddingLeft: 22, fontSize: 16, lineHeight: 1.6 }}>
               {pwaTab === 'iphone' ? (
                 <>
-                  <li>Abre <strong>familiacerca.com</strong> en <strong>Safari</strong>.</li>
-                  <li>Toca el botón de compartir <span aria-hidden="true">(el cuadrito con la flecha hacia arriba)</span>.</li>
+                  <li>Abre <strong>familiacerca.com</strong> en <strong>Safari o Chrome</strong>.</li>
+                  <li>Toca el botón de compartir <span aria-hidden="true">(el cuadrito con la flecha hacia arriba)</span>: en Safari está abajo, en Chrome arriba a la derecha.</li>
                   <li>Baja y toca <strong>"Agregar a pantalla de inicio"</strong>.</li>
                   <li>Toca <strong>"Agregar"</strong>. Listo, ya está en tu pantalla.</li>
                 </>
