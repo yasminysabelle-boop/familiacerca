@@ -1054,7 +1054,7 @@ export default function Medications() {
           </div>
         </div>
         {isAdmin && (
-          <button aria-label="Agregar medicamento"
+          <button aria-label="Agregar medicina"
             onClick={openAdd}
             style={{
               width: 44, height: 44, borderRadius: 16, flexShrink: 0,
@@ -1564,7 +1564,7 @@ export default function Medications() {
             {/* Sheet header */}
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: addStep === 'method' ? 8 : 20 }}>
               <h3 style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 19, fontWeight: 800, color: '#14303D', margin: 0 }}>
-                {addStep === 'method'       ? 'Agregar medicamento'
+                {addStep === 'method'       ? 'Agregar medicina'
                   : addStep === 'ai-processing' ? 'Analizando imagen…'
                   : addStep === 'ai-confirm'    ? 'Verificar datos'
                   : editId                      ? 'Editar medicamento'
@@ -1579,14 +1579,14 @@ export default function Medications() {
             {addStep === 'method' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <p style={{ fontSize: 15, color: '#5C6B78', margin: '0 0 8px', lineHeight: 1.5 }}>
-                  Cuéntanos qué medicamento cuida a{' '}
+                  Cuéntanos qué medicina toma{' '}
                   <span style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontStyle: 'italic', color: '#0C6C9C', fontWeight: 600 }}>
                     {(activePatientName || profile?.name || 'tu familiar').split(' ')[0]}
                   </span>, como prefieras.
                 </p>
                 {[
-                  { Icon: Camera,   iconBg: '#A6E3EC', iconColor: '#0A5A82', title: 'Foto de la caja',       desc: 'La IA lee nombre, dosis, cantidad y vencimiento',   shadow: '#087F7033', action: () => { setAddPhotoType('box'); setAddStep('photo-box') } },
-                  { Icon: FileText, iconBg: '#FBEAE4', iconColor: '#C4664F', title: 'Foto de la receta',     desc: 'La IA extrae el medicamento indicado por el médico', shadow: '#D99A1833', action: () => { setAddPhotoType('prescription'); setAddStep('photo-rx') } },
+                  { Icon: Camera,   iconBg: '#A6E3EC', iconColor: '#0A5A82', title: 'Foto de la caja',       desc: 'Milo lee el nombre, la dosis, cuántas quedan y cuándo vence',   shadow: '#087F7033', action: () => { setAddPhotoType('box'); setAddStep('photo-box') } },
+                  { Icon: FileText, iconBg: '#FBEAE4', iconColor: '#C4664F', title: 'Foto de la receta',     desc: 'Milo saca la medicina que indicó el médico', shadow: '#D99A1833', action: () => { setAddPhotoType('prescription'); setAddStep('photo-rx') } },
                   { Icon: Pencil,   iconBg: '#F6E4B8', iconColor: '#A87A0F', title: 'Ingresar manualmente',  desc: 'Llena los campos tú mismo',                          shadow: '#D99A1833', action: () => setAddStep('form') },
                 ].map(opt => (
                   <button

@@ -3272,7 +3272,8 @@ export default function Dashboard() {
       lines.push(`✅ ${e.medName}${e.timestamp ? ` ${hora(e.timestamp)}` : ''}${e.confirmedBy ? ` (${e.confirmedBy.split(' ')[0]})` : ''}`)
     }
     for (const e of evts.filter(e => e.type === 'MED_PENDING')) {
-      lines.push(`⏳ Falta: ${e.medName}${e.medTime ? ` ${e.medTime}` : ''}`)
+      const t12 = e.medTime ? (() => { const [h, m] = e.medTime.split(':').map(Number); return `${h % 12 || 12}:${String(m || 0).padStart(2, '0')} ${h >= 12 ? 'p. m.' : 'a. m.'}` })() : ''
+      lines.push(`⏳ Falta: ${e.medName}${t12 ? ` ${t12}` : ''}`)
     }
     const daily = buildCareItems(careRows).filter(i => i.category === 'daily')
     if (daily.length && (careLogRows.length || routineActive)) {
@@ -4094,7 +4095,7 @@ export default function Dashboard() {
               {/* ── NOTAS DE LA FAMILIA ── */}
               <div style={{ padding: '14px 20px 8px' }}>
                 <button
-                  onClick={() => { setShowNotifSheet(false); navigate('/paciente/notas-familia') }}
+                  onClick={() => { setShowNotifSheet(false); navigate('/notes') }}
                   style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, marginBottom: 10, display: 'flex', alignItems: 'center', gap: 4, WebkitTapHighlightColor: 'transparent' }}
                 >
                   <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#5E7480', letterSpacing: '0.06em' }}>
@@ -4104,7 +4105,7 @@ export default function Dashboard() {
                 </button>
                 {notifNotes.length === 0 ? (
                   <button
-                    onClick={() => { setShowNotifSheet(false); navigate('/paciente/notas-familia') }}
+                    onClick={() => { setShowNotifSheet(false); navigate('/notes') }}
                     style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0', textAlign: 'left', WebkitTapHighlightColor: 'transparent' }}
                   >
                     <p style={{ margin: 0, fontSize: 14, color: '#5E7480' }}>No hay notas sin leer</p>
@@ -4114,7 +4115,7 @@ export default function Dashboard() {
                     {notifNotes.map(note => (
                       <button
                         key={note.id}
-                        onClick={() => { setShowNotifSheet(false); navigate('/paciente/notas-familia') }}
+                        onClick={() => { setShowNotifSheet(false); navigate('/notes') }}
                         style={{
                           background: 'none', border: 'none', cursor: 'pointer', padding: '10px 0',
                           textAlign: 'left', borderBottom: '1px solid #F5F0E8', width: '100%',

@@ -14,7 +14,7 @@ import WatermarkHeart from '../components/WatermarkHeart'
 import {
   ChevronLeft, ChevronRight, Pill, ClipboardCheck, ClipboardList, Hospital, Home,
   Stethoscope, Calendar, Siren, Receipt, Camera, User, AlertTriangle, CheckIcon,
-  Bath, Tooth, Shirt, Utensils, Bed, Sparkle, Footsteps, Scissors, Lotus,
+  Heart, Bath, Tooth, Shirt, Utensils, Bed, Sparkle, Footsteps, Scissors, Lotus,
 } from '../components/Icons'
 
 // ── paleta del sistema (CLAUDE.md) ──────────────────────────────────────────
@@ -71,11 +71,15 @@ const TYPE_META = {
   sos:                     { label: 'SOS',                  Icon: Siren,          cat: 'sos' },
   expense:                 { label: 'Gastos',               Icon: Receipt,        cat: 'gold',     route: '/gastos' },
   incident:                { label: 'Incidentes',           Icon: AlertTriangle,  cat: 'coral' },
+  // Todo lo que se escribe del familiar también se lee aquí (UX nov 2026)
+  note:                    { label: 'Notas',                Icon: ClipboardList,  cat: 'cool',     route: '/notes' },
+  care_record:             { label: 'Cómo está',            Icon: Heart,          cat: 'teal',     route: '/registros' },
+  medical_visit:           { label: 'Médico',               Icon: Stethoscope,    cat: 'gold',     route: '/diario-medico' },
 }
 
 // Los 12 tipos reales tienen su propio pill (+ "Todo") = 13.
 const FILTER_OPTIONS = [
-  'all', 'med_confirmed', 'med_missed', 'care_routine', 'care_routine_missed',
+  'all', 'note', 'care_record', 'medical_visit', 'med_confirmed', 'med_missed', 'care_routine', 'care_routine_missed',
   'hospital_mode_on', 'hospital_discharge', 'doctor_note', 'appointment', 'sos',
   'expense', 'caregiver_assigned', 'incident',
 ]
@@ -392,7 +396,32 @@ export default function MedicationTimeline() {
 
       const { data, error: err } = await q
       if (err) throw err
-      setEvents(data ?? [])
+      // Notas, "cómo está" y visitas al médico: se leen de sus tablas y se
+      // mezclan en la misma línea de tiempo (antes había que buscarlos en 4 pantallas).
+      const extra = []
+      const wants = t => filterType === 'all' || filterType === t
+      try {
+        const jobs = []
+        if (wants('note')) jobs.push(supabase.from('notes').select('id, title, content, created_at, created_by_user_id, photo_url, is_incident').eq('user_id', ownerId).gte('created_at', since.toISOString()).lt('created_at', (until ?? new Date(Date.now() + 864e5)).toISOString()).then(({ data }) => (data ?? []).filter(n => !n.is_incident).forEach(n => extra.push({ id: `note-${n.id}`, type: 'note', description: n.title || (n.content || '').slice(0, 90), metadata: { photo_url: n.photo_url }, created_at: n.created_at, _uid: n.created_by_user_id }))))
+        if (wants('care_record')) jobs.push(supabase.from('care_records').select('id, recorded_at, mood, food, sleep, notes, user_id').eq('owner_id', ownerId).gte('recorded_at', since.toISOString()).lt('recorded_at', (until ?? new Date(Date.now() + 864e5)).toISOString()).then(({ data }) => (data ?? []).forEach(r => {
+          const parts = [r.mood && `Ánimo: ${r.mood}`, r.food && `Comió: ${r.food}`, r.sleep && `Durmió: ${r.sleep}`].filter(Boolean)
+          extra.push({ id: `care-${r.id}`, type: 'care_record', description: parts.join(' · ') || r.notes || 'Registro del día', metadata: {}, created_at: r.recorded_at, _uid: r.user_id })
+        })))
+        if (wants('medical_visit')) jobs.push(supabase.from('medical_diary').select('id, entry_date, entry_time, que_dijo_el_medico, estado_general, created_by_name, photo_url').eq('owner_id', ownerId).gte('entry_date', since.toLocaleDateString('en-CA')).then(({ data }) => (data ?? []).forEach(d => {
+          const at = new Date(`${d.entry_date}T${d.entry_time || '12:00'}`)
+          if (until && at >= until) return
+          extra.push({ id: `diary-${d.id}`, type: 'medical_visit', description: d.que_dijo_el_medico || d.estado_general || 'Visita al médico', metadata: { photo_url: d.photo_url }, created_at: at.toISOString(), actor_name: d.created_by_name })
+        })))
+        await Promise.all(jobs)
+        const ids = [...new Set(extra.map(e => e._uid).filter(Boolean))]
+        if (ids.length) {
+          const { data: ps } = await supabase.from('user_profiles').select('id, full_name').in('id', ids)
+          const names = Object.fromEntries((ps ?? []).map(p => [p.id, p.full_name]))
+          extra.forEach(e => { if (e._uid && !e.actor_name) e.actor_name = names[e._uid] || null })
+        }
+      } catch (e2) { console.warn('[Historial] extras', e2) }
+      const base = (filterType === 'note' || filterType === 'care_record' || filterType === 'medical_visit') ? [] : (data ?? [])
+      setEvents([...base, ...extra].sort((a, b) => new Date(b.created_at) - new Date(a.created_at)))
     } catch (e) {
       setError('No se pudo cargar el historial.')
       console.error(e)

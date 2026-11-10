@@ -347,7 +347,7 @@ export default function Layout({ children }) {
               {[
                 { Ic: Pill,          label: 'Dar una medicina',     path: '/medications' },
                 { Ic: ClipboardList, label: 'Marcar un cuidado',    path: '/cuidado' },
-                { Ic: Chat,          label: 'Notas de la familia',  path: '/paciente/notas-familia' },
+                { Ic: Chat,          label: 'Escribir una nota',     path: '/notes' },
               ].map(({ Ic, label, path }) => (
                 <button
                   key={path}

@@ -31,7 +31,6 @@ import Directory from './pages/Directory'
 import Settings from './pages/Settings'
 import Cuidado from './pages/Cuidado'
 import PatientProfile from './pages/PatientProfile'
-import NotasFamilia from './pages/NotasFamilia'
 import Landing from './pages/Landing'
 import Upgrade from './pages/Upgrade'
 import VideoCall from './pages/VideoCall'
@@ -133,12 +132,12 @@ function AppShell() {
         {/* Red de seguridad permanente: emails ya enviados (bienvenida, resúmenes) y
             notificaciones antiguas en dispositivos que no actualizaron el SW todavía
             siguen apuntando a /hoy. No quitar. */}
-        <Route path="/hoy"         element={<Navigate to="/medications" replace />} />
+        <Route path="/hoy"         element={<Navigate to="/dashboard" replace />} />
         <Route path="/historial"   element={<P><MedicationTimeline /></P>} />
         <Route path="/calendar"    element={<P><Calendar /></P>} />
         <Route path="/notes"       element={<P><Notes /></P>} />
         <Route path="/chat"        element={<P><Chat /></P>} />
-        <Route path="/diario-voz"  element={<P><Memorias /></P>} />
+        <Route path="/diario-voz"  element={<Navigate to="/memorias" replace />} />
         <Route path="/memorias"    element={<P><Memorias /></P>} />
         <Route path="/cuidado"     element={<P><Cuidado /></P>} />
         <Route path="/cuidado/horarios" element={<Navigate to="/cuidado?tab=horarios" replace />} />
@@ -154,7 +153,7 @@ function AppShell() {
         <Route path="/upgrade"     element={<P><Upgrade /></P>} />
         <Route path="/ajustes"            element={<P><Settings /></P>} />
         <Route path="/paciente/perfil"      element={<P><PatientProfile /></P>} />
-        <Route path="/paciente/notas-familia" element={<P><NotasFamilia /></P>} />
+        <Route path="/paciente/notas-familia" element={<Navigate to="/notes" replace />} />
         <Route path="/videollamada"       element={<P><VideoCall /></P>} />
         <Route path="/admin"              element={<P><Admin /></P>} />
         <Route path="/diario-medico"      element={<P><DiarioMedico /></P>} />

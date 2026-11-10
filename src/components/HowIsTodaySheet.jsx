@@ -12,8 +12,7 @@ const SERIF = "'Plus Jakarta Sans', system-ui, sans-serif"
 
 const OPTIONS = [
   { emoji: '🍽️', title: 'Cómo comió, durmió y su ánimo', sub: 'Un registro rápido de cómo está hoy', to: '/registros' },
-  { emoji: '📝', title: 'Algo que pasó hoy',             sub: 'Una novedad o algo que la familia deba saber', to: '/notes?add=1' },
-  { emoji: '🎙️', title: 'Grabar una nota de voz',       sub: 'Habla y se convierte en texto', to: '/paciente/notas-familia' },
+  { emoji: '📝', title: 'Una nota o algo que pasó',     sub: 'Escríbela o díctala; marca si fue algo grave', to: '/notes?add=1' },
   { emoji: '🩺', title: 'Lo que dijo el médico',         sub: 'Indicaciones o una receta; Milo lo organiza', to: '/diario-medico' },
 ]
 

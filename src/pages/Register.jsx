@@ -178,7 +178,7 @@ export default function Register() {
                 boxShadow: '0 6px 20px rgba(12,108,156,0.35)',
               }}
             >
-              {loading ? 'Creando cuenta...' : 'Comenzar prueba gratis →'}
+              {loading ? 'Creando cuenta...' : 'Crear mi cuenta gratis →'}
             </button>
           </form>
 

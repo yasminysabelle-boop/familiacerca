@@ -75,7 +75,7 @@ export default function TodoElCuidado() {
     { Icon: FileText,      label: 'Reportes para el médico', onClick: () => navigate('/reportes') },
     { Icon: Phone,         label: 'Contactos médicos',       onClick: () => navigate('/directorio') },
     { Icon: Video,         label: 'Videollamada',            onClick: () => navigate('/videollamada') },
-    { Icon: ClipboardList, label: 'Historia de cuidado',     onClick: () => navigate('/historial') },
+    { Icon: ClipboardList, label: 'Historial',               onClick: () => navigate('/historial') },
     { Icon: MessageCircle, label: 'Chat familiar',           onClick: () => navigate('/chat') },
   ]
   const especiales = [

@@ -333,21 +333,8 @@ export default function PatientProfile() {
           background:'linear-gradient(135deg, #0A5A82 0%, #0A4A6B 100%)',
           padding:'20px 16px 32px',
         }}>
-          <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:20 }}>
-            <button onClick={() => navigate('/dashboard')} style={{
-              width:36, height:36, borderRadius:'50%',
-              background:'rgba(255,255,255,0.15)', border:'none',
-              cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
-            }}>
-              <ChevronLeft size={18} color="white" strokeWidth={2} />
-            </button>
-            <div style={{ flex:1 }}>
-              <p style={{ color:'rgba(255,255,255,0.65)', fontSize: 15, margin:0 }}>Información clínica</p>
-              <h1 style={{ color:'white', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize:20, fontWeight:700, margin:'2px 0 0' }}>
-                {form.nombre_completo ? `Perfil de ${form.nombre_completo.split(' ')[0]}` : 'Perfil del Paciente'}
-              </h1>
-            </div>
-          </div>
+          {/* Un solo encabezado (UX nov 2026): la flecha y el título ya están arriba, en el encabezado de la app */}
+          <p style={{ color:'rgba(255,255,255,0.75)', fontSize: 15, margin:'0 0 14px' }}>Datos de salud</p>
 
           {/* Photo + name */}
           <div style={{ display:'flex', alignItems:'center', gap:16 }}>

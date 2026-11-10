@@ -70,7 +70,8 @@ function fmtTime(t) {
   if (!t) return ''
   const [h, m] = t.split(':').map(Number)
   const hh = h > 12 ? h - 12 : (h === 0 ? 12 : h)
-  return `${hh}${m ? ':' + String(m).padStart(2, '0') : ''}${h >= 12 ? 'pm' : 'am'}`
+  // Mismo formato en toda la app: "8:00 a. m."
+  return `${hh}:${String(m || 0).padStart(2, '0')} ${h >= 12 ? 'p. m.' : 'a. m.'}`
 }
 
 function toLocalDate(d = new Date()) {
@@ -93,6 +94,7 @@ export default function Cuidado() {
 
   const [careLogs, setCareLogs] = useState({})
   const [careSchedules, setCareSchedules] = useState({})
+  const [showSinMarcar, setShowSinMarcar] = useState(false)
   // Rutinas de esta familia: sugeridas que se usan + rutinas propias (nov 2026)
   const [scheduleRows, setScheduleRows] = useState([])
   const [hasCustomCols, setHasCustomCols] = useState(true)
@@ -301,7 +303,18 @@ export default function Cuidado() {
   const timeOf = i => careSchedules[i.key] ?? i.scheduledTime ?? '99:99'
   const byTime = (a, b) => timeOf(a).localeCompare(timeOf(b))
   const routineActive = routineStarted || Object.keys(careLogs).length > 0 || Object.keys(careSchedules).length > 0
-  const retrasadas  = !routineActive ? [] : ITEMS.filter(i => !careLogs[i.key] && !isFromTomorrow(i) && calcularEstadoCuidado(i, false, careSchedules[i.key]) === 'tarde').sort(byTime)
+  const retrasadasTodas = !routineActive ? [] : ITEMS.filter(i => !careLogs[i.key] && !isFromTomorrow(i) && calcularEstadoCuidado(i, false, careSchedules[i.key]) === 'tarde').sort(byTime)
+  // Sin regaños (UX nov 2026): solo lo de las últimas 2 horas sale como "Atrasada";
+  // lo más viejo va plegado y en gris como "Sin marcar".
+  const minsDesde = i => {
+    const t = careSchedules[i.key] ?? i.scheduledTime
+    if (!t) return 0
+    const [h, m] = t.split(':').map(Number)
+    const now = new Date()
+    return now.getHours() * 60 + now.getMinutes() - (h * 60 + m)
+  }
+  const retrasadas = retrasadasTodas.filter(i => minsDesde(i) <= 120)
+  const sinMarcar  = retrasadasTodas.filter(i => minsDesde(i) > 120)
   const desdeManana = ITEMS.filter(i => !careLogs[i.key] && isFromTomorrow(i))
   const proximas    = (!routineActive
     ? ITEMS.filter(i => !careLogs[i.key] && !!(careSchedules[i.key] ?? i.scheduledTime))
@@ -433,7 +446,7 @@ export default function Cuidado() {
                 </div>
               ) : (
                 <>
-                  {retrasadas.length === 0 && proximas.length === 0 && sinHorario.length === 0 && completadas.length === 0 && (
+                  {retrasadas.length === 0 && proximas.length === 0 && sinHorario.length === 0 && completadas.length === 0 && sinMarcar.length === 0 && (
                     <div style={{ marginTop: 8 }}>
                       <EmptyState
                         icon={<CheckIcon size={40} color="#A6E3EC" strokeWidth={2} />}
@@ -458,6 +471,34 @@ export default function Cuidado() {
                         />
                       ))}
                     </RoutineSection>
+                  )}
+
+                  {/* Sin marcar (más de 2 horas): plegado, sin rojo */}
+                  {sinMarcar.length > 0 && (
+                    <div style={{ marginBottom: 14 }}>
+                      <button onClick={() => setShowSinMarcar(v => !v)}
+                        style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', borderRadius: 16, border: '1px solid #E6E3DB', background: 'white', cursor: 'pointer', fontFamily: 'inherit' }}>
+                        <span style={{ fontSize: 16, fontWeight: 600, color: '#30454F' }}>
+                          {sinMarcar.length === 1 ? '1 cuidado de más temprano sin marcar' : `${sinMarcar.length} cuidados de más temprano sin marcar`}
+                        </span>
+                        <span style={{ fontSize: 15, fontWeight: 700, color: '#0C6C9C' }}>{showSinMarcar ? 'Ocultar' : 'Ver'}</span>
+                      </button>
+                      {showSinMarcar && (
+                        <div style={{ marginTop: 8 }}>
+                          {sinMarcar.map(item => (
+                            <RoutineCard
+                              key={item.key}
+                              item={item}
+                              state="proxima"
+                              isToggling={careToggling === item.key}
+                              isFamiliar={isFamiliar}
+                              scheduledTime={careSchedules[item.key] ?? item.scheduledTime}
+                              onToggle={() => toggleCareItem(item)}
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   )}
 
                   {/* Próximas */}
@@ -664,7 +705,7 @@ export default function Cuidado() {
                     <Clock size={14} color="#0C6C9C" strokeWidth={2} style={{ marginTop: 1, flexShrink: 0 }} />
                     <p style={{ fontSize: 15, color: '#0A5A82', margin: 0, lineHeight: 1.5 }}>
                       Los horarios aplican para toda la familia. Si un cuidado no se marca a tiempo,
-                      aparece en <strong>Atrasadas</strong> dentro de Hoy.
+                      aparece en <strong>Atrasadas</strong> dentro de Hoy durante 2 horas; después queda como “sin marcar”.
                     </p>
                   </div>
 

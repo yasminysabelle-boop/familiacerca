@@ -164,6 +164,10 @@ export default function OnboardingFlow() {
   const [medName, setMedName]   = useState('')
   const [medFreq, setMedFreq]   = useState('')
   const [medTime, setMedTime]   = useState('')
+  // Una hora por cada toma (UX nov 2026): "Dos veces al día" pide 2 horas
+  const [medTime2, setMedTime2] = useState('')
+  const [medTime3, setMedTime3] = useState('')
+  const doseCount = { twice_daily: 2, every_12h: 2, three_daily: 3, every_8h: 3 }[medFreq] || 1
 
   // Paso 4 — invitar equipo
   const [inviteLink, setInviteLink] = useState('')
@@ -204,7 +208,7 @@ export default function OnboardingFlow() {
 
   // ── Guardar perfil (Paso 2) ──────────────────────────────────────────
   async function handleSaveProfile() {
-    if (!patientName.trim() || !birthDate) return
+    if (!patientName.trim()) return
     setSaving(true); setError('')
     try {
       const { error: e1 } = await supabase.from('care_profiles').upsert(
@@ -213,7 +217,7 @@ export default function OnboardingFlow() {
       )
       if (e1) throw e1
       const { error: e2 } = await supabase.from('patient_profiles').upsert(
-        { owner_id: user.id, nombre_completo: patientName.trim(), fecha_nacimiento: birthDate },
+        { owner_id: user.id, nombre_completo: patientName.trim(), fecha_nacimiento: birthDate || null },
         { onConflict: 'owner_id' }
       )
       if (e2) throw e2
@@ -286,7 +290,7 @@ export default function OnboardingFlow() {
     setSaving(true)
     try {
       if (medName.trim()) {
-        const times = medTime ? [medTime] : []
+        const times = [medTime, doseCount >= 2 ? medTime2 : '', doseCount >= 3 ? medTime3 : ''].filter(Boolean)
         await supabase.from('medications').insert({
           user_id: user.id, created_by_user_id: user.id,
           name: medName.trim(),
@@ -355,7 +359,10 @@ export default function OnboardingFlow() {
       ])
     }
     refresh?.()
-    window.location.href = '/dashboard'
+    // Si eligió agregar la medicina con foto, al terminar se abre esa pantalla
+    let next = '/dashboard'
+    try { next = localStorage.getItem('fc_after_onboarding') || '/dashboard'; localStorage.removeItem('fc_after_onboarding') } catch { /* sin almacenamiento */ }
+    window.location.href = next
   }
 
   // ── RENDER ─────────────────────────────────────────────────────────────
@@ -472,7 +479,7 @@ export default function OnboardingFlow() {
                 />
               </div>
               <div>
-                <label style={LABEL}>Fecha de nacimiento *</label>
+                <label style={LABEL}>Fecha de nacimiento (opcional)</label>
                 <input
                   type="date" style={INPUT} value={birthDate}
                   onChange={e => setBirthDate(e.target.value)}
@@ -484,7 +491,7 @@ export default function OnboardingFlow() {
             {error && <p style={{ color: '#DC2626', fontSize: 14, marginTop: 12 }}>{error}</p>}
 
             <div style={{ marginTop: 32 }}>
-              <PrimaryBtn onClick={handleSaveProfile} disabled={!patientName.trim() || !birthDate || saving} pressed={pressed} onPD={pd} onPU={pu} onPL={pu}>
+              <PrimaryBtn onClick={handleSaveProfile} disabled={!patientName.trim() || saving} pressed={pressed} onPD={pd} onPU={pu} onPL={pu}>
                 {saving ? 'Guardando...' : 'Continuar →'}
               </PrimaryBtn>
             </div>
@@ -557,7 +564,7 @@ export default function OnboardingFlow() {
                 </p>
               </div>
               <div>
-                <label style={LABEL}>Nombre del medicamento *</label>
+                <label style={LABEL}>Nombre de la medicina *</label>
                 <input style={INPUT} value={medName} autoFocus
                   onChange={e => setMedName(e.target.value)}
                   placeholder="Ej: Metformina, Losartán, Aspirina..." />
@@ -574,8 +581,16 @@ export default function OnboardingFlow() {
                 </div>
               </div>
               <div>
-                <label style={LABEL}>Hora de toma</label>
+                <label style={LABEL}>{doseCount > 1 ? 'Hora de la primera toma' : 'Hora de toma'}</label>
                 <input type="time" style={INPUT} value={medTime} onChange={e => setMedTime(e.target.value)} />
+                {doseCount >= 2 && (<>
+                  <label style={{ ...LABEL, marginTop: 12 }}>Hora de la segunda toma</label>
+                  <input type="time" style={INPUT} value={medTime2} onChange={e => setMedTime2(e.target.value)} />
+                </>)}
+                {doseCount >= 3 && (<>
+                  <label style={{ ...LABEL, marginTop: 12 }}>Hora de la tercera toma</label>
+                  <input type="time" style={INPUT} value={medTime3} onChange={e => setMedTime3(e.target.value)} />
+                </>)}
               </div>
             </div>
 
@@ -585,8 +600,14 @@ export default function OnboardingFlow() {
                 disabled={saving || !medName.trim()}
                 pressed={pressed} onPD={pd} onPU={pu} onPL={pu}
               >
-                {saving ? 'Guardando...' : 'Agregar medicamento →'}
+                {saving ? 'Guardando...' : 'Agregar medicina →'}
               </PrimaryBtn>
+              <button
+                onClick={() => { try { localStorage.setItem('fc_after_onboarding', '/medications?add=1') } catch { /* sin almacenamiento */ } ; goToInvite() }}
+                style={{ padding: '14px', borderRadius: 14, border: '1.5px solid #0C6C9C', background: 'white', color: '#0C6C9C', fontSize: 16, fontWeight: 700, cursor: 'pointer' }}
+              >
+                📷 Prefiero tomarle foto a la receta o a la caja
+              </button>
               <SkipBtn onClick={goToInvite} />
             </div>
           </>
@@ -620,7 +641,7 @@ export default function OnboardingFlow() {
                 <span style={{ fontSize: 26, flexShrink: 0 }}>📱</span>
                 <div style={{ textAlign: 'left' }}>
                   <p style={{ margin: 0, fontSize: 16, fontWeight: 700 }}>Invitar por WhatsApp</p>
-                  <p style={{ margin: '2px 0 0', fontSize: 15, opacity: 0.85 }}>Mensaje con el nombre del paciente</p>
+                  <p style={{ margin: '2px 0 0', fontSize: 15, opacity: 0.85 }}>Mensaje con el nombre de tu familiar</p>
                 </div>
               </button>
 
@@ -696,12 +717,12 @@ export default function OnboardingFlow() {
                   : '¡Todo listo!'}
               </p>
               <p style={{ fontSize: 16, color: '#718096', margin: 0, lineHeight: 1.6 }}>
-                Tu equipo de cuidado está listo para comenzar.
+                Ya puedes empezar. Desde el inicio te guiamos paso a paso.
               </p>
             </div>
 
             <PrimaryBtn onClick={finish} pressed={pressed} onPD={pd} onPU={pu} onPL={pu}>
-              Ir al panel principal →
+              Ir al inicio →
             </PrimaryBtn>
           </>
         )}
