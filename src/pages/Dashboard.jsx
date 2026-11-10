@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import CaregiverShift from '../components/CaregiverShift'
+import NeedsPicker from '../components/NeedsPicker'
+import { needsFor, storedNeeds } from '../lib/needs'
 import { createPortal } from 'react-dom'
 import { Link, useSearchParams, useNavigate as useNav } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
@@ -14,7 +16,7 @@ import FirstTour from '../components/FirstTour'
 import { SkeletonDashSummary, SkeletonCard } from '../components/SkeletonLoader'
 import SuccessAnimation, { useSuccessAnimation } from '../components/SuccessAnimation'
 import { usePullToRefresh } from '../hooks/usePullToRefresh.jsx'
-import { AlertTriangle, CheckIcon, User, XIcon, Pill, ClipboardCheck, Chat, Calendar, Receipt, Users, Camera, Clock, MessageCircle, Video, Hospital, Building2, Heart, Bell, ChevronRight, Siren, Zap, Phone, Stethoscope } from '../components/Icons'
+import { AlertTriangle, CheckIcon, User, XIcon, Pill, ClipboardCheck, Chat, Calendar, Receipt, Users, Camera, Clock, MessageCircle, Video, Hospital, Building2, Heart, Bell, ChevronRight, Siren, Zap, Phone, Stethoscope, FileText, CheckSquare } from '../components/Icons'
 import { geminiGenerate } from '../lib/gemini'
 import { getActivitySummary } from '../lib/activitySummary'
 import { buildCareItems } from '../lib/careItems'
@@ -2154,6 +2156,17 @@ export default function Dashboard() {
   const [expandedDays, setExpandedDays] = useState(() => new Set([new Date().toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' })]))
   const [selectedDayTab, setSelectedDayTab] = useState(() => new Date().toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' }))
   const [showCompanion, setShowCompanion] = useState(false)
+  // Inicio a la medida (nov 2026): cada persona ve primero lo que usa.
+  const [myNeeds, setMyNeeds] = useState(() => needsFor(user, memberRole, isAdmin))
+  const [needsPicked, setNeedsPicked] = useState(() => storedNeeds(user) !== null)
+  const [needsOpen, setNeedsOpen] = useState(false)
+  const [needsSkipped, setNeedsSkipped] = useState(() => { try { return localStorage.getItem('fc_needs_skip') === '1' } catch { return false } })
+  useEffect(() => {
+    if (!needsPicked) setMyNeeds(needsFor(user, memberRole, isAdmin))
+  }, [memberRole, isAdmin]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (searchParams.get('personalizar') === '1') { setNeedsOpen(true); searchParams.delete('personalizar'); setSearchParams(searchParams, { replace: true }) }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
   const [showFamilySwitcher, setShowFamilySwitcher] = useState(false)
   const [showNotifSheet, setShowNotifSheet] = useState(false)
   const [notifMessages, setNotifMessages] = useState([])
@@ -3845,6 +3858,20 @@ export default function Dashboard() {
 
                 {memberRole === 'cuidador' && ownerId && <CaregiverShift ownerId={ownerId} compact />}
 
+                {/* ══ ¿QUÉ QUIERES TENER A MANO? — una vez, y cuando lo pidan ══ */}
+                {(needsOpen || (!needsPicked && !needsSkipped && !(isAdmin && !!realPatientName && (medTotal === 0 || !routineActive || familyCount <= 1)))) && (
+                  <NeedsPicker
+                    initial={myNeeds}
+                    firstTime={!needsPicked}
+                    onDone={ids => { setMyNeeds(ids); setNeedsPicked(true); setNeedsOpen(false) }}
+                    onSkip={() => {
+                      if (needsOpen) { setNeedsOpen(false); return }
+                      try { localStorage.setItem('fc_needs_skip', '1') } catch { /* */ }
+                      setNeedsSkipped(true)
+                    }}
+                  />
+                )}
+
                 {/* ══ PRIMEROS PASOS (UX nov 2026): una lista clara de 3 cosas, con la siguiente resaltada ══ */}
                 {isAdmin && !!realPatientName && (medTotal === 0 || !routineActive || familyCount <= 1) && (() => {
                   const who = patientFirstName || 'tu familiar'
@@ -3947,15 +3974,32 @@ export default function Dashboard() {
                     ACCIONES RÁPIDAS + MÁS HERRAMIENTAS — directo sobre el fondo crema
                     ════════════════════════════════════ */}
                 <div>
-                  <p style={{ margin: '0 0 14px', display: 'flex', alignItems: 'center', gap: 9, fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 18, fontWeight: 600, color: '#2A4350' }}>
-                    <Zap size={18} color="#0C6C9C" filled /> Acciones rápidas
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '0 0 14px' }}>
+                  <p style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 9, fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 18, fontWeight: 700, color: '#2A4350' }}>
+                    <Zap size={18} color="#0C6C9C" filled /> Lo que más usas
                   </p>
+                  <button onClick={() => setNeedsOpen(true)} style={{ background: 'none', border: 'none', padding: '8px 4px', minHeight: 40, fontSize: 15, fontWeight: 700, color: '#0C6C9C', cursor: 'pointer' }}>Cambiar</button>
+                  </div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                     {[
-                      // Lo diario que no está en la barra de abajo (UX nov 2026).
-                      { Icon: Heart,         label: '¿Cómo está hoy?', onClick: () => setShowHowIsToday(true), circleBg: '#E3F1F8', iconColor: '#0C6C9C', bold: false },
-                      { Icon: Calendar,      label: 'Citas',        onClick: () => navigate('/calendar'),     circleBg: '#E3F1F8', iconColor: '#0C6C9C', bold: false },
-                      { Icon: Users,         label: 'Familia',      onClick: () => navigate('/familia'),      circleBg: '#E3F1F8', iconColor: '#0C6C9C', bold: false },
+                      // Atajos según lo que cada quien escogió (Medicinas y Rutina ya están en la barra de abajo)
+                      ...(() => {
+                        const blue = { circleBg: '#E3F1F8', iconColor: '#0C6C9C', bold: false }
+                        const all = {
+                          diario:  { Icon: Heart,         label: '¿Cómo está hoy?', onClick: () => setShowHowIsToday(true) },
+                          citas:   { Icon: Calendar,      label: 'Citas',           onClick: () => navigate('/calendar') },
+                          tareas:  { Icon: CheckSquare,   label: 'Tareas',          onClick: () => navigate('/familia#tareas') },
+                          gastos:  { Icon: Receipt,       label: 'Gastos',          onClick: () => navigate('/gastos') },
+                          turnos:  { Icon: Clock,         label: 'Turnos',          onClick: () => navigate('/familia#turnos') },
+                          papeles: { Icon: FileText,      label: 'Papel en inglés', onClick: () => setShowCompanion(true) },
+                          video:   { Icon: Video,         label: 'Videollamada',    onClick: () => navigate('/videollamada') },
+                        }
+                        const picked = myNeeds.filter(id => all[id]).map(id => ({ ...all[id], ...blue }))
+                        const fill = ['diario', 'citas', 'tareas', 'gastos'].filter(id => !myNeeds.includes(id)).map(id => ({ ...all[id], ...blue }))
+                        const list = [...picked, ...fill].slice(0, 4)
+                        if (!list.some(x => x.label === 'Familia')) list.push({ Icon: Users, label: 'Familia', onClick: () => navigate('/familia'), ...blue })
+                        return list
+                      })(),
                       { Icon: Siren,         label: 'Emergencia',   onClick: prepareSOS,                      circleBg: 'rgba(217,83,79,0.12)', iconColor: '#D9534F', bold: true },
                     ].map(({ Icon, label, onClick, circleBg, iconColor, bold }) => (
                       <button

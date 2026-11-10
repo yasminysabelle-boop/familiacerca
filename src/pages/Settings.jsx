@@ -509,6 +509,17 @@ export default function Settings() {
           <p style={{ fontSize: 14, fontWeight: 700, color: '#5E7480', letterSpacing: '0.08em', textTransform: 'uppercase', padding: '14px 16px 8px', margin: 0 }}>
             Cómo se ve la app
           </p>
+          <button onClick={() => navigate('/dashboard?personalizar=1')} style={{
+            width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px',
+            background: 'none', border: 'none', borderBottom: '1px solid #F5F0EA', cursor: 'pointer', textAlign: 'left',
+          }}>
+            <span style={{ flex: 'none', width: 36, height: 36, borderRadius: 10, background: '#E3F1F8', fontSize: 17, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>⭐</span>
+            <span style={{ flex: 1, minWidth: 0 }}>
+              <span style={{ display: 'block', fontSize: 16, fontWeight: 700, color: '#14303D' }}>Personalizar mi Inicio</span>
+              <span style={{ display: 'block', fontSize: 14, color: '#4E6470', marginTop: 1 }}>Escoge lo que quieres tener a mano</span>
+            </span>
+            <ChevronRight size={16} color="#5E7480" strokeWidth={2} />
+          </button>
           <ToggleRow
             icon="Aa"
             label="Letra grande"

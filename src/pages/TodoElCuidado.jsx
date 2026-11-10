@@ -22,25 +22,24 @@ function GroupHeader({ icon, color, label }) {
   )
 }
 
-function ToolCard({ Icon, label, tint, tintBg, emphasis = false, onClick, span2 = false }) {
-  const iconBg    = emphasis ? tint : tintBg
-  const iconColor = emphasis ? '#FFFFFF' : tint
+function ToolCard({ Icon, label, sub, tint, tintBg, onClick }) {
   return (
     <button
       onClick={onClick}
       style={{
-        gridColumn: span2 ? '1 / -1' : undefined,
-        background: 'white', border: '1px solid #E6E3DB', borderRadius: 18,
-        padding: '16px 10px 14px', display: 'flex', flexDirection: 'column',
-        alignItems: 'center', gap: 8, cursor: 'pointer',
-        boxShadow: '0 2px 0 rgba(10, 74, 107, 0.06), 0 6px 16px -10px rgba(10, 74, 107, 0.35)',
-        WebkitTapHighlightColor: 'transparent',
+        width: '100%', background: 'white', border: 'none', borderTop: '1px solid #F0EEE8',
+        padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer',
+        textAlign: 'left', WebkitTapHighlightColor: 'transparent', fontFamily: SANS,
       }}
     >
-      <span style={{ width: 48, height: 48, borderRadius: 14, background: iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-        <Icon size={24} color={iconColor} strokeWidth={2.1} />
+      <span style={{ width: 44, height: 44, borderRadius: 13, background: tintBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+        <Icon size={22} color={tint} strokeWidth={2.1} />
       </span>
-      <span style={{ fontSize: 15, fontWeight: 600, color: '#2A4350', textAlign: 'center', lineHeight: 1.3 }}>{label}</span>
+      <span style={{ flex: 1, minWidth: 0 }}>
+        <span style={{ display: 'block', fontSize: 16, fontWeight: 700, color: '#14303D', lineHeight: 1.3 }}>{label}</span>
+        {sub && <span style={{ display: 'block', fontSize: 14, color: '#4E6470', lineHeight: 1.35, marginTop: 1 }}>{sub}</span>}
+      </span>
+      <span style={{ fontSize: 20, color: '#5E7480', flexShrink: 0 }}>›</span>
     </button>
   )
 }
@@ -51,41 +50,34 @@ export default function TodoElCuidado() {
   const [showHowIsToday, setShowHowIsToday] = useState(false)
   const { activePatientName } = useFamily()
 
-  // Funciones en 3 niveles (UX nov 2026): lo de todos los días arriba, lo de
-  // vez en cuando después, y lo de momentos especiales plegado. Emergencia
-  // siempre visible.
-  const [showMore, setShowMore] = useState(() => {
-    try { return localStorage.getItem('fc_mas_expandido') === '1' } catch { return false }
-  })
-  function toggleMore() {
-    const v = !showMore
-    setShowMore(v)
-    try { localStorage.setItem('fc_mas_expandido', v ? '1' : '0') } catch { /* sin almacenamiento */ }
-  }
-
-  const todosLosDias = [
-    { Icon: Pill,     label: 'Medicinas',         onClick: () => navigate('/medications') },
-    { Icon: Calendar, label: 'Rutina diaria',        onClick: () => navigate('/cuidado') },
-    // Una sola puerta para todo lo que se escribe del familiar (HowIsTodaySheet)
-    { Icon: Heart,    label: '¿Cómo está hoy?',      onClick: () => setShowHowIsToday(true) },
-    { Icon: Users,    label: 'Familia y cuidadores', onClick: () => navigate('/familia') },
-  ]
-  const organizar = [
-    { Icon: Calendar,      label: 'Citas y calendario',      onClick: () => navigate('/calendar') },
-    { Icon: FileText,      label: 'Reportes para el médico', onClick: () => navigate('/reportes') },
-    { Icon: Phone,         label: 'Contactos médicos',       onClick: () => navigate('/directorio') },
-    { Icon: Video,         label: 'Videollamada',            onClick: () => navigate('/videollamada') },
-    { Icon: ClipboardList, label: 'Historial',               onClick: () => navigate('/historial') },
-    { Icon: MessageCircle, label: 'Chat familiar',           onClick: () => navigate('/chat') },
-  ]
-  const especiales = [
-    { Icon: DollarSign, label: 'Gastos del cuidado', onClick: () => navigate('/gastos') },
-    { Icon: Pencil,     label: 'Memorias de voz',    onClick: () => navigate('/memorias') },
+  // Todo el cuidado en 4 grupos con nombres sencillos (nov 2026). Nada se
+  // esconde: cada opción dice para qué sirve, así se encuentra sin adivinar.
+  const groups = [
+    { label: 'Día a día', Ic: Heart, tint: '#0C6C9C', bg: '#E3F1F8', items: [
+      { Icon: Pill,     label: 'Medicinas',       sub: 'Dar, marcar y saber cuándo reponer', onClick: () => navigate('/medications') },
+      { Icon: Calendar, label: 'Rutina del día',  sub: 'Baño, comidas, pañal, paseo', onClick: () => navigate('/cuidado') },
+      { Icon: Heart,    label: '¿Cómo está hoy?', sub: 'Contar cómo amaneció o dejar una nota', onClick: () => setShowHowIsToday(true) },
+      { Icon: Calendar, label: 'Citas',           sub: 'Próximas citas y quién lleva', onClick: () => navigate('/calendar') },
+    ] },
+    { label: 'Salud', Ic: FileText, tint: '#A3452F', bg: '#FDEEEA', items: [
+      { Icon: FileText,      label: 'Reportes para el médico', sub: 'Un resumen para llevar a la consulta', onClick: () => navigate('/reportes') },
+      { Icon: ClipboardList, label: 'Historial',               sub: 'Todo lo que pasó, día por día', onClick: () => navigate('/historial') },
+      { Icon: Phone,         label: 'Contactos médicos',       sub: 'Médicos, farmacia, seguro', onClick: () => navigate('/directorio') },
+      { Icon: FileText,      label: 'Datos de salud',          sub: 'Alergias, diagnósticos y la ficha de emergencia', onClick: () => navigate('/paciente/perfil') },
+    ] },
+    { label: 'Familia', Ic: Users, tint: '#0A5A82', bg: '#E3F1F8', items: [
+      { Icon: Users,         label: 'Familia y cuidadores', sub: 'Quién está, tareas y turnos de la cuidadora', onClick: () => navigate('/familia') },
+      { Icon: MessageCircle, label: 'Chat familiar',        sub: 'Hablar entre todos sin perder nada', onClick: () => navigate('/chat') },
+      { Icon: Video,         label: 'Videollamada',         sub: 'Acompañar desde lejos', onClick: () => navigate('/videollamada') },
+      { Icon: Pencil,        label: 'Memorias de voz',      sub: 'Guardar sus historias y recuerdos', onClick: () => navigate('/memorias') },
+    ] },
+    { label: 'Dinero', Ic: DollarSign, tint: '#B07A12', bg: '#FDF3DF', items: [
+      { Icon: DollarSign, label: 'Gastos del cuidado', sub: 'Quién pagó y cuánto le toca a cada uno', onClick: () => navigate('/gastos') },
+    ] },
   ]
   const cuenta = [
-    { Icon: Settings, label: 'Mi cuenta y ajustes',  onClick: () => navigate('/ajustes') },
-    { Icon: Shield,   label: 'Quién ve qué',   onClick: () => navigate('/roles') },
-    { Icon: Star,     label: 'Planes y suscripción', onClick: () => navigate('/upgrade') },
+    { Icon: Settings, label: 'Mi cuenta y ajustes', sub: 'Tu familia, avisos, letra grande', onClick: () => navigate('/ajustes') },
+    { Icon: Star,     label: 'Planes y suscripción', sub: 'Lo que incluye cada plan', onClick: () => navigate('/upgrade') },
   ]
 
   // Grupos separados por un título, sin fondo de color (UX nov 2026)
@@ -124,21 +116,14 @@ export default function TodoElCuidado() {
             </button>
           </div>
 
-          {/* 1. Todos los días */}
-          <div style={block('linear-gradient(180deg, #E3F1F8 0%, #EEF6FA 100%)')}>
-            <GroupHeader icon={<Heart size={16} color="#0C6C9C" strokeWidth={2.1} />} color="#0C6C9C" label="Todos los días" />
-            <div style={grid}>
-              {todosLosDias.map(c => <ToolCard key={c.label} {...c} tint="#0C6C9C" tintBg="#E3F1F8" />)}
+          {groups.map(g => (
+            <div key={g.label} style={block()}>
+              <GroupHeader icon={<g.Ic size={16} color={g.tint} strokeWidth={2.1} />} label={g.label} />
+              <div style={{ background: 'white', border: '1px solid #E6E3DB', borderRadius: 18, overflow: 'hidden' }}>
+                {g.items.map(c => <ToolCard key={c.label} {...c} tint={g.tint} tintBg={g.bg} />)}
+              </div>
             </div>
-          </div>
-
-          {/* 2. Organizar (de vez en cuando) */}
-          <div style={block('linear-gradient(180deg, #FBEAE4 0%, #FCF0EC 100%)')}>
-            <GroupHeader icon={<Calendar size={16} color="#A3452F" strokeWidth={2.1} />} color="#A3452F" label="Organizar" />
-            <div style={grid}>
-              {organizar.map(c => <ToolCard key={c.label} {...c} tint="#C9654F" tintBg="#FDEEEA" />)}
-            </div>
-          </div>
+          ))}
 
           {/* Milo y Luna */}
           <div style={block('linear-gradient(180deg, #E3F1F8 0%, #EEF6FA 100%)')}>
@@ -151,30 +136,17 @@ export default function TodoElCuidado() {
               </span>
               <span style={{ flex: 1, minWidth: 0 }}>
                 <span style={{ display: 'block', fontFamily: SERIF, fontWeight: 600, fontSize: 17, color: '#2A4350', marginBottom: 2 }}>Milo y Luna</span>
-                <span style={{ display: 'block', fontSize: 15, color: '#4E6470', lineHeight: 1.35 }}>Pregúntales lo que necesites del cuidado</span>
+                <span style={{ display: 'block', fontSize: 15, color: '#4E6470', lineHeight: 1.35 }}>Pregúntales lo que sea, o mándales la foto de un papel en inglés</span>
               </span>
               <span style={{ fontSize: 20, color: '#0C6C9C', flexShrink: 0 }}>›</span>
             </button>
           </div>
 
-          {/* 3. Cuando haga falta (plegado) */}
-          <div style={{ ...block(), background: 'white', border: '1px solid #E6E3DB', borderRadius: 18, padding: '14px 16px' }}>
-            <button onClick={toggleMore} aria-expanded={showMore} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'none', border: 'none', padding: 0, cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}>
-              <span style={{ fontFamily: SERIF, fontWeight: 600, fontSize: 16, color: '#4E6470' }}>Cuando haga falta</span>
-              <span style={{ fontSize: 15, fontWeight: 600, color: '#0C6C9C' }}>{showMore ? 'Ocultar ▲' : 'Ver gastos y memorias ▼'}</span>
-            </button>
-            {showMore && (
-              <div style={{ ...grid, marginTop: 12 }}>
-                {especiales.map(c => <ToolCard key={c.label} {...c} tint="#B07A12" tintBg="#FDF3DF" />)}
-              </div>
-            )}
-          </div>
-
-          {/* 4. Mi cuenta */}
-          <div style={block('#EFEFEE')}>
-            <GroupHeader icon={<Settings size={16} color="#4E6470" strokeWidth={2.1} />} color="#4E6470" label="Mi cuenta" />
-            <div style={grid}>
-              {cuenta.map((c, i) => <ToolCard key={c.label} {...c} tint="#4E6470" tintBg="#F0F0EF" span2={i === 0} />)}
+          {/* Mi cuenta */}
+          <div style={block()}>
+            <GroupHeader icon={<Settings size={16} color="#4E6470" strokeWidth={2.1} />} label="Mi cuenta" />
+            <div style={{ background: 'white', border: '1px solid #E6E3DB', borderRadius: 18, overflow: 'hidden' }}>
+              {cuenta.map(c => <ToolCard key={c.label} {...c} tint="#4E6470" tintBg="#F0F0EF" />)}
             </div>
           </div>
 

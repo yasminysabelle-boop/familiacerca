@@ -45,6 +45,13 @@ export default function Familia() {
   const [waLink, setWaLink] = useState('')
   const [waCopied, setWaCopied] = useState(false)
   const location = useLocation()
+  // Atajos desde Inicio (/familia#tareas, #turnos): bajar directo a esa parte
+  useEffect(() => {
+    const id = location.hash?.slice(1)
+    if (!id) return
+    const t = setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 700)
+    return () => clearTimeout(t)
+  }, [location.hash])
   const [inviteEmail, setInviteEmail] = useState('')
   const [inviteStatus, setInviteStatus] = useState('idle')
   const [inviteLink, setInviteLink] = useState('')
@@ -699,8 +706,8 @@ export default function Familia() {
         })()}
 
         {/* Tareas repartidas y quién hizo qué (familias en varios países, nov 2026) */}
-        {ownerId && <CaregiverShift ownerId={ownerId} canClock={memberRole !== 'familiar'} />}
-        {ownerId && <FamilyTasks ownerId={ownerId} />}
+        <div id="turnos" style={{ scrollMarginTop: 80 }}>{ownerId && <CaregiverShift ownerId={ownerId} canClock={memberRole !== 'familiar'} />}</div>
+        <div id="tareas" style={{ scrollMarginTop: 80 }}>{ownerId && <FamilyTasks ownerId={ownerId} />}</div>
         {ownerId && <WeeklyContributions ownerId={ownerId} />}
 
 
