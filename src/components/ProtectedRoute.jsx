@@ -88,12 +88,12 @@ function ConnectingScreen({ onRetry, hasError }) {
       <p style={{ fontSize: 17, fontWeight: 700, color: '#2A4350', margin: 0, fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}>
         {hasError ? 'No pudimos conectar' : 'Conectando…'}
       </p>
-      <p style={{ fontSize: 13, color: '#9AA89E', margin: 0 }}>
+      <p style={{ fontSize: 14, color: '#9AA89E', margin: 0 }}>
         {hasError ? 'Verifica tu conexión a internet' : 'Verificando tu cuenta'}
       </p>
       <button
         onClick={onRetry}
-        style={{ marginTop: 8, padding: '10px 24px', borderRadius: 12, border: 'none', background: '#0C6C9C', color: 'white', fontWeight: 600, fontSize: 13, cursor: 'pointer' }}
+        style={{ marginTop: 8, padding: '10px 24px', borderRadius: 12, border: 'none', background: '#0C6C9C', color: 'white', fontWeight: 600, fontSize: 14, cursor: 'pointer' }}
       >
         Reintentar
       </button>

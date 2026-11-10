@@ -42,7 +42,7 @@ const INST_TYPE_COLORS = {
 const F = {
   width: '100%', padding: '11px 14px',
   border: '1.5px solid #E6E3DB', borderRadius: 12,
-  fontSize: 14, outline: 'none', background: '#FDFAF7',
+  fontSize: 15, outline: 'none', background: '#FDFAF7',
   boxSizing: 'border-box', transition: 'border-color 0.15s',
   fontFamily: 'inherit',
 }
@@ -54,8 +54,8 @@ function InfoRow({ Icon: Ic, value, href, color }) {
   if (!value) return null
   const inner = (
     <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginTop: 6 }}>
-      <Ic size={14} color={color ?? '#5E7480'} strokeWidth={1.5} style={{ flexShrink: 0, marginTop: 1 }} />
-      <span style={{ fontSize: 14, color: '#4E6470', wordBreak: 'break-all', lineHeight: 1.5 }}>{value}</span>
+      <Ic size={14} color={color ?? '#5E7480'} strokeWidth={2.1} style={{ flexShrink: 0, marginTop: 1 }} />
+      <span style={{ fontSize: 15, color: '#4E6470', wordBreak: 'break-all', lineHeight: 1.5 }}>{value}</span>
     </div>
   )
   return href
@@ -65,7 +65,7 @@ function InfoRow({ Icon: Ic, value, href, color }) {
 
 function Label({ children }) {
   return (
-    <p style={{ fontSize: 13, fontWeight: 700, color: '#4E6470', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>
+    <p style={{ fontSize: 14, fontWeight: 700, color: '#4E6470', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>
       {children}
     </p>
   )
@@ -105,11 +105,11 @@ function CardActions({ onEdit, onDeleteRequest, canDelete }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
       <button aria-label="Editar" onClick={onEdit} style={{ width: 28, height: 28, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F3F4F6', border: 'none', cursor: 'pointer' }}>
-        <Pencil size={13} color="#4E6470" strokeWidth={1.75} />
+        <Pencil size={13} color="#4E6470" strokeWidth={2.1} />
       </button>
       {canDelete && (
         <button aria-label="Eliminar" onClick={onDeleteRequest} style={{ width: 28, height: 28, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#FFF0F0', border: 'none', cursor: 'pointer' }}>
-          <Trash size={13} color="#D63031" strokeWidth={1.75} />
+          <Trash size={13} color="#D63031" strokeWidth={2.1} />
         </button>
       )}
     </div>
@@ -122,8 +122,8 @@ function EmptyState({ Icon: Ic, title, subtitle }) {
       <div style={{ width: 56, height: 56, borderRadius: '50%', background: '#F5EEE6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <Ic size={26} color="#0A5A82" strokeWidth={1.3} />
       </div>
-      <p style={{ fontSize: 14, fontWeight: 600, color: '#30454F', textAlign: 'center' }}>{title}</p>
-      <p style={{ fontSize: 14, color: '#5E7480', textAlign: 'center', maxWidth: 220, lineHeight: 1.6 }}>{subtitle}</p>
+      <p style={{ fontSize: 15, fontWeight: 600, color: '#30454F', textAlign: 'center' }}>{title}</p>
+      <p style={{ fontSize: 15, color: '#5E7480', textAlign: 'center', maxWidth: 220, lineHeight: 1.6 }}>{subtitle}</p>
     </div>
   )
 }
@@ -133,7 +133,7 @@ function AddBtn({ onClick, label }) {
     <button onClick={onClick} style={{
       width: '100%', padding: '14px', borderRadius: 16, marginTop: 8,
       border: '1.5px dashed #0A5A82', background: '#FFF8F4', color: '#0C6C9C',
-      fontWeight: 600, fontSize: 13, cursor: 'pointer',
+      fontWeight: 600, fontSize: 14, cursor: 'pointer',
       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
     }}>
       <Plus size={16} color="#0A5A82" strokeWidth={2} />
@@ -150,7 +150,7 @@ function SheetModal({ title, subtitle, onClose, onSave, saveLabel, saving, child
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 20 }}>
           <div>
             <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 18, fontWeight: 700, color: '#14303D', margin: 0 }}>{title}</p>
-            {subtitle && <p style={{ fontSize: 14, color: '#5E7480', marginTop: 4 }}>{subtitle}</p>}
+            {subtitle && <p style={{ fontSize: 15, color: '#5E7480', marginTop: 4 }}>{subtitle}</p>}
           </div>
           <button aria-label="Cerrar" onClick={onClose} style={{ padding: 8, borderRadius: 10, background: '#F3F4F6', border: 'none', cursor: 'pointer' }}>
             <XIcon size={16} color="#4E6470" strokeWidth={2} />
@@ -162,7 +162,7 @@ function SheetModal({ title, subtitle, onClose, onSave, saveLabel, saving, child
         <button onClick={onSave} disabled={saving} style={{
           width: '100%', marginTop: 24, padding: '14px', borderRadius: 16, border: 'none',
           background: saving ? '#C9D6DB' : 'linear-gradient(135deg, #0A5A82, #0A4A6B)',
-          color: 'white', fontWeight: 700, fontSize: 14,
+          color: 'white', fontWeight: 700, fontSize: 15,
           cursor: saving ? 'not-allowed' : 'pointer',
           boxShadow: saving ? 'none' : '0 6px 20px rgba(12,108,156,0.3)',
         }}>
@@ -179,15 +179,15 @@ function DoctorCard({ doc, onEdit, onDeleteRequest, canDelete }) {
     <div style={{ background: 'white', borderRadius: 16, border: '1px solid #E6E3DB', borderTop: '3px solid #0A5A82', padding: '14px 16px', marginBottom: 10, boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10 }}>
         <div style={{ minWidth: 0, flex: 1 }}>
-          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 14, fontWeight: 700, color: '#14303D', margin: 0 }}>{doc.name}</p>
-          {doc.specialty && <p style={{ fontSize: 14, fontWeight: 600, color: '#0C6C9C', marginTop: 2 }}>{doc.specialty}</p>}
+          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 15, fontWeight: 700, color: '#14303D', margin: 0 }}>{doc.name}</p>
+          {doc.specialty && <p style={{ fontSize: 15, fontWeight: 600, color: '#0C6C9C', marginTop: 2 }}>{doc.specialty}</p>}
         </div>
         <CardActions onEdit={onEdit} onDeleteRequest={onDeleteRequest} canDelete={canDelete} />
       </div>
       <InfoRow Icon={Phone}   value={doc.phone}  href={doc.phone  ? `tel:${doc.phone}`      : undefined} />
       <InfoRow Icon={Mail}    value={doc.email}  href={doc.email  ? `mailto:${doc.email}`   : undefined} />
       <InfoRow Icon={BookOpen} value={doc.clinic} />
-      {doc.notes && <p style={{ fontSize: 13, color: '#5E7480', marginTop: 8, paddingLeft: 12, borderLeft: '2px solid #F3F4F6', lineHeight: 1.5 }}>{doc.notes}</p>}
+      {doc.notes && <p style={{ fontSize: 14, color: '#5E7480', marginTop: 8, paddingLeft: 12, borderLeft: '2px solid #F3F4F6', lineHeight: 1.5 }}>{doc.notes}</p>}
     </div>
   )
 }
@@ -200,9 +200,9 @@ function InstitutionCard({ ins, onEdit, onDeleteRequest, canDelete }) {
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10 }}>
         <div style={{ minWidth: 0, flex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 14, fontWeight: 700, color: '#14303D', margin: 0 }}>{ins.name}</p>
+            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 15, fontWeight: 700, color: '#14303D', margin: 0 }}>{ins.name}</p>
             {ins.type && (
-              <span style={{ fontSize: 12, fontWeight: 700, color: typeColor, background: `${typeColor}14`, padding: '2px 8px', borderRadius: 6 }}>
+              <span style={{ fontSize: 14, fontWeight: 700, color: typeColor, background: `${typeColor}14`, padding: '2px 8px', borderRadius: 6 }}>
                 {ins.type}
               </span>
             )}
@@ -214,22 +214,22 @@ function InstitutionCard({ ins, onEdit, onDeleteRequest, canDelete }) {
       <InfoRow Icon={Phone}  value={ins.phone} href={ins.phone ? `tel:${ins.phone}` : undefined} />
       {ins.emergency_phone && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 6 }}>
-          <Phone size={14} color="#D63031" strokeWidth={1.75} style={{ flexShrink: 0 }} />
-          <a href={`tel:${ins.emergency_phone}`} style={{ fontSize: 14, color: '#D63031', fontWeight: 600, textDecoration: 'none' }}>
+          <Phone size={14} color="#D63031" strokeWidth={2.1} style={{ flexShrink: 0 }} />
+          <a href={`tel:${ins.emergency_phone}`} style={{ fontSize: 15, color: '#D63031', fontWeight: 600, textDecoration: 'none' }}>
             {ins.emergency_phone} <span style={{ fontWeight: 400, color: '#5E7480' }}>(emergencias)</span>
           </a>
         </div>
       )}
       {ins.website && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 6 }}>
-          <span style={{ fontSize: 14, flexShrink: 0 }}>🌐</span>
+          <span style={{ fontSize: 15, flexShrink: 0 }}>🌐</span>
           <a href={ins.website.startsWith('http') ? ins.website : `https://${ins.website}`} target="_blank" rel="noopener noreferrer"
-            style={{ fontSize: 14, color: '#2D86A0', textDecoration: 'none', wordBreak: 'break-all' }}>
+            style={{ fontSize: 15, color: '#2D86A0', textDecoration: 'none', wordBreak: 'break-all' }}>
             {ins.website}
           </a>
         </div>
       )}
-      {ins.notes && <p style={{ fontSize: 13, color: '#5E7480', marginTop: 8, paddingLeft: 12, borderLeft: '2px solid #F3F4F6', lineHeight: 1.5 }}>{ins.notes}</p>}
+      {ins.notes && <p style={{ fontSize: 14, color: '#5E7480', marginTop: 8, paddingLeft: 12, borderLeft: '2px solid #F3F4F6', lineHeight: 1.5 }}>{ins.notes}</p>}
     </div>
   )
 }
@@ -246,20 +246,20 @@ function ContactCard({ con, onEdit, onToggleEmergency, onDeleteRequest, canDelet
     }}>
       {isEmergency && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 6 }}>
-          <span style={{ fontSize: 12, fontWeight: 800, color: '#D63031', letterSpacing: '0.1em' }}>⭐ EMERGENCIA</span>
+          <span style={{ fontSize: 14, fontWeight: 800, color: '#D63031', letterSpacing: '0.1em' }}>⭐ EMERGENCIA</span>
         </div>
       )}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10 }}>
         <div style={{ minWidth: 0, flex: 1 }}>
-          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 14, fontWeight: 700, color: '#14303D', margin: 0 }}>{con.name}</p>
-          {con.relationship && <p style={{ fontSize: 14, color: '#4E6470', marginTop: 2 }}>{con.relationship}</p>}
+          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 15, fontWeight: 700, color: '#14303D', margin: 0 }}>{con.name}</p>
+          {con.relationship && <p style={{ fontSize: 15, color: '#4E6470', marginTop: 2 }}>{con.relationship}</p>}
         </div>
         <CardActions onEdit={onEdit} onDeleteRequest={onDeleteRequest} canDelete={canDelete} />
       </div>
       <InfoRow Icon={Phone}  value={con.phone}   href={con.phone  ? `tel:${con.phone}`    : undefined} />
       <InfoRow Icon={Mail}   value={con.email}   href={con.email  ? `mailto:${con.email}` : undefined} />
       <InfoRow Icon={MapPin} value={con.address} />
-      {con.notes && <p style={{ fontSize: 13, color: '#5E7480', marginTop: 8, paddingLeft: 12, borderLeft: '2px solid #F3F4F6', lineHeight: 1.5 }}>{con.notes}</p>}
+      {con.notes && <p style={{ fontSize: 14, color: '#5E7480', marginTop: 8, paddingLeft: 12, borderLeft: '2px solid #F3F4F6', lineHeight: 1.5 }}>{con.notes}</p>}
 
       {/* Emergency call button */}
       {isEmergency && con.phone && (
@@ -267,7 +267,7 @@ function ContactCard({ con, onEdit, onToggleEmergency, onDeleteRequest, canDelet
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
           marginTop: 12, padding: '11px', borderRadius: 12,
           background: 'linear-gradient(135deg, #2BB8CC, #0C6C9C)',
-          color: 'white', fontWeight: 700, fontSize: 13,
+          color: 'white', fontWeight: 700, fontSize: 14,
           textDecoration: 'none', boxShadow: '0 4px 16px rgba(34,197,94,0.3)',
         }}>
           <Phone size={16} color="white" strokeWidth={2} />
@@ -282,9 +282,9 @@ function ContactCard({ con, onEdit, onToggleEmergency, onDeleteRequest, canDelet
         background: isEmergency ? '#FFF0F0' : '#F9F5F1',
         border: isEmergency ? '1px solid #FECACA' : '1px solid #E6E3DB',
         color: isEmergency ? '#D63031' : '#5E7480',
-        fontSize: 13, fontWeight: 600,
+        fontSize: 14, fontWeight: 600,
       }}>
-        <Star size={11} color={isEmergency ? '#D63031' : '#5E7480'} strokeWidth={1.75} filled={isEmergency} />
+        <Star size={11} color={isEmergency ? '#D63031' : '#5E7480'} strokeWidth={2.1} filled={isEmergency} />
         {isEmergency ? 'Quitar como emergencia' : 'Marcar como emergencia'}
       </button>
     </div>
@@ -316,22 +316,22 @@ function JoinedMemberCard({ member, inDirectory, onClick }) {
           {member.name?.charAt(0)?.toUpperCase() ?? '?'}
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ fontSize: 13, fontWeight: 700, color: '#14303D', margin: 0 }}>{member.name}</p>
+          <p style={{ fontSize: 14, fontWeight: 700, color: '#14303D', margin: 0 }}>{member.name}</p>
           {member.email && (
-            <p style={{ fontSize: 13, color: '#5E7480', margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <p style={{ fontSize: 14, color: '#5E7480', margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {member.email}
             </p>
           )}
         </div>
         <span style={{
-          fontSize: 13, fontWeight: 700, color: roleColor,
+          fontSize: 14, fontWeight: 700, color: roleColor,
           background: roleBg, border: `1px solid ${roleBorder}`,
           padding: '3px 9px', borderRadius: 20, flexShrink: 0,
         }}>
           {roleLabel}
         </span>
       </div>
-      <p style={{ fontSize: 13, color: inDirectory ? '#0C6C9C' : '#0C6C9C', margin: '8px 0 0', fontWeight: 600 }}>
+      <p style={{ fontSize: 14, color: inDirectory ? '#0C6C9C' : '#0C6C9C', margin: '8px 0 0', fontWeight: 600 }}>
         {inDirectory ? '✓ En directorio — toca para editar' : '+ Toca para añadir al directorio'}
       </p>
     </div>
@@ -631,7 +631,7 @@ export default function Directory() {
           {TABS.map(t => (
             <button key={t.id} onClick={() => setTab(t.id)} style={{
               flex: 1, padding: '7px 4px', borderRadius: 12,
-              border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 700,
+              border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 700,
               background: tab === t.id ? 'white' : 'transparent',
               color: tab === t.id ? (t.accent ?? '#14303D') : '#5E7480',
               boxShadow: tab === t.id ? '0 1px 4px rgba(0,0,0,0.1)' : 'none',
@@ -650,9 +650,9 @@ export default function Directory() {
         {tab === 'medicos' && (
           <>
             {loading
-              ? <p style={{ textAlign: 'center', color: '#5E7480', fontSize: 13, padding: '32px 0' }}>Cargando...</p>
+              ? <p style={{ textAlign: 'center', color: '#5E7480', fontSize: 14, padding: '32px 0' }}>Cargando...</p>
               : loadError
-              ? <div style={{ textAlign: 'center', padding: '32px 0' }}><p style={{ fontSize: 13, color: '#D63031', marginBottom: 10 }}>{loadError}</p><button onClick={fetchAll} style={{ padding: '9px 20px', borderRadius: 12, background: '#0C6C9C', color: 'white', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>Reintentar</button></div>
+              ? <div style={{ textAlign: 'center', padding: '32px 0' }}><p style={{ fontSize: 14, color: '#D63031', marginBottom: 10 }}>{loadError}</p><button onClick={fetchAll} style={{ padding: '9px 20px', borderRadius: 12, background: '#0C6C9C', color: 'white', fontWeight: 700, fontSize: 14, border: 'none', cursor: 'pointer' }}>Reintentar</button></div>
               : doctors.length === 0
               ? <EmptyState Icon={BookOpen} title="Sin médicos registrados" subtitle="Agrega los médicos tratantes para tenerlos siempre a la mano" />
               : doctors.map(d => (
@@ -670,9 +670,9 @@ export default function Directory() {
         {tab === 'instituciones' && (
           <>
             {loading
-              ? <p style={{ textAlign: 'center', color: '#5E7480', fontSize: 13, padding: '32px 0' }}>Cargando...</p>
+              ? <p style={{ textAlign: 'center', color: '#5E7480', fontSize: 14, padding: '32px 0' }}>Cargando...</p>
               : loadError
-              ? <div style={{ textAlign: 'center', padding: '32px 0' }}><p style={{ fontSize: 13, color: '#D63031', marginBottom: 10 }}>{loadError}</p><button onClick={fetchAll} style={{ padding: '9px 20px', borderRadius: 12, background: '#0C6C9C', color: 'white', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>Reintentar</button></div>
+              ? <div style={{ textAlign: 'center', padding: '32px 0' }}><p style={{ fontSize: 14, color: '#D63031', marginBottom: 10 }}>{loadError}</p><button onClick={fetchAll} style={{ padding: '9px 20px', borderRadius: 12, background: '#0C6C9C', color: 'white', fontWeight: 700, fontSize: 14, border: 'none', cursor: 'pointer' }}>Reintentar</button></div>
               : institutions.length === 0
               ? <EmptyState Icon={BookOpen} title="Sin instituciones registradas" subtitle="Agrega hospitales, clínicas y farmacias de referencia" />
               : institutions.map(i => (
@@ -690,15 +690,15 @@ export default function Directory() {
         {tab === 'familiares' && (
           <>
             {loading
-              ? <p style={{ textAlign: 'center', color: '#5E7480', fontSize: 13, padding: '32px 0' }}>Cargando...</p>
+              ? <p style={{ textAlign: 'center', color: '#5E7480', fontSize: 14, padding: '32px 0' }}>Cargando...</p>
               : loadError
-              ? <div style={{ textAlign: 'center', padding: '32px 0' }}><p style={{ fontSize: 13, color: '#D63031', marginBottom: 10 }}>{loadError}</p><button onClick={fetchAll} style={{ padding: '9px 20px', borderRadius: 12, background: '#0C6C9C', color: 'white', fontWeight: 700, fontSize: 13, border: 'none', cursor: 'pointer' }}>Reintentar</button></div>
+              ? <div style={{ textAlign: 'center', padding: '32px 0' }}><p style={{ fontSize: 14, color: '#D63031', marginBottom: 10 }}>{loadError}</p><button onClick={fetchAll} style={{ padding: '9px 20px', borderRadius: 12, background: '#0C6C9C', color: 'white', fontWeight: 700, fontSize: 14, border: 'none', cursor: 'pointer' }}>Reintentar</button></div>
               : (
                 <>
                   {/* Joined app members */}
                   {familyMembers.length > 0 && (
                     <div style={{ marginBottom: 20 }}>
-                      <p style={{ fontSize: 13, fontWeight: 700, color: '#5E7480', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10 }}>
+                      <p style={{ fontSize: 14, fontWeight: 700, color: '#5E7480', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10 }}>
                         Con acceso al app
                       </p>
                       {familyMembers.map(m => {
@@ -721,7 +721,7 @@ export default function Directory() {
                   {contacts.length > 0 ? (
                     <div>
                       {familyMembers.length > 0 && (
-                        <p style={{ fontSize: 13, fontWeight: 700, color: '#5E7480', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10 }}>
+                        <p style={{ fontSize: 14, fontWeight: 700, color: '#5E7480', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10 }}>
                           Directorio
                         </p>
                       )}
@@ -747,7 +747,7 @@ export default function Directory() {
         {tab === 'paciente' && (
           <div>
             {loading ? (
-              <p style={{ textAlign: 'center', color: '#5E7480', fontSize: 13, padding: '32px 0' }}>Cargando...</p>
+              <p style={{ textAlign: 'center', color: '#5E7480', fontSize: 14, padding: '32px 0' }}>Cargando...</p>
             ) : !patientProfile?.nombre_completo ? (
               <div>
                 <EmptyState Icon={User} title="Perfil del paciente vacío" subtitle="Agrega diagnósticos, alergias y médico tratante para tenerlos siempre disponibles" />
@@ -758,7 +758,7 @@ export default function Directory() {
                       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                       padding: '14px', borderRadius: 16, marginTop: 4,
                       background: 'linear-gradient(135deg, #0A5A82, #0A4A6B)',
-                      color: 'white', fontWeight: 700, fontSize: 14, textDecoration: 'none',
+                      color: 'white', fontWeight: 700, fontSize: 15, textDecoration: 'none',
                       boxShadow: '0 4px 16px rgba(12,108,156,0.3)',
                     }}
                   >
@@ -810,7 +810,7 @@ export default function Directory() {
                             width: 22, height: 22, borderRadius: '50%',
                             background: photoUploading ? '#5E7480' : '#BF513C',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontSize: 13, cursor: 'pointer', border: '2px solid white',
+                            fontSize: 14, cursor: 'pointer', border: '2px solid white',
                           }}
                         >
                           {photoUploading ? '⏳' : '📷'}
@@ -824,7 +824,7 @@ export default function Directory() {
                         {patientProfile.nombre_completo}
                       </p>
                       {patientProfile.fecha_nacimiento && (
-                        <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.6)', margin: '3px 0 0' }}>
+                        <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.6)', margin: '3px 0 0' }}>
                           {new Date(patientProfile.fecha_nacimiento + 'T12:00:00').toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' })}
                           {patientProfile.sexo ? ` · ${patientProfile.sexo.charAt(0).toUpperCase() + patientProfile.sexo.slice(1)}` : ''}
                         </p>
@@ -838,7 +838,7 @@ export default function Directory() {
                           padding: '7px 14px', borderRadius: 20,
                           background: 'rgba(255,255,255,0.15)',
                           border: '1px solid rgba(255,255,255,0.25)',
-                          color: 'white', fontSize: 14, fontWeight: 600,
+                          color: 'white', fontSize: 15, fontWeight: 600,
                           textDecoration: 'none', flexShrink: 0,
                         }}
                       >
@@ -849,7 +849,7 @@ export default function Directory() {
                 </div>
 
                 {photoError && (
-                  <div style={{ background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 12, padding: '10px 14px', marginBottom: 12, fontSize: 13, color: '#DC2626' }}>
+                  <div style={{ background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 12, padding: '10px 14px', marginBottom: 12, fontSize: 14, color: '#DC2626' }}>
                     {photoError}
                   </div>
                 )}
@@ -860,7 +860,7 @@ export default function Directory() {
                     background: '#FFF0F0', border: '1.5px solid #FECACA',
                     borderRadius: 14, padding: '14px 16px', marginBottom: 12,
                   }}>
-                    <p style={{ fontSize: 13, fontWeight: 800, color: '#DC2626', letterSpacing: '0.1em', textTransform: 'uppercase', margin: '0 0 8px' }}>
+                    <p style={{ fontSize: 14, fontWeight: 800, color: '#DC2626', letterSpacing: '0.1em', textTransform: 'uppercase', margin: '0 0 8px' }}>
                       ⚠ Alergias
                     </p>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
@@ -868,7 +868,7 @@ export default function Directory() {
                         <span key={a} style={{
                           padding: '5px 11px', borderRadius: 20,
                           background: 'white', border: '1px solid #FECACA',
-                          color: '#DC2626', fontSize: 13, fontWeight: 600,
+                          color: '#DC2626', fontSize: 14, fontWeight: 600,
                         }}>{a}</span>
                       ))}
                     </div>
@@ -878,24 +878,24 @@ export default function Directory() {
                 {/* Diagnóstico */}
                 {patientProfile.diagnostico_principal && (
                   <div style={{ background: 'white', border: '1px solid #E6E3DB', borderRadius: 14, padding: '14px 16px', marginBottom: 10 }}>
-                    <p style={{ fontSize: 13, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 6px' }}>
+                    <p style={{ fontSize: 14, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 6px' }}>
                       Diagnóstico principal
                     </p>
-                    <p style={{ fontSize: 14, color: '#1F2937', margin: 0, lineHeight: 1.5 }}>{patientProfile.diagnostico_principal}</p>
+                    <p style={{ fontSize: 15, color: '#1F2937', margin: 0, lineHeight: 1.5 }}>{patientProfile.diagnostico_principal}</p>
                   </div>
                 )}
 
                 {/* Condiciones secundarias */}
                 {patientProfile.condiciones_secundarias?.length > 0 && (
                   <div style={{ background: 'white', border: '1px solid #E6E3DB', borderRadius: 14, padding: '14px 16px', marginBottom: 10 }}>
-                    <p style={{ fontSize: 13, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 8px' }}>
+                    <p style={{ fontSize: 14, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 8px' }}>
                       Condiciones secundarias
                     </p>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                       {patientProfile.condiciones_secundarias.map(c => (
                         <span key={c} style={{
                           padding: '4px 10px', borderRadius: 20,
-                          background: '#E3F1F8', color: '#0A4A6B', fontSize: 13, fontWeight: 600,
+                          background: '#E3F1F8', color: '#0A4A6B', fontSize: 14, fontWeight: 600,
                         }}>{c}</span>
                       ))}
                     </div>
@@ -905,16 +905,16 @@ export default function Directory() {
                 {/* Médico tratante */}
                 {patientProfile.medico_tratante && (
                   <div style={{ background: 'white', border: '1px solid #E6E3DB', borderTop: '3px solid #2563EB', borderRadius: 14, padding: '14px 16px', marginBottom: 10 }}>
-                    <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 14, fontWeight: 700, color: '#14303D', margin: '0 0 2px' }}>
+                    <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 15, fontWeight: 700, color: '#14303D', margin: '0 0 2px' }}>
                       {patientProfile.medico_tratante}
                     </p>
                     {patientProfile.especialidad_medico && (
-                      <p style={{ fontSize: 14, color: '#2563EB', fontWeight: 600, margin: '0 0 6px' }}>{patientProfile.especialidad_medico}</p>
+                      <p style={{ fontSize: 15, color: '#2563EB', fontWeight: 600, margin: '0 0 6px' }}>{patientProfile.especialidad_medico}</p>
                     )}
                     {patientProfile.telefono_medico && (
                       <a href={`tel:${patientProfile.telefono_medico}`} style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 6, textDecoration: 'none' }}>
                         <Phone size={13} color="#2563EB" strokeWidth={2} />
-                        <span style={{ fontSize: 14, color: '#2563EB', fontWeight: 600 }}>{patientProfile.telefono_medico}</span>
+                        <span style={{ fontSize: 15, color: '#2563EB', fontWeight: 600 }}>{patientProfile.telefono_medico}</span>
                       </a>
                     )}
                   </div>
@@ -923,10 +923,10 @@ export default function Directory() {
                 {/* Notas generales */}
                 {patientProfile.notas_generales && (
                   <div style={{ background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 14, padding: '14px 16px', marginBottom: 10 }}>
-                    <p style={{ fontSize: 13, fontWeight: 700, color: '#92400E', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 6px' }}>
+                    <p style={{ fontSize: 14, fontWeight: 700, color: '#92400E', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 6px' }}>
                       Notas
                     </p>
-                    <p style={{ fontSize: 13, color: '#78350F', margin: 0, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{patientProfile.notas_generales}</p>
+                    <p style={{ fontSize: 14, color: '#78350F', margin: 0, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{patientProfile.notas_generales}</p>
                   </div>
                 )}
               </div>
@@ -944,14 +944,14 @@ export default function Directory() {
                   👤
                 </div>
                 <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 20, fontWeight: 700, color: 'white', margin: '0 0 4px' }}>{emergency.name}</p>
-                {emergency.relationship && <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', margin: '0 0 8px' }}>{emergency.relationship}</p>}
+                {emergency.relationship && <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.75)', margin: '0 0 8px' }}>{emergency.relationship}</p>}
                 {emergency.phone && <p style={{ fontSize: 16, fontWeight: 600, color: 'rgba(255,255,255,0.9)', letterSpacing: '0.04em', margin: 0 }}>{emergency.phone}</p>}
               </div>
             ) : (
               <div style={{ background: '#FFF0F0', border: '1.5px solid #FECACA', borderRadius: 16, padding: '20px', marginBottom: 14, textAlign: 'center' }}>
-                <p style={{ fontSize: 14, fontWeight: 600, color: '#D63031', marginBottom: 4 }}>Sin contacto de emergencia</p>
-                <p style={{ fontSize: 14, color: '#5E7480', marginBottom: 12 }}>Ve a Familiares y marca uno como contacto de emergencia</p>
-                <button onClick={() => setTab('familiares')} style={{ padding: '8px 20px', borderRadius: 10, background: '#D63031', color: 'white', border: 'none', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>
+                <p style={{ fontSize: 15, fontWeight: 600, color: '#D63031', marginBottom: 4 }}>Sin contacto de emergencia</p>
+                <p style={{ fontSize: 15, color: '#5E7480', marginBottom: 12 }}>Ve a Familiares y marca uno como contacto de emergencia</p>
+                <button onClick={() => setTab('familiares')} style={{ padding: '8px 20px', borderRadius: 10, background: '#D63031', color: 'white', border: 'none', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}>
                   Ir a Familiares →
                 </button>
               </div>
@@ -959,14 +959,14 @@ export default function Directory() {
 
             {/* Call & email buttons */}
             {emergency?.phone && (
-              <a href={`tel:${emergency.phone}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, padding: '15px', borderRadius: 16, background: 'linear-gradient(135deg, #2BB8CC, #0C6C9C)', color: 'white', fontWeight: 700, fontSize: 15, textDecoration: 'none', boxShadow: '0 6px 24px rgba(34,197,94,0.35)', marginBottom: 10 }}>
+              <a href={`tel:${emergency.phone}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, padding: '15px', borderRadius: 16, background: 'linear-gradient(135deg, #2BB8CC, #0C6C9C)', color: 'white', fontWeight: 700, fontSize: 16, textDecoration: 'none', boxShadow: '0 6px 24px rgba(34,197,94,0.35)', marginBottom: 10 }}>
                 <Phone size={20} color="white" strokeWidth={2} />
                 Llamar ahora
               </a>
             )}
             {emergency?.email && (
-              <a href={`mailto:${emergency.email}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px', borderRadius: 14, background: 'white', border: '1.5px solid #E6E3DB', color: '#30454F', fontWeight: 600, fontSize: 13, textDecoration: 'none', marginBottom: 16 }}>
-                <Mail size={15} color="#4E6470" strokeWidth={1.75} />
+              <a href={`mailto:${emergency.email}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px', borderRadius: 14, background: 'white', border: '1.5px solid #E6E3DB', color: '#30454F', fontWeight: 600, fontSize: 14, textDecoration: 'none', marginBottom: 16 }}>
+                <Mail size={15} color="#4E6470" strokeWidth={2.1} />
                 Enviar correo
               </a>
             )}
@@ -974,17 +974,17 @@ export default function Directory() {
             {/* Top institutions with emergency phones */}
             {topInstitutions.length > 0 && (
               <div style={{ marginBottom: 16 }}>
-                <p style={{ fontSize: 13, fontWeight: 700, color: '#5E7480', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10 }}>
+                <p style={{ fontSize: 14, fontWeight: 700, color: '#5E7480', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10 }}>
                   Instituciones de emergencia
                 </p>
                 {topInstitutions.map(ins => (
                   <div key={ins.id} style={{ background: 'white', borderRadius: 14, border: '1px solid #E6E3DB', padding: '12px 14px', marginBottom: 8 }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
                       <div>
-                        <p style={{ fontSize: 13, fontWeight: 700, color: '#14303D', margin: '0 0 2px' }}>{ins.name}</p>
-                        {ins.type && <p style={{ fontSize: 13, color: '#5E7480', margin: 0 }}>{ins.type}</p>}
+                        <p style={{ fontSize: 14, fontWeight: 700, color: '#14303D', margin: '0 0 2px' }}>{ins.name}</p>
+                        {ins.type && <p style={{ fontSize: 14, color: '#5E7480', margin: 0 }}>{ins.type}</p>}
                       </div>
-                      <a href={`tel:${ins.emergency_phone}`} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 10, background: '#FFF0F0', border: '1px solid #FECACA', color: '#D63031', fontWeight: 700, fontSize: 14, textDecoration: 'none', whiteSpace: 'nowrap' }}>
+                      <a href={`tel:${ins.emergency_phone}`} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 10, background: '#FFF0F0', border: '1px solid #FECACA', color: '#D63031', fontWeight: 700, fontSize: 15, textDecoration: 'none', whiteSpace: 'nowrap' }}>
                         <Phone size={13} color="#D63031" strokeWidth={2} />
                         {ins.emergency_phone}
                       </a>
@@ -992,7 +992,7 @@ export default function Directory() {
                   </div>
                 ))}
                 {institutions.filter(i => i.emergency_phone).length === 0 && (
-                  <p style={{ fontSize: 14, color: '#5E7480', textAlign: 'center', padding: '8px 0' }}>
+                  <p style={{ fontSize: 15, color: '#5E7480', textAlign: 'center', padding: '8px 0' }}>
                     Agrega instituciones con teléfono de emergencia para verlas aquí.
                   </p>
                 )}
@@ -1001,12 +1001,12 @@ export default function Directory() {
 
             {/* SOS reminder */}
             <div style={{ background: 'linear-gradient(135deg, #1F2937, #111827)', borderRadius: 16, padding: '16px 18px', display: 'flex', alignItems: 'center', gap: 14 }}>
-              <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'linear-gradient(135deg, #D63031, #B82020)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 3px 12px rgba(214,48,49,0.5)', fontSize: 14, fontWeight: 900, color: 'white', letterSpacing: '0.04em' }}>
+              <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'linear-gradient(135deg, #D63031, #B82020)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 3px 12px rgba(214,48,49,0.5)', fontSize: 15, fontWeight: 900, color: 'white', letterSpacing: '0.04em' }}>
                 SOS
               </div>
               <div>
-                <p style={{ fontSize: 13, fontWeight: 700, color: 'white', margin: '0 0 3px' }}>Botón SOS en el inicio</p>
-                <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', margin: 0, lineHeight: 1.5 }}>
+                <p style={{ fontSize: 14, fontWeight: 700, color: 'white', margin: '0 0 3px' }}>Botón SOS en el inicio</p>
+                <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)', margin: 0, lineHeight: 1.5 }}>
                   El botón rojo en el Dashboard alerta a toda la familia al instante.
                 </p>
               </div>
@@ -1031,7 +1031,7 @@ export default function Directory() {
             <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 17, fontWeight: 700, color: '#14303D', marginBottom: 10 }}>
               ¿Eliminar este registro?
             </p>
-            <p style={{ fontSize: 13, color: '#4E6470', marginBottom: 24, lineHeight: 1.6 }}>
+            <p style={{ fontSize: 14, color: '#4E6470', marginBottom: 24, lineHeight: 1.6 }}>
               Esta acción no se puede deshacer.
             </p>
             <div style={{ display: 'flex', gap: 10 }}>
@@ -1040,7 +1040,7 @@ export default function Directory() {
                 style={{
                   flex: 1, padding: '12px', borderRadius: 12,
                   border: '1.5px solid #E6E3DB', background: 'white',
-                  fontSize: 14, fontWeight: 600, color: '#30454F', cursor: 'pointer',
+                  fontSize: 15, fontWeight: 600, color: '#30454F', cursor: 'pointer',
                 }}
               >
                 Cancelar
@@ -1050,7 +1050,7 @@ export default function Directory() {
                 style={{
                   flex: 1, padding: '12px', borderRadius: 12,
                   border: 'none', background: '#D63031',
-                  fontSize: 14, fontWeight: 700, color: 'white', cursor: 'pointer',
+                  fontSize: 15, fontWeight: 700, color: 'white', cursor: 'pointer',
                 }}
               >
                 Eliminar
@@ -1113,11 +1113,11 @@ export default function Directory() {
               border: conForm.is_emergency_contact ? '1.5px solid #FECACA' : '1.5px solid #E6E3DB',
             }}>
             <div style={{ width: 22, height: 22, borderRadius: '50%', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: conForm.is_emergency_contact ? '#D63031' : 'white', border: conForm.is_emergency_contact ? 'none' : '1.5px solid #E6E3DB' }}>
-              {conForm.is_emergency_contact && <span style={{ color: 'white', fontSize: 14 }}>★</span>}
+              {conForm.is_emergency_contact && <span style={{ color: 'white', fontSize: 15 }}>★</span>}
             </div>
             <div>
-              <p style={{ fontSize: 13, fontWeight: 600, color: conForm.is_emergency_contact ? '#D63031' : '#30454F', margin: 0 }}>Contacto de emergencia</p>
-              <p style={{ fontSize: 13, color: '#5E7480', marginTop: 2 }}>Solo puede haber uno — reemplaza al anterior</p>
+              <p style={{ fontSize: 14, fontWeight: 600, color: conForm.is_emergency_contact ? '#D63031' : '#30454F', margin: 0 }}>Contacto de emergencia</p>
+              <p style={{ fontSize: 14, color: '#5E7480', marginTop: 2 }}>Solo puede haber uno — reemplaza al anterior</p>
             </div>
           </button>
         </SheetModal>
@@ -1153,7 +1153,7 @@ export default function Directory() {
               onChange={(e) => setZoom(Number(e.target.value))}
               style={{ width: '100%', accentColor: '#0A4A6B', marginTop: '12px' }}
             />
-            <p style={{ color: 'white', fontSize: 14, textAlign: 'center', margin: '4px 0 0' }}>
+            <p style={{ color: 'white', fontSize: 15, textAlign: 'center', margin: '4px 0 0' }}>
               Pellizca o desliza para ajustar
             </p>
           </div>
@@ -1169,7 +1169,7 @@ export default function Directory() {
               onClick={handleCropCancel}
               style={{
                 background: 'none', border: 'none', cursor: 'pointer',
-                fontSize: 15, fontWeight: 600, color: '#6D7B74', padding: '12px 20px',
+                fontSize: 16, fontWeight: 600, color: '#6D7B74', padding: '12px 20px',
               }}
             >
               Cancelar
@@ -1180,7 +1180,7 @@ export default function Directory() {
               style={{
                 background: photoUploading ? '#5E7480' : '#0A4A6B',
                 border: 'none', borderRadius: 999, cursor: photoUploading ? 'default' : 'pointer',
-                fontSize: 15, fontWeight: 700, color: 'white',
+                fontSize: 16, fontWeight: 700, color: 'white',
                 padding: '12px 32px',
                 opacity: photoUploading ? 0.7 : 1,
               }}

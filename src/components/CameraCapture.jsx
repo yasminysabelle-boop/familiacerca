@@ -113,7 +113,7 @@ export default function CameraCapture({
       {status === 'requesting' && (
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
           <div style={{ width: 34, height: 34, borderRadius: '50%', border: '3px solid rgba(255,255,255,0.15)', borderTopColor: '#0C6C9C', animation: 'camCaptureSpin 0.85s linear infinite' }} />
-          <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: 13.5, fontWeight: 600, margin: 0 }}>Abriendo cámara…</p>
+          <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: 15, fontWeight: 600, margin: 0 }}>Abriendo cámara…</p>
         </div>
       )}
 
@@ -123,7 +123,7 @@ export default function CameraCapture({
             {guidance && (
               <span style={{
                 background: 'rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.12)',
-                color: 'white', fontSize: 14, fontWeight: 600, padding: '8px 14px',
+                color: 'white', fontSize: 15, fontWeight: 600, padding: '8px 14px',
                 borderRadius: 100, maxWidth: '78%', textAlign: 'center',
               }}>
                 {guidance}
@@ -156,19 +156,19 @@ export default function CameraCapture({
           gap: 18, background: '#F7F6F2', padding: '0 30px', textAlign: 'center',
         }}>
           <div style={{ width: 56, height: 56, borderRadius: 18, background: '#FBEAE4', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Camera size={26} color="#C4664F" strokeWidth={1.8} />
+            <Camera size={26} color="#C4664F" strokeWidth={2.1} />
           </div>
           <h3 style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 16.5, fontWeight: 800, color: '#14303D', margin: 0 }}>
             {deniedTitle}
           </h3>
-          <p style={{ fontSize: 13, lineHeight: 1.55, color: '#4E6470', margin: 0, maxWidth: '27ch' }}>
+          <p style={{ fontSize: 14, lineHeight: 1.55, color: '#4E6470', margin: 0, maxWidth: '27ch' }}>
             {deniedDescription}
           </p>
           <button
             onClick={onManualFallback}
             style={{
               width: '100%', marginTop: 4, padding: 13, border: 'none', borderRadius: 14,
-              background: '#0C6C9C', color: 'white', fontSize: 14, fontWeight: 700, cursor: 'pointer',
+              background: '#0C6C9C', color: 'white', fontSize: 15, fontWeight: 700, cursor: 'pointer',
               boxShadow: '0 4px 14px rgba(12,108,156,0.3)',
             }}
           >

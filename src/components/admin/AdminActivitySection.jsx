@@ -131,18 +131,18 @@ export default function AdminActivitySection() {
     }
   }
 
-  if (loading) return <p style={{ color: '#5E7480', fontSize: 14, textAlign: 'center', padding: 24 }}>Cargando actividad...</p>
+  if (loading) return <p style={{ color: '#5E7480', fontSize: 15, textAlign: 'center', padding: 24 }}>Cargando actividad...</p>
 
   if (events.length === 0) return (
     <div style={{ textAlign: 'center', padding: '32px 0' }}>
       <p style={{ fontSize: 32 }}>📋</p>
-      <p style={{ fontSize: 14, color: '#5E7480', marginTop: 8 }}>Sin actividad en los últimos 30 días.</p>
+      <p style={{ fontSize: 15, color: '#5E7480', marginTop: 8 }}>Sin actividad en los últimos 30 días.</p>
     </div>
   )
 
   return (
     <div>
-      <p style={{ fontSize: 13, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 12px 2px' }}>
+      <p style={{ fontSize: 14, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 12px 2px' }}>
         Últimos 30 días ({events.length} eventos)
       </p>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
@@ -153,7 +153,7 @@ export default function AdminActivitySection() {
             <div key={ev.id}>
               {showDate && (
                 <p style={{
-                  fontSize: 12, fontWeight: 700, color: '#5E7480',
+                  fontSize: 14, fontWeight: 700, color: '#5E7480',
                   textTransform: 'uppercase', letterSpacing: '0.08em',
                   margin: i === 0 ? '0 0 8px' : '16px 0 8px',
                 }}>
@@ -175,10 +175,10 @@ export default function AdminActivitySection() {
                   {meta.icon}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#14303D', lineHeight: 1.3 }}>
+                  <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#14303D', lineHeight: 1.3 }}>
                     {ev.what}
                   </p>
-                  <p style={{ margin: '3px 0 0', fontSize: 13, color: '#5E7480' }}>
+                  <p style={{ margin: '3px 0 0', fontSize: 14, color: '#5E7480' }}>
                     {ev.who} · {timeAgo(ev.ts)}
                   </p>
                 </div>

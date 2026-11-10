@@ -41,11 +41,11 @@ const EMPTY = {
 // ── Style tokens ─────────────────────────────────────────────────────────────
 const F = {
   width:'100%', padding:'11px 13px', border:'1.5px solid #E6E3DB',
-  borderRadius:12, fontSize:14, outline:'none', background:'#FDFAF7',
+  borderRadius:12, fontSize:15, outline:'none', background:'#FDFAF7',
   boxSizing:'border-box', color:'#1F2937', fontFamily:'system-ui,sans-serif',
 }
 const L = {
-  fontSize: 13, fontWeight:700, color:'#4E6470',
+  fontSize: 14, fontWeight:700, color:'#4E6470',
   letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:5, display:'block',
 }
 const fo = e => { e.target.style.borderColor='#0C6C9C'; e.target.style.boxShadow='0 0 0 3px rgba(12,108,156,0.1)' }
@@ -66,7 +66,7 @@ function VoiceArea({ id, value, onChange, placeholder, lf, onVoice, rows=3 }) {
         position:'absolute', top:8, right:8, width:28, height:28,
         borderRadius:8, border:'none', cursor:'pointer',
         background: lf===id ? '#D63031' : '#E3F1F8',
-        fontSize:14, display:'flex', alignItems:'center', justifyContent:'center',
+        fontSize:15, display:'flex', alignItems:'center', justifyContent:'center',
         transition:'background 0.15s', animation: lf===id ? 'mic-pulse 1s ease-in-out infinite' : 'none',
       }}>🎙️</button>
     </div>
@@ -91,15 +91,15 @@ function Section({ color, icon, title, badge, open, onToggle, children }) {
           justifyContent:'center', fontSize:20,
         }}>{icon}</span>
         <div style={{ flex:1 }}>
-          <p style={{ fontSize:14, fontWeight:700, color:'#14303D', margin:0 }}>{title}</p>
+          <p style={{ fontSize:15, fontWeight:700, color:'#14303D', margin:0 }}>{title}</p>
           {badge>0 && (
-            <p style={{ fontSize: 13, color, fontWeight:600, margin:'2px 0 0' }}>
+            <p style={{ fontSize: 14, color, fontWeight:600, margin:'2px 0 0' }}>
               {badge} campo{badge!==1?'s':''} completado{badge!==1?'s':''}
             </p>
           )}
         </div>
         <span style={{
-          fontSize:13, color:'#5E7480',
+          fontSize:14, color:'#5E7480',
           display:'inline-block', transform: open?'rotate(180deg)':'none',
           transition:'transform 0.2s',
         }}>▾</span>
@@ -117,13 +117,13 @@ function CheckChips({ opts, value, onChange, colorOn='#0C6C9C', bgOn='#E3F1F8' }
         const on = value.includes(o)
         return (
           <button key={o} type="button" onClick={() => toggle(o)} style={{
-            padding:'7px 13px', borderRadius:20, fontWeight:600, fontSize:13, cursor:'pointer',
+            padding:'7px 13px', borderRadius:20, fontWeight:600, fontSize:14, cursor:'pointer',
             border:`1.5px solid ${on ? colorOn : '#E6E3DB'}`,
             background: on ? bgOn : 'white',
             color: on ? colorOn : '#4E6470',
             display:'flex', alignItems:'center', gap:5, transition:'all 0.15s',
           }}>
-            {on && <span style={{ fontSize: 13 }}>✓</span>}{o}
+            {on && <span style={{ fontSize: 14 }}>✓</span>}{o}
           </button>
         )
       })}
@@ -323,7 +323,7 @@ export default function PatientProfile() {
           zIndex:100, background:'#0A4A6B', color:'white',
           borderRadius:14, padding:'12px 20px',
           boxShadow:'0 8px 32px rgba(0,0,0,0.2)',
-          fontSize:14, fontWeight:600, whiteSpace:'nowrap',
+          fontSize:15, fontWeight:600, whiteSpace:'nowrap',
         }}>✓ Perfil guardado correctamente</div>
       )}
 
@@ -342,7 +342,7 @@ export default function PatientProfile() {
               <ChevronLeft size={18} color="white" strokeWidth={2} />
             </button>
             <div style={{ flex:1 }}>
-              <p style={{ color:'rgba(255,255,255,0.65)', fontSize: 14, margin:0 }}>Información clínica</p>
+              <p style={{ color:'rgba(255,255,255,0.65)', fontSize: 15, margin:0 }}>Información clínica</p>
               <h1 style={{ color:'white', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize:20, fontWeight:700, margin:'2px 0 0' }}>
                 {form.nombre_completo ? `Perfil de ${form.nombre_completo.split(' ')[0]}` : 'Perfil del Paciente'}
               </h1>
@@ -368,7 +368,7 @@ export default function PatientProfile() {
                 }
                 {uploading && (
                   <div style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0.5)', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                    <span style={{ color:'white', fontSize: 13 }}>...</span>
+                    <span style={{ color:'white', fontSize: 14 }}>...</span>
                   </div>
                 )}
               </div>
@@ -377,7 +377,7 @@ export default function PatientProfile() {
                   position:'absolute', bottom:0, right:0, width:22, height:22,
                   borderRadius:'50%', background:'white', border:'2px solid #0A5A82',
                   display:'flex', alignItems:'center', justifyContent:'center',
-                  fontSize: 13, cursor:'pointer',
+                  fontSize: 14, cursor:'pointer',
                 }}>📷</div>
               )}
             </div>
@@ -385,7 +385,7 @@ export default function PatientProfile() {
               <p style={{ color:'white', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize:18, fontWeight:700, margin:0 }}>
                 {loading ? '...' : (form.nombre_completo || 'Sin nombre registrado')}
               </p>
-              <p style={{ color:'rgba(255,255,255,0.65)', fontSize: 14, margin:'4px 0 0' }}>
+              <p style={{ color:'rgba(255,255,255,0.65)', fontSize: 15, margin:'4px 0 0' }}>
                 {form.fecha_nacimiento
                   ? new Date(form.fecha_nacimiento+'T12:00:00').toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'})
                   : 'Fecha sin registrar'}
@@ -399,7 +399,7 @@ export default function PatientProfile() {
         <input ref={fileRef} type="file" accept="image/*" style={{ display:'none' }} onChange={handlePhoto} />
 
         {loading ? (
-          <div style={{ padding:'40px', textAlign:'center', color:'#5E7480', fontSize:14 }}>Cargando perfil...</div>
+          <div style={{ padding:'40px', textAlign:'center', color:'#5E7480', fontSize:15 }}>Cargando perfil...</div>
         ) : (
           <form onSubmit={handleSave} style={{ padding:'16px 16px 0' }}>
 
@@ -426,7 +426,7 @@ export default function PatientProfile() {
                     <button key={o.v} type="button"
                       onClick={() => set('sexo', form.sexo===o.v ? '' : o.v)}
                       style={{
-                        flex:1, padding:'12px 0', borderRadius:12, fontWeight:700, fontSize:14, cursor:'pointer',
+                        flex:1, padding:'12px 0', borderRadius:12, fontWeight:700, fontSize:15, cursor:'pointer',
                         border:`1.5px solid ${form.sexo===o.v ? '#0C6C9C' : '#E6E3DB'}`,
                         background: form.sexo===o.v ? '#E3F1F8' : 'white',
                         color: form.sexo===o.v ? '#0A4A6B' : '#4E6470',
@@ -442,7 +442,7 @@ export default function PatientProfile() {
                     const on = form.tipo_sangre===s
                     return (
                       <button key={s} type="button" onClick={() => set('tipo_sangre', on?'':s)} style={{
-                        padding:'8px 14px', borderRadius:20, fontWeight:700, fontSize:13, cursor:'pointer',
+                        padding:'8px 14px', borderRadius:20, fontWeight:700, fontSize:14, cursor:'pointer',
                         border:`1.5px solid ${on ? '#D63031' : '#E6E3DB'}`,
                         background: on ? '#FFF0F0' : 'white',
                         color: on ? '#D63031' : '#4E6470',
@@ -472,7 +472,7 @@ export default function PatientProfile() {
                     const on = !!form.alergias_detalle.find(x=>x.nombre===a)
                     return (
                       <button key={a} type="button" onClick={() => toggleAlergia(a)} style={{
-                        padding:'7px 13px', borderRadius:20, fontWeight:600, fontSize:13, cursor:'pointer',
+                        padding:'7px 13px', borderRadius:20, fontWeight:600, fontSize:14, cursor:'pointer',
                         border:`1.5px solid ${on ? '#D63031' : '#E6E3DB'}`,
                         background: on ? '#FFF0F0' : 'white',
                         color: on ? '#D63031' : '#4E6470', transition:'all 0.15s',
@@ -486,9 +486,9 @@ export default function PatientProfile() {
                     display:'flex', alignItems:'center', gap:8, marginBottom:8,
                     padding:'8px 12px', background:'#FFF8F8', borderRadius:10, border:'1px solid #FFCDD2',
                   }}>
-                    <span style={{ fontSize:13, fontWeight:600, color:'#D63031', flex:1 }}>⚠ {a.nombre}</span>
+                    <span style={{ fontSize:14, fontWeight:600, color:'#D63031', flex:1 }}>⚠ {a.nombre}</span>
                     <select value={a.reaccion} onChange={e=>setReaccion(a.nombre,e.target.value)} style={{
-                      fontSize: 14, border:'1px solid #E6E3DB', borderRadius:8,
+                      fontSize: 15, border:'1px solid #E6E3DB', borderRadius:8,
                       padding:'5px 8px', background:'white', color:'#30454F', outline:'none',
                     }}>
                       <option value="">Reacción...</option>
@@ -559,10 +559,10 @@ export default function PatientProfile() {
             >
               <span style={{ fontSize: 20 }}>{generatingPDF ? '⏳' : '📄'}</span>
               <div style={{ flex: 1, textAlign: 'left' }}>
-                <p style={{ fontSize: 13, fontWeight: 700, color: '#0A4A6B', margin: 0 }}>
+                <p style={{ fontSize: 14, fontWeight: 700, color: '#0A4A6B', margin: 0 }}>
                   Reporte para el médico
                 </p>
-                <p style={{ fontSize: 13, color: '#5E7480', margin: '1px 0 0' }}>
+                <p style={{ fontSize: 14, color: '#5E7480', margin: '1px 0 0' }}>
                   Para descargar y llevar a la consulta
                 </p>
               </div>
@@ -583,7 +583,7 @@ export default function PatientProfile() {
                         border:`1.5px solid ${on ? '#EA8C00' : '#E6E3DB'}`,
                         background: on ? '#FFFBEB' : 'white',
                         color: on ? '#7C5000' : '#4E6470',
-                        fontWeight:600, fontSize:13, transition:'all 0.15s',
+                        fontWeight:600, fontSize:14, transition:'all 0.15s',
                       }}>
                         <div style={{ fontSize:22, marginBottom:4 }}>{m.icon}</div>
                         {m.label}
@@ -599,7 +599,7 @@ export default function PatientProfile() {
                     const on = form.estado_cognitivo===c
                     return (
                       <button key={c} type="button" onClick={() => set('estado_cognitivo', on?'':c)} style={{
-                        padding:'8px 14px', borderRadius:20, fontWeight:600, fontSize:13, cursor:'pointer',
+                        padding:'8px 14px', borderRadius:20, fontWeight:600, fontSize:14, cursor:'pointer',
                         border:`1.5px solid ${on ? '#EA8C00' : '#E6E3DB'}`,
                         background: on ? '#FFFBEB' : 'white',
                         color: on ? '#7C5000' : '#4E6470', transition:'all 0.15s',
@@ -669,7 +669,7 @@ export default function PatientProfile() {
             <Section color="#1677A6" icon="📖" title="Historia personal" badge={b5}
               open={open.s5} onToggle={() => setOpen(p=>({...p,s5:!p.s5}))}>
 
-              <p style={{ fontSize:13, color:'#5E7480', margin:'0 0 16px', lineHeight:1.5 }}>
+              <p style={{ fontSize:14, color:'#5E7480', margin:'0 0 16px', lineHeight:1.5 }}>
                 Ayuda a los cuidadores a conocer a la persona más allá de su condición médica.
               </p>
 
@@ -705,7 +705,7 @@ export default function PatientProfile() {
             {error && (
               <div style={{
                 padding:'12px 14px', background:'#FFF0F0', border:'1px solid #FFBABA',
-                borderRadius:12, fontSize:13, color:'#D63031', marginBottom:12,
+                borderRadius:12, fontSize:14, color:'#D63031', marginBottom:12,
                 display:'flex', gap:8, alignItems:'flex-start',
               }}>
                 <AlertTriangle size={15} color="#D63031" strokeWidth={2} style={{ flexShrink:0, marginTop:1 }} />
@@ -718,7 +718,7 @@ export default function PatientProfile() {
                 type="submit"
                 loading={saving}
                 loadingText="Guardando..."
-                style={{ width: '100%', padding: '15px', fontSize: 15, marginBottom: 16 }}
+                style={{ width: '100%', padding: '15px', fontSize: 16, marginBottom: 16 }}
               >
                 <CheckIcon size={17} color="white" strokeWidth={2.5} />
                 {form.nombre_completo ? `Guardar perfil de ${form.nombre_completo.split(' ')[0]}` : 'Guardar perfil del paciente'}

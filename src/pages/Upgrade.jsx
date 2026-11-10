@@ -75,13 +75,13 @@ function CopyableSubscriptionId({ subscriptionId }) {
       }}
     >
       <span style={{
-        fontFamily: 'monospace', fontSize: 14, color: '#30454F',
+        fontFamily: 'monospace', fontSize: 15, color: '#30454F',
         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
       }}>
         {subscriptionId}
       </span>
       <span style={{
-        flexShrink: 0, fontSize: 13, fontWeight: 700,
+        flexShrink: 0, fontSize: 14, fontWeight: 700,
         color: copied ? '#0C6C9C' : '#5E7480',
       }}>
         {copied ? 'Copiado ✓' : 'Copiar'}
@@ -105,7 +105,7 @@ function PayPalSection({
         background: '#E3F1F8', border: '1.5px solid #0A4A6B',
         borderRadius: 14, padding: '14px', textAlign: 'center',
       }}>
-        <p style={{ color: '#0A4A6B', fontWeight: 700, fontSize: 15, margin: 0 }}>
+        <p style={{ color: '#0A4A6B', fontWeight: 700, fontSize: 16, margin: 0 }}>
           ✅ ¡Plan activado! Redirigiendo...
         </p>
       </div>
@@ -117,13 +117,13 @@ function PayPalSection({
         background: '#F7F6F2', border: '1.5px solid #E9826E',
         borderRadius: 14, padding: '16px',
       }}>
-        <p style={{ color: '#0C6C9C', fontWeight: 700, fontSize: 15, margin: '0 0 4px', lineHeight: 1.4 }}>
+        <p style={{ color: '#0C6C9C', fontWeight: 700, fontSize: 16, margin: '0 0 4px', lineHeight: 1.4 }}>
           ✅ Tu pago se completó en PayPal.
         </p>
-        <p style={{ color: '#30454F', fontSize: 13, margin: '0 0 12px', lineHeight: 1.5 }}>
+        <p style={{ color: '#30454F', fontSize: 14, margin: '0 0 12px', lineHeight: 1.5 }}>
           Estamos activando tu plan — puede tardar unos minutos.
         </p>
-        <p style={{ color: '#4E6470', fontSize: 14, margin: '0 0 4px', lineHeight: 1.5 }}>
+        <p style={{ color: '#4E6470', fontSize: 15, margin: '0 0 4px', lineHeight: 1.5 }}>
           Si al volver no ves el cambio, escribinos a <strong>hola@familiacerca.com</strong> con este número:
         </p>
         <CopyableSubscriptionId subscriptionId={timedOut.subscriptionId} />
@@ -132,7 +132,7 @@ function PayPalSection({
           style={{
             width: '100%', marginTop: 12, padding: '11px', borderRadius: 12,
             border: 'none', background: '#0C6C9C', color: 'white',
-            fontWeight: 700, fontSize: 13.5, cursor: 'pointer',
+            fontWeight: 700, fontSize: 15, cursor: 'pointer',
             fontFamily: "'Plus Jakarta Sans', sans-serif",
           }}
         >
@@ -147,10 +147,10 @@ function PayPalSection({
         background: '#E3F1F8', border: '1.5px solid #0A4A6B',
         borderRadius: 14, padding: '16px', textAlign: 'center',
       }}>
-        <p style={{ color: '#0A4A6B', fontWeight: 700, fontSize: 14, margin: 0 }}>
+        <p style={{ color: '#0A4A6B', fontWeight: 700, fontSize: 15, margin: 0 }}>
           Confirmando tu pago...
         </p>
-        <p style={{ color: '#3A6B65', fontSize: 14, margin: '4px 0 0' }}>
+        <p style={{ color: '#3A6B65', fontSize: 15, margin: '4px 0 0' }}>
           Esto suele tardar unos segundos.
         </p>
       </div>
@@ -178,7 +178,7 @@ function PayPalSection({
       <button disabled style={{
         width: '100%', padding: '13px', borderRadius: 14, border: 'none',
         background: '#E5E7EB', color: '#5E7480',
-        fontWeight: 600, fontSize: 14, cursor: 'default',
+        fontWeight: 600, fontSize: 15, cursor: 'default',
       }}>
         Tu plan actual
       </button>
@@ -186,14 +186,14 @@ function PayPalSection({
   }
   if (isRejected) {
     return (
-      <p style={{ fontSize: 13, color: '#DC2626', textAlign: 'center', margin: 0 }}>
+      <p style={{ fontSize: 14, color: '#DC2626', textAlign: 'center', margin: 0 }}>
         No se pudo cargar PayPal. Verifica tu conexión.
       </p>
     )
   }
   if (!isResolved) {
     return (
-      <div style={{ textAlign: 'center', padding: '16px 0', color: '#5E7480', fontSize: 13 }}>
+      <div style={{ textAlign: 'center', padding: '16px 0', color: '#5E7480', fontSize: 14 }}>
         Cargando opciones de pago...
       </div>
     )
@@ -215,7 +215,7 @@ function PayPalSection({
       />
       {errors[planKey] && (
         <p style={{
-          fontSize: 14, color: '#DC2626', margin: '8px 0 0',
+          fontSize: 15, color: '#DC2626', margin: '8px 0 0',
           padding: '8px 12px', background: '#FFF0F0',
           border: '1px solid #FFBABA', borderRadius: 10,
         }}>
@@ -360,14 +360,14 @@ function UpgradeContent() {
             <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 17, fontWeight: 700, color: '#14303D', marginBottom: 8 }}>
               Solo quien creó la familia puede cambiar el plan.
             </p>
-            <p style={{ fontSize: 13, color: '#4E6470', lineHeight: 1.5, marginBottom: 20 }}>
+            <p style={{ fontSize: 14, color: '#4E6470', lineHeight: 1.5, marginBottom: 20 }}>
               Si necesitas más cuidadores, historial o funciones, pídele al dueño de la familia que actualice el plan desde su cuenta.
             </p>
             <button
               onClick={() => navigate('/ajustes')}
               style={{
                 padding: '11px 24px', borderRadius: 12, border: 'none',
-                background: '#0C6C9C', color: 'white', fontWeight: 700, fontSize: 13, cursor: 'pointer',
+                background: '#0C6C9C', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer',
               }}
             >
               Volver a Ajustes
@@ -390,11 +390,11 @@ function UpgradeContent() {
           }}>
             Elige tu plan
           </h1>
-          <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: 14, margin: 0, lineHeight: 1.5 }}>
+          <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: 15, margin: 0, lineHeight: 1.5 }}>
             Sin contratos. Cancela cuando quieras. Si no eliges un plan, sigues gratis con lo esencial.
           </p>
           {isTrialing && (
-            <p style={{ color: 'white', fontSize: 13, fontWeight: 700, margin: '10px 0 0', background: 'rgba(255,255,255,0.15)', borderRadius: 10, padding: '8px 12px', display: 'inline-block' }}>
+            <p style={{ color: 'white', fontSize: 14, fontWeight: 700, margin: '10px 0 0', background: 'rgba(255,255,255,0.15)', borderRadius: 10, padding: '8px 12px', display: 'inline-block' }}>
               ✨ Estás probando todo incluido · te queda{daysLeft !== 1 ? 'n' : ''} {daysLeft} día{daysLeft !== 1 ? 's' : ''}
             </p>
           )}
@@ -414,7 +414,7 @@ function UpgradeContent() {
               <div style={{
                 position: 'absolute', top: -1, right: 18,
                 background: '#5E7480', color: 'white',
-                fontSize: 13, fontWeight: 700,
+                fontSize: 14, fontWeight: 700,
                 padding: '4px 12px', borderRadius: '0 0 10px 10px',
               }}>
                 {isTrialing ? 'Al terminar la prueba' : 'Tu plan actual'}
@@ -429,15 +429,15 @@ function UpgradeContent() {
             <div style={{ marginBottom: 18 }}>
               {FREE_FEATURES.map(f => (
                 <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 7 }}>
-                  <span style={{ color: '#2BB8CC', fontSize: 13, flexShrink: 0, marginTop: 1 }}>✓</span>
-                  <span style={{ fontSize: 13, color: '#30454F', lineHeight: 1.4 }}>{f}</span>
+                  <span style={{ color: '#2BB8CC', fontSize: 14, flexShrink: 0, marginTop: 1 }}>✓</span>
+                  <span style={{ fontSize: 14, color: '#30454F', lineHeight: 1.4 }}>{f}</span>
                 </div>
               ))}
             </div>
             <button disabled style={{
               width: '100%', padding: '13px', borderRadius: 14, border: 'none',
               background: '#E5E7EB', color: '#5E7480',
-              fontWeight: 600, fontSize: 14, cursor: 'default',
+              fontWeight: 600, fontSize: 15, cursor: 'default',
             }}>
               {activePlan === null ? (isTrialing ? 'Sigues aquí si no eliges plan' : 'Tu plan actual') : 'Plan básico'}
             </button>
@@ -453,7 +453,7 @@ function UpgradeContent() {
             <div style={{
               position: 'absolute', top: -1, right: 18,
               background: activePlan === 'familiar' ? '#0A4A6B' : '#E58B73',
-              color: 'white', fontSize: 13, fontWeight: 700,
+              color: 'white', fontSize: 14, fontWeight: 700,
               padding: '4px 12px', borderRadius: '0 0 10px 10px',
             }}>
               {activePlan === 'familiar' ? 'Tu plan actual' : 'Recomendado para la mayoría de las familias'}
@@ -464,14 +464,14 @@ function UpgradeContent() {
               </p>
               <span style={{ fontSize: 24, fontWeight: 800, color: '#0A4A6B' }}>${PLANS.familiar.price}/mes</span>
             </div>
-            <p style={{ fontSize: 14, color: '#0A4A6B', fontWeight: 600, margin: '0 0 14px' }}>
+            <p style={{ fontSize: 15, color: '#0A4A6B', fontWeight: 600, margin: '0 0 14px' }}>
               {PLANS.familiar.tagline}
             </p>
             <div style={{ marginBottom: 18 }}>
               {FAMILIAR_FEATURES.map(f => (
                 <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 7 }}>
-                  <span style={{ color: '#2BB8CC', fontSize: 13, flexShrink: 0, marginTop: 1 }}>✓</span>
-                  <span style={{ fontSize: 13, color: '#30454F', lineHeight: 1.4 }}>{f}</span>
+                  <span style={{ color: '#2BB8CC', fontSize: 14, flexShrink: 0, marginTop: 1 }}>✓</span>
+                  <span style={{ fontSize: 14, color: '#30454F', lineHeight: 1.4 }}>{f}</span>
                 </div>
               ))}
             </div>
@@ -494,7 +494,7 @@ function UpgradeContent() {
               <div style={{
                 position: 'absolute', top: -1, right: 18,
                 background: '#0A4A6B', color: 'white',
-                fontSize: 13, fontWeight: 700,
+                fontSize: 14, fontWeight: 700,
                 padding: '4px 12px', borderRadius: '0 0 10px 10px',
               }}>
                 Tu plan actual
@@ -506,14 +506,14 @@ function UpgradeContent() {
               </p>
               <span style={{ fontSize: 24, fontWeight: 800, color: '#0A4A6B' }}>${PLANS.care_plus.price}/mes</span>
             </div>
-            <p style={{ fontSize: 14, color: '#0A4A6B', fontWeight: 600, margin: '0 0 14px' }}>
+            <p style={{ fontSize: 15, color: '#0A4A6B', fontWeight: 600, margin: '0 0 14px' }}>
               {PLANS.care_plus.tagline}
             </p>
             <div style={{ marginBottom: 18 }}>
               {TOTAL_FEATURES.map(f => (
                 <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 7 }}>
-                  <span style={{ color: '#2BB8CC', fontSize: 13, flexShrink: 0, marginTop: 1 }}>✓</span>
-                  <span style={{ fontSize: 13, color: '#30454F', lineHeight: 1.4 }}>{f}</span>
+                  <span style={{ color: '#2BB8CC', fontSize: 14, flexShrink: 0, marginTop: 1 }}>✓</span>
+                  <span style={{ fontSize: 14, color: '#30454F', lineHeight: 1.4 }}>{f}</span>
                 </div>
               ))}
             </div>
@@ -525,7 +525,7 @@ function UpgradeContent() {
             />
           </div>
 
-          <p style={{ fontSize: 13, color: '#B0A898', textAlign: 'center', margin: '4px 0 0', lineHeight: 1.6 }}>
+          <p style={{ fontSize: 14, color: '#B0A898', textAlign: 'center', margin: '4px 0 0', lineHeight: 1.6 }}>
             Pago seguro procesado por PayPal · Cancela en cualquier momento
           </p>
         </div>

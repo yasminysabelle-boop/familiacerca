@@ -26,15 +26,15 @@ export default function AdminPaymentAlertsSection() {
       })
   }, [])
 
-  if (error) return <p style={{ color: '#DC2626', fontSize: 14, textAlign: 'center', padding: 24 }}>{error}</p>
-  if (alerts === null) return <p style={{ color: '#5E7480', fontSize: 14, textAlign: 'center', padding: 24 }}>Cargando alertas...</p>
+  if (error) return <p style={{ color: '#DC2626', fontSize: 15, textAlign: 'center', padding: 24 }}>{error}</p>
+  if (alerts === null) return <p style={{ color: '#5E7480', fontSize: 15, textAlign: 'center', padding: 24 }}>Cargando alertas...</p>
 
   if (alerts.length === 0) {
     return (
       <div style={{ background: 'white', borderRadius: 16, border: '1px solid #E6E3DB', padding: '32px 20px', textAlign: 'center' }}>
         <div style={{ fontSize: 36, marginBottom: 10 }}>✅</div>
-        <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#14303D' }}>Sin alertas</p>
-        <p style={{ margin: '4px 0 0', fontSize: 14, color: '#5E7480' }}>
+        <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#14303D' }}>Sin alertas</p>
+        <p style={{ margin: '4px 0 0', fontSize: 15, color: '#5E7480' }}>
           Todos los pagos de PayPal se correlacionaron con una cuenta.
         </p>
       </div>
@@ -43,7 +43,7 @@ export default function AdminPaymentAlertsSection() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-      <p style={{ fontSize: 14, color: '#5E7480', margin: '0 0 4px' }}>
+      <p style={{ fontSize: 15, color: '#5E7480', margin: '0 0 4px' }}>
         Pagos de PayPal que no se pudieron correlacionar con ninguna cuenta.
       </p>
       {alerts.map(a => (
@@ -53,10 +53,10 @@ export default function AdminPaymentAlertsSection() {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
             <span style={{ fontSize: 16 }}>⚠️</span>
-            <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#DC2626' }}>{a.event_type}</p>
+            <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#DC2626' }}>{a.event_type}</p>
           </div>
-          <p style={{ margin: '0 0 6px', fontSize: 14, color: '#30454F' }}>{a.detail}</p>
-          <p style={{ margin: 0, fontSize: 13, color: '#5E7480' }}>
+          <p style={{ margin: '0 0 6px', fontSize: 15, color: '#30454F' }}>{a.detail}</p>
+          <p style={{ margin: 0, fontSize: 14, color: '#5E7480' }}>
             {fmt(a.created_at)}
             {a.paypal_subscription_id && <> · suscripción: {a.paypal_subscription_id}</>}
             {a.custom_id && <> · custom_id: {a.custom_id}</>}

@@ -26,7 +26,7 @@ export default function MedicationRecetasTab({ medications = [], stockByMedId = 
 
   return (
     <div style={{ padding: '12px 0 96px', fontFamily: SANS }}>
-      <p style={{ fontSize: 13, color: '#4E6470', marginBottom: 14 }}>
+      <p style={{ fontSize: 14, color: '#4E6470', marginBottom: 14 }}>
         Documentos que has subido para cada medicamento.
       </p>
 
@@ -37,12 +37,12 @@ export default function MedicationRecetasTab({ medications = [], stockByMedId = 
               <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                 <div style={{ width: 48, height: 60, borderRadius: 12, background: '#FBEAE4', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden' }}>
                   {doc.kind === 'receta'
-                    ? <FileText size={20} color="#D99A18" strokeWidth={1.8} />
-                    : <ImageIcon size={20} color="#D99A18" strokeWidth={1.8} />}
+                    ? <FileText size={20} color="#D99A18" strokeWidth={2.1} />
+                    : <ImageIcon size={20} color="#D99A18" strokeWidth={2.1} />}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontWeight: 700, fontSize: 15.5, color: '#14303D' }}>{doc.medName}</div>
-                  <div style={{ fontSize: 13, color: '#4E6470', marginTop: 2 }}>
+                  <div style={{ fontSize: 14, color: '#4E6470', marginTop: 2 }}>
                     {doc.kind === 'receta' ? 'Receta médica' : 'Foto de la caja'}
                     {doc.updatedAt ? ` · Subida el ${doc.updatedAt}` : ''}
                   </div>
@@ -50,7 +50,7 @@ export default function MedicationRecetasTab({ medications = [], stockByMedId = 
               </div>
               <button
                 onClick={() => onViewDoc(doc.url)}
-                style={{ display: 'block', width: '100%', textAlign: 'left', border: 'none', background: 'none', cursor: 'pointer', marginTop: 12, paddingTop: 12, borderTop: '1px solid #F1EDE3', fontSize: 13.5, color: '#0C6C9C', fontWeight: 700, fontFamily: SANS }}
+                style={{ display: 'block', width: '100%', textAlign: 'left', border: 'none', background: 'none', cursor: 'pointer', marginTop: 12, paddingTop: 12, borderTop: '1px solid #F1EDE3', fontSize: 15, color: '#0C6C9C', fontWeight: 700, fontFamily: SANS }}
               >
                 Ver {doc.kind === 'receta' ? 'receta' : 'caja'} →
               </button>
@@ -61,7 +61,7 @@ export default function MedicationRecetasTab({ medications = [], stockByMedId = 
 
       {docs.length === 0 && (
         <div style={{ background: '#FFFFFF', borderRadius: 20, padding: 20, textAlign: 'center', boxShadow: '0 6px 14px -8px #087F7022' }}>
-          <p style={{ fontSize: 13.5, color: '#4E6470', lineHeight: 1.55, margin: 0 }}>
+          <p style={{ fontSize: 15, color: '#4E6470', lineHeight: 1.55, margin: 0 }}>
             Aún no has subido recetas. Puedes hacerlo desde cada medicamento.
           </p>
         </div>

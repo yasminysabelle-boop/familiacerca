@@ -56,7 +56,7 @@ function VideoIconCircle({ icon }) {
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       flexShrink: 0,
     }}>
-      {icon ?? <Video size={40} color="#0A5A82" strokeWidth={1.75} />}
+      {icon ?? <Video size={40} color="#0A5A82" strokeWidth={2.1} />}
     </div>
   )
 }
@@ -250,7 +250,7 @@ export default function VideoCall() {
           {/* Header propio — requiere '/videollamada' en Layout.hasOwnHeader */}
           <header style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 20px', background: '#FDFBF7', boxShadow: '0 2px 10px rgba(51,65,85,0.06)' }}>
             <h1 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: '#2A4350', fontFamily: SANS }}>Videollamada</h1>
-            <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#A6E3EC', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 15, color: '#0A5A82' }}>
+            <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#A6E3EC', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 16, color: '#0A5A82' }}>
               {headerInitial}
             </div>
           </header>
@@ -281,7 +281,7 @@ export default function VideoCall() {
               </button>
 
               {instantError && (
-                <p style={{ margin: 0, fontSize: 13, color: '#B91C1C', textAlign: 'center' }}>{instantError}</p>
+                <p style={{ margin: 0, fontSize: 14, color: '#B91C1C', textAlign: 'center' }}>{instantError}</p>
               )}
 
               <button
@@ -300,7 +300,7 @@ export default function VideoCall() {
 
             {/* ¿Quién está disponible? — usePresence() real, igual que Familia.jsx/Dashboard.jsx */}
             <section style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              <h2 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#2A4350', fontFamily: SANS }}>¿Quién está disponible?</h2>
+              <h2 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#2A4350', fontFamily: SANS }}>¿Quién está disponible?</h2>
               <div style={{ display: 'flex', gap: 18, overflowX: 'auto', paddingBottom: 4 }}>
                 {team.map(m => {
                   const online = onlineIds.has(m.id)
@@ -316,7 +316,7 @@ export default function VideoCall() {
                         </div>
                         <span style={{ position: 'absolute', bottom: -2, right: -2, width: 14, height: 14, borderRadius: '50%', background: dot, border: '2px solid #F7F6F2' }} />
                       </div>
-                      <span style={{ fontSize: 14, fontWeight: 600, color: '#2A4350' }}>{m.name.split(' ')[0]}</span>
+                      <span style={{ fontSize: 15, fontWeight: 600, color: '#2A4350' }}>{m.name.split(' ')[0]}</span>
                     </div>
                   )
                 })}
@@ -325,7 +325,7 @@ export default function VideoCall() {
 
             {/* Próximas llamadas — video_calls real, tarjeta clicable para unirse */}
             <section style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              <h2 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#2A4350', fontFamily: SANS }}>Próximas llamadas</h2>
+              <h2 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#2A4350', fontFamily: SANS }}>Próximas llamadas</h2>
               {nextCall ? (
                 <div
                   onClick={() => navigate(`/videollamada?id=${nextCall.id}`)}
@@ -335,10 +335,10 @@ export default function VideoCall() {
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0A5A82" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"></rect><path d="M3 10h18"></path><path d="M8 3v4"></path><path d="M16 3v4"></path></svg>
                   </div>
                   <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
-                    <span style={{ fontSize: 15, fontWeight: 700, color: '#2A4350', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <span style={{ fontSize: 16, fontWeight: 700, color: '#2A4350', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {nextCall.title || 'Videollamada familiar'}
                     </span>
-                    <span style={{ fontSize: 13, color: '#64748B' }}>{fmtUpcomingMeta(nextCall.scheduled_at, inviteCount)}</span>
+                    <span style={{ fontSize: 14, color: '#64748B' }}>{fmtUpcomingMeta(nextCall.scheduled_at, inviteCount)}</span>
                   </div>
                   <button
                     onClick={e => { e.stopPropagation(); setReminderSet(s => !s) }}
@@ -347,7 +347,7 @@ export default function VideoCall() {
                       border: '1.5px solid #E9826E',
                       background: reminderSet ? '#BF513C' : '#FDF0EC',
                       color: reminderSet ? '#FFFFFF' : '#A3452F',
-                      fontSize: 13, fontWeight: 700, fontFamily: SANS, cursor: 'pointer', flexShrink: 0,
+                      fontSize: 14, fontWeight: 700, fontFamily: SANS, cursor: 'pointer', flexShrink: 0,
                     }}
                   >
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={reminderSet ? '#FFFFFF' : '#E9826E'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 01-3.46 0"></path></svg>
@@ -359,19 +359,19 @@ export default function VideoCall() {
                   <div style={{ width: 52, height: 52, borderRadius: '50%', background: '#A6E3EC', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0A5A82" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"></rect><path d="M3 10h18"></path><path d="M8 3v4"></path><path d="M16 3v4"></path></svg>
                   </div>
-                  <span style={{ fontSize: 14, color: '#64748B', fontWeight: 600 }}>No hay llamadas programadas</span>
+                  <span style={{ fontSize: 15, color: '#64748B', fontWeight: 600 }}>No hay llamadas programadas</span>
                 </div>
               )}
             </section>
 
             {/* Recientes — Fase 1: estado vacío elegante, sin backend nuevo (ver Fase 2 en CLAUDE.md) */}
             <section style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              <h2 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#2A4350', fontFamily: SANS }}>Recientes</h2>
+              <h2 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#2A4350', fontFamily: SANS }}>Recientes</h2>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, padding: '28px 16px', border: '1.5px dashed #C9BFA9', borderRadius: 20 }}>
                 <div style={{ width: 52, height: 52, borderRadius: '50%', background: '#A6E3EC', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0A5A82" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 8l5-3v14l-5-3"></path><rect x="2" y="6" width="13" height="12" rx="2.5"></rect></svg>
                 </div>
-                <span style={{ fontSize: 14, color: '#64748B', fontWeight: 600 }}>Aún no hay llamadas recientes</span>
+                <span style={{ fontSize: 15, color: '#64748B', fontWeight: 600 }}>Aún no hay llamadas recientes</span>
               </div>
             </section>
 
@@ -398,7 +398,7 @@ export default function VideoCall() {
           fontFamily: SANS,
         }}>
           <div style={{ width: 40, height: 40, borderRadius: '50%', border: '3px solid #E6E3DB', borderTopColor: '#0A5A82', animation: 'spin 0.8s linear infinite' }} />
-          <p style={{ color: '#0A4A6B', fontSize: 15, fontWeight: 600 }}>Conectando...</p>
+          <p style={{ color: '#0A4A6B', fontSize: 16, fontWeight: 600 }}>Conectando...</p>
           <style>{SPIN_KEYFRAMES}</style>
         </div>
       </Layout>
@@ -415,7 +415,7 @@ export default function VideoCall() {
           fontFamily: SANS,
         }}>
           <span style={{ fontSize: 40 }}>⚠️</span>
-          <p style={{ color: '#0A4A6B', fontSize: 15, textAlign: 'center' }}>
+          <p style={{ color: '#0A4A6B', fontSize: 16, textAlign: 'center' }}>
             {error || 'Videollamada no encontrada'}
           </p>
           <button
@@ -423,7 +423,7 @@ export default function VideoCall() {
             style={{
               padding: '12px 28px', borderRadius: 12, border: 'none',
               background: '#0A5A82', color: 'white', fontWeight: 700,
-              fontSize: 14, cursor: 'pointer', fontFamily: SANS,
+              fontSize: 15, cursor: 'pointer', fontFamily: SANS,
             }}
           >
             Volver al inicio
@@ -448,7 +448,7 @@ export default function VideoCall() {
         }}>
           <span style={{ fontSize: 40 }}>🕐</span>
           <p style={{ color: '#0A4A6B', fontSize: 16, fontWeight: 700, textAlign: 'center' }}>{call.title}</p>
-          <p style={{ color: '#4E6470', fontSize: 13, textAlign: 'center' }}>
+          <p style={{ color: '#4E6470', fontSize: 14, textAlign: 'center' }}>
             Esta llamada ya terminó.
           </p>
           <button
@@ -456,7 +456,7 @@ export default function VideoCall() {
             style={{
               padding: '12px 28px', borderRadius: 12, border: 'none',
               background: '#0A5A82', color: 'white', fontWeight: 700,
-              fontSize: 14, cursor: 'pointer', fontFamily: SANS,
+              fontSize: 15, cursor: 'pointer', fontFamily: SANS,
             }}
           >
             Volver al inicio
@@ -501,7 +501,7 @@ export default function VideoCall() {
             <p style={{ color: '#2A4350', fontSize: 21, fontWeight: 800, margin: '0 0 6px' }}>
               {call.title}
             </p>
-            <p style={{ color: '#64748B', fontSize: 13.5, margin: 0 }}>
+            <p style={{ color: '#64748B', fontSize: 15, margin: 0 }}>
               {fmtScheduled(call.scheduled_at)}
             </p>
           </div>
@@ -512,13 +512,13 @@ export default function VideoCall() {
               background: 'white', border: '1px solid #E6E3DB',
               textAlign: 'center',
             }}>
-              <p style={{ margin: 0, color: '#4E6470', fontSize: 13, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+              <p style={{ margin: 0, color: '#4E6470', fontSize: 14, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                 La sala abre en
               </p>
               <p style={{ margin: '6px 0 0', color: '#0C6C9C', fontSize: 32, fontWeight: 800 }}>
                 {minutesUntil} min
               </p>
-              <p style={{ margin: '4px 0 0', color: '#4E6470', fontSize: 14 }}>
+              <p style={{ margin: '4px 0 0', color: '#4E6470', fontSize: 15 }}>
                 Disponible 15 minutos antes
               </p>
             </div>
@@ -527,7 +527,7 @@ export default function VideoCall() {
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
                 {callPresence.count > 0 ? (
                   <>
-                    <span style={{ fontSize: 14, fontWeight: 700, color: '#64748B' }}>Ya están dentro:</span>
+                    <span style={{ fontSize: 15, fontWeight: 700, color: '#64748B' }}>Ya están dentro:</span>
                     <div style={{ display: 'flex' }}>
                       {callPresence.participants.slice(0, 6).map((p, i) => (
                         <div
@@ -535,7 +535,7 @@ export default function VideoCall() {
                           style={{
                             width: 38, height: 38, borderRadius: '50%',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontSize: 14, fontWeight: 800, color: '#0A5A82', background: '#A6E3EC',
+                            fontSize: 15, fontWeight: 800, color: '#0A5A82', background: '#A6E3EC',
                             border: '2.5px solid #F7F6F2', marginLeft: i === 0 ? 0 : -10,
                           }}
                         >
@@ -545,7 +545,7 @@ export default function VideoCall() {
                     </div>
                   </>
                 ) : (
-                  <span style={{ fontSize: 13, fontWeight: 700, color: '#BF513C', background: '#FDF0EC', padding: '8px 16px', borderRadius: 999 }}>
+                  <span style={{ fontSize: 14, fontWeight: 700, color: '#BF513C', background: '#FDF0EC', padding: '8px 16px', borderRadius: 999 }}>
                     Sé la primera en unirte
                   </span>
                 )}
@@ -557,15 +557,15 @@ export default function VideoCall() {
                   background: '#FEF0ED', border: '1px solid #F5C6BB',
                   textAlign: 'center', maxWidth: 320,
                 }}>
-                  <p style={{ color: '#B91C1C', fontSize: 13, fontWeight: 600, margin: '0 0 4px' }}>
+                  <p style={{ color: '#B91C1C', fontSize: 14, fontWeight: 600, margin: '0 0 4px' }}>
                     Permisos denegados
                   </p>
-                  <p style={{ color: '#4E6470', fontSize: 14, margin: '0 0 10px', lineHeight: 1.5 }}>
+                  <p style={{ color: '#4E6470', fontSize: 15, margin: '0 0 10px', lineHeight: 1.5 }}>
                     Activa cámara y micrófono desde los ajustes de tu navegador.
                   </p>
                   <button
                     onClick={requestPermissionsAndJoin}
-                    style={{ padding: '8px 18px', borderRadius: 10, border: 'none', background: '#0C6C9C', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer', fontFamily: SANS }}
+                    style={{ padding: '8px 18px', borderRadius: 10, border: 'none', background: '#0C6C9C', color: 'white', fontWeight: 700, fontSize: 15, cursor: 'pointer', fontFamily: SANS }}
                   >
                     Intentar de nuevo
                   </button>
@@ -600,7 +600,7 @@ export default function VideoCall() {
                 </button>
                 <button
                   onClick={() => navigate('/dashboard')}
-                  style={{ background: 'none', border: 'none', fontSize: 13.5, fontWeight: 700, color: '#64748B', cursor: 'pointer', padding: '6px 10px', fontFamily: SANS }}
+                  style={{ background: 'none', border: 'none', fontSize: 15, fontWeight: 700, color: '#64748B', cursor: 'pointer', padding: '6px 10px', fontFamily: SANS }}
                 >
                   Volver
                 </button>
@@ -693,7 +693,7 @@ function ActiveCall({ call, displayName, onLeave }) {
             display: 'flex', alignItems: 'center', gap: 8,
             padding: '12px 24px', borderRadius: 999, border: 'none',
             background: '#DC2626',
-            color: 'white', fontWeight: 800, fontSize: 15,
+            color: 'white', fontWeight: 800, fontSize: 16,
             cursor: 'pointer',
             boxShadow: '0 4px 20px rgba(220,38,38,0.5)',
             fontFamily: SANS,

@@ -17,7 +17,7 @@ function GroupHeader({ icon, color, label }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 12 }}>
       {icon}
-      <span style={{ fontFamily: SERIF, fontWeight: 600, fontSize: 16, color }}>{label}</span>
+      <span style={{ fontFamily: SERIF, fontWeight: 800, fontSize: 18, color: '#14303D' }}>{label}</span>
     </div>
   )
 }
@@ -30,17 +30,17 @@ function ToolCard({ Icon, label, tint, tintBg, emphasis = false, onClick, span2 
       onClick={onClick}
       style={{
         gridColumn: span2 ? '1 / -1' : undefined,
-        background: 'white', border: 'none', borderRadius: 18,
-        padding: '14px 10px 12px', display: 'flex', flexDirection: 'column',
+        background: 'white', border: '1px solid #E6E3DB', borderRadius: 18,
+        padding: '16px 10px 14px', display: 'flex', flexDirection: 'column',
         alignItems: 'center', gap: 8, cursor: 'pointer',
-        boxShadow: `0 6px 14px -8px ${tint}55`,
+        boxShadow: '0 2px 0 rgba(10, 74, 107, 0.06), 0 6px 16px -10px rgba(10, 74, 107, 0.35)',
         WebkitTapHighlightColor: 'transparent',
       }}
     >
-      <span style={{ width: 38, height: 38, borderRadius: 11, background: iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-        <Icon size={19} color={iconColor} strokeWidth={1.8} />
+      <span style={{ width: 48, height: 48, borderRadius: 14, background: iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+        <Icon size={24} color={iconColor} strokeWidth={2.1} />
       </span>
-      <span style={{ fontSize: 14, fontWeight: 600, color: '#2A4350', textAlign: 'center', lineHeight: 1.3 }}>{label}</span>
+      <span style={{ fontSize: 15, fontWeight: 600, color: '#2A4350', textAlign: 'center', lineHeight: 1.3 }}>{label}</span>
     </button>
   )
 }
@@ -88,7 +88,8 @@ export default function TodoElCuidado() {
     { Icon: Star,     label: 'Planes y suscripción', onClick: () => navigate('/upgrade') },
   ]
 
-  const block = (bg) => ({ margin: '12px 14px 0', padding: '16px 14px 18px', borderRadius: 22, background: bg })
+  // Grupos separados por un título, sin fondo de color (UX nov 2026)
+  const block = () => ({ margin: '22px 16px 0' })
   const grid = { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }
 
   return (
@@ -100,7 +101,7 @@ export default function TodoElCuidado() {
           <button onClick={() => navigate(-1)} aria-label="Volver" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', WebkitTapHighlightColor: 'transparent' }}>
             <ChevronLeft size={22} color="#2A4350" strokeWidth={2.2} />
           </button>
-          <h1 style={{ margin: 0, fontFamily: SERIF, fontWeight: 600, fontSize: 21, color: '#2A4350', letterSpacing: '-0.01em' }}>Todo el cuidado</h1>
+          <h1 style={{ margin: 0, fontFamily: SERIF, fontWeight: 800, fontSize: 22, color: '#14303D', letterSpacing: '-0.02em' }}>Todo el cuidado</h1>
         </div>
 
         <div style={{ padding: '8px 0 24px' }}>
@@ -113,13 +114,13 @@ export default function TodoElCuidado() {
             >
               <AlertTriangle size={22} color="#FFFFFF" strokeWidth={2} />
               <span style={{ flex: 1, textAlign: 'left', fontSize: 17, fontWeight: 700 }}>Emergencia</span>
-              <span style={{ fontSize: 14, opacity: 0.9 }}>Avisa a toda la familia ›</span>
+              <span style={{ fontSize: 15, opacity: 0.9 }}>Avisa a toda la familia ›</span>
             </button>
           </div>
 
           {/* 1. Todos los días */}
           <div style={block('linear-gradient(180deg, #E3F1F8 0%, #EEF6FA 100%)')}>
-            <GroupHeader icon={<Heart size={16} color="#0C6C9C" strokeWidth={1.9} />} color="#0C6C9C" label="Todos los días" />
+            <GroupHeader icon={<Heart size={16} color="#0C6C9C" strokeWidth={2.1} />} color="#0C6C9C" label="Todos los días" />
             <div style={grid}>
               {todosLosDias.map(c => <ToolCard key={c.label} {...c} tint="#0C6C9C" tintBg="#E3F1F8" />)}
             </div>
@@ -127,7 +128,7 @@ export default function TodoElCuidado() {
 
           {/* 2. Organizar (de vez en cuando) */}
           <div style={block('linear-gradient(180deg, #FBEAE4 0%, #FCF0EC 100%)')}>
-            <GroupHeader icon={<Calendar size={16} color="#A3452F" strokeWidth={1.9} />} color="#A3452F" label="Organizar" />
+            <GroupHeader icon={<Calendar size={16} color="#A3452F" strokeWidth={2.1} />} color="#A3452F" label="Organizar" />
             <div style={grid}>
               {organizar.map(c => <ToolCard key={c.label} {...c} tint="#C9654F" tintBg="#FDEEEA" />)}
             </div>
@@ -137,24 +138,24 @@ export default function TodoElCuidado() {
           <div style={block('linear-gradient(180deg, #E3F1F8 0%, #EEF6FA 100%)')}>
             <button
               onClick={() => setShowCompanion(true)}
-              style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 14, background: '#E3F1F8', border: 'none', borderRadius: 18, padding: '14px 14px', cursor: 'pointer', WebkitTapHighlightColor: 'transparent', textAlign: 'left' }}
+              style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 14, background: 'white', border: '1px solid #E6E3DB', borderRadius: 18, padding: '14px 14px', cursor: 'pointer', WebkitTapHighlightColor: 'transparent', textAlign: 'left' }}
             >
               <span style={{ flexShrink: 0, width: 56, height: 56, borderRadius: 14, background: '#CDE8F3', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                 <img src="/images/milo-luna.webp" alt="Milo el perro y Luna la gata" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
               </span>
               <span style={{ flex: 1, minWidth: 0 }}>
                 <span style={{ display: 'block', fontFamily: SERIF, fontWeight: 600, fontSize: 17, color: '#2A4350', marginBottom: 2 }}>Milo y Luna</span>
-                <span style={{ display: 'block', fontSize: 14, color: '#4E6470', lineHeight: 1.35 }}>Pregúntales lo que necesites del cuidado</span>
+                <span style={{ display: 'block', fontSize: 15, color: '#4E6470', lineHeight: 1.35 }}>Pregúntales lo que necesites del cuidado</span>
               </span>
               <span style={{ fontSize: 20, color: '#0C6C9C', flexShrink: 0 }}>›</span>
             </button>
           </div>
 
           {/* 3. Cuando haga falta (plegado) */}
-          <div style={block('#F4F2EC')}>
+          <div style={{ ...block(), background: 'white', border: '1px solid #E6E3DB', borderRadius: 18, padding: '14px 16px' }}>
             <button onClick={toggleMore} aria-expanded={showMore} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'none', border: 'none', padding: 0, cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}>
               <span style={{ fontFamily: SERIF, fontWeight: 600, fontSize: 16, color: '#4E6470' }}>Cuando haga falta</span>
-              <span style={{ fontSize: 14, fontWeight: 600, color: '#0C6C9C' }}>{showMore ? 'Ocultar ▲' : 'Ver gastos y memorias ▼'}</span>
+              <span style={{ fontSize: 15, fontWeight: 600, color: '#0C6C9C' }}>{showMore ? 'Ocultar ▲' : 'Ver gastos y memorias ▼'}</span>
             </button>
             {showMore && (
               <div style={{ ...grid, marginTop: 12 }}>
@@ -165,7 +166,7 @@ export default function TodoElCuidado() {
 
           {/* 4. Mi cuenta */}
           <div style={block('#EFEFEE')}>
-            <GroupHeader icon={<Settings size={16} color="#4E6470" strokeWidth={1.9} />} color="#4E6470" label="Mi cuenta" />
+            <GroupHeader icon={<Settings size={16} color="#4E6470" strokeWidth={2.1} />} color="#4E6470" label="Mi cuenta" />
             <div style={grid}>
               {cuenta.map((c, i) => <ToolCard key={c.label} {...c} tint="#4E6470" tintBg="#F0F0EF" span2={i === 0} />)}
             </div>

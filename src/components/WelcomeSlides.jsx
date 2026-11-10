@@ -120,7 +120,7 @@ export default function WelcomeSlides({ onDone }) {
             </p>
             <p style={{
               color: '#9AA89E',
-              fontSize: 15, lineHeight: 1.65,
+              fontSize: 16, lineHeight: 1.65,
               margin: 0, maxWidth: 290,
             }}>
               La app que conecta a toda la familia para cuidar mejor a quien más quieres.
@@ -148,7 +148,7 @@ export default function WelcomeSlides({ onDone }) {
               <Logo size={40} />
             </div>
             <p style={{
-              color: '#4E6470', fontSize: 13, margin: '0 0 8px',
+              color: '#4E6470', fontSize: 14, margin: '0 0 8px',
               letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 700,
             }}>
               Todo en un solo lugar
@@ -182,10 +182,10 @@ export default function WelcomeSlides({ onDone }) {
                 <span style={{ fontSize: 28, display: 'block', marginBottom: 8, lineHeight: 1 }}>
                   {f.icon}
                 </span>
-                <p style={{ fontSize: 13, fontWeight: 700, color: '#14303D', margin: '0 0 4px' }}>
+                <p style={{ fontSize: 14, fontWeight: 700, color: '#14303D', margin: '0 0 4px' }}>
                   {f.title}
                 </p>
-                <p style={{ fontSize: 13, color: '#5E7480', margin: 0, lineHeight: 1.4 }}>
+                <p style={{ fontSize: 14, color: '#5E7480', margin: 0, lineHeight: 1.4 }}>
                   {f.desc}
                 </p>
               </div>
@@ -217,7 +217,7 @@ export default function WelcomeSlides({ onDone }) {
               marginBottom: 24,
             }}>
               <span style={{ fontSize: 16 }}>🎁</span>
-              <span style={{ color: '#0C6C9C', fontSize: 14, fontWeight: 700 }}>14 días gratis</span>
+              <span style={{ color: '#0C6C9C', fontSize: 15, fontWeight: 700 }}>14 días gratis</span>
             </div>
 
             <h2 style={{
@@ -230,7 +230,7 @@ export default function WelcomeSlides({ onDone }) {
             </h2>
             <p style={{
               color: '#4E6470',
-              fontSize: 15, lineHeight: 1.65,
+              fontSize: 16, lineHeight: 1.65,
               margin: '0 0 40px',
             }}>
               Sin tarjeta de crédito.<br />Sin contratos. Cancela cuando quieras.
@@ -263,7 +263,7 @@ export default function WelcomeSlides({ onDone }) {
                 background: 'transparent',
                 border: '1.5px solid #0C6C9C',
                 color: '#0C6C9C',
-                fontSize: 15, fontWeight: 600,
+                fontSize: 16, fontWeight: 600,
                 cursor: 'pointer',
               }}
             >
@@ -286,7 +286,7 @@ export default function WelcomeSlides({ onDone }) {
             border: '1px solid #E6E3DB',
             borderRadius: 20,
             color: '#4E6470',
-            fontSize: 13, fontWeight: 600,
+            fontSize: 14, fontWeight: 600,
             padding: '6px 15px',
             cursor: 'pointer',
           }}

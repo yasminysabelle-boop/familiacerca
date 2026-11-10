@@ -152,7 +152,7 @@ function PhotoThumb({ url, tone }) {
   if (!url || failed) {
     return (
       <div style={{ width: 50, height: 50, borderRadius: 12, flexShrink: 0, marginTop: 1, background: gradient, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Camera size={18} color="rgba(255,255,255,0.85)" strokeWidth={1.8} />
+        <Camera size={18} color="rgba(255,255,255,0.85)" strokeWidth={2.1} />
       </div>
     )
   }
@@ -176,45 +176,45 @@ function EventDetail({ event }) {
   const type = event.type
 
   if (type === 'incident' && meta.description) {
-    return <p style={{ fontSize: 14, color: INK_SOFT, margin: '4px 0 0', lineHeight: 1.45 }}>{meta.description}</p>
+    return <p style={{ fontSize: 15, color: INK_SOFT, margin: '4px 0 0', lineHeight: 1.45 }}>{meta.description}</p>
   }
   if (type === 'doctor_note') {
     const text = meta.doctor_notes ?? meta.content
-    return text ? <p style={{ fontSize: 14, color: INK_SOFT, margin: '4px 0 0', lineHeight: 1.45, fontStyle: 'italic' }}>&ldquo;{text}&rdquo;</p> : null
+    return text ? <p style={{ fontSize: 15, color: INK_SOFT, margin: '4px 0 0', lineHeight: 1.45, fontStyle: 'italic' }}>&ldquo;{text}&rdquo;</p> : null
   }
   if (type === 'appointment') {
     const when = [meta.date, meta.time].filter(Boolean).join(' · ')
     const note = secondaryOnly(event.description, meta.description)
     return (when || note) ? (
-      <p style={{ fontSize: 14, color: INK_SOFT, margin: '4px 0 0', lineHeight: 1.45 }}>
+      <p style={{ fontSize: 15, color: INK_SOFT, margin: '4px 0 0', lineHeight: 1.45 }}>
         {when}{when && note ? ' · ' : ''}{note}
       </p>
     ) : null
   }
   if (type === 'hospital_mode_on') {
     const parts = [meta.hospital_name, meta.room_number ? `Hab. ${meta.room_number}` : null, meta.patient_status].filter(Boolean)
-    return parts.length ? <p style={{ fontSize: 14, color: INK_SOFT, margin: '4px 0 0' }}>{parts.join(' · ')}</p> : null
+    return parts.length ? <p style={{ fontSize: 15, color: INK_SOFT, margin: '4px 0 0' }}>{parts.join(' · ')}</p> : null
   }
   if (type === 'hospital_discharge') {
     const parts = [meta.hospital_name, meta.discharge_date].filter(Boolean)
-    return parts.length ? <p style={{ fontSize: 14, color: INK_SOFT, margin: '4px 0 0' }}>{parts.join(' · ')}</p> : null
+    return parts.length ? <p style={{ fontSize: 15, color: INK_SOFT, margin: '4px 0 0' }}>{parts.join(' · ')}</p> : null
   }
   if (type === 'caregiver_assigned' && meta.shift_date) {
-    return <p style={{ fontSize: 14, color: INK_SOFT, margin: '4px 0 0' }}>{meta.shift_date}</p>
+    return <p style={{ fontSize: 15, color: INK_SOFT, margin: '4px 0 0' }}>{meta.shift_date}</p>
   }
   if (type === 'sos') {
     return (
       <div style={{ marginTop: 4 }}>
-        {meta.address && <p style={{ fontSize: 14, color: INK_SOFT, margin: 0 }}>{meta.address}</p>}
+        {meta.address && <p style={{ fontSize: 15, color: INK_SOFT, margin: 0 }}>{meta.address}</p>}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: meta.address ? 4 : 0 }}>
           {meta.latitude && meta.longitude && (
             <a href={mapsUrl(meta.latitude, meta.longitude)} target="_blank" rel="noopener noreferrer"
-              style={{ fontSize: 13, color: TEAL, textDecoration: 'none', fontWeight: 700 }}>
+              style={{ fontSize: 14, color: TEAL, textDecoration: 'none', fontWeight: 700 }}>
               Ver mapa →
             </a>
           )}
           {meta.resolved && (
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, fontSize: 12, fontWeight: 800, color: TEAL_DEEP }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, fontSize: 14, fontWeight: 800, color: TEAL_DEEP }}>
               <CheckIcon size={11} color={TEAL_DEEP} strokeWidth={2.5} /> Resuelta
             </span>
           )}
@@ -224,7 +224,7 @@ function EventDetail({ event }) {
   }
   if (type === 'expense') {
     const parts = [meta.category, meta.paid_by ? `Pagó ${meta.paid_by}` : null].filter(Boolean)
-    return parts.length ? <p style={{ fontSize: 13, color: INK_FAINT, margin: '3px 0 0' }}>{parts.join(' · ')}</p> : null
+    return parts.length ? <p style={{ fontSize: 14, color: INK_FAINT, margin: '3px 0 0' }}>{parts.join(' · ')}</p> : null
   }
   return null
 }
@@ -265,28 +265,28 @@ function EventCard({ event, onClick }) {
         background: isIncident ? 'rgba(255,255,255,0.55)' : cat.bg,
         display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}>
-        <Icon size={17} color={cat.ink} strokeWidth={1.8} />
+        <Icon size={17} color={cat.ink} strokeWidth={2.1} />
       </div>
 
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
           <p style={{
-            fontSize: 14, fontWeight: 700, color: INK_2, margin: 0, lineHeight: 1.3, flex: 1, minWidth: 0,
+            fontSize: 15, fontWeight: 700, color: INK_2, margin: 0, lineHeight: 1.3, flex: 1, minWidth: 0,
             overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
           }}>
             {title}
           </p>
           {event.type === 'expense' && event.metadata?.amount != null && (
-            <span style={{ flexShrink: 0, fontSize: 13, fontWeight: 800, color: GOLD_INK, fontVariantNumeric: 'tabular-nums' }}>
+            <span style={{ flexShrink: 0, fontSize: 14, fontWeight: 800, color: GOLD_INK, fontVariantNumeric: 'tabular-nums' }}>
               {fmtCurrency(event.metadata.amount)}
             </span>
           )}
         </div>
-        <p style={{ fontSize: 13, color: INK_SOFT, fontWeight: 600, margin: '3px 0 0' }}>{metaLine}</p>
+        <p style={{ fontSize: 14, color: INK_SOFT, fontWeight: 600, margin: '3px 0 0' }}>{metaLine}</p>
         <EventDetail event={event} />
         {isMissed && (
           <span style={{
-            display: 'inline-flex', marginTop: 6, fontSize: 12, fontWeight: 800, letterSpacing: '0.02em',
+            display: 'inline-flex', marginTop: 6, fontSize: 14, fontWeight: 800, letterSpacing: '0.02em',
             padding: '2px 9px', borderRadius: 999, background: PEACH, color: CORAL_ACTION_INK, width: 'fit-content',
           }}>
             Omitida
@@ -455,7 +455,7 @@ export default function MedicationTimeline() {
             <h1 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: INK, letterSpacing: '-0.01em' }}>
               Historia de cuidado
             </h1>
-            <p style={{ margin: '2px 0 0', fontFamily: SERIF, fontStyle: 'italic', fontWeight: 500, fontSize: 14, color: TEAL }}>
+            <p style={{ margin: '2px 0 0', fontFamily: SERIF, fontWeight: 500, fontSize: 15, color: TEAL }}>
               Cuidando a {patientFirstName}
             </p>
           </div>
@@ -489,7 +489,7 @@ export default function MedicationTimeline() {
                   style={{
                     flexShrink: 0, display: 'flex', alignItems: 'center', gap: 6,
                     padding: '7px 13px', borderRadius: 999, border: 'none',
-                    fontFamily: 'inherit', fontWeight: 700, fontSize: 14, cursor: 'pointer',
+                    fontFamily: 'inherit', fontWeight: 700, fontSize: 15, cursor: 'pointer',
                     background: selected ? (cat ? cat.sel : GRADIENT_BRAND) : (cat ? cat.bg : 'white'),
                     color: selected ? '#fff' : (cat ? cat.ink : INK_SOFT),
                     boxShadow: selected ? '0 6px 14px -8px rgba(5,92,81,0.45)' : (cat ? 'none' : SHADOW_CARD),
@@ -511,7 +511,7 @@ export default function MedicationTimeline() {
                 onClick={() => setPeriod(opt.id)}
                 style={{
                   flex: 1, padding: '9px 0', borderRadius: 999, border: 'none',
-                  fontFamily: 'inherit', fontWeight: 700, fontSize: 14, cursor: 'pointer',
+                  fontFamily: 'inherit', fontWeight: 700, fontSize: 15, cursor: 'pointer',
                   background: period === opt.id ? GRADIENT_BRAND : 'white',
                   color: period === opt.id ? '#fff' : INK_SOFT,
                   boxShadow: period === opt.id ? '0 8px 16px -8px #087F7066' : SHADOW_CARD,
@@ -531,14 +531,14 @@ export default function MedicationTimeline() {
               display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10,
               background: TEAL_CHIP, borderRadius: 12, padding: '10px 14px', marginBottom: 14,
             }}>
-              <span style={{ fontSize: 14, color: TEAL_INK, lineHeight: 1.4 }}>
+              <span style={{ fontSize: 15, color: TEAL_INK, lineHeight: 1.4 }}>
                 Tu plan permite ver hasta {familyHistoryWindowDays} día{familyHistoryWindowDays === 1 ? '' : 's'} de historial
               </span>
               <button
                 onClick={() => navigate('/upgrade')}
                 style={{
                   flexShrink: 0, background: 'none', border: 'none', cursor: 'pointer',
-                  fontFamily: 'inherit', fontWeight: 700, fontSize: 14, color: TEAL,
+                  fontFamily: 'inherit', fontWeight: 700, fontSize: 15, color: TEAL,
                   textDecoration: 'underline', padding: 0,
                 }}
               >
@@ -559,13 +559,13 @@ export default function MedicationTimeline() {
                 style={{
                   width: '100%', padding: '10px 14px',
                   borderRadius: 12, border: `1.5px solid ${HAIRLINE}`,
-                  fontSize: 14, fontWeight: 600, color: customDate ? INK : INK_FAINT,
+                  fontSize: 15, fontWeight: 600, color: customDate ? INK : INK_FAINT,
                   background: 'white', boxSizing: 'border-box',
                   fontFamily: 'inherit', outline: 'none',
                 }}
               />
               {!customDate && (
-                <p style={{ margin: '6px 0 0', fontSize: 14, color: INK_FAINT, textAlign: 'center' }}>
+                <p style={{ margin: '6px 0 0', fontSize: 15, color: INK_FAINT, textAlign: 'center' }}>
                   Elige un día para ver su actividad
                 </p>
               )}
@@ -586,7 +586,7 @@ export default function MedicationTimeline() {
                     style={{
                       display: 'flex', alignItems: 'center', gap: 5,
                       padding: '6px 12px', borderRadius: 999, border: 'none',
-                      fontFamily: 'inherit', fontWeight: 700, fontSize: 14, cursor: 'pointer',
+                      fontFamily: 'inherit', fontWeight: 700, fontSize: 15, cursor: 'pointer',
                       background: selected ? CAT.coral.sel : CAT.coral.bg,
                       color: selected ? '#fff' : CAT.coral.ink,
                       transition: 'all 0.15s',
@@ -619,13 +619,13 @@ export default function MedicationTimeline() {
             </div>
           ) : error ? (
             <div style={{ background: PEACH, border: `1px solid ${CORAL_ACTION}`, borderRadius: 18, padding: 24, textAlign: 'center' }}>
-              <p style={{ fontSize: 14, color: CORAL_ACTION_INK, marginBottom: 12 }}>{error}</p>
+              <p style={{ fontSize: 15, color: CORAL_ACTION_INK, marginBottom: 12 }}>{error}</p>
               <button
                 onClick={fetchLog}
                 style={{
                   padding: '10px 24px', borderRadius: 12, border: 'none',
                   background: GRADIENT_BRAND, color: 'white', fontWeight: 700,
-                  fontSize: 13, cursor: 'pointer', boxShadow: '0 8px 16px -8px #087F7066',
+                  fontSize: 14, cursor: 'pointer', boxShadow: '0 8px 16px -8px #087F7066',
                 }}
               >
                 Reintentar
@@ -643,10 +643,10 @@ export default function MedicationTimeline() {
                   background: TEAL_CHIP, color: TEAL_INK,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
-                  <ClipboardList size={24} color={TEAL_INK} strokeWidth={1.8} />
+                  <ClipboardList size={24} color={TEAL_INK} strokeWidth={2.1} />
                 </div>
-                <p style={{ margin: '0 0 4px', fontSize: 14.5, fontWeight: 800, color: INK_2 }}>Sin eventos</p>
-                <p style={{ margin: 0, fontSize: 14, color: INK_FAINT, lineHeight: 1.5, maxWidth: 260, marginInline: 'auto' }}>
+                <p style={{ margin: '0 0 4px', fontSize: 16, fontWeight: 800, color: INK_2 }}>Sin eventos</p>
+                <p style={{ margin: 0, fontSize: 15, color: INK_FAINT, lineHeight: 1.5, maxWidth: 260, marginInline: 'auto' }}>
                   {filterType !== 'all'
                     ? 'No hay eventos de este tipo en este período.'
                     : 'No hay actividad registrada en este período. Las acciones del equipo aparecerán aquí.'}
@@ -687,16 +687,16 @@ export default function MedicationTimeline() {
                         }}
                       >
                         <div style={{ flex: 1, textAlign: 'left' }}>
-                          <p style={{ fontSize: 13.5, fontWeight: 800, color: INK_2, margin: 0 }}>
+                          <p style={{ fontSize: 15, fontWeight: 800, color: INK_2, margin: 0 }}>
                             {dayLabel(dateKey)}
                             {isToday && (
-                              <span style={{ marginLeft: 7, fontSize: 12, fontWeight: 800, color: TEAL_DEEP, background: 'rgba(12,108,156,0.12)', padding: '2px 8px', borderRadius: 6 }}>
+                              <span style={{ marginLeft: 7, fontSize: 14, fontWeight: 800, color: TEAL_DEEP, background: 'rgba(12,108,156,0.12)', padding: '2px 8px', borderRadius: 6 }}>
                                 Hoy
                               </span>
                             )}
                           </p>
                         </div>
-                        <span style={{ fontSize: 12, fontWeight: 700, color: INK_SOFT, background: HAIRLINE, padding: '3px 9px', borderRadius: 10, flexShrink: 0 }}>
+                        <span style={{ fontSize: 14, fontWeight: 700, color: INK_SOFT, background: HAIRLINE, padding: '3px 9px', borderRadius: 10, flexShrink: 0 }}>
                           {dayEvents.length} evento{dayEvents.length !== 1 ? 's' : ''}
                         </span>
                         <span style={{

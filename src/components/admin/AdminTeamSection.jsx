@@ -97,19 +97,19 @@ export default function AdminTeamSection() {
     setBusy(null)
   }
 
-  if (loading) return <p style={{ color: '#5E7480', fontSize: 14, textAlign: 'center', padding: 24 }}>Cargando equipo...</p>
+  if (loading) return <p style={{ color: '#5E7480', fontSize: 15, textAlign: 'center', padding: 24 }}>Cargando equipo...</p>
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
       {/* Active members */}
       <div>
-        <p style={{ fontSize: 13, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 10px 2px' }}>
+        <p style={{ fontSize: 14, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 10px 2px' }}>
           Miembros activos ({members.length})
         </p>
 
         {members.length === 0 ? (
-          <p style={{ fontSize: 14, color: '#5E7480', textAlign: 'center', padding: '16px 0' }}>
+          <p style={{ fontSize: 15, color: '#5E7480', textAlign: 'center', padding: '16px 0' }}>
             No hay miembros en el equipo aún.
           </p>
         ) : (
@@ -136,18 +136,18 @@ export default function AdminTeamSection() {
                   </div>
 
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#14303D', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#14303D', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {m.name}
                     </p>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 3 }}>
                       <span style={{
-                        fontSize: 12, fontWeight: 700, padding: '2px 8px', borderRadius: 6,
+                        fontSize: 14, fontWeight: 700, padding: '2px 8px', borderRadius: 6,
                         background: ROLE_COLOR[m.role] + '18',
                         color: ROLE_COLOR[m.role],
                       }}>
                         {ROLE_LABEL[m.role]}
                       </span>
-                      <span style={{ fontSize: 13, color: '#5E7480' }}>
+                      <span style={{ fontSize: 14, color: '#5E7480' }}>
                         Activo {timeAgo(m.lastSeen)}
                       </span>
                     </div>
@@ -159,7 +159,7 @@ export default function AdminTeamSection() {
                       disabled={busy === m.id}
                       title={`Cambiar a ${m.role === 'familiar' ? 'Cuidador' : 'Familiar'}`}
                       style={{
-                        padding: '5px 10px', borderRadius: 8, fontSize: 13, fontWeight: 700,
+                        padding: '5px 10px', borderRadius: 8, fontSize: 14, fontWeight: 700,
                         border: `1px solid ${ROLE_COLOR[m.role]}`,
                         background: 'white', color: ROLE_COLOR[m.role],
                         cursor: busy === m.id ? 'default' : 'pointer',
@@ -174,7 +174,7 @@ export default function AdminTeamSection() {
                       style={{
                         width: 30, height: 30, borderRadius: 8,
                         border: '1px solid #FFBABA', background: '#FFF8F8',
-                        color: '#D63031', fontSize: 14, cursor: 'pointer',
+                        color: '#D63031', fontSize: 15, cursor: 'pointer',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         opacity: busy === m.id ? 0.5 : 1,
                       }}
@@ -192,7 +192,7 @@ export default function AdminTeamSection() {
       {/* Pending invitations */}
       {invitations.length > 0 && (
         <div>
-          <p style={{ fontSize: 13, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 10px 2px' }}>
+          <p style={{ fontSize: 14, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.08em', margin: '0 0 10px 2px' }}>
             Invitaciones pendientes ({invitations.length})
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -204,10 +204,10 @@ export default function AdminTeamSection() {
               }}>
                 <span style={{ fontSize: 20, flexShrink: 0 }}>✉️</span>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#14303D', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#14303D', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {inv.invited_email}
                   </p>
-                  <p style={{ margin: '2px 0 0', fontSize: 13, color: '#4E6470' }}>
+                  <p style={{ margin: '2px 0 0', fontSize: 14, color: '#4E6470' }}>
                     Enviada {timeAgo(inv.created_at)} · vence {new Date(inv.expires_at).toLocaleDateString('es-MX', { day: 'numeric', month: 'short' })}
                   </p>
                 </div>
@@ -215,7 +215,7 @@ export default function AdminTeamSection() {
                   onClick={() => revokeInvitation(inv)}
                   disabled={busy === inv.id}
                   style={{
-                    padding: '5px 12px', borderRadius: 8, fontSize: 14, fontWeight: 700,
+                    padding: '5px 12px', borderRadius: 8, fontSize: 15, fontWeight: 700,
                     border: '1px solid #FDE68A', background: 'white',
                     color: '#92400E', cursor: 'pointer',
                     opacity: busy === inv.id ? 0.5 : 1, flexShrink: 0,
@@ -244,19 +244,19 @@ export default function AdminTeamSection() {
             <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 17, fontWeight: 700, color: '#14303D', margin: '0 0 8px' }}>
               ¿Eliminar a {confirmRemove.name}?
             </p>
-            <p style={{ fontSize: 13, color: '#4E6470', lineHeight: 1.6, margin: '0 0 24px' }}>
+            <p style={{ fontSize: 14, color: '#4E6470', lineHeight: 1.6, margin: '0 0 24px' }}>
               Perderá acceso a la familia inmediatamente. Sus datos no se borran.
             </p>
             <div style={{ display: 'flex', gap: 10 }}>
               <button onClick={() => setConfirmRemove(null)} style={{
                 flex: 1, padding: 12, borderRadius: 12, border: '1px solid #E6E3DB',
-                background: 'white', color: '#4E6470', fontWeight: 600, fontSize: 14, cursor: 'pointer',
+                background: 'white', color: '#4E6470', fontWeight: 600, fontSize: 15, cursor: 'pointer',
               }}>
                 Cancelar
               </button>
               <button onClick={() => removeMember(confirmRemove)} style={{
                 flex: 1, padding: 12, borderRadius: 12, border: 'none',
-                background: '#D63031', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer',
+                background: '#D63031', color: 'white', fontWeight: 700, fontSize: 15, cursor: 'pointer',
               }}>
                 Eliminar
               </button>

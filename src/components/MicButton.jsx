@@ -33,9 +33,9 @@ export default function MicButton({ onStart, onStop, recording, size = 'md' }) {
         userSelect: 'none',
       }}
     >
-      <Mic size={iconSz} color={recording ? 'white' : '#4E6470'} strokeWidth={1.75} />
+      <Mic size={iconSz} color={recording ? 'white' : '#4E6470'} strokeWidth={2.1} />
       {recording && (
-        <span style={{ fontSize: 14, fontWeight: 700, color: 'white', whiteSpace: 'nowrap' }}>
+        <span style={{ fontSize: 15, fontWeight: 700, color: 'white', whiteSpace: 'nowrap' }}>
           Grabando...
         </span>
       )}

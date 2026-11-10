@@ -94,7 +94,7 @@ export default function MedicationStockList() {
         <h2 style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontWeight: 600, fontSize: 18, color: '#14303D', margin: 0 }}>
           Inventario
         </h2>
-        <p style={{ fontSize: 13, color: '#4E6470', margin: '2px 0 0' }}>
+        <p style={{ fontSize: 14, color: '#4E6470', margin: '2px 0 0' }}>
           Así llevamos la cuenta de cuánto queda de cada medicamento.
         </p>
       </div>
@@ -142,12 +142,12 @@ export default function MedicationStockList() {
               <div key={med.id} style={{ background: cardBg, borderRadius: 20, padding: 16, boxShadow: `0 6px 14px -8px ${shadow}` }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                   <div style={{ width: 44, height: 44, borderRadius: 14, background: iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <Pill size={20} color={color} strokeWidth={1.9} />
+                    <Pill size={20} color={color} strokeWidth={2.1} />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontWeight: 700, fontSize: 15.5, color: '#14303D' }}>{med.name}{med.dosage ? ` ${med.dosage}` : ''}</div>
                     {stock && (
-                      <div style={{ fontSize: 14, color: '#4E6470', marginTop: 2 }}>
+                      <div style={{ fontSize: 15, color: '#4E6470', marginTop: 2 }}>
                         {stock.pills_remaining} de {stock.total_pills} dosis · {dailyConsumption % 1 === 0 ? dailyConsumption : dailyConsumption.toFixed(2)} dosis/día
                       </div>
                     )}
@@ -160,21 +160,21 @@ export default function MedicationStockList() {
                       <div style={{ width: `${pct}%`, height: '100%', borderRadius: 6, background: barColor, transition: 'width 0.4s ease' }} />
                     </div>
                     {statusText && (
-                      <div style={{ marginTop: 8, fontSize: 14, fontWeight: isAgotado ? 700 : 600, color }}>{statusText}</div>
+                      <div style={{ marginTop: 8, fontSize: 15, fontWeight: isAgotado ? 700 : 600, color }}>{statusText}</div>
                     )}
 
                     {isAdmin && (
                       isEditing ? (
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 12 }}>
                           <button onClick={() => setEditingValue(v => Math.max(0, v - 1))} style={{ width: 34, height: 34, borderRadius: 11, border: 'none', background: '#FFFFFF', boxShadow: '0 4px 10px -6px #087F7033', fontSize: 18, fontWeight: 700, color: '#2A4350', cursor: 'pointer' }}>–</button>
-                          <div style={{ minWidth: 34, textAlign: 'center', fontWeight: 700, fontSize: 15, color: '#14303D' }}>{editingValue}</div>
+                          <div style={{ minWidth: 34, textAlign: 'center', fontWeight: 700, fontSize: 16, color: '#14303D' }}>{editingValue}</div>
                           <button onClick={() => setEditingValue(v => Math.min(stock.total_pills || v + 1, v + 1))} style={{ width: 34, height: 34, borderRadius: 11, border: 'none', background: '#FFFFFF', boxShadow: '0 4px 10px -6px #087F7033', fontSize: 18, fontWeight: 700, color: '#2A4350', cursor: 'pointer' }}>+</button>
-                          <button onClick={() => saveStock(med.id, editingValue)} style={{ marginLeft: 'auto', border: 'none', cursor: 'pointer', padding: '9px 16px', borderRadius: 12, fontSize: 13, fontWeight: 700, fontFamily: SANS, color: '#FFFFFF', background: '#0C6C9C' }}>Guardar</button>
+                          <button onClick={() => saveStock(med.id, editingValue)} style={{ marginLeft: 'auto', border: 'none', cursor: 'pointer', padding: '9px 16px', borderRadius: 12, fontSize: 14, fontWeight: 700, fontFamily: SANS, color: '#FFFFFF', background: '#0C6C9C' }}>Guardar</button>
                         </div>
                       ) : (
                         <button
                           onClick={() => { setEditingId(med.id); setEditingValue(stock.pills_remaining) }}
-                          style={{ marginTop: 12, border: 'none', cursor: 'pointer', padding: '9px 16px', borderRadius: 12, fontSize: 13, fontWeight: 700, fontFamily: SANS, color: '#0C6C9C', background: '#FFFFFF', boxShadow: '0 4px 10px -6px #087F7033' }}
+                          style={{ marginTop: 12, border: 'none', cursor: 'pointer', padding: '9px 16px', borderRadius: 12, fontSize: 14, fontWeight: 700, fontFamily: SANS, color: '#0C6C9C', background: '#FFFFFF', boxShadow: '0 4px 10px -6px #087F7033' }}
                         >
                           Actualizar cantidad
                         </button>
@@ -184,7 +184,7 @@ export default function MedicationStockList() {
                     {isAdmin && (
                       <button
                         onClick={() => setStockTabMed(med)}
-                        style={{ width: '100%', marginTop: 8, padding: 10, borderRadius: 12, border: 'none', background: 'linear-gradient(148deg,#1677A6 0%,#0C6C9C 46%,#0A5A82 100%)', color: 'white', fontWeight: 700, fontSize: 13, cursor: 'pointer', boxShadow: '0 4px 14px rgba(12,108,156,0.25)' }}
+                        style={{ width: '100%', marginTop: 8, padding: 10, borderRadius: 12, border: 'none', background: 'linear-gradient(148deg,#1677A6 0%,#0C6C9C 46%,#0A5A82 100%)', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer', boxShadow: '0 4px 14px rgba(12,108,156,0.25)' }}
                       >
                         📦 Gestionar stock
                       </button>
@@ -192,7 +192,7 @@ export default function MedicationStockList() {
                     {!isAdmin && (
                       <button
                         onClick={() => setStockTabMed(med)}
-                        style={{ width: '100%', marginTop: 10, padding: 8, borderRadius: 10, border: '1px solid rgba(51,65,85,0.12)', background: '#FDFAF7', color: '#0C6C9C', fontWeight: 600, fontSize: 14, cursor: 'pointer' }}
+                        style={{ width: '100%', marginTop: 10, padding: 8, borderRadius: 10, border: '1px solid rgba(51,65,85,0.12)', background: '#FDFAF7', color: '#0C6C9C', fontWeight: 600, fontSize: 15, cursor: 'pointer' }}
                       >
                         📦 Ver detalles de stock
                       </button>
@@ -200,11 +200,11 @@ export default function MedicationStockList() {
                   </>
                 ) : (
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
-                    <p style={{ fontSize: 14, color: '#4E6470', margin: 0 }}>Stock no configurado</p>
+                    <p style={{ fontSize: 15, color: '#4E6470', margin: 0 }}>Stock no configurado</p>
                     {isAdmin && (
                       <button
                         onClick={() => setStockTabMed(med)}
-                        style={{ padding: '6px 14px', borderRadius: 10, border: '1px solid #0C6C9C', background: '#E3F1F8', color: '#0C6C9C', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}
+                        style={{ padding: '6px 14px', borderRadius: 10, border: '1px solid #0C6C9C', background: '#E3F1F8', color: '#0C6C9C', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}
                       >
                         + Configurar
                       </button>

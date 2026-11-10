@@ -31,13 +31,13 @@ export default function HospitalBanner({ onManage }) {
           </div>
 
           {hospitalMode.hospital_name && (
-            <p style={{ margin: '0 0 2px', fontSize: 14, fontWeight: 600, opacity: 0.95 }}>
+            <p style={{ margin: '0 0 2px', fontSize: 15, fontWeight: 600, opacity: 0.95 }}>
               {hospitalMode.hospital_name}
               {hospitalMode.room_number && ` · Hab. ${hospitalMode.room_number}`}
             </p>
           )}
 
-          <p style={{ margin: '4px 0 0', fontSize: 14, opacity: 0.8 }}>
+          <p style={{ margin: '4px 0 0', fontSize: 15, opacity: 0.8 }}>
             {hospitalMode.activated_by_name
               ? `Activado por ${hospitalMode.activated_by_name}`
               : 'Modo hospital en curso'}
@@ -54,7 +54,7 @@ export default function HospitalBanner({ onManage }) {
               border: '1.5px solid rgba(255,255,255,0.4)',
               background: 'rgba(255,255,255,0.15)',
               color: 'white',
-              fontSize: 14,
+              fontSize: 15,
               fontWeight: 700,
               cursor: 'pointer',
               flexShrink: 0,
@@ -78,7 +78,7 @@ export default function HospitalBanner({ onManage }) {
           animation: 'hbPulse 2s ease-in-out infinite',
           display: 'inline-block',
         }} />
-        <span style={{ fontSize: 13, opacity: 0.85 }}>
+        <span style={{ fontSize: 14, opacity: 0.85 }}>
           Medicamentos y rutinas pausados · El equipo fue notificado
         </span>
       </div>

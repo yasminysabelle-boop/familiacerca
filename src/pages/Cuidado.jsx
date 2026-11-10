@@ -39,7 +39,7 @@ function renderIcon(item, props) {
 const fieldStyle = {
   padding: '10px 14px', borderRadius: 12,
   border: '1.5px solid rgba(51,65,85,0.12)', background: '#F7F6F2',
-  fontSize: 14, fontWeight: 700, outline: 'none', boxSizing: 'border-box',
+  fontSize: 15, fontWeight: 700, outline: 'none', boxSizing: 'border-box',
   transition: 'all 0.15s', color: '#2A4350',
 }
 const onFocusStyle = e => { e.target.style.borderColor = '#0C6C9C'; e.target.style.boxShadow = '0 0 0 3px rgba(12,108,156,0.12)' }
@@ -353,7 +353,7 @@ export default function Cuidado() {
             <h1 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: '#2A4350', letterSpacing: '-0.01em' }}>
               Rutina diaria
             </h1>
-            <p style={{ margin: '2px 0 0', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontStyle: 'italic', fontWeight: 500, fontSize: 14, color: '#0C6C9C' }}>
+            <p style={{ margin: '2px 0 0', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontWeight: 500, fontSize: 15, color: '#0C6C9C' }}>
               Cuidando a {patientFirstName}
             </p>
           </div>
@@ -379,7 +379,7 @@ export default function Cuidado() {
               </span>
               {allDone && <Heart size={17} color="#A3452F" strokeWidth={2} filled />}
             </div>
-            <p style={{ fontSize: 13.5, color: '#2A4350', opacity: 0.85, marginTop: 6, lineHeight: 1.5 }}>
+            <p style={{ fontSize: 15, color: '#2A4350', opacity: 0.85, marginTop: 6, lineHeight: 1.5 }}>
               {bannerSub}
             </p>
           </div>
@@ -395,7 +395,7 @@ export default function Cuidado() {
                 onClick={() => switchTab(tab.id)}
                 style={{
                   flex: 1, padding: '10px 0', cursor: 'pointer', borderRadius: 999, border: 'none',
-                  fontFamily: 'inherit', fontWeight: 700, fontSize: 13.5,
+                  fontFamily: 'inherit', fontWeight: 700, fontSize: 15,
                   background: activeTab === tab.id ? 'linear-gradient(148deg,#1677A6 0%,#0C6C9C 46%,#0A5A82 100%)' : 'white',
                   color: activeTab === tab.id ? '#FFFFFF' : '#5C6B78',
                   boxShadow: activeTab === tab.id ? '0 8px 16px -8px #087F7066' : '0 4px 10px -6px #087F7022',
@@ -416,8 +416,8 @@ export default function Cuidado() {
                   background: 'white', border: '1px solid rgba(51,65,85,0.08)',
                   borderRadius: 12, padding: '10px 14px', marginBottom: 14,
                 }}>
-                  <Lock size={15} color="#4E6470" strokeWidth={1.8} style={{ flexShrink: 0 }} />
-                  <p style={{ fontSize: 14, color: '#4E6470', margin: 0 }}>
+                  <Lock size={15} color="#4E6470" strokeWidth={2.1} style={{ flexShrink: 0 }} />
+                  <p style={{ fontSize: 15, color: '#4E6470', margin: 0 }}>
                     Solo puedes ver el cuidado registrado por el cuidador.
                   </p>
                 </div>
@@ -518,10 +518,10 @@ export default function Cuidado() {
                         onClick={() => setShowCompleted(s => !s)}
                       >
                         <CheckIcon size={12} color="#0C6C9C" strokeWidth={2.6} />
-                        <span style={{ fontSize: 13, fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#0C6C9C' }}>
+                        <span style={{ fontSize: 14, fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#0C6C9C' }}>
                           Completadas <span style={{ opacity: 0.7, fontWeight: 600 }}>({completadas.length})</span>
                         </span>
-                        <span style={{ marginLeft: 'auto', color: '#94A0AD', fontSize: 13 }}>{showCompleted ? '▾' : '▸'}</span>
+                        <span style={{ marginLeft: 'auto', color: '#94A0AD', fontSize: 14 }}>{showCompleted ? '▾' : '▸'}</span>
                       </div>
                       {showCompleted && (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -551,7 +551,7 @@ export default function Cuidado() {
           {/* ── HORARIOS TAB ── */}
           {activeTab === 'horarios' && (
             <div>
-              <p style={{ fontSize: 14, color: '#4E6470', margin: '0 0 16px', lineHeight: 1.5 }}>
+              <p style={{ fontSize: 15, color: '#4E6470', margin: '0 0 16px', lineHeight: 1.5 }}>
                 Se avisa si no se marca 30 min después de la hora programada.
               </p>
 
@@ -561,8 +561,8 @@ export default function Cuidado() {
                   background: 'white', border: '1px solid rgba(51,65,85,0.08)',
                   borderRadius: 12, padding: '10px 14px', marginBottom: 16,
                 }}>
-                  <Lock size={15} color="#4E6470" strokeWidth={1.8} style={{ flexShrink: 0 }} />
-                  <p style={{ fontSize: 14, color: '#4E6470', margin: 0 }}>
+                  <Lock size={15} color="#4E6470" strokeWidth={2.1} style={{ flexShrink: 0 }} />
+                  <p style={{ fontSize: 15, color: '#4E6470', margin: 0 }}>
                     Solo el administrador puede cambiar los horarios.
                   </p>
                 </div>
@@ -589,15 +589,15 @@ export default function Cuidado() {
                           <span style={{ width: 34, height: 34, borderRadius: 11, background: '#E3F1F8', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                             {renderIcon(item, { size: 16, color: '#0C6C9C', strokeWidth: 1.8 })}
                           </span>
-                          <p style={{ flex: 1, fontSize: 14.5, fontWeight: 700, color: '#14303D', margin: 0 }}>
+                          <p style={{ flex: 1, fontSize: 16, fontWeight: 700, color: '#14303D', margin: 0 }}>
                             {item.label}
                           </p>
                           {item.active ? (
-                            <span style={{ fontSize: 13.5, fontWeight: 700, color: '#0A5A82', background: '#E3F1F8', padding: '5px 11px', borderRadius: 999, flexShrink: 0 }}>
+                            <span style={{ fontSize: 15, fontWeight: 700, color: '#0A5A82', background: '#E3F1F8', padding: '5px 11px', borderRadius: 999, flexShrink: 0 }}>
                               {fmtTime(times[item.key] ?? item.scheduledTime)}
                             </span>
                           ) : (
-                            <span style={{ fontSize: 13, fontWeight: 600, color: '#5E7480', flexShrink: 0 }}>No se usa</span>
+                            <span style={{ fontSize: 14, fontWeight: 600, color: '#5E7480', flexShrink: 0 }}>No se usa</span>
                           )}
                         </div>
                         <div style={{ maxHeight: isOpen ? 160 : 0, overflow: 'hidden', transition: 'max-height 0.25s ease' }}>
@@ -614,7 +614,7 @@ export default function Cuidado() {
                             {isAdmin && hasCustomCols && (
                               <button
                                 onClick={() => { setActive(item, !item.active); setOpenSchedKey(null) }}
-                                style={{ marginTop: 10, width: '100%', padding: '11px', borderRadius: 12, border: '1.5px solid #E6E3DB', background: 'white', color: item.active ? '#A3452F' : '#0C6C9C', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}
+                                style={{ marginTop: 10, width: '100%', padding: '11px', borderRadius: 12, border: '1.5px solid #E6E3DB', background: 'white', color: item.active ? '#A3452F' : '#0C6C9C', fontWeight: 700, fontSize: 16, cursor: 'pointer' }}
                               >
                                 {item.custom ? 'Quitar esta rutina' : item.active ? 'No usamos esta rutina' : 'Sí la usamos'}
                               </button>
@@ -646,8 +646,8 @@ export default function Cuidado() {
                       </div>
                       <input type="time" value={newRoutine.time} onChange={e => setNewRoutine(r => ({ ...r, time: e.target.value }))} style={{ ...fieldStyle, width: '100%', marginBottom: 12 }} />
                       <div style={{ display: 'flex', gap: 10 }}>
-                        <button onClick={() => setNewRoutine(null)} style={{ flex: 1, padding: 12, borderRadius: 12, border: '1.5px solid #E6E3DB', background: 'white', color: '#4E6470', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}>Cancelar</button>
-                        <button onClick={addRoutine} disabled={!newRoutine.label.trim()} style={{ flex: 1, padding: 12, borderRadius: 12, border: 'none', background: newRoutine.label.trim() ? '#0C6C9C' : '#C9D6DB', color: 'white', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}>Agregar</button>
+                        <button onClick={() => setNewRoutine(null)} style={{ flex: 1, padding: 12, borderRadius: 12, border: '1.5px solid #E6E3DB', background: 'white', color: '#4E6470', fontWeight: 700, fontSize: 16, cursor: 'pointer' }}>Cancelar</button>
+                        <button onClick={addRoutine} disabled={!newRoutine.label.trim()} style={{ flex: 1, padding: 12, borderRadius: 12, border: 'none', background: newRoutine.label.trim() ? '#0C6C9C' : '#C9D6DB', color: 'white', fontWeight: 700, fontSize: 16, cursor: 'pointer' }}>Agregar</button>
                       </div>
                     </div>
                   ) : (
@@ -662,14 +662,14 @@ export default function Cuidado() {
                     background: '#E3F1F8', borderRadius: 12, padding: '10px 14px', margin: '10px 0 20px',
                   }}>
                     <Clock size={14} color="#0C6C9C" strokeWidth={2} style={{ marginTop: 1, flexShrink: 0 }} />
-                    <p style={{ fontSize: 14, color: '#0A5A82', margin: 0, lineHeight: 1.5 }}>
+                    <p style={{ fontSize: 15, color: '#0A5A82', margin: 0, lineHeight: 1.5 }}>
                       Los horarios aplican para toda la familia. Si un cuidado no se marca a tiempo,
                       aparece en <strong>Atrasadas</strong> dentro de Hoy.
                     </p>
                   </div>
 
                   {saveError && (
-                    <p style={{ fontSize: 14, color: '#A3452F', textAlign: 'center', marginBottom: 12 }}>
+                    <p style={{ fontSize: 15, color: '#A3452F', textAlign: 'center', marginBottom: 12 }}>
                       {saveError}
                     </p>
                   )}
@@ -681,7 +681,7 @@ export default function Cuidado() {
                       style={{
                         width: '100%', padding: '14px', borderRadius: 14, border: 'none', fontFamily: 'inherit',
                         background: saved ? '#0C6C9C' : saving ? '#C7D6D2' : 'linear-gradient(148deg,#1677A6 0%,#0C6C9C 46%,#0A5A82 100%)',
-                        color: 'white', fontWeight: 700, fontSize: 14,
+                        color: 'white', fontWeight: 700, fontSize: 15,
                         cursor: saving ? 'not-allowed' : 'pointer',
                         boxShadow: saving ? 'none' : '0 8px 18px -8px #087F7066',
                         transition: 'all 0.2s',
@@ -717,7 +717,7 @@ export default function Cuidado() {
           position: 'fixed', bottom: 96, left: '50%', transform: 'translateX(-50%)',
           zIndex: 400, background: '#FBEAE4', border: '1px solid rgba(196,102,79,0.25)',
           borderRadius: 14, padding: '12px 18px',
-          fontSize: 13, fontWeight: 600, color: '#8A5A4A',
+          fontSize: 14, fontWeight: 600, color: '#8A5A4A',
           maxWidth: 320, width: 'calc(100% - 32px)',
           boxShadow: '0 8px 24px -10px rgba(196,102,79,0.4)',
           textAlign: 'center', lineHeight: 1.5,
@@ -737,7 +737,7 @@ export default function Cuidado() {
 function RoutineSection({ label, color = '#94A0AD', children }) {
   return (
     <div style={{ marginBottom: 16 }}>
-      <p style={{ fontSize: 13, fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color, margin: '0 0 8px 2px' }}>
+      <p style={{ fontSize: 14, fontWeight: 800, letterSpacing: '0.06em', textTransform: 'uppercase', color, margin: '0 0 8px 2px' }}>
         {label}
       </p>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -774,7 +774,7 @@ function RoutineCard({ item, state, isToggling, isFamiliar, scheduledTime, log, 
 
       <div style={{ flex: 1, minWidth: 0 }}>
         <p style={{
-          fontSize: 14.5, fontWeight: 700, margin: 0, lineHeight: 1.3,
+          fontSize: 16, fontWeight: 700, margin: 0, lineHeight: 1.3,
           color: isCompletada ? '#94A0AD' : '#14303D',
           textDecoration: isCompletada ? 'line-through' : 'none',
         }}>
@@ -782,13 +782,13 @@ function RoutineCard({ item, state, isToggling, isFamiliar, scheduledTime, log, 
         </p>
 
         {isCompletada && checkedTime && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 3, fontSize: 13, fontWeight: 700, color: '#0C6C9C' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 3, fontSize: 14, fontWeight: 700, color: '#0C6C9C' }}>
             <CheckIcon size={11} color="#0C6C9C" strokeWidth={2.6} />
             {checkedTime}{log?.checked_by ? ` · ${log.checked_by.split(' ')[0]}` : ''}
           </div>
         )}
         {!isCompletada && scheduledTime && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 3, fontSize: 13, color: '#4E6470', fontWeight: 600 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 3, fontSize: 14, color: '#4E6470', fontWeight: 600 }}>
             <Clock size={11} color="#4E6470" strokeWidth={2.2} />
             {fmtTime(scheduledTime)}
           </div>
@@ -811,7 +811,7 @@ function RoutineCard({ item, state, isToggling, isFamiliar, scheduledTime, log, 
       </div>
 
       {isRetrasada && (
-        <span style={{ fontSize: 12, fontWeight: 800, color: '#8A5A4A', background: '#FBEAE4', padding: '3px 9px', borderRadius: 999, flexShrink: 0 }}>
+        <span style={{ fontSize: 14, fontWeight: 800, color: '#8A5A4A', background: '#FBEAE4', padding: '3px 9px', borderRadius: 999, flexShrink: 0 }}>
           Atrasada
         </span>
       )}

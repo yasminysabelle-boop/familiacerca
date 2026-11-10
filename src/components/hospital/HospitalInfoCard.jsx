@@ -5,7 +5,7 @@ import { useFamily } from '../../contexts/FamilyContext'
 const fieldStyle = {
   width: '100%', padding: '10px 13px', borderRadius: 10,
   border: '1.5px solid #FECACA', background: '#FFF5F5',
-  fontSize: 14, color: '#14303D', boxSizing: 'border-box',
+  fontSize: 15, color: '#14303D', boxSizing: 'border-box',
   outline: 'none', transition: 'border-color 0.15s',
 }
 const onFocus = e => { e.target.style.borderColor = '#B91C1C'; e.target.style.boxShadow = '0 0 0 3px rgba(185,28,28,0.1)' }
@@ -73,21 +73,21 @@ export default function HospitalInfoCard() {
       {/* Header row */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
         <p style={{
-          margin: 0, fontSize: 13, fontWeight: 800,
+          margin: 0, fontSize: 14, fontWeight: 800,
           color: '#B91C1C', letterSpacing: '0.06em', textTransform: 'uppercase',
         }}>
           Información hospitalaria
         </p>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           {saved && (
-            <span style={{ fontSize: 13, color: '#0C6C9C', fontWeight: 700 }}>✓ Guardado</span>
+            <span style={{ fontSize: 14, color: '#0C6C9C', fontWeight: 700 }}>✓ Guardado</span>
           )}
           <button
             onClick={() => { setEditing(e => !e); setSaved(false) }}
             style={{
               padding: '5px 14px', borderRadius: 8,
               border: '1.5px solid #FECACA', background: editing ? '#FEE2E2' : 'white',
-              color: '#B91C1C', fontSize: 14, fontWeight: 700, cursor: 'pointer',
+              color: '#B91C1C', fontSize: 15, fontWeight: 700, cursor: 'pointer',
             }}
           >
             {editing ? 'Cancelar' : 'Editar'}
@@ -108,7 +108,7 @@ export default function HospitalInfoCard() {
             value={hospitalMode?.patient_status ?? 'Sin registrar'}
             multiline />
           {updatedAt && (
-            <p style={{ margin: '4px 0 0', fontSize: 13, color: '#5E7480', textAlign: 'right' }}>
+            <p style={{ margin: '4px 0 0', fontSize: 14, color: '#5E7480', textAlign: 'right' }}>
               Actualizado: {updatedAt}
             </p>
           )}
@@ -137,7 +137,7 @@ export default function HospitalInfoCard() {
             style={{
               padding: '13px', borderRadius: 12, border: 'none', marginTop: 4,
               background: saving ? '#5E7480' : 'linear-gradient(135deg, #B91C1C, #DC2626)',
-              color: 'white', fontWeight: 700, fontSize: 14,
+              color: 'white', fontWeight: 700, fontSize: 15,
               cursor: saving ? 'default' : 'pointer',
               boxShadow: saving ? 'none' : '0 4px 16px rgba(185,28,28,0.3)',
             }}
@@ -156,11 +156,11 @@ function InfoRow({ icon, label, value, multiline }) {
     <div style={{ display: 'flex', gap: 10, alignItems: multiline ? 'flex-start' : 'center' }}>
       <span style={{ fontSize: 16, flexShrink: 0, marginTop: multiline ? 1 : 0 }}>{icon}</span>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+        <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
           {label}
         </p>
         <p style={{
-          margin: '2px 0 0', fontSize: 14, fontWeight: empty ? 400 : 600,
+          margin: '2px 0 0', fontSize: 15, fontWeight: empty ? 400 : 600,
           color: empty ? '#D1D5DB' : '#14303D',
           lineHeight: 1.5, fontStyle: empty ? 'italic' : 'normal',
         }}>
@@ -174,7 +174,7 @@ function InfoRow({ icon, label, value, multiline }) {
 function Field({ label, value, onChange, placeholder, multiline }) {
   if (multiline) return (
     <div>
-      <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#B91C1C', marginBottom: 5, letterSpacing: '0.04em' }}>
+      <label style={{ display: 'block', fontSize: 14, fontWeight: 700, color: '#B91C1C', marginBottom: 5, letterSpacing: '0.04em' }}>
         {label}
       </label>
       <textarea
@@ -190,7 +190,7 @@ function Field({ label, value, onChange, placeholder, multiline }) {
   )
   return (
     <div>
-      <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#B91C1C', marginBottom: 5, letterSpacing: '0.04em' }}>
+      <label style={{ display: 'block', fontSize: 14, fontWeight: 700, color: '#B91C1C', marginBottom: 5, letterSpacing: '0.04em' }}>
         {label}
       </label>
       <input

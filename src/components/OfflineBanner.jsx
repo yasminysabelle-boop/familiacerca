@@ -22,7 +22,7 @@ export default function OfflineBanner() {
       display: 'flex', alignItems: 'center', gap: 10,
     }}>
       <span style={{ fontSize: 18, flexShrink: 0 }}>📵</span>
-      <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.9)', lineHeight: 1.45 }}>
+      <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.9)', lineHeight: 1.45 }}>
         Sin conexión — tus datos están seguros y se sincronizarán cuando vuelva la conexión 💙
       </span>
     </div>

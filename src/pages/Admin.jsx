@@ -40,7 +40,7 @@ export default function Admin() {
     return (
       <Layout>
         <div style={{ display: 'flex', justifyContent: 'center', padding: 48 }}>
-          <p style={{ color: '#5E7480', fontSize: 14 }}>Verificando acceso...</p>
+          <p style={{ color: '#5E7480', fontSize: 15 }}>Verificando acceso...</p>
         </div>
       </Layout>
     )
@@ -70,7 +70,7 @@ export default function Admin() {
           }}>
             Acceso restringido
           </h2>
-          <p style={{ fontSize: 14, color: '#4E6470', lineHeight: 1.6, margin: '0 0 24px', maxWidth: 300 }}>
+          <p style={{ fontSize: 15, color: '#4E6470', lineHeight: 1.6, margin: '0 0 24px', maxWidth: 300 }}>
             El panel de administración solo está disponible para el administrador de la familia — quien creó la cuenta.
           </p>
           <button
@@ -78,7 +78,7 @@ export default function Admin() {
             style={{
               padding: '12px 28px', borderRadius: 12, border: 'none',
               background: '#0C6C9C', color: 'white', fontWeight: 700,
-              fontSize: 14, cursor: 'pointer',
+              fontSize: 15, cursor: 'pointer',
             }}
           >
             Volver al inicio
@@ -118,7 +118,7 @@ export default function Admin() {
             }}>
               Panel de administración
             </p>
-            <p style={{ color: '#5E7480', fontSize: 14, margin: '4px 0 0' }}>
+            <p style={{ color: '#5E7480', fontSize: 15, margin: '4px 0 0' }}>
               {user?.user_metadata?.full_name ?? user?.email} · Administrador
             </p>
           </div>
@@ -137,7 +137,7 @@ export default function Admin() {
                 padding: '10px 4px', borderRadius: 12, border: 'none',
                 background: activeTab === t.id ? '#0C6C9C' : '#F3F4F6',
                 color: activeTab === t.id ? 'white' : '#4E6470',
-                fontWeight: 700, fontSize: 13, cursor: 'pointer',
+                fontWeight: 700, fontSize: 14, cursor: 'pointer',
                 display: 'flex', flexDirection: 'column',
                 alignItems: 'center', gap: 3,
                 transition: 'all 0.15s',

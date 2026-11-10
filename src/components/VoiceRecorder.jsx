@@ -202,19 +202,19 @@ export default function VoiceRecorder({
       )}
 
       {/* Status text */}
-      <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: active ? '#DC2626' : '#0C6C9C' }}>
+      <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: active ? '#DC2626' : '#0C6C9C' }}>
         {active ? 'Grabando... toca para detener' : placeholder}
       </p>
 
       {/* Live interim text (transcribe mode) */}
       {active && mode === 'transcribe' && interim && (
-        <p style={{ margin: 0, fontSize: 14, color: '#5E7480', fontStyle: 'italic', textAlign: 'center', maxWidth: 280 }}>
+        <p style={{ margin: 0, fontSize: 15, color: '#5E7480', fontStyle: 'italic', textAlign: 'center', maxWidth: 280 }}>
           {interim}...
         </p>
       )}
 
       {error && (
-        <p style={{ margin: 0, fontSize: 14, color: '#DC2626', textAlign: 'center' }}>
+        <p style={{ margin: 0, fontSize: 15, color: '#DC2626', textAlign: 'center' }}>
           {error}
         </p>
       )}

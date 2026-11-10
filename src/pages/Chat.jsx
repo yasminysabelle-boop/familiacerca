@@ -428,7 +428,7 @@ ${lines}`
             </h1>
             <p style={{
               margin: '2px 0 0', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
-              fontStyle: 'italic', fontWeight: 500, fontSize: 14, color: '#0C6C9C',
+              fontWeight: 500, fontSize: 15, color: '#0C6C9C',
             }}>
               {patientFirstName ? `Cuidando a ${patientFirstName}` : 'Cuidando a tu familiar'}
             </p>
@@ -442,7 +442,7 @@ ${lines}`
             padding: '8px 14px', flexShrink: 0,
           }}>
             {pinError && (
-              <p style={{ fontSize: 13, color: '#D9534F', marginBottom: 4 }}>{pinError}</p>
+              <p style={{ fontSize: 14, color: '#D9534F', marginBottom: 4 }}>{pinError}</p>
             )}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
               {pinnedMsgs.map(msg => {
@@ -451,7 +451,7 @@ ${lines}`
                 return (
                   <div key={msg.id} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <Clock size={13} color="#94A0AD" strokeWidth={2.2} style={{ flexShrink: 0 }} />
-                    <p style={{ flex: 1, fontSize: 14, color: '#2A4350', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <p style={{ flex: 1, fontSize: 15, color: '#2A4350', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {msgText}
                     </p>
                     {canUnpin && (
@@ -487,7 +487,7 @@ ${lines}`
                   border: `1.5px solid ${active ? m.solid : m.border}`,
                   background: active ? m.solid : m.bg,
                   color: active ? '#FFFFFF' : m.ink,
-                  fontSize: 14, fontWeight: 700, cursor: 'pointer',
+                  fontSize: 15, fontWeight: 700, cursor: 'pointer',
                   flexShrink: 0, whiteSpace: 'nowrap',
                   transition: 'background 0.15s, color 0.15s, border-color 0.15s',
                 }}
@@ -514,20 +514,20 @@ ${lines}`
               onClick={e => e.stopPropagation()}
             >
               <div style={{ padding: '12px 16px', borderBottom: '1px solid rgba(51,65,85,0.08)' }}>
-                <p style={{ fontSize: 14, color: '#94A0AD', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <p style={{ fontSize: 15, color: '#94A0AD', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   "{(contextMsg.content ?? contextMsg.message ?? '').slice(0, 50)}"
                 </p>
               </div>
               <button
                 onClick={() => togglePin(contextMsg)}
-                style={{ width: '100%', padding: '14px 16px', border: 'none', background: 'none', cursor: 'pointer', textAlign: 'left', fontSize: 14, fontWeight: 700, color: contextMsg.is_pinned ? '#D9534F' : '#0C6C9C', display: 'flex', alignItems: 'center', gap: 10 }}
+                style={{ width: '100%', padding: '14px 16px', border: 'none', background: 'none', cursor: 'pointer', textAlign: 'left', fontSize: 15, fontWeight: 700, color: contextMsg.is_pinned ? '#D9534F' : '#0C6C9C', display: 'flex', alignItems: 'center', gap: 10 }}
               >
                 <Clock size={16} color={contextMsg.is_pinned ? '#D9534F' : '#0C6C9C'} strokeWidth={2.2} />
                 {contextMsg.is_pinned ? 'Desfijar mensaje' : 'Fijar mensaje'}
               </button>
               <button
                 onClick={() => setContextMsg(null)}
-                style={{ width: '100%', padding: '12px 16px', border: 'none', background: '#F7F6F2', cursor: 'pointer', textAlign: 'center', fontSize: 13, fontWeight: 700, color: '#94A0AD' }}
+                style={{ width: '100%', padding: '12px 16px', border: 'none', background: '#F7F6F2', cursor: 'pointer', textAlign: 'center', fontSize: 14, fontWeight: 700, color: '#94A0AD' }}
               >
                 Cancelar
               </button>
@@ -552,7 +552,7 @@ ${lines}`
                 background: '#A6E3EC', display: 'flex',
                 alignItems: 'center', justifyContent: 'center', marginBottom: 2,
               }}>
-                <MessageCircle size={32} color="#0A4A6B" strokeWidth={1.8} />
+                <MessageCircle size={32} color="#0A4A6B" strokeWidth={2.1} />
               </div>
               <p style={{
                 fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontStyle: 'italic', fontWeight: 500,
@@ -560,7 +560,7 @@ ${lines}`
               }}>
                 Aquí la familia se mantiene cerca.
               </p>
-              <p style={{ fontSize: 14, color: '#6B7686', margin: 0 }}>
+              <p style={{ fontSize: 15, color: '#6B7686', margin: 0 }}>
                 Escribe el primer mensaje.
               </p>
             </div>
@@ -571,7 +571,7 @@ ${lines}`
               {/* Date separator */}
               <div style={{ display: 'flex', justifyContent: 'center', margin: '14px 0 12px' }}>
                 <span style={{
-                  fontSize: 13, fontWeight: 700, color: '#94A0AD',
+                  fontSize: 14, fontWeight: 700, color: '#94A0AD',
                   background: 'rgba(51,65,85,0.07)', padding: '5px 14px', borderRadius: 999,
                 }}>
                   {date}
@@ -621,7 +621,7 @@ ${lines}`
                         maxWidth: '78%',
                       }}>
                         {showName && (
-                          <span style={{ fontSize: 14, fontWeight: 700, color: '#6B7686', marginBottom: 3, marginLeft: 4 }}>
+                          <span style={{ fontSize: 15, fontWeight: 700, color: '#6B7686', marginBottom: 3, marginLeft: 4 }}>
                             {senderName.split(' ')[0]}
                           </span>
                         )}
@@ -629,7 +629,7 @@ ${lines}`
                         {catInfo && (
                           <span style={{
                             display: 'inline-flex', alignItems: 'center', gap: 4,
-                            fontSize: 12, fontWeight: 800, padding: '3px 9px', borderRadius: 999,
+                            fontSize: 14, fontWeight: 800, padding: '3px 9px', borderRadius: 999,
                             background: catInfo.bg, color: catInfo.ink,
                             margin: mine ? '0 4px 3px 0' : '0 0 3px 4px',
                           }}>
@@ -644,7 +644,7 @@ ${lines}`
                           borderRadius: mine ? '18px 18px 6px 18px' : '18px 18px 18px 6px',
                           background: mine ? 'linear-gradient(148deg, #1677A6 0%, #0C6C9C 46%, #0A5A82 100%)' : 'white',
                           color: mine ? 'white' : '#2A4350',
-                          fontSize: 14.5,
+                          fontSize: 16,
                           lineHeight: 1.48,
                           boxShadow: mine ? '0 6px 14px -8px rgba(5,92,81,0.55)' : '0 6px 14px -8px rgba(51,65,85,0.35)',
                           wordBreak: 'break-word',
@@ -654,7 +654,7 @@ ${lines}`
 
                         {/* Timestamp + pin indicator */}
                         <span style={{
-                          fontSize: 12, color: '#94A0AD',
+                          fontSize: 14, color: '#94A0AD',
                           marginTop: 3,
                           marginLeft: mine ? 0 : 4,
                           marginRight: mine ? 4 : 0,
@@ -677,10 +677,10 @@ ${lines}`
         {/* Input area */}
         <div style={{ padding: '8px 12px 16px', background: '#F7F6F2', flexShrink: 0 }}>
           {sendError && (
-            <p style={{ fontSize: 14, color: '#D9534F', marginBottom: 8 }}>{sendError}</p>
+            <p style={{ fontSize: 15, color: '#D9534F', marginBottom: 8 }}>{sendError}</p>
           )}
           {speechError && (
-            <p style={{ fontSize: 14, color: '#D9534F', marginBottom: 8 }}>
+            <p style={{ fontSize: 15, color: '#D9534F', marginBottom: 8 }}>
               {speechError}{' '}
               <button
                 onClick={clearError}
@@ -692,7 +692,7 @@ ${lines}`
           )}
           {recording && (
             <p style={{
-              fontSize: 14, marginBottom: 8, fontStyle: 'italic',
+              fontSize: 15, marginBottom: 8, fontStyle: 'italic',
               color: interim ? '#6B7686' : '#D9534F',
               fontWeight: interim ? 400 : 700,
             }}>
@@ -713,7 +713,7 @@ ${lines}`
                   <img src={miloAvatarImg} alt="" style={{ width: 22, height: 22, borderRadius: '50%', objectFit: 'cover', marginRight: -8, border: '2px solid #EFEDFC' }} />
                   <img src={lunaAvatarImg} alt="" style={{ width: 22, height: 22, borderRadius: '50%', objectFit: 'cover', border: '2px solid #EFEDFC' }} />
                 </span>
-                <p style={{ fontSize: 14, fontWeight: 800, color: '#0A4A6B', margin: 0, flex: 1 }}>
+                <p style={{ fontSize: 15, fontWeight: 800, color: '#0A4A6B', margin: 0, flex: 1 }}>
                   {assistantCard.type === 'catchup' ? 'Ponte al día' : 'Preguntar a Milo y Luna'}
                 </p>
                 <button
@@ -735,7 +735,7 @@ ${lines}`
                     autoFocus
                     style={{
                       flex: 1, padding: '9px 13px', borderRadius: 12,
-                      border: '1.5px solid rgba(12,108,156,0.35)', fontSize: 13.5,
+                      border: '1.5px solid rgba(12,108,156,0.35)', fontSize: 15,
                       outline: 'none', background: 'white', fontFamily: 'inherit', color: '#2A4350',
                     }}
                   />
@@ -746,7 +746,7 @@ ${lines}`
                     style={{
                       padding: '9px 16px', borderRadius: 12, border: 'none',
                       background: askInput.trim() ? 'linear-gradient(160deg, #1677A6, #0C6C9C)' : '#D9D6EE',
-                      color: 'white', fontWeight: 700, fontSize: 14, flexShrink: 0,
+                      color: 'white', fontWeight: 700, fontSize: 15, flexShrink: 0,
                       cursor: askInput.trim() ? 'pointer' : 'not-allowed',
                     }}
                   >
@@ -756,27 +756,27 @@ ${lines}`
               )}
 
               {assistantCard.loading && (
-                <p style={{ fontSize: 13, color: '#0A4A6B', margin: 0, fontStyle: 'italic' }}>Pensando...</p>
+                <p style={{ fontSize: 14, color: '#0A4A6B', margin: 0, fontStyle: 'italic' }}>Pensando...</p>
               )}
 
               {assistantCard.error && (
-                <p style={{ fontSize: 13, color: '#D9534F', margin: 0 }}>{assistantCard.error}</p>
+                <p style={{ fontSize: 14, color: '#D9534F', margin: 0 }}>{assistantCard.error}</p>
               )}
 
               {assistantCard.text && (
                 <div style={{ marginTop: assistantCard.question ? 10 : 0 }}>
                   {assistantCard.question && (
-                    <p style={{ fontSize: 14, color: '#6B7686', margin: '0 0 8px', fontStyle: 'italic' }}>
+                    <p style={{ fontSize: 15, color: '#6B7686', margin: '0 0 8px', fontStyle: 'italic' }}>
                       "{assistantCard.question}"
                     </p>
                   )}
                   <div style={{ padding: '11px 13px', background: 'white', borderRadius: 12, border: '1px solid rgba(12,108,156,0.18)' }}>
-                    <p style={{ fontSize: 13.5, color: '#2A4350', lineHeight: 1.58, margin: 0 }}>
+                    <p style={{ fontSize: 15, color: '#2A4350', lineHeight: 1.58, margin: 0 }}>
                       {assistantCard.text}
                     </p>
                   </div>
                   {assistantCard.type === 'catchup' && !assistantCard.upToDate && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 8, fontSize: 13, fontWeight: 700, color: '#0A4A6B', opacity: 0.85 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 8, fontSize: 14, fontWeight: 700, color: '#0A4A6B', opacity: 0.85 }}>
                       <Sparkles size={11} color="#0A4A6B" strokeWidth={2.2} />
                       Solo tú ves este resumen
                     </div>
@@ -795,7 +795,7 @@ ${lines}`
             {/* Etiquetas plegadas: para escribir solo hace falta la caja (UX nov 2026) */}
             {!showTags && (
               <button type="button" onClick={() => setShowTags(true)}
-                style={{ background: 'none', border: 'none', padding: '0 4px 8px', cursor: 'pointer', fontSize: 13, fontWeight: 600, color: msgCategory !== 'general' ? '#0A4A6B' : '#5E7480' }}>
+                style={{ background: 'none', border: 'none', padding: '0 4px 8px', cursor: 'pointer', fontSize: 14, fontWeight: 600, color: msgCategory !== 'general' ? '#0A4A6B' : '#5E7480' }}>
                 {msgCategory !== 'general' ? `🏷️ Marcado como: ${metaFor(msgCategory).label} · cambiar` : '🏷️ Marcar como aviso, algo pasó o foto'}
               </button>
             )}
@@ -816,7 +816,7 @@ ${lines}`
                       border: `1.5px solid ${selected ? m.solid : m.border}`,
                       background: selected ? m.solid : m.bg,
                       color: selected ? '#FFFFFF' : m.ink,
-                      fontSize: 13, fontWeight: 700, cursor: 'pointer',
+                      fontSize: 14, fontWeight: 700, cursor: 'pointer',
                       flexShrink: 0, whiteSpace: 'nowrap',
                       transition: 'all 0.15s',
                     }}
@@ -840,7 +840,7 @@ ${lines}`
                 style={{
                   flex: 1, padding: '11px 16px',
                   border: '1px solid rgba(51,65,85,0.12)', borderRadius: 999,
-                  fontSize: 14, outline: 'none', resize: 'none',
+                  fontSize: 15, outline: 'none', resize: 'none',
                   background: '#F7F6F2', lineHeight: 1.4,
                   fontFamily: 'inherit', color: '#2A4350',
                   transition: 'border-color 0.15s',
@@ -870,7 +870,7 @@ ${lines}`
                 disabled={!input.trim()}
                 loadingText="..."
                 style={{
-                  padding: '11px 18px', borderRadius: 999, fontSize: 13, flexShrink: 0,
+                  padding: '11px 18px', borderRadius: 999, fontSize: 14, flexShrink: 0,
                   background: '#0C6C9C', boxShadow: sending || !input.trim() ? 'none' : '0 6px 14px -6px rgba(12,108,156,0.5)',
                 }}
               >
@@ -902,7 +902,7 @@ ${lines}`
                 </span>
                 <div>
                   <h2 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: '#0A4A6B' }}>Milo y Luna</h2>
-                  <p style={{ margin: '1px 0 0', fontSize: 14, color: '#6B7686' }}>
+                  <p style={{ margin: '1px 0 0', fontSize: 15, color: '#6B7686' }}>
                     Tus compañeros para el cuidado de {patientFirstName ?? 'tu familiar'}
                   </p>
                 </div>
@@ -922,8 +922,8 @@ ${lines}`
                   <Clock size={19} color="#0A4A6B" strokeWidth={2} />
                 </span>
                 <span>
-                  <p style={{ fontSize: 14.5, fontWeight: 800, color: '#2A4350', margin: '0 0 2px' }}>Ponte al día</p>
-                  <p style={{ fontSize: 14, color: '#6B7686', margin: 0, lineHeight: 1.35 }}>Te resumimos lo que pasó en el chat desde tu última visita.</p>
+                  <p style={{ fontSize: 16, fontWeight: 800, color: '#2A4350', margin: '0 0 2px' }}>Ponte al día</p>
+                  <p style={{ fontSize: 15, color: '#6B7686', margin: 0, lineHeight: 1.35 }}>Te resumimos lo que pasó en el chat desde tu última visita.</p>
                 </span>
               </button>
 
@@ -940,8 +940,8 @@ ${lines}`
                   <MessageCircle size={19} color="#0A4A6B" strokeWidth={2} />
                 </span>
                 <span>
-                  <p style={{ fontSize: 14.5, fontWeight: 800, color: '#2A4350', margin: '0 0 2px' }}>Preguntar a Milo y Luna</p>
-                  <p style={{ fontSize: 14, color: '#6B7686', margin: 0, lineHeight: 1.35 }}>
+                  <p style={{ fontSize: 16, fontWeight: 800, color: '#2A4350', margin: '0 0 2px' }}>Preguntar a Milo y Luna</p>
+                  <p style={{ fontSize: 15, color: '#6B7686', margin: 0, lineHeight: 1.35 }}>
                     Escribe lo que quieras saber sobre el cuidado de {patientFirstName ?? 'tu familiar'}.
                   </p>
                 </span>

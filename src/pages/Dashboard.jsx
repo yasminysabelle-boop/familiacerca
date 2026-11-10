@@ -157,12 +157,12 @@ function PendingCard({ evt, confirming, onConfirm, todayKey, isFamiliar }) {
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
         <span style={{ fontSize: 20, flexShrink: 0, marginTop: 1 }}>⚠️</span>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ fontSize: 14, fontWeight: 700, color: '#7A5A18', margin: 0, lineHeight: 1.4 }}>
+          <p style={{ fontSize: 15, fontWeight: 700, color: '#7A5A18', margin: 0, lineHeight: 1.4 }}>
             {medLabel} pendiente
             {ago && <span style={{ fontWeight: 400, color: '#A07020' }}> — {ago}</span>}
           </p>
           {evt.medTime && (
-            <p style={{ fontSize: 13, color: '#A07020', marginTop: 2 }}>
+            <p style={{ fontSize: 14, color: '#A07020', marginTop: 2 }}>
               Programado a las {fmtTime(evt.medTime)}
             </p>
           )}
@@ -175,7 +175,7 @@ function PendingCard({ evt, confirming, onConfirm, todayKey, isFamiliar }) {
           style={{
             marginTop: 10, width: '100%', padding: '9px 0',
             background: busy ? '#C9D6DB' : 'linear-gradient(135deg, #2BB8CC, #0C6C9C)',
-            color: 'white', fontWeight: 700, fontSize: 13,
+            color: 'white', fontWeight: 700, fontSize: 14,
             borderRadius: 10, border: 'none',
             cursor: busy ? 'not-allowed' : 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
@@ -204,16 +204,16 @@ function MissedCard({ evt }) {
     }}>
       <span style={{ fontSize: 20, flexShrink: 0 }}>⚠️</span>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ fontSize: 13, fontWeight: 700, color: '#D63031', margin: 0 }}>
+        <p style={{ fontSize: 14, fontWeight: 700, color: '#D63031', margin: 0 }}>
           {medLabel} — no se dio
         </p>
         {evt.medTime && (
-          <p style={{ fontSize: 13, color: '#5E7480', marginTop: 2 }}>
+          <p style={{ fontSize: 14, color: '#5E7480', marginTop: 2 }}>
             Programado a las {fmtTime(evt.medTime)}
           </p>
         )}
       </div>
-      <span style={{ fontSize: 13, fontWeight: 700, color: '#D63031', background: '#FFF0F0', padding: '3px 8px', borderRadius: 6, flexShrink: 0 }}>
+      <span style={{ fontSize: 14, fontWeight: 700, color: '#D63031', background: '#FFF0F0', padding: '3px 8px', borderRadius: 6, flexShrink: 0 }}>
         No dado
       </span>
     </div>
@@ -229,15 +229,15 @@ function ConfirmedCard({ evt, onTap }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         <span style={{ fontSize: 16, flexShrink: 0 }}>💊</span>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ fontSize: 13, fontWeight: 600, color: '#0A4A6B', margin: 0, lineHeight: 1.4 }}>
+          <p style={{ fontSize: 14, fontWeight: 600, color: '#0A4A6B', margin: 0, lineHeight: 1.4 }}>
             {time && <span style={{ fontWeight: 400, color: '#0A4A6B' }}>{time} — </span>}
             {name ? `${name} dio ${medLabel}` : medLabel}
           </p>
           {evt.latitude && (
             <a href={mapsUrl(evt.latitude, evt.longitude)} target="_blank" rel="noopener noreferrer"
               style={{ display: 'inline-flex', alignItems: 'center', gap: 3, marginTop: 3, textDecoration: 'none' }}>
-              <span style={{ fontSize: 13 }}>📍</span>
-              <span style={{ fontSize: 13, color: '#3B82F6' }}>{evt.address ?? 'Ver ubicación'}</span>
+              <span style={{ fontSize: 14 }}>📍</span>
+              <span style={{ fontSize: 14, color: '#3B82F6' }}>{evt.address ?? 'Ver ubicación'}</span>
             </a>
           )}
         </div>
@@ -266,11 +266,11 @@ function ReactionBar({ eventKey, reactions, userId, onToggle }) {
               padding: '3px 8px', borderRadius: 20,
               background: mine ? '#E3F1F8' : '#F3F4F6',
               border: mine ? '1px solid #0A5A82' : '1px solid #E5E7EB',
-              cursor: 'pointer', fontSize: 13, lineHeight: 1,
+              cursor: 'pointer', fontSize: 14, lineHeight: 1,
               transition: 'all 0.15s',
             }}>
             <span>{emoji}</span>
-            {count > 0 && <span style={{ fontSize: 13, color: mine ? '#0A5A82' : '#4E6470', fontWeight: 600 }}>{count}</span>}
+            {count > 0 && <span style={{ fontSize: 14, color: mine ? '#0A5A82' : '#4E6470', fontWeight: 600 }}>{count}</span>}
           </button>
         )
       })}
@@ -297,20 +297,20 @@ function MemoryCard({ evt, onTap }) {
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         <span style={{ fontSize: 16, flexShrink: 0 }}>🎙️</span>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ fontSize: 13, fontWeight: 600, color: '#14303D', margin: 0 }}>
+          <p style={{ fontSize: 14, fontWeight: 600, color: '#14303D', margin: 0 }}>
             {name ? `${name} dejó una memoria` : 'Memoria de voz'}
             {evt.mood && <span style={{ marginLeft: 5 }}>{emoji}</span>}
           </p>
           {evt.transcription && (
             <p style={{
-              fontSize: 13, color: '#5E7480', marginTop: 2,
+              fontSize: 14, color: '#5E7480', marginTop: 2,
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
             }}>
               {evt.transcription}
             </p>
           )}
         </div>
-        <span style={{ fontSize: 13, color: '#5E7480', flexShrink: 0 }}>▶ Escuchar</span>
+        <span style={{ fontSize: 14, color: '#5E7480', flexShrink: 0 }}>▶ Escuchar</span>
       </div>
     </div>
   )
@@ -330,11 +330,11 @@ function SosCard({ evt, onTap }) {
     }}>
       <span style={{ fontSize: 18, flexShrink: 0 }}>{evt.resolved ? '✅' : '🚨'}</span>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ fontSize: 13, fontWeight: 700, color: evt.resolved ? '#30454F' : '#D63031', margin: 0 }}>
+        <p style={{ fontSize: 14, fontWeight: 700, color: evt.resolved ? '#30454F' : '#D63031', margin: 0 }}>
           {evt.resolved ? 'Emergencia resuelta' : `EMERGENCIA — ${name}`}
         </p>
         {evt.address && (
-          <p style={{ fontSize: 13, color: '#4E6470', marginTop: 2 }}>📍 {evt.address}</p>
+          <p style={{ fontSize: 14, color: '#4E6470', marginTop: 2 }}>📍 {evt.address}</p>
         )}
       </div>
       {evt.latitude && evt.longitude && !evt.resolved && (
@@ -346,7 +346,7 @@ function SosCard({ evt, onTap }) {
           style={{
             padding: '5px 10px', borderRadius: 8,
             background: '#D63031', color: 'white',
-            fontSize: 13, fontWeight: 700, textDecoration: 'none', flexShrink: 0,
+            fontSize: 14, fontWeight: 700, textDecoration: 'none', flexShrink: 0,
           }}
         >
           Ver mapa
@@ -369,12 +369,12 @@ function ExpenseCard({ evt, onTap }) {
     }}>
       <span style={{ fontSize: 16, flexShrink: 0 }}>💰</span>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ fontSize: 13, fontWeight: 600, color: '#14303D', margin: 0 }}>
+        <p style={{ fontSize: 14, fontWeight: 600, color: '#14303D', margin: 0 }}>
           {name ? `${name} pagó ${evt.description}` : evt.description}
         </p>
       </div>
       {evt.amount != null && (
-        <span style={{ fontSize: 14, fontWeight: 700, color: '#0A5A82', flexShrink: 0 }}>
+        <span style={{ fontSize: 15, fontWeight: 700, color: '#0A5A82', flexShrink: 0 }}>
           ${Number(evt.amount).toFixed(2)}
         </span>
       )}
@@ -403,12 +403,12 @@ function AppointmentCard({ evt, todayKey, tomorrowKey }) {
     >
       <span style={{ fontSize: 16, flexShrink: 0 }}>📅</span>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ fontSize: 13, fontWeight: 600, color: '#14303D', margin: 0 }}>
+        <p style={{ fontSize: 14, fontWeight: 600, color: '#14303D', margin: 0 }}>
           {evt.appointmentTitle}
         </p>
-        <p style={{ fontSize: 13, color: '#3B82F6', marginTop: 2 }}>{timeText}</p>
+        <p style={{ fontSize: 14, color: '#3B82F6', marginTop: 2 }}>{timeText}</p>
       </div>
-      <span style={{ color: '#BBBBBB', fontSize: 14 }}>›</span>
+      <span style={{ color: '#BBBBBB', fontSize: 15 }}>›</span>
     </Link>
   )
 }
@@ -436,15 +436,15 @@ function AppointmentProofCard({ evt, onTap }) {
         <span style={{ fontSize: 22, flexShrink: 0 }}>📅</span>
       )}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ fontSize: 13, fontWeight: 600, color: '#14303D', margin: 0 }}>
+        <p style={{ fontSize: 14, fontWeight: 600, color: '#14303D', margin: 0 }}>
           {evt.appointmentTitle}
         </p>
-        <p style={{ fontSize: 13, color: '#0C6C9C', marginTop: 2, fontWeight: 600 }}>
+        <p style={{ fontSize: 14, color: '#0C6C9C', marginTop: 2, fontWeight: 600 }}>
           ✓ Asistencia confirmada
           {evt.appointmentTime ? ` · ${fmtTime(evt.appointmentTime)}` : ''}
         </p>
         {evt.proofNotes && (
-          <p style={{ fontSize: 13, color: '#4E6470', marginTop: 2 }}>{evt.proofNotes}</p>
+          <p style={{ fontSize: 14, color: '#4E6470', marginTop: 2 }}>{evt.proofNotes}</p>
         )}
       </div>
     </div>
@@ -459,10 +459,10 @@ function CaregiverCard({ evt }) {
       padding: '14px 16px',
       boxShadow: '0 2px 8px rgba(124,92,191,0.12)',
     }}>
-      <p style={{ fontSize: 14, fontWeight: 700, color: '#5B21B6', margin: '0 0 4px' }}>
+      <p style={{ fontSize: 15, fontWeight: 700, color: '#5B21B6', margin: '0 0 4px' }}>
         💙 Reconocimiento semanal
       </p>
-      <p style={{ fontSize: 13, color: '#6D28D9', lineHeight: 1.5, margin: 0 }}>
+      <p style={{ fontSize: 14, color: '#6D28D9', lineHeight: 1.5, margin: 0 }}>
         {evt.caregiverName.split(' ')[0]} coordinó{' '}
         <strong>{evt.weekCount} dosis</strong> esta semana.
         El cuidado invisible merece ser visto. 💙
@@ -478,8 +478,8 @@ function DetailRow({ icon, label, value }) {
     <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
       <span style={{ fontSize: 16, flexShrink: 0, marginTop: 1 }}>{icon}</span>
       <div>
-        <p style={{ fontSize: 13, color: '#5E7480', margin: 0 }}>{label}</p>
-        <p style={{ fontSize: 13, color: '#14303D', fontWeight: 500, margin: '1px 0 0' }}>{value}</p>
+        <p style={{ fontSize: 14, color: '#5E7480', margin: 0 }}>{label}</p>
+        <p style={{ fontSize: 14, color: '#14303D', fontWeight: 500, margin: '1px 0 0' }}>{value}</p>
       </div>
     </div>
   )
@@ -568,7 +568,7 @@ function MedConfirmedDetail({ evt }) {
           <p style={{ fontSize: 18, fontWeight: 700, color: '#14303D', margin: 0 }}>
             {[evt.medName, evt.medDosage].filter(Boolean).join(' · ')}
           </p>
-          <p style={{ fontSize: 14, color: '#2BB8CC', fontWeight: 600, margin: '3px 0 0' }}>Medicamento dado ✅</p>
+          <p style={{ fontSize: 15, color: '#2BB8CC', fontWeight: 600, margin: '3px 0 0' }}>Medicamento dado ✅</p>
         </div>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -578,9 +578,9 @@ function MedConfirmedDetail({ evt }) {
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
             <span style={{ fontSize: 16, flexShrink: 0, marginTop: 1 }}>📍</span>
             <div>
-              <p style={{ fontSize: 13, color: '#5E7480', margin: 0 }}>Ubicación</p>
+              <p style={{ fontSize: 14, color: '#5E7480', margin: 0 }}>Ubicación</p>
               <a href={mapsUrl(evt.latitude, evt.longitude)} target="_blank" rel="noopener noreferrer"
-                style={{ fontSize: 13, color: '#3B82F6', textDecoration: 'none', fontWeight: 500 }}>
+                style={{ fontSize: 14, color: '#3B82F6', textDecoration: 'none', fontWeight: 500 }}>
                 {evt.address ?? 'Ver en mapa'} →
               </a>
             </div>
@@ -592,9 +592,9 @@ function MedConfirmedDetail({ evt }) {
           <div style={{ background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: 12, padding: '12px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <span>⚠️</span>
-              <span style={{ fontSize: 13, fontWeight: 600, color: '#9A3412' }}>Falta la foto de prueba</span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: '#9A3412' }}>Falta la foto de prueba</span>
             </div>
-            <button onClick={() => setEditing(true)} style={{ padding: '6px 12px', background: '#F97316', color: 'white', border: 'none', borderRadius: 8, fontSize: 14, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
+            <button onClick={() => setEditing(true)} style={{ padding: '6px 12px', background: '#F97316', color: 'white', border: 'none', borderRadius: 8, fontSize: 15, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
               📷 Agregar
             </button>
           </div>
@@ -604,8 +604,8 @@ function MedConfirmedDetail({ evt }) {
         {!editing && photoUrl && (
           <div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-              <p style={{ fontSize: 13, color: '#5E7480', margin: 0 }}>Foto de prueba</p>
-              <button onClick={() => setEditing(true)} style={{ padding: '4px 10px', background: 'none', border: '1px solid #D1D5DB', borderRadius: 7, fontSize: 14, fontWeight: 600, color: '#30454F', cursor: 'pointer' }}>
+              <p style={{ fontSize: 14, color: '#5E7480', margin: 0 }}>Foto de prueba</p>
+              <button onClick={() => setEditing(true)} style={{ padding: '4px 10px', background: 'none', border: '1px solid #D1D5DB', borderRadius: 7, fontSize: 15, fontWeight: 600, color: '#30454F', cursor: 'pointer' }}>
                 Cambiar
               </button>
             </div>
@@ -616,7 +616,7 @@ function MedConfirmedDetail({ evt }) {
         {/* Photo — upload form */}
         {editing && (
           <div>
-            <p style={{ fontSize: 13, color: '#5E7480', margin: '0 0 8px' }}>
+            <p style={{ fontSize: 14, color: '#5E7480', margin: '0 0 8px' }}>
               {photoUrl ? 'Reemplazar foto de prueba' : 'Agregar foto de prueba'}
             </p>
             <input ref={attachFileRef} type="file" accept="image/*" capture="environment" style={{ display: 'none' }} onChange={handleAttachPhotoChange} />
@@ -629,30 +629,30 @@ function MedConfirmedDetail({ evt }) {
               {attachStamping ? (
                 <div style={{ height: 110, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, color: '#5E7480' }}>
                   <div style={{ width: 20, height: 20, border: '2px solid #0A5A82', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
-                  <span style={{ fontSize: 14 }}>Aplicando sello...</span>
+                  <span style={{ fontSize: 15 }}>Aplicando sello...</span>
                 </div>
               ) : attachPreview ? (
                 <div>
                   <img src={attachPreview} style={{ width: '100%', maxHeight: 180, objectFit: 'cover' }} alt="Nueva prueba" />
-                  <p style={{ fontSize: 13, color: '#5E7480', textAlign: 'center', padding: '6px 0 8px', margin: 0 }}>Toca para cambiar</p>
+                  <p style={{ fontSize: 14, color: '#5E7480', textAlign: 'center', padding: '6px 0 8px', margin: 0 }}>Toca para cambiar</p>
                 </div>
               ) : photoUrl ? (
                 <div style={{ position: 'relative' }}>
                   <img src={photoUrl} style={{ width: '100%', maxHeight: 180, objectFit: 'cover', opacity: 0.35 }} alt="Foto actual" />
                   <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
                     <span style={{ fontSize: 24 }}>📷</span>
-                    <span style={{ fontSize: 14, fontWeight: 600, color: '#30454F' }}>Toca para reemplazar</span>
+                    <span style={{ fontSize: 15, fontWeight: 600, color: '#30454F' }}>Toca para reemplazar</span>
                   </div>
                 </div>
               ) : (
                 <div style={{ height: 110, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, color: '#5E7480' }}>
                   <span style={{ fontSize: 28 }}>📷</span>
-                  <span style={{ fontSize: 14 }}>Toca para tomar foto</span>
+                  <span style={{ fontSize: 15 }}>Toca para tomar foto</span>
                 </div>
               )}
             </button>
             {attachError && (
-              <div style={{ marginBottom: 10, padding: '10px 12px', background: '#FFF0F0', border: '1px solid #FFBABA', borderRadius: 10, fontSize: 13, color: '#D63031', display: 'flex', alignItems: 'center', gap: 6 }}>
+              <div style={{ marginBottom: 10, padding: '10px 12px', background: '#FFF0F0', border: '1px solid #FFBABA', borderRadius: 10, fontSize: 14, color: '#D63031', display: 'flex', alignItems: 'center', gap: 6 }}>
                 <span>⚠</span>{attachError}
               </div>
             )}
@@ -660,13 +660,13 @@ function MedConfirmedDetail({ evt }) {
               <button
                 onClick={submitAttachPhoto}
                 disabled={attachSaving || attachStamping}
-                style={{ flex: 1, padding: '11px', borderRadius: 12, border: 'none', background: '#0A5A82', color: 'white', fontWeight: 700, fontSize: 13, cursor: (attachSaving || attachStamping) ? 'default' : 'pointer', opacity: (attachSaving || attachStamping) ? 0.6 : 1 }}
+                style={{ flex: 1, padding: '11px', borderRadius: 12, border: 'none', background: '#0A5A82', color: 'white', fontWeight: 700, fontSize: 14, cursor: (attachSaving || attachStamping) ? 'default' : 'pointer', opacity: (attachSaving || attachStamping) ? 0.6 : 1 }}
               >
                 {attachSaving ? 'Guardando...' : '✓ Guardar foto'}
               </button>
               <button
                 onClick={() => { setEditing(false); setAttachFile(null); setAttachPreview(null); setAttachError('') }}
-                style={{ flex: 1, padding: '11px', borderRadius: 12, border: '1px solid #E5E7EB', background: 'none', color: '#30454F', fontWeight: 600, fontSize: 13, cursor: 'pointer' }}
+                style={{ flex: 1, padding: '11px', borderRadius: 12, border: '1px solid #E5E7EB', background: 'none', color: '#30454F', fontWeight: 600, fontSize: 14, cursor: 'pointer' }}
               >
                 Cancelar
               </button>
@@ -692,7 +692,7 @@ function VoiceMemoryDetail({ evt }) {
             <span style={{
               display: 'inline-block', marginTop: 4,
               padding: '2px 10px', borderRadius: 20,
-              background: color + '20', fontSize: 13, color, fontWeight: 600,
+              background: color + '20', fontSize: 14, color, fontWeight: 600,
             }}>
               {emoji}
             </span>
@@ -704,13 +704,13 @@ function VoiceMemoryDetail({ evt }) {
         {time && <DetailRow icon="🕐" label="Hora" value={time} />}
         {evt.audioUrl && (
           <div>
-            <p style={{ fontSize: 13, color: '#5E7480', margin: '0 0 8px' }}>Reproducir</p>
+            <p style={{ fontSize: 14, color: '#5E7480', margin: '0 0 8px' }}>Reproducir</p>
             <audio src={evt.audioUrl} controls style={{ width: '100%', height: 40, borderRadius: 8 }} />
           </div>
         )}
         {evt.transcription && (
           <div style={{ padding: '12px 14px', background: '#F9FAFB', borderRadius: 12, border: '1px solid #E5E7EB' }}>
-            <p style={{ fontSize: 13, color: '#30454F', lineHeight: 1.6, margin: 0, fontStyle: 'italic' }}>
+            <p style={{ fontSize: 14, color: '#30454F', lineHeight: 1.6, margin: 0, fontStyle: 'italic' }}>
               "{evt.transcription}"
             </p>
           </div>
@@ -731,14 +731,14 @@ function NoteDetail({ evt }) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
         {evt.noteText && (
           <div style={{ padding: '12px 14px', background: '#F9FAFB', borderRadius: 12, border: '1px solid #E5E7EB' }}>
-            <p style={{ fontSize: 13, color: '#30454F', lineHeight: 1.6, margin: 0 }}>{evt.noteText}</p>
+            <p style={{ fontSize: 14, color: '#30454F', lineHeight: 1.6, margin: 0 }}>{evt.noteText}</p>
           </div>
         )}
         {evt.authorName && <DetailRow icon="👤" label="Escrito por" value={evt.authorName} />}
         {time && <DetailRow icon="🕐" label="Hora" value={time} />}
         {evt.photoUrl && (
           <div>
-            <p style={{ fontSize: 13, color: '#5E7480', margin: '0 0 8px' }}>Foto adjunta</p>
+            <p style={{ fontSize: 14, color: '#5E7480', margin: '0 0 8px' }}>Foto adjunta</p>
             <img src={evt.photoUrl} alt="Adjunto" style={{ width: '100%', borderRadius: 12, maxHeight: 220, objectFit: 'cover' }} />
           </div>
         )}
@@ -757,7 +757,7 @@ function ExpenseDetail({ evt }) {
           <p style={{ fontSize: 22, fontWeight: 700, color: '#0A5A82', margin: 0 }}>
             ${evt.amount != null ? Number(evt.amount).toFixed(2) : '—'}
           </p>
-          <p style={{ fontSize: 13, color: '#4E6470', margin: '2px 0 0' }}>{evt.description}</p>
+          <p style={{ fontSize: 14, color: '#4E6470', margin: '2px 0 0' }}>{evt.description}</p>
         </div>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -765,7 +765,7 @@ function ExpenseDetail({ evt }) {
         {time && <DetailRow icon="🕐" label="Hora" value={time} />}
         {evt.receiptUrl && (
           <div>
-            <p style={{ fontSize: 13, color: '#5E7480', margin: '0 0 8px' }}>Recibo</p>
+            <p style={{ fontSize: 14, color: '#5E7480', margin: '0 0 8px' }}>Recibo</p>
             <img src={evt.receiptUrl} alt="Recibo" style={{ width: '100%', borderRadius: 12, maxHeight: 220, objectFit: 'cover' }} />
           </div>
         )}
@@ -790,7 +790,7 @@ function SosDetail({ evt }) {
           <p style={{ fontSize: 16, fontWeight: 700, color: evt.resolved ? '#30454F' : '#D63031', margin: 0 }}>
             {evt.resolved ? 'Emergencia resuelta' : 'EMERGENCIA'}
           </p>
-          <p style={{ fontSize: 14, color: '#4E6470', margin: '2px 0 0' }}>
+          <p style={{ fontSize: 15, color: '#4E6470', margin: '2px 0 0' }}>
             {evt.resolved ? 'Esta alerta fue atendida' : 'Alerta activa'}
           </p>
         </div>
@@ -809,7 +809,7 @@ function SosDetail({ evt }) {
               padding: '14px', borderRadius: 16, marginTop: 4,
               background: evt.resolved ? '#F3F4F6' : 'linear-gradient(135deg, #D63031, #B82020)',
               color: evt.resolved ? '#30454F' : 'white',
-              fontWeight: 700, fontSize: 14, textDecoration: 'none',
+              fontWeight: 700, fontSize: 15, textDecoration: 'none',
               boxShadow: evt.resolved ? 'none' : '0 6px 20px rgba(214,48,49,0.35)',
             }}
           >
@@ -853,7 +853,7 @@ function EventDetailSheet({ evt, onClose, onAttachProof, isFamiliar }) {
           <div style={{ width: 40, height: 4, borderRadius: 2, background: '#E5E7EB' }} />
         </div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 20px 0' }}>
-          <p style={{ fontSize: 13, color: '#5E7480', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>
+          <p style={{ fontSize: 14, color: '#5E7480', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', margin: 0 }}>
             {TITLES[evt.type] ?? 'Detalle'}
           </p>
           <button aria-label="Cerrar"
@@ -896,7 +896,7 @@ function EventDetailSheet({ evt, onClose, onAttachProof, isFamiliar }) {
                   )}
                   {evt.proofPhotoUrl && (
                     <div>
-                      <p style={{ fontSize: 13, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
+                      <p style={{ fontSize: 14, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
                         Comprobante
                       </p>
                       <img
@@ -914,7 +914,7 @@ function EventDetailSheet({ evt, onClose, onAttachProof, isFamiliar }) {
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                     padding: '14px', borderRadius: 14, border: 'none',
                     background: 'linear-gradient(135deg, #0C6C9C, #0A5A82)',
-                    color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer',
+                    color: 'white', fontWeight: 700, fontSize: 15, cursor: 'pointer',
                     boxShadow: '0 4px 14px rgba(12,108,156,0.3)',
                   }}
                 >
@@ -939,7 +939,7 @@ function EventDetailSheet({ evt, onClose, onAttachProof, isFamiliar }) {
               )}
               {evt.proofPhotoUrl && (
                 <div>
-                  <p style={{ fontSize: 13, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
+                  <p style={{ fontSize: 14, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
                     Foto de prueba
                   </p>
                   <img
@@ -998,10 +998,10 @@ function EmptyState({ profile }) {
       <div style={{ fontSize: 44, marginBottom: 12 }}>
         {profile ? '💊' : '🌱'}
       </div>
-      <p style={{ fontSize: 14, fontWeight: 600, color: '#14303D', marginBottom: 6 }}>
+      <p style={{ fontSize: 15, fontWeight: 600, color: '#14303D', marginBottom: 6 }}>
         {profile ? 'Todo tranquilo por aquí' : 'Bienvenido a FamiliaCerca'}
       </p>
-      <p style={{ fontSize: 14, color: '#5E7480', marginBottom: 20, lineHeight: 1.6 }}>
+      <p style={{ fontSize: 15, color: '#5E7480', marginBottom: 20, lineHeight: 1.6 }}>
         {profile
           ? 'El historial de cuidado aparecerá aquí. Agrega medicamentos para comenzar.'
           : 'Configura el perfil familiar para comenzar a registrar el cuidado.'}
@@ -1012,7 +1012,7 @@ function EmptyState({ profile }) {
           display: 'inline-flex', alignItems: 'center', gap: 6,
           padding: '10px 20px', borderRadius: 12,
           background: 'linear-gradient(135deg, #0A5A82, #0A4A6B)',
-          color: 'white', fontWeight: 700, fontSize: 13,
+          color: 'white', fontWeight: 700, fontSize: 14,
           textDecoration: 'none',
         }}
       >
@@ -1091,11 +1091,11 @@ function DaySection({
         }}
       >
         {ss.dot && (
-          <span style={{ fontSize: 12, flexShrink: 0, lineHeight: 1 }}>{ss.dot}</span>
+          <span style={{ fontSize: 14, flexShrink: 0, lineHeight: 1 }}>{ss.dot}</span>
         )}
         <div style={{ flex: 1, minWidth: 0 }}>
           <span style={{
-            fontSize: 14, fontWeight: 700,
+            fontSize: 15, fontWeight: 700,
             color: isExpanded ? '#5E7480' : '#30454F',
             display: 'block',
             transition: 'color 0.2s ease',
@@ -1104,7 +1104,7 @@ function DaySection({
           </span>
           {!isExpanded && lastUpdateText && (
             <span style={{
-              fontSize: 13, color: '#5E7480',
+              fontSize: 14, color: '#5E7480',
               display: 'block', marginTop: 2,
             }}>
               última actualización {lastUpdateText}
@@ -1112,7 +1112,7 @@ function DaySection({
           )}
         </div>
         <span style={{
-          fontSize: 14, color: '#9AADA3', flexShrink: 0,
+          fontSize: 15, color: '#9AADA3', flexShrink: 0,
           display: 'inline-block',
           transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
           transition: 'transform 0.25s ease',
@@ -1140,7 +1140,7 @@ function DaySection({
                 padding: '14px 4px',
               }}>
                 <span style={{ fontSize: 16, opacity: 0.4 }}>🗓️</span>
-                <p style={{ fontSize: 13, color: '#5E7480', margin: 0 }}>Sin actividad registrada</p>
+                <p style={{ fontSize: 14, color: '#5E7480', margin: 0 }}>Sin actividad registrada</p>
               </div>
             ) : CATEGORY_GROUPS.map(group => {
               const groupEvts = section.events.filter(e => group.types.includes(e.type))
@@ -1152,11 +1152,11 @@ function DaySection({
                     paddingBottom: 6, marginBottom: 8,
                     borderBottom: '1px solid #F3F4F6',
                   }}>
-                    <span style={{ fontSize: 13 }}>{group.emoji}</span>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                    <span style={{ fontSize: 14 }}>{group.emoji}</span>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                       {group.label}
                     </span>
-                    <span style={{ fontSize: 12, color: '#9AADA3' }}>{groupEvts.length}</span>
+                    <span style={{ fontSize: 14, color: '#9AADA3' }}>{groupEvts.length}</span>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                     {groupEvts.map(evt => (
@@ -1216,13 +1216,13 @@ function AiCard({ type, text }) {
       boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
     }}>
       <p style={{
-        fontSize: 12, fontWeight: 700, letterSpacing: '0.08em',
+        fontSize: 14, fontWeight: 700, letterSpacing: '0.08em',
         textTransform: 'uppercase', color: c.textColor, opacity: 0.7,
         margin: '0 0 6px',
       }}>
         {c.icon} {c.label} · IA
       </p>
-      <p style={{ fontSize: 13, color: c.textColor, lineHeight: 1.6, margin: 0 }}>{text}</p>
+      <p style={{ fontSize: 14, color: c.textColor, lineHeight: 1.6, margin: 0 }}>{text}</p>
     </div>
   )
 }
@@ -1249,11 +1249,11 @@ function StatusCard({ icon, title, subtitle, status, statusType, to, onClick, pu
       overflow: 'hidden', minWidth: 0,
     }}>
       <span style={{ fontSize: 34, lineHeight: 1, display: 'block' }}>{icon}</span>
-      <p style={{ fontSize: 14, fontWeight: 700, color: '#14303D', margin: 0, lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</p>
+      <p style={{ fontSize: 15, fontWeight: 700, color: '#14303D', margin: 0, lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</p>
       {subtitle && (
-        <p style={{ fontSize: 13, color: '#5E7480', margin: 0, lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{subtitle}</p>
+        <p style={{ fontSize: 14, color: '#5E7480', margin: 0, lineHeight: 1.3, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{subtitle}</p>
       )}
-      <p style={{ fontSize: 13, fontWeight: 700, color: s.statusColor, margin: 'auto 0 0', paddingTop: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+      <p style={{ fontSize: 14, fontWeight: 700, color: s.statusColor, margin: 'auto 0 0', paddingTop: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {s.statusIcon} {status}
       </p>
     </div>
@@ -1298,7 +1298,7 @@ function SosConfirmSheet({ open, onClose, onConfirm, patientProfile, patientName
           <div style={{ width: 36, height: 4, borderRadius: 4, background: '#E6E3DB', margin: '0 auto 14px' }} />
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
             <div>
-              <p style={{ fontSize: 14, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#D9534F', margin: '0 0 4px' }}>Emergencia para</p>
+              <p style={{ fontSize: 15, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#D9534F', margin: '0 0 4px' }}>Emergencia para</p>
               <h3 style={{ fontSize: 20, fontWeight: 800, color: '#14303D', margin: 0 }}>{patientName}</h3>
             </div>
             <button aria-label="Cerrar" onClick={onClose} style={{ width: 32, height: 32, borderRadius: '50%', background: '#F3F4F6', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -1312,7 +1312,7 @@ function SosConfirmSheet({ open, onClose, onConfirm, patientProfile, patientName
         <div style={{ flex: 1, overflowY: 'auto', padding: '16px 16px 28px', display: 'flex', flexDirection: 'column', gap: 12, WebkitOverflowScrolling: 'touch' }}>
           {/* 1. Alergias y diagnóstico */}
           <div style={{ background: '#FCEEED', border: '1.5px solid rgba(217,83,79,0.28)', borderRadius: 18, padding: 16 }}>
-            <p style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#D9534F', margin: '0 0 10px', display: 'flex', alignItems: 'center', gap: 6 }}>
+            <p style={{ fontSize: 14, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#D9534F', margin: '0 0 10px', display: 'flex', alignItems: 'center', gap: 6 }}>
               <AlertTriangle size={13} color="#D9534F" strokeWidth={2.3} />
               Alergias y diagnóstico
             </p>
@@ -1322,14 +1322,14 @@ function SosConfirmSheet({ open, onClose, onConfirm, patientProfile, patientName
             {allergies.length > 0 ? (
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                 {allergies.map((a, i) => (
-                  <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: '#D9534F', color: 'white', fontSize: 14, fontWeight: 700, padding: '7px 13px', borderRadius: 100 }}>
+                  <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: '#D9534F', color: 'white', fontSize: 15, fontWeight: 700, padding: '7px 13px', borderRadius: 100 }}>
                     <AlertTriangle size={13} color="white" strokeWidth={2.5} />
                     {a}
                   </span>
                 ))}
               </div>
             ) : (
-              <p style={{ fontSize: 14, color: '#4E6470', lineHeight: 1.5, margin: 0 }}>
+              <p style={{ fontSize: 15, color: '#4E6470', lineHeight: 1.5, margin: 0 }}>
                 Sin alergias registradas — nadie ha reportado ninguna todavía.
               </p>
             )}
@@ -1337,7 +1337,7 @@ function SosConfirmSheet({ open, onClose, onConfirm, patientProfile, patientName
 
           {/* 2. Medicamentos activos */}
           <div style={{ background: 'white', border: '1px solid #E6E3DB', borderRadius: 18, padding: 16 }}>
-            <p style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#4E6470', margin: '0 0 10px' }}>
+            <p style={{ fontSize: 14, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#4E6470', margin: '0 0 10px' }}>
               Medicamentos activos
             </p>
             {meds.length > 0 ? (
@@ -1347,9 +1347,9 @@ function SosConfirmSheet({ open, onClose, onConfirm, patientProfile, patientName
                     const times = med.scheduled_times?.length ? [...med.scheduled_times].sort() : (med.time ? [med.time] : [])
                     return (
                       <tr key={med.id} style={{ borderBottom: '1px solid #E6E3DB' }}>
-                        <td style={{ padding: '10px 0', fontSize: 15, fontWeight: 700, color: '#2A4350', width: '42%' }}>{med.name}</td>
-                        <td style={{ padding: '10px 8px 10px 0', fontSize: 14.5, fontWeight: 700, color: '#0C6C9C', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>{med.dosage || '—'}</td>
-                        <td style={{ padding: '10px 0', fontSize: 14, color: '#4E6470', textAlign: 'right', fontVariantNumeric: 'tabular-nums', lineHeight: 1.4 }}>
+                        <td style={{ padding: '10px 0', fontSize: 16, fontWeight: 700, color: '#2A4350', width: '42%' }}>{med.name}</td>
+                        <td style={{ padding: '10px 8px 10px 0', fontSize: 16, fontWeight: 700, color: '#0C6C9C', fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>{med.dosage || '—'}</td>
+                        <td style={{ padding: '10px 0', fontSize: 15, color: '#4E6470', textAlign: 'right', fontVariantNumeric: 'tabular-nums', lineHeight: 1.4 }}>
                           {times.length > 1 && <>{times.length}×/día<br /></>}
                           {times.length > 0 ? times.map(fmtTime).join(' · ') : ''}
                         </td>
@@ -1359,7 +1359,7 @@ function SosConfirmSheet({ open, onClose, onConfirm, patientProfile, patientName
                 </tbody>
               </table>
             ) : (
-              <p style={{ fontSize: 14, color: '#4E6470', lineHeight: 1.5, margin: 0 }}>Sin medicamentos activos registrados.</p>
+              <p style={{ fontSize: 15, color: '#4E6470', lineHeight: 1.5, margin: 0 }}>Sin medicamentos activos registrados.</p>
             )}
           </div>
 
@@ -1370,18 +1370,18 @@ function SosConfirmSheet({ open, onClose, onConfirm, patientProfile, patientName
                 <Phone size={20} color="white" strokeWidth={2} />
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#4E6470', margin: '0 0 2px' }}>Contacto de emergencia</p>
+                <p style={{ fontSize: 14, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#4E6470', margin: '0 0 2px' }}>Contacto de emergencia</p>
                 <p style={{ fontSize: 16, fontWeight: 700, margin: 0, color: '#2A4350' }}>
                   {emergencyContact.name}{emergencyContact.relationship ? <span style={{ fontWeight: 500, color: '#4E6470' }}> · {emergencyContact.relationship}</span> : null}
                 </p>
-                {emergencyContact.phone && <p style={{ fontSize: 14, color: '#0C6C9C', fontWeight: 600, margin: '2px 0 0', fontVariantNumeric: 'tabular-nums' }}>{emergencyContact.phone} — toca para llamar</p>}
+                {emergencyContact.phone && <p style={{ fontSize: 15, color: '#0C6C9C', fontWeight: 600, margin: '2px 0 0', fontVariantNumeric: 'tabular-nums' }}>{emergencyContact.phone} — toca para llamar</p>}
               </div>
               <ChevronRight size={17} color="#4E6470" strokeWidth={2} />
             </a>
           ) : (
             <div style={{ background: '#E3F1F8', border: '1px solid rgba(12,108,156,0.14)', borderRadius: 18, padding: 16 }}>
-              <p style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#0C6C9C', margin: '0 0 10px' }}>Contacto de emergencia</p>
-              <p style={{ fontSize: 14, color: '#4E6470', lineHeight: 1.5, margin: 0 }}>
+              <p style={{ fontSize: 14, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#0C6C9C', margin: '0 0 10px' }}>Contacto de emergencia</p>
+              <p style={{ fontSize: 15, color: '#4E6470', lineHeight: 1.5, margin: 0 }}>
                 Aún no hay nadie marcado como contacto de emergencia — la familia recibe la alerta de todas formas al activar.
               </p>
             </div>
@@ -1394,18 +1394,18 @@ function SosConfirmSheet({ open, onClose, onConfirm, patientProfile, patientName
                 <Stethoscope size={20} color="#0C6C9C" strokeWidth={2} />
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#4E6470', margin: '0 0 2px' }}>Médico tratante</p>
+                <p style={{ fontSize: 14, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#4E6470', margin: '0 0 2px' }}>Médico tratante</p>
                 <p style={{ fontSize: 16, fontWeight: 700, margin: 0, color: '#2A4350' }}>{primaryDoctor.name}</p>
                 {(primaryDoctor.specialty || primaryDoctor.clinic) && (
-                  <p style={{ fontSize: 14, color: '#4E6470', margin: '2px 0 0' }}>{[primaryDoctor.specialty, primaryDoctor.clinic].filter(Boolean).join(' · ')}</p>
+                  <p style={{ fontSize: 15, color: '#4E6470', margin: '2px 0 0' }}>{[primaryDoctor.specialty, primaryDoctor.clinic].filter(Boolean).join(' · ')}</p>
                 )}
               </div>
               {primaryDoctor.phone && <ChevronRight size={17} color="#4E6470" strokeWidth={2} />}
             </a>
           ) : (
             <div style={{ background: '#E3F1F8', border: '1px solid rgba(12,108,156,0.14)', borderRadius: 18, padding: 16 }}>
-              <p style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#0C6C9C', margin: '0 0 10px' }}>Médico tratante</p>
-              <p style={{ fontSize: 14, color: '#4E6470', lineHeight: 1.5, margin: 0 }}>
+              <p style={{ fontSize: 14, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#0C6C9C', margin: '0 0 10px' }}>Médico tratante</p>
+              <p style={{ fontSize: 15, color: '#4E6470', lineHeight: 1.5, margin: 0 }}>
                 Sin médico marcado como principal todavía — la familia sabrá a quién más avisar.
               </p>
             </div>
@@ -1429,7 +1429,7 @@ function SosConfirmSheet({ open, onClose, onConfirm, patientProfile, patientName
             <Siren size={21} color="white" strokeWidth={2.3} style={{ position: 'relative', zIndex: 1 }} />
             <span style={{ position: 'relative', zIndex: 1 }}>Activar emergencia</span>
           </button>
-          <button onClick={onClose} style={{ width: '100%', border: 'none', background: 'transparent', color: '#4E6470', fontSize: 13.5, fontWeight: 600, padding: 6, cursor: 'pointer' }}>
+          <button onClick={onClose} style={{ width: '100%', border: 'none', background: 'transparent', color: '#4E6470', fontSize: 15, fontWeight: 600, padding: 6, cursor: 'pointer' }}>
             Cancelar — fue un error
           </button>
         </div>
@@ -1473,11 +1473,11 @@ function RecentEventRow({ evt, onTap }) {
         {c.icon}
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ fontSize: 14, fontWeight: 600, color: '#14303D', margin: 0, lineHeight: 1.3 }}>
+        <p style={{ fontSize: 15, fontWeight: 600, color: '#14303D', margin: 0, lineHeight: 1.3 }}>
           {c.label(evt)}
         </p>
         {time && (
-          <p style={{ fontSize: 13, color: '#5E7480', margin: '2px 0 0' }}>{time}</p>
+          <p style={{ fontSize: 14, color: '#5E7480', margin: '2px 0 0' }}>{time}</p>
         )}
       </div>
       <span style={{ fontSize: 16, color: '#D4C0B0', flexShrink: 0 }}>›</span>
@@ -1536,7 +1536,7 @@ function DashCard({ Icon, title, subtitle, status, statusType, to, onClick }) {
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           flexShrink: 0,
         }}>
-          <Icon size={20} color="#0A5A82" strokeWidth={1.75} />
+          <Icon size={20} color="#0A5A82" strokeWidth={2.1} />
         </div>
         {status && (
           <div style={{
@@ -1544,14 +1544,14 @@ function DashCard({ Icon, title, subtitle, status, statusType, to, onClick }) {
             gap: 4, padding: '3px 8px', borderRadius: 20, background: s.bg,
           }}>
             <span style={{ width: 4, height: 4, borderRadius: '50%', background: s.color, flexShrink: 0 }} />
-            <span style={{ fontSize: 12, fontWeight: 700, color: s.color, whiteSpace: 'nowrap' }}>{status}</span>
+            <span style={{ fontSize: 14, fontWeight: 700, color: s.color, whiteSpace: 'nowrap' }}>{status}</span>
           </div>
         )}
       </div>
       <div style={{ flex: 1 }}>
-        <p style={{ fontSize: 14, fontWeight: 700, color: '#2d3748', margin: 0, lineHeight: 1.25 }}>{title}</p>
+        <p style={{ fontSize: 15, fontWeight: 700, color: '#2d3748', margin: 0, lineHeight: 1.25 }}>{title}</p>
         {subtitle && (
-          <p style={{ fontSize: 14, color: '#718096', margin: '4px 0 0', lineHeight: 1.4 }}>{subtitle}</p>
+          <p style={{ fontSize: 15, color: '#718096', margin: '4px 0 0', lineHeight: 1.4 }}>{subtitle}</p>
         )}
       </div>
     </div>
@@ -1578,12 +1578,12 @@ function VideoCallDashCard({ onInstant, onSchedule, starting, error }) {
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           flexShrink: 0,
         }}>
-          <Camera size={20} color="#0A5A82" strokeWidth={1.75} />
+          <Camera size={20} color="#0A5A82" strokeWidth={2.1} />
         </div>
       </div>
       <div style={{ flex: 1 }}>
-        <p style={{ fontSize: 14, fontWeight: 700, color: '#2d3748', margin: 0, lineHeight: 1.25 }}>Videollamada</p>
-        <p style={{ fontSize: 14, color: '#718096', margin: '4px 0 0' }}>Conectar con la familia</p>
+        <p style={{ fontSize: 15, fontWeight: 700, color: '#2d3748', margin: 0, lineHeight: 1.25 }}>Videollamada</p>
+        <p style={{ fontSize: 15, color: '#718096', margin: '4px 0 0' }}>Conectar con la familia</p>
       </div>
       <button
         onClick={onInstant}
@@ -1594,7 +1594,7 @@ function VideoCallDashCard({ onInstant, onSchedule, starting, error }) {
         style={{
           width: '100%', padding: '8px 0', borderRadius: 10, border: 'none',
           background: starting ? '#C9D6DB' : 'linear-gradient(135deg, #0A5A82, #0A4A6B)',
-          color: 'white', fontWeight: 700, fontSize: 14,
+          color: 'white', fontWeight: 700, fontSize: 15,
           cursor: starting ? 'default' : 'pointer',
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
           transform: pressed ? 'translateY(1px)' : 'none',
@@ -1614,14 +1614,14 @@ function VideoCallDashCard({ onInstant, onSchedule, starting, error }) {
         onClick={onSchedule}
         style={{
           background: 'none', border: 'none', cursor: 'pointer',
-          fontSize: 13, color: '#5E7480', padding: 0, textAlign: 'center',
+          fontSize: 14, color: '#5E7480', padding: 0, textAlign: 'center',
           WebkitTapHighlightColor: 'transparent',
         }}
       >
         Ver programadas →
       </button>
       {error && (
-        <p style={{ fontSize: 12, color: '#DC2626', margin: 0, textAlign: 'center', lineHeight: 1.3 }}>
+        <p style={{ fontSize: 14, color: '#DC2626', margin: 0, textAlign: 'center', lineHeight: 1.3 }}>
           {error}
         </p>
       )}
@@ -1640,12 +1640,12 @@ function CareDaySection({ title, emoji, count, children }) {
         paddingBottom: 6, marginBottom: 10,
         borderBottom: '1px solid #F3F4F6',
       }}>
-        <span style={{ fontSize: 13 }}>{emoji}</span>
-        <span style={{ fontSize: 12, fontWeight: 700, color: '#4E6470', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+        <span style={{ fontSize: 14 }}>{emoji}</span>
+        <span style={{ fontSize: 14, fontWeight: 700, color: '#4E6470', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
           {title}
         </span>
         <span style={{
-          fontSize: 12, fontWeight: 700, color: '#5E7480',
+          fontSize: 14, fontWeight: 700, color: '#5E7480',
           background: '#F3F4F6', borderRadius: 10, padding: '1px 7px', marginLeft: 2,
         }}>
           {count}
@@ -1678,18 +1678,18 @@ function MedDetailRow({ evt, isToday, confirming, onConfirm, isFamiliar }) {
     }}>
       <span style={{ fontSize: 18, flexShrink: 0 }}>💊</span>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ fontSize: 13, fontWeight: 600, color: '#14303D', margin: 0, lineHeight: 1.3 }}>
+        <p style={{ fontSize: 14, fontWeight: 600, color: '#14303D', margin: 0, lineHeight: 1.3 }}>
           {medLabel}
         </p>
         {timeStr && (
-          <p style={{ fontSize: 13, color: '#5E7480', margin: '2px 0 0' }}>
+          <p style={{ fontSize: 14, color: '#5E7480', margin: '2px 0 0' }}>
             {isConfirmed ? `Dado a las ${timeStr}` : `Programado ${timeStr}`}
           </p>
         )}
       </div>
       <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>
-        <span style={{ fontSize: 15 }}>{sc.icon}</span>
-        <span style={{ fontSize: 12, fontWeight: 700, color: sc.color }}>{sc.label}</span>
+        <span style={{ fontSize: 16 }}>{sc.icon}</span>
+        <span style={{ fontSize: 14, fontWeight: 700, color: sc.color }}>{sc.label}</span>
       </div>
       {isPending && isToday && !isFamiliar && (
         <button
@@ -1698,7 +1698,7 @@ function MedDetailRow({ evt, isToday, confirming, onConfirm, isFamiliar }) {
           style={{
             padding: '6px 11px', borderRadius: 8, border: 'none',
             background: busy ? '#C9D6DB' : '#0C6C9C',
-            color: 'white', fontSize: 13, fontWeight: 700,
+            color: 'white', fontSize: 14, fontWeight: 700,
             cursor: busy ? 'not-allowed' : 'pointer', flexShrink: 0,
           }}
         >
@@ -1740,19 +1740,19 @@ function CareEventRow({ evt, onTap }) {
         {cfg.icon}
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ fontSize: 13, fontWeight: 600, color: '#14303D', margin: 0, lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <p style={{ fontSize: 14, fontWeight: 600, color: '#14303D', margin: 0, lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {cfg.label(evt)}
         </p>
         <div style={{ display: 'flex', gap: 8, marginTop: 2, alignItems: 'center' }}>
-          {time && <span style={{ fontSize: 13, color: '#5E7480' }}>{time}</span>}
+          {time && <span style={{ fontSize: 14, color: '#5E7480' }}>{time}</span>}
           {cfg.sub(evt) && (
-            <span style={{ fontSize: 13, color: evt.type === 'APPOINTMENT_PROOF' ? '#0A4A6B' : '#4E6470', fontWeight: evt.type === 'APPOINTMENT_PROOF' ? 600 : 400 }}>
+            <span style={{ fontSize: 14, color: evt.type === 'APPOINTMENT_PROOF' ? '#0A4A6B' : '#4E6470', fontWeight: evt.type === 'APPOINTMENT_PROOF' ? 600 : 400 }}>
               {cfg.sub(evt)}
             </span>
           )}
         </div>
       </div>
-      {tappable && <span style={{ fontSize: 14, color: '#D4C0B0', flexShrink: 0 }}>›</span>}
+      {tappable && <span style={{ fontSize: 15, color: '#D4C0B0', flexShrink: 0 }}>›</span>}
     </div>
   )
 }
@@ -1772,15 +1772,15 @@ function AlertDetailRow({ evt, onTap }) {
     >
       <span style={{ fontSize: 18, flexShrink: 0 }}>{evt.resolved ? '✅' : '🚨'}</span>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ fontSize: 13, fontWeight: 700, color: evt.resolved ? '#30454F' : '#D63031', margin: 0 }}>
+        <p style={{ fontSize: 14, fontWeight: 700, color: evt.resolved ? '#30454F' : '#D63031', margin: 0 }}>
           {evt.resolved ? 'Emergencia resuelta' : 'SOS Familiar'}
         </p>
         <div style={{ display: 'flex', gap: 8, marginTop: 2 }}>
-          {evt.triggeredBy && <span style={{ fontSize: 13, color: '#4E6470' }}>{evt.triggeredBy.split(' ')[0]}</span>}
-          {time && <span style={{ fontSize: 13, color: '#5E7480' }}>{time}</span>}
+          {evt.triggeredBy && <span style={{ fontSize: 14, color: '#4E6470' }}>{evt.triggeredBy.split(' ')[0]}</span>}
+          {time && <span style={{ fontSize: 14, color: '#5E7480' }}>{time}</span>}
         </div>
       </div>
-      <span style={{ fontSize: 14, color: '#D4C0B0', flexShrink: 0 }}>›</span>
+      <span style={{ fontSize: 15, color: '#D4C0B0', flexShrink: 0 }}>›</span>
     </div>
   )
 }
@@ -1812,7 +1812,7 @@ function CareDayDetail({ section, todayKey, confirming, onConfirm, isFamiliar, o
         boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
       }}>
         <span style={{ fontSize: 32, display: 'block', marginBottom: 10 }}>🗓️</span>
-        <p style={{ fontSize: 13, color: '#5E7480', margin: 0 }}>Sin actividad registrada este día</p>
+        <p style={{ fontSize: 14, color: '#5E7480', margin: 0 }}>Sin actividad registrada este día</p>
       </div>
     )
   }
@@ -1895,28 +1895,28 @@ function AttentionCard({ medName, medDosage, medTime, windowLabel, isExpired, on
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           <span style={{ width: 70, height: 70, borderRadius: '50%', background: 'rgba(233,130,110,0.16)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <Pill size={34} color="#A3452F" strokeWidth={1.8} />
+            <Pill size={34} color="#A3452F" strokeWidth={2.1} />
           </span>
           <div style={{ flex: 1, minWidth: 0 }}>
             <p style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#2A4350', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{medName}{medDosage ? ` ${medDosage}` : ''}</p>
-            <p style={{ margin: '6px 0 0', display: 'flex', alignItems: 'center', gap: 6, fontSize: 14, fontWeight: 600, color: '#64748B' }}>
+            <p style={{ margin: '6px 0 0', display: 'flex', alignItems: 'center', gap: 6, fontSize: 15, fontWeight: 600, color: '#64748B' }}>
               <Clock size={15} color="#64748B" strokeWidth={2} /> Hoy {medTime}
             </p>
-            <p style={{ margin: '5px 0 0', display: 'flex', alignItems: 'center', gap: 6, fontSize: 13.5, fontWeight: 600, color: '#A3452F' }}>
+            <p style={{ margin: '5px 0 0', display: 'flex', alignItems: 'center', gap: 6, fontSize: 15, fontWeight: 600, color: '#A3452F' }}>
               {isExpired
                 ? <><Clock size={13} color="#A3452F" strokeWidth={2.4} /> ¿Se administró? Puedes registrarlo</>
                 : <><AlertTriangle size={13} color="#A3452F" strokeWidth={2.4} /> Pendiente de confirmar</>}
             </p>
           </div>
-          <button onClick={isExpired ? onLate : onConfirm} style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 7, borderRadius: 15, background: '#BF513C', padding: '13px 17px', border: 'none', cursor: 'pointer', color: 'white', fontWeight: 700, fontSize: 14.5, boxShadow: '0 8px 18px -6px rgba(233,130,110,0.7)', WebkitTapHighlightColor: 'transparent' }}>
+          <button onClick={isExpired ? onLate : onConfirm} style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 7, borderRadius: 15, background: '#BF513C', padding: '13px 17px', border: 'none', cursor: 'pointer', color: 'white', fontWeight: 700, fontSize: 16, boxShadow: '0 8px 18px -6px rgba(233,130,110,0.7)', WebkitTapHighlightColor: 'transparent' }}>
             {isExpired ? 'Registrar' : 'Confirmar'} <CheckIcon size={17} color="white" strokeWidth={2.6} />
           </button>
         </div>
       </div>
       {windowLabel && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, borderTop: '1px solid rgba(233,130,110,0.25)', padding: '13px 18px' }}>
-          <Calendar size={15} color="#64748B" strokeWidth={1.9} />
-          <span style={{ flex: 1, fontSize: 13.5, fontWeight: 600, color: '#64748B' }}>Ventana: {windowLabel}</span>
+          <Calendar size={15} color="#64748B" strokeWidth={2.1} />
+          <span style={{ flex: 1, fontSize: 15, fontWeight: 600, color: '#64748B' }}>Ventana: {windowLabel}</span>
           <ChevronRight size={18} color="#C9A597" strokeWidth={2.2} />
         </div>
       )}
@@ -1950,16 +1950,16 @@ function RecentActivity({ items, onViewAll, onSelect, firstName, summaryText, su
         <h2 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 9, fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 18, fontWeight: 800, color: '#14303D' }}>
           <Heart size={19} color="#0C6C9C" strokeWidth={2} /> Hoy en casa
         </h2>
-        <button onClick={onViewAll} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, color: '#0C6C9C', fontWeight: 700, padding: 0, WebkitTapHighlightColor: 'transparent' }}>Ver todo</button>
+        <button onClick={onViewAll} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 15, color: '#0C6C9C', fontWeight: 700, padding: 0, WebkitTapHighlightColor: 'transparent' }}>Ver todo</button>
       </div>
-      {(summaryEmpty || summaryText) && (
+      {items.length > 0 && summaryText && (
         <div style={{ background: '#E3F1F8', borderRadius: 14, padding: '12px 14px', marginBottom: 14 }}>
-          <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#0C6C9C', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Resumen del día</p>
-          <p style={{ margin: '4px 0 0', fontSize: 13.5, color: '#475569', lineHeight: 1.5 }}>
+          <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#0C6C9C', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Resumen del día</p>
+          <p style={{ margin: '4px 0 0', fontSize: 15, color: '#475569', lineHeight: 1.5 }}>
             {summaryEmpty ? 'Aún no hay registros del día.' : summaryText}
           </p>
           {!summaryEmpty && summaryStale && (
-            <p style={{ margin: '6px 0 0', fontSize: 13, color: '#7C8698', lineHeight: 1.4, fontStyle: 'italic' }}>
+            <p style={{ margin: '6px 0 0', fontSize: 14, color: '#7C8698', lineHeight: 1.4, fontStyle: 'italic' }}>
               Este resumen es de hoy, generado más temprano. Mañana Milo lo actualiza con lo último.
             </p>
           )}
@@ -1967,8 +1967,8 @@ function RecentActivity({ items, onViewAll, onSelect, firstName, summaryText, su
       )}
       {items.length === 0 ? (
         <div style={{ padding: '6px 0 2px' }}>
-          <p style={{ color: '#7C8698', fontSize: 13, margin: '0 0 4px', fontWeight: 500 }}>Todavía no hay nada marcado hoy</p>
-          <p style={{ color: '#5E7480', fontSize: 14, margin: 0, lineHeight: 1.6 }}>
+          <p style={{ color: '#7C8698', fontSize: 14, margin: '0 0 4px', fontWeight: 500 }}>Todavía no hay nada marcado hoy</p>
+          <p style={{ color: '#5E7480', fontSize: 15, margin: 0, lineHeight: 1.6 }}>
             Cuando alguien confirme un medicamento,<br />suba una foto o escriba una nota,<br />aparecerá aquí.
           </p>
         </div>
@@ -1997,17 +1997,17 @@ function RecentActivity({ items, onViewAll, onSelect, firstName, summaryText, su
                   {avatarLetter}
                 </span>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ margin: 0, fontSize: 15, color: '#2A4350', lineHeight: 1.3 }}>
+                  <p style={{ margin: 0, fontSize: 16, color: '#2A4350', lineHeight: 1.3 }}>
                     <span style={{ fontWeight: 700 }}>{actor}</span> {meta.text}
                   </p>
                   {meta.sub && (
-                    <p style={{ margin: '3px 0 0', fontSize: 14, fontStyle: isNote ? 'italic' : 'normal', color: isNote ? '#475569' : '#5E7480', lineHeight: 1.4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{isNote ? `"${meta.sub}"` : meta.sub}</p>
+                    <p style={{ margin: '3px 0 0', fontSize: 15, fontStyle: isNote ? 'italic' : 'normal', color: isNote ? '#475569' : '#5E7480', lineHeight: 1.4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{isNote ? `"${meta.sub}"` : meta.sub}</p>
                   )}
-                  <p style={{ margin: '3px 0 0', fontSize: 13, color: '#64748B', fontWeight: 600 }}>{time}</p>
+                  <p style={{ margin: '3px 0 0', fontSize: 14, color: '#64748B', fontWeight: 600 }}>{time}</p>
                 </div>
                 {isNote ? (
                   <span style={{ width: 32, height: 32, borderRadius: '50%', flexShrink: 0, background: '#EEF2F6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Chat size={16} color="#94A3B8" strokeWidth={1.9} />
+                    <Chat size={16} color="#94A3B8" strokeWidth={2.1} />
                   </span>
                 ) : (
                   <span style={{ width: 32, height: 32, borderRadius: '50%', flexShrink: 0, background: '#E3F1F8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -2032,10 +2032,10 @@ function PetsCard({ onOpen, patientFirstName }) {
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <p style={{ margin: 0, fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 16, fontWeight: 600, color: '#0A4A6B', lineHeight: 1.2 }}>Milo y Luna están aquí para ayudar</p>
-          <p style={{ margin: '4px 0 0', fontSize: 13.5, color: '#4E6470', lineHeight: 1.3 }}>
+          <p style={{ margin: '4px 0 0', fontSize: 15, color: '#4E6470', lineHeight: 1.3 }}>
             {patientFirstName ? `¿Necesitas algo sobre el cuidado de ${patientFirstName}?` : '¿Necesitas algo sobre el cuidado de tu familiar?'}
           </p>
-          <button onClick={(e) => { e.stopPropagation(); onOpen() }} style={{ marginTop: 11, display: 'inline-flex', alignItems: 'center', gap: 8, borderRadius: 999, background: '#0C6C9C', padding: '10px 16px', border: 'none', cursor: 'pointer', color: 'white', fontWeight: 700, fontSize: 13.5, boxShadow: '0 8px 16px -6px rgba(12,108,156,0.6)', WebkitTapHighlightColor: 'transparent' }}>
+          <button onClick={(e) => { e.stopPropagation(); onOpen() }} style={{ marginTop: 11, display: 'inline-flex', alignItems: 'center', gap: 8, borderRadius: 999, background: '#0C6C9C', padding: '10px 16px', border: 'none', cursor: 'pointer', color: 'white', fontWeight: 700, fontSize: 15, boxShadow: '0 8px 16px -6px rgba(12,108,156,0.6)', WebkitTapHighlightColor: 'transparent' }}>
             <MessageCircle size={16} color="white" strokeWidth={2} /> Hablar con Milo y Luna
           </button>
         </div>
@@ -3473,7 +3473,7 @@ export default function Dashboard() {
           zIndex: 100, background: '#0A4A6B', color: 'white',
           borderRadius: 14, padding: '12px 20px',
           boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
-          fontSize: 14, fontWeight: 600, whiteSpace: 'nowrap',
+          fontSize: 15, fontWeight: 600, whiteSpace: 'nowrap',
         }}>
           🎉 ¡Suscripción activada! Gracias por confiar en FamiliaCerca.
         </div>
@@ -3485,7 +3485,7 @@ export default function Dashboard() {
           zIndex: 100, background: '#D63031', color: 'white',
           borderRadius: 14, padding: '12px 20px',
           boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
-          fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap',
+          fontSize: 14, fontWeight: 600, whiteSpace: 'nowrap',
           maxWidth: '90vw', textAlign: 'center',
         }}>
           ⚠️ {confirmError}
@@ -3517,10 +3517,10 @@ export default function Dashboard() {
             onClick={() => setShowFamilySwitcher(true)}
             style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 5, background: 'rgba(20,60,50,0.06)', border: 'none', borderRadius: 20, padding: '6px 14px', cursor: 'pointer', WebkitTapHighlightColor: 'transparent' }}
           >
-            <span style={{ fontSize: 13, fontWeight: 600, color: '#2A4350', maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <span style={{ fontSize: 14, fontWeight: 600, color: '#2A4350', maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {(patientProfile?.nombre_completo || activePatientName || profile?.name || 'Paciente').split(' ')[0]}
             </span>
-            <span style={{ fontSize: 12, color: '#6D7B74', lineHeight: 1 }}>▼</span>
+            <span style={{ fontSize: 14, color: '#6D7B74', lineHeight: 1 }}>▼</span>
           </button>
           {/* Right: Bell + user avatar */}
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 10 }}>
@@ -3534,7 +3534,7 @@ export default function Dashboard() {
                   >
                     <Bell size={20} color="#2A4350" strokeWidth={2} />
                     {totalBadge > 0 && (
-                      <span style={{ position: 'absolute', top: -2, right: -2, background: '#BF513C', color: 'white', fontSize: 13, fontWeight: 700, borderRadius: '50%', width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1 }}>
+                      <span style={{ position: 'absolute', top: -2, right: -2, background: '#BF513C', color: 'white', fontSize: 14, fontWeight: 700, borderRadius: '50%', width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1 }}>
                         {totalBadge > 9 ? '9+' : totalBadge}
                       </span>
                     )}
@@ -3555,7 +3555,7 @@ export default function Dashboard() {
                 ) : (
                   <div
                     onClick={() => navigate('/ajustes')}
-                    style={{ width: 44, height: 44, borderRadius: '50%', background: 'linear-gradient(135deg, #E58B73, #C9882A)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, fontWeight: 700, color: 'white', flexShrink: 0, cursor: 'pointer', border: '2px solid white', boxShadow: '0 2px 8px rgba(20,35,30,0.08)' }}
+                    style={{ width: 44, height: 44, borderRadius: '50%', background: 'linear-gradient(135deg, #E58B73, #C9882A)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, fontWeight: 700, color: 'white', flexShrink: 0, cursor: 'pointer', border: '2px solid white', boxShadow: '0 2px 8px rgba(20,35,30,0.08)' }}
                   >
                     {initial}
                   </div>
@@ -3568,13 +3568,13 @@ export default function Dashboard() {
         {notifActivated && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '12px 16px 0', padding: '10px 14px', background: '#E3F1F8', border: '1px solid #A6E3EC', borderRadius: 14 }}>
             <span style={{ fontSize: 17, flexShrink: 0 }}>✅</span>
-            <p style={{ flex: 1, fontSize: 13, color: '#0A4A6B', margin: 0, fontWeight: 600 }}>Notificaciones activadas</p>
+            <p style={{ flex: 1, fontSize: 14, color: '#0A4A6B', margin: 0, fontWeight: 600 }}>Notificaciones activadas</p>
           </div>
         )}
         {permission !== 'granted' && !notifDismissed && !(isAdmin && familyCount <= 1) && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '12px 16px 0', padding: '10px 14px', background: 'white', border: '1px solid #E6E3DB', borderRadius: 16, boxShadow: '0 2px 8px rgba(20,35,30,0.05)' }}>
             <span style={{ fontSize: 17, flexShrink: 0 }}>🔔</span>
-            <p style={{ flex: 1, fontSize: 14, color: '#0A4A6B', margin: 0, fontWeight: 500, lineHeight: 1.35 }}>
+            <p style={{ flex: 1, fontSize: 15, color: '#0A4A6B', margin: 0, fontWeight: 500, lineHeight: 1.35 }}>
               {iosNeedsInstall
                 ? (showIosHelp
                     ? <>En iPhone: toca <strong>Compartir ⬆️</strong> en Safari, luego <strong>“Agregar a pantalla de inicio”</strong>. Abre FamiliaCerca desde ese ícono y toca Activar.</>
@@ -3582,8 +3582,8 @@ export default function Dashboard() {
                 : 'Activa las notificaciones para saber si falta un medicamento'}
             </p>
             {iosNeedsInstall
-              ? !showIosHelp && <button onClick={() => setShowIosHelp(true)} style={{ padding: '7px 13px', borderRadius: 9, background: '#BF513C', color: 'white', fontSize: 13, fontWeight: 700, border: 'none', cursor: 'pointer', flexShrink: 0 }}>Cómo</button>
-              : <button onClick={requestAndSubscribe} style={{ padding: '7px 13px', borderRadius: 9, background: '#BF513C', color: 'white', fontSize: 13, fontWeight: 700, border: 'none', cursor: 'pointer', flexShrink: 0 }}>Activar</button>}
+              ? !showIosHelp && <button onClick={() => setShowIosHelp(true)} style={{ padding: '7px 13px', borderRadius: 9, background: '#BF513C', color: 'white', fontSize: 14, fontWeight: 700, border: 'none', cursor: 'pointer', flexShrink: 0 }}>Cómo</button>
+              : <button onClick={requestAndSubscribe} style={{ padding: '7px 13px', borderRadius: 9, background: '#BF513C', color: 'white', fontSize: 14, fontWeight: 700, border: 'none', cursor: 'pointer', flexShrink: 0 }}>Activar</button>}
             <button onClick={dismissNotifBanner} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, flexShrink: 0, display: 'flex' }} aria-label="Cerrar">
               <XIcon size={14} color="#5E7480" strokeWidth={2} />
             </button>
@@ -3593,12 +3593,12 @@ export default function Dashboard() {
           <div style={{ margin: '12px 16px 0', background: 'linear-gradient(135deg,#7F1D1D,#991B1B)', borderRadius: 16, padding: '16px 18px', boxShadow: '0 4px 24px rgba(185,28,28,0.4)', display: 'flex', alignItems: 'center', gap: 14, animation: 'fadeInUp 0.3s ease both' }}>
             <span style={{ fontSize: 26, flexShrink: 0, animation: 'sos-ring 1.4s ease-in-out infinite' }}>🚨</span>
             <div style={{ flex: 1 }}>
-              <p style={{ margin: 0, fontSize: 15, fontWeight: 800, color: 'white' }}>Alerta SOS activa</p>
-              <p style={{ margin: '3px 0 0', fontSize: 13, color: 'rgba(255,255,255,0.75)' }}>
+              <p style={{ margin: 0, fontSize: 16, fontWeight: 800, color: 'white' }}>Alerta SOS activa</p>
+              <p style={{ margin: '3px 0 0', fontSize: 14, color: 'rgba(255,255,255,0.75)' }}>
                 {activeSosEvent?.triggeredBy ? `Activada por ${activeSosEvent.triggeredBy.split(' ')[0]}` : 'Emergencia familiar'}
               </p>
             </div>
-            <button onClick={dismissSOS} style={{ flexShrink: 0, padding: '7px 14px', borderRadius: 10, border: 'none', background: 'rgba(255,255,255,0.18)', color: 'white', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
+            <button onClick={dismissSOS} style={{ flexShrink: 0, padding: '7px 14px', borderRadius: 10, border: 'none', background: 'rgba(255,255,255,0.18)', color: 'white', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
               Resolver
             </button>
           </div>
@@ -3626,10 +3626,10 @@ export default function Dashboard() {
             <div key={med.id} style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '12px 16px 0', padding: '12px 14px', borderRadius: 16, border: `1.5px solid ${borderColor}`, background: bgColor, boxShadow: '0 2px 8px rgba(20,35,30,0.05)' }}>
               <span style={{ fontSize: 20, flexShrink: 0 }}>{emoji}</span>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ fontSize: 13, fontWeight: 700, color: textColor, margin: 0, lineHeight: 1.3 }}>{title}</p>
-                <p style={{ fontSize: 13, color: '#5E7480', margin: '2px 0 0' }}>{subtitle}</p>
+                <p style={{ fontSize: 14, fontWeight: 700, color: textColor, margin: 0, lineHeight: 1.3 }}>{title}</p>
+                <p style={{ fontSize: 14, color: '#5E7480', margin: '2px 0 0' }}>{subtitle}</p>
               </div>
-              <button onClick={() => navigate('/medications')} style={{ padding: '6px 12px', borderRadius: 10, border: 'none', flexShrink: 0, background: btnBg, color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>
+              <button onClick={() => navigate('/medications')} style={{ padding: '6px 12px', borderRadius: 10, border: 'none', flexShrink: 0, background: btnBg, color: 'white', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}>
                 {kind === 'silent' ? 'Ver' : 'Renovar'}
               </button>
             </div>
@@ -3721,9 +3721,9 @@ export default function Dashboard() {
                     <span style={{ flex: 'none', width: 46, height: 46, borderRadius: 14, background: '#E3F1F8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>👨‍👩‍👧</span>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#14303D' }}>Solo tú por ahora</p>
-                      <p style={{ margin: '2px 0 0', fontSize: 14, color: '#4E6470', lineHeight: 1.4 }}>Invita a tu familia para que todos vean el cuidado y reciban los avisos.</p>
+                      <p style={{ margin: '2px 0 0', fontSize: 15, color: '#4E6470', lineHeight: 1.4 }}>Invita a tu familia para que todos vean el cuidado y reciban los avisos.</p>
                     </div>
-                    <button onClick={() => navigate('/familia?invitar=1')} style={{ flex: 'none', padding: '10px 14px', borderRadius: 12, background: '#BF513C', color: 'white', fontSize: 14, fontWeight: 700, border: 'none', cursor: 'pointer' }}>Invitar</button>
+                    <button onClick={() => navigate('/familia?invitar=1')} style={{ flex: 'none', padding: '10px 14px', borderRadius: 12, background: '#BF513C', color: 'white', fontSize: 15, fontWeight: 700, border: 'none', cursor: 'pointer' }}>Invitar</button>
                   </div>
                 )}
 
@@ -3732,7 +3732,7 @@ export default function Dashboard() {
                   <button onClick={() => navigate('/familia')} style={{ width: '100%', textAlign: 'left', background: 'white', border: '1px solid #E6E3DB', borderRadius: 20, padding: '14px 16px', cursor: 'pointer' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
                       <span style={{ fontSize: 17, fontWeight: 800, color: '#14303D' }}>La familia hoy</span>
-                      <span style={{ fontSize: 14, fontWeight: 600, color: '#0C6C9C' }}>Ver familia ›</span>
+                      <span style={{ fontSize: 15, fontWeight: 600, color: '#0C6C9C' }}>Ver familia ›</span>
                     </div>
                     <div style={{ display: 'flex', gap: 14, overflowX: 'auto', paddingBottom: 2 }}>
                       {familyMembers.map((m, i) => {
@@ -3744,18 +3744,18 @@ export default function Dashboard() {
                             <span style={{ position: 'relative', width: 52, height: 52, borderRadius: '50%', background: colors[i % colors.length], color: 'white', fontSize: 21, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', border: active ? '3px solid #4FD0E0' : '3px solid #E6E3DB' }}>
                               {name.charAt(0).toUpperCase()}
                             </span>
-                            <span style={{ fontSize: 13, fontWeight: 600, color: '#30454F', maxWidth: 62, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</span>
+                            <span style={{ fontSize: 14, fontWeight: 600, color: '#30454F', maxWidth: 62, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</span>
                           </div>
                         )
                       })}
                       {isAdmin && (
                         <span onClick={e => { e.stopPropagation(); navigate('/familia?invitar=1') }} style={{ flex: 'none', width: 62, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
                           <span style={{ width: 52, height: 52, borderRadius: '50%', border: '2px dashed #0C6C9C', color: '#0C6C9C', fontSize: 26, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>+</span>
-                          <span style={{ fontSize: 13, fontWeight: 600, color: '#0C6C9C' }}>Invitar</span>
+                          <span style={{ fontSize: 14, fontWeight: 600, color: '#0C6C9C' }}>Invitar</span>
                         </span>
                       )}
                     </div>
-                    <p style={{ margin: '10px 0 0', fontSize: 13, color: '#5E7480' }}>El borde turquesa es quien entró hoy.</p>
+                    <p style={{ margin: '10px 0 0', fontSize: 14, color: '#5E7480' }}>El borde turquesa es quien entró hoy.</p>
                   </button>
                 )}
 
@@ -3815,15 +3815,15 @@ export default function Dashboard() {
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                           flexShrink: 0,
                         }}>
-                          <Icon size={23} color={iconColor} strokeWidth={1.9} />
+                          <Icon size={23} color={iconColor} strokeWidth={2.1} />
                         </span>
-                        <span style={{ fontSize: 13, fontWeight: bold ? 700 : 600, color: bold ? '#2A4350' : '#475569', lineHeight: 1.2, textAlign: 'center' }}>{label}</span>
+                        <span style={{ fontSize: 14, fontWeight: bold ? 700 : 600, color: bold ? '#2A4350' : '#475569', lineHeight: 1.2, textAlign: 'center' }}>{label}</span>
                       </button>
                     ))}
                   </div>
                 </div>
 
-                <button onClick={() => navigate('/mas')} style={{ alignSelf: 'center', background: 'none', border: 'none', padding: '12px 16px', minHeight: 44, fontSize: 15, fontWeight: 700, color: '#0C6C9C', cursor: 'pointer' }}>
+                <button onClick={() => navigate('/mas')} style={{ alignSelf: 'center', background: 'none', border: 'none', padding: '12px 16px', minHeight: 44, fontSize: 16, fontWeight: 700, color: '#0C6C9C', cursor: 'pointer' }}>
                   Ver todo el cuidado ›
                 </button>
               </>
@@ -3858,22 +3858,22 @@ export default function Dashboard() {
             <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 17, fontWeight: 700, color: '#14303D', marginBottom: 8 }}>
               Confirmar como administrador
             </p>
-            <p style={{ fontSize: 13, color: '#7A5A18', lineHeight: 1.6, marginBottom: 8, background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 12, padding: '10px 14px' }}>
+            <p style={{ fontSize: 14, color: '#7A5A18', lineHeight: 1.6, marginBottom: 8, background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 12, padding: '10px 14px' }}>
               Confirmando como administrador — solo en caso de emergencia
             </p>
-            <p style={{ fontSize: 14, color: '#4E6470', lineHeight: 1.6, marginBottom: 24 }}>
+            <p style={{ fontSize: 15, color: '#4E6470', lineHeight: 1.6, marginBottom: 24 }}>
               {adminConfirmEvt.medName} · Esta acción se registrará con tu nombre.
             </p>
             <div style={{ display: 'flex', gap: 10 }}>
               <button
                 onClick={() => setAdminConfirmEvt(null)}
-                style={{ flex: 1, padding: '12px', borderRadius: 12, border: '1.5px solid #E6E3DB', background: 'white', color: '#4E6470', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}
+                style={{ flex: 1, padding: '12px', borderRadius: 12, border: '1.5px solid #E6E3DB', background: 'white', color: '#4E6470', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}
               >
                 Cancelar
               </button>
               <button
                 onClick={() => { const evt = adminConfirmEvt; setAdminConfirmEvt(null); quickConfirm(evt) }}
-                style={{ flex: 1, padding: '12px', borderRadius: 12, border: 'none', background: '#C9882A', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer', boxShadow: '0 4px 16px rgba(201,136,42,0.3)' }}
+                style={{ flex: 1, padding: '12px', borderRadius: 12, border: 'none', background: '#C9882A', color: 'white', fontWeight: 700, fontSize: 15, cursor: 'pointer', boxShadow: '0 4px 16px rgba(201,136,42,0.3)' }}
               >
                 Confirmar
               </button>
@@ -3905,7 +3905,7 @@ export default function Dashboard() {
         <div style={{
           position: 'fixed', bottom: 'calc(80px + env(safe-area-inset-bottom))', left: 16, right: 16, zIndex: 250,
           background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 12,
-          padding: '12px 16px', fontSize: 13, color: '#DC2626', textAlign: 'center',
+          padding: '12px 16px', fontSize: 14, color: '#DC2626', textAlign: 'center',
           boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
         }}>
           {proofError}
@@ -3929,10 +3929,10 @@ export default function Dashboard() {
           }}>
             {/* Sheet header */}
             <div style={{ padding: '16px 20px 12px', borderBottom: '1px solid #F7F6F2', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
-              <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#0A4A6B' }}>🔔 Notificaciones</p>
+              <p style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#0A4A6B' }}>🔔 Notificaciones</p>
               <button
                 onClick={() => setShowNotifSheet(false)}
-                style={{ background: 'rgba(0,0,0,0.06)', border: 'none', borderRadius: '50%', width: 28, height: 28, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, color: '#4E6470', flexShrink: 0 }}
+                style={{ background: 'rgba(0,0,0,0.06)', border: 'none', borderRadius: '50%', width: 28, height: 28, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, color: '#4E6470', flexShrink: 0 }}
               >
                 ✕
               </button>
@@ -3943,11 +3943,11 @@ export default function Dashboard() {
 
               {/* ── MENSAJES ── */}
               <div style={{ padding: '14px 20px 8px' }}>
-                <p style={{ margin: '0 0 10px', fontSize: 13, fontWeight: 700, color: '#5E7480', letterSpacing: '0.06em' }}>
+                <p style={{ margin: '0 0 10px', fontSize: 14, fontWeight: 700, color: '#5E7480', letterSpacing: '0.06em' }}>
                   💬 MENSAJES
                 </p>
                 {notifMessages.length === 0 ? (
-                  <p style={{ margin: 0, fontSize: 13, color: '#5E7480', padding: '4px 0' }}>No hay mensajes nuevos</p>
+                  <p style={{ margin: 0, fontSize: 14, color: '#5E7480', padding: '4px 0' }}>No hay mensajes nuevos</p>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                     {notifMessages.map(msg => (
@@ -3965,14 +3965,14 @@ export default function Dashboard() {
                           💬
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <p style={{ margin: '0 0 2px', fontSize: 14, fontWeight: 700, color: '#0A4A6B' }}>
+                          <p style={{ margin: '0 0 2px', fontSize: 15, fontWeight: 700, color: '#0A4A6B' }}>
                             {msg.user_name ?? 'Familiar'}
                           </p>
-                          <p style={{ margin: 0, fontSize: 14, color: '#4B5563', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: 1.4 }}>
+                          <p style={{ margin: 0, fontSize: 15, color: '#4B5563', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: 1.4 }}>
                             {msg.message}
                           </p>
                         </div>
-                        <span style={{ fontSize: 12, color: '#5E7480', whiteSpace: 'nowrap', flexShrink: 0, marginTop: 2 }}>
+                        <span style={{ fontSize: 14, color: '#5E7480', whiteSpace: 'nowrap', flexShrink: 0, marginTop: 2 }}>
                           {timeAgo(new Date(msg.created_at))}
                         </span>
                       </button>
@@ -3987,17 +3987,17 @@ export default function Dashboard() {
                   onClick={() => { setShowNotifSheet(false); navigate('/paciente/notas-familia') }}
                   style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, marginBottom: 10, display: 'flex', alignItems: 'center', gap: 4, WebkitTapHighlightColor: 'transparent' }}
                 >
-                  <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#5E7480', letterSpacing: '0.06em' }}>
+                  <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#5E7480', letterSpacing: '0.06em' }}>
                     📓 NOTAS DE LA FAMILIA
                   </p>
-                  <span style={{ fontSize: 12, color: '#5E7480' }}>›</span>
+                  <span style={{ fontSize: 14, color: '#5E7480' }}>›</span>
                 </button>
                 {notifNotes.length === 0 ? (
                   <button
                     onClick={() => { setShowNotifSheet(false); navigate('/paciente/notas-familia') }}
                     style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0', textAlign: 'left', WebkitTapHighlightColor: 'transparent' }}
                   >
-                    <p style={{ margin: 0, fontSize: 13, color: '#5E7480' }}>No hay notas sin leer</p>
+                    <p style={{ margin: 0, fontSize: 14, color: '#5E7480' }}>No hay notas sin leer</p>
                   </button>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
@@ -4016,14 +4016,14 @@ export default function Dashboard() {
                           📝
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <p style={{ margin: '0 0 2px', fontSize: 14, fontWeight: 700, color: '#0A4A6B' }}>
+                          <p style={{ margin: '0 0 2px', fontSize: 15, fontWeight: 700, color: '#0A4A6B' }}>
                             {note.authorName}
                           </p>
-                          <p style={{ margin: 0, fontSize: 14, color: '#4B5563', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: 1.4 }}>
+                          <p style={{ margin: 0, fontSize: 15, color: '#4B5563', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: 1.4 }}>
                             {note.title ? `${note.title}: ` : ''}{note.content}
                           </p>
                         </div>
-                        <span style={{ fontSize: 12, color: '#5E7480', whiteSpace: 'nowrap', flexShrink: 0, marginTop: 2 }}>
+                        <span style={{ fontSize: 14, color: '#5E7480', whiteSpace: 'nowrap', flexShrink: 0, marginTop: 2 }}>
                           {timeAgo(new Date(note.created_at))}
                         </span>
                       </button>
@@ -4054,7 +4054,7 @@ export default function Dashboard() {
               {/* Header: patient name + close */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
                 <div>
-                  <p style={{ margin: 0, fontSize: 13, fontWeight: 500, color: '#5E7480', letterSpacing: '0.03em', textTransform: 'uppercase' }}>
+                  <p style={{ margin: 0, fontSize: 14, fontWeight: 500, color: '#5E7480', letterSpacing: '0.03em', textTransform: 'uppercase' }}>
                     Cuidando a
                   </p>
                   <p style={{ margin: '2px 0 0', fontSize: 18, fontWeight: 700, color: '#0A4A6B', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}>
@@ -4070,7 +4070,7 @@ export default function Dashboard() {
               </div>
 
               {/* Section 1: Care team */}
-              <p style={{ margin: '0 0 10px', fontSize: 14, fontWeight: 700, color: '#5E7480', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+              <p style={{ margin: '0 0 10px', fontSize: 15, fontWeight: 700, color: '#5E7480', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
                 Equipo de cuidado
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxHeight: '40vh', overflowY: 'auto' }}>
@@ -4107,12 +4107,12 @@ export default function Dashboard() {
                         {initial}
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#0A4A6B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {displayName}{isMe && <span style={{ fontWeight: 400, color: '#5E7480', fontSize: 13 }}> · Tú</span>}
+                        <p style={{ margin: 0, fontSize: 15, fontWeight: 600, color: '#0A4A6B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {displayName}{isMe && <span style={{ fontWeight: 400, color: '#5E7480', fontSize: 14 }}> · Tú</span>}
                         </p>
-                        <p style={{ margin: '2px 0 0', fontSize: 13, color: presence.color }}>{presence.dot} {presence.label}</p>
+                        <p style={{ margin: '2px 0 0', fontSize: 14, color: presence.color }}>{presence.dot} {presence.label}</p>
                       </div>
-                      <span style={{ fontSize: 13, fontWeight: 600, color: roleColor, background: roleBg, borderRadius: 20, padding: '3px 10px', flexShrink: 0 }}>
+                      <span style={{ fontSize: 14, fontWeight: 600, color: roleColor, background: roleBg, borderRadius: 20, padding: '3px 10px', flexShrink: 0 }}>
                         {roleLabel}
                       </span>
                     </div>
@@ -4126,7 +4126,7 @@ export default function Dashboard() {
                 if (!otherFamilies.length) return null
                 return (
                   <>
-                    <p style={{ margin: '18px 0 10px', fontSize: 14, fontWeight: 700, color: '#5E7480', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                    <p style={{ margin: '18px 0 10px', fontSize: 15, fontWeight: 700, color: '#5E7480', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
                       Otras familias
                     </p>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -4156,20 +4156,20 @@ export default function Dashboard() {
                                 width: 40, height: 40, borderRadius: '50%', flexShrink: 0,
                                 background: 'linear-gradient(135deg,#5E7480,#4E6470)',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                fontSize: 15, fontWeight: 700, color: 'white',
+                                fontSize: 16, fontWeight: 700, color: 'white',
                               }}>
                                 {famInitial}
                               </div>
                             )}
                             <div style={{ flex: 1, minWidth: 0 }}>
-                              <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#0A4A6B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              <p style={{ margin: 0, fontSize: 15, fontWeight: 600, color: '#0A4A6B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                 {fam.patientName ?? 'Mi familiar'}
                               </p>
-                              <span style={{ fontSize: 13, fontWeight: 600, color: famRoleColor, background: famRoleBg, borderRadius: 20, padding: '2px 8px' }}>
+                              <span style={{ fontSize: 14, fontWeight: 600, color: famRoleColor, background: famRoleBg, borderRadius: 20, padding: '2px 8px' }}>
                                 {famRoleLabel}
                               </span>
                             </div>
-                            <span style={{ fontSize: 13, color: '#5E7480', flexShrink: 0 }}>›</span>
+                            <span style={{ fontSize: 14, color: '#5E7480', flexShrink: 0 }}>›</span>
                           </button>
                         )
                       })}
@@ -4184,7 +4184,7 @@ export default function Dashboard() {
                 style={{
                   width: '100%', padding: '13px', marginTop: 16,
                   background: '#F5F0E8', border: 'none', borderRadius: 12,
-                  cursor: 'pointer', fontSize: 14, color: '#6F7A72', fontWeight: 600,
+                  cursor: 'pointer', fontSize: 15, color: '#6F7A72', fontWeight: 600,
                   WebkitTapHighlightColor: 'transparent',
                 }}
               >

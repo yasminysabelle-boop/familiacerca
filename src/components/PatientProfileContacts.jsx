@@ -5,12 +5,12 @@ import { MEDICAL_SPECIALTIES, INSTITUTION_TYPES, RELATIONSHIP_TYPES } from '../u
 // ── Style helpers ─────────────────────────────────────────────────────────────
 const F = {
   width: '100%', padding: '10px 12px', border: '1.5px solid #E6E3DB',
-  borderRadius: 10, fontSize: 14, outline: 'none', background: '#FDFAF7',
+  borderRadius: 10, fontSize: 15, outline: 'none', background: '#FDFAF7',
   boxSizing: 'border-box', color: '#1F2937', fontFamily: 'system-ui,sans-serif',
 }
 const fo = e => { e.target.style.borderColor = '#0891B2'; e.target.style.boxShadow = '0 0 0 3px rgba(8,145,178,0.1)' }
 const fb = e => { e.target.style.borderColor = '#E6E3DB'; e.target.style.boxShadow = 'none' }
-const L  = { fontSize: 13, fontWeight: 700, color: '#4E6470', letterSpacing: '0.07em', textTransform: 'uppercase', display: 'block', marginBottom: 4 }
+const L  = { fontSize: 14, fontWeight: 700, color: '#4E6470', letterSpacing: '0.07em', textTransform: 'uppercase', display: 'block', marginBottom: 4 }
 
 // ── Primitive field components ────────────────────────────────────────────────
 function Inp({ label, value, onChange, type = 'text', placeholder, mb = 10 }) {
@@ -42,8 +42,8 @@ function Grid2({ children }) {
 // ── Shared UI ─────────────────────────────────────────────────────────────────
 function CatLabel({ icon, title, color }) {
   return (
-    <p style={{ fontSize: 13, fontWeight: 700, color, textTransform: 'uppercase', letterSpacing: '0.07em', margin: '18px 0 8px', display: 'flex', alignItems: 'center', gap: 5 }}>
-      <span style={{ fontSize: 15 }}>{icon}</span>{title}
+    <p style={{ fontSize: 14, fontWeight: 700, color, textTransform: 'uppercase', letterSpacing: '0.07em', margin: '18px 0 8px', display: 'flex', alignItems: 'center', gap: 5 }}>
+      <span style={{ fontSize: 16 }}>{icon}</span>{title}
     </p>
   )
 }
@@ -53,7 +53,7 @@ function AddBtn({ label, color, onClick }) {
     <button type="button" onClick={onClick} style={{
       width: '100%', padding: '10px', borderRadius: 12, marginBottom: 4,
       border: `1.5px dashed ${color}66`, background: 'transparent',
-      color, fontWeight: 600, fontSize: 13, cursor: 'pointer',
+      color, fontWeight: 600, fontSize: 14, cursor: 'pointer',
     }}>+ {label}</button>
   )
 }
@@ -77,8 +77,8 @@ function CallBtn({ phone, big = false }) {
 function EditDeleteBtns({ onEdit, onDelete }) {
   return (
     <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
-      <button aria-label="Editar" type="button" onClick={onEdit}   style={{ padding: '5px 8px', borderRadius: 8, border: '1px solid #E6E3DB', background: 'white', cursor: 'pointer', fontSize: 13, lineHeight: 1 }}>✏️</button>
-      <button aria-label="Eliminar" type="button" onClick={onDelete} style={{ padding: '5px 8px', borderRadius: 8, border: '1px solid #FFCDD2', background: '#FFF8F8', cursor: 'pointer', fontSize: 13, lineHeight: 1 }}>🗑️</button>
+      <button aria-label="Editar" type="button" onClick={onEdit}   style={{ padding: '5px 8px', borderRadius: 8, border: '1px solid #E6E3DB', background: 'white', cursor: 'pointer', fontSize: 14, lineHeight: 1 }}>✏️</button>
+      <button aria-label="Eliminar" type="button" onClick={onDelete} style={{ padding: '5px 8px', borderRadius: 8, border: '1px solid #FFCDD2', background: '#FFF8F8', cursor: 'pointer', fontSize: 14, lineHeight: 1 }}>🗑️</button>
     </div>
   )
 }
@@ -86,10 +86,10 @@ function EditDeleteBtns({ onEdit, onDelete }) {
 function SaveCancelBtns({ onSave, onCancel, saving, disabled, color = '#0891B2' }) {
   return (
     <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 8 }}>
-      <button type="button" onClick={onCancel} style={{ padding: '8px 16px', borderRadius: 10, border: '1px solid #E6E3DB', background: 'white', color: '#4E6470', fontSize: 13, cursor: 'pointer' }}>
+      <button type="button" onClick={onCancel} style={{ padding: '8px 16px', borderRadius: 10, border: '1px solid #E6E3DB', background: 'white', color: '#4E6470', fontSize: 14, cursor: 'pointer' }}>
         Cancelar
       </button>
-      <button type="button" onClick={onSave} disabled={saving || disabled} style={{ padding: '8px 20px', borderRadius: 10, border: 'none', background: disabled || saving ? '#C9D6DB' : color, color: 'white', fontWeight: 700, fontSize: 13, cursor: disabled || saving ? 'not-allowed' : 'pointer' }}>
+      <button type="button" onClick={onSave} disabled={saving || disabled} style={{ padding: '8px 20px', borderRadius: 10, border: 'none', background: disabled || saving ? '#C9D6DB' : color, color: 'white', fontWeight: 700, fontSize: 14, cursor: disabled || saving ? 'not-allowed' : 'pointer' }}>
         {saving ? '...' : 'Guardar'}
       </button>
     </div>
@@ -103,14 +103,14 @@ function DoctorCard({ doc, canEdit, onEdit, onDelete }) {
     <div style={{ background: '#F0F9FF', borderRadius: 14, padding: '12px 14px', marginBottom: 8, border: '1px solid #BAE6FD' }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ fontSize: 14, fontWeight: 700, color: '#14303D', margin: '0 0 2px' }}>{doc.name}</p>
-          {doc.specialty && <p style={{ fontSize: 14, color: '#0891B2', margin: '0 0 2px', fontWeight: 600 }}>{doc.specialty}</p>}
-          {doc.clinic && <p style={{ fontSize: 14, color: '#4E6470', margin: '0 0 1px' }}>🏥 {doc.clinic}</p>}
-          {doc.address && <p style={{ fontSize: 14, color: '#4E6470', margin: '0 0 1px' }}>📍 {doc.address}</p>}
-          {doc.phone && <p style={{ fontSize: 14, color: '#4E6470', margin: '0 0 1px' }}>☎ {doc.phone}</p>}
-          {doc.cellphone && <p style={{ fontSize: 14, color: '#4E6470', margin: '0 0 1px' }}>📱 {doc.cellphone}</p>}
-          {doc.email && <p style={{ fontSize: 14, color: '#4E6470', margin: '0 0 1px' }}>✉ {doc.email}</p>}
-          {doc.notes && <p style={{ fontSize: 14, color: '#5E7480', margin: '4px 0 0', fontStyle: 'italic' }}>{doc.notes}</p>}
+          <p style={{ fontSize: 15, fontWeight: 700, color: '#14303D', margin: '0 0 2px' }}>{doc.name}</p>
+          {doc.specialty && <p style={{ fontSize: 15, color: '#0891B2', margin: '0 0 2px', fontWeight: 600 }}>{doc.specialty}</p>}
+          {doc.clinic && <p style={{ fontSize: 15, color: '#4E6470', margin: '0 0 1px' }}>🏥 {doc.clinic}</p>}
+          {doc.address && <p style={{ fontSize: 15, color: '#4E6470', margin: '0 0 1px' }}>📍 {doc.address}</p>}
+          {doc.phone && <p style={{ fontSize: 15, color: '#4E6470', margin: '0 0 1px' }}>☎ {doc.phone}</p>}
+          {doc.cellphone && <p style={{ fontSize: 15, color: '#4E6470', margin: '0 0 1px' }}>📱 {doc.cellphone}</p>}
+          {doc.email && <p style={{ fontSize: 15, color: '#4E6470', margin: '0 0 1px' }}>✉ {doc.email}</p>}
+          {doc.notes && <p style={{ fontSize: 15, color: '#5E7480', margin: '4px 0 0', fontStyle: 'italic' }}>{doc.notes}</p>}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
           <CallBtn phone={phone} />
@@ -145,14 +145,14 @@ function InstitutionCard({ inst, canEdit, onEdit, onDelete }) {
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
-            <p style={{ fontSize: 14, fontWeight: 700, color: '#14303D', margin: 0 }}>{inst.name}</p>
-            {inst.type && <span style={{ fontSize: 12, fontWeight: 700, color: '#1677A6', background: '#EDE9FE', padding: '2px 7px', borderRadius: 6 }}>{inst.type}</span>}
+            <p style={{ fontSize: 15, fontWeight: 700, color: '#14303D', margin: 0 }}>{inst.name}</p>
+            {inst.type && <span style={{ fontSize: 14, fontWeight: 700, color: '#1677A6', background: '#EDE9FE', padding: '2px 7px', borderRadius: 6 }}>{inst.type}</span>}
           </div>
-          {inst.address && <p style={{ fontSize: 14, color: '#4E6470', margin: '0 0 1px' }}>📍 {inst.address}</p>}
-          {inst.phone && <p style={{ fontSize: 14, color: '#4E6470', margin: '0 0 1px' }}>☎ {inst.phone}</p>}
-          {inst.email && <p style={{ fontSize: 14, color: '#4E6470', margin: '0 0 1px' }}>✉ {inst.email}</p>}
-          {inst.hours && <p style={{ fontSize: 14, color: '#4E6470', margin: '0 0 1px' }}>🕐 {inst.hours}</p>}
-          {inst.notes && <p style={{ fontSize: 14, color: '#5E7480', margin: '4px 0 0', fontStyle: 'italic' }}>{inst.notes}</p>}
+          {inst.address && <p style={{ fontSize: 15, color: '#4E6470', margin: '0 0 1px' }}>📍 {inst.address}</p>}
+          {inst.phone && <p style={{ fontSize: 15, color: '#4E6470', margin: '0 0 1px' }}>☎ {inst.phone}</p>}
+          {inst.email && <p style={{ fontSize: 15, color: '#4E6470', margin: '0 0 1px' }}>✉ {inst.email}</p>}
+          {inst.hours && <p style={{ fontSize: 15, color: '#4E6470', margin: '0 0 1px' }}>🕐 {inst.hours}</p>}
+          {inst.notes && <p style={{ fontSize: 15, color: '#5E7480', margin: '4px 0 0', fontStyle: 'italic' }}>{inst.notes}</p>}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
           <CallBtn phone={inst.phone} />
@@ -190,12 +190,12 @@ function ContactCard({ contact, canEdit, isEmergency, onEdit, onDelete }) {
     <div style={{ borderRadius: 14, padding: '12px 14px', marginBottom: 8, background: bg, border }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ fontSize: 14, fontWeight: 700, color: '#14303D', margin: '0 0 2px' }}>{contact.name}</p>
-          {contact.relationship && <p style={{ fontSize: 14, color: relColor, margin: '0 0 2px', fontWeight: 600 }}>{contact.relationship}</p>}
-          {phone && <p style={{ fontSize: 14, color: '#4E6470', margin: '0 0 1px' }}>📱 {phone}</p>}
-          {contact.email && <p style={{ fontSize: 14, color: '#4E6470', margin: '0 0 1px' }}>✉ {contact.email}</p>}
-          {contact.address && <p style={{ fontSize: 14, color: '#4E6470', margin: '0 0 1px' }}>📍 {contact.address}</p>}
-          {contact.notes && <p style={{ fontSize: 14, color: '#5E7480', margin: '4px 0 0', fontStyle: 'italic' }}>{contact.notes}</p>}
+          <p style={{ fontSize: 15, fontWeight: 700, color: '#14303D', margin: '0 0 2px' }}>{contact.name}</p>
+          {contact.relationship && <p style={{ fontSize: 15, color: relColor, margin: '0 0 2px', fontWeight: 600 }}>{contact.relationship}</p>}
+          {phone && <p style={{ fontSize: 15, color: '#4E6470', margin: '0 0 1px' }}>📱 {phone}</p>}
+          {contact.email && <p style={{ fontSize: 15, color: '#4E6470', margin: '0 0 1px' }}>✉ {contact.email}</p>}
+          {contact.address && <p style={{ fontSize: 15, color: '#4E6470', margin: '0 0 1px' }}>📍 {contact.address}</p>}
+          {contact.notes && <p style={{ fontSize: 15, color: '#5E7480', margin: '4px 0 0', fontStyle: 'italic' }}>{contact.notes}</p>}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
           <CallBtn phone={phone} big={isEmergency} />
@@ -231,11 +231,11 @@ function DeleteModal({ name, onConfirm, onCancel }) {
     <div style={{ position: 'fixed', inset: 0, zIndex: 400, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 24px' }}>
       <div style={{ background: 'white', borderRadius: 20, padding: '28px 24px', maxWidth: 320, width: '100%', textAlign: 'center', boxShadow: '0 24px 64px rgba(0,0,0,0.2)' }}>
         <p style={{ fontSize: 36, marginBottom: 10 }}>🗑️</p>
-        <p style={{ fontSize: 15, fontWeight: 700, color: '#14303D', margin: '0 0 6px' }}>¿Eliminar contacto?</p>
-        <p style={{ fontSize: 13, color: '#4E6470', margin: '0 0 24px' }}>{name}</p>
+        <p style={{ fontSize: 16, fontWeight: 700, color: '#14303D', margin: '0 0 6px' }}>¿Eliminar contacto?</p>
+        <p style={{ fontSize: 14, color: '#4E6470', margin: '0 0 24px' }}>{name}</p>
         <div style={{ display: 'flex', gap: 10 }}>
-          <button type="button" onClick={onCancel} style={{ flex: 1, padding: '11px', borderRadius: 12, border: '1.5px solid #E6E3DB', background: 'white', color: '#4E6470', fontWeight: 600, fontSize: 13, cursor: 'pointer' }}>Cancelar</button>
-          <button type="button" onClick={onConfirm} style={{ flex: 1, padding: '11px', borderRadius: 12, border: 'none', background: '#D63031', color: 'white', fontWeight: 700, fontSize: 13, cursor: 'pointer', boxShadow: '0 4px 14px rgba(214,48,49,0.3)' }}>Eliminar</button>
+          <button type="button" onClick={onCancel} style={{ flex: 1, padding: '11px', borderRadius: 12, border: '1.5px solid #E6E3DB', background: 'white', color: '#4E6470', fontWeight: 600, fontSize: 14, cursor: 'pointer' }}>Cancelar</button>
+          <button type="button" onClick={onConfirm} style={{ flex: 1, padding: '11px', borderRadius: 12, border: 'none', background: '#D63031', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer', boxShadow: '0 4px 14px rgba(214,48,49,0.3)' }}>Eliminar</button>
         </div>
       </div>
     </div>
@@ -396,7 +396,7 @@ export default function PatientProfileContacts({ ownerId, canEdit, initialForm, 
   const ed = (k, v) => setEditData(p => ({ ...p, [k]: v }))
   const ad = (k, v) => setAddData(p => ({ ...p, [k]: v }))
 
-  if (loading) return <p style={{ color: '#5E7480', fontSize: 13 }}>Cargando directorio...</p>
+  if (loading) return <p style={{ color: '#5E7480', fontSize: 14 }}>Cargando directorio...</p>
 
   const primaryDoctor = doctors.find(d => d.is_primary)
   const specialists   = doctors.filter(d => !d.is_primary)

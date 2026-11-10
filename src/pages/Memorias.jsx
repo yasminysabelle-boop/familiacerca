@@ -165,10 +165,10 @@ export default function Memorias() {
           }}>
             <span style={{ fontSize: 24, flexShrink: 0 }}>🎙️</span>
             <div>
-              <p style={{ fontSize: 14, fontWeight: 700, color: '#6D28D9', margin: '0 0 2px' }}>
+              <p style={{ fontSize: 15, fontWeight: 700, color: '#6D28D9', margin: '0 0 2px' }}>
                 En este día, hace un año...
               </p>
-              <p style={{ fontSize: 14, color: '#1677A6', margin: 0 }}>{yearAgoMemory.title}</p>
+              <p style={{ fontSize: 15, color: '#1677A6', margin: 0 }}>{yearAgoMemory.title}</p>
             </div>
           </div>
         )}
@@ -181,7 +181,7 @@ export default function Memorias() {
             display: 'flex', alignItems: 'center', gap: 12,
           }}>
             <span style={{ fontSize: 22 }}>👁️</span>
-            <p style={{ fontSize: 13, color: '#4E6470', margin: 0 }}>
+            <p style={{ fontSize: 14, color: '#4E6470', margin: 0 }}>
               Solo puedes escuchar las memorias grabadas por el cuidador.
             </p>
           </div>
@@ -196,7 +196,7 @@ export default function Memorias() {
           {step === 'idle' && (
             <div style={{ textAlign: 'center', padding: '12px 0 8px' }}>
               <p style={{
-                fontSize: 14, fontWeight: 600, letterSpacing: '0.06em',
+                fontSize: 15, fontWeight: 600, letterSpacing: '0.06em',
                 textTransform: 'uppercase', color: '#5E7480', marginBottom: 24,
               }}>
                 Memoria de {patientName}
@@ -206,7 +206,7 @@ export default function Memorias() {
                 <div style={{
                   marginBottom: 20, padding: '12px 16px', borderRadius: 14,
                   background: '#FFF0F0', border: '1.5px solid #FFBABA',
-                  color: '#B91C1C', fontSize: 13, fontWeight: 500,
+                  color: '#B91C1C', fontSize: 14, fontWeight: 500,
                   lineHeight: 1.5, textAlign: 'left',
                   boxShadow: '0 2px 8px rgba(214,48,49,0.12)',
                 }}>
@@ -231,7 +231,7 @@ export default function Memorias() {
                 border: '3px solid #E6E3DB', borderTopColor: '#0C6C9C',
                 animation: 'spin 0.8s linear infinite',
               }} />
-              <p style={{ fontSize: 14, color: '#4E6470' }}>Guardando memoria...</p>
+              <p style={{ fontSize: 15, color: '#4E6470' }}>Guardando memoria...</p>
             </div>
           )}
         </div>
@@ -260,7 +260,7 @@ export default function Memorias() {
           grouped.map(({ key, label, items }) => (
             <div key={key} style={{ marginBottom: 8 }}>
               <p style={{
-                fontSize: 13, fontWeight: 700, letterSpacing: '0.08em',
+                fontSize: 14, fontWeight: 700, letterSpacing: '0.08em',
                 textTransform: 'uppercase', color: '#5E7480',
                 marginBottom: 8, paddingLeft: 2,
               }}>
@@ -289,7 +289,7 @@ export default function Memorias() {
                         </span>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
-                            <p style={{ fontSize: 13, fontWeight: 700, color: '#14303D', margin: 0, lineHeight: 1.4 }}>
+                            <p style={{ fontSize: 14, fontWeight: 700, color: '#14303D', margin: 0, lineHeight: 1.4 }}>
                               {rec.title}
                             </p>
                             {rec.user_id === user.id && (
@@ -297,12 +297,12 @@ export default function Memorias() {
                                 onClick={e => { e.stopPropagation(); deleteRecording(rec.id) }}
                                 style={{
                                   background: 'none', border: 'none', color: '#C9D6DB',
-                                  cursor: 'pointer', padding: 2, flexShrink: 0, fontSize: 14,
+                                  cursor: 'pointer', padding: 2, flexShrink: 0, fontSize: 15,
                                 }}
                               >✕</button>
                             )}
                           </div>
-                          <p style={{ fontSize: 13, color: '#5E7480', margin: '4px 0 0' }}>
+                          <p style={{ fontSize: 14, color: '#5E7480', margin: '4px 0 0' }}>
                             {name} · {new Date(rec.created_at).toLocaleTimeString('es-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
                             {rec.duration_seconds ? ` · ⏱ ${fmt(rec.duration_seconds)}` : ''}
                           </p>
@@ -311,7 +311,7 @@ export default function Memorias() {
                               display: 'inline-block', marginTop: 6,
                               background: `${moodObj.color}15`, color: moodObj.color,
                               padding: '2px 8px', borderRadius: 6,
-                              fontSize: 12, fontWeight: 700,
+                              fontSize: 14, fontWeight: 700,
                               border: `1px solid ${moodObj.color}30`,
                             }}>
                               {moodObj.label}
@@ -321,7 +321,7 @@ export default function Memorias() {
                       </div>
                       {rec.transcription && (
                         <p style={{
-                          fontSize: 14, color: '#4E6470', lineHeight: 1.5,
+                          fontSize: 15, color: '#4E6470', lineHeight: 1.5,
                           marginTop: 8, fontStyle: 'italic',
                         }}>
                           "{rec.transcription}"
@@ -336,7 +336,7 @@ export default function Memorias() {
                           onClick={e => e.stopPropagation()}
                         />
                       ) : (
-                        <p style={{ fontSize: 13, color: '#0C6C9C', marginTop: 8, fontWeight: 600 }}>
+                        <p style={{ fontSize: 14, color: '#0C6C9C', marginTop: 8, fontWeight: 600 }}>
                           ▶ Tap para escuchar
                         </p>
                       )}

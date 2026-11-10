@@ -52,14 +52,14 @@ export default function DischargeDateCard() {
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
         <span style={{ fontSize: 20 }}>🗓️</span>
-        <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#14303D', flex: 1 }}>
+        <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#14303D', flex: 1 }}>
           Fecha de alta estimada
         </h3>
         <button
           onClick={() => setEditing(e => !e)}
           style={{
             padding: '5px 12px', borderRadius: 8, border: '1px solid #D1C9BF',
-            background: 'white', color: '#0A5A82', fontSize: 14,
+            background: 'white', color: '#0A5A82', fontSize: 15,
             fontWeight: 700, cursor: 'pointer',
           }}
         >
@@ -73,17 +73,17 @@ export default function DischargeDateCard() {
           background: 'linear-gradient(135deg, #EFF6FF, #DBEAFE)',
           border: '1px solid #BFDBFE',
         }}>
-          <p style={{ margin: '0 0 2px', fontSize: 15, fontWeight: 700, color: '#1E40AF' }}>
+          <p style={{ margin: '0 0 2px', fontSize: 16, fontWeight: 700, color: '#1E40AF' }}>
             {formatted}
           </p>
-          <p style={{ margin: 0, fontSize: 13, color: '#3B82F6', fontWeight: 600 }}>
+          <p style={{ margin: 0, fontSize: 14, color: '#3B82F6', fontWeight: 600 }}>
             Alta estimada {remaining}
           </p>
         </div>
       )}
 
       {!editing && !displayDate && (
-        <p style={{ margin: 0, fontSize: 13, color: '#5E7480', textAlign: 'center', padding: '6px 0' }}>
+        <p style={{ margin: 0, fontSize: 14, color: '#5E7480', textAlign: 'center', padding: '6px 0' }}>
           Sin fecha estimada aún
         </p>
       )}
@@ -91,7 +91,7 @@ export default function DischargeDateCard() {
       {editing && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           <div>
-            <label style={{ fontSize: 14, fontWeight: 600, color: '#30454F', display: 'block', marginBottom: 6 }}>
+            <label style={{ fontSize: 15, fontWeight: 600, color: '#30454F', display: 'block', marginBottom: 6 }}>
               Fecha de alta
             </label>
             <input
@@ -100,7 +100,7 @@ export default function DischargeDateCard() {
               onChange={e => setDate(e.target.value)}
               style={{
                 width: '100%', padding: '10px 12px', borderRadius: 10,
-                border: '1.5px solid #D1C9BF', fontSize: 14, color: '#14303D',
+                border: '1.5px solid #D1C9BF', fontSize: 15, color: '#14303D',
                 background: 'white', boxSizing: 'border-box',
               }}
             />
@@ -111,7 +111,7 @@ export default function DischargeDateCard() {
             style={{
               alignSelf: 'flex-end', padding: '8px 20px', borderRadius: 10,
               border: 'none', background: '#0A5A82', color: 'white',
-              fontWeight: 700, fontSize: 13, cursor: saving ? 'default' : 'pointer',
+              fontWeight: 700, fontSize: 14, cursor: saving ? 'default' : 'pointer',
             }}
           >
             {saving ? 'Guardando...' : 'Guardar'}

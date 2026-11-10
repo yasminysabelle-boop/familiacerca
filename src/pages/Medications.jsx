@@ -215,13 +215,13 @@ const emptyStock = { totalPills: '', renewalMethod: '', pharmacyName: '', refill
 const fieldStyle = {
   width: '100%', padding: '11px 14px', borderRadius: 14,
   border: '1.5px solid rgba(51,65,85,0.14)', background: '#FDFAF7',
-  fontSize: 14, outline: 'none', boxSizing: 'border-box',
+  fontSize: 15, outline: 'none', boxSizing: 'border-box',
   transition: 'all 0.15s', appearance: 'none', WebkitAppearance: 'none',
 }
 const onFocus = e => { e.target.style.borderColor = '#0C6C9C'; e.target.style.boxShadow = '0 0 0 3px rgba(12,108,156,0.1)' }
 const onBlur  = e => { e.target.style.borderColor = 'rgba(51,65,85,0.14)'; e.target.style.boxShadow = 'none' }
 const labelStyle = {
-  display: 'block', fontSize: 13, fontWeight: 700, color: '#4E6470',
+  display: 'block', fontSize: 14, fontWeight: 700, color: '#4E6470',
   letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6,
 }
 
@@ -1047,8 +1047,8 @@ export default function Medications() {
             <ChevronLeft size={19} color="#2A4350" strokeWidth={2.2} />
           </button>
           <div style={{ minWidth: 0 }}>
-            <div style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontWeight: 800, fontSize: 21, color: '#14303D', letterSpacing: '-0.3px' }}>Medicamentos</div>
-            <div style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontStyle: 'italic', fontWeight: 500, fontSize: 13.5, color: '#0C6C9C', marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <div style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontWeight: 800, fontSize: 22, color: '#14303D', letterSpacing: '-0.3px' }}>Medicamentos</div>
+            <div style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontWeight: 500, fontSize: 15, color: '#0C6C9C', marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               Cuidando a {activePatientName || profile?.name || 'tu familiar'}
             </div>
           </div>
@@ -1079,7 +1079,7 @@ export default function Medications() {
                 borderRadius: 999, border: 'none',
                 background: activeTab === tab ? 'linear-gradient(148deg,#1677A6 0%,#0C6C9C 46%,#0A5A82 100%)' : '#FFFFFF',
                 color: activeTab === tab ? '#FFFFFF' : '#5C6B78',
-                fontWeight: 700, fontSize: 13,
+                fontWeight: 700, fontSize: 14,
                 fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
                 boxShadow: activeTab === tab ? '0 8px 16px -8px #087F7066' : '0 4px 10px -6px #087F7022',
                 transition: 'all 0.2s',
@@ -1108,13 +1108,13 @@ export default function Medications() {
         {supported && permission !== 'granted' && permission !== 'denied' && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'white', borderRadius: 20, padding: '14px 16px', marginBottom: 14, boxShadow: '0 6px 14px -8px #087F7033' }}>
             <div style={{ width: 36, height: 36, borderRadius: 12, flexShrink: 0, background: '#E3F1F8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Bell size={18} color="#0C6C9C" strokeWidth={1.5} />
+              <Bell size={18} color="#0C6C9C" strokeWidth={2.1} />
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ fontSize: 13, fontWeight: 600, color: '#2A4350', marginBottom: 1 }}>Recordatorios de medicamentos</p>
-              <p style={{ fontSize: 13, color: '#4E6470' }}>Activa las notificaciones para no olvidar ninguna dosis.</p>
+              <p style={{ fontSize: 14, fontWeight: 600, color: '#2A4350', marginBottom: 1 }}>Recordatorios de medicamentos</p>
+              <p style={{ fontSize: 14, color: '#4E6470' }}>Activa las notificaciones para no olvidar ninguna dosis.</p>
             </div>
-            <button onClick={requestAndSubscribe} style={{ padding: '7px 16px', borderRadius: 999, background: '#BF513C', color: 'white', fontWeight: 700, fontSize: 14, border: 'none', cursor: 'pointer', flexShrink: 0 }}>
+            <button onClick={requestAndSubscribe} style={{ padding: '7px 16px', borderRadius: 999, background: '#BF513C', color: 'white', fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer', flexShrink: 0 }}>
               Activar
             </button>
           </div>
@@ -1127,8 +1127,12 @@ export default function Medications() {
         ) : medications.length === 0 ? (
           <EmptyState
             icon="💊"
-            title="Sin medicamentos aún"
-            description="Toma una foto de la receta o de la caja y Milo los agrega por ti. También puedes escribirlos."
+            title="Todavía no hay medicinas"
+            description="Toma una foto de la receta o de la caja y Milo las agrega por ti. También puedes escribirlas."
+            example={[
+              { icon: '💊', title: 'Losartán 50 mg', sub: '8:00 a. m. · Ya se la dio Ana ✓' },
+              { icon: '💊', title: 'Metformina 500 mg', sub: '7:00 p. m. · Pendiente' },
+            ]}
             actionLabel={isAdmin ? '📷 Agregar con una foto' : undefined}
             onAction={isAdmin ? openAdd : undefined}
           />
@@ -1174,7 +1178,7 @@ export default function Medications() {
                     <div style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontStyle: 'italic', fontWeight: 600, fontSize: 17.5, color: '#0A5A82', lineHeight: 1.35 }}>{title}</div>
                     {isAllDone && <Heart size={17} color="#A3452F" strokeWidth={2} filled />}
                   </div>
-                  <div style={{ fontSize: 13.5, color: '#3E5A54', marginTop: 6, lineHeight: 1.5 }}>{subtitle}</div>
+                  <div style={{ fontSize: 15, color: '#3E5A54', marginTop: 6, lineHeight: 1.5 }}>{subtitle}</div>
                 </div>
               )
             })()}
@@ -1186,13 +1190,13 @@ export default function Medications() {
                   {todayContributors.slice(0, 4).map((name, i) => {
                     const colors = ['#0C6C9C','#0C6C9C','#1677A6','#0A5A82']
                     return (
-                      <div key={i} style={{ width: 28, height: 28, borderRadius: '50%', background: colors[i % 4], color: 'white', fontSize: 14, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: i > 0 ? -8 : 0, border: '2px solid #E3F1F8', flexShrink: 0 }}>
+                      <div key={i} style={{ width: 28, height: 28, borderRadius: '50%', background: colors[i % 4], color: 'white', fontSize: 15, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: i > 0 ? -8 : 0, border: '2px solid #E3F1F8', flexShrink: 0 }}>
                         {name.charAt(0).toUpperCase()}
                       </div>
                     )
                   })}
                 </div>
-                <p style={{ fontSize: 14, color: '#0A5A82', fontWeight: 600, margin: 0 }}>
+                <p style={{ fontSize: 15, color: '#0A5A82', fontWeight: 600, margin: 0 }}>
                   {todayContributors.length === 1
                     ? `${todayContributors[0].split(' ')[0]} participó hoy`
                     : `${todayContributors.slice(0, 2).map(n => n.split(' ')[0]).join(' y ')} participaron hoy`}
@@ -1215,14 +1219,14 @@ export default function Medications() {
                     boxShadow: '0 4px 12px -8px #E9826E55',
                   }}
                 >
-                  <span style={{ flexShrink: 0, display: 'flex' }}><Camera size={17} color="#C4664F" strokeWidth={1.9} /></span>
+                  <span style={{ flexShrink: 0, display: 'flex' }}><Camera size={17} color="#C4664F" strokeWidth={2.1} /></span>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ fontSize: 13, fontWeight: 700, color: '#A3452F', margin: 0 }}>
+                    <p style={{ fontSize: 14, fontWeight: 700, color: '#A3452F', margin: 0 }}>
                       ¿Quieres agregar una foto? (opcional)
                     </p>
-                    <p style={{ fontSize: 13, color: '#8A5A4A', margin: '2px 0 0' }}>{med.name}</p>
+                    <p style={{ fontSize: 14, color: '#8A5A4A', margin: '2px 0 0' }}>{med.name}</p>
                   </div>
-                  <span style={{ fontSize: 13, color: '#A3452F', fontWeight: 700, flexShrink: 0 }}>Agregar</span>
+                  <span style={{ fontSize: 14, color: '#A3452F', fontWeight: 700, flexShrink: 0 }}>Agregar</span>
                 </button>
               )
             })}
@@ -1256,7 +1260,7 @@ export default function Medications() {
 
               return SECTIONS.filter(s => buckets[s.key].length > 0).map(section => (
                 <div key={section.key}>
-                  <p style={{ fontSize: 14, fontWeight: 700, letterSpacing: '1.2px', color: '#7D8A9A', textTransform: 'uppercase', margin: '0 0 10px 2px' }}>
+                  <p style={{ fontSize: 15, fontWeight: 700, letterSpacing: '1.2px', color: '#7D8A9A', textTransform: 'uppercase', margin: '0 0 10px 2px' }}>
                     {section.label}
                   </p>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -1271,15 +1275,15 @@ export default function Medications() {
                           <div key={med.id} style={{ background: 'white', borderRadius: 20, padding: 16, boxShadow: '0 6px 14px -8px #087F7022' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: times.length ? 8 : 0 }}>
                               <span style={{ width: 40, height: 40, borderRadius: '50%', background: '#E3F1F8', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                <Pill size={18} color="#0C6C9C" strokeWidth={1.9} />
+                                <Pill size={18} color="#0C6C9C" strokeWidth={2.1} />
                               </span>
                               <div style={{ flex: 1, minWidth: 0 }}>
                                 <p style={{ fontSize: 15.5, fontWeight: 700, color: '#14303D', margin: 0 }}>
-                                  {med.name}{med.dosage ? <span style={{ fontWeight: 400, color: '#4E6470', fontSize: 13 }}> · {med.dosage}</span> : null}
+                                  {med.name}{med.dosage ? <span style={{ fontWeight: 400, color: '#4E6470', fontSize: 14 }}> · {med.dosage}</span> : null}
                                 </p>
                               </div>
                               <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-                                <span style={{ fontSize: 13, fontWeight: 700, color: sCfg.color, background: sCfg.bg, padding: '3px 10px', borderRadius: 999 }}>
+                                <span style={{ fontSize: 14, fontWeight: 700, color: sCfg.color, background: sCfg.bg, padding: '3px 10px', borderRadius: 999 }}>
                                   {sCfg.label}
                                 </span>
                                 {isAdmin && (
@@ -1292,11 +1296,11 @@ export default function Medications() {
                             {times.length > 0 && (
                               <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 10 }}>
                                 {times.map((t, i) => (
-                                  <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 3, background: '#E3F1F8', color: '#0A5A82', padding: '2px 8px', borderRadius: 6, fontSize: 13, fontWeight: 600 }}>
+                                  <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 3, background: '#E3F1F8', color: '#0A5A82', padding: '2px 8px', borderRadius: 6, fontSize: 14, fontWeight: 600 }}>
                                     <Clock size={10} color="#0A5A82" strokeWidth={2.2} /> {t}
                                   </span>
                                 ))}
-                                {med.time_window_minutes && <span style={{ fontSize: 13, color: '#4E6470' }}>ventana {med.time_window_minutes} min</span>}
+                                {med.time_window_minutes && <span style={{ fontSize: 14, color: '#4E6470' }}>ventana {med.time_window_minutes} min</span>}
                               </div>
                             )}
                             {!isFamiliar && (() => {
@@ -1309,7 +1313,7 @@ export default function Medications() {
                                     width: '100%', padding: '10px', borderRadius: 999, border: 'none',
                                     background: notYetOpen ? '#E5E1D6' : '#BF513C',
                                     color: notYetOpen ? '#8A8F85' : 'white',
-                                    fontWeight: 700, fontSize: 14,
+                                    fontWeight: 700, fontSize: 15,
                                     cursor: notYetOpen ? 'not-allowed' : 'pointer',
                                     boxShadow: notYetOpen ? 'none' : '0 4px 12px rgba(233,130,110,0.35)',
                                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
@@ -1342,10 +1346,10 @@ export default function Medications() {
                               </span>
                               <div style={{ flex: 1, minWidth: 0 }}>
                                 <p style={{ fontSize: 15.5, fontWeight: 700, color: '#14303D', margin: '0 0 2px' }}>
-                                  {med.name}{med.dosage ? <span style={{ fontWeight: 400, color: '#4E6470', fontSize: 13 }}> · {med.dosage}</span> : null}
+                                  {med.name}{med.dosage ? <span style={{ fontWeight: 400, color: '#4E6470', fontSize: 14 }}> · {med.dosage}</span> : null}
                                 </p>
                                 {timeLabel && (
-                                  <p style={{ fontSize: 14, color: '#8A5A4A', fontWeight: 600, margin: 0 }}>
+                                  <p style={{ fontSize: 15, color: '#8A5A4A', fontWeight: 600, margin: 0 }}>
                                     Programado: {timeLabel}
                                   </p>
                                 )}
@@ -1357,12 +1361,12 @@ export default function Medications() {
                               )}
                             </div>
                             <div style={{ background: 'rgba(255,255,255,0.55)', borderRadius: 10, padding: '10px 12px', marginBottom: 10 }}>
-                              <p style={{ fontSize: 14, color: '#8A5A4A', lineHeight: 1.6, margin: 0, fontWeight: 500 }}>
+                              <p style={{ fontSize: 15, color: '#8A5A4A', lineHeight: 1.6, margin: 0, fontWeight: 500 }}>
                                 Esta dosis no se registró a tiempo. ¿Se administró y no dio tiempo de registrarla?
                               </p>
                             </div>
                             {!isFamiliar && (
-                              <button onClick={() => handleTapAdministrar(med)} style={{ width: '100%', padding: '10px', borderRadius: 999, border: 'none', background: '#BF513C', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer', boxShadow: '0 4px 12px rgba(233,130,110,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 8 }}>
+                              <button onClick={() => handleTapAdministrar(med)} style={{ width: '100%', padding: '10px', borderRadius: 999, border: 'none', background: '#BF513C', color: 'white', fontWeight: 700, fontSize: 15, cursor: 'pointer', boxShadow: '0 4px 12px rgba(233,130,110,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 8 }}>
                                 <CheckIcon size={15} color="white" strokeWidth={2.6} /> Registrar ahora
                               </button>
                             )}
@@ -1370,7 +1374,7 @@ export default function Medications() {
                               href={`https://wa.me/?text=${waText}`}
                               target="_blank"
                               rel="noreferrer"
-                              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, width: '100%', padding: '8px', borderRadius: 10, border: '1px solid #E9826E', background: 'transparent', color: '#A3452F', fontWeight: 600, fontSize: 14, textDecoration: 'none' }}
+                              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, width: '100%', padding: '8px', borderRadius: 10, border: '1px solid #E9826E', background: 'transparent', color: '#A3452F', fontWeight: 600, fontSize: 15, textDecoration: 'none' }}
                             >
                               Notificar al médico
                             </a>
@@ -1417,8 +1421,8 @@ export default function Medications() {
                                 <Clock size={15} color="#C4664F" strokeWidth={2} />
                               </span>
                             )}
-                            <p style={{ fontSize: 14.5, fontWeight: 700, color: isOmitted ? '#14303D' : '#0C6C9C', margin: 0, flex: 1 }}>
-                              {med.name}{med.dosage ? <span style={{ fontWeight: 400, color: '#4E6470', fontSize: 14 }}> · {med.dosage}</span> : null}
+                            <p style={{ fontSize: 16, fontWeight: 700, color: isOmitted ? '#14303D' : '#0C6C9C', margin: 0, flex: 1 }}>
+                              {med.name}{med.dosage ? <span style={{ fontWeight: 400, color: '#4E6470', fontSize: 15 }}> · {med.dosage}</span> : null}
                             </p>
                             {isAdmin && (
                               <button onClick={() => openEdit(med)} style={{ padding: 5, border: 'none', background: 'transparent', cursor: 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center' }}>
@@ -1428,55 +1432,55 @@ export default function Medications() {
                           </div>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: 4, paddingLeft: 42 }}>
                             {scheduledTime && (
-                              <span style={{ fontSize: 13, color: '#4E6470', display: 'flex', alignItems: 'center', gap: 4 }}>
+                              <span style={{ fontSize: 14, color: '#4E6470', display: 'flex', alignItems: 'center', gap: 4 }}>
                                 <Clock size={11} color="#4E6470" strokeWidth={2} /> Programado: {scheduledTime}
                               </span>
                             )}
                             {confTime && (
-                              <span style={{ fontSize: 13, color: '#0C6C9C', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
+                              <span style={{ fontSize: 14, color: '#0C6C9C', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
                                 <Clock size={11} color="#4E6470" strokeWidth={2} /> {isOmitted ? 'Sin registro de toma' : `Administrado: ${confTime}`}
                               </span>
                             )}
                             {byName && !isOmitted && (
-                              <span style={{ fontSize: 13, color: '#4E6470', display: 'flex', alignItems: 'center', gap: 4 }}>
+                              <span style={{ fontSize: 14, color: '#4E6470', display: 'flex', alignItems: 'center', gap: 4 }}>
                                 <User size={11} color="#4E6470" strokeWidth={2} /> Por: {byName}
                               </span>
                             )}
                             {isOmitted && (
                               <div style={{ background: 'rgba(255,255,255,0.55)', borderRadius: 10, padding: '8px 10px', marginTop: 2 }}>
-                                <p style={{ fontSize: 13, color: '#8A5A4A', lineHeight: 1.5, margin: 0, fontWeight: 500 }}>
+                                <p style={{ fontSize: 14, color: '#8A5A4A', lineHeight: 1.5, margin: 0, fontWeight: 500 }}>
                                   Esta dosis no se registró a tiempo. ¿Se administró y no dio tiempo de registrarla?
                                   {!isAutoMissed && omissionData?.reason && ` Motivo registrado: ${omissionData.reason}.`}
                                 </p>
                               </div>
                             )}
                             {!isOmitted && (
-                              <span style={{ fontSize: 13, fontWeight: 600, color: todayLog?.given_on_time === false ? '#D97706' : '#0C6C9C', display: 'flex', alignItems: 'center', gap: 4 }}>
+                              <span style={{ fontSize: 14, fontWeight: 600, color: todayLog?.given_on_time === false ? '#D97706' : '#0C6C9C', display: 'flex', alignItems: 'center', gap: 4 }}>
                                 {todayLog?.given_on_time === false && todayLog?.minutes_late
                                   ? `Se registró más tarde de lo programado`
                                   : <><CheckIcon size={11} color="#4E6470" strokeWidth={2.4} /> Administrado a tiempo</>}
                               </span>
                             )}
                             {isOmitted && !isFamiliar && (
-                              <button onClick={() => handleTapAdministrar(med)} style={{ marginTop: 6, width: '100%', padding: '9px', borderRadius: 999, border: 'none', background: '#BF513C', color: 'white', fontWeight: 700, fontSize: 13, cursor: 'pointer', boxShadow: '0 4px 12px rgba(233,130,110,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                              <button onClick={() => handleTapAdministrar(med)} style={{ marginTop: 6, width: '100%', padding: '9px', borderRadius: 999, border: 'none', background: '#BF513C', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer', boxShadow: '0 4px 12px rgba(233,130,110,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
                                 <CheckIcon size={14} color="white" strokeWidth={2.4} /> Registrar ahora
                               </button>
                             )}
-                            {med.notes && <span style={{ fontSize: 13, color: '#4E6470' }}>📝 {med.notes}</span>}
+                            {med.notes && <span style={{ fontSize: 14, color: '#4E6470' }}>📝 {med.notes}</span>}
                             {(todayLog?.photo_url || stockDoc?.prescription_photo_url || stockDoc?.box_photo_url || (todayLog?.latitude && todayLog?.longitude)) && (
                               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 2 }}>
                                 {todayLog?.photo_url && (
-                                  <button onClick={() => setPreviewPhotoUrl(todayLog.photo_url)} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 8, border: '1px solid #A6E3EC', background: 'white', fontSize: 13, fontWeight: 600, color: '#0C6C9C', cursor: 'pointer' }}>
+                                  <button onClick={() => setPreviewPhotoUrl(todayLog.photo_url)} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 8, border: '1px solid #A6E3EC', background: 'white', fontSize: 14, fontWeight: 600, color: '#0C6C9C', cursor: 'pointer' }}>
                                     <Camera size={11} color="#4E6470" strokeWidth={2} /> Ver evidencia
                                   </button>
                                 )}
                                 {stockDoc?.prescription_photo_url && (
-                                  <button onClick={() => setPreviewPhotoUrl(stockDoc.prescription_photo_url)} style={{ padding: '4px 10px', borderRadius: 8, border: '1px solid #A6E3EC', background: 'white', fontSize: 13, fontWeight: 600, color: '#0C6C9C', cursor: 'pointer' }}>
+                                  <button onClick={() => setPreviewPhotoUrl(stockDoc.prescription_photo_url)} style={{ padding: '4px 10px', borderRadius: 8, border: '1px solid #A6E3EC', background: 'white', fontSize: 14, fontWeight: 600, color: '#0C6C9C', cursor: 'pointer' }}>
                                     📄 Ver receta
                                   </button>
                                 )}
                                 {stockDoc?.box_photo_url && (
-                                  <button onClick={() => setPreviewPhotoUrl(stockDoc.box_photo_url)} style={{ padding: '4px 10px', borderRadius: 8, border: '1px solid #A6E3EC', background: 'white', fontSize: 13, fontWeight: 600, color: '#0C6C9C', cursor: 'pointer' }}>
+                                  <button onClick={() => setPreviewPhotoUrl(stockDoc.box_photo_url)} style={{ padding: '4px 10px', borderRadius: 8, border: '1px solid #A6E3EC', background: 'white', fontSize: 14, fontWeight: 600, color: '#0C6C9C', cursor: 'pointer' }}>
                                     📦 Ver caja
                                   </button>
                                 )}
@@ -1484,7 +1488,7 @@ export default function Medications() {
                                   <a
                                     href={mapsUrl(todayLog.latitude, todayLog.longitude)}
                                     target="_blank" rel="noopener noreferrer"
-                                    style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 8, border: '1px solid #A6E3EC', background: 'white', fontSize: 13, fontWeight: 600, color: '#0C6C9C', textDecoration: 'none' }}
+                                    style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 8, border: '1px solid #A6E3EC', background: 'white', fontSize: 14, fontWeight: 600, color: '#0C6C9C', textDecoration: 'none' }}
                                   >
                                     <MapPin size={11} color="#0C6C9C" strokeWidth={2} /> Ver ubicación
                                   </a>
@@ -1502,7 +1506,7 @@ export default function Medications() {
 
             {/* Mensaje emocional de cierre */}
             <div style={{ background: '#FFFFFF', borderRadius: 20, padding: '18px 18px', textAlign: 'center', boxShadow: '0 6px 14px -8px #087F7022' }}>
-              <p style={{ fontSize: 13, color: '#4E6470', margin: 0, lineHeight: 1.55 }}>
+              <p style={{ fontSize: 14, color: '#4E6470', margin: 0, lineHeight: 1.55 }}>
                 Cada pequeño cuidado cuenta. Gracias por estar pendiente de{' '}
                 <span style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontStyle: 'italic', color: '#0C6C9C', fontWeight: 600 }}>
                   {(activePatientName || profile?.name || 'tu familiar').split(' ')[0]}
@@ -1574,7 +1578,7 @@ export default function Medications() {
             {/* ── STEP: method selection ─────────────────────────────────── */}
             {addStep === 'method' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                <p style={{ fontSize: 14, color: '#5C6B78', margin: '0 0 8px', lineHeight: 1.5 }}>
+                <p style={{ fontSize: 15, color: '#5C6B78', margin: '0 0 8px', lineHeight: 1.5 }}>
                   Cuéntanos qué medicamento cuida a{' '}
                   <span style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontStyle: 'italic', color: '#0C6C9C', fontWeight: 600 }}>
                     {(activePatientName || profile?.name || 'tu familiar').split(' ')[0]}
@@ -1596,11 +1600,11 @@ export default function Medications() {
                     }}
                   >
                     <div style={{ width: 46, height: 46, borderRadius: 15, background: opt.iconBg, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <opt.Icon size={21} color={opt.iconColor} strokeWidth={1.8} />
+                      <opt.Icon size={21} color={opt.iconColor} strokeWidth={2.1} />
                     </div>
                     <div>
-                      <p style={{ fontSize: 15, fontWeight: 700, color: '#14303D', margin: 0 }}>{opt.title}</p>
-                      <p style={{ fontSize: 14, color: '#4E6470', margin: '2px 0 0', lineHeight: 1.4 }}>{opt.desc}</p>
+                      <p style={{ fontSize: 16, fontWeight: 700, color: '#14303D', margin: 0 }}>{opt.title}</p>
+                      <p style={{ fontSize: 15, color: '#4E6470', margin: '2px 0 0', lineHeight: 1.4 }}>{opt.desc}</p>
                     </div>
                   </button>
                 ))}
@@ -1623,7 +1627,7 @@ export default function Medications() {
                 <div style={{ width: 56, height: 56, borderRadius: '50%', border: '4px solid #E3F1F8', borderTopColor: '#0C6C9C', animation: 'spin 0.9s linear infinite' }} />
                 <div style={{ textAlign: 'center' }}>
                   <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 16, fontWeight: 800, color: '#14303D', margin: 0 }}>Analizando con IA…</p>
-                  <p style={{ fontSize: 13, color: '#4E6470', margin: '6px 0 0' }}>Extrayendo información del medicamento</p>
+                  <p style={{ fontSize: 14, color: '#4E6470', margin: '6px 0 0' }}>Extrayendo información del medicamento</p>
                 </div>
                 {addPhotoPreview && (
                   <img src={addPhotoPreview} alt="preview" style={{ width: '100%', maxHeight: 200, objectFit: 'cover', borderRadius: 14, opacity: 0.5 }} />
@@ -1659,7 +1663,7 @@ export default function Medications() {
 
                   {addAiError ? (
                     <div style={{ background: '#FBEAE4', borderRadius: 20, padding: '12px 14px', boxShadow: '0 6px 14px -8px #D9534F33' }}>
-                      <p style={{ fontSize: 13, color: '#A3452F', margin: 0 }}>⚠️ {addAiError}</p>
+                      <p style={{ fontSize: 14, color: '#A3452F', margin: 0 }}>⚠️ {addAiError}</p>
                     </div>
                   ) : addAiExtracted ? (
                     <>
@@ -1667,7 +1671,7 @@ export default function Medications() {
                       {warnings.length > 0 && (
                         <div style={{ background: '#F6E4B8', borderRadius: 20, padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 4 }}>
                           {warnings.map((w, i) => (
-                            <p key={i} style={{ fontSize: 14, color: '#8A661A', margin: 0 }}>⚠️ {w}</p>
+                            <p key={i} style={{ fontSize: 15, color: '#8A661A', margin: 0 }}>⚠️ {w}</p>
                           ))}
                         </div>
                       )}
@@ -1675,7 +1679,7 @@ export default function Medications() {
                       {/* Always: review notice */}
                       <div style={{ background: '#F6E4B8', borderRadius: 16, padding: '10px 14px', display: 'flex', gap: 8, alignItems: 'center' }}>
                         <span style={{ fontSize: 16 }}>👁️</span>
-                        <p style={{ fontSize: 14, color: '#8A661A', fontWeight: 600, margin: 0 }}>
+                        <p style={{ fontSize: 15, color: '#8A661A', fontWeight: 600, margin: 0 }}>
                           Revisa los datos antes de continuar — la IA puede cometer errores
                         </p>
                       </div>
@@ -1683,7 +1687,7 @@ export default function Medications() {
                       {isMulti ? (
                         /* ── Multiple meds: checkbox selection ────────── */
                         <>
-                          <p style={{ fontSize: 14, fontWeight: 700, color: '#14303D', margin: 0 }}>
+                          <p style={{ fontSize: 15, fontWeight: 700, color: '#14303D', margin: 0 }}>
                             Encontramos {meds.length} medicamentos en esta receta
                           </p>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -1711,19 +1715,19 @@ export default function Medications() {
                                     style={{ marginTop: 3, accentColor: '#0C6C9C', width: 16, height: 16, flexShrink: 0 }}
                                   />
                                   <div style={{ flex: 1 }}>
-                                    <p style={{ fontSize: 14, fontWeight: 700, color: '#14303D', margin: 0 }}>
+                                    <p style={{ fontSize: 15, fontWeight: 700, color: '#14303D', margin: 0 }}>
                                       {med.name?.value ?? '(sin nombre)'}
-                                      {hasLowConf && <span style={{ marginLeft: 6, fontSize: 13, color: '#A87A0F', fontWeight: 600 }}>⚠️ revisar</span>}
+                                      {hasLowConf && <span style={{ marginLeft: 6, fontSize: 14, color: '#A87A0F', fontWeight: 600 }}>⚠️ revisar</span>}
                                     </p>
                                     <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginTop: 4 }}>
                                       {med.strength?.value && (
-                                        <span style={{ fontSize: 13, background: '#E3F1F8', color: '#0C6C9C', padding: '1px 7px', borderRadius: 6 }}>{med.strength.value}</span>
+                                        <span style={{ fontSize: 14, background: '#E3F1F8', color: '#0C6C9C', padding: '1px 7px', borderRadius: 6 }}>{med.strength.value}</span>
                                       )}
                                       {med.form?.value && (
-                                        <span style={{ fontSize: 13, background: '#F1EDE3', color: '#4E6470', padding: '1px 7px', borderRadius: 6 }}>{FORM_MAP[med.form.value] ?? med.form.value}</span>
+                                        <span style={{ fontSize: 14, background: '#F1EDE3', color: '#4E6470', padding: '1px 7px', borderRadius: 6 }}>{FORM_MAP[med.form.value] ?? med.form.value}</span>
                                       )}
                                       {med.frequency?.value && (
-                                        <span style={{ fontSize: 13, background: '#F1EDE3', color: '#4E6470', padding: '1px 7px', borderRadius: 6 }}>
+                                        <span style={{ fontSize: 14, background: '#F1EDE3', color: '#4E6470', padding: '1px 7px', borderRadius: 6 }}>
                                           {FREQ_OPTIONS.find(o => o.value === med.frequency.value)?.label ?? med.frequency.value}
                                         </span>
                                       )}
@@ -1739,7 +1743,7 @@ export default function Medications() {
                             style={{
                               padding: '13px', borderRadius: 16, border: 'none',
                               background: selectedMedIndices.size === 0 ? '#C9D6DB' : 'linear-gradient(148deg,#1677A6 0%,#0C6C9C 46%,#0A5A82 100%)',
-                              color: 'white', fontWeight: 700, fontSize: 14,
+                              color: 'white', fontWeight: 700, fontSize: 15,
                               cursor: selectedMedIndices.size === 0 ? 'not-allowed' : 'pointer',
                               boxShadow: selectedMedIndices.size === 0 ? 'none' : '0 6px 20px rgba(12,108,156,0.3)',
                             }}
@@ -1751,7 +1755,7 @@ export default function Medications() {
                         /* ── Single med: editable fields with confidence ─ */
                         meds.length === 1 && (
                           <div style={{ background: '#E3F1F8', borderRadius: 20, padding: '16px' }}>
-                            <p style={{ fontSize: 14, fontWeight: 700, color: '#0C6C9C', letterSpacing: '0.06em', textTransform: 'uppercase', margin: '0 0 12px' }}>
+                            <p style={{ fontSize: 15, fontWeight: 700, color: '#0C6C9C', letterSpacing: '0.06em', textTransform: 'uppercase', margin: '0 0 12px' }}>
                               La IA encontró lo siguiente
                             </p>
                             {fields.map(f => {
@@ -1799,14 +1803,14 @@ export default function Medications() {
                   <div style={{ display: 'flex', gap: 10 }}>
                     <button
                       onClick={() => setAddStep('method')}
-                      style={{ flex: 1, padding: '13px', borderRadius: 16, border: 'none', background: 'white', color: '#5C6B78', fontWeight: 700, fontSize: 14, cursor: 'pointer', boxShadow: '0 4px 10px -6px #087F7022' }}
+                      style={{ flex: 1, padding: '13px', borderRadius: 16, border: 'none', background: 'white', color: '#5C6B78', fontWeight: 700, fontSize: 15, cursor: 'pointer', boxShadow: '0 4px 10px -6px #087F7022' }}
                     >
                       Volver
                     </button>
                     {(!isMulti || !addAiExtracted) && (
                       <button
                         onClick={applyAiAndContinue}
-                        style={{ flex: 2, padding: '13px', borderRadius: 14, border: 'none', background: 'linear-gradient(148deg,#1677A6 0%,#0C6C9C 46%,#0A5A82 100%)', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer', boxShadow: '0 6px 20px rgba(12,108,156,0.3)' }}
+                        style={{ flex: 2, padding: '13px', borderRadius: 14, border: 'none', background: 'linear-gradient(148deg,#1677A6 0%,#0C6C9C 46%,#0A5A82 100%)', color: 'white', fontWeight: 700, fontSize: 15, cursor: 'pointer', boxShadow: '0 6px 20px rgba(12,108,156,0.3)' }}
                       >
                         {addAiExtracted ? 'Continuar →' : 'Ingresar manual →'}
                       </button>
@@ -1829,7 +1833,7 @@ export default function Medications() {
                         <option key={f} value={f}>{f}</option>
                       ))}
                     </select>
-                    <span style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#4E6470', fontSize: 14 }}>▼</span>
+                    <span style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#4E6470', fontSize: 15 }}>▼</span>
                   </div>
                 </div>
 
@@ -1863,7 +1867,7 @@ export default function Medications() {
                       <option value="">Seleccionar frecuencia...</option>
                       {FREQ_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                     </select>
-                    <span style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#4E6470', fontSize: 14 }}>▼</span>
+                    <span style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#4E6470', fontSize: 15 }}>▼</span>
                   </div>
                 </div>
 
@@ -1873,16 +1877,16 @@ export default function Medications() {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                       {scheduledTimes.map((t, i) => (
                         <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          {scheduledTimes.length > 1 && <span style={{ fontSize: 14, color: '#4E6470', width: 18, flexShrink: 0 }}>{i + 1}.</span>}
+                          {scheduledTimes.length > 1 && <span style={{ fontSize: 15, color: '#4E6470', width: 18, flexShrink: 0 }}>{i + 1}.</span>}
                           <input type="time" value={t} onChange={e => { const n = [...scheduledTimes]; n[i] = e.target.value; setScheduledTimes(n) }} style={{ ...fieldStyle, flex: 1 }} onFocus={onFocus} onBlur={onBlur} />
                         </div>
                       ))}
                     </div>
                     {previewTimes.length > 0 && (
                       <div style={{ marginTop: 8, padding: '10px 12px', background: '#E3F1F8', borderRadius: 10 }}>
-                        <p style={{ fontSize: 13, color: '#0A4A6B', fontWeight: 600, marginBottom: 6 }}>Horarios automáticos ({previewTimes.length} dosis al día):</p>
+                        <p style={{ fontSize: 14, color: '#0A4A6B', fontWeight: 600, marginBottom: 6 }}>Horarios automáticos ({previewTimes.length} dosis al día):</p>
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-                          {previewTimes.map((t, i) => <span key={i} style={{ background: 'white', color: '#0A4A6B', padding: '2px 8px', borderRadius: 6, fontSize: 13, fontWeight: 600, border: '1px solid #C1E4CC' }}>{t}</span>)}
+                          {previewTimes.map((t, i) => <span key={i} style={{ background: 'white', color: '#0A4A6B', padding: '2px 8px', borderRadius: 6, fontSize: 14, fontWeight: 600, border: '1px solid #C1E4CC' }}>{t}</span>)}
                         </div>
                       </div>
                     )}
@@ -1896,10 +1900,10 @@ export default function Medications() {
 
                 {/* ── Stock section ──────────────────────────────────────── */}
                 <div style={{ borderTop: '1px solid #F1EDE3', paddingTop: 20 }}>
-                  <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 14, fontWeight: 800, color: '#14303D', margin: '0 0 4px' }}>
+                  <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 15, fontWeight: 800, color: '#14303D', margin: '0 0 4px' }}>
                     Stock y renovación
                   </p>
-                  <p style={{ fontSize: 13, color: '#4E6470', margin: '0 0 16px' }}>
+                  <p style={{ fontSize: 14, color: '#4E6470', margin: '0 0 16px' }}>
                     Opcional — para calcular cuándo se agota y enviar alertas
                   </p>
 
@@ -1916,7 +1920,7 @@ export default function Medications() {
                   {stockPreviewDays && (
                     <div style={{ marginTop: 8, padding: '10px 14px', background: '#E3F1F8', borderRadius: 10, border: '1px solid #A6E3EC', display: 'flex', alignItems: 'center', gap: 8 }}>
                       <span>📅</span>
-                      <p style={{ fontSize: 14, color: '#0A4A6B', fontWeight: 600, margin: 0 }}>
+                      <p style={{ fontSize: 15, color: '#0A4A6B', fontWeight: 600, margin: 0 }}>
                         Duración: {stockPreviewDays.days} días · Se acaba aprox. el {stockPreviewDays.date}
                       </p>
                     </div>
@@ -1932,20 +1936,20 @@ export default function Medications() {
                       placeholder="7"
                       style={fieldStyle} onFocus={onFocus} onBlur={onBlur}
                     />
-                    <p style={{ fontSize: 13, color: '#4E6470', margin: '4px 0 0' }}>
+                    <p style={{ fontSize: 14, color: '#4E6470', margin: '4px 0 0' }}>
                       Se mostrará una alerta cuando queden menos de estas dosis
                     </p>
                   </div>
                 </div>
 
                 {saveError && (
-                  <p style={{ color: '#A3452F', fontSize: 13, margin: '0', textAlign: 'center', padding: '8px', background: '#FBEAE4', borderRadius: 12 }}>
+                  <p style={{ color: '#A3452F', fontSize: 14, margin: '0', textAlign: 'center', padding: '8px', background: '#FBEAE4', borderRadius: 12 }}>
                     {saveError}
                   </p>
                 )}
 
                 <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
-                  <button type="button" onClick={closeForm} style={{ flex: 1, padding: '13px', border: 'none', borderRadius: 16, background: 'white', color: '#5C6B78', fontSize: 14, fontWeight: 600, cursor: 'pointer', boxShadow: '0 4px 10px -6px #087F7022' }}>
+                  <button type="button" onClick={closeForm} style={{ flex: 1, padding: '13px', border: 'none', borderRadius: 16, background: 'white', color: '#5C6B78', fontSize: 15, fontWeight: 600, cursor: 'pointer', boxShadow: '0 4px 10px -6px #087F7022' }}>
                     Cancelar
                   </button>
                   <LoadingButton
@@ -1975,11 +1979,11 @@ export default function Medications() {
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 16 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <span style={{ width: 40, height: 40, borderRadius: 14, background: '#E3F1F8', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <Pill size={19} color="#0C6C9C" strokeWidth={1.9} />
+                  <Pill size={19} color="#0C6C9C" strokeWidth={2.1} />
                 </span>
                 <div>
                   <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 19, fontWeight: 800, color: '#14303D', margin: 0 }}>{adminModal.name}</p>
-                  {adminModal.dosage && <p style={{ fontSize: 13, color: '#4E6470', margin: '2px 0 0' }}>{adminModal.dosage}</p>}
+                  {adminModal.dosage && <p style={{ fontSize: 14, color: '#4E6470', margin: '2px 0 0' }}>{adminModal.dosage}</p>}
                 </div>
               </div>
               <button onClick={() => { if (!adminSaving) { setAdminModal(null); setAdminPhotoBlob(null); setAdminPhotoPreview(null); setAdminGps(null) } }} style={{ width: 32, height: 32, borderRadius: 11, background: '#FFFFFF', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -1989,48 +1993,48 @@ export default function Medications() {
 
             <div style={{ background: 'white', borderRadius: 16, padding: '12px 14px', marginBottom: 16, display: 'flex', gap: 20, boxShadow: '0 6px 14px -8px #087F7022' }}>
               <div>
-                <p style={{ fontSize: 13, color: '#4E6470', margin: 0 }}>Programado</p>
-                <p style={{ fontSize: 14, fontWeight: 700, color: '#14303D', margin: '2px 0 0' }}>{firstTimeMed(adminModal) ?? '—'}</p>
+                <p style={{ fontSize: 14, color: '#4E6470', margin: 0 }}>Programado</p>
+                <p style={{ fontSize: 15, fontWeight: 700, color: '#14303D', margin: '2px 0 0' }}>{firstTimeMed(adminModal) ?? '—'}</p>
               </div>
               <div>
-                <p style={{ fontSize: 13, color: '#4E6470', margin: 0 }}>Hora actual</p>
-                <p style={{ fontSize: 14, fontWeight: 700, color: '#0C6C9C', margin: '2px 0 0' }}>{new Date().toLocaleTimeString('es-US', { hour: 'numeric', minute: '2-digit', hour12: true })}</p>
+                <p style={{ fontSize: 14, color: '#4E6470', margin: 0 }}>Hora actual</p>
+                <p style={{ fontSize: 15, fontWeight: 700, color: '#0C6C9C', margin: '2px 0 0' }}>{new Date().toLocaleTimeString('es-US', { hour: 'numeric', minute: '2-digit', hour12: true })}</p>
               </div>
             </div>
 
-            <p style={{ fontSize: 14, fontWeight: 700, color: '#7D8A9A', letterSpacing: '0.06em', textTransform: 'uppercase', margin: '0 0 8px' }}>Foto de evidencia (opcional)</p>
+            <p style={{ fontSize: 15, fontWeight: 700, color: '#7D8A9A', letterSpacing: '0.06em', textTransform: 'uppercase', margin: '0 0 8px' }}>Foto de evidencia (opcional)</p>
             <div style={{ borderRadius: 16, overflow: 'hidden', marginBottom: 12, background: 'white', boxShadow: '0 6px 14px -8px #087F7022' }}>
               {adminPhotoStamping ? (
                 <div style={{ padding: '28px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
                   <div style={{ width: 22, height: 22, borderRadius: '50%', border: '3px solid #E3F1F8', borderTopColor: '#0C6C9C', animation: 'spin 0.8s linear infinite' }} />
-                  <p style={{ fontSize: 14, color: '#4E6470', margin: 0 }}>Aplicando sello...</p>
+                  <p style={{ fontSize: 15, color: '#4E6470', margin: 0 }}>Aplicando sello...</p>
                 </div>
               ) : adminPhotoPreview ? (
                 <>
                   <img src={adminPhotoPreview} alt="Evidencia" style={{ width: '100%', maxHeight: 180, objectFit: 'cover' }} />
                   <div style={{ padding: '8px 12px', background: '#E3F1F8', display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ fontSize: 14 }}>🔒</span>
-                    <p style={{ fontSize: 13, fontWeight: 700, color: '#0C6C9C', margin: 0, flex: 1 }}>Sello aplicado</p>
+                    <span style={{ fontSize: 15 }}>🔒</span>
+                    <p style={{ fontSize: 14, fontWeight: 700, color: '#0C6C9C', margin: 0, flex: 1 }}>Sello aplicado</p>
                   </div>
                   <div style={{ padding: '8px 12px', display: 'flex', gap: 8 }}>
-                    <button onClick={adminOpenCamera} style={{ flex: 1, padding: 10, borderRadius: 13, border: 'none', background: '#A6E3EC', color: '#0C6C9C', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>Cambiar foto</button>
-                    <button onClick={() => { setAdminPhotoBlob(null); setAdminPhotoPreview(null); setAdminGps(null) }} style={{ flex: 1, padding: 10, borderRadius: 13, border: 'none', background: '#F1EDE3', color: '#5C6B78', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>Quitar</button>
+                    <button onClick={adminOpenCamera} style={{ flex: 1, padding: 10, borderRadius: 13, border: 'none', background: '#A6E3EC', color: '#0C6C9C', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>Cambiar foto</button>
+                    <button onClick={() => { setAdminPhotoBlob(null); setAdminPhotoPreview(null); setAdminGps(null) }} style={{ flex: 1, padding: 10, borderRadius: 13, border: 'none', background: '#F1EDE3', color: '#5C6B78', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>Quitar</button>
                   </div>
                 </>
               ) : (
                 <div style={{ padding: '18px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  <p style={{ fontSize: 13, color: '#4E6470', margin: 0, textAlign: 'center' }}>Se sellará automáticamente con fecha y hora</p>
+                  <p style={{ fontSize: 14, color: '#4E6470', margin: 0, textAlign: 'center' }}>Se sellará automáticamente con fecha y hora</p>
                   <div style={{ display: 'flex', gap: 8 }}>
-                    <button onClick={adminOpenCamera} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: 10, borderRadius: 13, border: 'none', background: '#A6E3EC', color: '#0C6C9C', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
-                      <Camera size={15} color="#0C6C9C" strokeWidth={1.9} /> Tomar foto
+                    <button onClick={adminOpenCamera} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: 10, borderRadius: 13, border: 'none', background: '#A6E3EC', color: '#0C6C9C', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
+                      <Camera size={15} color="#0C6C9C" strokeWidth={2.1} /> Tomar foto
                     </button>
-                    <button onClick={adminOpenGallery} style={{ flex: 1, padding: 10, borderRadius: 13, border: 'none', background: '#F1EDE3', color: '#5C6B78', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>Elegir de galería</button>
+                    <button onClick={adminOpenGallery} style={{ flex: 1, padding: 10, borderRadius: 13, border: 'none', background: '#F1EDE3', color: '#5C6B78', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>Elegir de galería</button>
                   </div>
                 </div>
               )}
             </div>
 
-            {adminError && <div style={{ background: '#FBEAE4', borderRadius: 16, padding: '10px 12px', marginBottom: 12 }}><p style={{ fontSize: 14, color: '#A3452F', margin: 0 }}>⚠️ {adminError}</p></div>}
+            {adminError && <div style={{ background: '#FBEAE4', borderRadius: 16, padding: '10px 12px', marginBottom: 12 }}><p style={{ fontSize: 15, color: '#A3452F', margin: 0 }}>⚠️ {adminError}</p></div>}
 
             <button
               onClick={handleAdministrar}
@@ -2055,19 +2059,19 @@ export default function Medications() {
             <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 17, fontWeight: 800, color: '#14303D', marginBottom: 10 }}>
               Confirmar como administrador
             </p>
-            <p style={{ fontSize: 13, color: '#8A661A', lineHeight: 1.6, marginBottom: 10, background: '#F6E4B8', borderRadius: 14, padding: '10px 14px' }}>
+            <p style={{ fontSize: 14, color: '#8A661A', lineHeight: 1.6, marginBottom: 10, background: '#F6E4B8', borderRadius: 14, padding: '10px 14px' }}>
               Úsalo solo si el cuidador habitual no puede confirmar en este momento.
             </p>
-            <p style={{ fontSize: 14, color: '#4E6470', lineHeight: 1.6, marginBottom: 24 }}>
+            <p style={{ fontSize: 15, color: '#4E6470', lineHeight: 1.6, marginBottom: 24 }}>
               Esta acción quedará registrada con tu nombre.
             </p>
             <div style={{ display: 'flex', gap: 10 }}>
-              <button onClick={() => setAdminConfirmWarningMed(null)} style={{ flex: 1, padding: 12, borderRadius: 12, border: 'none', background: '#F1EDE3', color: '#5C6B78', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>
+              <button onClick={() => setAdminConfirmWarningMed(null)} style={{ flex: 1, padding: 12, borderRadius: 12, border: 'none', background: '#F1EDE3', color: '#5C6B78', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}>
                 Cancelar
               </button>
               <button
                 onClick={() => { const m = adminConfirmWarningMed; setAdminConfirmWarningMed(null); openAdminModal(m) }}
-                style={{ flex: 1, padding: 12, borderRadius: 12, border: 'none', background: '#D99A18', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer', boxShadow: '0 4px 16px rgba(217,154,24,0.35)' }}
+                style={{ flex: 1, padding: 12, borderRadius: 12, border: 'none', background: '#D99A18', color: 'white', fontWeight: 700, fontSize: 15, cursor: 'pointer', boxShadow: '0 4px 16px rgba(217,154,24,0.35)' }}
               >
                 Confirmar
               </button>
@@ -2086,17 +2090,17 @@ export default function Medications() {
             <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 17, fontWeight: 800, color: '#14303D', marginBottom: 8 }}>
               ¿Desmarcar esta dosis?
             </p>
-            <p style={{ fontSize: 13, color: '#4E6470', lineHeight: 1.6, marginBottom: 24 }}>
+            <p style={{ fontSize: 14, color: '#4E6470', lineHeight: 1.6, marginBottom: 24 }}>
               {unconfirmTarget.name} volverá a aparecer como pendiente.
             </p>
             <div style={{ display: 'flex', gap: 10 }}>
-              <button onClick={() => setUnconfirmTarget(null)} disabled={unconfirming} style={{ flex: 1, padding: 12, borderRadius: 12, border: 'none', background: '#F1EDE3', color: '#5C6B78', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>
+              <button onClick={() => setUnconfirmTarget(null)} disabled={unconfirming} style={{ flex: 1, padding: 12, borderRadius: 12, border: 'none', background: '#F1EDE3', color: '#5C6B78', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}>
                 Cancelar
               </button>
               <button
                 onClick={handleUnconfirm}
                 disabled={unconfirming}
-                style={{ flex: 1, padding: 12, borderRadius: 12, border: 'none', background: unconfirming ? '#C9D6DB' : '#C4664F', color: 'white', fontWeight: 700, fontSize: 14, cursor: unconfirming ? 'not-allowed' : 'pointer' }}
+                style={{ flex: 1, padding: 12, borderRadius: 12, border: 'none', background: unconfirming ? '#C9D6DB' : '#C4664F', color: 'white', fontWeight: 700, fontSize: 15, cursor: unconfirming ? 'not-allowed' : 'pointer' }}
               >
                 {unconfirming ? 'Desmarcando...' : 'Desmarcar'}
               </button>
@@ -2121,7 +2125,7 @@ export default function Medications() {
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 16 }}>
                 <div>
                   <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 18, fontWeight: 800, color: '#14303D', margin: 0 }}>Agregar foto (opcional)</p>
-                  <p style={{ fontSize: 13, color: minLeft <= 5 ? '#C4664F' : '#4E6470', marginTop: 4 }}>
+                  <p style={{ fontSize: 14, color: minLeft <= 5 ? '#C4664F' : '#4E6470', marginTop: 4 }}>
                     {proofSheet.med.name} — {minLeft > 0 ? `${minLeft} min restantes` : 'Tiempo agotado'}
                   </p>
                 </div>
@@ -2134,36 +2138,36 @@ export default function Medications() {
                 {proofStamping ? (
                   <div style={{ padding: '32px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
                     <div style={{ width: 26, height: 26, borderRadius: '50%', border: '3px solid #E3F1F8', borderTopColor: '#0C6C9C', animation: 'spin 0.8s linear infinite' }} />
-                    <p style={{ fontSize: 13, color: '#4E6470', margin: 0 }}>Aplicando sello...</p>
+                    <p style={{ fontSize: 14, color: '#4E6470', margin: 0 }}>Aplicando sello...</p>
                   </div>
                 ) : proofPreview ? (
                   <>
                     <img src={proofPreview} alt="Prueba sellada" style={{ width: '100%', maxHeight: 220, objectFit: 'cover' }} />
                     <div style={{ padding: '10px 14px', background: '#E3F1F8', display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <span style={{ fontSize: 14 }}>🔒</span>
+                      <span style={{ fontSize: 15 }}>🔒</span>
                       <div style={{ flex: 1 }}>
-                        <p style={{ fontSize: 14, fontWeight: 700, color: '#0C6C9C', margin: 0 }}>Sello aplicado</p>
+                        <p style={{ fontSize: 15, fontWeight: 700, color: '#0C6C9C', margin: 0 }}>Sello aplicado</p>
                         {proofGps && (
-                          <p style={{ fontSize: 13, color: '#0C6C9C', margin: '2px 0 0' }}>
+                          <p style={{ fontSize: 14, color: '#0C6C9C', margin: '2px 0 0' }}>
                             📍 {proofGps.address ?? `${proofGps.latitude.toFixed(5)}, ${proofGps.longitude.toFixed(5)}`}
                           </p>
                         )}
                       </div>
                     </div>
                     <div style={{ display: 'flex', gap: 8, padding: '8px 12px 12px' }}>
-                      <button type="button" onClick={proofOpenCamera} disabled={proofUploading} style={{ flex: 1, padding: '8px 0', borderRadius: 10, border: 'none', background: '#A6E3EC', color: '#0C6C9C', fontSize: 14, fontWeight: 700, cursor: proofUploading ? 'not-allowed' : 'pointer' }}>Tomar foto</button>
-                      <button type="button" onClick={proofOpenGallery} disabled={proofUploading} style={{ flex: 1, padding: '8px 0', borderRadius: 10, border: 'none', background: '#F1EDE3', color: '#5C6B78', fontSize: 14, fontWeight: 700, cursor: proofUploading ? 'not-allowed' : 'pointer' }}>De galería</button>
+                      <button type="button" onClick={proofOpenCamera} disabled={proofUploading} style={{ flex: 1, padding: '8px 0', borderRadius: 10, border: 'none', background: '#A6E3EC', color: '#0C6C9C', fontSize: 15, fontWeight: 700, cursor: proofUploading ? 'not-allowed' : 'pointer' }}>Tomar foto</button>
+                      <button type="button" onClick={proofOpenGallery} disabled={proofUploading} style={{ flex: 1, padding: '8px 0', borderRadius: 10, border: 'none', background: '#F1EDE3', color: '#5C6B78', fontSize: 15, fontWeight: 700, cursor: proofUploading ? 'not-allowed' : 'pointer' }}>De galería</button>
                     </div>
                   </>
                 ) : (
                   <div style={{ padding: '28px 16px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
                     <span style={{ width: 56, height: 56, borderRadius: '50%', background: '#E3F1F8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <Camera size={24} color="#0C6C9C" strokeWidth={1.8} />
+                      <Camera size={24} color="#0C6C9C" strokeWidth={2.1} />
                     </span>
-                    <p style={{ fontSize: 14, color: '#4E6470', margin: 0 }}>Se sellará automáticamente con fecha y hora</p>
+                    <p style={{ fontSize: 15, color: '#4E6470', margin: 0 }}>Se sellará automáticamente con fecha y hora</p>
                     <div style={{ display: 'flex', gap: 8, width: '100%' }}>
-                      <button type="button" onClick={proofOpenCamera} style={{ flex: 1, padding: '11px 0', borderRadius: 12, border: 'none', background: '#A6E3EC', color: '#0C6C9C', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Tomar foto</button>
-                      <button type="button" onClick={proofOpenGallery} style={{ flex: 1, padding: '11px 0', borderRadius: 12, border: 'none', background: '#F1EDE3', color: '#5C6B78', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Elegir de galería</button>
+                      <button type="button" onClick={proofOpenCamera} style={{ flex: 1, padding: '11px 0', borderRadius: 12, border: 'none', background: '#A6E3EC', color: '#0C6C9C', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>Tomar foto</button>
+                      <button type="button" onClick={proofOpenGallery} style={{ flex: 1, padding: '11px 0', borderRadius: 12, border: 'none', background: '#F1EDE3', color: '#5C6B78', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>Elegir de galería</button>
                     </div>
                   </div>
                 )}
@@ -2171,7 +2175,7 @@ export default function Medications() {
 
               {proofError && (
                 <div style={{ background: '#FBEAE4', borderRadius: 14, padding: '10px 12px', marginBottom: 12 }}>
-                  <p style={{ fontSize: 14, color: '#A3452F', margin: 0 }}>⚠️ {proofError}</p>
+                  <p style={{ fontSize: 15, color: '#A3452F', margin: 0 }}>⚠️ {proofError}</p>
                 </div>
               )}
 
@@ -2181,7 +2185,7 @@ export default function Medications() {
                 style={{
                   width: '100%', padding: 14, marginBottom: 10, borderRadius: 14, border: 'none',
                   background: proofBlob && !proofUploading ? 'linear-gradient(148deg,#1677A6 0%,#0C6C9C 46%,#0A5A82 100%)' : '#C9D6DB',
-                  color: 'white', fontWeight: 700, fontSize: 14,
+                  color: 'white', fontWeight: 700, fontSize: 15,
                   cursor: proofBlob && !proofUploading ? 'pointer' : 'not-allowed',
                   boxShadow: proofBlob && !proofUploading ? '0 8px 18px -6px rgba(12,108,156,0.5)' : 'none',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
@@ -2192,7 +2196,7 @@ export default function Medications() {
                   : 'Guardar foto'}
               </button>
 
-              <button onClick={closeProofSheet} style={{ width: '100%', padding: 12, background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, color: '#4E6470' }}>
+              <button onClick={closeProofSheet} style={{ width: '100%', padding: 12, background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, color: '#4E6470' }}>
                 Omitir por ahora {minLeft > 0 ? `(tienes ${minLeft} min)` : ''}
               </button>
             </div>
@@ -2202,7 +2206,7 @@ export default function Medications() {
 
       {/* ── Toast ──────────────────────────────────────────────────────────── */}
       {toastMsg && (
-        <div style={{ position: 'fixed', bottom: 'calc(80px + env(safe-area-inset-bottom))', left: '50%', transform: 'translateX(-50%)', zIndex: 400, background: '#14303D', color: 'white', padding: '12px 20px', borderRadius: 12, fontSize: 13, fontWeight: 600, boxShadow: '0 8px 24px -8px #08554A66', pointerEvents: 'none', whiteSpace: 'nowrap' }}>
+        <div style={{ position: 'fixed', bottom: 'calc(80px + env(safe-area-inset-bottom))', left: '50%', transform: 'translateX(-50%)', zIndex: 400, background: '#14303D', color: 'white', padding: '12px 20px', borderRadius: 12, fontSize: 14, fontWeight: 600, boxShadow: '0 8px 24px -8px #08554A66', pointerEvents: 'none', whiteSpace: 'nowrap' }}>
           {toastMsg}
         </div>
       )}

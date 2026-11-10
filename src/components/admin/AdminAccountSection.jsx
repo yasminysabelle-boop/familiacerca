@@ -27,7 +27,7 @@ export default function AdminAccountSection() {
 
   const meta = PLAN_META[sub?.plan ?? 'free']
 
-  if (!sub) return <p style={{ color: '#5E7480', fontSize: 14, textAlign: 'center', padding: 24 }}>Cargando suscripción...</p>
+  if (!sub) return <p style={{ color: '#5E7480', fontSize: 15, textAlign: 'center', padding: 24 }}>Cargando suscripción...</p>
 
   const periodEnd = sub.current_period_end
     ? new Date(sub.current_period_end).toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' })
@@ -56,13 +56,13 @@ export default function AdminAccountSection() {
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <p style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#14303D' }}>{meta.label}</p>
               <span style={{
-                fontSize: 12, fontWeight: 700, padding: '2px 8px', borderRadius: 6,
+                fontSize: 14, fontWeight: 700, padding: '2px 8px', borderRadius: 6,
                 background: meta.color + '18', color: meta.color,
               }}>
                 {STATUS_LABEL[sub.status] ?? sub.status}
               </span>
             </div>
-            <p style={{ margin: '3px 0 0', fontSize: 14, color: trialExpired ? '#DC2626' : daysLeft <= 3 ? '#DC2626' : '#4E6470' }}>
+            <p style={{ margin: '3px 0 0', fontSize: 15, color: trialExpired ? '#DC2626' : daysLeft <= 3 ? '#DC2626' : '#4E6470' }}>
               {isTrialing && `⏳ ${daysLeft} día${daysLeft !== 1 ? 's' : ''} de prueba${trialEnd ? ` · Vence ${trialEnd}` : ''}`}
               {isPaid && periodEnd && `Próximo cobro: ${periodEnd}`}
               {trialExpired && '⚠ Prueba expirada — activa un plan'}
@@ -75,7 +75,7 @@ export default function AdminAccountSection() {
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
           {meta.features.map(f => (
             <span key={f} style={{
-              fontSize: 13, padding: '3px 10px', borderRadius: 20,
+              fontSize: 14, padding: '3px 10px', borderRadius: 20,
               background: 'white', border: `1px solid ${meta.color}25`,
               color: '#30454F', fontWeight: 500,
             }}>
@@ -97,10 +97,10 @@ export default function AdminAccountSection() {
         >
           <span style={{ fontSize: 20, flexShrink: 0 }}>💳</span>
           <div style={{ flex: 1 }}>
-            <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#14303D' }}>
+            <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#14303D' }}>
               Gestionar suscripción
             </p>
-            <p style={{ margin: '1px 0 0', fontSize: 14, color: '#5E7480' }}>
+            <p style={{ margin: '1px 0 0', fontSize: 15, color: '#5E7480' }}>
               Ver plan activo, próximo cobro, cancelar
             </p>
           </div>
@@ -109,7 +109,7 @@ export default function AdminAccountSection() {
 
         <div style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
           <span style={{ fontSize: 16 }}>🔒</span>
-          <p style={{ margin: 0, fontSize: 14, color: '#5E7480', lineHeight: 1.5 }}>
+          <p style={{ margin: 0, fontSize: 15, color: '#5E7480', lineHeight: 1.5 }}>
             Los pagos se procesan de forma segura a través de PayPal.
           </p>
         </div>
@@ -122,7 +122,7 @@ export default function AdminAccountSection() {
           style={{
             padding: '14px', borderRadius: 14, border: 'none',
             background: '#0C6C9C',
-            color: 'white', fontWeight: 700, fontSize: 15,
+            color: 'white', fontWeight: 700, fontSize: 16,
             cursor: 'pointer', boxShadow: '0 4px 16px rgba(12,108,156,0.3)',
           }}
         >

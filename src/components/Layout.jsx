@@ -107,7 +107,7 @@ export default function Layout({ children }) {
   return (
     <div style={{ background: bg }}>
       {offline && (
-        <div role="status" style={{ position: 'fixed', left: 12, right: 12, bottom: 88, zIndex: 60, background: '#14303D', color: 'white', borderRadius: 14, padding: '12px 14px', fontSize: 15, fontWeight: 600, textAlign: 'center', boxShadow: '0 8px 24px rgba(0,0,0,0.3)' }}>
+        <div role="status" style={{ position: 'fixed', left: 12, right: 12, bottom: 88, zIndex: 60, background: '#14303D', color: 'white', borderRadius: 14, padding: '12px 14px', fontSize: 16, fontWeight: 600, textAlign: 'center', boxShadow: '0 8px 24px rgba(0,0,0,0.3)' }}>
           📶 Sin internet. Lo que veas puede no estar al día; en cuanto vuelva la conexión se actualiza.
         </div>
       )}
@@ -123,8 +123,8 @@ export default function Layout({ children }) {
             gap: 8, textDecoration: 'none',
           }}
         >
-          <span style={{ fontSize: 13 }}>🏥</span>
-          <span style={{ fontSize: 13, fontWeight: 800, color: 'white', letterSpacing: '0.05em' }}>
+          <span style={{ fontSize: 14 }}>🏥</span>
+          <span style={{ fontSize: 14, fontWeight: 800, color: 'white', letterSpacing: '0.05em' }}>
             MODO HOSPITAL ACTIVO
             {hospitalMode?.hospital_name ? ` · ${hospitalMode.hospital_name}` : ''}
           </span>
@@ -191,7 +191,7 @@ export default function Layout({ children }) {
                 background: isLightHeader ? 'rgba(12,108,156,0.08)' : 'rgba(255,255,255,0.18)',
                 border: isLightHeader ? '2px solid rgba(12,108,156,0.15)' : '2px solid rgba(255,255,255,0.25)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 13, fontWeight: 700,
+                fontSize: 14, fontWeight: 700,
                 color: isLightHeader ? '#2A4350' : 'white',
                 fontFamily: 'Inter, system-ui, sans-serif',
               }}>
@@ -208,7 +208,7 @@ export default function Layout({ children }) {
         background: bg,
         top:           hasOwnHeader ? `calc(${hospitalBarHeight}px + env(safe-area-inset-top))` : `calc(${hospitalBarHeight}px + 56px + env(safe-area-inset-top))`,
         bottom:        (isSecondary || isHospitalMode || isVideoCall) ? 'env(safe-area-inset-bottom)' : 'calc(64px + env(safe-area-inset-bottom))',
-        paddingBottom: location.pathname === '/chat' ? 0 : 80,
+        paddingBottom: location.pathname === '/chat' ? 0 : 150,
       }}>
         <PWAInstallBanner />
         <OfflineBanner />
@@ -218,15 +218,15 @@ export default function Layout({ children }) {
         {/* Texto legal solo en Mi cuenta (antes salía en todas las pantallas, hasta en el chat) */}
         {location.pathname === '/ajustes' && <footer style={{ padding: '24px 16px', textAlign: 'center', borderTop: '1px solid #E6E3DB' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, marginBottom: 8 }}>
-            <Link to="/terminos" style={{ fontSize: 13, color: '#5E7480', textDecoration: 'none' }}>
+            <Link to="/terminos" style={{ fontSize: 14, color: '#5E7480', textDecoration: 'none' }}>
               Términos de servicio
             </Link>
-            <span style={{ color: '#6B7280', fontSize: 13 }}>·</span>
-            <Link to="/privacidad" style={{ fontSize: 13, color: '#5E7480', textDecoration: 'none' }}>
+            <span style={{ color: '#6B7280', fontSize: 14 }}>·</span>
+            <Link to="/privacidad" style={{ fontSize: 14, color: '#5E7480', textDecoration: 'none' }}>
               Política de privacidad
             </Link>
           </div>
-          <p style={{ fontSize: 12, color: '#5E7480', margin: 0 }}>© 2026 FamiliaCerca LLC</p>
+          <p style={{ fontSize: 14, color: '#5E7480', margin: 0 }}>© 2026 FamiliaCerca LLC</p>
         </footer>}
       </main>
 
@@ -247,7 +247,7 @@ export default function Layout({ children }) {
           boxShadow: '0 -4px 24px rgba(0,0,0,0.3)',
           display: 'flex', flexDirection: 'column', gap: 10,
         }}>
-          <p style={{ fontSize: 13, color: 'white', lineHeight: 1.5, margin: 0 }}>
+          <p style={{ fontSize: 14, color: 'white', lineHeight: 1.5, margin: 0 }}>
             ¿Sigues ahí? La sesión se cerrará en 1 minuto por seguridad.
           </p>
           <button
@@ -255,7 +255,7 @@ export default function Layout({ children }) {
             style={{
               padding: '10px 16px', borderRadius: 10, border: 'none',
               background: '#0C6C9C', color: 'white', fontWeight: 700,
-              fontSize: 13, cursor: 'pointer', alignSelf: 'flex-start',
+              fontSize: 14, cursor: 'pointer', alignSelf: 'flex-start',
             }}
           >
             Sí, continuar →
@@ -285,7 +285,7 @@ export default function Layout({ children }) {
             <span style={{ width: location.pathname === '/dashboard' ? 52 : 36, height: 32, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: location.pathname === '/dashboard' ? '#0C6C9C' : 'transparent', transition: 'width 0.15s ease' }}>
               <Home size={18} color={location.pathname === '/dashboard' ? 'white' : '#7C8698'} strokeWidth={2} />
             </span>
-            <span style={{ fontSize: 11, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: location.pathname === '/dashboard' ? '#0C6C9C' : '#7C8698' }}>Inicio</span>
+            <span style={{ fontSize: 13, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: location.pathname === '/dashboard' ? '#0C6C9C' : '#5E7480' }}>Inicio</span>
           </Link>
 
           {/* Medicamentos */}
@@ -293,7 +293,7 @@ export default function Layout({ children }) {
             <span style={{ width: location.pathname === '/medications' ? 52 : 36, height: 32, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: location.pathname === '/medications' ? '#0C6C9C' : 'transparent', transition: 'width 0.15s ease' }}>
               <Pill size={18} color={location.pathname === '/medications' ? 'white' : '#7C8698'} strokeWidth={2} />
             </span>
-            <span style={{ fontSize: 11, fontWeight: 700, color: location.pathname === '/medications' ? '#0C6C9C' : '#7C8698' }}>Medicamentos</span>
+            <span style={{ fontSize: 13, fontWeight: 700, color: location.pathname === '/medications' ? '#0C6C9C' : '#5E7480' }}>Medicinas</span>
           </button>
 
           {/* Rutina */}
@@ -301,7 +301,7 @@ export default function Layout({ children }) {
             <span style={{ width: location.pathname === '/cuidado' ? 52 : 36, height: 32, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: location.pathname === '/cuidado' ? '#0C6C9C' : 'transparent', transition: 'width 0.15s ease' }}>
               <ClipboardList size={18} color={location.pathname === '/cuidado' ? 'white' : '#7C8698'} strokeWidth={2} />
             </span>
-            <span style={{ fontSize: 11, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: location.pathname === '/cuidado' ? '#0C6C9C' : '#7C8698' }}>Rutina</span>
+            <span style={{ fontSize: 13, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: location.pathname === '/cuidado' ? '#0C6C9C' : '#5E7480' }}>Rutina</span>
           </Link>
 
           {/* Chat */}
@@ -312,7 +312,7 @@ export default function Layout({ children }) {
                 <span style={{ position: 'absolute', top: 0, right: 0, width: 7, height: 7, borderRadius: '50%', background: '#D99A18', display: 'block' }} />
               )}
             </span>
-            <span style={{ fontSize: 11, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: location.pathname === '/chat' ? '#0C6C9C' : '#7C8698' }}>Chat</span>
+            <span style={{ fontSize: 13, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: location.pathname === '/chat' ? '#0C6C9C' : '#5E7480' }}>Chat</span>
           </Link>
 
           {/* Más */}
@@ -320,7 +320,7 @@ export default function Layout({ children }) {
             <span style={{ width: location.pathname === '/mas' ? 52 : 36, height: 32, borderRadius: 999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: location.pathname === '/mas' ? '#0C6C9C' : 'transparent', transition: 'width 0.15s ease' }}>
               <Menu size={18} color={location.pathname === '/mas' ? 'white' : '#7C8698'} strokeWidth={2} />
             </span>
-            <span style={{ fontSize: 11, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: location.pathname === '/mas' ? '#0C6C9C' : '#7C8698' }}>Más</span>
+            <span style={{ fontSize: 13, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', color: location.pathname === '/mas' ? '#0C6C9C' : '#5E7480' }}>Más</span>
           </Link>
         </nav>
 
@@ -341,7 +341,7 @@ export default function Layout({ children }) {
             boxShadow: '0 -4px 24px rgba(0,0,0,0.15)',
           }}>
             <div style={{ width: 36, height: 4, borderRadius: 2, background: '#E5E5E5', margin: '0 auto 14px' }} />
-            <p style={{ margin: '0 0 12px', fontSize: 14, fontWeight: 700, color: '#0A4A6B', textAlign: 'center' }}>Acción rápida</p>
+            <p style={{ margin: '0 0 12px', fontSize: 15, fontWeight: 700, color: '#0A4A6B', textAlign: 'center' }}>Acción rápida</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {[
                 { emoji: '💊', label: 'Registrar medicamento', path: '/medications' },
@@ -360,7 +360,7 @@ export default function Layout({ children }) {
                   }}
                 >
                   <span style={{ fontSize: 20 }}>{emoji}</span>
-                  <span style={{ fontSize: 14, fontWeight: 500, color: '#0A4A6B' }}>{label}</span>
+                  <span style={{ fontSize: 15, fontWeight: 500, color: '#0A4A6B' }}>{label}</span>
                 </button>
               ))}
             </div>

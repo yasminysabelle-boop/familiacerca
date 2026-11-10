@@ -43,8 +43,14 @@ export default function FirstTour() {
     }
     measure()
     const t = setTimeout(measure, 350)
+    const iv = setInterval(() => {
+      const el = document.querySelector(STEPS[step].sel)
+      if (!el) return
+      const r = el.getBoundingClientRect()
+      setRect(prev => (prev && Math.abs(prev.top - r.top) < 1 && Math.abs(prev.height - r.height) < 1) ? prev : { top: r.top, left: r.left, width: r.width, height: r.height })
+    }, 300)
     window.addEventListener('resize', measure)
-    return () => { clearTimeout(t); window.removeEventListener('resize', measure) }
+    return () => { clearTimeout(t); clearInterval(iv); window.removeEventListener('resize', measure) }
   }, [step])
 
   function finish() {
@@ -78,11 +84,11 @@ export default function FirstTour() {
         background: 'white', borderRadius: 20, padding: '18px 18px 14px',
         boxShadow: '0 18px 40px rgba(0,0,0,0.3)', fontFamily: SANS,
       }}>
-        <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#A3452F' }}>Paso {step + 1} de {STEPS.length}</p>
+        <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#A3452F' }}>Paso {step + 1} de {STEPS.length}</p>
         <p style={{ margin: '4px 0 6px', fontSize: 19, fontWeight: 800, color: '#14303D' }}>{s.title}</p>
         <p style={{ margin: 0, fontSize: 16, lineHeight: 1.5, color: '#30454F' }}>{s.text}</p>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 16 }}>
-          <button onClick={finish} style={{ background: 'none', border: 'none', padding: '10px 4px', fontSize: 15, color: '#5E7480', cursor: 'pointer' }}>
+          <button onClick={finish} style={{ background: 'none', border: 'none', padding: '10px 4px', fontSize: 16, color: '#5E7480', cursor: 'pointer' }}>
             Saltar
           </button>
           <button

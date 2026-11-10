@@ -24,15 +24,15 @@ export default function MedicationListTab({ medications = [], onOpenDetail }) {
     return (
       <div style={{ padding: '40px 0', textAlign: 'center' }}>
         <p style={{ fontSize: 40, marginBottom: 12 }}>💊</p>
-        <p style={{ fontSize: 14, fontWeight: 600, color: '#14303D', fontFamily: SANS }}>Sin medicamentos aún</p>
-        <p style={{ fontSize: 14, color: '#5E7480', fontFamily: SANS }}>Agrega medicamentos desde el botón + de arriba.</p>
+        <p style={{ fontSize: 15, fontWeight: 600, color: '#14303D', fontFamily: SANS }}>Sin medicamentos aún</p>
+        <p style={{ fontSize: 15, color: '#5E7480', fontFamily: SANS }}>Agrega medicamentos desde el botón + de arriba.</p>
       </div>
     )
   }
 
   return (
     <div style={{ padding: '12px 0 96px' }}>
-      <p style={{ fontSize: 13, color: '#4E6470', marginBottom: 14, fontFamily: SANS }}>
+      <p style={{ fontSize: 14, color: '#4E6470', marginBottom: 14, fontFamily: SANS }}>
         {medications.length} medicamento{medications.length !== 1 ? 's' : ''} registrado{medications.length !== 1 ? 's' : ''}. Toca una tarjeta para ver el detalle.
       </p>
 
@@ -53,14 +53,14 @@ export default function MedicationListTab({ medications = [], onOpenDetail }) {
               }}
             >
               <div style={{ width: 44, height: 44, borderRadius: 14, background: '#A6E3EC', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <Pill size={20} color="#0A5A82" strokeWidth={1.8} />
+                <Pill size={20} color="#0A5A82" strokeWidth={2.1} />
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontWeight: 700, fontSize: 15.5, color: '#14303D' }}>
                   {med.name}{med.dosage ? ` ${med.dosage}` : ''}
                 </div>
                 {subtitle && (
-                  <div style={{ fontSize: 13, color: '#4E6470', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{subtitle}</div>
+                  <div style={{ fontSize: 14, color: '#4E6470', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{subtitle}</div>
                 )}
               </div>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B7C0C9" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>

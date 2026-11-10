@@ -25,7 +25,7 @@ export default function PaywallModal({ onClose, patientName, title, message }) {
         }}>
           {title || 'Tu prueba gratuita ha terminado'}
         </h2>
-        <p style={{ fontSize: 14, color: '#4E6470', lineHeight: 1.6, margin: '0 0 24px' }}>
+        <p style={{ fontSize: 15, color: '#4E6470', lineHeight: 1.6, margin: '0 0 24px' }}>
           {message || (
             <>
               Actualiza tu plan para seguir cuidando a{' '}
@@ -39,7 +39,7 @@ export default function PaywallModal({ onClose, patientName, title, message }) {
           style={{
             width: '100%', padding: '14px', borderRadius: 14, border: 'none',
             background: '#0C6C9C',
-            color: 'white', fontWeight: 700, fontSize: 15, cursor: 'pointer',
+            color: 'white', fontWeight: 700, fontSize: 16, cursor: 'pointer',
             boxShadow: '0 6px 20px rgba(12,108,156,0.3)', marginBottom: 10,
           }}
         >
@@ -50,7 +50,7 @@ export default function PaywallModal({ onClose, patientName, title, message }) {
           style={{
             width: '100%', padding: '12px', borderRadius: 12,
             border: '1.5px solid #E6E3DB', background: 'white',
-            color: '#5E7480', fontWeight: 600, fontSize: 14, cursor: 'pointer',
+            color: '#5E7480', fontWeight: 600, fontSize: 15, cursor: 'pointer',
           }}
         >
           Más tarde

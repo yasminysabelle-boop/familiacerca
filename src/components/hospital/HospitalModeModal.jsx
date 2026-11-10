@@ -54,7 +54,7 @@ export default function HospitalModeModal({ open, onClose }) {
   const btnPrimary = (color = '#0A5A82') => ({
     width: '100%', padding: '15px', borderRadius: 14, border: 'none',
     background: saving ? '#C9D6DB' : color,
-    color: 'white', fontWeight: 700, fontSize: 15,
+    color: 'white', fontWeight: 700, fontSize: 16,
     cursor: saving ? 'not-allowed' : 'pointer',
   })
 
@@ -92,7 +92,7 @@ export default function HospitalModeModal({ open, onClose }) {
               <h3 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: '#14303D', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}>
                 Modo Hospital
               </h3>
-              <p style={{ margin: '2px 0 0', fontSize: 13, color: '#4E6470' }}>
+              <p style={{ margin: '2px 0 0', fontSize: 14, color: '#4E6470' }}>
                 {isHospitalMode ? 'Activo — el equipo está en alerta' : `Activa cuando ${patientName} esté hospitalizado`}
               </p>
             </div>
@@ -119,7 +119,7 @@ export default function HospitalModeModal({ open, onClose }) {
               padding: '16px', borderRadius: 14,
               background: '#FFF7ED', border: '1px solid #FDE68A',
             }}>
-              <p style={{ margin: 0, fontSize: 14, color: '#92400E', lineHeight: 1.6 }}>
+              <p style={{ margin: 0, fontSize: 15, color: '#92400E', lineHeight: 1.6 }}>
                 Al desactivar el Modo Hospital, los medicamentos y rutinas se reanudan y se notifica a todo el equipo.
               </p>
             </div>
@@ -132,7 +132,7 @@ export default function HospitalModeModal({ open, onClose }) {
                 padding: '12px 14px', borderRadius: 12,
                 background: '#FFF0F0', border: '1px solid #FFBABA',
               }}>
-                <p style={{ margin: 0, fontSize: 13, color: '#B91C1C', lineHeight: 1.5 }}>
+                <p style={{ margin: 0, fontSize: 14, color: '#B91C1C', lineHeight: 1.5 }}>
                   Al activar: se pausa la rutina normal, se reorganiza el dashboard por prioridad y se notifica a todos.
                 </p>
               </div>
@@ -151,12 +151,12 @@ export default function HospitalModeModal({ open, onClose }) {
                 border: '1px solid rgba(185,28,28,0.2)',
               }}>
                 {hospitalMode?.hospital_name && (
-                  <p style={{ margin: '0 0 4px', fontSize: 14, fontWeight: 700, color: '#B91C1C' }}>
+                  <p style={{ margin: '0 0 4px', fontSize: 15, fontWeight: 700, color: '#B91C1C' }}>
                     {hospitalMode.hospital_name}
                     {hospitalMode.room_number && ` · Hab. ${hospitalMode.room_number}`}
                   </p>
                 )}
-                <p style={{ margin: 0, fontSize: 14, color: '#4E6470' }}>
+                <p style={{ margin: 0, fontSize: 15, color: '#4E6470' }}>
                   Activado por {hospitalMode?.activated_by_name ?? 'el equipo'}
                 </p>
               </div>
@@ -186,7 +186,7 @@ export default function HospitalModeModal({ open, onClose }) {
                 style={{
                   width: '100%', padding: '13px', borderRadius: 14,
                   border: '1px solid #E6E3DB', background: 'white',
-                  color: '#4E6470', fontWeight: 600, fontSize: 14, cursor: 'pointer',
+                  color: '#4E6470', fontWeight: 600, fontSize: 15, cursor: 'pointer',
                 }}
               >
                 Cancelar
@@ -219,7 +219,7 @@ export default function HospitalModeModal({ open, onClose }) {
                 style={{
                   width: '100%', padding: '13px', borderRadius: 14,
                   border: '1.5px solid #DC2626', background: 'white',
-                  color: '#DC2626', fontWeight: 700, fontSize: 14, cursor: 'pointer',
+                  color: '#DC2626', fontWeight: 700, fontSize: 15, cursor: 'pointer',
                 }}
               >
                 Desactivar Modo Hospital

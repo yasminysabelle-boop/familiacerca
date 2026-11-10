@@ -21,7 +21,7 @@ function RoleBadge({ role }) {
     <span style={{
       padding: '3px 10px', borderRadius: 20,
       background: meta.bg, color: meta.color,
-      fontSize: 13, fontWeight: 700, flexShrink: 0,
+      fontSize: 14, fontWeight: 700, flexShrink: 0,
     }}>
       {meta.label}
     </span>
@@ -51,15 +51,15 @@ function MemberRow({ name, email, avatarUrl, role, isCurrentUser, isAdmin, isOwn
 
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-            <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#0A4A6B', lineHeight: 1.3 }}>
+            <p style={{ margin: 0, fontSize: 15, fontWeight: 600, color: '#0A4A6B', lineHeight: 1.3 }}>
               {name}
             </p>
             {isCurrentUser && (
-              <span style={{ fontSize: 12, color: '#5E7480', fontWeight: 500 }}>(tú)</span>
+              <span style={{ fontSize: 14, color: '#5E7480', fontWeight: 500 }}>(tú)</span>
             )}
           </div>
           {email && (
-            <p style={{ margin: '1px 0 0', fontSize: 13, color: '#5E7480', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <p style={{ margin: '1px 0 0', fontSize: 14, color: '#5E7480', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {email}
             </p>
           )}
@@ -73,7 +73,7 @@ function MemberRow({ name, email, avatarUrl, role, isCurrentUser, isAdmin, isOwn
               style={{
                 background: 'none', border: '1px solid #E5E7EB', borderRadius: 8,
                 cursor: 'pointer', padding: '4px 10px',
-                fontSize: 14, color: '#4E6470', fontWeight: 500,
+                fontSize: 15, color: '#4E6470', fontWeight: 500,
                 WebkitTapHighlightColor: 'transparent',
               }}
             >
@@ -85,7 +85,7 @@ function MemberRow({ name, email, avatarUrl, role, isCurrentUser, isAdmin, isOwn
 
       {editing && (
         <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid #F7F6F2' }}>
-          <p style={{ margin: '0 0 10px', fontSize: 14, fontWeight: 600, color: '#4E6470' }}>
+          <p style={{ margin: '0 0 10px', fontSize: 15, fontWeight: 600, color: '#4E6470' }}>
             Cambiar rol:
           </p>
           <div style={{ display: 'flex', gap: 8 }}>
@@ -106,8 +106,8 @@ function MemberRow({ name, email, avatarUrl, role, isCurrentUser, isAdmin, isOwn
                   WebkitTapHighlightColor: 'transparent',
                 }}
               >
-                <span style={{ fontSize: 13, fontWeight: 700, color: '#0A4A6B' }}>{opt.label}</span>
-                <span style={{ fontSize: 13, color: '#5E7480' }}>{opt.desc}</span>
+                <span style={{ fontSize: 14, fontWeight: 700, color: '#0A4A6B' }}>{opt.label}</span>
+                <span style={{ fontSize: 14, color: '#5E7480' }}>{opt.desc}</span>
               </button>
             ))}
           </div>
@@ -115,7 +115,7 @@ function MemberRow({ name, email, avatarUrl, role, isCurrentUser, isAdmin, isOwn
             onClick={onCancelEdit}
             style={{
               marginTop: 8, width: '100%', background: 'none', border: 'none',
-              cursor: 'pointer', fontSize: 14, color: '#5E7480', padding: '6px 0',
+              cursor: 'pointer', fontSize: 15, color: '#5E7480', padding: '6px 0',
             }}
           >
             Cancelar
@@ -200,7 +200,7 @@ export default function FamilyRoles() {
           style={{
             display: 'flex', alignItems: 'center', gap: 6,
             background: 'none', border: 'none', cursor: 'pointer',
-            color: '#0A4A6B', fontWeight: 600, fontSize: 14,
+            color: '#0A4A6B', fontWeight: 600, fontSize: 15,
             padding: '4px 0', marginBottom: 16,
             WebkitTapHighlightColor: 'transparent',
           }}
@@ -211,7 +211,7 @@ export default function FamilyRoles() {
         <h1 style={{ margin: '0 0 4px', fontSize: 20, fontWeight: 700, color: '#0A4A6B', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}>
           Quién ve qué
         </h1>
-        <p style={{ margin: '0 0 20px', fontSize: 13, color: '#5E7480', lineHeight: 1.5 }}>
+        <p style={{ margin: '0 0 20px', fontSize: 14, color: '#5E7480', lineHeight: 1.5 }}>
           {isAdmin
             ? 'Administra los roles de tu equipo de cuidado.'
             : 'Roles y accesos del equipo de cuidado.'}
@@ -227,17 +227,17 @@ export default function FamilyRoles() {
             const meta = ROLE_META[key]
             return (
               <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                <span style={{ padding: '2px 8px', borderRadius: 20, background: meta.bg, color: meta.color, fontSize: 12, fontWeight: 700 }}>
+                <span style={{ padding: '2px 8px', borderRadius: 20, background: meta.bg, color: meta.color, fontSize: 14, fontWeight: 700 }}>
                   {meta.label}
                 </span>
-                <span style={{ fontSize: 13, color: '#5E7480' }}>{desc}</span>
+                <span style={{ fontSize: 14, color: '#5E7480' }}>{desc}</span>
               </div>
             )
           })}
         </div>
 
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '40px 0', color: '#5E7480', fontSize: 14 }}>
+          <div style={{ textAlign: 'center', padding: '40px 0', color: '#5E7480', fontSize: 15 }}>
             Cargando...
           </div>
         ) : (
@@ -284,17 +284,17 @@ export default function FamilyRoles() {
               <div style={{
                 textAlign: 'center', padding: '32px 16px',
                 background: 'white', borderRadius: 16,
-                border: '1px solid #F7F6F2', color: '#5E7480', fontSize: 13,
+                border: '1px solid #F7F6F2', color: '#5E7480', fontSize: 14,
               }}>
                 No hay otros miembros en el equipo todavía.<br />
-                <span style={{ fontSize: 14 }}>Invita a tu familia desde <b>Mi Familia</b>.</span>
+                <span style={{ fontSize: 15 }}>Invita a tu familia desde <b>Mi Familia</b>.</span>
               </div>
             )}
           </div>
         )}
 
         {error && (
-          <p style={{ marginTop: 16, fontSize: 13, color: '#E45B4C', textAlign: 'center' }}>
+          <p style={{ marginTop: 16, fontSize: 14, color: '#E45B4C', textAlign: 'center' }}>
             {error}
           </p>
         )}

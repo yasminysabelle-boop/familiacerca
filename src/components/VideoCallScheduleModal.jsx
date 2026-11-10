@@ -166,28 +166,28 @@ export default function VideoCallScheduleModal({ open, onClose }) {
 
           <div style={{ display: 'flex', gap: 10 }}>
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
-              <label style={{ fontSize: 13, fontWeight: 700, color: '#4E6470', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Fecha</label>
+              <label style={{ fontSize: 14, fontWeight: 700, color: '#4E6470', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Fecha</label>
               <input
                 type="date"
                 value={date}
                 min={minDate}
                 onChange={e => setDate(e.target.value)}
-                style={{ padding: '11px 13px', borderRadius: 12, border: '1.5px solid #E6E3DB', background: '#F7F6F2', fontSize: 14, color: '#2A4350', fontFamily: 'inherit' }}
+                style={{ padding: '11px 13px', borderRadius: 12, border: '1.5px solid #E6E3DB', background: '#F7F6F2', fontSize: 15, color: '#2A4350', fontFamily: 'inherit' }}
               />
             </div>
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
-              <label style={{ fontSize: 13, fontWeight: 700, color: '#4E6470', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Hora</label>
+              <label style={{ fontSize: 14, fontWeight: 700, color: '#4E6470', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Hora</label>
               <input
                 type="time"
                 value={time}
                 onChange={e => setTime(e.target.value)}
-                style={{ padding: '11px 13px', borderRadius: 12, border: '1.5px solid #E6E3DB', background: '#F7F6F2', fontSize: 14, color: '#2A4350', fontFamily: 'inherit' }}
+                style={{ padding: '11px 13px', borderRadius: 12, border: '1.5px solid #E6E3DB', background: '#F7F6F2', fontSize: 15, color: '#2A4350', fontFamily: 'inherit' }}
               />
             </div>
           </div>
 
           {scheduleError && (
-            <p style={{ margin: 0, fontSize: 13, color: '#B91C1C', padding: '10px 14px', borderRadius: 10, background: '#FEF0ED', border: '1px solid #F5C6BB' }}>
+            <p style={{ margin: 0, fontSize: 14, color: '#B91C1C', padding: '10px 14px', borderRadius: 10, background: '#FEF0ED', border: '1px solid #F5C6BB' }}>
               {scheduleError}
             </p>
           )}
@@ -199,7 +199,7 @@ export default function VideoCallScheduleModal({ open, onClose }) {
               width: '100%', padding: 14, borderRadius: 15, border: 'none',
               background: date && time && !scheduling ? '#0C6C9C' : '#E5DED2',
               color: date && time && !scheduling ? 'white' : '#5E7480',
-              fontWeight: 800, fontSize: 15, fontFamily: 'inherit',
+              fontWeight: 800, fontSize: 16, fontFamily: 'inherit',
               cursor: date && time && !scheduling ? 'pointer' : 'default',
               boxShadow: date && time && !scheduling ? '0 6px 18px rgba(12,108,156,0.35)' : 'none',
             }}
@@ -216,18 +216,18 @@ export default function VideoCallScheduleModal({ open, onClose }) {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 2 }}>
             <div style={{ flex: 1, height: 1, background: '#E6E3DB' }} />
-            <span style={{ fontSize: 13, fontWeight: 800, letterSpacing: '0.08em', color: '#5E7480', textTransform: 'uppercase' }}>Programadas</span>
+            <span style={{ fontSize: 14, fontWeight: 800, letterSpacing: '0.08em', color: '#5E7480', textTransform: 'uppercase' }}>Programadas</span>
             <div style={{ flex: 1, height: 1, background: '#E6E3DB' }} />
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {loadingCalls && (
-            <p style={{ textAlign: 'center', color: '#5E7480', fontSize: 13 }}>Cargando...</p>
+            <p style={{ textAlign: 'center', color: '#5E7480', fontSize: 14 }}>Cargando...</p>
           )}
           {!loadingCalls && upcomingCalls.length === 0 && (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: '26px 16px', border: '1.5px dashed #C9BFA9', borderRadius: 18 }}>
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0A5A82" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"></rect><path d="M3 10h18"></path><path d="M8 3v4"></path><path d="M16 3v4"></path></svg>
-              <span style={{ fontSize: 13.5, color: '#64748B', fontWeight: 600 }}>No hay llamadas programadas</span>
+              <span style={{ fontSize: 15, color: '#64748B', fontWeight: 600 }}>No hay llamadas programadas</span>
             </div>
           )}
           {upcomingCalls.map(call => {
@@ -248,16 +248,16 @@ export default function VideoCallScheduleModal({ open, onClose }) {
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-                    <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: '#2A4350', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#2A4350', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {call.title}
                     </p>
                     {live && (
-                      <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: '0.03em', padding: '2px 7px', borderRadius: 999, background: '#0C6C9C', color: 'white', flexShrink: 0 }}>
+                      <span style={{ fontSize: 14, fontWeight: 800, letterSpacing: '0.03em', padding: '2px 7px', borderRadius: 999, background: '#0C6C9C', color: 'white', flexShrink: 0 }}>
                         EN CURSO
                       </span>
                     )}
                   </div>
-                  <p style={{ margin: '2px 0 0', fontSize: 14, color: live ? '#0C6C9C' : '#64748B', fontWeight: live ? 700 : 400 }}>
+                  <p style={{ margin: '2px 0 0', fontSize: 15, color: live ? '#0C6C9C' : '#64748B', fontWeight: live ? 700 : 400 }}>
                     {live ? 'En curso ahora' : fmtScheduled(call.scheduled_at)}
                   </p>
                 </div>
@@ -267,7 +267,7 @@ export default function VideoCallScheduleModal({ open, onClose }) {
                     padding: '8px 15px', borderRadius: 11, border: 'none',
                     background: (live || joinSoon) ? '#0C6C9C' : 'transparent',
                     color: (live || joinSoon) ? 'white' : '#5E7480',
-                    fontWeight: (live || joinSoon) ? 800 : 700, fontSize: 14, fontFamily: 'inherit',
+                    fontWeight: (live || joinSoon) ? 800 : 700, fontSize: 15, fontFamily: 'inherit',
                     cursor: 'pointer', flexShrink: 0,
                   }}
                 >

@@ -31,12 +31,12 @@ export default function TrialEndedNotice({ onClose }) {
         }}>
           Tu prueba terminó — ahora estás en el plan Gratis
         </h2>
-        <p style={{ fontSize: 13.5, color: '#4E6470', lineHeight: 1.6, margin: '0 0 12px', textAlign: 'left' }}>
+        <p style={{ fontSize: 15, color: '#4E6470', lineHeight: 1.6, margin: '0 0 12px', textAlign: 'left' }}>
           <strong style={{ color: '#14303D' }}>Conservás:</strong> Milo y Luna, tu
           checklist diario, medicamentos, historial de 7 días y un equipo de 2
           personas.
         </p>
-        <p style={{ fontSize: 13.5, color: '#4E6470', lineHeight: 1.6, margin: '0 0 22px', textAlign: 'left' }}>
+        <p style={{ fontSize: 15, color: '#4E6470', lineHeight: 1.6, margin: '0 0 22px', textAlign: 'left' }}>
           <strong style={{ color: '#14303D' }}>Con Familiar sumás:</strong> alertas
           si una dosis no aparece registrada, hasta 6 cuidadores, historial de
           90 días y gastos de cuidado.
@@ -46,7 +46,7 @@ export default function TrialEndedNotice({ onClose }) {
           style={{
             width: '100%', padding: '14px', borderRadius: 14, border: 'none',
             background: '#0C6C9C',
-            color: 'white', fontWeight: 700, fontSize: 15, cursor: 'pointer',
+            color: 'white', fontWeight: 700, fontSize: 16, cursor: 'pointer',
             boxShadow: '0 6px 20px rgba(12,108,156,0.3)', marginBottom: 10,
           }}
         >
@@ -57,7 +57,7 @@ export default function TrialEndedNotice({ onClose }) {
           style={{
             width: '100%', padding: '12px', borderRadius: 12,
             border: '1.5px solid #E6E3DB', background: 'white',
-            color: '#5E7480', fontWeight: 600, fontSize: 14, cursor: 'pointer',
+            color: '#5E7480', fontWeight: 600, fontSize: 15, cursor: 'pointer',
           }}
         >
           Entendido

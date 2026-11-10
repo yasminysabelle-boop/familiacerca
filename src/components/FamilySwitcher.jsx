@@ -13,7 +13,7 @@ export default function FamilySwitcher({ isLight = false }) {
     if (!patientName) return null
     return (
       <span style={{
-        fontSize: 13, fontWeight: 600,
+        fontSize: 14, fontWeight: 600,
         color: isLight ? '#4E6470' : 'rgba(255,255,255,0.65)',
         maxWidth: 110, overflow: 'hidden',
         textOverflow: 'ellipsis', whiteSpace: 'nowrap',
@@ -39,7 +39,7 @@ export default function FamilySwitcher({ isLight = false }) {
         }}
       >
         <span style={{
-          fontSize: 13, fontWeight: 700, color: isLight ? '#2A4350' : 'white',
+          fontSize: 14, fontWeight: 700, color: isLight ? '#2A4350' : 'white',
           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
           lineHeight: 1.2,
         }}>
@@ -118,14 +118,14 @@ export default function FamilySwitcher({ isLight = false }) {
                     {/* Info */}
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p style={{
-                        fontSize: 15, fontWeight: 700, color: '#14303D',
+                        fontSize: 16, fontWeight: 700, color: '#14303D',
                         margin: '0 0 4px', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
                         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                       }}>
                         {fam.patientName ?? 'Mi familia'}
                       </p>
                       <span style={{
-                        fontSize: 12, fontWeight: 700,
+                        fontSize: 14, fontWeight: 700,
                         color: roleColor, background: roleBg,
                         padding: '2px 8px', borderRadius: 5,
                       }}>
@@ -136,7 +136,7 @@ export default function FamilySwitcher({ isLight = false }) {
                     {/* Action */}
                     {isActive ? (
                       <span style={{
-                        fontSize: 13, fontWeight: 700, color: '#0C6C9C',
+                        fontSize: 14, fontWeight: 700, color: '#0C6C9C',
                         flexShrink: 0,
                       }}>
                         ✓ Viendo
@@ -148,7 +148,7 @@ export default function FamilySwitcher({ isLight = false }) {
                           padding: '8px 14px', borderRadius: 10,
                           background: '#0C6C9C', color: 'white',
                           border: 'none', cursor: 'pointer',
-                          fontSize: 13, fontWeight: 700,
+                          fontSize: 14, fontWeight: 700,
                           flexShrink: 0, fontFamily: 'inherit',
                         }}
                       >

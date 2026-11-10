@@ -48,7 +48,7 @@ export default function VoiceInput({
     padding: '10px 44px 10px 12px',
     borderRadius: 10,
     border: `1.5px solid ${recording ? '#FCA5A5' : '#D1C9BF'}`,
-    fontSize: 14,
+    fontSize: 15,
     lineHeight: 1.5,
     color: recording ? '#4E6470' : '#14303D',
     background: disabled ? '#F9F5F0' : 'white',
@@ -61,7 +61,7 @@ export default function VoiceInput({
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
       {label && (
-        <label style={{ fontSize: 13, fontWeight: 600, color: '#30454F' }}>
+        <label style={{ fontSize: 14, fontWeight: 600, color: '#30454F' }}>
           {label}
         </label>
       )}
@@ -113,7 +113,7 @@ export default function VoiceInput({
             }}
           >
             {recording ? (
-              <span style={{ fontSize: 14 }}>⏹</span>
+              <span style={{ fontSize: 15 }}>⏹</span>
             ) : (
               <MicIcon color={micColor} />
             )}
@@ -133,7 +133,7 @@ export default function VoiceInput({
 
       {/* Interim transcript hint */}
       {recording && interim && (
-        <p style={{ fontSize: 14, color: '#5E7480', margin: 0, fontStyle: 'italic' }}>
+        <p style={{ fontSize: 15, color: '#5E7480', margin: 0, fontStyle: 'italic' }}>
           {interim}...
         </p>
       )}
@@ -145,11 +145,11 @@ export default function VoiceInput({
           padding: '8px 12px', borderRadius: 8,
           background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)',
         }}>
-          <span style={{ fontSize: 14, color: '#DC2626', flex: 1 }}>{error}</span>
+          <span style={{ fontSize: 15, color: '#DC2626', flex: 1 }}>{error}</span>
           <button aria-label="Cerrar"
             type="button"
             onClick={clearError}
-            style={{ fontSize: 13, color: '#DC2626', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+            style={{ fontSize: 14, color: '#DC2626', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
           >
             ✕
           </button>
@@ -170,7 +170,7 @@ export default function VoiceInput({
             background: saving ? '#5E7480' : '#0C6C9C',
             color: 'white',
             fontWeight: 700,
-            fontSize: 13,
+            fontSize: 14,
             cursor: saving ? 'default' : 'pointer',
           }}
         >

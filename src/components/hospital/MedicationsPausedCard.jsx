@@ -29,24 +29,24 @@ export default function MedicationsPausedCard() {
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
         <span style={{ fontSize: 20 }}>💊</span>
-        <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#92400E', flex: 1 }}>
+        <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#92400E', flex: 1 }}>
           Medicamentos
         </h3>
         <span style={{
           padding: '3px 10px', borderRadius: 20,
           background: '#FED7AA', color: '#92400E',
-          fontSize: 13, fontWeight: 700, letterSpacing: '0.03em',
+          fontSize: 14, fontWeight: 700, letterSpacing: '0.03em',
         }}>
           ⏸ PAUSADOS
         </span>
       </div>
 
-      <p style={{ margin: '0 0 12px', fontSize: 14, color: '#B45309' }}>
+      <p style={{ margin: '0 0 12px', fontSize: 15, color: '#B45309' }}>
         Solo lectura durante el Modo Hospital. Los recordatorios están desactivados.
       </p>
 
       {meds.length === 0 ? (
-        <p style={{ margin: 0, fontSize: 13, color: '#5E7480' }}>Sin medicamentos registrados</p>
+        <p style={{ margin: 0, fontSize: 14, color: '#5E7480' }}>Sin medicamentos registrados</p>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {meds.map(m => (
@@ -61,11 +61,11 @@ export default function MedicationsPausedCard() {
             >
               <span style={{ fontSize: 18, flexShrink: 0 }}>💊</span>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#92400E' }}>
+                <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#92400E' }}>
                   {m.name}
                 </p>
                 {m.dosage && (
-                  <p style={{ margin: '1px 0 0', fontSize: 13, color: '#B45309' }}>
+                  <p style={{ margin: '1px 0 0', fontSize: 14, color: '#B45309' }}>
                     {m.dosage}
                     {m.scheduled_times?.length > 0 && ` · ${m.scheduled_times.join(', ')}`}
                   </p>

@@ -21,7 +21,7 @@ function RoleBadge({ role }) {
   return (
     <span style={{
       display: 'inline-flex', alignItems: 'center', padding: '5px 14px',
-      borderRadius: 20, fontSize: 14, fontWeight: 700,
+      borderRadius: 20, fontSize: 15, fontWeight: 700,
       color: cfg.color, background: cfg.bg,
     }}>
       {cfg.label}
@@ -69,7 +69,7 @@ const CARD = {
 const BTN_PRIMARY = {
   width: '100%', padding: '14px', borderRadius: 14,
   background: 'linear-gradient(135deg, #0A5A82, #0A4A6B)',
-  color: 'white', fontWeight: 700, fontSize: 14,
+  color: 'white', fontWeight: 700, fontSize: 15,
   border: 'none', cursor: 'pointer',
   boxShadow: '0 8px 24px rgba(10,90,130,0.35)',
   transition: 'all 0.2s',
@@ -78,7 +78,7 @@ const BTN_PRIMARY = {
 const BTN_OUTLINE = {
   width: '100%', padding: '13px', borderRadius: 14,
   border: '1.5px solid #E6E3DB', background: 'white',
-  color: '#30454F', fontWeight: 600, fontSize: 14,
+  color: '#30454F', fontWeight: 600, fontSize: 15,
   cursor: 'pointer', transition: 'all 0.2s',
 }
 
@@ -387,7 +387,7 @@ export default function JoinFamily() {
             </button>
           </div>
 
-          <p style={{ marginTop: 20, fontSize: 13, color: '#5E7480', textAlign: 'center', lineHeight: 1.5 }}>
+          <p style={{ marginTop: 20, fontSize: 14, color: '#5E7480', textAlign: 'center', lineHeight: 1.5 }}>
             🔒 Lo que compartes aquí es solo para tu familia.
           </p>
         </div>
@@ -428,7 +428,7 @@ export default function JoinFamily() {
           {/* Loading */}
           {(invLoading || sessionLoading) && (
             <div style={CARD}>
-              <p style={{ color: '#4E6470', fontSize: 14 }}>Verificando invitación...</p>
+              <p style={{ color: '#4E6470', fontSize: 15 }}>Verificando invitación...</p>
             </div>
           )}
 
@@ -439,7 +439,7 @@ export default function JoinFamily() {
               <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 18, fontWeight: 700, color: '#14303D', marginBottom: 8 }}>
                 Enlace no válido
               </p>
-              <p style={{ fontSize: 13, color: '#4E6470', lineHeight: 1.6, marginBottom: 24 }}>
+              <p style={{ fontSize: 14, color: '#4E6470', lineHeight: 1.6, marginBottom: 24 }}>
                 {invError}
               </p>
               <button onClick={() => navigate('/login')} style={BTN_PRIMARY}>
@@ -455,7 +455,7 @@ export default function JoinFamily() {
               <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 18, fontWeight: 700, color: '#14303D', marginBottom: 8 }}>
                 Invitación expirada
               </p>
-              <p style={{ fontSize: 13, color: '#4E6470', lineHeight: 1.6, marginBottom: 24 }}>
+              <p style={{ fontSize: 14, color: '#4E6470', lineHeight: 1.6, marginBottom: 24 }}>
                 Esta invitación expiró. Pide al administrador que te envíe una nueva.
               </p>
               <button onClick={() => navigate('/login')} style={BTN_PRIMARY}>
@@ -471,7 +471,7 @@ export default function JoinFamily() {
               <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 18, fontWeight: 700, color: '#14303D', marginBottom: 8 }}>
                 Invitación ya usada
               </p>
-              <p style={{ fontSize: 13, color: '#4E6470', lineHeight: 1.6, marginBottom: 24 }}>
+              <p style={{ fontSize: 14, color: '#4E6470', lineHeight: 1.6, marginBottom: 24 }}>
                 Este enlace de invitación ya fue utilizado. Cada enlace es de un solo uso.
               </p>
               <button onClick={() => navigate(user ? '/dashboard' : '/login')} style={BTN_PRIMARY}>
@@ -487,7 +487,7 @@ export default function JoinFamily() {
               <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 18, fontWeight: 700, color: '#14303D', marginBottom: 8 }}>
                 Ya formas parte de esta familia
               </p>
-              <p style={{ fontSize: 13, color: '#4E6470', lineHeight: 1.6, marginBottom: 24 }}>
+              <p style={{ fontSize: 14, color: '#4E6470', lineHeight: 1.6, marginBottom: 24 }}>
                 Ya eres miembro del grupo de cuidado{patientName ? ` de ${patientName}` : ''}.
               </p>
               <button onClick={() => navigate('/dashboard')} style={BTN_PRIMARY}>
@@ -505,7 +505,7 @@ export default function JoinFamily() {
               <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 20, fontWeight: 700, color: '#14303D', marginBottom: 8 }}>
                 ¡Bienvenido a la familia!
               </p>
-              <p style={{ fontSize: 13, color: '#4E6470', lineHeight: 1.6, marginBottom: 24 }}>
+              <p style={{ fontSize: 14, color: '#4E6470', lineHeight: 1.6, marginBottom: 24 }}>
                 Ahora formas parte del grupo de cuidado{patientName ? ` de ${patientName}` : ''}.
               </p>
               <button
@@ -514,7 +514,7 @@ export default function JoinFamily() {
               >
                 Ir al panel →
               </button>
-              <p style={{ fontSize: 13, color: '#5E7480', margin: 0, lineHeight: 1.5 }}>
+              <p style={{ fontSize: 14, color: '#5E7480', margin: 0, lineHeight: 1.5 }}>
                 Instala la app para recibir alertas en tiempo real
               </p>
             </div>
@@ -531,16 +531,16 @@ export default function JoinFamily() {
                   }}>
                     No estar ahí no significa no estar cerca.
                   </p>
-                  <p style={{ fontSize: 13, color: '#4E6470', lineHeight: 1.6, margin: '0 0 22px' }}>
+                  <p style={{ fontSize: 14, color: '#4E6470', lineHeight: 1.6, margin: '0 0 22px' }}>
                     Desde donde estés, puedes ver cómo está {patientName || 'tu familiar'} y mandarle cariño en segundos.
                   </p>
 
                   {introLoading ? (
-                    <p style={{ color: '#5E7480', fontSize: 13, marginBottom: 18 }}>Cargando…</p>
+                    <p style={{ color: '#5E7480', fontSize: 14, marginBottom: 18 }}>Cargando…</p>
                   ) : familiarHasData ? (
                     <div style={{ position: 'relative', background: '#F7F6F2', borderRadius: 20, padding: '14px 16px', marginBottom: 16, overflow: 'hidden', textAlign: 'left' }}>
                       <WatermarkHeart heartOpacity={0.045} cutout="#F7F6F2" width={130} height={130} style={{ right: -18, bottom: -30 }} />
-                      <p style={{ position: 'relative', zIndex: 1, fontSize: 13, color: '#30454F', margin: 0 }}>
+                      <p style={{ position: 'relative', zIndex: 1, fontSize: 14, color: '#30454F', margin: 0 }}>
                         <b style={{ color: '#14303D' }}>{introLogsToday.length} de {introMeds.length}</b> medicamentos dados hoy
                       </p>
                     </div>
@@ -548,8 +548,8 @@ export default function JoinFamily() {
                     <div style={{ position: 'relative', background: 'white', borderRadius: 20, padding: '20px 16px', marginBottom: 16, overflow: 'hidden', textAlign: 'left', boxShadow: '0 6px 14px -8px rgba(0,0,0,0.08)' }}>
                       <WatermarkHeart heartOpacity={0.08} cutout="white" width={130} height={130} style={{ top: '50%', left: '50%', transform: 'translate(-50%,-50%)' }} />
                       <div style={{ position: 'relative', zIndex: 1 }}>
-                        <p style={{ fontSize: 13, fontWeight: 700, color: '#14303D', margin: '0 0 4px' }}>Día 1 — el equipo recién está empezando</p>
-                        <p style={{ fontSize: 14, color: '#4E6470', margin: 0, lineHeight: 1.5 }}>
+                        <p style={{ fontSize: 14, fontWeight: 700, color: '#14303D', margin: '0 0 4px' }}>Día 1 — el equipo recién está empezando</p>
+                        <p style={{ fontSize: 15, color: '#4E6470', margin: 0, lineHeight: 1.5 }}>
                           Todavía no hay actividad registrada. Muy pronto verás aquí cómo va el día.
                         </p>
                       </div>
@@ -564,11 +564,11 @@ export default function JoinFamily() {
                     disabled={introActionBusy || introJustDone}
                     style={{
                       width: '100%', padding: '11px 13px', borderRadius: 14, border: '1.5px solid #E6E3DB',
-                      fontSize: 13.5, fontFamily: 'inherit', resize: 'none', boxSizing: 'border-box', marginBottom: 12,
+                      fontSize: 15, fontFamily: 'inherit', resize: 'none', boxSizing: 'border-box', marginBottom: 12,
                     }}
                   />
                   {introActionError && (
-                    <p style={{ color: '#D63031', fontSize: 14, marginBottom: 10 }}>{introActionError}</p>
+                    <p style={{ color: '#D63031', fontSize: 15, marginBottom: 10 }}>{introActionError}</p>
                   )}
                   <button
                     onClick={sendFirstMessage}
@@ -589,30 +589,30 @@ export default function JoinFamily() {
                   }}>
                     Ya no estás cuidando solo/a.
                   </p>
-                  <p style={{ fontSize: 13, color: '#4E6470', lineHeight: 1.6, margin: '0 0 22px' }}>
+                  <p style={{ fontSize: 14, color: '#4E6470', lineHeight: 1.6, margin: '0 0 22px' }}>
                     Desde ahora, alguien más sabe exactamente qué necesita {patientName || 'tu familiar'} — y no tienes que recordarlo todo tú.
                   </p>
 
                   {introLoading ? (
-                    <p style={{ color: '#5E7480', fontSize: 13, marginBottom: 18 }}>Cargando…</p>
+                    <p style={{ color: '#5E7480', fontSize: 14, marginBottom: 18 }}>Cargando…</p>
                   ) : cuidadorHasData ? (
                     <>
                       <div style={{ position: 'relative', background: '#F7F6F2', borderRadius: 20, padding: '14px 16px', marginBottom: 16, overflow: 'hidden', textAlign: 'left' }}>
                         <WatermarkHeart heartOpacity={0.045} cutout="#F7F6F2" width={130} height={130} style={{ right: -18, bottom: -30 }} />
                         <div style={{ position: 'relative', zIndex: 1 }}>
-                          <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#5E7480', margin: '0 0 6px' }}>
+                          <p style={{ fontSize: 14, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#5E7480', margin: '0 0 6px' }}>
                             Próxima dosis
                           </p>
                           <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 16, fontWeight: 800, color: '#14303D', margin: 0 }}>
                             {nextMed.name}
                           </p>
                           {fmtMedTime(nextMed) && (
-                            <p style={{ fontSize: 14, color: '#4E6470', margin: '6px 0 0' }}>{fmtMedTime(nextMed)}</p>
+                            <p style={{ fontSize: 15, color: '#4E6470', margin: '6px 0 0' }}>{fmtMedTime(nextMed)}</p>
                           )}
                         </div>
                       </div>
                       {introActionError && (
-                        <p style={{ color: '#D63031', fontSize: 14, marginBottom: 10 }}>{introActionError}</p>
+                        <p style={{ color: '#D63031', fontSize: 15, marginBottom: 10 }}>{introActionError}</p>
                       )}
                       <button
                         onClick={confirmFirstDose}
@@ -630,8 +630,8 @@ export default function JoinFamily() {
                       <div style={{ position: 'relative', background: 'white', borderRadius: 20, padding: '20px 16px', marginBottom: 16, overflow: 'hidden', textAlign: 'left', boxShadow: '0 6px 14px -8px rgba(0,0,0,0.08)' }}>
                         <WatermarkHeart heartOpacity={0.08} cutout="white" width={130} height={130} style={{ top: '50%', left: '50%', transform: 'translate(-50%,-50%)' }} />
                         <div style={{ position: 'relative', zIndex: 1 }}>
-                          <p style={{ fontSize: 13, fontWeight: 700, color: '#14303D', margin: '0 0 4px' }}>Día 1 — todavía no hay medicamentos programados</p>
-                          <p style={{ fontSize: 14, color: '#4E6470', margin: 0, lineHeight: 1.5 }}>
+                          <p style={{ fontSize: 14, fontWeight: 700, color: '#14303D', margin: '0 0 4px' }}>Día 1 — todavía no hay medicamentos programados</p>
+                          <p style={{ fontSize: 15, color: '#4E6470', margin: 0, lineHeight: 1.5 }}>
                             En cuanto {invitation.invited_by || 'el administrador'} agregue el primero, lo verás aquí para confirmarlo.
                           </p>
                         </div>
@@ -656,7 +656,7 @@ export default function JoinFamily() {
                 <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 18, fontWeight: 700, color: '#14303D', marginBottom: 8 }}>
                   Abre desde otra cuenta
                 </p>
-                <p style={{ fontSize: 13, color: '#4E6470', lineHeight: 1.6, marginBottom: 24 }}>
+                <p style={{ fontSize: 14, color: '#4E6470', lineHeight: 1.6, marginBottom: 24 }}>
                   Creaste este enlace con tu cuenta ({user.email}). Compártelo con el familiar que quieres agregar.
                 </p>
                 <button onClick={signOut} style={BTN_OUTLINE}>
@@ -671,14 +671,14 @@ export default function JoinFamily() {
                 <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 18, fontWeight: 700, color: '#14303D', marginBottom: 8 }}>
                   Correo diferente
                 </p>
-                <p style={{ fontSize: 13, color: '#4E6470', lineHeight: 1.6, marginBottom: 4 }}>
+                <p style={{ fontSize: 14, color: '#4E6470', lineHeight: 1.6, marginBottom: 4 }}>
                   Esta invitación fue enviada a <strong>{invitation.invited_email}</strong>.
                 </p>
-                <p style={{ fontSize: 13, color: '#4E6470', lineHeight: 1.6, marginBottom: 24 }}>
+                <p style={{ fontSize: 14, color: '#4E6470', lineHeight: 1.6, marginBottom: 24 }}>
                   Tu cuenta actual es <strong>{user.email}</strong>. ¿Quieres continuar de todas formas?
                 </p>
                 {acceptError && (
-                  <div style={{ marginBottom: 14, padding: '10px 14px', background: '#FFF0F0', border: '1px solid #FFBABA', borderRadius: 10, fontSize: 13, color: '#D63031' }}>
+                  <div style={{ marginBottom: 14, padding: '10px 14px', background: '#FFF0F0', border: '1px solid #FFBABA', borderRadius: 10, fontSize: 14, color: '#D63031' }}>
                     ⚠ {acceptError}
                   </div>
                 )}
@@ -699,7 +699,7 @@ export default function JoinFamily() {
                 <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 18, fontWeight: 700, color: '#14303D', marginBottom: 8 }}>
                   No se pudo unir
                 </p>
-                <p style={{ fontSize: 13, color: '#4E6470', lineHeight: 1.6, marginBottom: 24 }}>
+                <p style={{ fontSize: 14, color: '#4E6470', lineHeight: 1.6, marginBottom: 24 }}>
                   {acceptError}
                 </p>
                 <button onClick={acceptInvitation} style={BTN_PRIMARY}>
@@ -710,7 +710,7 @@ export default function JoinFamily() {
             ) : (
               /* Auto-accepting (triggers via useEffect; show while in flight) */
               <div style={CARD}>
-                <p style={{ color: '#4E6470', fontSize: 14, marginBottom: patientName ? 8 : 0 }}>
+                <p style={{ color: '#4E6470', fontSize: 15, marginBottom: patientName ? 8 : 0 }}>
                   Uniéndote al grupo de cuidado...
                 </p>
                 {patientName && (

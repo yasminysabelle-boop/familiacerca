@@ -97,7 +97,7 @@ export default function Login() {
     width: '100%',
     padding: '12px 44px 12px 16px',
     borderRadius: 12,
-    fontSize: 14,
+    fontSize: 15,
     outline: 'none',
     transition: 'all 0.15s',
     boxSizing: 'border-box',
@@ -116,8 +116,8 @@ export default function Login() {
         aria-label={show ? 'Ocultar contraseña' : 'Mostrar contraseña'}
       >
         {show
-          ? <EyeOff size={18} color="#5E7480" strokeWidth={1.5} />
-          : <Eye    size={18} color="#5E7480" strokeWidth={1.5} />
+          ? <EyeOff size={18} color="#5E7480" strokeWidth={2.1} />
+          : <Eye    size={18} color="#5E7480" strokeWidth={2.1} />
         }
       </button>
     )
@@ -180,26 +180,26 @@ export default function Login() {
             <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 22, fontWeight: 700, color: '#14303D', marginBottom: 6 }}>
               Nueva contraseña
             </h2>
-            <p style={{ fontSize: 13, color: '#5E7480', marginBottom: 24 }}>
+            <p style={{ fontSize: 14, color: '#5E7480', marginBottom: 24 }}>
               Elige una contraseña segura para tu cuenta.
             </p>
 
             {resetDone ? (
               <div style={{ textAlign: 'center', padding: '20px 0' }}>
                 <div style={{ fontSize: 40, marginBottom: 12 }}>✅</div>
-                <p style={{ fontSize: 14, fontWeight: 600, color: '#14303D' }}>¡Contraseña actualizada!</p>
-                <p style={{ fontSize: 13, color: '#5E7480', marginTop: 6 }}>Redirigiendo al panel...</p>
+                <p style={{ fontSize: 15, fontWeight: 600, color: '#14303D' }}>¡Contraseña actualizada!</p>
+                <p style={{ fontSize: 14, color: '#5E7480', marginTop: 6 }}>Redirigiendo al panel...</p>
               </div>
             ) : (
               <>
                 {error && (
-                  <div style={{ marginBottom: 16, padding: '10px 14px', borderRadius: 12, background: '#FFF0F0', border: '1px solid #FFBABA', color: '#D63031', fontSize: 13 }}>
+                  <div style={{ marginBottom: 16, padding: '10px 14px', borderRadius: 12, background: '#FFF0F0', border: '1px solid #FFBABA', color: '#D63031', fontSize: 14 }}>
                     {error}
                   </div>
                 )}
                 <form onSubmit={handleReset} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                   <div>
-                    <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#4E6470', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>
+                    <label style={{ display: 'block', fontSize: 14, fontWeight: 700, color: '#4E6470', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>
                       Nueva contraseña
                     </label>
                     <div style={{ position: 'relative' }}>
@@ -221,7 +221,7 @@ export default function Login() {
                     style={{
                       marginTop: 4, width: '100%', padding: '14px',
                       background: loading ? '#C9D6DB' : '#0C6C9C',
-                      color: 'white', fontWeight: 700, fontSize: 14, borderRadius: 999,
+                      color: 'white', fontWeight: 700, fontSize: 15, borderRadius: 999,
                       border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
                       boxShadow: loading ? 'none' : '0 6px 20px rgba(12,108,156,0.35)',
                       transition: 'all 0.15s',
@@ -240,7 +240,7 @@ export default function Login() {
           <>
             <button
               onClick={() => { setMode('login'); setError(''); setResetSent(false) }}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#0C6C9C', fontSize: 13, fontWeight: 600, padding: 0, marginBottom: 16 }}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#0C6C9C', fontSize: 14, fontWeight: 600, padding: 0, marginBottom: 16 }}
             >
               ← Volver
             </button>
@@ -251,8 +251,8 @@ export default function Login() {
             {resetSent ? (
               <div style={{ textAlign: 'center', padding: '20px 0' }}>
                 <div style={{ fontSize: 40, marginBottom: 12 }}>📧</div>
-                <p style={{ fontSize: 14, fontWeight: 600, color: '#14303D', marginBottom: 8 }}>¡Revisa tu correo!</p>
-                <p style={{ fontSize: 13, color: '#4E6470', lineHeight: 1.6 }}>
+                <p style={{ fontSize: 15, fontWeight: 600, color: '#14303D', marginBottom: 8 }}>¡Revisa tu correo!</p>
+                <p style={{ fontSize: 14, color: '#4E6470', lineHeight: 1.6 }}>
                   Te enviamos un enlace a <strong>{email}</strong> para restablecer tu contraseña.
                 </p>
                 <button
@@ -260,7 +260,7 @@ export default function Login() {
                   style={{
                     marginTop: 20, padding: '12px 28px', borderRadius: 999,
                     background: '#0C6C9C',
-                    color: 'white', fontWeight: 700, fontSize: 14, border: 'none', cursor: 'pointer',
+                    color: 'white', fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer',
                   }}
                 >
                   Volver al inicio
@@ -268,17 +268,17 @@ export default function Login() {
               </div>
             ) : (
               <>
-                <p style={{ fontSize: 13, color: '#5E7480', marginBottom: 24 }}>
+                <p style={{ fontSize: 14, color: '#5E7480', marginBottom: 24 }}>
                   Ingresa tu correo y te enviaremos un enlace para restablecer tu contraseña.
                 </p>
                 {error && (
-                  <div style={{ marginBottom: 16, padding: '10px 14px', borderRadius: 12, background: '#FFF0F0', border: '1px solid #FFBABA', color: '#D63031', fontSize: 13 }}>
+                  <div style={{ marginBottom: 16, padding: '10px 14px', borderRadius: 12, background: '#FFF0F0', border: '1px solid #FFBABA', color: '#D63031', fontSize: 14 }}>
                     {error}
                   </div>
                 )}
                 <form onSubmit={handleForgot} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                   <div>
-                    <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#4E6470', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>
+                    <label style={{ display: 'block', fontSize: 14, fontWeight: 700, color: '#4E6470', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>
                       Correo electrónico
                     </label>
                     <input
@@ -286,7 +286,7 @@ export default function Login() {
                       onChange={e => setEmail(e.target.value)}
                       placeholder="tu@correo.com"
                       onFocus={onFocus} onBlur={onBlur}
-                      style={{ ...fieldBase, width: '100%', padding: '12px 16px', borderRadius: 12, fontSize: 14, outline: 'none', transition: 'all 0.15s', boxSizing: 'border-box' }}
+                      style={{ ...fieldBase, width: '100%', padding: '12px 16px', borderRadius: 12, fontSize: 15, outline: 'none', transition: 'all 0.15s', boxSizing: 'border-box' }}
                     />
                   </div>
                   <button
@@ -294,7 +294,7 @@ export default function Login() {
                     style={{
                       marginTop: 4, width: '100%', padding: '14px',
                       background: loading ? '#C9D6DB' : '#0C6C9C',
-                      color: 'white', fontWeight: 700, fontSize: 14, borderRadius: 999,
+                      color: 'white', fontWeight: 700, fontSize: 15, borderRadius: 999,
                       border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
                       boxShadow: loading ? 'none' : '0 6px 20px rgba(12,108,156,0.35)',
                       transition: 'all 0.15s',
@@ -314,19 +314,19 @@ export default function Login() {
             <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 22, fontWeight: 700, color: '#14303D', marginBottom: 6 }}>
               Bienvenida de nuevo
             </h2>
-            <p style={{ fontSize: 13, color: '#5E7480', marginBottom: 24 }}>
+            <p style={{ fontSize: 14, color: '#5E7480', marginBottom: 24 }}>
               Inicia sesión para continuar cuidando
             </p>
 
             {error && (
-              <div style={{ marginBottom: 16, padding: '10px 14px', borderRadius: 12, background: '#FFF0F0', border: '1px solid #FFBABA', color: '#D63031', fontSize: 13 }}>
+              <div style={{ marginBottom: 16, padding: '10px 14px', borderRadius: 12, background: '#FFF0F0', border: '1px solid #FFBABA', color: '#D63031', fontSize: 14 }}>
                 {error}
               </div>
             )}
 
             <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div>
-                <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#4E6470', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>
+                <label style={{ display: 'block', fontSize: 14, fontWeight: 700, color: '#4E6470', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 6 }}>
                   Correo electrónico
                 </label>
                 <input
@@ -334,19 +334,19 @@ export default function Login() {
                   onChange={e => setEmail(e.target.value)}
                   placeholder="tu@correo.com"
                   onFocus={onFocus} onBlur={onBlur}
-                  style={{ ...fieldBase, width: '100%', padding: '12px 16px', borderRadius: 12, fontSize: 14, outline: 'none', transition: 'all 0.15s', boxSizing: 'border-box' }}
+                  style={{ ...fieldBase, width: '100%', padding: '12px 16px', borderRadius: 12, fontSize: 15, outline: 'none', transition: 'all 0.15s', boxSizing: 'border-box' }}
                 />
               </div>
 
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                  <label style={{ fontSize: 13, fontWeight: 700, color: '#4E6470', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+                  <label style={{ fontSize: 14, fontWeight: 700, color: '#4E6470', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                     Contraseña
                   </label>
                   <button
                     type="button"
                     onClick={() => { setMode('forgot'); setError('') }}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#0C6C9C', fontSize: 14, fontWeight: 600, padding: 0 }}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#0C6C9C', fontSize: 15, fontWeight: 600, padding: 0 }}
                   >
                     ¿Olvidaste tu contraseña?
                   </button>
@@ -371,8 +371,8 @@ export default function Login() {
                     aria-label={showPw ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                   >
                     {showPw
-                      ? <EyeOff size={18} color="#5E7480" strokeWidth={1.5} />
-                      : <Eye    size={18} color="#5E7480" strokeWidth={1.5} />
+                      ? <EyeOff size={18} color="#5E7480" strokeWidth={2.1} />
+                      : <Eye    size={18} color="#5E7480" strokeWidth={2.1} />
                     }
                   </button>
                 </div>
@@ -383,7 +383,7 @@ export default function Login() {
                 style={{
                   marginTop: 4, width: '100%', padding: '14px',
                   background: loading ? '#C9D6DB' : '#0C6C9C',
-                  color: 'white', fontWeight: 700, fontSize: 14, borderRadius: 999,
+                  color: 'white', fontWeight: 700, fontSize: 15, borderRadius: 999,
                   border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
                   boxShadow: loading ? 'none' : '0 6px 20px rgba(12,108,156,0.35)',
                   transition: 'all 0.15s',
@@ -393,14 +393,14 @@ export default function Login() {
               </button>
             </form>
 
-            <p style={{ marginTop: 20, textAlign: 'center', fontSize: 13, color: '#4E6470' }}>
+            <p style={{ marginTop: 20, textAlign: 'center', fontSize: 14, color: '#4E6470' }}>
               ¿No tienes cuenta?{' '}
               <Link to="/register" style={{ color: '#A3452F', fontWeight: 600, textDecoration: 'none' }}>
                 Regístrate gratis
               </Link>
             </p>
 
-            <p style={{ marginTop: 12, textAlign: 'center', fontSize: 13, color: '#5E7480' }}>
+            <p style={{ marginTop: 12, textAlign: 'center', fontSize: 14, color: '#5E7480' }}>
               <Link to="/terminos" style={{ color: '#5E7480', textDecoration: 'underline' }}>Términos de Servicio</Link>
               {' · '}
               <Link to="/privacidad" style={{ color: '#5E7480', textDecoration: 'underline' }}>Política de Privacidad</Link>

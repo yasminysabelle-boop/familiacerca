@@ -74,12 +74,12 @@ export default function AdminDataSection() {
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: exportError ? 12 : 0 }}>
           <span style={{ fontSize: 28, flexShrink: 0 }}>📄</span>
           <div style={{ flex: 1 }}>
-            <p style={{ margin: '0 0 2px', fontSize: 15, fontWeight: 700, color: '#14303D' }}>Exportar historial médico</p>
-            <p style={{ margin: '0 0 12px', fontSize: 14, color: '#4E6470', lineHeight: 1.5 }}>
+            <p style={{ margin: '0 0 2px', fontSize: 16, fontWeight: 700, color: '#14303D' }}>Exportar historial médico</p>
+            <p style={{ margin: '0 0 12px', fontSize: 15, color: '#4E6470', lineHeight: 1.5 }}>
               PDF completo con perfil del paciente, medicamentos, registros de dosis (90 días), notas y gastos.
             </p>
             {exportError && (
-              <p style={{ margin: '0 0 10px', fontSize: 14, color: '#DC2626', padding: '6px 10px', borderRadius: 8, background: '#FEF2F2' }}>
+              <p style={{ margin: '0 0 10px', fontSize: 15, color: '#DC2626', padding: '6px 10px', borderRadius: 8, background: '#FEF2F2' }}>
                 {exportError}
               </p>
             )}
@@ -89,7 +89,7 @@ export default function AdminDataSection() {
               style={{
                 padding: '10px 20px', borderRadius: 10, border: 'none',
                 background: exporting ? '#5E7480' : '#0C6C9C',
-                color: 'white', fontWeight: 700, fontSize: 13,
+                color: 'white', fontWeight: 700, fontSize: 14,
                 cursor: exporting ? 'default' : 'pointer',
               }}
             >
@@ -107,8 +107,8 @@ export default function AdminDataSection() {
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
           <span style={{ fontSize: 28, flexShrink: 0 }}>🗑️</span>
           <div style={{ flex: 1 }}>
-            <p style={{ margin: '0 0 2px', fontSize: 15, fontWeight: 700, color: '#B91C1C' }}>Borrar cuenta y datos</p>
-            <p style={{ margin: '0 0 12px', fontSize: 14, color: '#4E6470', lineHeight: 1.5 }}>
+            <p style={{ margin: '0 0 2px', fontSize: 16, fontWeight: 700, color: '#B91C1C' }}>Borrar cuenta y datos</p>
+            <p style={{ margin: '0 0 12px', fontSize: 15, color: '#4E6470', lineHeight: 1.5 }}>
               Elimina permanentemente tu cuenta, todos los miembros del equipo, medicamentos, historial, notas, gastos y documentos. Esta acción no se puede deshacer.
             </p>
 
@@ -118,7 +118,7 @@ export default function AdminDataSection() {
                 style={{
                   padding: '9px 18px', borderRadius: 10,
                   border: '1.5px solid #DC2626', background: 'white',
-                  color: '#DC2626', fontWeight: 700, fontSize: 13, cursor: 'pointer',
+                  color: '#DC2626', fontWeight: 700, fontSize: 14, cursor: 'pointer',
                 }}
               >
                 Eliminar cuenta
@@ -131,7 +131,7 @@ export default function AdminDataSection() {
                   padding: '10px 12px', borderRadius: 10,
                   background: 'rgba(185,28,28,0.06)', border: '1px solid rgba(185,28,28,0.2)',
                 }}>
-                  <p style={{ margin: 0, fontSize: 14, color: '#B91C1C', fontWeight: 600 }}>
+                  <p style={{ margin: 0, fontSize: 15, color: '#B91C1C', fontWeight: 600 }}>
                     Escribe ELIMINAR para confirmar:
                   </p>
                 </div>
@@ -142,7 +142,7 @@ export default function AdminDataSection() {
                   rows={1}
                 />
                 {deleteError && (
-                  <p style={{ margin: 0, fontSize: 14, color: '#DC2626', padding: '6px 10px', borderRadius: 8, background: '#FEF2F2' }}>
+                  <p style={{ margin: 0, fontSize: 15, color: '#DC2626', padding: '6px 10px', borderRadius: 8, background: '#FEF2F2' }}>
                     {deleteError}
                   </p>
                 )}
@@ -152,7 +152,7 @@ export default function AdminDataSection() {
                     style={{
                       flex: 1, padding: '10px', borderRadius: 10,
                       border: '1px solid #E6E3DB', background: 'white',
-                      color: '#4E6470', fontWeight: 600, fontSize: 13, cursor: 'pointer',
+                      color: '#4E6470', fontWeight: 600, fontSize: 14, cursor: 'pointer',
                     }}
                   >
                     Cancelar
@@ -163,7 +163,7 @@ export default function AdminDataSection() {
                     style={{
                       flex: 1, padding: '10px', borderRadius: 10, border: 'none',
                       background: confirmText.trim().toUpperCase() === 'ELIMINAR' ? '#DC2626' : '#5E7480',
-                      color: 'white', fontWeight: 700, fontSize: 13,
+                      color: 'white', fontWeight: 700, fontSize: 14,
                       cursor: confirmText.trim().toUpperCase() === 'ELIMINAR' ? 'pointer' : 'default',
                     }}
                   >
@@ -174,11 +174,11 @@ export default function AdminDataSection() {
             )}
 
             {deletePhase === 'deleting' && (
-              <p style={{ fontSize: 13, color: '#DC2626', fontWeight: 600 }}>⏳ Eliminando cuenta y datos...</p>
+              <p style={{ fontSize: 14, color: '#DC2626', fontWeight: 600 }}>⏳ Eliminando cuenta y datos...</p>
             )}
 
             {deletePhase === 'done' && (
-              <p style={{ fontSize: 13, color: '#0C6C9C', fontWeight: 700 }}>✓ Cuenta eliminada. Redirigiendo...</p>
+              <p style={{ fontSize: 14, color: '#0C6C9C', fontWeight: 700 }}>✓ Cuenta eliminada. Redirigiendo...</p>
             )}
           </div>
         </div>

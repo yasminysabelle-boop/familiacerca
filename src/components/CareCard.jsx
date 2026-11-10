@@ -6,7 +6,7 @@ const CORAL_EMERGENCY  = '#D9534F'
 const CORAL_HEART      = '#F5836E'
 const GOLD             = '#D99A18'
 
-const SERIF = "'Fraunces', Georgia, serif"
+const SERIF = "'Plus Jakarta Sans', system-ui, sans-serif"  // una sola letra en toda la app
 const SANS  = "'Plus Jakarta Sans', system-ui, sans-serif"
 
 const STATUS = {
@@ -37,8 +37,8 @@ function StatItem({ icon, label, sub, onClick }) {
       <span style={{ flex: 'none', width: 30, height: 30, borderRadius: '50%', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 6px rgba(0,0,0,0.15)' }}>
         {icon}
       </span>
-      <span style={{ maxWidth: '100%', fontSize: 12.5, fontWeight: 700, lineHeight: 1.15, letterSpacing: '-0.01em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</span>
-      <span style={{ fontSize: 12, fontWeight: 500, color: 'rgba(255,255,255,0.88)', lineHeight: 1.1, whiteSpace: 'nowrap' }}>{sub} ›</span>
+      <span style={{ maxWidth: '100%', fontSize: 14, fontWeight: 700, lineHeight: 1.15, letterSpacing: '-0.01em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</span>
+      <span style={{ fontSize: 14, fontWeight: 500, color: 'rgba(255,255,255,0.88)', lineHeight: 1.1, whiteSpace: 'nowrap' }}>{sub} ›</span>
     </button>
   )
 }
@@ -122,7 +122,7 @@ export default function CareCard({
           </div>
           <div style={{ flex: 1, minWidth: 0, paddingTop: 2 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-              <h2 style={{ margin: 0, fontFamily: SERIF, fontSize: 31, fontWeight: 600, color: 'white', letterSpacing: '-0.01em', lineHeight: 1 }}>
+              <h2 style={{ margin: 0, fontFamily: SERIF, fontSize: 30, fontWeight: 800, color: 'white', letterSpacing: '-0.02em', lineHeight: 1 }}>
                 {name}
               </h2>
               <Heart size={24} color={CORAL_HEART} filled />
@@ -140,7 +140,7 @@ export default function CareCard({
                 cursor: onStatusClick ? 'pointer' : 'default',
               }}>
               <span style={{ width: 11, height: 11, borderRadius: '50%', background: s.dot, boxShadow: `0 0 0 4px ${s.glow}` }} />
-              <span style={{ fontFamily: SANS, color: '#fff', fontSize: 14, fontWeight: 600 }}>{s.label}</span>
+              <span style={{ fontFamily: SANS, color: '#fff', fontSize: 15, fontWeight: 600 }}>{s.label}</span>
               {onStatusClick && <span aria-hidden="true" style={{ color: 'rgba(255,255,255,0.8)', fontSize: 16, lineHeight: 1 }}>›</span>}
             </span>
           </div>
@@ -164,7 +164,7 @@ export default function CareCard({
             onClick={onRoutineClick ? (e) => { e.stopPropagation(); onRoutineClick() } : undefined}
           />
           <StatItem
-            icon={<Users size={16} color={TEAL} strokeWidth={1.9} />}
+            icon={<Users size={16} color={TEAL} strokeWidth={2.1} />}
             label="Familia"
             sub={familyCount <= 1 ? 'solo tú' : `${familyCount} conectados`}
             onClick={onFamilyClick ? (e) => { e.stopPropagation(); onFamilyClick() } : undefined}

@@ -162,8 +162,8 @@ export default function Register() {
                   aria-label={showPw ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                 >
                   {showPw
-                    ? <EyeOff size={18} color="#5E7480" strokeWidth={1.5} />
-                    : <Eye    size={18} color="#5E7480" strokeWidth={1.5} />
+                    ? <EyeOff size={18} color="#5E7480" strokeWidth={2.1} />
+                    : <Eye    size={18} color="#5E7480" strokeWidth={2.1} />
                   }
                 </button>
               </div>
@@ -199,7 +199,7 @@ export default function Register() {
           </Link>
         </p>
 
-        <p className="mt-3 text-center text-[13px] text-gray-500 leading-relaxed">
+        <p className="mt-3 text-center text-[14px] text-gray-500 leading-relaxed">
           Al crear tu cuenta aceptas nuestros{' '}
           <Link to="/terminos" className="underline hover:text-gray-600 transition-colors">
             Términos de Servicio

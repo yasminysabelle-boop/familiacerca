@@ -124,7 +124,7 @@ export default function NotasFamilia() {
               style={{
                 flex: 1, padding: '10px 0', border: 'none', cursor: 'pointer',
                 background: 'transparent', fontFamily: 'inherit',
-                fontSize: 13, fontWeight: 700,
+                fontSize: 14, fontWeight: 700,
                 color: tab === t.key ? 'white' : 'rgba(255,255,255,0.8)',
                 borderBottom: tab === t.key ? '2px solid white' : '2px solid transparent',
                 transition: 'color 0.15s, border-color 0.15s',
@@ -145,7 +145,7 @@ export default function NotasFamilia() {
             {saved && (
               <div style={{ background: '#DCFCE7', borderRadius: 12, padding: '12px 16px', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 10, border: '1px solid #A6E3EC' }}>
                 <span style={{ fontSize: 18 }}>✅</span>
-                <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#0A4A6B' }}>Nota guardada</p>
+                <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#0A4A6B' }}>Nota guardada</p>
               </div>
             )}
 
@@ -156,10 +156,10 @@ export default function NotasFamilia() {
               boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
               textAlign: 'center',
             }}>
-              <p style={{ margin: '0 0 4px', fontSize: 15, fontWeight: 700, color: '#14303D' }}>
+              <p style={{ margin: '0 0 4px', fontSize: 16, fontWeight: 700, color: '#14303D' }}>
                 🎙️ Graba tu nota de turno
               </p>
-              <p style={{ margin: '0 0 20px', fontSize: 14, color: '#5E7480' }}>
+              <p style={{ margin: '0 0 20px', fontSize: 15, color: '#5E7480' }}>
                 El audio se convierte en texto automáticamente
               </p>
               <VoiceRecorder
@@ -180,7 +180,7 @@ export default function NotasFamilia() {
                 width: '100%', boxSizing: 'border-box',
                 padding: '14px', borderRadius: 14,
                 border: '1.5px solid #DDD5C8', background: 'white',
-                fontSize: 14, color: '#30454F', lineHeight: 1.6,
+                fontSize: 15, color: '#30454F', lineHeight: 1.6,
                 resize: 'vertical', outline: 'none',
                 fontFamily: 'inherit', marginBottom: 16,
               }}
@@ -199,8 +199,8 @@ export default function NotasFamilia() {
             >
               <span style={{ fontSize: 20 }}>🩺</span>
               <span style={{ flex: 1 }}>
-                <span style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#14303D' }}>Evento agudo</span>
-                <span style={{ display: 'block', fontSize: 13, color: '#5E7480' }}>Caída, ER/hospitalización, cambio de conducta...</span>
+                <span style={{ display: 'block', fontSize: 14, fontWeight: 700, color: '#14303D' }}>Evento agudo</span>
+                <span style={{ display: 'block', fontSize: 14, color: '#5E7480' }}>Caída, ER/hospitalización, cambio de conducta...</span>
               </span>
               <span style={{
                 width: 40, height: 22, borderRadius: 20, flexShrink: 0, position: 'relative',
@@ -232,7 +232,7 @@ export default function NotasFamilia() {
                         }}
                       >
                         <span style={{ fontSize: 20 }}>{t.emoji}</span>
-                        <span style={{ fontSize: 12, fontWeight: 700, color: isSelected ? '#8C3A2A' : '#4E6470', textAlign: 'center', lineHeight: 1.2 }}>{t.label}</span>
+                        <span style={{ fontSize: 14, fontWeight: 700, color: isSelected ? '#8C3A2A' : '#4E6470', textAlign: 'center', lineHeight: 1.2 }}>{t.label}</span>
                       </button>
                     )
                   })}
@@ -242,7 +242,7 @@ export default function NotasFamilia() {
                     <img src={photoUrl} alt="Preview" style={{ width: 64, height: 64, borderRadius: 10, objectFit: 'cover', border: '1.5px solid #DDD5C8' }} />
                     <button
                       onClick={() => setPhotoUrl(null)}
-                      style={{ background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 8, padding: '4px 10px', fontSize: 14, color: '#DC2626', cursor: 'pointer', fontWeight: 600, fontFamily: 'inherit' }}
+                      style={{ background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 8, padding: '4px 10px', fontSize: 15, color: '#DC2626', cursor: 'pointer', fontWeight: 600, fontFamily: 'inherit' }}
                     >
                       Quitar foto
                     </button>
@@ -259,7 +259,7 @@ export default function NotasFamilia() {
             )}
 
             {saveError && (
-              <p style={{ margin: '0 0 12px', fontSize: 13, color: '#DC2626', fontWeight: 500 }}>{saveError}</p>
+              <p style={{ margin: '0 0 12px', fontSize: 14, color: '#DC2626', fontWeight: 500 }}>{saveError}</p>
             )}
 
             <button
@@ -269,7 +269,7 @@ export default function NotasFamilia() {
                 width: '100%', padding: '14px', borderRadius: 14,
                 border: 'none',
                 background: saving || !content.trim() ? '#5E7480' : '#0C6C9C',
-                color: 'white', fontSize: 15, fontWeight: 700,
+                color: 'white', fontSize: 16, fontWeight: 700,
                 cursor: saving || !content.trim() ? 'default' : 'pointer',
                 fontFamily: 'inherit',
               }}
@@ -282,7 +282,7 @@ export default function NotasFamilia() {
         {/* ── HISTORIAL ──────────────────────────────────── */}
         {tab === 'historial' && (
           loading ? (
-            <p style={{ textAlign: 'center', color: '#5E7480', fontSize: 13, padding: 40 }}>Cargando…</p>
+            <p style={{ textAlign: 'center', color: '#5E7480', fontSize: 14, padding: 40 }}>Cargando…</p>
           ) : notes.length === 0 ? (
             <div style={{ position: 'relative', background: 'white', borderRadius: 20, padding: '36px 20px', textAlign: 'center', boxShadow: '0 2px 12px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
               <WatermarkHeart
@@ -291,11 +291,11 @@ export default function NotasFamilia() {
               />
               <div style={{ position: 'relative', zIndex: 1 }}>
                 <p style={{ fontSize: 36, margin: '0 0 12px' }}>📋</p>
-                <p style={{ fontSize: 15, fontWeight: 700, color: '#14303D', margin: '0 0 6px', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Sin notas aún</p>
-                <p style={{ fontSize: 13, color: '#4E6470', margin: '0 0 20px', lineHeight: 1.5 }}>Las notas del equipo aparecerán aquí</p>
+                <p style={{ fontSize: 16, fontWeight: 700, color: '#14303D', margin: '0 0 6px', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Sin notas aún</p>
+                <p style={{ fontSize: 14, color: '#4E6470', margin: '0 0 20px', lineHeight: 1.5 }}>Las notas del equipo aparecerán aquí</p>
                 <button
                   onClick={() => setTab('grabar')}
-                  style={{ padding: '12px 24px', borderRadius: 14, background: '#0C6C9C', color: 'white', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 14, fontFamily: 'inherit' }}
+                  style={{ padding: '12px 24px', borderRadius: 14, background: '#0C6C9C', color: 'white', border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 15, fontFamily: 'inherit' }}
                 >
                   Grabar primera nota
                 </button>
@@ -335,26 +335,26 @@ export default function NotasFamilia() {
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
-                          <span style={{ fontSize: 14, fontWeight: 700, color: '#14303D' }}>
+                          <span style={{ fontSize: 15, fontWeight: 700, color: '#14303D' }}>
                             {isOwn ? 'Tú' : authorName}
                           </span>
-                          <span style={{ fontSize: 13, color: '#5E7480' }}>·</span>
-                          <span style={{ fontSize: 13, color: '#5E7480' }}>
+                          <span style={{ fontSize: 14, color: '#5E7480' }}>·</span>
+                          <span style={{ fontSize: 14, color: '#5E7480' }}>
                             {new Date(note.created_at).toLocaleString('es', { dateStyle: 'short', timeStyle: 'short' })}
                           </span>
                           {note.is_incident && (
-                            <span style={{ fontSize: 12, fontWeight: 700, color: '#8C3A2A', background: '#FBEAE4', padding: '2px 8px', borderRadius: 20 }}>
+                            <span style={{ fontSize: 14, fontWeight: 700, color: '#8C3A2A', background: '#FBEAE4', padding: '2px 8px', borderRadius: 20 }}>
                               {incidentTypeInfo(note.incident_type).emoji} {incidentTypeInfo(note.incident_type).label}
                             </span>
                           )}
                         </div>
                         {note.title && (
-                          <p style={{ margin: '0 0 3px', fontSize: 13, fontWeight: 600, color: '#14303D', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          <p style={{ margin: '0 0 3px', fontSize: 14, fontWeight: 600, color: '#14303D', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                             {note.title}
                           </p>
                         )}
                         <p style={{
-                          margin: 0, fontSize: 13, color: '#4B5563', lineHeight: 1.5,
+                          margin: 0, fontSize: 14, color: '#4B5563', lineHeight: 1.5,
                           ...(isOpen ? {} : { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }),
                         }}>
                           {note.content}
@@ -365,7 +365,7 @@ export default function NotasFamilia() {
                           </div>
                         )}
                       </div>
-                      <span style={{ fontSize: 13, color: '#5E7480', whiteSpace: 'nowrap', flexShrink: 0, marginTop: 2 }}>
+                      <span style={{ fontSize: 14, color: '#5E7480', whiteSpace: 'nowrap', flexShrink: 0, marginTop: 2 }}>
                         {timeAgoEs(note.created_at)}
                       </span>
                     </div>

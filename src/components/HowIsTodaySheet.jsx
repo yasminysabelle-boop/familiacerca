@@ -30,7 +30,7 @@ export default function HowIsTodaySheet({ open, onClose, patientName }) {
         <p style={{ fontFamily: SERIF, fontSize: 21, fontWeight: 600, color: '#14303D', margin: '0 0 4px' }}>
           ¿Cómo está {patientName || 'tu familiar'} hoy?
         </p>
-        <p style={{ fontSize: 14, color: '#4E6470', margin: '0 0 16px' }}>¿Qué quieres guardar?</p>
+        <p style={{ fontSize: 15, color: '#4E6470', margin: '0 0 16px' }}>¿Qué quieres guardar?</p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {OPTIONS.map(o => (
             <button
@@ -41,13 +41,13 @@ export default function HowIsTodaySheet({ open, onClose, patientName }) {
               <span style={{ fontSize: 26, lineHeight: 1, flexShrink: 0 }} aria-hidden="true">{o.emoji}</span>
               <span style={{ flex: 1, minWidth: 0 }}>
                 <span style={{ display: 'block', fontSize: 16, fontWeight: 700, color: '#14303D' }}>{o.title}</span>
-                <span style={{ display: 'block', fontSize: 14, color: '#4E6470', marginTop: 2 }}>{o.sub}</span>
+                <span style={{ display: 'block', fontSize: 15, color: '#4E6470', marginTop: 2 }}>{o.sub}</span>
               </span>
               <span style={{ color: '#0C6C9C', fontSize: 20, flexShrink: 0 }} aria-hidden="true">›</span>
             </button>
           ))}
         </div>
-        <button onClick={onClose} style={{ display: 'block', width: '100%', marginTop: 14, padding: 12, border: 'none', background: 'none', fontSize: 15, color: '#4E6470', cursor: 'pointer' }}>
+        <button onClick={onClose} style={{ display: 'block', width: '100%', marginTop: 14, padding: 12, border: 'none', background: 'none', fontSize: 16, color: '#4E6470', cursor: 'pointer' }}>
           Cerrar
         </button>
       </div>

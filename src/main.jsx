@@ -17,7 +17,7 @@ if (import.meta.env.PROD && 'serviceWorker' in navigator) {
     const banner = document.createElement('div')
     banner.id = 'sw-update-banner'
     banner.style.cssText = [
-      'position:fixed', 'bottom:80px', 'left:50%', 'transform:translateX(-50%)',
+      'position:fixed', 'top:calc(env(safe-area-inset-top, 0px) + 12px)', 'left:50%', 'transform:translateX(-50%)',
       'background:#14303D', 'color:#fff', 'padding:12px 14px 12px 16px',
       'border-radius:16px', 'display:flex', 'align-items:center', 'gap:12px',
       'z-index:99999', 'font-family:system-ui,sans-serif', 'font-size:14px',

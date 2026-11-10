@@ -291,11 +291,11 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
               style={{ width: 34, height: 34, borderRadius: '50%', objectFit: 'cover',
                 border: '2px solid rgba(255,255,255,0.35)' }} />
             <div style={{ flex: 1 }}>
-              <p style={{ color: 'white', fontWeight: 700, fontSize: 14, margin: 0,
+              <p style={{ color: 'white', fontWeight: 700, fontSize: 15, margin: 0,
                 fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}>
                 {cfg.name}
               </p>
-              <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: 13, margin: 0 }}>
+              <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: 14, margin: 0 }}>
                 {companion === 'milo' ? 'Tu compañero virtual' : 'Tu compañera virtual'}
               </p>
             </div>
@@ -303,7 +303,7 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
             <button
               onClick={() => pick(companion === 'milo' ? 'luna' : 'milo')}
               aria-label={`Cambiar a ${companion === 'milo' ? 'Luna' : 'Milo'}`}
-              style={{ background: 'rgba(255,255,255,0.16)', border: '1px solid rgba(255,255,255,0.35)', color: 'white', borderRadius: 999, padding: '6px 11px', fontSize: 13, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}
+              style={{ background: 'rgba(255,255,255,0.16)', border: '1px solid rgba(255,255,255,0.35)', color: 'white', borderRadius: 999, padding: '6px 11px', fontSize: 14, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}
             >
               {companion === 'milo' ? '🐱 Luna' : '🐶 Milo'}
             </button>
@@ -339,7 +339,7 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
                     : '16px 16px 16px 4px',
                   background: msg.role === 'user' ? '#F0F0F0' : '#0A5A82',
                   color: msg.role === 'user' ? '#14303D' : 'white',
-                  fontSize: 13, lineHeight: 1.55,
+                  fontSize: 14, lineHeight: 1.55,
                 }}>
                   {msg.text}
                 </div>
@@ -351,7 +351,7 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 4 }}>
                 <div>
                   <p style={{
-                    margin: '0 0 6px', fontSize: 12, fontWeight: 700,
+                    margin: '0 0 6px', fontSize: 14, fontWeight: 700,
                     color: '#0C6C9C', letterSpacing: '0.06em', textTransform: 'uppercase',
                   }}>
                     Cuidado de hoy
@@ -367,7 +367,7 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
                           border: `1.5px solid ${i % 2 === 0 ? '#0A5A82' : '#C9882A'}`,
                           background: i % 2 === 0 ? '#F0F7F3' : '#FDF6EC',
                           color: i % 2 === 0 ? '#0A4A6B' : '#9A6420',
-                          fontSize: 13, fontWeight: 600,
+                          fontSize: 14, fontWeight: 600,
                           cursor: 'pointer', textAlign: 'left',
                           lineHeight: 1.35,
                           transition: 'all 0.15s',
@@ -381,7 +381,7 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
 
                 <div>
                   <p style={{
-                    margin: '0 0 6px', fontSize: 12, fontWeight: 700,
+                    margin: '0 0 6px', fontSize: 14, fontWeight: 700,
                     color: '#5E7480', letterSpacing: '0.06em', textTransform: 'uppercase',
                   }}>
                     Soporte
@@ -397,7 +397,7 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
                           border: `1.5px solid ${i % 2 === 0 ? '#0C6C9C' : '#C9882A'}`,
                           background: i % 2 === 0 ? '#E3F1F8' : '#FDF6EC',
                           color: i % 2 === 0 ? '#1C5559' : '#9A6420',
-                          fontSize: 13, fontWeight: 600,
+                          fontSize: 14, fontWeight: 600,
                           cursor: 'pointer', textAlign: 'left',
                           lineHeight: 1.35,
                           transition: 'all 0.15s',
@@ -440,7 +440,7 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
               style={{
                 flexShrink: 0, padding: '5px 8px', borderRadius: 12,
                 border: '1px solid #E6E3DB', background: '#F7F6F2',
-                color: '#5E7480', fontSize: 12, fontWeight: 600,
+                color: '#5E7480', fontSize: 14, fontWeight: 600,
                 cursor: 'pointer', lineHeight: 1.2, whiteSpace: 'nowrap',
               }}
             >
@@ -473,7 +473,7 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
               <SendIcon active={!!input.trim() && !loading} />
             </button>
           </div>
-          <p style={{ margin: '6px 0 0', fontSize: 12, color: '#5E7480', textAlign: 'center' }}>
+          <p style={{ margin: '6px 0 0', fontSize: 14, color: '#5E7480', textAlign: 'center' }}>
             {cfg.name} ayuda a organizar el cuidado. No reemplaza a tu médico.
           </p>
         </div>
@@ -513,7 +513,7 @@ function SelectionCard({ onPick, onClose }) {
         }}>
           ¿Quién quieres que te acompañe?
         </p>
-        <p style={{ fontSize: 13, color: '#4E6470', margin: '0 0 20px', lineHeight: 1.5 }}>
+        <p style={{ fontSize: 14, color: '#4E6470', margin: '0 0 20px', lineHeight: 1.5 }}>
           Tu compañero estará aquí para escucharte siempre.
         </p>
         <div style={{ display: 'flex', gap: 12 }}>
@@ -524,7 +524,7 @@ function SelectionCard({ onPick, onClose }) {
               style={{
                 flex: 1, padding: '14px 8px', borderRadius: 16,
                 border: '2px solid #E6E3DB', background: '#F7F6F2',
-                cursor: 'pointer', fontSize: 14, fontWeight: 700, color: '#14303D',
+                cursor: 'pointer', fontSize: 15, fontWeight: 700, color: '#14303D',
                 transition: 'border-color 0.15s, background 0.15s',
               }}
               onMouseEnter={e => {
@@ -544,7 +544,7 @@ function SelectionCard({ onPick, onClose }) {
           onClick={onClose}
           style={{
             marginTop: 14, background: 'none', border: 'none',
-            color: '#5E7480', fontSize: 14, cursor: 'pointer',
+            color: '#5E7480', fontSize: 15, cursor: 'pointer',
           }}
         >
           Ahora no

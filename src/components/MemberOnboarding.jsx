@@ -140,13 +140,13 @@ export default function MemberOnboarding({ onDone }) {
       {/* ─── PASO 1 ─── */}
       {step === 1 && (
         <div style={{ ...cardStyle, position: 'relative', zIndex: 1 }}>
-          <p style={{ margin: '0 0 4px', fontSize: 13, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+          <p style={{ margin: '0 0 4px', fontSize: 14, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
             Paso 1 de 2
           </p>
           <h2 style={{ margin: '0 0 4px', fontSize: 20, fontWeight: 800, color: '#14303D', fontFamily: "'Plus Jakarta Sans', sans-serif", lineHeight: 1.2 }}>
             Cuéntanos de ti
           </h2>
-          <p style={{ margin: '0 0 22px', fontSize: 13, color: '#4E6470', lineHeight: 1.5 }}>
+          <p style={{ margin: '0 0 22px', fontSize: 14, color: '#4E6470', lineHeight: 1.5 }}>
             Te unes al cuidado de <strong style={{ color: '#14303D' }}>{patientName}</strong>.
           </p>
 
@@ -174,7 +174,7 @@ export default function MemberOnboarding({ onDone }) {
                 width: 24, height: 24, borderRadius: '50%',
                 background: '#0C6C9C', border: '2px solid white',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 14, pointerEvents: 'none',
+                fontSize: 15, pointerEvents: 'none',
               }}>
                 ✏️
               </div>
@@ -187,7 +187,7 @@ export default function MemberOnboarding({ onDone }) {
               onChange={handlePhotoChange}
             />
           </div>
-          <p style={{ margin: '-12px 0 18px', textAlign: 'center', fontSize: 13, color: '#5E7480' }}>
+          <p style={{ margin: '-12px 0 18px', textAlign: 'center', fontSize: 14, color: '#5E7480' }}>
             Toca para agregar foto (opcional)
           </p>
 
@@ -204,7 +204,7 @@ export default function MemberOnboarding({ onDone }) {
 
           {/* Relationship */}
           <div style={{ marginBottom: 20 }}>
-            <label style={{ fontSize: 14, fontWeight: 600, color: '#30454F', display: 'block', marginBottom: 8 }}>
+            <label style={{ fontSize: 15, fontWeight: 600, color: '#30454F', display: 'block', marginBottom: 8 }}>
               Tu relación con {patientName}
             </label>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8 }}>
@@ -224,7 +224,7 @@ export default function MemberOnboarding({ onDone }) {
                 >
                   <span style={{ fontSize: 20 }}>{r.emoji}</span>
                   <span style={{
-                    fontSize: 13, fontWeight: 700,
+                    fontSize: 14, fontWeight: 700,
                     color: relationship === r.value ? 'white' : '#30454F',
                   }}>
                     {r.label}
@@ -235,7 +235,7 @@ export default function MemberOnboarding({ onDone }) {
           </div>
 
           {error && (
-            <p style={{ margin: '0 0 12px', fontSize: 14, color: '#DC2626', padding: '7px 12px', borderRadius: 8, background: '#FEF2F2' }}>
+            <p style={{ margin: '0 0 12px', fontSize: 15, color: '#DC2626', padding: '7px 12px', borderRadius: 8, background: '#FEF2F2' }}>
               {error}
             </p>
           )}
@@ -249,7 +249,7 @@ export default function MemberOnboarding({ onDone }) {
             style={{
               width: '100%', padding: '14px', borderRadius: 14, border: 'none',
               background: 'linear-gradient(135deg, #0C6C9C, #A6E3EC)',
-              color: 'white', fontWeight: 800, fontSize: 15,
+              color: 'white', fontWeight: 800, fontSize: 16,
               cursor: 'pointer', boxShadow: '0 6px 20px rgba(12,108,156,0.3)',
             }}
           >
@@ -261,18 +261,18 @@ export default function MemberOnboarding({ onDone }) {
       {/* ─── PASO 2 ─── */}
       {step === 2 && (
         <div style={{ ...cardStyle, position: 'relative', zIndex: 1 }}>
-          <p style={{ margin: '0 0 4px', fontSize: 13, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+          <p style={{ margin: '0 0 4px', fontSize: 14, fontWeight: 700, color: '#5E7480', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
             Paso 2 de 2
           </p>
           <h2 style={{ margin: '0 0 4px', fontSize: 20, fontWeight: 800, color: '#14303D', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
             Tu celular
           </h2>
-          <p style={{ margin: '0 0 22px', fontSize: 13, color: '#4E6470', lineHeight: 1.5 }}>
+          <p style={{ margin: '0 0 22px', fontSize: 14, color: '#4E6470', lineHeight: 1.5 }}>
             Para que el equipo pueda contactarte en una emergencia.
           </p>
 
           <div style={{ marginBottom: 20 }}>
-            <label style={{ fontSize: 14, fontWeight: 600, color: '#30454F', display: 'block', marginBottom: 6 }}>
+            <label style={{ fontSize: 15, fontWeight: 600, color: '#30454F', display: 'block', marginBottom: 6 }}>
               Número de celular
             </label>
             <input
@@ -282,7 +282,7 @@ export default function MemberOnboarding({ onDone }) {
               placeholder="+52 55 1234 5678"
               style={{
                 width: '100%', padding: '12px 14px', borderRadius: 12,
-                border: '1.5px solid #D1C9BF', fontSize: 15,
+                border: '1.5px solid #D1C9BF', fontSize: 16,
                 color: '#14303D', background: 'white', boxSizing: 'border-box',
                 letterSpacing: '0.03em',
               }}
@@ -291,7 +291,7 @@ export default function MemberOnboarding({ onDone }) {
           </div>
 
           {error && (
-            <p style={{ margin: '0 0 12px', fontSize: 14, color: '#DC2626', padding: '7px 12px', borderRadius: 8, background: '#FEF2F2' }}>
+            <p style={{ margin: '0 0 12px', fontSize: 15, color: '#DC2626', padding: '7px 12px', borderRadius: 8, background: '#FEF2F2' }}>
               {error}
             </p>
           )}
@@ -302,7 +302,7 @@ export default function MemberOnboarding({ onDone }) {
             style={{
               width: '100%', padding: '14px', borderRadius: 14, border: 'none',
               background: saving ? '#5E7480' : 'linear-gradient(135deg, #0C6C9C, #A6E3EC)',
-              color: 'white', fontWeight: 800, fontSize: 15,
+              color: 'white', fontWeight: 800, fontSize: 16,
               cursor: saving ? 'default' : 'pointer',
               boxShadow: saving ? 'none' : '0 6px 20px rgba(12,108,156,0.3)',
               marginBottom: 10,
@@ -316,7 +316,7 @@ export default function MemberOnboarding({ onDone }) {
             style={{
               width: '100%', padding: '11px', borderRadius: 14,
               border: '1px solid #E6E3DB', background: 'white',
-              color: '#4E6470', fontWeight: 600, fontSize: 13, cursor: 'pointer',
+              color: '#4E6470', fontWeight: 600, fontSize: 14, cursor: 'pointer',
             }}
           >
             ← Atrás

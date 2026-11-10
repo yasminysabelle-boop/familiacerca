@@ -11,7 +11,7 @@ export default function LoadingButton({
 }) {
   const base = {
     display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-    gap: 8, borderRadius: 14, fontWeight: 700, fontSize: 14,
+    gap: 8, borderRadius: 14, fontWeight: 700, fontSize: 15,
     cursor: loading || disabled ? 'not-allowed' : 'pointer',
     opacity: loading || disabled ? 0.7 : 1,
     border: 'none', transition: 'all 0.15s',

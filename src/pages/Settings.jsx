@@ -42,7 +42,7 @@ function ToggleRow({ icon, label, subtitle, checked, onChange }) {
       <span style={{ fontSize: 18 }}>{icon}</span>
       <div style={{ flex: 1 }}>
         <p style={{ fontSize: 16, fontWeight: 600, color: '#14303D', margin: 0 }}>{label}</p>
-        {subtitle && <p style={{ fontSize: 14, color: '#5E7480', margin: '1px 0 0' }}>{subtitle}</p>}
+        {subtitle && <p style={{ fontSize: 15, color: '#5E7480', margin: '1px 0 0' }}>{subtitle}</p>}
       </div>
       <button
         role="switch" aria-checked={checked} aria-label={label}
@@ -284,7 +284,7 @@ export default function Settings() {
                 opacity: profileUploading ? 1 : 0,
                 transition: 'opacity 0.2s',
               }}>
-                <span style={{ fontSize: 14 }}>{profileUploading ? '⏳' : '📷'}</span>
+                <span style={{ fontSize: 15 }}>{profileUploading ? '⏳' : '📷'}</span>
               </div>
             </button>
             <input
@@ -298,7 +298,7 @@ export default function Settings() {
               <p style={{ color: 'white', fontSize: 16, fontWeight: 700, fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", margin: 0 }}>
                 {user?.user_metadata?.full_name ?? 'Mi cuenta'}
               </p>
-              <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 14, margin: '3px 0 0' }}>
+              <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 15, margin: '3px 0 0' }}>
                 {user?.email}
               </p>
             </div>
@@ -308,7 +308,7 @@ export default function Settings() {
         {/* Mis familias — only shown when user belongs to more than one care group */}
         {hasMultiple && (
           <div style={{ background: 'white', borderRadius: 20, border: '1px solid #E6E3DB', overflow: 'hidden', marginBottom: 12 }}>
-            <p style={{ fontSize: 13, fontWeight: 700, color: '#5E7480', letterSpacing: '0.08em', textTransform: 'uppercase', padding: '14px 16px 8px', margin: 0 }}>
+            <p style={{ fontSize: 14, fontWeight: 700, color: '#5E7480', letterSpacing: '0.08em', textTransform: 'uppercase', padding: '14px 16px 8px', margin: 0 }}>
               Mis familias
             </p>
             {families.map((fam, i) => {
@@ -342,15 +342,15 @@ export default function Settings() {
                     </div>
                   )}
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#14303D', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <p style={{ margin: 0, fontSize: 15, fontWeight: 600, color: '#14303D', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {fam.patientName ?? 'Sin paciente'}
                     </p>
-                    <p style={{ margin: '2px 0 0', fontSize: 13, color: '#5E7480' }}>
+                    <p style={{ margin: '2px 0 0', fontSize: 14, color: '#5E7480' }}>
                       {fam.role === null ? 'Tu grupo de cuidado' : 'Miembro del grupo'}
                     </p>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-                    <span style={{ padding: '3px 9px', borderRadius: 20, fontSize: 13, fontWeight: 700, background: roleBg, color: roleColor }}>
+                    <span style={{ padding: '3px 9px', borderRadius: 20, fontSize: 14, fontWeight: 700, background: roleBg, color: roleColor }}>
                       {roleLabel}
                     </span>
                     {isActive && (
@@ -362,7 +362,7 @@ export default function Settings() {
             })}
             <p style={{
               margin: 0, padding: '10px 16px 14px',
-              fontSize: 13, color: '#B0A898', lineHeight: 1.5, textAlign: 'center',
+              fontSize: 14, color: '#B0A898', lineHeight: 1.5, textAlign: 'center',
             }}>
               Para unirte a otra familia, pide al administrador que te envíe una invitación.
             </p>
@@ -380,7 +380,7 @@ export default function Settings() {
           padding: '20px', marginBottom: 12,
           boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
         }}>
-          <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 15, fontWeight: 700, color: '#14303D', margin: '0 0 16px' }}>
+          <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 16, fontWeight: 700, color: '#14303D', margin: '0 0 16px' }}>
             Suscripción
           </p>
 
@@ -400,11 +400,11 @@ export default function Settings() {
             </div>
             <div style={{ flex: 1 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <p style={{ fontSize: 15, fontWeight: 700, color: '#14303D', margin: 0 }}>
+                <p style={{ fontSize: 16, fontWeight: 700, color: '#14303D', margin: 0 }}>
                   {meta.label}
                 </p>
                 <span style={{
-                  fontSize: 12, fontWeight: 700,
+                  fontSize: 14, fontWeight: 700,
                   color: meta.color, background: `${meta.color}18`,
                   padding: '2px 8px', borderRadius: 6,
                 }}>
@@ -412,18 +412,18 @@ export default function Settings() {
                 </span>
               </div>
               {isTrialing && (
-                <p style={{ fontSize: 14, color: daysLeft <= 3 ? '#DC2626' : '#5E7480', margin: '3px 0 0' }}>
+                <p style={{ fontSize: 15, color: daysLeft <= 3 ? '#DC2626' : '#5E7480', margin: '3px 0 0' }}>
                   {daysLeft <= 3 ? '⚠ ' : ''}{daysLeft} día{daysLeft !== 1 ? 's' : ''} restante{daysLeft !== 1 ? 's' : ''} de prueba
                   {trialEnd ? ` · Vence ${trialEnd}` : ''}
                 </p>
               )}
               {isPaid && periodEnd && (
-                <p style={{ fontSize: 14, color: '#5E7480', margin: '3px 0 0' }}>
+                <p style={{ fontSize: 15, color: '#5E7480', margin: '3px 0 0' }}>
                   Próximo cobro: {periodEnd}
                 </p>
               )}
               {trialExpired && (
-                <p style={{ fontSize: 14, color: '#DC2626', margin: '3px 0 0' }}>
+                <p style={{ fontSize: 15, color: '#DC2626', margin: '3px 0 0' }}>
                   Período de prueba terminado
                 </p>
               )}
@@ -432,14 +432,14 @@ export default function Settings() {
 
           {false && features.length > 0 && (
             <div style={{ marginBottom: 16 }}>
-              <p style={{ fontSize: 13, fontWeight: 700, color: '#5E7480', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8 }}>
+              <p style={{ fontSize: 14, fontWeight: 700, color: '#5E7480', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8 }}>
                 {isTrialing ? 'Al terminar la prueba sigues gratis con' : 'Tu plan incluye'}
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {features.map(f => (
                   <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ color: '#2BB8CC', fontSize: 13, flexShrink: 0 }}>✓</span>
-                    <span style={{ fontSize: 13, color: '#30454F' }}>{f}</span>
+                    <span style={{ color: '#2BB8CC', fontSize: 14, flexShrink: 0 }}>✓</span>
+                    <span style={{ fontSize: 14, color: '#30454F' }}>{f}</span>
                   </div>
                 ))}
               </div>
@@ -451,7 +451,7 @@ export default function Settings() {
             style={{
               width: '100%', padding: '13px', borderRadius: 14, border: 'none',
               background: 'linear-gradient(135deg, #E58B73, #d4785f)',
-              color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer',
+              color: 'white', fontWeight: 700, fontSize: 15, cursor: 'pointer',
               boxShadow: '0 6px 20px rgba(229,139,115,0.35)',
               transition: 'all 0.2s',
             }}
@@ -464,7 +464,7 @@ export default function Settings() {
               style={{
                 width: '100%', padding: '11px', borderRadius: 12, marginTop: 8,
                 border: '1.5px solid #E6E3DB', background: 'transparent',
-                color: '#5E7480', fontWeight: 600, fontSize: 13, cursor: 'pointer',
+                color: '#5E7480', fontWeight: 600, fontSize: 14, cursor: 'pointer',
               }}
             >
               Cancelar suscripción
@@ -477,7 +477,7 @@ export default function Settings() {
             padding: '20px', marginBottom: 12,
             boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
           }}>
-            <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 15, fontWeight: 700, color: '#14303D', margin: '0 0 16px' }}>
+            <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 16, fontWeight: 700, color: '#14303D', margin: '0 0 16px' }}>
               Suscripción
             </p>
             <div style={{
@@ -494,7 +494,7 @@ export default function Settings() {
               }}>
                 {(PLAN_META[familyPlan?.plan ?? 'free'] ?? PLAN_META.free).icon}
               </div>
-              <p style={{ fontSize: 14, color: '#30454F', margin: 0, lineHeight: 1.4 }}>
+              <p style={{ fontSize: 15, color: '#30454F', margin: 0, lineHeight: 1.4 }}>
                 Esta familia está en{' '}
                 <strong>{{ free: 'Plan Gratis', familiar: 'Plan Familiar', care_plus: 'Cuidado Total' }[familyPlan?.plan ?? 'free']}</strong>
               </p>
@@ -504,7 +504,7 @@ export default function Settings() {
 
         {/* Preferences */}
         <div style={{ background: 'white', borderRadius: 20, border: '1px solid #E6E3DB', overflow: 'hidden', marginBottom: 12 }}>
-          <p style={{ fontSize: 13, fontWeight: 700, color: '#5E7480', letterSpacing: '0.08em', textTransform: 'uppercase', padding: '14px 16px 8px', margin: 0 }}>
+          <p style={{ fontSize: 14, fontWeight: 700, color: '#5E7480', letterSpacing: '0.08em', textTransform: 'uppercase', padding: '14px 16px 8px', margin: 0 }}>
             Preferencias
           </p>
           <ToggleRow
@@ -533,10 +533,10 @@ export default function Settings() {
         {/* Push Notifications */}
         {supported && (
           <div style={{ background: 'white', borderRadius: 20, border: '1px solid #E6E3DB', padding: '16px', marginBottom: 12 }}>
-            <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 15, fontWeight: 700, color: '#14303D', margin: '0 0 6px' }}>
+            <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 16, fontWeight: 700, color: '#14303D', margin: '0 0 6px' }}>
               Notificaciones push
             </p>
-            <p style={{ fontSize: 14, color: '#5E7480', margin: '0 0 12px', lineHeight: 1.5 }}>
+            <p style={{ fontSize: 15, color: '#5E7480', margin: '0 0 12px', lineHeight: 1.5 }}>
               {permission === 'granted'
                 ? subscribed
                   ? 'Activas — recibirás recordatorios de medicamentos y alertas familiares.'
@@ -557,7 +557,7 @@ export default function Settings() {
                 {permission === 'granted' && subscribed ? '🔔' : permission === 'denied' ? '🔕' : '🔔'}
               </span>
               <span style={{
-                fontSize: 14, fontWeight: 600,
+                fontSize: 15, fontWeight: 600,
                 color: permission === 'granted' && subscribed ? '#0A4A6B' : '#7A5A18',
               }}>
                 {permission === 'granted' && subscribed
@@ -575,7 +575,7 @@ export default function Settings() {
                 style={{
                   width: '100%', padding: '12px', borderRadius: 14, border: 'none',
                   background: 'linear-gradient(135deg, #0A5A82, #0A4A6B)',
-                  color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer',
+                  color: 'white', fontWeight: 700, fontSize: 15, cursor: 'pointer',
                   boxShadow: '0 4px 16px rgba(10,90,130,0.25)',
                   marginBottom: 8,
                 }}
@@ -592,7 +592,7 @@ export default function Settings() {
                 style={{
                   width: '100%', padding: '12px', borderRadius: 14,
                   border: '1.5px solid #0A5A82', background: 'white',
-                  color: '#0A5A82', fontWeight: 700, fontSize: 14,
+                  color: '#0A5A82', fontWeight: 700, fontSize: 15,
                   cursor: testingPush ? 'not-allowed' : 'pointer',
                   opacity: testingPush ? 0.6 : 1,
                   transition: 'all 0.2s',
@@ -606,7 +606,7 @@ export default function Settings() {
             {testResult && (
               <>
                 <p style={{
-                  fontSize: 14, fontWeight: 600, margin: '10px 0 0',
+                  fontSize: 15, fontWeight: 600, margin: '10px 0 0',
                   color: testResult.ok ? '#0A4A6B' : '#DC2626',
                   padding: '8px 12px', borderRadius: 10,
                   background: testResult.ok ? '#E3F1F8' : '#FEF2F2',
@@ -619,7 +619,7 @@ export default function Settings() {
                     style={{
                       width: '100%', padding: '11px', borderRadius: 14, border: 'none',
                       background: 'linear-gradient(135deg, #0A5A82, #0A4A6B)',
-                      color: 'white', fontWeight: 700, fontSize: 13, cursor: 'pointer',
+                      color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer',
                       marginTop: 8, boxShadow: '0 4px 14px rgba(10,90,130,0.25)',
                     }}
                   >
@@ -634,20 +634,20 @@ export default function Settings() {
         {/* Tus datos (confianza nov 2026): descargar y borrar a la vista */}
         <div style={{ background: 'white', borderRadius: 20, border: '1px solid #E6E3DB', padding: 16, marginBottom: 12 }}>
           <p style={{ margin: '0 0 4px', fontSize: 16, fontWeight: 800, color: '#14303D' }}>🔒 Tus datos son de tu familia</p>
-          <p style={{ margin: '0 0 14px', fontSize: 14, color: '#4E6470', lineHeight: 1.5 }}>
+          <p style={{ margin: '0 0 14px', fontSize: 15, color: '#4E6470', lineHeight: 1.5 }}>
             No vendemos tu información ni la compartimos con nadie. Puedes llevártela o borrarla cuando quieras.
           </p>
           {isAdmin ? (
             <div style={{ display: 'flex', gap: 10 }}>
-              <button onClick={() => navigate('/admin?tab=data')} style={{ flex: 1, padding: '13px 10px', borderRadius: 14, border: '1.5px solid #0C6C9C', background: 'white', color: '#0C6C9C', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}>
+              <button onClick={() => navigate('/admin?tab=data')} style={{ flex: 1, padding: '13px 10px', borderRadius: 14, border: '1.5px solid #0C6C9C', background: 'white', color: '#0C6C9C', fontWeight: 700, fontSize: 16, cursor: 'pointer' }}>
                 Descargar mis datos
               </button>
-              <button onClick={() => navigate('/admin?tab=data')} style={{ flex: 1, padding: '13px 10px', borderRadius: 14, border: '1.5px solid #E6E3DB', background: 'white', color: '#B42318', fontWeight: 700, fontSize: 15, cursor: 'pointer' }}>
+              <button onClick={() => navigate('/admin?tab=data')} style={{ flex: 1, padding: '13px 10px', borderRadius: 14, border: '1.5px solid #E6E3DB', background: 'white', color: '#B42318', fontWeight: 700, fontSize: 16, cursor: 'pointer' }}>
                 Borrar mi cuenta
               </button>
             </div>
           ) : (
-            <a href="mailto:hola@familiacerca.com?subject=Borrar%20mi%20cuenta" style={{ display: 'block', textAlign: 'center', padding: '13px 10px', borderRadius: 14, border: '1.5px solid #E6E3DB', color: '#B42318', fontWeight: 700, fontSize: 15, textDecoration: 'none' }}>
+            <a href="mailto:hola@familiacerca.com?subject=Borrar%20mi%20cuenta" style={{ display: 'block', textAlign: 'center', padding: '13px 10px', borderRadius: 14, border: '1.5px solid #E6E3DB', color: '#B42318', fontWeight: 700, fontSize: 16, textDecoration: 'none' }}>
               Pedir que borren mi cuenta
             </a>
           )}
@@ -674,10 +674,10 @@ export default function Settings() {
                 fontSize: 22,
               }}>⚙️</div>
               <div style={{ flex: 1 }}>
-                <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#0A4A6B' }}>
+                <p style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#0A4A6B' }}>
                   Panel de administración
                 </p>
-                <p style={{ margin: '2px 0 0', fontSize: 14, color: '#0A5A82' }}>
+                <p style={{ margin: '2px 0 0', fontSize: 15, color: '#0A5A82' }}>
                   Equipo, cuenta, datos y actividad
                 </p>
               </div>
@@ -705,7 +705,7 @@ export default function Settings() {
               }}
             >
               <span style={{ fontSize: 18 }}>{icon}</span>
-              <span style={{ flex: 1, fontSize: 14, fontWeight: 600, color: '#14303D' }}>{label}</span>
+              <span style={{ flex: 1, fontSize: 15, fontWeight: 600, color: '#14303D' }}>{label}</span>
               <ChevronRight size={16} color="#D1D5DB" strokeWidth={2} />
             </button>
           ))}
@@ -718,12 +718,12 @@ export default function Settings() {
             }}
           >
             <span style={{ fontSize: 18 }}>🚪</span>
-            <span style={{ flex: 1, fontSize: 14, fontWeight: 600, color: '#D63031' }}>Cerrar sesión</span>
-            <LogOut size={15} color="#D63031" strokeWidth={1.75} />
+            <span style={{ flex: 1, fontSize: 15, fontWeight: 600, color: '#D63031' }}>Cerrar sesión</span>
+            <LogOut size={15} color="#D63031" strokeWidth={2.1} />
           </button>
         </div>
 
-        <p style={{ textAlign: 'center', fontSize: 13, color: '#6B7280', marginTop: 8 }}>
+        <p style={{ textAlign: 'center', fontSize: 14, color: '#6B7280', marginTop: 8 }}>
           © 2025 FamiliaCerca LLC · v1.0
         </p>
       </div>
@@ -752,7 +752,7 @@ export default function Settings() {
                 <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 18, fontWeight: 700, color: '#14303D', margin: '0 0 10px' }}>
                   Suscripción cancelada
                 </p>
-                <p style={{ fontSize: 14, color: '#4E6470', lineHeight: 1.6, margin: 0 }}>
+                <p style={{ fontSize: 15, color: '#4E6470', lineHeight: 1.6, margin: 0 }}>
                   Tu plan estará activo hasta el fin del período pagado.
                 </p>
               </div>
@@ -772,7 +772,7 @@ export default function Settings() {
                     🐶
                   </div>
                   <p style={{
-                    fontSize: 15, color: '#30454F', textAlign: 'center',
+                    fontSize: 16, color: '#30454F', textAlign: 'center',
                     lineHeight: 1.65, margin: 0, maxWidth: 320,
                   }}>
                     ¡Espera! ¿Seguro que quieres cancelar? Me quedaré sin poder ayudarte a cuidar a tu familia 🥺
@@ -784,7 +784,7 @@ export default function Settings() {
                   style={{
                     width: '100%', padding: '13px', borderRadius: 14, border: 'none',
                     background: 'linear-gradient(135deg, #E58B73, #d4785f)',
-                    color: 'white', fontWeight: 700, fontSize: 15, cursor: 'pointer',
+                    color: 'white', fontWeight: 700, fontSize: 16, cursor: 'pointer',
                     boxShadow: '0 6px 20px rgba(229,139,115,0.35)',
                     marginBottom: 10,
                   }}
@@ -796,7 +796,7 @@ export default function Settings() {
                   style={{
                     width: '100%', padding: '12px', borderRadius: 12,
                     border: '1.5px solid #E6E3DB', background: 'transparent',
-                    color: '#5E7480', fontWeight: 600, fontSize: 14, cursor: 'pointer',
+                    color: '#5E7480', fontWeight: 600, fontSize: 15, cursor: 'pointer',
                   }}
                 >
                   Sí, quiero cancelar
@@ -833,7 +833,7 @@ export default function Settings() {
                         transition: 'all 0.15s',
                       }}
                     >
-                      <span style={{ fontSize: 14, fontWeight: 600, color: cancelReason === r ? '#0A5A82' : '#30454F' }}>
+                      <span style={{ fontSize: 15, fontWeight: 600, color: cancelReason === r ? '#0A5A82' : '#30454F' }}>
                         {r}
                       </span>
                       {cancelReason === r && (
@@ -845,7 +845,7 @@ export default function Settings() {
 
                 {cancelError && (
                   <p style={{
-                    fontSize: 13, color: '#DC2626', margin: '0 0 14px',
+                    fontSize: 14, color: '#DC2626', margin: '0 0 14px',
                     padding: '10px 14px', background: '#FEF2F2',
                     border: '1px solid #FECACA', borderRadius: 12, textAlign: 'center',
                   }}>
@@ -858,7 +858,7 @@ export default function Settings() {
                   style={{
                     width: '100%', padding: '13px', borderRadius: 14, border: 'none',
                     background: 'linear-gradient(135deg, #E58B73, #d4785f)',
-                    color: 'white', fontWeight: 700, fontSize: 15, cursor: 'pointer',
+                    color: 'white', fontWeight: 700, fontSize: 16, cursor: 'pointer',
                     boxShadow: '0 6px 20px rgba(229,139,115,0.35)',
                     marginBottom: 10,
                   }}
@@ -871,7 +871,7 @@ export default function Settings() {
                   style={{
                     width: '100%', padding: '12px', borderRadius: 12,
                     border: '1.5px solid #E6E3DB', background: 'transparent',
-                    color: '#5E7480', fontWeight: 600, fontSize: 14,
+                    color: '#5E7480', fontWeight: 600, fontSize: 15,
                     cursor: cancelLoading ? 'not-allowed' : 'pointer',
                     opacity: cancelLoading ? 0.6 : 1,
                   }}
@@ -912,7 +912,7 @@ export default function Settings() {
               onClick={handleProfileCropCancel}
               style={{
                 background: 'none', border: 'none', cursor: 'pointer',
-                fontSize: 15, fontWeight: 600, color: '#6D7B74', padding: '12px 20px',
+                fontSize: 16, fontWeight: 600, color: '#6D7B74', padding: '12px 20px',
               }}
             >
               Cancelar
@@ -923,7 +923,7 @@ export default function Settings() {
               style={{
                 background: profileUploading ? '#5E7480' : '#0A4A6B',
                 border: 'none', borderRadius: 999, cursor: profileUploading ? 'default' : 'pointer',
-                fontSize: 15, fontWeight: 700, color: 'white',
+                fontSize: 16, fontWeight: 700, color: 'white',
                 padding: '12px 32px',
                 opacity: profileUploading ? 0.7 : 1,
               }}

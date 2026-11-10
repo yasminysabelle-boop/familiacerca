@@ -93,8 +93,8 @@ export default function HospitalDashboard({ onManageMode, onSOS, onVideoCall }) 
       >
         <span style={{ fontSize: 28, flexShrink: 0 }}>📹</span>
         <div style={{ flex: 1 }}>
-          <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#14303D' }}>Videollamadas</p>
-          <p style={{ margin: '2px 0 0', fontSize: 14, color: '#4E6470' }}>Programar o unirse a la sala familiar</p>
+          <p style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#14303D' }}>Videollamadas</p>
+          <p style={{ margin: '2px 0 0', fontSize: 15, color: '#4E6470' }}>Programar o unirse a la sala familiar</p>
         </div>
         <span style={{ color: '#0A5A82', fontSize: 18, flexShrink: 0 }}>›</span>
       </button>
@@ -115,7 +115,7 @@ export default function HospitalDashboard({ onManageMode, onSOS, onVideoCall }) 
         <span style={{ fontSize: 28 }}>🚨</span>
         <div style={{ textAlign: 'left' }}>
           <p style={{ margin: 0, fontSize: 17, fontWeight: 800, color: 'white' }}>SOS — Emergencia</p>
-          <p style={{ margin: '2px 0 0', fontSize: 14, color: 'rgba(255,255,255,0.8)' }}>
+          <p style={{ margin: '2px 0 0', fontSize: 15, color: 'rgba(255,255,255,0.8)' }}>
             Notifica a todo el equipo de inmediato
           </p>
         </div>
@@ -128,7 +128,7 @@ export default function HospitalDashboard({ onManageMode, onSOS, onVideoCall }) 
           style={{
             width: '100%', padding: '14px', borderRadius: 14,
             border: '2px solid #DC2626', background: 'white',
-            color: '#DC2626', fontWeight: 700, fontSize: 14,
+            color: '#DC2626', fontWeight: 700, fontSize: 15,
             cursor: 'pointer', transition: 'all 0.15s',
           }}
         >
@@ -140,14 +140,14 @@ export default function HospitalDashboard({ onManageMode, onSOS, onVideoCall }) 
           background: '#FFF5F5', padding: '18px',
           display: 'flex', flexDirection: 'column', gap: 12,
         }}>
-          <p style={{ margin: 0, fontSize: 14, color: '#B91C1C', fontWeight: 700, textAlign: 'center' }}>
+          <p style={{ margin: 0, fontSize: 15, color: '#B91C1C', fontWeight: 700, textAlign: 'center' }}>
             ¿Confirmar alta hospitalaria?
           </p>
-          <p style={{ margin: 0, fontSize: 13, color: '#4E6470', textAlign: 'center', lineHeight: 1.5 }}>
+          <p style={{ margin: 0, fontSize: 14, color: '#4E6470', textAlign: 'center', lineHeight: 1.5 }}>
             Los medicamentos y rutinas se reanudan. El equipo será notificado.
           </p>
           {deactivateError && (
-            <p style={{ margin: 0, fontSize: 14, color: '#DC2626', textAlign: 'center', fontWeight: 600 }}>
+            <p style={{ margin: 0, fontSize: 15, color: '#DC2626', textAlign: 'center', fontWeight: 600 }}>
               ⚠ {deactivateError}
             </p>
           )}
@@ -157,7 +157,7 @@ export default function HospitalDashboard({ onManageMode, onSOS, onVideoCall }) 
               style={{
                 flex: 1, padding: '12px', borderRadius: 12,
                 border: '1.5px solid #E6E3DB', background: 'white',
-                color: '#4E6470', fontWeight: 700, fontSize: 14, cursor: 'pointer',
+                color: '#4E6470', fontWeight: 700, fontSize: 15, cursor: 'pointer',
               }}
             >
               Cancelar
@@ -169,7 +169,7 @@ export default function HospitalDashboard({ onManageMode, onSOS, onVideoCall }) 
                 flex: 1, padding: '12px', borderRadius: 12,
                 border: 'none',
                 background: deactivating ? '#5E7480' : 'linear-gradient(135deg, #0A5A82, #0A4A6B)',
-                color: 'white', fontWeight: 700, fontSize: 14,
+                color: 'white', fontWeight: 700, fontSize: 15,
                 cursor: deactivating ? 'default' : 'pointer',
                 boxShadow: deactivating ? 'none' : '0 4px 14px rgba(10,90,130,0.3)',
               }}
@@ -196,8 +196,8 @@ function QuickLink({ to, emoji, title, subtitle, color, bg, border }) {
     >
       <span style={{ fontSize: 24, flexShrink: 0 }}>{emoji}</span>
       <div style={{ flex: 1 }}>
-        <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#14303D' }}>{title}</p>
-        <p style={{ margin: '2px 0 0', fontSize: 14, color: '#4E6470' }}>{subtitle}</p>
+        <p style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#14303D' }}>{title}</p>
+        <p style={{ margin: '2px 0 0', fontSize: 15, color: '#4E6470' }}>{subtitle}</p>
       </div>
       <span style={{ color: color, fontSize: 18, flexShrink: 0 }}>›</span>
     </Link>

@@ -9,13 +9,13 @@ export default function EmptyState({ icon, title, description, actionLabel, onAc
     }}>
       {example?.length > 0 && (
         <div aria-hidden="true" style={{ marginBottom: 20, textAlign: 'left' }}>
-          <p style={{ margin: '0 0 8px', fontSize: 12, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#5E7480' }}>Así se verá</p>
+          <p style={{ margin: '0 0 8px', fontSize: 14, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#5E7480' }}>Así se verá</p>
           {example.map((e, i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', borderRadius: 14, background: '#F4F2EC', marginBottom: 8, opacity: 0.75 }}>
               <span style={{ fontSize: 22 }}>{e.icon}</span>
               <span style={{ flex: 1, minWidth: 0 }}>
-                <span style={{ display: 'block', fontSize: 15, fontWeight: 700, color: '#30454F' }}>{e.title}</span>
-                {e.sub && <span style={{ display: 'block', fontSize: 13, color: '#5E7480' }}>{e.sub}</span>}
+                <span style={{ display: 'block', fontSize: 16, fontWeight: 700, color: '#30454F' }}>{e.title}</span>
+                {e.sub && <span style={{ display: 'block', fontSize: 14, color: '#5E7480' }}>{e.sub}</span>}
               </span>
             </div>
           ))}
@@ -30,7 +30,7 @@ export default function EmptyState({ icon, title, description, actionLabel, onAc
       </p>
       {description && (
         <p style={{
-          fontSize: 15, color: '#4E6470', lineHeight: 1.55,
+          fontSize: 16, color: '#4E6470', lineHeight: 1.55,
           margin: actionLabel ? '0 0 20px' : 0,
         }}>
           {description}
