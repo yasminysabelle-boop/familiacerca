@@ -3233,6 +3233,17 @@ export default function Dashboard() {
     }).length
   })()
   const confirmedTodayCount = todaySection?.events.filter(e => e.type === 'MED_CONFIRMED').length ?? 0
+
+  // "Todo listo hoy" (nov 2026): cuando ya se dieron todas las medicinas del día,
+  // se invita UNA vez al día a compartir el resumen en el grupo de WhatsApp.
+  const [shareNudge, setShareNudge] = useState(false)
+  useEffect(() => {
+    if (loading || pendingCount > 0 || confirmedTodayCount === 0) return
+    const k = `fc_share_nudge_${todayKey}`
+    try { if (localStorage.getItem(k)) return; localStorage.setItem(k, '1') } catch { return }
+    const t = setTimeout(() => setShareNudge(true), 1200)
+    return () => clearTimeout(t)
+  }, [loading, pendingCount, confirmedTodayCount, todayKey])
   const missedTodayCount = todaySection?.events.filter(e => e.type === 'MED_MISSED').length ?? 0
 
   // Next pending medication for the meds card
@@ -3928,6 +3939,25 @@ export default function Dashboard() {
       />
 
       {/* ── Admin emergency confirmation dialog ────────────────────────────── */}
+      {shareNudge && (
+        <div role="dialog" aria-label="Todo listo hoy" onClick={() => setShareNudge(false)} style={{ position: 'fixed', inset: 0, zIndex: 300, background: 'rgba(8,30,42,0.45)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: '100%', maxWidth: 480, background: 'white', borderRadius: '24px 24px 0 0', padding: '24px 20px calc(24px + env(safe-area-inset-bottom, 0px))', textAlign: 'center' }}>
+            <p style={{ margin: 0, fontSize: 40 }}>💙</p>
+            <p style={{ margin: '8px 0 6px', fontSize: 22, fontWeight: 800, color: '#14303D' }}>¡Todo listo hoy!</p>
+            <p style={{ margin: '0 0 18px', fontSize: 16, color: '#4E6470', lineHeight: 1.5 }}>Ya se dieron todas las medicinas. ¿Le avisas a la familia en el grupo?</p>
+            <a
+              href={`https://wa.me/?text=${encodeURIComponent(shareText)}`}
+              target="_blank" rel="noopener noreferrer"
+              onClick={() => { track('share_whatsapp_nudge'); setShareNudge(false) }}
+              style={{ display: 'block', padding: '15px 16px', borderRadius: 14, background: '#075E54', color: 'white', fontSize: 17, fontWeight: 700, textDecoration: 'none' }}
+            >
+              Compartir en WhatsApp
+            </a>
+            <button onClick={() => setShareNudge(false)} style={{ marginTop: 8, width: '100%', padding: '14px', background: 'none', border: 'none', fontSize: 16, color: '#4E6470', cursor: 'pointer' }}>Ahora no</button>
+          </div>
+        </div>
+      )}
+
       {adminConfirmEvt && (
         <div
           style={{ position: 'fixed', inset: 0, zIndex: 300, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 24px' }}
