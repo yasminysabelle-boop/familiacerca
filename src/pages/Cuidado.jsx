@@ -379,14 +379,15 @@ export default function Cuidado() {
             borderRadius: 22, padding: '18px 20px', marginBottom: 16,
             background: allDone
               ? 'linear-gradient(135deg, #A6E3EC 0%, #F7F6F2 100%)'
-              : 'linear-gradient(135deg, #FBEAE4 0%, #F7F6F2 100%)',
-            boxShadow: allDone ? '0 8px 20px -10px #087F7055' : '0 8px 20px -10px #E9826E44',
+              : 'white',
+            border: allDone ? 'none' : '1px solid #E6E3DB',
+            boxShadow: allDone ? '0 8px 20px -10px #087F7055' : 'none',
             transition: 'background 0.4s ease',
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <span style={{
-                fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontStyle: 'italic', fontWeight: 600,
-                fontSize: 17.5, color: '#0A5A82', lineHeight: 1.35,
+                fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontWeight: 800,
+                fontSize: 18, color: '#14303D', lineHeight: 1.35,
               }}>
                 {bannerTitle}
               </span>

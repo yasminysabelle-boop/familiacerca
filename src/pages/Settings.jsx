@@ -39,7 +39,7 @@ function ToggleRow({ icon, label, subtitle, checked, onChange }) {
       display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer',
       padding: '14px 16px', borderBottom: '1px solid #F5F0EA',
     }}>
-      <span style={{ fontSize: 18 }}>{icon}</span>
+      <span style={{ flex: 'none', width: 36, height: 36, borderRadius: 10, background: '#E3F1F8', color: '#0C6C9C', fontSize: 17, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{icon}</span>
       <div style={{ flex: 1 }}>
         <p style={{ fontSize: 16, fontWeight: 600, color: '#14303D', margin: 0 }}>{label}</p>
         {subtitle && <p style={{ fontSize: 15, color: '#5E7480', margin: '1px 0 0' }}>{subtitle}</p>}
@@ -510,21 +510,21 @@ export default function Settings() {
             Preferencias
           </p>
           <ToggleRow
-            icon="🔠"
+            icon="Aa"
             label="Letra grande"
             subtitle="Todo se ve más grande y fácil de leer"
             checked={bigText}
             onChange={toggleBigText}
           />
           <ToggleRow
-            icon="🌙"
+            icon="◐"
             label="Modo oscuro"
             subtitle="Fondo oscuro para usar de noche"
             checked={dark}
             onChange={toggleDark}
           />
           <ToggleRow
-            icon="📍"
+            icon="⌖"
             label="Compartir ubicación"
             subtitle="Las medicinas y emergencias siempre guardan dónde se hizo. Esto la agrega también a las notas."
             checked={locationOn}
@@ -706,7 +706,7 @@ export default function Settings() {
                 borderBottom: '1px solid #F5F0EA', cursor: 'pointer', textAlign: 'left',
               }}
             >
-              <span style={{ fontSize: 18 }}>{icon}</span>
+              <span style={{ flex: 'none', width: 36, height: 36, borderRadius: 10, background: '#E3F1F8', color: '#0C6C9C', fontSize: 17, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{icon}</span>
               <span style={{ flex: 1, fontSize: 15, fontWeight: 600, color: '#14303D' }}>{label}</span>
               <ChevronRight size={16} color="#D1D5DB" strokeWidth={2} />
             </button>

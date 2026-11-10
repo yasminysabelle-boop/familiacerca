@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
 import { supabase } from '../lib/supabase'
 import Layout from '../components/Layout'
-import { ChevronLeft, CheckIcon, XIcon, AlertTriangle } from '../components/Icons'
+import { ChevronLeft, CheckIcon, XIcon, AlertTriangle, ClipboardList, Stethoscope, Star, BookOpen, Phone, FileText } from '../components/Icons'
 import LoadingButton from '../components/LoadingButton'
 import PatientProfileContacts from '../components/PatientProfileContacts'
 import { fetchPdfReportData, generatePdfReport, SECTIONS } from '../utils/generatePdfReport'
@@ -42,11 +42,11 @@ const EMPTY = {
 const F = {
   width:'100%', padding:'11px 13px', border:'1.5px solid #E6E3DB',
   borderRadius:12, fontSize:15, outline:'none', background:'#FDFAF7',
-  boxSizing:'border-box', color:'#1F2937', fontFamily:'system-ui,sans-serif',
+  boxSizing:'border-box', color:'#14303D', fontFamily:"'Plus Jakarta Sans', system-ui, sans-serif", fontSize:16,
 }
 const L = {
-  fontSize: 14, fontWeight:700, color:'#4E6470',
-  letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:5, display:'block',
+  fontSize: 15, fontWeight:700, color:'#30454F',
+  marginBottom:6, display:'block',
 }
 const fo = e => { e.target.style.borderColor='#0C6C9C'; e.target.style.boxShadow='0 0 0 3px rgba(12,108,156,0.1)' }
 const fb = e => { e.target.style.borderColor='#E6E3DB'; e.target.style.boxShadow='none' }
@@ -87,9 +87,9 @@ function Section({ color, icon, title, badge, open, onToggle, children }) {
       }}>
         <span style={{
           width:38, height:38, borderRadius:11, flexShrink:0,
-          background:`${color}1A`, display:'flex', alignItems:'center',
+          background:'#E3F1F8', display:'flex', alignItems:'center',
           justifyContent:'center', fontSize:20,
-        }}>{icon}</span>
+        }}>{typeof icon === 'string' ? icon : (() => { const Ic = icon; return <Ic size={20} color="#0C6C9C" strokeWidth={2.1} /> })()}</span>
         <div style={{ flex:1 }}>
           <p style={{ fontSize:15, fontWeight:700, color:'#14303D', margin:0 }}>{title}</p>
           {badge>0 && (
@@ -135,6 +135,14 @@ function CheckChips({ opts, value, onChange, colorOn='#0C6C9C', bgOn='#E3F1F8' }
 export default function PatientProfile() {
   const { user } = useAuth()
   const { ownerId, memberRole } = useFamily()
+  const [ficha, setFicha] = useState({ contacto: null, medico: null })
+  useEffect(() => {
+    if (!ownerId) return
+    Promise.all([
+      supabase.from('directory_contacts').select('name, phone').eq('owner_id', ownerId).eq('is_emergency_contact', true).maybeSingle(),
+      supabase.from('directory_contacts').select('name, phone').eq('owner_id', ownerId).eq('kind', 'medico').eq('is_primary', true).maybeSingle(),
+    ]).then(([c, m]) => setFicha({ contacto: c.data ?? null, medico: m.data ?? null }))
+  }, [ownerId])
   const navigate = useNavigate()
   const canEdit = memberRole === null || memberRole === 'cuidador'
 
@@ -390,8 +398,45 @@ export default function PatientProfile() {
         ) : (
           <form onSubmit={handleSave} style={{ padding:'16px 16px 0' }}>
 
+            {/* Lo importante en una emergencia (UX nov 2026): lo que ve el paramédico en la ficha */}
+            {(() => {
+              const alergias = (form.alergias_detalle ?? []).map(a => a?.nombre ?? a).filter(Boolean)
+              const contacto = ficha.contacto?.name ? `${ficha.contacto.name}${ficha.contacto.phone ? ` · ${ficha.contacto.phone}` : ''}` : (form.contacto_emergencia_nombre ? `${form.contacto_emergencia_nombre}${form.contacto_emergencia_telefono ? ` · ${form.contacto_emergencia_telefono}` : ''}` : '')
+              const medico = ficha.medico?.name ? `${ficha.medico.name}${ficha.medico.phone ? ` · ${ficha.medico.phone}` : ''}` : (form.medico_tratante || '')
+              const rows = [
+                { k: 'Alergias', v: alergias.join(', '), sec: 's2' },
+                { k: 'Diagnóstico', v: form.diagnostico_principal, sec: 's2' },
+                { k: 'Contacto de emergencia', v: contacto, sec: 's4' },
+                { k: 'Médico', v: medico, sec: 's4' },
+              ]
+              const faltan = rows.filter(r => !r.v).length
+              return (
+                <div style={{ background:'white', borderRadius:18, border:'1px solid #E6E3DB', padding:16, marginBottom:14 }}>
+                  <p style={{ margin:0, fontSize:17, fontWeight:800, color:'#14303D' }}>Lo importante en una emergencia</p>
+                  <p style={{ margin:'4px 0 12px', fontSize:15, color:'#4E6470' }}>
+                    {faltan ? `Esto es lo que verán los paramédicos. Falta${faltan === 1 ? '' : 'n'} ${faltan}.` : 'Completo. Esto es lo que verán los paramédicos.'}
+                  </p>
+                  {rows.map(r => (
+                    <div key={r.k} style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 0', borderTop:'1px solid #F0EEE8' }}>
+                      <span style={{ flex:'none', width:22, textAlign:'center', color: r.v ? '#0C6C9C' : '#A3452F', fontWeight:800 }}>{r.v ? '✓' : '!'}</span>
+                      <span style={{ flex:1, minWidth:0 }}>
+                        <span style={{ display:'block', fontSize:14, color:'#4E6470' }}>{r.k}</span>
+                        <span style={{ display:'block', fontSize:16, fontWeight:600, color: r.v ? '#14303D' : '#A3452F' }}>{r.v || 'Falta'}</span>
+                      </span>
+                      {!r.v && canEdit && (
+                        <button type="button" onClick={() => setOpen(p => ({ ...p, [r.sec]: true }))}
+                          style={{ flex:'none', padding:'8px 12px', borderRadius:10, border:'1.5px solid #0C6C9C', background:'white', color:'#0C6C9C', fontSize:15, fontWeight:700, cursor:'pointer' }}>
+                          Completar
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )
+            })()}
+
             {/* ══ S1: Información básica ═══════════════════════════════════ */}
-            <Section color="#0A5A82" icon="📋" title="Información básica" badge={b1}
+            <Section color="#0C6C9C" icon={ClipboardList} title="Información básica" badge={b1}
               open={open.s1} onToggle={() => setOpen(p=>({...p,s1:!p.s1}))}>
 
               <Fld label="Nombre completo">
@@ -442,7 +487,7 @@ export default function PatientProfile() {
             </Section>
 
             {/* ══ S2: Información médica ════════════════════════════════════ */}
-            <Section color="#0C6C9C" icon="🏥" title="Información médica" badge={b2}
+            <Section color="#0C6C9C" icon={Stethoscope} title="Información médica" badge={b2}
               open={open.s2} onToggle={() => setOpen(p=>({...p,s2:!p.s2}))}>
 
               <Fld label="Diagnóstico principal">
@@ -544,7 +589,7 @@ export default function PatientProfile() {
                 boxShadow: '0 2px 8px rgba(10,74,107,0.08)',
               }}
             >
-              <span style={{ fontSize: 20 }}>{generatingPDF ? '⏳' : '📄'}</span>
+              <span style={{ width: 38, height: 38, borderRadius: 11, background: '#E3F1F8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><FileText size={20} color="#0C6C9C" strokeWidth={2.1} /></span>
               <div style={{ flex: 1, textAlign: 'left' }}>
                 <p style={{ fontSize: 14, fontWeight: 700, color: '#0A4A6B', margin: 0 }}>
                   Reporte para el médico
@@ -557,7 +602,7 @@ export default function PatientProfile() {
             </button>
 
             {/* ══ S3: Preferencias ═══════════════════════════════════════════ */}
-            <Section color="#EA8C00" icon="⭐" title="Preferencias" badge={b3}
+            <Section color="#0C6C9C" icon={Star} title="Preferencias" badge={b3}
               open={open.s3} onToggle={() => setOpen(p=>({...p,s3:!p.s3}))}>
 
               <Fld label="Movilidad">
@@ -642,7 +687,7 @@ export default function PatientProfile() {
             </Section>
 
             {/* ══ S4: Contactos ════════════════════════════════════════════ */}
-            <Section color="#0891B2" icon="📒" title="Directorio" badge={b4}
+            <Section color="#0C6C9C" icon={Phone} title="Contactos y médicos" badge={b4}
               open={open.s4} onToggle={() => setOpen(p=>({...p,s4:!p.s4}))}>
               <PatientProfileContacts
                 ownerId={ownerId}
@@ -653,7 +698,7 @@ export default function PatientProfile() {
             </Section>
 
             {/* ══ S5: Historia personal ════════════════════════════════════ */}
-            <Section color="#1677A6" icon="📖" title="Historia personal" badge={b5}
+            <Section color="#0C6C9C" icon={BookOpen} title="Historia personal" badge={b5}
               open={open.s5} onToggle={() => setOpen(p=>({...p,s5:!p.s5}))}>
 
               <p style={{ fontSize:14, color:'#5E7480', margin:'0 0 16px', lineHeight:1.5 }}>

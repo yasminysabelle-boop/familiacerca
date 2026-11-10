@@ -1277,9 +1277,12 @@ function StatusCard({ icon, title, subtitle, status, statusType, to, onClick, pu
 // enterrado. El degradado y el anillo de pulso del botón vienen del antiguo
 // EmergencyCard (código muerto, nunca tuvo datos reales) — solo se reusa el
 // tratamiento visual.
-function SosConfirmSheet({ open, onClose, onConfirm, patientProfile, patientName, medsList, emergencyContact, primaryDoctor, viewOnly = false }) {
+function SosConfirmSheet({ open, onClose, onConfirm, patientProfile, patientName, medsList, emergencyContact: ec, primaryDoctor: pd, viewOnly = false }) {
   if (!open) return null
-  const allergies = (patientProfile?.alergias_detalle ?? []).filter(Boolean)
+  // Si no hay contactos en el directorio, usar los del perfil del familiar
+  const emergencyContact = ec ?? (patientProfile?.contacto_emergencia_nombre ? { name: patientProfile.contacto_emergencia_nombre, phone: patientProfile.contacto_emergencia_telefono } : null)
+  const primaryDoctor = pd ?? (patientProfile?.medico_tratante ? { name: patientProfile.medico_tratante, specialty: patientProfile.especialidad_medico, phone: patientProfile.telefono_medico } : null)
+  const allergies = (patientProfile?.alergias_detalle ?? []).map(a => a?.nombre ?? a).filter(a => typeof a === 'string' && a)
   const diagnosis = patientProfile?.diagnostico_principal
   const meds = medsList ?? []
 

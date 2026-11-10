@@ -247,3 +247,13 @@ button[style*="background: white"], button[style*="background: rgb(255, 255, 255
 
 /* ── Letra grande (accesibilidad nov 2026) ── */
 html.letra-grande #root { zoom: 1.15; }
+
+/* ── Unificar pantallas hechas con clases de Tailwind (UX nov 2026) ──
+   Citas, Reportes, Registro y otras usaban esquinas más chicas y grises claros. */
+#root .rounded-xl { border-radius: 20px; }
+#root .rounded-lg { border-radius: 14px; }
+#root .text-gray-900 { color: #14303D; }
+#root .text-gray-700 { color: #30454F; }
+#root .text-gray-600, #root .text-gray-500 { color: #4E6470; }
+#root .bg-gray-50 { background-color: #F7F6F2; }
+#root .border-gray-100, #root .border-gray-200 { border-color: #E6E3DB; }
