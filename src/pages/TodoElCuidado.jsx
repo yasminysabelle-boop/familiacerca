@@ -10,7 +10,7 @@ import {
   Pencil, DollarSign, Shield, Star, Settings,
 } from '../components/Icons'
 
-const SERIF = "'Fraunces', Georgia, serif"
+const SERIF = "'Plus Jakarta Sans', system-ui, sans-serif"
 const SANS  = "'Plus Jakarta Sans', system-ui, sans-serif"
 
 function GroupHeader({ icon, color, label }) {

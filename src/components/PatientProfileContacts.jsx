@@ -65,8 +65,8 @@ function CallBtn({ phone, big = false }) {
       display: 'inline-flex', alignItems: 'center', gap: 4, flexShrink: 0,
       padding: big ? '10px 18px' : '6px 11px', borderRadius: 10, textDecoration: 'none',
       fontWeight: 700, fontSize: big ? 14 : 12,
-      background: big ? 'linear-gradient(135deg, #D63031, #B91C1C)' : '#F0FDF4',
-      color: big ? 'white' : '#16A34A',
+      background: big ? 'linear-gradient(135deg, #D63031, #B91C1C)' : '#E3F1F8',
+      color: big ? 'white' : '#0C6C9C',
       boxShadow: big ? '0 4px 14px rgba(214,48,49,0.25)' : 'none',
     }}>
       📞 {big ? 'LLAMAR' : 'Llamar'}
@@ -146,7 +146,7 @@ function InstitutionCard({ inst, canEdit, onEdit, onDelete }) {
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
             <p style={{ fontSize: 14, fontWeight: 700, color: '#14303D', margin: 0 }}>{inst.name}</p>
-            {inst.type && <span style={{ fontSize: 12, fontWeight: 700, color: '#7C3AED', background: '#EDE9FE', padding: '2px 7px', borderRadius: 6 }}>{inst.type}</span>}
+            {inst.type && <span style={{ fontSize: 12, fontWeight: 700, color: '#1677A6', background: '#EDE9FE', padding: '2px 7px', borderRadius: 6 }}>{inst.type}</span>}
           </div>
           {inst.address && <p style={{ fontSize: 14, color: '#4E6470', margin: '0 0 1px' }}>📍 {inst.address}</p>}
           {inst.phone && <p style={{ fontSize: 14, color: '#4E6470', margin: '0 0 1px' }}>☎ {inst.phone}</p>}
@@ -165,7 +165,7 @@ function InstitutionCard({ inst, canEdit, onEdit, onDelete }) {
 
 function InstitutionForm({ data, onChange, onSave, onCancel, saving }) {
   return (
-    <div style={{ background: '#FAF5FF', borderRadius: 14, padding: 14, marginBottom: 8, border: '1.5px solid #7C3AED' }}>
+    <div style={{ background: '#FAF5FF', borderRadius: 14, padding: 14, marginBottom: 8, border: '1.5px solid #1677A6' }}>
       <Inp label="Nombre del establecimiento" value={data.name} onChange={v => onChange('name', v)} placeholder="Farmacia del Ahorro" />
       <Sel label="Tipo" value={data.type} onChange={v => onChange('type', v)} options={INSTITUTION_TYPES} placeholder="Seleccionar tipo..." />
       <Grid2>
@@ -175,7 +175,7 @@ function InstitutionForm({ data, onChange, onSave, onCancel, saving }) {
       <Inp label="Dirección"          value={data.address} onChange={v => onChange('address', v)} placeholder="Calle Principal 123" />
       <Inp label="Horario de atención" value={data.hours}   onChange={v => onChange('hours', v)}   placeholder="Lun–Vie 8am–8pm" />
       <Inp label="Notas" value={data.notes} onChange={v => onChange('notes', v)} placeholder="Referencia, detalles..." mb={0} />
-      <SaveCancelBtns onSave={onSave} onCancel={onCancel} saving={saving} disabled={!data.name?.trim()} accentColor="#7C3AED" color="#7C3AED" />
+      <SaveCancelBtns onSave={onSave} onCancel={onCancel} saving={saving} disabled={!data.name?.trim()} accentColor="#1677A6" color="#1677A6" />
     </div>
   )
 }
@@ -185,7 +185,7 @@ function ContactCard({ contact, canEdit, isEmergency, onEdit, onDelete }) {
   const phone = contact.phone
   const bg     = isEmergency ? '#FFF5F5' : '#FAF5FF'
   const border = isEmergency ? '1.5px solid #FECACA' : '1px solid #E9D5FF'
-  const relColor = isEmergency ? '#D63031' : '#7C3AED'
+  const relColor = isEmergency ? '#D63031' : '#1677A6'
   return (
     <div style={{ borderRadius: 14, padding: '12px 14px', marginBottom: 8, background: bg, border }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
@@ -207,7 +207,7 @@ function ContactCard({ contact, canEdit, isEmergency, onEdit, onDelete }) {
 }
 
 function ContactForm({ data, onChange, onSave, onCancel, saving, isEmergency }) {
-  const color  = isEmergency ? '#D63031' : '#7C3AED'
+  const color  = isEmergency ? '#D63031' : '#1677A6'
   const bg     = isEmergency ? '#FFF5F5' : '#FAF5FF'
   const border = isEmergency ? '#FECACA' : '#C4B5FD'
   return (
@@ -430,7 +430,7 @@ export default function PatientProfileContacts({ ownerId, canEdit, initialForm, 
       }
 
       {/* ── 🏢 Establecimientos ───────────────────────────────────────────────── */}
-      <CatLabel icon="🏢" title="Establecimientos" color="#7C3AED" />
+      <CatLabel icon="🏢" title="Establecimientos" color="#1677A6" />
       {insts.map(inst =>
         editId === inst.id
           ? <InstitutionForm key={inst.id} data={editData} onChange={ed} onSave={() => updateInst(inst.id)} onCancel={cancelEdit} saving={saving} />
@@ -438,7 +438,7 @@ export default function PatientProfileContacts({ ownerId, canEdit, initialForm, 
       )}
       {addingTo === 'inst'
         ? <InstitutionForm data={addData} onChange={ad} onSave={addInst} onCancel={cancelAdd} saving={saving} />
-        : canEdit && <AddBtn label="Agregar establecimiento" color="#7C3AED" onClick={() => startAdd('inst')} />
+        : canEdit && <AddBtn label="Agregar establecimiento" color="#1677A6" onClick={() => startAdd('inst')} />
       }
 
       {/* ── 🚨 Emergencia ─────────────────────────────────────────────────────── */}
@@ -454,7 +454,7 @@ export default function PatientProfileContacts({ ownerId, canEdit, initialForm, 
       }
 
       {/* ── 👫 Amigos y familiares ────────────────────────────────────────────── */}
-      <CatLabel icon="👫" title="Amigos y familiares cercanos" color="#7C3AED" />
+      <CatLabel icon="👫" title="Amigos y familiares cercanos" color="#1677A6" />
       {friends.map(c =>
         editId === c.id
           ? <ContactForm key={c.id} data={editData} onChange={ed} onSave={() => updateContact(c.id, false)} onCancel={cancelEdit} saving={saving} />
@@ -462,7 +462,7 @@ export default function PatientProfileContacts({ ownerId, canEdit, initialForm, 
       )}
       {addingTo === 'friend'
         ? <ContactForm data={addData} onChange={ad} onSave={() => addContact(false)} onCancel={cancelAdd} saving={saving} />
-        : canEdit && <AddBtn label="Agregar amigo o familiar" color="#7C3AED" onClick={() => startAdd('friend')} />
+        : canEdit && <AddBtn label="Agregar amigo o familiar" color="#1677A6" onClick={() => startAdd('friend')} />
       }
 
       {/* ── Confirmación de borrado ───────────────────────────────────────────── */}

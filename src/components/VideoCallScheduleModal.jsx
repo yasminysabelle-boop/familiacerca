@@ -252,12 +252,12 @@ export default function VideoCallScheduleModal({ open, onClose }) {
                       {call.title}
                     </p>
                     {live && (
-                      <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: '0.03em', padding: '2px 7px', borderRadius: 999, background: '#16A34A', color: 'white', flexShrink: 0 }}>
+                      <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: '0.03em', padding: '2px 7px', borderRadius: 999, background: '#0C6C9C', color: 'white', flexShrink: 0 }}>
                         EN CURSO
                       </span>
                     )}
                   </div>
-                  <p style={{ margin: '2px 0 0', fontSize: 14, color: live ? '#16A34A' : '#64748B', fontWeight: live ? 700 : 400 }}>
+                  <p style={{ margin: '2px 0 0', fontSize: 14, color: live ? '#0C6C9C' : '#64748B', fontWeight: live ? 700 : 400 }}>
                     {live ? 'En curso ahora' : fmtScheduled(call.scheduled_at)}
                   </p>
                 </div>

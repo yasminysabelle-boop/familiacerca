@@ -357,7 +357,7 @@ function UpgradeContent() {
             boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
           }}>
             <p style={{ fontSize: 32, marginBottom: 12 }}>🔒</p>
-            <p style={{ fontFamily: 'Georgia, serif', fontSize: 17, fontWeight: 700, color: '#14303D', marginBottom: 8 }}>
+            <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 17, fontWeight: 700, color: '#14303D', marginBottom: 8 }}>
               Solo quien creó la familia puede cambiar el plan.
             </p>
             <p style={{ fontSize: 13, color: '#4E6470', lineHeight: 1.5, marginBottom: 20 }}>
@@ -429,7 +429,7 @@ function UpgradeContent() {
             <div style={{ marginBottom: 18 }}>
               {FREE_FEATURES.map(f => (
                 <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 7 }}>
-                  <span style={{ color: '#22C55E', fontSize: 13, flexShrink: 0, marginTop: 1 }}>✓</span>
+                  <span style={{ color: '#2BB8CC', fontSize: 13, flexShrink: 0, marginTop: 1 }}>✓</span>
                   <span style={{ fontSize: 13, color: '#30454F', lineHeight: 1.4 }}>{f}</span>
                 </div>
               ))}
@@ -470,7 +470,7 @@ function UpgradeContent() {
             <div style={{ marginBottom: 18 }}>
               {FAMILIAR_FEATURES.map(f => (
                 <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 7 }}>
-                  <span style={{ color: '#22C55E', fontSize: 13, flexShrink: 0, marginTop: 1 }}>✓</span>
+                  <span style={{ color: '#2BB8CC', fontSize: 13, flexShrink: 0, marginTop: 1 }}>✓</span>
                   <span style={{ fontSize: 13, color: '#30454F', lineHeight: 1.4 }}>{f}</span>
                 </div>
               ))}
@@ -512,7 +512,7 @@ function UpgradeContent() {
             <div style={{ marginBottom: 18 }}>
               {TOTAL_FEATURES.map(f => (
                 <div key={f} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 7 }}>
-                  <span style={{ color: '#22C55E', fontSize: 13, flexShrink: 0, marginTop: 1 }}>✓</span>
+                  <span style={{ color: '#2BB8CC', fontSize: 13, flexShrink: 0, marginTop: 1 }}>✓</span>
                   <span style={{ fontSize: 13, color: '#30454F', lineHeight: 1.4 }}>{f}</span>
                 </div>
               ))}

@@ -15,7 +15,7 @@ const FREQ_LABELS = {
   weekly:      'Semanal',
 }
 
-const SERIF = "'Fraunces', Georgia, serif"
+const SERIF = "'Plus Jakarta Sans', system-ui, sans-serif"
 const SANS  = "'Plus Jakarta Sans', system-ui, sans-serif"
 
 function fmtTime12(t) {

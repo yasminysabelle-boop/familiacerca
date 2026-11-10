@@ -213,7 +213,7 @@ export default function Reports() {
                   : <><span>📄</span> Descargar reporte PDF</>}
               </button>
               {pdfDone && (
-                <p className="text-sm mt-2 px-3 py-2 rounded-lg" style={{ color: '#15803D', background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
+                <p className="text-sm mt-2 px-3 py-2 rounded-lg" style={{ color: '#0A4A6B', background: '#E3F1F8', border: '1px solid #A6E3EC' }}>
                   ✓ PDF descargado correctamente
                 </p>
               )}

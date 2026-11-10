@@ -16,7 +16,7 @@ import { ChevronRight, LogOut } from '../components/Icons'
 const PLAN_META = {
   free:      { label: 'Gratis',        color: '#5E7480', icon: '🌱' },
   familiar:  { label: 'Plan Familiar', color: '#0A5A82', icon: '❤️' },
-  care_plus: { label: 'Cuidado Total',  color: '#7C3AED', icon: '⭐' },
+  care_plus: { label: 'Cuidado Total',  color: '#1677A6', icon: '⭐' },
 }
 
 const STATUS_LABEL = {
@@ -285,7 +285,7 @@ export default function Settings() {
               onChange={handleProfilePhotoSelect}
             />
             <div style={{ minWidth: 0 }}>
-              <p style={{ color: 'white', fontSize: 16, fontWeight: 700, fontFamily: 'Georgia, serif', margin: 0 }}>
+              <p style={{ color: 'white', fontSize: 16, fontWeight: 700, fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", margin: 0 }}>
                 {user?.user_metadata?.full_name ?? 'Mi cuenta'}
               </p>
               <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 14, margin: '3px 0 0' }}>
@@ -314,7 +314,7 @@ export default function Settings() {
                   style={{
                     width: '100%', display: 'flex', alignItems: 'center', gap: 12,
                     padding: '14px 16px', textAlign: 'left', cursor: 'pointer',
-                    background: isActive ? '#F0FDF4' : 'transparent', border: 'none',
+                    background: isActive ? '#E3F1F8' : 'transparent', border: 'none',
                     borderBottom: i < families.length - 1 ? '1px solid #F5F0EA' : 'none',
                     WebkitTapHighlightColor: 'transparent',
                   }}
@@ -370,7 +370,7 @@ export default function Settings() {
           padding: '20px', marginBottom: 12,
           boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
         }}>
-          <p style={{ fontFamily: 'Georgia, serif', fontSize: 15, fontWeight: 700, color: '#14303D', margin: '0 0 16px' }}>
+          <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 15, fontWeight: 700, color: '#14303D', margin: '0 0 16px' }}>
             Suscripción
           </p>
 
@@ -428,7 +428,7 @@ export default function Settings() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {features.map(f => (
                   <div key={f} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ color: '#22C55E', fontSize: 13, flexShrink: 0 }}>✓</span>
+                    <span style={{ color: '#2BB8CC', fontSize: 13, flexShrink: 0 }}>✓</span>
                     <span style={{ fontSize: 13, color: '#30454F' }}>{f}</span>
                   </div>
                 ))}
@@ -467,7 +467,7 @@ export default function Settings() {
             padding: '20px', marginBottom: 12,
             boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
           }}>
-            <p style={{ fontFamily: 'Georgia, serif', fontSize: 15, fontWeight: 700, color: '#14303D', margin: '0 0 16px' }}>
+            <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 15, fontWeight: 700, color: '#14303D', margin: '0 0 16px' }}>
               Suscripción
             </p>
             <div style={{
@@ -516,7 +516,7 @@ export default function Settings() {
         {/* Push Notifications */}
         {supported && (
           <div style={{ background: 'white', borderRadius: 20, border: '1px solid #E6E3DB', padding: '16px', marginBottom: 12 }}>
-            <p style={{ fontFamily: 'Georgia, serif', fontSize: 15, fontWeight: 700, color: '#14303D', margin: '0 0 6px' }}>
+            <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 15, fontWeight: 700, color: '#14303D', margin: '0 0 6px' }}>
               Notificaciones push
             </p>
             <p style={{ fontSize: 14, color: '#5E7480', margin: '0 0 12px', lineHeight: 1.5 }}>
@@ -533,15 +533,15 @@ export default function Settings() {
             <div style={{
               display: 'flex', alignItems: 'center', gap: 8,
               padding: '8px 12px', borderRadius: 10, marginBottom: 12,
-              background: permission === 'granted' && subscribed ? '#F0FDF4' : '#FFF7ED',
-              border: `1px solid ${permission === 'granted' && subscribed ? '#BBF7D0' : '#FED7AA'}`,
+              background: permission === 'granted' && subscribed ? '#E3F1F8' : '#FFF7ED',
+              border: `1px solid ${permission === 'granted' && subscribed ? '#A6E3EC' : '#FED7AA'}`,
             }}>
               <span style={{ fontSize: 16 }}>
                 {permission === 'granted' && subscribed ? '🔔' : permission === 'denied' ? '🔕' : '🔔'}
               </span>
               <span style={{
                 fontSize: 14, fontWeight: 600,
-                color: permission === 'granted' && subscribed ? '#15803D' : '#7A5A18',
+                color: permission === 'granted' && subscribed ? '#0A4A6B' : '#7A5A18',
               }}>
                 {permission === 'granted' && subscribed
                   ? 'Notificaciones activas'
@@ -590,9 +590,9 @@ export default function Settings() {
               <>
                 <p style={{
                   fontSize: 14, fontWeight: 600, margin: '10px 0 0',
-                  color: testResult.ok ? '#15803D' : '#DC2626',
+                  color: testResult.ok ? '#0A4A6B' : '#DC2626',
                   padding: '8px 12px', borderRadius: 10,
-                  background: testResult.ok ? '#F0FDF4' : '#FEF2F2',
+                  background: testResult.ok ? '#E3F1F8' : '#FEF2F2',
                 }}>
                   {testResult.msg}
                 </p>
@@ -710,7 +710,7 @@ export default function Settings() {
             {cancelDone && (
               <div style={{ textAlign: 'center', padding: '8px 0' }}>
                 <p style={{ fontSize: 36, margin: '0 0 12px' }}>✅</p>
-                <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#14303D', margin: '0 0 10px' }}>
+                <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 18, fontWeight: 700, color: '#14303D', margin: '0 0 10px' }}>
                   Suscripción cancelada
                 </p>
                 <p style={{ fontSize: 14, color: '#4E6470', lineHeight: 1.6, margin: 0 }}>
@@ -769,7 +769,7 @@ export default function Settings() {
             {!cancelDone && cancelStep === 2 && (
               <>
                 <p style={{
-                  fontFamily: 'Georgia, serif', fontSize: 19, fontWeight: 700,
+                  fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 19, fontWeight: 700,
                   color: '#14303D', margin: '0 0 18px', textAlign: 'center',
                 }}>
                   ¿Por qué cancelas?

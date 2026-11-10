@@ -169,14 +169,14 @@ function MedList({ meds, onChange }) {
         <div key={i} style={{
           display: 'flex', flexDirection: 'column', gap: 6,
           padding: '10px 12px', borderRadius: 10,
-          background: '#E3F1F8', border: '1px solid #BBF7D0',
+          background: '#E3F1F8', border: '1px solid #A6E3EC',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <span style={{ fontSize: 16 }}>💊</span>
             <input
               value={m.nombre} placeholder="Medicamento"
               onChange={e => update(i, 'nombre', e.target.value)}
-              style={{ flex: 1, padding: '6px 10px', borderRadius: 8, border: '1px solid #BBF7D0', fontSize: 13 }}
+              style={{ flex: 1, padding: '6px 10px', borderRadius: 8, border: '1px solid #A6E3EC', fontSize: 13 }}
             />
             <button onClick={() => remove(i)} style={{
               background: 'none', border: 'none', cursor: 'pointer',
@@ -454,7 +454,7 @@ export default function DiarioMedicoEntryModal({ open, onClose, onSaved }) {
                 {transcript && (
                   <div style={{
                     padding: '12px', borderRadius: 12,
-                    background: '#E3F1F8', border: '1px solid #BBF7D0',
+                    background: '#E3F1F8', border: '1px solid #A6E3EC',
                   }}>
                     <p style={{ margin: '0 0 6px', fontSize: 13, fontWeight: 700, color: '#0C6C9C', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                       Transcripción

@@ -89,7 +89,7 @@ export default function HospitalModeModal({ open, onClose }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <span style={{ fontSize: 26 }}>🏥</span>
             <div>
-              <h3 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: '#14303D', fontFamily: 'Georgia, serif' }}>
+              <h3 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: '#14303D', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}>
                 Modo Hospital
               </h3>
               <p style={{ margin: '2px 0 0', fontSize: 13, color: '#4E6470' }}>

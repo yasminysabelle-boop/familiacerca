@@ -311,7 +311,7 @@ export default function Cuidado() {
             <h1 style={{ margin: 0, fontSize: 17, fontWeight: 800, color: '#2A4350', letterSpacing: '-0.01em' }}>
               Rutina diaria
             </h1>
-            <p style={{ margin: '2px 0 0', fontFamily: "'Fraunces', Georgia, serif", fontStyle: 'italic', fontWeight: 500, fontSize: 14, color: '#0C6C9C' }}>
+            <p style={{ margin: '2px 0 0', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontStyle: 'italic', fontWeight: 500, fontSize: 14, color: '#0C6C9C' }}>
               Cuidando a {patientFirstName}
             </p>
           </div>
@@ -330,7 +330,7 @@ export default function Cuidado() {
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <span style={{
-                fontFamily: "'Fraunces', Georgia, serif", fontStyle: 'italic', fontWeight: 600,
+                fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontStyle: 'italic', fontWeight: 600,
                 fontSize: 17.5, color: '#0A5A82', lineHeight: 1.35,
               }}>
                 {bannerTitle}

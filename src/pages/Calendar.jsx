@@ -23,7 +23,7 @@ const typeLabel = t => EVENT_TYPES.find(x => x.value === t)?.label ?? t
 
 const STATUS_OPTIONS = [
   { value: 'programada', label: 'Programada', color: '#2563EB', bg: '#EFF6FF' },
-  { value: 'realizada',  label: 'Realizada',  color: '#16A34A', bg: '#F0FDF4' },
+  { value: 'realizada',  label: 'Realizada',  color: '#0C6C9C', bg: '#E3F1F8' },
   { value: 'cancelada',  label: 'Cancelada',  color: '#DC2626', bg: '#FEF2F2' },
 ]
 const statusInfo = s => STATUS_OPTIONS.find(o => o.value === s) ?? STATUS_OPTIONS[0]

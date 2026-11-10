@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom'
 // mueve ningún dato.
 
 const SANS  = "'Plus Jakarta Sans', system-ui, sans-serif"
-const SERIF = "'Fraunces', Georgia, serif"
+const SERIF = "'Plus Jakarta Sans', system-ui, sans-serif"
 
 const OPTIONS = [
   { emoji: '🍽️', title: 'Cómo comió, durmió y su ánimo', sub: 'Un registro rápido de cómo está hoy', to: '/registros' },

@@ -7,7 +7,7 @@ import { track } from '../lib/analytics'
 import VoiceRecorder from '../components/VoiceRecorder'
 
 const MOODS = [
-  { value: 'good',    emoji: '😊', label: 'Buen día',   color: '#22C55E' },
+  { value: 'good',    emoji: '😊', label: 'Buen día',   color: '#2BB8CC' },
   { value: 'regular', emoji: '😐', label: 'Regular',    color: '#C9882A' },
   { value: 'hard',    emoji: '😔', label: 'Difícil',    color: '#D63031' },
 ]
@@ -167,7 +167,7 @@ export default function Memorias() {
               <p style={{ fontSize: 14, fontWeight: 700, color: '#6D28D9', margin: '0 0 2px' }}>
                 En este día, hace un año...
               </p>
-              <p style={{ fontSize: 14, color: '#7C3AED', margin: 0 }}>{yearAgoMemory.title}</p>
+              <p style={{ fontSize: 14, color: '#1677A6', margin: 0 }}>{yearAgoMemory.title}</p>
             </div>
           </div>
         )}

@@ -427,7 +427,7 @@ ${lines}`
               Chat familiar
             </h1>
             <p style={{
-              margin: '2px 0 0', fontFamily: "'Fraunces', Georgia, serif",
+              margin: '2px 0 0', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
               fontStyle: 'italic', fontWeight: 500, fontSize: 14, color: '#0C6C9C',
             }}>
               {patientFirstName ? `Cuidando a ${patientFirstName}` : 'Cuidando a tu familiar'}
@@ -502,7 +502,7 @@ ${lines}`
         {/* Overlay de menú contextual (long press) */}
         {contextMsg && (
           <div
-            style={{ position: 'fixed', inset: 0, zIndex: 300, background: 'rgba(51,41,74,0.4)' }}
+            style={{ position: 'fixed', inset: 0, zIndex: 300, background: 'rgba(10,40,55,0.4)' }}
             onClick={() => setContextMsg(null)}
           >
             <div
@@ -555,7 +555,7 @@ ${lines}`
                 <MessageCircle size={32} color="#0A4A6B" strokeWidth={1.8} />
               </div>
               <p style={{
-                fontFamily: "'Fraunces', Georgia, serif", fontStyle: 'italic', fontWeight: 500,
+                fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontStyle: 'italic', fontWeight: 500,
                 fontSize: 20, color: '#0C6C9C', margin: 0, maxWidth: 240,
               }}>
                 Aquí la familia se mantiene cerca.
@@ -704,16 +704,16 @@ ${lines}`
           {assistantCard && (
             <div style={{
               background: 'linear-gradient(178deg, #EFEDFC 0%, #FFFFFF 60%)',
-              border: '1px solid rgba(117,102,216,0.22)',
+              border: '1px solid rgba(12,108,156,0.22)',
               borderRadius: 18, padding: '14px 16px', marginBottom: 12,
-              boxShadow: '0 6px 14px -8px rgba(117,102,216,0.35)',
+              boxShadow: '0 6px 14px -8px rgba(12,108,156,0.35)',
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
                 <span style={{ display: 'flex' }}>
                   <img src={miloAvatarImg} alt="" style={{ width: 22, height: 22, borderRadius: '50%', objectFit: 'cover', marginRight: -8, border: '2px solid #EFEDFC' }} />
                   <img src={lunaAvatarImg} alt="" style={{ width: 22, height: 22, borderRadius: '50%', objectFit: 'cover', border: '2px solid #EFEDFC' }} />
                 </span>
-                <p style={{ fontSize: 14, fontWeight: 800, color: '#5B4BC4', margin: 0, flex: 1 }}>
+                <p style={{ fontSize: 14, fontWeight: 800, color: '#0A4A6B', margin: 0, flex: 1 }}>
                   {assistantCard.type === 'catchup' ? 'Ponte al día' : 'Preguntar a Milo y Luna'}
                 </p>
                 <button
@@ -735,7 +735,7 @@ ${lines}`
                     autoFocus
                     style={{
                       flex: 1, padding: '9px 13px', borderRadius: 12,
-                      border: '1.5px solid rgba(117,102,216,0.35)', fontSize: 13.5,
+                      border: '1.5px solid rgba(12,108,156,0.35)', fontSize: 13.5,
                       outline: 'none', background: 'white', fontFamily: 'inherit', color: '#2A4350',
                     }}
                   />
@@ -745,7 +745,7 @@ ${lines}`
                     disabled={!askInput.trim()}
                     style={{
                       padding: '9px 16px', borderRadius: 12, border: 'none',
-                      background: askInput.trim() ? 'linear-gradient(160deg, #9E8FEF, #7566D8)' : '#D9D6EE',
+                      background: askInput.trim() ? 'linear-gradient(160deg, #1677A6, #0C6C9C)' : '#D9D6EE',
                       color: 'white', fontWeight: 700, fontSize: 14, flexShrink: 0,
                       cursor: askInput.trim() ? 'pointer' : 'not-allowed',
                     }}
@@ -756,7 +756,7 @@ ${lines}`
               )}
 
               {assistantCard.loading && (
-                <p style={{ fontSize: 13, color: '#5B4BC4', margin: 0, fontStyle: 'italic' }}>Pensando...</p>
+                <p style={{ fontSize: 13, color: '#0A4A6B', margin: 0, fontStyle: 'italic' }}>Pensando...</p>
               )}
 
               {assistantCard.error && (
@@ -770,14 +770,14 @@ ${lines}`
                       "{assistantCard.question}"
                     </p>
                   )}
-                  <div style={{ padding: '11px 13px', background: 'white', borderRadius: 12, border: '1px solid rgba(117,102,216,0.18)' }}>
+                  <div style={{ padding: '11px 13px', background: 'white', borderRadius: 12, border: '1px solid rgba(12,108,156,0.18)' }}>
                     <p style={{ fontSize: 13.5, color: '#2A4350', lineHeight: 1.58, margin: 0 }}>
                       {assistantCard.text}
                     </p>
                   </div>
                   {assistantCard.type === 'catchup' && !assistantCard.upToDate && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 8, fontSize: 13, fontWeight: 700, color: '#5B4BC4', opacity: 0.85 }}>
-                      <Sparkles size={11} color="#5B4BC4" strokeWidth={2.2} />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 8, fontSize: 13, fontWeight: 700, color: '#0A4A6B', opacity: 0.85 }}>
+                      <Sparkles size={11} color="#0A4A6B" strokeWidth={2.2} />
                       Solo tú ves este resumen
                     </div>
                   )}
@@ -854,8 +854,8 @@ ${lines}`
                 onClick={openSheet}
                 style={{
                   width: 42, height: 42, borderRadius: '50%', border: 'none',
-                  background: 'linear-gradient(160deg, #9E8FEF, #7566D8)',
-                  boxShadow: '0 6px 14px -6px rgba(117,102,216,0.55)',
+                  background: 'linear-gradient(160deg, #1677A6, #0C6C9C)',
+                  boxShadow: '0 6px 14px -6px rgba(12,108,156,0.55)',
                   cursor: 'pointer', flexShrink: 0,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   transition: 'transform 0.12s',
@@ -883,7 +883,7 @@ ${lines}`
         {/* Sheet de Milo y Luna */}
         {sheetOpen && (
           <div
-            style={{ position: 'fixed', inset: 0, zIndex: 400, background: 'rgba(38,32,74,0.4)', display: 'flex', alignItems: 'flex-end' }}
+            style={{ position: 'fixed', inset: 0, zIndex: 400, background: 'rgba(10,40,55,0.4)', display: 'flex', alignItems: 'flex-end' }}
             onClick={closeSheet}
           >
             <div
@@ -894,14 +894,14 @@ ${lines}`
               }}
               onClick={e => e.stopPropagation()}
             >
-              <div style={{ width: 38, height: 4, borderRadius: 4, background: 'rgba(117,102,216,0.3)', margin: '6px auto 16px' }} />
+              <div style={{ width: 38, height: 4, borderRadius: 4, background: 'rgba(12,108,156,0.3)', margin: '6px auto 16px' }} />
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 18 }}>
                 <span style={{ display: 'flex' }}>
                   <img src={miloAvatarImg} alt="Milo" style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', marginRight: -10, border: '2.5px solid #EFEDFC' }} />
                   <img src={lunaAvatarImg} alt="Luna" style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', border: '2.5px solid #EFEDFC' }} />
                 </span>
                 <div>
-                  <h2 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: '#5B4BC4' }}>Milo y Luna</h2>
+                  <h2 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: '#0A4A6B' }}>Milo y Luna</h2>
                   <p style={{ margin: '1px 0 0', fontSize: 14, color: '#6B7686' }}>
                     Tus compañeros para el cuidado de {patientFirstName ?? 'tu familiar'}
                   </p>
@@ -913,13 +913,13 @@ ${lines}`
                 onClick={pickCatchUp}
                 style={{
                   width: '100%', display: 'flex', alignItems: 'center', gap: 12,
-                  textAlign: 'left', background: 'white', border: '1px solid rgba(117,102,216,0.16)',
+                  textAlign: 'left', background: 'white', border: '1px solid rgba(12,108,156,0.16)',
                   borderRadius: 18, padding: '13px 14px', cursor: 'pointer', fontFamily: 'inherit',
                   marginBottom: 10,
                 }}
               >
                 <span style={{ width: 38, height: 38, borderRadius: 13, flexShrink: 0, background: '#EFEDFC', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Clock size={19} color="#5B4BC4" strokeWidth={2} />
+                  <Clock size={19} color="#0A4A6B" strokeWidth={2} />
                 </span>
                 <span>
                   <p style={{ fontSize: 14.5, fontWeight: 800, color: '#2A4350', margin: '0 0 2px' }}>Ponte al día</p>
@@ -932,12 +932,12 @@ ${lines}`
                 onClick={pickAsk}
                 style={{
                   width: '100%', display: 'flex', alignItems: 'center', gap: 12,
-                  textAlign: 'left', background: 'white', border: '1px solid rgba(117,102,216,0.16)',
+                  textAlign: 'left', background: 'white', border: '1px solid rgba(12,108,156,0.16)',
                   borderRadius: 18, padding: '13px 14px', cursor: 'pointer', fontFamily: 'inherit',
                 }}
               >
                 <span style={{ width: 38, height: 38, borderRadius: 13, flexShrink: 0, background: '#EFEDFC', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <MessageCircle size={19} color="#5B4BC4" strokeWidth={2} />
+                  <MessageCircle size={19} color="#0A4A6B" strokeWidth={2} />
                 </span>
                 <span>
                   <p style={{ fontSize: 14.5, fontWeight: 800, color: '#2A4350', margin: '0 0 2px' }}>Preguntar a Milo y Luna</p>

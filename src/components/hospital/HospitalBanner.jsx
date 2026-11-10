@@ -24,7 +24,7 @@ export default function HospitalBanner({ onManage }) {
             <span style={{ fontSize: 22 }}>🏥</span>
             <span style={{
               fontSize: 17, fontWeight: 800,
-              fontFamily: 'Georgia, serif', letterSpacing: '-0.3px',
+              fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", letterSpacing: '-0.3px',
             }}>
               Modo Hospital Activo
             </span>

@@ -320,7 +320,7 @@ export default function PatientProfile() {
       {success && (
         <div style={{
           position:'fixed', top:64, left:'50%', transform:'translateX(-50%)',
-          zIndex:100, background:'#15803D', color:'white',
+          zIndex:100, background:'#0A4A6B', color:'white',
           borderRadius:14, padding:'12px 20px',
           boxShadow:'0 8px 32px rgba(0,0,0,0.2)',
           fontSize:14, fontWeight:600, whiteSpace:'nowrap',
@@ -343,7 +343,7 @@ export default function PatientProfile() {
             </button>
             <div style={{ flex:1 }}>
               <p style={{ color:'rgba(255,255,255,0.65)', fontSize: 14, margin:0 }}>Información clínica</p>
-              <h1 style={{ color:'white', fontFamily:'Georgia,serif', fontSize:20, fontWeight:700, margin:'2px 0 0' }}>
+              <h1 style={{ color:'white', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize:20, fontWeight:700, margin:'2px 0 0' }}>
                 {form.nombre_completo ? `Perfil de ${form.nombre_completo.split(' ')[0]}` : 'Perfil del Paciente'}
               </h1>
             </div>
@@ -382,7 +382,7 @@ export default function PatientProfile() {
               )}
             </div>
             <div>
-              <p style={{ color:'white', fontFamily:'Georgia,serif', fontSize:18, fontWeight:700, margin:0 }}>
+              <p style={{ color:'white', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize:18, fontWeight:700, margin:0 }}>
                 {loading ? '...' : (form.nombre_completo || 'Sin nombre registrado')}
               </p>
               <p style={{ color:'rgba(255,255,255,0.65)', fontSize: 14, margin:'4px 0 0' }}>
@@ -518,7 +518,7 @@ export default function PatientProfile() {
 
               <Fld label="Antecedentes familiares">
                 <CheckChips opts={CONDICION} value={form.antecedentes_familiares}
-                  onChange={v=>set('antecedentes_familiares',v)} colorOn="#7C3AED" bgOn="#F5F3FF" />
+                  onChange={v=>set('antecedentes_familiares',v)} colorOn="#1677A6" bgOn="#F5F3FF" />
               </Fld>
 
               <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
@@ -666,7 +666,7 @@ export default function PatientProfile() {
             </Section>
 
             {/* ══ S5: Historia personal ════════════════════════════════════ */}
-            <Section color="#7C3AED" icon="📖" title="Historia personal" badge={b5}
+            <Section color="#1677A6" icon="📖" title="Historia personal" badge={b5}
               open={open.s5} onToggle={() => setOpen(p=>({...p,s5:!p.s5}))}>
 
               <p style={{ fontSize:13, color:'#5E7480', margin:'0 0 16px', lineHeight:1.5 }}>

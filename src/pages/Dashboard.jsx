@@ -32,10 +32,10 @@ import { startsTomorrow, scheduledBeforeStart } from '../lib/medTiming'
 
 // Mood lookup — handles both stored text values and emoji values
 const MOOD_MAP = {
-  good:    { emoji: '😊', color: '#22C55E' },
+  good:    { emoji: '😊', color: '#2BB8CC' },
   regular: { emoji: '😐', color: '#C9882A' },
   hard:    { emoji: '😔', color: '#D63031' },
-  '😊':   { emoji: '😊', color: '#22C55E' },
+  '😊':   { emoji: '😊', color: '#2BB8CC' },
   '😐':   { emoji: '😐', color: '#C9882A' },
   '😔':   { emoji: '😔', color: '#D63031' },
 }
@@ -174,7 +174,7 @@ function PendingCard({ evt, confirming, onConfirm, todayKey, isFamiliar }) {
           disabled={busy}
           style={{
             marginTop: 10, width: '100%', padding: '9px 0',
-            background: busy ? '#C9D6DB' : 'linear-gradient(135deg, #22C55E, #16A34A)',
+            background: busy ? '#C9D6DB' : 'linear-gradient(135deg, #2BB8CC, #0C6C9C)',
             color: 'white', fontWeight: 700, fontSize: 13,
             borderRadius: 10, border: 'none',
             cursor: busy ? 'not-allowed' : 'pointer',
@@ -225,11 +225,11 @@ function ConfirmedCard({ evt, onTap }) {
   const name = evt.confirmedBy ? evt.confirmedBy.split(' ')[0] : null
   const medLabel = [evt.medName, evt.medDosage].filter(Boolean).join(' ')
   return (
-    <div onClick={onTap} style={{ background: '#F0FDF4', borderRadius: 16, border: '1px solid #BBF7D0', padding: '12px 14px', cursor: 'pointer' }}>
+    <div onClick={onTap} style={{ background: '#E3F1F8', borderRadius: 16, border: '1px solid #A6E3EC', padding: '12px 14px', cursor: 'pointer' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         <span style={{ fontSize: 16, flexShrink: 0 }}>💊</span>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ fontSize: 13, fontWeight: 600, color: '#15803D', margin: 0, lineHeight: 1.4 }}>
+          <p style={{ fontSize: 13, fontWeight: 600, color: '#0A4A6B', margin: 0, lineHeight: 1.4 }}>
             {time && <span style={{ fontWeight: 400, color: '#0A4A6B' }}>{time} — </span>}
             {name ? `${name} dio ${medLabel}` : medLabel}
           </p>
@@ -419,7 +419,7 @@ function AppointmentProofCard({ evt, onTap }) {
       onClick={() => onTap(evt)}
       style={{
         background: 'white', borderRadius: 16,
-        border: '1px solid #BBF7D0',
+        border: '1px solid #A6E3EC',
         padding: '12px 14px',
         display: 'flex', alignItems: 'center', gap: 10,
         cursor: 'pointer',
@@ -439,7 +439,7 @@ function AppointmentProofCard({ evt, onTap }) {
         <p style={{ fontSize: 13, fontWeight: 600, color: '#14303D', margin: 0 }}>
           {evt.appointmentTitle}
         </p>
-        <p style={{ fontSize: 13, color: '#16A34A', marginTop: 2, fontWeight: 600 }}>
+        <p style={{ fontSize: 13, color: '#0C6C9C', marginTop: 2, fontWeight: 600 }}>
           ✓ Asistencia confirmada
           {evt.appointmentTime ? ` · ${fmtTime(evt.appointmentTime)}` : ''}
         </p>
@@ -568,7 +568,7 @@ function MedConfirmedDetail({ evt }) {
           <p style={{ fontSize: 18, fontWeight: 700, color: '#14303D', margin: 0 }}>
             {[evt.medName, evt.medDosage].filter(Boolean).join(' · ')}
           </p>
-          <p style={{ fontSize: 14, color: '#22C55E', fontWeight: 600, margin: '3px 0 0' }}>Medicamento dado ✅</p>
+          <p style={{ fontSize: 14, color: '#2BB8CC', fontWeight: 600, margin: '3px 0 0' }}>Medicamento dado ✅</p>
         </div>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -875,7 +875,7 @@ function EventDetailSheet({ evt, onClose, onAttachProof, isFamiliar }) {
           {evt.type === 'SOS_ALERT' && <SosDetail evt={evt} />}
           {evt.type === 'APPOINTMENT' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              <p style={{ fontSize: 17, fontWeight: 700, color: '#14303D', fontFamily: 'Georgia, serif', margin: 0 }}>
+              <p style={{ fontSize: 17, fontWeight: 700, color: '#14303D', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", margin: 0 }}>
                 {evt.appointmentTitle}
               </p>
               {evt.appointmentTime && (
@@ -927,7 +927,7 @@ function EventDetailSheet({ evt, onClose, onAttachProof, isFamiliar }) {
           )}
           {evt.type === 'APPOINTMENT_PROOF' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              <p style={{ fontSize: 17, fontWeight: 700, color: '#14303D', fontFamily: 'Georgia, serif', margin: 0 }}>
+              <p style={{ fontSize: 17, fontWeight: 700, color: '#14303D', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", margin: 0 }}>
                 {evt.appointmentTitle}
               </p>
               {evt.appointmentTime && (
@@ -1054,7 +1054,7 @@ function DaySection({
   }
 
   const STATUS_STYLE = {
-    green:  { dot: '🟢', border: '#22C55E', bg: '#F0FDF4' },
+    green:  { dot: '🟢', border: '#2BB8CC', bg: '#E3F1F8' },
     yellow: { dot: '🟡', border: '#F59E0B', bg: '#FFFBEB' },
     red:    { dot: '🔴', border: '#D63031', bg: '#FFF0F0' },
     none:   { dot: '',   border: '#E6E3DB', bg: 'white'   },
@@ -1231,7 +1231,7 @@ function AiCard({ type, text }) {
 
 function StatusCard({ icon, title, subtitle, status, statusType, to, onClick, pulse }) {
   const styles = {
-    ok:      { bg: '#F0FDF4', border: '#86EFAC', statusColor: '#15803D', statusIcon: '✅' },
+    ok:      { bg: '#E3F1F8', border: '#A6E3EC', statusColor: '#0A4A6B', statusIcon: '✅' },
     warning: { bg: '#FFFBEB', border: '#FDE68A', statusColor: '#7A5A18', statusIcon: '⚠️' },
     urgent:  { bg: '#FFF0F0', border: '#FECACA', statusColor: '#D63031', statusIcon: '🔴' },
     info:    { bg: '#FFFFFF', border: '#C8BEB4', statusColor: '#4E6470', statusIcon: '💙' },
@@ -1439,12 +1439,12 @@ function SosConfirmSheet({ open, onClose, onConfirm, patientProfile, patientName
 }
 
 const RECENT_EVENT_CONFIG = {
-  MED_CONFIRMED:     { icon: '💊', color: '#15803D', label: e => `${e.medName ?? 'Medicamento'} dado${e.confirmedBy ? ` por ${e.confirmedBy.split(' ')[0]}` : ''}` },
+  MED_CONFIRMED:     { icon: '💊', color: '#0A4A6B', label: e => `${e.medName ?? 'Medicamento'} dado${e.confirmedBy ? ` por ${e.confirmedBy.split(' ')[0]}` : ''}` },
   VOICE_MEMORY:      { icon: '🎙️', color: '#7C5CBF', label: e => `Memoria de voz${e.recorderName ? ` de ${e.recorderName.split(' ')[0]}` : ''}` },
   EXPENSE:           { icon: '💰', color: '#0A5A82', label: e => e.description ?? 'Gasto registrado' },
   SOS_ALERT:         { icon: '🚨', color: '#D63031', label: () => 'Alerta de emergencia' },
   APPOINTMENT:       { icon: '📅', color: '#3B82F6', label: e => e.appointmentTitle ?? 'Cita médica' },
-  APPOINTMENT_PROOF: { icon: '✅', color: '#15803D', label: e => `Cita: ${e.appointmentTitle ?? 'médica'}` },
+  APPOINTMENT_PROOF: { icon: '✅', color: '#0A4A6B', label: e => `Cita: ${e.appointmentTitle ?? 'médica'}` },
   NOTE:              { icon: '📝', color: '#4E6470', label: () => 'Nota registrada' },
   INCIDENT:          { icon: '🤕', color: '#DC2626', label: e => incidentTypeInfo(e.incidentType).label },
 }
@@ -1495,7 +1495,7 @@ function calcAge(dateStr) {
 // ── Unified DashCard ─────────────────────────────────────────────────────────
 
 const DASH_STATUS = {
-  ok:      { color: '#15803D', bg: '#DCFCE7' },
+  ok:      { color: '#0A4A6B', bg: '#DCFCE7' },
   warning: { color: '#92400E', bg: '#FEF3C7' },
   urgent:  { color: '#DC2626', bg: '#FEE2E2' },
   info:    { color: '#4E6470', bg: '#F3F4F6' },
@@ -1663,7 +1663,7 @@ function MedDetailRow({ evt, isToday, confirming, onConfirm, isFamiliar }) {
   const isConfirmed = evt.type === 'MED_CONFIRMED'
   const isPending = evt.type === 'MED_PENDING'
   const sc = isConfirmed
-    ? { icon: '✅', color: '#15803D', bg: '#F0FDF4', border: '#BBF7D0', label: evt.confirmedBy ? evt.confirmedBy.split(' ')[0] : 'Dado' }
+    ? { icon: '✅', color: '#0A4A6B', bg: '#E3F1F8', border: '#A6E3EC', label: evt.confirmedBy ? evt.confirmedBy.split(' ')[0] : 'Dado' }
     : (isPending && isToday)
       ? { icon: '⏳', color: '#92400E', bg: '#FFFBEB', border: '#FDE68A', label: 'Pendiente' }
       : { icon: '❌', color: '#DC2626', bg: '#FFF5F5', border: '#FECACA', label: 'No dado' }
@@ -1697,7 +1697,7 @@ function MedDetailRow({ evt, isToday, confirming, onConfirm, isFamiliar }) {
           disabled={busy}
           style={{
             padding: '6px 11px', borderRadius: 8, border: 'none',
-            background: busy ? '#C9D6DB' : '#22C55E',
+            background: busy ? '#C9D6DB' : '#2BB8CC',
             color: 'white', fontSize: 13, fontWeight: 700,
             cursor: busy ? 'not-allowed' : 'pointer', flexShrink: 0,
           }}
@@ -1734,7 +1734,7 @@ function CareEventRow({ evt, onTap }) {
     >
       <div style={{
         width: 34, height: 34, borderRadius: 9, flexShrink: 0,
-        background: evt.type === 'APPOINTMENT' ? '#EFF6FF' : '#F0FDF4',
+        background: evt.type === 'APPOINTMENT' ? '#EFF6FF' : '#E3F1F8',
         display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16,
       }}>
         {cfg.icon}
@@ -1746,7 +1746,7 @@ function CareEventRow({ evt, onTap }) {
         <div style={{ display: 'flex', gap: 8, marginTop: 2, alignItems: 'center' }}>
           {time && <span style={{ fontSize: 13, color: '#5E7480' }}>{time}</span>}
           {cfg.sub(evt) && (
-            <span style={{ fontSize: 13, color: evt.type === 'APPOINTMENT_PROOF' ? '#15803D' : '#4E6470', fontWeight: evt.type === 'APPOINTMENT_PROOF' ? 600 : 400 }}>
+            <span style={{ fontSize: 13, color: evt.type === 'APPOINTMENT_PROOF' ? '#0A4A6B' : '#4E6470', fontWeight: evt.type === 'APPOINTMENT_PROOF' ? 600 : 400 }}>
               {cfg.sub(evt)}
             </span>
           )}
@@ -1891,7 +1891,7 @@ function AttentionCard({ medName, medDosage, medTime, windowLabel, isExpired, on
       <div style={{ padding: '18px 18px 20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 16 }}>
           <Bell size={19} color="#E9826E" strokeWidth={2} />
-          <h2 style={{ margin: 0, fontFamily: "'Fraunces', Georgia, serif", fontSize: 18, fontWeight: 600, color: '#E9826E' }}>Necesita tu atención</h2>
+          <h2 style={{ margin: 0, fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 18, fontWeight: 600, color: '#E9826E' }}>Necesita tu atención</h2>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           <span style={{ width: 70, height: 70, borderRadius: '50%', background: 'rgba(233,130,110,0.16)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -1947,7 +1947,7 @@ function RecentActivity({ items, onViewAll, onSelect, firstName, summaryText, su
   return (
     <section aria-label="Actividad reciente" style={{ borderRadius: 26, background: 'white', padding: 20, boxShadow: '0 6px 24px -12px rgba(51,65,85,0.18)' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-        <h2 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 9, fontFamily: "'Fraunces', Georgia, serif", fontSize: 18, fontWeight: 600, color: '#2A4350' }}>
+        <h2 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 9, fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 18, fontWeight: 600, color: '#2A4350' }}>
           <Heart size={19} color="#0C6C9C" strokeWidth={2} /> Actividad reciente
         </h2>
         <button onClick={onViewAll} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, color: '#0C6C9C', fontWeight: 700, padding: 0, WebkitTapHighlightColor: 'transparent' }}>Ver todo</button>
@@ -2027,7 +2027,7 @@ function PetsCard({ onOpen, patientFirstName }) {
           <img src="/images/milo-luna.webp" alt="Milo el perro y Luna la gata" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ margin: 0, fontFamily: "'Fraunces', Georgia, serif", fontSize: 16, fontWeight: 600, color: '#0A4A6B', lineHeight: 1.2 }}>Milo y Luna están aquí para ayudar</p>
+          <p style={{ margin: 0, fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 16, fontWeight: 600, color: '#0A4A6B', lineHeight: 1.2 }}>Milo y Luna están aquí para ayudar</p>
           <p style={{ margin: '4px 0 0', fontSize: 13.5, color: '#4E6470', lineHeight: 1.3 }}>
             {patientFirstName ? `¿Necesitas algo sobre el cuidado de ${patientFirstName}?` : '¿Necesitas algo sobre el cuidado de tu familiar?'}
           </p>
@@ -3454,7 +3454,7 @@ export default function Dashboard() {
       {checkoutSuccess && (
         <div style={{
           position: 'fixed', top: 64, left: '50%', transform: 'translateX(-50%)',
-          zIndex: 100, background: '#15803D', color: 'white',
+          zIndex: 100, background: '#0A4A6B', color: 'white',
           borderRadius: 14, padding: '12px 20px',
           boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
           fontSize: 14, fontWeight: 600, whiteSpace: 'nowrap',
@@ -3550,9 +3550,9 @@ export default function Dashboard() {
 
         {/* Banners */}
         {notifActivated && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '12px 16px 0', padding: '10px 14px', background: '#F0FDF4', border: '1px solid #86EFAC', borderRadius: 14 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '12px 16px 0', padding: '10px 14px', background: '#E3F1F8', border: '1px solid #A6E3EC', borderRadius: 14 }}>
             <span style={{ fontSize: 17, flexShrink: 0 }}>✅</span>
-            <p style={{ flex: 1, fontSize: 13, color: '#15803D', margin: 0, fontWeight: 600 }}>Notificaciones activadas</p>
+            <p style={{ flex: 1, fontSize: 13, color: '#0A4A6B', margin: 0, fontWeight: 600 }}>Notificaciones activadas</p>
           </div>
         )}
         {permission !== 'granted' && !notifDismissed && !(isAdmin && familyCount <= 1) && (
@@ -3637,7 +3637,7 @@ export default function Dashboard() {
             const recentMembers = familyMembers.filter(m => m.last_seen && Date.now() - new Date(m.last_seen).getTime() < 24 * 60 * 60 * 1000)
             const participacion = recentMembers.length >= 2 ? 'Alta' : recentMembers.length === 1 ? 'Moderada' : 'Baja'
 
-            const PALETTE = ['#0A4A6B', '#C9882A', '#7C3AED', '#E58B73', '#0EA5E9']
+            const PALETTE = ['#0A4A6B', '#C9882A', '#1677A6', '#E58B73', '#0EA5E9']
 
             const pendingMedWindowMinutes = nextPendingMed
               ? (medsList.find(m => m.id === nextPendingMed.medicationId)?.time_window_minutes ?? 60)
@@ -3661,6 +3661,20 @@ export default function Dashboard() {
 
             return (
               <>
+                {/* ══ SALUDO — cambia según la hora (UX nov 2026) ══ */}
+                {(() => {
+                  const h = new Date().getHours()
+                  const [g, e] = h < 12 ? ['Buenos días', '☀️'] : h < 19 ? ['Buenas tardes', '🌤️'] : ['Buenas noches', '🌙']
+                  return (
+                    <div style={{ marginBottom: -10 }}>
+                      <p style={{ margin: 0, fontSize: 23, fontWeight: 800, color: '#14303D', letterSpacing: '-0.02em' }}>{g}{firstName ? `, ${firstName}` : ''} {e}</p>
+                      <p style={{ margin: '3px 0 0', fontSize: 16, color: '#4E6470' }}>
+                        {patientFirstName ? `Así va ${patientFirstName} hoy` : 'Empecemos a organizar el cuidado'}
+                      </p>
+                    </div>
+                  )
+                })()}
+
                 {/* ══════════════════════════════════════════
                     HERO — CareCard (paleta app: teal/coral emergencia/gold — ver CLAUDE.md)
                     ══════════════════════════════════════════ */}
@@ -3697,6 +3711,38 @@ export default function Dashboard() {
                   </div>
                 )}
 
+                {/* ══ LA FAMILIA HOY — caritas, como los estados de WhatsApp ══ */}
+                {familyMembers.length > 1 && (
+                  <button onClick={() => navigate('/familia')} style={{ width: '100%', textAlign: 'left', background: 'white', border: '1px solid #E6E3DB', borderRadius: 20, padding: '14px 16px', cursor: 'pointer' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                      <span style={{ fontSize: 17, fontWeight: 800, color: '#14303D' }}>La familia hoy</span>
+                      <span style={{ fontSize: 14, fontWeight: 600, color: '#0C6C9C' }}>Ver familia ›</span>
+                    </div>
+                    <div style={{ display: 'flex', gap: 14, overflowX: 'auto', paddingBottom: 2 }}>
+                      {familyMembers.map((m, i) => {
+                        const name = m.id === user?.id ? 'Tú' : (m.full_name?.split(' ')[0] || m.email?.split('@')[0] || 'Familiar')
+                        const active = m.last_seen && Date.now() - new Date(m.last_seen).getTime() < 24 * 60 * 60 * 1000
+                        const colors = ['#0C6C9C', '#E9826E', '#2BB8CC', '#0A4A6B', '#C9654F']
+                        return (
+                          <div key={m.id || i} style={{ flex: 'none', width: 62, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+                            <span style={{ position: 'relative', width: 52, height: 52, borderRadius: '50%', background: colors[i % colors.length], color: 'white', fontSize: 21, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', border: active ? '3px solid #4FD0E0' : '3px solid #E6E3DB' }}>
+                              {name.charAt(0).toUpperCase()}
+                            </span>
+                            <span style={{ fontSize: 13, fontWeight: 600, color: '#30454F', maxWidth: 62, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</span>
+                          </div>
+                        )
+                      })}
+                      {isAdmin && (
+                        <span onClick={e => { e.stopPropagation(); navigate('/familia?invitar=1') }} style={{ flex: 'none', width: 62, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+                          <span style={{ width: 52, height: 52, borderRadius: '50%', border: '2px dashed #0C6C9C', color: '#0C6C9C', fontSize: 26, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>+</span>
+                          <span style={{ fontSize: 13, fontWeight: 600, color: '#0C6C9C' }}>Invitar</span>
+                        </span>
+                      )}
+                    </div>
+                    <p style={{ margin: '10px 0 0', fontSize: 13, color: '#5E7480' }}>El borde turquesa es quien entró hoy.</p>
+                  </button>
+                )}
+
                 {/* ══ ATENCIÓN — medicamento pendiente (v0: AttentionCard) ══ */}
                 {nextPendingMed && (
                   <AttentionCard
@@ -3721,14 +3767,12 @@ export default function Dashboard() {
                   summaryStale={!loading && activitySummaryStale}
                 />
 
-                {/* ══ MILO Y LUNA (v0: PetsCard) ══ */}
-                <PetsCard onOpen={() => setShowCompanion(true)} patientFirstName={patientFirstName} />
 
                 {/* ════════════════════════════════════
                     ACCIONES RÁPIDAS + MÁS HERRAMIENTAS — directo sobre el fondo crema
                     ════════════════════════════════════ */}
                 <div>
-                  <p style={{ margin: '0 0 14px', display: 'flex', alignItems: 'center', gap: 9, fontFamily: "'Fraunces', Georgia, serif", fontSize: 18, fontWeight: 600, color: '#2A4350' }}>
+                  <p style={{ margin: '0 0 14px', display: 'flex', alignItems: 'center', gap: 9, fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 18, fontWeight: 600, color: '#2A4350' }}>
                     <Zap size={18} color="#0C6C9C" filled /> Acciones rápidas
                   </p>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 11 }}>
@@ -3763,49 +3807,9 @@ export default function Dashboard() {
                   </div>
                 </div>
 
-                {/* ════════════════════════════════════
-                    TODO EL CUIDADO — 4 destacadas + Ver todas → /mas
-                    ════════════════════════════════════ */}
-                {(() => {
-                  const featuredTools = [
-                    { Icon: ClipboardCheck, label: 'Reportes para el médico', onClick: () => navigate('/reportes'), circleBg: '#E3F1F8', iconColor: '#0A5A82' },
-                    { Icon: Video,     label: 'Videollamada', onClick: () => navigate('/videollamada'),  circleBg: '#E3F1F8', iconColor: '#0A5A82' },
-                    { Icon: Building2, label: 'Modo hospital', onClick: () => setShowHospitalModal(true), circleBg: '#FEF0ED', iconColor: '#E9826E' },
-                  ]
-                  return (
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-                        <p style={{ margin: 0, display: 'flex', alignItems: 'center', gap: 9, fontFamily: "'Fraunces', Georgia, serif", fontSize: 18, fontWeight: 600, color: '#2A4350' }}>Todo el cuidado</p>
-                        <button onClick={() => navigate('/mas')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 14, color: '#0C6C9C', fontWeight: 700, padding: 0, WebkitTapHighlightColor: 'transparent' }}>Ver todas</button>
-                      </div>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 11 }}>
-                        {featuredTools.map(({ Icon, label, onClick, circleBg, iconColor }) => (
-                          <button
-                            key={label} onClick={onClick}
-                            style={{
-                              background: 'white', border: '1px solid rgba(51,65,85,0.05)',
-                              borderRadius: 20, padding: '15px 6px 12px', cursor: 'pointer',
-                              width: '100%', minWidth: 0, boxSizing: 'border-box',
-                              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 9,
-                              boxShadow: '0 5px 18px -10px rgba(51,65,85,0.18)',
-                              WebkitTapHighlightColor: 'transparent',
-                            }}
-                          >
-                            <span style={{
-                              width: 44, height: 44, borderRadius: 14,
-                              background: circleBg,
-                              display: 'flex', alignItems: 'center', justifyContent: 'center',
-                              flexShrink: 0,
-                            }}>
-                              <Icon size={22} color={iconColor} strokeWidth={1.9} />
-                            </span>
-                            <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#475569', lineHeight: 1.3, textAlign: 'center' }}>{label}</p>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )
-                })()}
+                <button onClick={() => navigate('/mas')} style={{ alignSelf: 'center', background: 'none', border: 'none', padding: '4px 8px', fontSize: 15, fontWeight: 700, color: '#0C6C9C', cursor: 'pointer' }}>
+                  Ver todo el cuidado ›
+                </button>
               </>
             )
           })()}
@@ -3835,7 +3839,7 @@ export default function Dashboard() {
         >
           <div style={{ background: 'white', borderRadius: 20, padding: '28px 24px', maxWidth: 340, width: '100%', boxShadow: '0 24px 64px rgba(0,0,0,0.25)', textAlign: 'center' }}>
             <div style={{ fontSize: 40, marginBottom: 14 }}>⚠️</div>
-            <p style={{ fontFamily: 'Georgia, serif', fontSize: 17, fontWeight: 700, color: '#14303D', marginBottom: 8 }}>
+            <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 17, fontWeight: 700, color: '#14303D', marginBottom: 8 }}>
               Confirmar como administrador
             </p>
             <p style={{ fontSize: 13, color: '#7A5A18', lineHeight: 1.6, marginBottom: 8, background: '#FFFBEB', border: '1px solid #FDE68A', borderRadius: 12, padding: '10px 14px' }}>
@@ -4037,7 +4041,7 @@ export default function Dashboard() {
                   <p style={{ margin: 0, fontSize: 13, fontWeight: 500, color: '#5E7480', letterSpacing: '0.03em', textTransform: 'uppercase' }}>
                     Cuidando a
                   </p>
-                  <p style={{ margin: '2px 0 0', fontSize: 18, fontWeight: 700, color: '#0A4A6B', fontFamily: 'Georgia, serif' }}>
+                  <p style={{ margin: '2px 0 0', fontSize: 18, fontWeight: 700, color: '#0A4A6B', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}>
                     {activePatientName || activeFamilyLabel || 'Mi familiar'}
                   </p>
                 </div>
@@ -4059,7 +4063,7 @@ export default function Dashboard() {
                   const isAdm = m.role === 'admin'
                   const isCuid = m.role === 'cuidador'
                   const roleLabel = isAdm ? 'Admin' : isCuid ? 'Cuidador' : 'Familiar'
-                  const roleColor = isAdm ? '#15803D' : isCuid ? '#1D4ED8' : '#D97706'
+                  const roleColor = isAdm ? '#0A4A6B' : isCuid ? '#1D4ED8' : '#D97706'
                   const roleBg = isAdm ? '#DCFCE7' : isCuid ? '#DBEAFE' : '#FEF3C7'
                   const displayName = m.full_name?.trim() || (m.email ? m.email.split('@')[0] : 'Sin nombre')
                   const initial = displayName.charAt(0).toUpperCase()
@@ -4068,7 +4072,7 @@ export default function Dashboard() {
                     const diffMs = Date.now() - new Date(m.last_seen).getTime()
                     const diffMin = diffMs / 60000
                     const diffH = diffMs / 3600000
-                    if (diffMin <= 5) return { dot: '🟢', label: 'En línea', color: '#15803D' }
+                    if (diffMin <= 5) return { dot: '🟢', label: 'En línea', color: '#0A4A6B' }
                     if (diffH <= 24) {
                       const label = diffH < 1 ? `Hace ${Math.round(diffMin)}min` : `Hace ${Math.round(diffH)}h`
                       return { dot: '🟡', label, color: '#D97706' }
@@ -4113,7 +4117,7 @@ export default function Dashboard() {
                       {otherFamilies.map(fam => {
                         const isCuid = fam.role === 'cuidador'
                         const famRoleLabel = fam.role === null ? 'Admin' : isCuid ? 'Cuidador' : 'Familiar'
-                        const famRoleColor = fam.role === null ? '#15803D' : isCuid ? '#1D4ED8' : '#D97706'
+                        const famRoleColor = fam.role === null ? '#0A4A6B' : isCuid ? '#1D4ED8' : '#D97706'
                         const famRoleBg = fam.role === null ? '#DCFCE7' : isCuid ? '#DBEAFE' : '#FEF3C7'
                         const famInitial = (fam.patientName ?? 'F').charAt(0).toUpperCase()
                         return (

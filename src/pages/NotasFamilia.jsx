@@ -143,9 +143,9 @@ export default function NotasFamilia() {
         {tab === 'grabar' && (
           <div>
             {saved && (
-              <div style={{ background: '#DCFCE7', borderRadius: 12, padding: '12px 16px', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 10, border: '1px solid #BBF7D0' }}>
+              <div style={{ background: '#DCFCE7', borderRadius: 12, padding: '12px 16px', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 10, border: '1px solid #A6E3EC' }}>
                 <span style={{ fontSize: 18 }}>✅</span>
-                <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#15803D' }}>Nota guardada</p>
+                <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#0A4A6B' }}>Nota guardada</p>
               </div>
             )}
 

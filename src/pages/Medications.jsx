@@ -1048,7 +1048,7 @@ export default function Medications() {
           </button>
           <div style={{ minWidth: 0 }}>
             <div style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontWeight: 800, fontSize: 21, color: '#14303D', letterSpacing: '-0.3px' }}>Medicamentos</div>
-            <div style={{ fontFamily: "'Fraunces', Georgia, serif", fontStyle: 'italic', fontWeight: 500, fontSize: 13.5, color: '#0C6C9C', marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <div style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontStyle: 'italic', fontWeight: 500, fontSize: 13.5, color: '#0C6C9C', marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               Cuidando a {activePatientName || profile?.name || 'tu familiar'}
             </div>
           </div>
@@ -1171,7 +1171,7 @@ export default function Medications() {
                   boxShadow: isAllDone ? '0 8px 20px -10px #087F7055' : '0 8px 20px -10px #E9826E44',
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <div style={{ fontFamily: "'Fraunces', Georgia, serif", fontStyle: 'italic', fontWeight: 600, fontSize: 17.5, color: '#0A5A82', lineHeight: 1.35 }}>{title}</div>
+                    <div style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontStyle: 'italic', fontWeight: 600, fontSize: 17.5, color: '#0A5A82', lineHeight: 1.35 }}>{title}</div>
                     {isAllDone && <Heart size={17} color="#E9826E" strokeWidth={2} filled />}
                   </div>
                   <div style={{ fontSize: 13.5, color: '#3E5A54', marginTop: 6, lineHeight: 1.5 }}>{subtitle}</div>
@@ -1504,7 +1504,7 @@ export default function Medications() {
             <div style={{ background: '#FFFFFF', borderRadius: 20, padding: '18px 18px', textAlign: 'center', boxShadow: '0 6px 14px -8px #087F7022' }}>
               <p style={{ fontSize: 13, color: '#4E6470', margin: 0, lineHeight: 1.55 }}>
                 Cada pequeño cuidado cuenta. Gracias por estar pendiente de{' '}
-                <span style={{ fontFamily: "'Fraunces', Georgia, serif", fontStyle: 'italic', color: '#0C6C9C', fontWeight: 600 }}>
+                <span style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontStyle: 'italic', color: '#0C6C9C', fontWeight: 600 }}>
                   {(activePatientName || profile?.name || 'tu familiar').split(' ')[0]}
                 </span>.
               </p>
@@ -1576,7 +1576,7 @@ export default function Medications() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <p style={{ fontSize: 14, color: '#5C6B78', margin: '0 0 8px', lineHeight: 1.5 }}>
                   Cuéntanos qué medicamento cuida a{' '}
-                  <span style={{ fontFamily: "'Fraunces', Georgia, serif", fontStyle: 'italic', color: '#0C6C9C', fontWeight: 600 }}>
+                  <span style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontStyle: 'italic', color: '#0C6C9C', fontWeight: 600 }}>
                     {(activePatientName || profile?.name || 'tu familiar').split(' ')[0]}
                   </span>, como prefieras.
                 </p>
@@ -1914,9 +1914,9 @@ export default function Medications() {
 
                   {/* Duration preview */}
                   {stockPreviewDays && (
-                    <div style={{ marginTop: 8, padding: '10px 14px', background: '#E3F1F8', borderRadius: 10, border: '1px solid #BBF7D0', display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{ marginTop: 8, padding: '10px 14px', background: '#E3F1F8', borderRadius: 10, border: '1px solid #A6E3EC', display: 'flex', alignItems: 'center', gap: 8 }}>
                       <span>📅</span>
-                      <p style={{ fontSize: 14, color: '#15803D', fontWeight: 600, margin: 0 }}>
+                      <p style={{ fontSize: 14, color: '#0A4A6B', fontWeight: 600, margin: 0 }}>
                         Duración: {stockPreviewDays.days} días · Se acaba aprox. el {stockPreviewDays.date}
                       </p>
                     </div>

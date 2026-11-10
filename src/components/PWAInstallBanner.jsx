@@ -39,7 +39,7 @@ export default function PWAInstallBanner() {
     return (
       <div style={{
         position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 8900,
-        background: 'linear-gradient(135deg, #15803D, #166534)',
+        background: 'linear-gradient(135deg, #0A4A6B, #166534)',
         padding: '16px 20px',
         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
         boxShadow: '0 -4px 24px rgba(0,0,0,0.25)',

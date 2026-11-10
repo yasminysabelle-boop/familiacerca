@@ -384,7 +384,7 @@ export default function OnboardingFlow() {
           <>
             <div style={{ textAlign: 'center', marginBottom: 32 }}>
               <div style={{ fontSize: 56, marginBottom: 16, lineHeight: 1 }}>🏠</div>
-              <p style={{ fontSize: 28, fontWeight: 800, color: '#14303D', fontFamily: 'Georgia, serif', lineHeight: 1.2, margin: '0 0 12px' }}>
+              <p style={{ fontSize: 28, fontWeight: 800, color: '#14303D', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", lineHeight: 1.2, margin: '0 0 12px' }}>
                 Bienvenido a FamiliaCerca
               </p>
               <p style={{ fontSize: 16, color: '#718096', margin: 0, lineHeight: 1.6 }}>
@@ -418,7 +418,7 @@ export default function OnboardingFlow() {
         {/* ════ PASO 2 — PERFIL BÁSICO ════ */}
         {step === 2 && (
           <>
-            <p style={{ fontSize: 26, fontWeight: 800, color: '#14303D', fontFamily: 'Georgia, serif', lineHeight: 1.25, margin: '0 0 6px' }}>
+            <p style={{ fontSize: 26, fontWeight: 800, color: '#14303D', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", lineHeight: 1.25, margin: '0 0 6px' }}>
               Cuéntanos sobre tu familiar
             </p>
             <p style={{ fontSize: 14, color: '#718096', margin: '0 0 28px' }}>
@@ -494,7 +494,7 @@ export default function OnboardingFlow() {
         {/* ════ PASO 3 — SOBRE EL CUIDADO ════ */}
         {step === 3 && (
           <>
-            <p style={{ fontSize: 26, fontWeight: 800, color: '#14303D', fontFamily: 'Georgia, serif', lineHeight: 1.25, margin: '0 0 24px' }}>
+            <p style={{ fontSize: 26, fontWeight: 800, color: '#14303D', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", lineHeight: 1.25, margin: '0 0 24px' }}>
               Sobre el cuidado
             </p>
 
@@ -543,7 +543,7 @@ export default function OnboardingFlow() {
         {/* ════ PASO 4 — PRIMER MEDICAMENTO ════ */}
         {step === 4 && (
           <>
-            <p style={{ fontSize: 26, fontWeight: 800, color: '#14303D', fontFamily: 'Georgia, serif', lineHeight: 1.25, margin: '0 0 8px' }}>
+            <p style={{ fontSize: 26, fontWeight: 800, color: '#14303D', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", lineHeight: 1.25, margin: '0 0 8px' }}>
               Hagamos algo juntos
             </p>
             <p style={{ fontSize: 14, color: '#718096', margin: '0 0 20px', lineHeight: 1.5 }}>
@@ -595,7 +595,7 @@ export default function OnboardingFlow() {
         {/* ════ PASO 5 — INVITA AL EQUIPO ════ */}
         {step === 5 && (
           <>
-            <p style={{ fontSize: 26, fontWeight: 800, color: '#14303D', fontFamily: 'Georgia, serif', lineHeight: 1.25, margin: '0 0 8px' }}>
+            <p style={{ fontSize: 26, fontWeight: 800, color: '#14303D', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", lineHeight: 1.25, margin: '0 0 8px' }}>
               Invita a alguien del equipo
             </p>
             <p style={{ fontSize: 14, color: '#718096', margin: '0 0 28px', lineHeight: 1.5 }}>
@@ -690,7 +690,7 @@ export default function OnboardingFlow() {
           <>
             <div style={{ textAlign: 'center', marginBottom: 32 }}>
               <div style={{ fontSize: 56, marginBottom: 14, lineHeight: 1 }}>🎉</div>
-              <p style={{ fontSize: 26, fontWeight: 800, color: '#14303D', fontFamily: 'Georgia, serif', lineHeight: 1.25, margin: '0 0 10px' }}>
+              <p style={{ fontSize: 26, fontWeight: 800, color: '#14303D', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", lineHeight: 1.25, margin: '0 0 10px' }}>
                 {patientName.trim()
                   ? `¡Listo! Ya están organizados para cuidar a ${patientName.trim()}.`
                   : '¡Todo listo!'}

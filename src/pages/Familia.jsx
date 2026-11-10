@@ -566,14 +566,14 @@ export default function Familia() {
                           : <span style={{ fontSize: 16, fontWeight: 700, color: '#0C6C9C' }}>{adminInitials}</span>
                         }
                       </div>
-                      <div style={{ position: 'absolute', bottom: 0, right: 0, width: 12, height: 12, borderRadius: '50%', border: '2px solid white', background: adminOnline ? '#22C55E' : '#5E7480' }} />
+                      <div style={{ position: 'absolute', bottom: 0, right: 0, width: 12, height: 12, borderRadius: '50%', border: '2px solid white', background: adminOnline ? '#2BB8CC' : '#5E7480' }} />
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p style={{ fontSize: 14, fontWeight: 600, color: '#14303D', margin: '0 0 2px' }}>
                         {adminName.split(' ')[0]}
                         {isAdmin && <span style={{ marginLeft: 6, fontSize: 12, fontWeight: 700, color: '#0C6C9C', background: '#E3F1F8', padding: '2px 7px', borderRadius: 6 }}>Tú</span>}
                       </p>
-                      <p style={{ fontSize: 13, color: adminOnline ? '#16A34A' : '#5E7480', margin: 0 }}>
+                      <p style={{ fontSize: 13, color: adminOnline ? '#0C6C9C' : '#5E7480', margin: 0 }}>
                         {adminOnline
                           ? '🟢 En línea ahora'
                           : (() => {
@@ -630,14 +630,14 @@ export default function Familia() {
                         position: 'absolute', bottom: 0, right: 0,
                         width: 12, height: 12, borderRadius: '50%',
                         border: '2px solid white',
-                        background: online ? '#22C55E' : '#5E7480',
+                        background: online ? '#2BB8CC' : '#5E7480',
                       }} />
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p style={{ fontSize: 14, fontWeight: 600, color: '#14303D', margin: '0 0 2px' }}>
                         {name.split(' ')[0]}
                       </p>
-                      <p style={{ fontSize: 13, color: online ? '#16A34A' : '#5E7480', margin: 0 }}>
+                      <p style={{ fontSize: 13, color: online ? '#0C6C9C' : '#5E7480', margin: 0 }}>
                         {online
                           ? '🟢 En línea ahora'
                           : (() => {
@@ -719,7 +719,7 @@ export default function Familia() {
                     }
                   </div>
                   <div style={{ position: 'absolute', bottom: 0, right: 0, width: 16, height: 16,
-                    borderRadius: '50%', border: '2px solid white', background: online ? '#22C55E' : '#5E7480' }} />
+                    borderRadius: '50%', border: '2px solid white', background: online ? '#2BB8CC' : '#5E7480' }} />
                 </div>
                 <p style={{ fontFamily: SANS, fontSize: 18, fontWeight: 700, color: '#14303D', margin: 0 }}>{name}</p>
                 {mc?.relationship && <p style={{ fontSize: 13, color: '#5E7480', margin: '4px 0 0' }}>{mc.relationship}</p>}
@@ -827,7 +827,7 @@ export default function Familia() {
                 <a href={`tel:${mc.phone}`} style={{
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
                   width: '100%', padding: '13px', borderRadius: 16, marginBottom: 10,
-                  background: 'linear-gradient(135deg, #22C55E, #16A34A)',
+                  background: 'linear-gradient(135deg, #2BB8CC, #0C6C9C)',
                   color: 'white', fontWeight: 700, fontSize: 14, textDecoration: 'none',
                   boxShadow: '0 4px 16px rgba(34,197,94,0.3)',
                 }}>
@@ -963,9 +963,9 @@ export default function Familia() {
             {inviteStatus === 'success' ? (
               <div>
                 {emailSent ? (
-                  <div style={{ padding: 16, background: '#F0FDF4', border: '1px solid #BBF7D0', borderRadius: 12, marginBottom: 14, textAlign: 'center' }}>
+                  <div style={{ padding: 16, background: '#E3F1F8', border: '1px solid #A6E3EC', borderRadius: 12, marginBottom: 14, textAlign: 'center' }}>
                     <p style={{ fontSize: 22, margin: '0 0 6px' }}>📧</p>
-                    <p style={{ fontSize: 14, fontWeight: 700, color: '#15803D', margin: '0 0 4px' }}>¡Invitación enviada!</p>
+                    <p style={{ fontSize: 14, fontWeight: 700, color: '#0A4A6B', margin: '0 0 4px' }}>¡Invitación enviada!</p>
                     <p style={{ fontSize: 14, color: '#0A4A6B', margin: 0 }}>
                       Le llegará un email a <strong>{inviteEmail}</strong> con el enlace para unirse.
                     </p>

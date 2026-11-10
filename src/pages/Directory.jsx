@@ -266,7 +266,7 @@ function ContactCard({ con, onEdit, onToggleEmergency, onDeleteRequest, canDelet
         <a href={`tel:${con.phone}`} style={{
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
           marginTop: 12, padding: '11px', borderRadius: 12,
-          background: 'linear-gradient(135deg, #22C55E, #16A34A)',
+          background: 'linear-gradient(135deg, #2BB8CC, #0C6C9C)',
           color: 'white', fontWeight: 700, fontSize: 13,
           textDecoration: 'none', boxShadow: '0 4px 16px rgba(34,197,94,0.3)',
         }}>
@@ -294,8 +294,8 @@ function ContactCard({ con, onEdit, onToggleEmergency, onDeleteRequest, canDelet
 function JoinedMemberCard({ member, inDirectory, onClick }) {
   const roleLabel  = member.role === 'cuidador' ? 'Cuidador' : 'Familiar'
   const roleColor  = member.role === 'cuidador' ? '#0C6C9C' : '#7C5CBF'
-  const roleBg     = member.role === 'cuidador' ? '#F0FDF4' : '#EDE9FE'
-  const roleBorder = member.role === 'cuidador' ? '#BBF7D0' : '#C4B5FD'
+  const roleBg     = member.role === 'cuidador' ? '#E3F1F8' : '#EDE9FE'
+  const roleBorder = member.role === 'cuidador' ? '#A6E3EC' : '#C4B5FD'
   return (
     <div
       onClick={onClick}
@@ -959,7 +959,7 @@ export default function Directory() {
 
             {/* Call & email buttons */}
             {emergency?.phone && (
-              <a href={`tel:${emergency.phone}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, padding: '15px', borderRadius: 16, background: 'linear-gradient(135deg, #22C55E, #16A34A)', color: 'white', fontWeight: 700, fontSize: 15, textDecoration: 'none', boxShadow: '0 6px 24px rgba(34,197,94,0.35)', marginBottom: 10 }}>
+              <a href={`tel:${emergency.phone}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, padding: '15px', borderRadius: 16, background: 'linear-gradient(135deg, #2BB8CC, #0C6C9C)', color: 'white', fontWeight: 700, fontSize: 15, textDecoration: 'none', boxShadow: '0 6px 24px rgba(34,197,94,0.35)', marginBottom: 10 }}>
                 <Phone size={20} color="white" strokeWidth={2} />
                 Llamar ahora
               </a>

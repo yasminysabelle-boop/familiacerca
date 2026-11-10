@@ -80,7 +80,7 @@ export default function HospitalInfoCard() {
         </p>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           {saved && (
-            <span style={{ fontSize: 13, color: '#16A34A', fontWeight: 700 }}>✓ Guardado</span>
+            <span style={{ fontSize: 13, color: '#0C6C9C', fontWeight: 700 }}>✓ Guardado</span>
           )}
           <button
             onClick={() => { setEditing(e => !e); setSaved(false) }}

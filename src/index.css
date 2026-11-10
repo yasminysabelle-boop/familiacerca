@@ -53,12 +53,12 @@ body {
 
 /* Serif for all headings */
 h1, h2, h3 {
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
 }
 
 /* Utility for explicit serif use */
 .font-serif {
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
 }
 
 /* Warm card shadow utility */

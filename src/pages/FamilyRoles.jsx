@@ -8,7 +8,7 @@ import Layout from '../components/Layout'
 const ROLE_META = {
   admin:    { label: 'Admin',    color: '#0A4A6B', bg: '#E3F1F8' },
   cuidador: { label: 'Cuidador', color: '#1D4ED8', bg: '#EFF6FF' },
-  familiar: { label: 'Familiar', color: '#7C3AED', bg: '#F5F3FF' },
+  familiar: { label: 'Familiar', color: '#1677A6', bg: '#F5F3FF' },
 }
 
 function roleKey(role) {
@@ -208,7 +208,7 @@ export default function FamilyRoles() {
           ← Mi cuenta
         </button>
 
-        <h1 style={{ margin: '0 0 4px', fontSize: 20, fontWeight: 700, color: '#0A4A6B', fontFamily: 'Georgia, serif' }}>
+        <h1 style={{ margin: '0 0 4px', fontSize: 20, fontWeight: 700, color: '#0A4A6B', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}>
           Quién ve qué
         </h1>
         <p style={{ margin: '0 0 20px', fontSize: 13, color: '#5E7480', lineHeight: 1.5 }}>

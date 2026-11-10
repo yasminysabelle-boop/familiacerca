@@ -91,7 +91,7 @@ export default function MedicationStockList() {
 
       {/* Header */}
       <div style={{ marginBottom: 16 }}>
-        <h2 style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 600, fontSize: 18, color: '#14303D', margin: 0 }}>
+        <h2 style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontWeight: 600, fontSize: 18, color: '#14303D', margin: 0 }}>
           Inventario
         </h2>
         <p style={{ fontSize: 13, color: '#4E6470', margin: '2px 0 0' }}>

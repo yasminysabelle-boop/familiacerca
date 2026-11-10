@@ -46,7 +46,7 @@ export default function HospitalDashboard({ onManageMode, onSOS, onVideoCall }) 
           style={{ width: 40, height: 40, objectFit: 'contain', flexShrink: 0 }}
           onError={e => { e.currentTarget.style.display = 'none' }}
         />
-        <span style={{ fontFamily: 'Georgia, serif', fontSize: 19, fontWeight: 700, lineHeight: 1 }}>
+        <span style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 19, fontWeight: 700, lineHeight: 1 }}>
           <span style={{ color: '#0A4A6B' }}>Familia</span>
           <span style={{ color: '#E58B73' }}>Cerca</span>
         </span>
@@ -79,7 +79,7 @@ export default function HospitalDashboard({ onManageMode, onSOS, onVideoCall }) 
         subtitle="Mantente comunicado con el equipo"
         color="#0A5A82"
         bg="#E3F1F8"
-        border="#BBF7D0"
+        border="#A6E3EC"
       />
 
       {/* 7. Videollamada */}

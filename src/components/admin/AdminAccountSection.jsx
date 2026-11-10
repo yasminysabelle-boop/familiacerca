@@ -4,7 +4,7 @@ import { useBillingAccount } from '../../contexts/BillingAccountContext'
 const PLAN_META = {
   free:      { label: 'Gratis',        color: '#5E7480', icon: '🌱', features: ['2 cuidadores', 'Chat familiar', 'Medicamentos básicos', 'Historial 7 días'] },
   familiar:  { label: 'Plan Familiar',   color: '#0C6C9C', icon: '❤️', features: ['6 cuidadores', 'Recordatorios automáticos', 'Notas de voz', 'Foto-prueba', 'Reportes PDF', 'Álbum familiar', 'Gastos de cuidado', 'Historial 90 días'] },
-  care_plus: { label: 'Cuidado Total',   color: '#7C3AED', icon: '⭐', features: ['Cuidadores ilimitados', 'Alertas SOS prioritarias', 'Reporte semanal IA', 'Historial indefinido', 'Soporte prioritario'] },
+  care_plus: { label: 'Cuidado Total',   color: '#1677A6', icon: '⭐', features: ['Cuidadores ilimitados', 'Alertas SOS prioritarias', 'Reporte semanal IA', 'Historial indefinido', 'Soporte prioritario'] },
 }
 
 const STATUS_LABEL = {

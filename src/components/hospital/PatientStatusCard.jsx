@@ -52,7 +52,7 @@ export default function PatientStatusCard() {
           padding: '10px 12px',
           borderRadius: 10,
           background: '#E3F1F8',
-          border: '1px solid #BBF7D0',
+          border: '1px solid #A6E3EC',
           marginBottom: 12,
         }}>
           <p style={{ margin: 0, fontSize: 13, color: '#1A5C35', lineHeight: 1.5 }}>

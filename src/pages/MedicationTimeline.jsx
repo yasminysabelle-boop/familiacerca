@@ -36,7 +36,7 @@ const HAIRLINE          = 'rgba(51,65,85,0.09)'
 const SHADOW_CARD       = '0 6px 14px -8px #087F7022'
 const SHADOW_CORAL      = '0 6px 14px -8px #E9826E44'
 const GRADIENT_BRAND    = 'linear-gradient(148deg,#1677A6 0%,#0C6C9C 46%,#0A5A82 100%)'
-const SERIF             = "'Fraunces', Georgia, serif"
+const SERIF             = "'Plus Jakarta Sans', system-ui, sans-serif"
 
 // Tono de categoría — mismo lenguaje que los pills del Chat (teal/coral/gold/cool),
 // coral-emergencia reservado solo para SOS (urgencia real).

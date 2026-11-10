@@ -270,7 +270,7 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
                 border: '2px solid rgba(255,255,255,0.35)' }} />
             <div style={{ flex: 1 }}>
               <p style={{ color: 'white', fontWeight: 700, fontSize: 14, margin: 0,
-                fontFamily: 'Georgia, serif' }}>
+                fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}>
                 {cfg.name}
               </p>
               <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 13, margin: 0 }}>

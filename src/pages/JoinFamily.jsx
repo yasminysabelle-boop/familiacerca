@@ -50,7 +50,7 @@ function PatientAvatar({ photo, name, size = 80 }) {
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       fontSize: Math.round(size * 0.38), fontWeight: 700, color: 'white',
       border: '3px solid white', boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
-      fontFamily: 'Georgia, serif', flexShrink: 0,
+      fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", flexShrink: 0,
     }}>
       {initial}
     </div>
@@ -434,7 +434,7 @@ export default function JoinFamily() {
           {!invLoading && !sessionLoading && invError && (
             <div style={CARD}>
               <div style={{ fontSize: 48, marginBottom: 16 }}>🔗</div>
-              <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#14303D', marginBottom: 8 }}>
+              <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 18, fontWeight: 700, color: '#14303D', marginBottom: 8 }}>
                 Enlace no válido
               </p>
               <p style={{ fontSize: 13, color: '#4E6470', lineHeight: 1.6, marginBottom: 24 }}>
@@ -450,7 +450,7 @@ export default function JoinFamily() {
           {!invLoading && invitation && isExpired(invitation) && (
             <div style={CARD}>
               <div style={{ fontSize: 48, marginBottom: 16 }}>⏰</div>
-              <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#14303D', marginBottom: 8 }}>
+              <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 18, fontWeight: 700, color: '#14303D', marginBottom: 8 }}>
                 Invitación expirada
               </p>
               <p style={{ fontSize: 13, color: '#4E6470', lineHeight: 1.6, marginBottom: 24 }}>
@@ -466,7 +466,7 @@ export default function JoinFamily() {
           {!invLoading && invitation && invitation.status === 'accepted' && !accepted && !alreadyMember && (
             <div style={CARD}>
               <div style={{ fontSize: 48, marginBottom: 16 }}>🔒</div>
-              <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#14303D', marginBottom: 8 }}>
+              <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 18, fontWeight: 700, color: '#14303D', marginBottom: 8 }}>
                 Invitación ya usada
               </p>
               <p style={{ fontSize: 13, color: '#4E6470', lineHeight: 1.6, marginBottom: 24 }}>
@@ -482,7 +482,7 @@ export default function JoinFamily() {
           {alreadyMember && (
             <div style={CARD}>
               <div style={{ fontSize: 48, marginBottom: 16 }}>✅</div>
-              <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#14303D', marginBottom: 8 }}>
+              <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 18, fontWeight: 700, color: '#14303D', marginBottom: 8 }}>
                 Ya formas parte de esta familia
               </p>
               <p style={{ fontSize: 13, color: '#4E6470', lineHeight: 1.6, marginBottom: 24 }}>
@@ -500,7 +500,7 @@ export default function JoinFamily() {
               <div className="animate-heartbeat inline-flex" style={{ marginBottom: 16 }}>
                 <Heart size={56} color="#0A5A82" strokeWidth={1.2} filled />
               </div>
-              <p style={{ fontFamily: 'Georgia, serif', fontSize: 20, fontWeight: 700, color: '#14303D', marginBottom: 8 }}>
+              <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 20, fontWeight: 700, color: '#14303D', marginBottom: 8 }}>
                 ¡Bienvenido a la familia!
               </p>
               <p style={{ fontSize: 13, color: '#4E6470', lineHeight: 1.6, marginBottom: 24 }}>
@@ -524,7 +524,7 @@ export default function JoinFamily() {
               {invitation.role === 'familiar' ? (
                 <>
                   <p style={{
-                    fontFamily: "'Fraunces', Georgia, serif", fontStyle: 'italic', fontWeight: 500,
+                    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontStyle: 'italic', fontWeight: 500,
                     fontSize: 21, lineHeight: 1.3, color: '#14303D', margin: '0 0 10px',
                   }}>
                     No estar ahí no significa no estar cerca.
@@ -582,7 +582,7 @@ export default function JoinFamily() {
               ) : (
                 <>
                   <p style={{
-                    fontFamily: "'Fraunces', Georgia, serif", fontStyle: 'italic', fontWeight: 500,
+                    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontStyle: 'italic', fontWeight: 500,
                     fontSize: 21, lineHeight: 1.3, color: '#14303D', margin: '0 0 10px',
                   }}>
                     Ya no estás cuidando solo/a.
@@ -651,7 +651,7 @@ export default function JoinFamily() {
               /* Admin opening own link */
               <div style={CARD}>
                 <div style={{ fontSize: 48, marginBottom: 16 }}>⚠️</div>
-                <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#14303D', marginBottom: 8 }}>
+                <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 18, fontWeight: 700, color: '#14303D', marginBottom: 8 }}>
                   Abre desde otra cuenta
                 </p>
                 <p style={{ fontSize: 13, color: '#4E6470', lineHeight: 1.6, marginBottom: 24 }}>
@@ -666,7 +666,7 @@ export default function JoinFamily() {
               /* Wrong email warning */
               <div style={CARD}>
                 <div style={{ fontSize: 48, marginBottom: 16 }}>📧</div>
-                <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#14303D', marginBottom: 8 }}>
+                <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 18, fontWeight: 700, color: '#14303D', marginBottom: 8 }}>
                   Correo diferente
                 </p>
                 <p style={{ fontSize: 13, color: '#4E6470', lineHeight: 1.6, marginBottom: 4 }}>
@@ -694,7 +694,7 @@ export default function JoinFamily() {
               /* Acceptance failed */
               <div style={CARD}>
                 <div style={{ fontSize: 48, marginBottom: 16 }}>⚠️</div>
-                <p style={{ fontFamily: 'Georgia, serif', fontSize: 18, fontWeight: 700, color: '#14303D', marginBottom: 8 }}>
+                <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 18, fontWeight: 700, color: '#14303D', marginBottom: 8 }}>
                   No se pudo unir
                 </p>
                 <p style={{ fontSize: 13, color: '#4E6470', lineHeight: 1.6, marginBottom: 24 }}>
@@ -712,7 +712,7 @@ export default function JoinFamily() {
                   Uniéndote al grupo de cuidado...
                 </p>
                 {patientName && (
-                  <p style={{ fontFamily: 'Georgia, serif', fontSize: 16, fontWeight: 600, color: '#14303D', margin: 0 }}>
+                  <p style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontSize: 16, fontWeight: 600, color: '#14303D', margin: 0 }}>
                     {patientName}
                   </p>
                 )}

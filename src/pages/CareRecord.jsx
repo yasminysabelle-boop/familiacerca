@@ -56,8 +56,8 @@ const SECTIONS = [
 ]
 
 const MOOD_BG = {
-  excelente: { bg: '#F0FDF4', border: '#86EFAC', color: '#15803D' },
-  bien:      { bg: '#F0FDF4', border: '#86EFAC', color: '#15803D' },
+  excelente: { bg: '#E3F1F8', border: '#A6E3EC', color: '#0A4A6B' },
+  bien:      { bg: '#E3F1F8', border: '#A6E3EC', color: '#0A4A6B' },
   regular:   { bg: '#FFFBEB', border: '#FDE68A', color: '#92400E' },
   mal:       { bg: '#FEF2F2', border: '#FCA5A5', color: '#DC2626' },
 }
@@ -166,7 +166,7 @@ export default function CareRecord() {
           <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', margin: '0 0 4px', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
             {dayLabel(todayKey)}
           </p>
-          <h2 style={{ fontSize: 22, fontWeight: 700, color: 'white', fontFamily: 'Georgia, serif', margin: '0 0 6px' }}>
+          <h2 style={{ fontSize: 22, fontWeight: 700, color: 'white', fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", margin: '0 0 6px' }}>
             Síntomas físicos del día
           </h2>
           <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', margin: 0, lineHeight: 1.5 }}>
@@ -281,7 +281,7 @@ export default function CareRecord() {
                   width: '100%', padding: '15px',
                   borderRadius: 16, border: 'none',
                   background: saved
-                    ? 'linear-gradient(135deg, #22C55E, #16A34A)'
+                    ? 'linear-gradient(135deg, #2BB8CC, #0C6C9C)'
                     : (!hasAnySelection || saving)
                       ? '#D1D5DB'
                       : 'linear-gradient(148deg, #1677A6 0%, #0C6C9C 46%, #0A5A82 100%)',

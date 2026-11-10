@@ -11,12 +11,12 @@ import CompanionChat from '../components/CompanionChat'
 const LOCATION_META = {
   hospital: { label: 'Hospital',  emoji: '🏥', bg: '#FFF0F0', color: '#B91C1C' },
   consulta: { label: 'Consulta',  emoji: '🏪', bg: '#EFF6FF', color: '#1D4ED8' },
-  casa:     { label: 'Casa',      emoji: '🏠', bg: '#E3F1F8', color: '#15803D' },
+  casa:     { label: 'Casa',      emoji: '🏠', bg: '#E3F1F8', color: '#0A4A6B' },
   otro:     { label: 'Otro',      emoji: '📍', bg: '#F9F7F4', color: '#4E6470' },
 }
 
 const INPUT_META = {
-  voice: { label: '🎙️ Voz', bg: '#F5F0FF', color: '#7C3AED' },
+  voice: { label: '🎙️ Voz', bg: '#F5F0FF', color: '#1677A6' },
   photo: { label: '📷 Foto', bg: '#FFF7ED', color: '#C9882A' },
   text:  { label: '✏️ Texto', bg: '#F3F4F6', color: '#4E6470' },
 }
@@ -112,7 +112,7 @@ function EntryCard({ entry }) {
                 <span key={i} style={{
                   padding: '4px 10px', borderRadius: 20, fontSize: 14, fontWeight: 600,
                   background: '#E3F1F8', color: '#1A5C35',
-                  border: '1px solid #BBF7D0',
+                  border: '1px solid #A6E3EC',
                 }}>
                   {m.nombre}{m.dosis ? ` ${m.dosis}` : ''}{m.frecuencia ? ` · ${m.frecuencia}` : ''}
                 </span>
@@ -151,7 +151,7 @@ function EntryCard({ entry }) {
         {/* Raw transcript (expanded only) */}
         {expanded && entry.raw_transcript && (
           <div style={{ margin: '0 0 10px', padding: '8px 12px', borderRadius: 10, background: '#F5F0FF', border: '1px solid #DDD6FE' }}>
-            <p style={{ margin: '0 0 2px', fontSize: 12, fontWeight: 700, color: '#7C3AED', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Transcripción original</p>
+            <p style={{ margin: '0 0 2px', fontSize: 12, fontWeight: 700, color: '#1677A6', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Transcripción original</p>
             <p style={{ margin: 0, fontSize: 14, color: '#4E6470', lineHeight: 1.5, fontStyle: 'italic' }}>{entry.raw_transcript}</p>
           </div>
         )}
