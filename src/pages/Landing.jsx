@@ -122,6 +122,7 @@ export default function Landing() {
   const { installed, isIOS, isAndroid, canPrompt, install, isMobile } = usePWAInstall()
   const [pwaTab, setPwaTab] = useState(() => isAndroid ? 'android' : 'iphone')
   const [pwaInstallClicked, setPwaInstallClicked] = useState(false)
+  const [installHelp, setInstallHelp] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [annual, setAnnual] = useState(false)
   const [showBar, setShowBar] = useState(false)
@@ -765,18 +766,87 @@ export default function Landing() {
 
       {/* ─────────────── 17. STICKY BAR ─────────────── */}
       <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 9000, background: ACTION, padding: '14px 24px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, boxShadow: '0 -4px 24px rgba(0,0,0,0.22)', opacity: showBar && !dismissed ? 1 : 0, transform: showBar && !dismissed ? 'translateY(0)' : 'translateY(100%)', transition: 'opacity 0.35s ease, transform 0.35s cubic-bezier(0.16,1,0.3,1)', pointerEvents: showBar && !dismissed ? 'all' : 'none' }}>
-        {/* Un solo botón en toda la landing: "Empezar gratis" (antes competía
-            con "Instalar"). La instalación se explica después del registro. */}
-        <Link to="/register" onClick={() => track('sticky_bar_click', { action: 'register' })} className="cta-coral" style={{ color: WHITE, background: CORAL, borderRadius: 9999, padding: '10px 26px', fontFamily: SANS, fontWeight: 700, fontSize: 'clamp(15px, 2vw, 17px)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 8, boxShadow: '0 8px 22px rgba(0,0,0,0.18)' }}>
-          Empezar gratis
-          <span aria-hidden="true">→</span>
-        </Link>
+        {/* Dos cosas distintas, dos botones (nov 2026): registrarse es una cosa
+            e instalar la app en el teléfono es otra. Mientras no estemos en
+            las tiendas de Apple y Google, se instala desde aquí. */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, flexWrap: 'wrap', paddingRight: 30 }}>
+          <Link to="/register" onClick={() => track('sticky_bar_click', { action: 'register' })} className="cta-coral" style={{ color: WHITE, background: CORAL, borderRadius: 9999, padding: '10px 22px', fontFamily: SANS, fontWeight: 700, fontSize: 'clamp(15px, 2vw, 17px)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 8, boxShadow: '0 8px 22px rgba(0,0,0,0.18)' }}>
+            Empezar gratis
+            <span aria-hidden="true">→</span>
+          </Link>
+          {!installed && (
+            <button
+              onClick={async () => {
+                if (canPrompt) {
+                  track('sticky_bar_click', { action: 'install_prompt' })
+                  const outcome = await install()
+                  if (outcome === 'accepted') return
+                } else {
+                  track('sticky_bar_click', { action: 'install_help', ios: isIOS, android: isAndroid })
+                }
+                setPwaTab(isAndroid ? 'android' : 'iphone')
+                setInstallHelp(true)
+              }}
+              style={{ color: WHITE, background: 'transparent', border: '1.5px solid rgba(255,255,255,0.85)', borderRadius: 9999, padding: '9px 18px', fontFamily: SANS, fontWeight: 700, fontSize: 'clamp(15px, 2vw, 17px)', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 8 }}
+            >
+              <span aria-hidden="true">📲</span> Instalar la app
+            </button>
+          )}
+        </div>
         <button
           onClick={() => { setDismissed(true); track('sticky_bar_click', { action: 'dismiss' }) }}
           aria-label="Cerrar"
           style={{ position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.15)', border: 'none', borderRadius: '50%', width: 28, height: 28, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: WHITE, fontSize: 14, lineHeight: 1 }}
         >×</button>
       </div>
+
+      {/* Cómo instalar la app en el teléfono (sin tiendas) */}
+      {installHelp && (
+        <div role="dialog" aria-label="Instalar la app" onClick={() => setInstallHelp(false)} style={{ position: 'fixed', inset: 0, zIndex: 9500, background: 'rgba(8,30,42,0.5)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: '100%', maxWidth: 480, background: WHITE, borderRadius: '24px 24px 0 0', padding: '22px 22px calc(22px + env(safe-area-inset-bottom, 0px))', fontFamily: SANS, color: '#14303D' }}>
+            <h2 style={{ margin: 0, fontSize: 21, fontWeight: 800 }}>Pon FamiliaCerca en tu teléfono</h2>
+            <p style={{ margin: '6px 0 14px', fontSize: 16, color: '#4E6470', lineHeight: 1.5 }}>
+              Queda con su ícono como cualquier app, sin pasar por la tienda. Es gratis.
+            </p>
+            {!isMobile && (
+              <p style={{ margin: '0 0 14px', padding: '10px 12px', borderRadius: 12, background: '#EEF6FA', fontSize: 15, lineHeight: 1.45 }}>
+                Estás en una computadora. Abre <strong>familiacerca.com</strong> en tu teléfono y sigue estos pasos.
+              </p>
+            )}
+            <div role="tablist" style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
+              {[['iphone', 'iPhone'], ['android', 'Android']].map(([id, label]) => (
+                <button key={id} role="tab" aria-selected={pwaTab === id} onClick={() => setPwaTab(id)}
+                  style={{ flex: 1, padding: 11, borderRadius: 12, fontSize: 16, fontWeight: 700, cursor: 'pointer', fontFamily: SANS, border: pwaTab === id ? '2px solid #0C6C9C' : '1.5px solid #E6E3DB', background: pwaTab === id ? '#EEF6FA' : WHITE, color: '#14303D' }}>
+                  {label}
+                </button>
+              ))}
+            </div>
+            <ol style={{ margin: 0, paddingLeft: 22, fontSize: 16, lineHeight: 1.6 }}>
+              {pwaTab === 'iphone' ? (
+                <>
+                  <li>Abre <strong>familiacerca.com</strong> en <strong>Safari</strong>.</li>
+                  <li>Toca el botón de compartir <span aria-hidden="true">(el cuadrito con la flecha hacia arriba)</span>.</li>
+                  <li>Baja y toca <strong>"Agregar a pantalla de inicio"</strong>.</li>
+                  <li>Toca <strong>"Agregar"</strong>. Listo, ya está en tu pantalla.</li>
+                </>
+              ) : (
+                <>
+                  <li>Abre <strong>familiacerca.com</strong> en <strong>Chrome</strong>.</li>
+                  <li>Toca los <strong>tres puntitos</strong> de arriba a la derecha.</li>
+                  <li>Toca <strong>"Instalar aplicación"</strong> o <strong>"Agregar a pantalla principal"</strong>.</li>
+                  <li>Confirma. Listo, ya está en tu pantalla.</li>
+                </>
+              )}
+            </ol>
+            <p style={{ margin: '14px 0 0', fontSize: 15, color: '#4E6470', lineHeight: 1.45 }}>
+              ¿Todavía no tienes cuenta? Puedes instalarla primero y registrarte desde la app.
+            </p>
+            <button onClick={() => setInstallHelp(false)} style={{ marginTop: 16, width: '100%', padding: 14, borderRadius: 14, border: 'none', background: '#0C6C9C', color: WHITE, fontSize: 17, fontWeight: 700, cursor: 'pointer', fontFamily: SANS }}>
+              Entendido
+            </button>
+          </div>
+        </div>
+      )}
 
       <style>{`
         .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.65s cubic-bezier(0.16,1,0.3,1), transform 0.65s cubic-bezier(0.16,1,0.3,1); }
