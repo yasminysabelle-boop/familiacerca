@@ -3023,6 +3023,15 @@ export default function Dashboard() {
         })
       )
       fireMedSuccess()
+      // Ubicación (nov 2026): antes el botón del Inicio no la guardaba. Se pide
+      // después de confirmar para no hacer esperar a nadie; si no hay permiso, no pasa nada.
+      getLocation({ force: true }).then(loc => {
+        if (!loc) return
+        supabase.from('medication_logs')
+          .update({ latitude: loc.latitude, longitude: loc.longitude, address: loc.address })
+          .eq('medication_id', evt.medicationId).eq('log_date', todayKey).eq('user_id', ownerId)
+          .then(() => {})
+      }).catch(() => {})
     }
     setConfirming(null)
   }
@@ -3116,7 +3125,9 @@ export default function Dashboard() {
 
   async function prepareSOS() {
     setSosConfirming(true)
-    const loc = await getLocation()
+    // En una emergencia la ubicación siempre se pide (antes solo si estaba
+    // encendida en Mi cuenta, y casi nadie la encendía: 0 alertas con ubicación).
+    const loc = await getLocation({ force: true })
     setSosLocation(loc)
   }
 

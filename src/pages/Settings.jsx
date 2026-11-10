@@ -9,7 +9,7 @@ import { useFamilyPlan } from '../contexts/FamilyPlanContext'
 import { useDarkMode } from '../contexts/DarkModeContext'
 import { usePushNotifications } from '../hooks/usePushNotifications'
 import { supabase } from '../lib/supabase'
-import { isLocationEnabled, setLocationEnabled } from '../lib/gps'
+import { isLocationEnabled, setLocationEnabled, getLocation } from '../lib/gps'
 import Layout from '../components/Layout'
 import { ChevronRight, LogOut } from '../components/Icons'
 
@@ -137,6 +137,8 @@ export default function Settings() {
   function handleLocationToggle(val) {
     setLocationEnabled(val)
     setLocationOn(val)
+    // Al encenderla, el teléfono pide el permiso en ese momento (no más tarde, de sorpresa)
+    if (val) getLocation({ force: true }).catch(() => {})
   }
 
   function handleProfilePhotoSelect(e) {
@@ -524,7 +526,7 @@ export default function Settings() {
           <ToggleRow
             icon="📍"
             label="Compartir ubicación"
-            subtitle="Captura GPS al marcar medicamentos y notas"
+            subtitle="Las medicinas y emergencias siempre guardan dónde se hizo. Esto la agrega también a las notas."
             checked={locationOn}
             onChange={handleLocationToggle}
           />
