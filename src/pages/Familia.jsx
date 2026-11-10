@@ -10,6 +10,9 @@ import { UserPlus, Phone, Mail, MapPin, XIcon } from '../components/Icons'
 import { track } from '../lib/analytics'
 import PaywallModal from '../components/PaywallModal'
 import { getTodayPR, getDatePR } from '../lib/utils'
+import { otherTimeLabel } from '../lib/zonas'
+import FamilyTasks from '../components/FamilyTasks'
+import WeeklyContributions from '../components/WeeklyContributions'
 
 // Espejo mínimo de calcMedStatus() en Medications.jsx — solo necesitamos
 // distinguir "tarde" (ya se auto-marca missed aparte) del resto.
@@ -189,10 +192,17 @@ export default function Familia() {
     // Include ownerId so the admin's profile is always available for non-admin views
     const ids = [...new Set([(memberRows ?? []).map(m => m.member_user_id).filter(Boolean), user.id, ownerId].flat().filter(Boolean))]
     if (ids.length) {
-      const { data: profiles } = await supabase
+      let { data: profiles, error: pErr } = await supabase
         .from('user_profiles')
-        .select('id, full_name, email, avatar_url, last_seen')
+        .select('id, full_name, email, avatar_url, last_seen, timezone')
         .in('id', ids)
+      if (pErr) {
+        // La columna timezone aún no existe: seguir como antes
+        ;({ data: profiles } = await supabase
+          .from('user_profiles')
+          .select('id, full_name, email, avatar_url, last_seen')
+          .in('id', ids))
+      }
       const map = {}
       ;(profiles ?? []).forEach(p => { map[p.id] = p })
       setMemberProfiles(map)
@@ -492,6 +502,10 @@ export default function Familia() {
           )
         })()}
 
+        {/* Tareas repartidas y quién hizo qué (familias en varios países, nov 2026) */}
+        {ownerId && <FamilyTasks ownerId={ownerId} />}
+        {ownerId && <WeeklyContributions ownerId={ownerId} />}
+
         {/* Members section */}
         <div style={{
           background: 'white', borderRadius: 20, border: '1px solid #E6E3DB',
@@ -581,6 +595,9 @@ export default function Familia() {
                               return ago ? `⚪ Última vez ${ago}` : '⚪ Ausente'
                             })()}
                       </p>
+                      {otherTimeLabel(adminMp?.timezone) && (
+                        <p style={{ fontSize: 14, color: '#4E6470', margin: '2px 0 0' }}>🕐 {otherTimeLabel(adminMp.timezone)}</p>
+                      )}
                     </div>
                     <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
                       <span style={{ fontSize: 14, fontWeight: 700, color: '#0C6C9C', background: '#E3F1F8', padding: '3px 10px', borderRadius: 6 }}>
@@ -646,6 +663,9 @@ export default function Familia() {
                             })()}
                         {!online && joined ? ` · Desde ${joined}` : ''}
                       </p>
+                      {otherTimeLabel(mp?.timezone) && (
+                        <p style={{ fontSize: 14, color: '#4E6470', margin: '2px 0 0' }}>🕐 {otherTimeLabel(mp.timezone)}</p>
+                      )}
                     </div>
                     <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>

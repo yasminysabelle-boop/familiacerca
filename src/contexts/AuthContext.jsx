@@ -94,6 +94,12 @@ export function AuthProvider({ children }) {
     const ping = () =>
       supabase.from('user_profiles').update({ last_seen: new Date().toISOString() }).eq('id', user.id).then()
     ping()
+    // Zona horaria del teléfono (familias en varios países). Llamada aparte para
+    // que, si la columna aún no existe, no afecte a last_seen.
+    try {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
+      if (tz) supabase.from('user_profiles').update({ timezone: tz }).eq('id', user.id).then(() => {})
+    } catch { /* sin zona horaria */ }
     const interval = setInterval(ping, 2 * 60 * 1000)
     return () => clearInterval(interval)
   }, [user])
