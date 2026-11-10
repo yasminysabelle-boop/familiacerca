@@ -116,6 +116,12 @@ export default function TodoElCuidado() {
               <span style={{ flex: 1, textAlign: 'left', fontSize: 17, fontWeight: 700 }}>Emergencia</span>
               <span style={{ fontSize: 15, opacity: 0.9 }}>Avisa a toda la familia ›</span>
             </button>
+            <button
+              onClick={() => navigate('/dashboard?ficha=1')}
+              style={{ marginTop: 8, width: '100%', padding: '12px 16px', borderRadius: 14, border: '1.5px solid #E6E3DB', background: 'white', color: '#B42318', fontSize: 16, fontWeight: 700, cursor: 'pointer', textAlign: 'left' }}
+            >
+              📋 Ficha médica para los paramédicos ›
+            </button>
           </div>
 
           {/* 1. Todos los días */}

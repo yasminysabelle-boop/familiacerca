@@ -750,6 +750,19 @@ export default function Medications() {
   async function handleAdministrar() {
     if (!adminModal?.id || adminSaving) return
     const med = adminModal
+    // Aviso de dosis ya dada (nov 2026): si alguien más la marcó mientras tanto, no se da dos veces
+    {
+      const { data: ya } = await supabase.from('medication_logs')
+        .select('confirmed_by_name, confirmed_at')
+        .eq('medication_id', med.id).eq('user_id', ownerId).eq('log_date', today).eq('status', 'confirmed')
+        .maybeSingle()
+      if (ya) {
+        const quien = (ya.confirmed_by_name || 'Alguien').split(' ')[0]
+        const hora = ya.confirmed_at ? new Date(ya.confirmed_at).toLocaleTimeString('es', { hour: 'numeric', minute: '2-digit' }) : ''
+        setAdminError(`⚠️ ${quien} ya se la dio hoy${hora ? ` a las ${hora}` : ''}. No la des de nuevo.`)
+        return
+      }
+    }
     const _sched = firstTimeMed(med)
     if (_sched && minsUntilScheduled(_sched) > 10) {
       setAdminError(`Aún no se puede administrar. Disponible a las ${fmt12h(_sched)}.`)

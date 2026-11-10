@@ -1277,7 +1277,7 @@ function StatusCard({ icon, title, subtitle, status, statusType, to, onClick, pu
 // enterrado. El degradado y el anillo de pulso del botón vienen del antiguo
 // EmergencyCard (código muerto, nunca tuvo datos reales) — solo se reusa el
 // tratamiento visual.
-function SosConfirmSheet({ open, onClose, onConfirm, patientProfile, patientName, medsList, emergencyContact, primaryDoctor }) {
+function SosConfirmSheet({ open, onClose, onConfirm, patientProfile, patientName, medsList, emergencyContact, primaryDoctor, viewOnly = false }) {
   if (!open) return null
   const allergies = (patientProfile?.alergias_detalle ?? []).filter(Boolean)
   const diagnosis = patientProfile?.diagnostico_principal
@@ -1298,7 +1298,7 @@ function SosConfirmSheet({ open, onClose, onConfirm, patientProfile, patientName
           <div style={{ width: 36, height: 4, borderRadius: 4, background: '#E6E3DB', margin: '0 auto 14px' }} />
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
             <div>
-              <p style={{ fontSize: 15, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#D9534F', margin: '0 0 4px' }}>Emergencia para</p>
+              <p style={{ fontSize: 15, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: '#D9534F', margin: '0 0 4px' }}>{viewOnly ? 'Ficha médica de' : 'Emergencia para'}</p>
               <h3 style={{ fontSize: 20, fontWeight: 800, color: '#14303D', margin: 0 }}>{patientName}</h3>
             </div>
             <button aria-label="Cerrar" onClick={onClose} style={{ width: 32, height: 32, borderRadius: '50%', background: '#F3F4F6', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -1310,6 +1310,14 @@ function SosConfirmSheet({ open, onClose, onConfirm, patientProfile, patientName
         {/* cuerpo con scroll — padding-bottom generoso para que el último bloque
             (médico tratante) nunca quede pegado o cortado contra el footer fijo */}
         <div style={{ flex: 1, overflowY: 'auto', padding: '16px 16px 28px', display: 'flex', flexDirection: 'column', gap: 12, WebkitOverflowScrolling: 'touch' }}>
+          {/* 0. 911 en un toque (nov 2026) */}
+          <a href="tel:911" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, padding: '14px', borderRadius: 16, border: '2px solid #B42318', color: '#B42318', fontSize: 17, fontWeight: 800, textDecoration: 'none' }}>
+            📞 Llamar al 911
+          </a>
+          {viewOnly && (
+            <p style={{ margin: 0, fontSize: 15, color: '#4E6470', textAlign: 'center' }}>Enséñale esta pantalla a los paramédicos.</p>
+          )}
+
           {/* 1. Alergias y diagnóstico */}
           <div style={{ background: '#FCEEED', border: '1.5px solid rgba(217,83,79,0.28)', borderRadius: 18, padding: 16 }}>
             <p style={{ fontSize: 14, fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#D9534F', margin: '0 0 10px', display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -1414,7 +1422,7 @@ function SosConfirmSheet({ open, onClose, onConfirm, patientProfile, patientName
 
         {/* footer fijo — fuera del área con scroll, siempre visible */}
         <div style={{ flexShrink: 0, padding: '14px 16px calc(16px + env(safe-area-inset-bottom, 0px))', background: 'white', borderTop: '1px solid #E6E3DB', boxShadow: '0 -6px 16px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <button
+          {!viewOnly && <button
             onClick={onConfirm}
             style={{
               position: 'relative', width: '100%', border: 'none', borderRadius: 16,
@@ -1428,9 +1436,9 @@ function SosConfirmSheet({ open, onClose, onConfirm, patientProfile, patientName
             <span className="sos-sheet-pulse-ring" style={{ position: 'absolute', inset: 0, borderRadius: 16, border: '2px solid rgba(255,255,255,0.55)', animation: 'sos-sheet-pulse 2s cubic-bezier(0,0,0.2,1) infinite', pointerEvents: 'none' }} />
             <Siren size={21} color="white" strokeWidth={2.3} style={{ position: 'relative', zIndex: 1 }} />
             <span style={{ position: 'relative', zIndex: 1 }}>Activar emergencia</span>
-          </button>
+          </button>}
           <button onClick={onClose} style={{ width: '100%', border: 'none', background: 'transparent', color: '#4E6470', fontSize: 15, fontWeight: 600, padding: 6, cursor: 'pointer' }}>
-            Cancelar — fue un error
+            {viewOnly ? 'Cerrar' : 'Cancelar — fue un error'}
           </button>
         </div>
       </div>
@@ -2181,6 +2189,10 @@ export default function Dashboard() {
     if (searchParams.get('sos') === '1') {
       setSearchParams({}, { replace: true })
       prepareSOS()
+    }
+    if (searchParams.get('ficha') === '1') {
+      setSearchParams({}, { replace: true })
+      setFichaOpen(true)
     }
   }, [])
 
@@ -3004,6 +3016,22 @@ export default function Dashboard() {
   async function quickConfirm(evt) {
     setConfirming(evt.medicationId)
     setConfirmError('')
+    // Aviso de dosis ya dada (nov 2026)
+    {
+      const { data: ya } = await supabase.from('medication_logs')
+        .select('confirmed_by_name, confirmed_at')
+        .eq('medication_id', evt.medicationId).eq('user_id', ownerId).eq('log_date', todayKey).eq('status', 'confirmed')
+        .maybeSingle()
+      if (ya) {
+        const quien = (ya.confirmed_by_name || 'Alguien').split(' ')[0]
+        const hora = ya.confirmed_at ? new Date(ya.confirmed_at).toLocaleTimeString('es', { hour: 'numeric', minute: '2-digit' }) : ''
+        setConfirmError(`⚠️ ${quien} ya le dio ${evt.medName} hoy${hora ? ` a las ${hora}` : ''}. No la des de nuevo.`)
+        setTimeout(() => setConfirmError(''), 8000)
+        setConfirming(null)
+        fetchTimeline()
+        return
+      }
+    }
     const { error } = await supabase.from('medication_logs').upsert({
       medication_id: evt.medicationId,
       user_id: ownerId,
@@ -3034,6 +3062,10 @@ export default function Dashboard() {
         })
       )
       fireMedSuccess()
+      // Deshacer (nov 2026): 8 segundos para corregir un toque por error
+      clearTimeout(undoTimer.current)
+      setUndoMed(evt)
+      undoTimer.current = setTimeout(() => setUndoMed(null), 8000)
       // Ubicación (nov 2026): antes el botón del Inicio no la guardaba. Se pide
       // después de confirmar para no hacer esperar a nadie; si no hay permiso, no pasa nada.
       getLocation({ force: true }).then(loc => {
@@ -3237,6 +3269,22 @@ export default function Dashboard() {
   // "Todo listo hoy" (nov 2026): cuando ya se dieron todas las medicinas del día,
   // se invita UNA vez al día a compartir el resumen en el grupo de WhatsApp.
   const [shareNudge, setShareNudge] = useState(false)
+  const [undoMed, setUndoMed] = useState(null)
+  const undoTimer = useRef(null)
+  async function undoConfirm() {
+    const evt = undoMed
+    if (!evt) return
+    clearTimeout(undoTimer.current)
+    setUndoMed(null)
+    await supabase.from('medication_logs').delete()
+      .eq('medication_id', evt.medicationId).eq('user_id', ownerId).eq('log_date', todayKey)
+    fetchTimeline()
+  }
+
+  // Emergencia completa (nov 2026): quién va, 911 y ficha médica
+  const [fichaOpen, setFichaOpen] = useState(false)
+  const [sosResponders, setSosResponders] = useState([])
+  const [respondsOk, setRespondsOk] = useState(true)
   useEffect(() => {
     if (loading || pendingCount > 0 || confirmedTodayCount === 0) return
     const k = `fc_share_nudge_${todayKey}`
@@ -3251,6 +3299,27 @@ export default function Dashboard() {
 
   const activeSosEvent = sections.flatMap(s => s.events).find(e => e.type === 'SOS_ALERT' && !e.resolved) ?? null
   const hasActiveSOS = !!activeSosEvent
+  const sosAlertIdForResponses = activeSosEvent?.sosAlertId ?? null
+  useEffect(() => {
+    if (!sosAlertIdForResponses) { setSosResponders([]); return }
+    let off = false
+    const load = async () => {
+      const { data, error } = await supabase.from('emergency_responses').select('user_id, name, created_at').eq('alert_id', sosAlertIdForResponses).order('created_at')
+      if (off) return
+      if (error) { setRespondsOk(false); return }
+      setSosResponders(data ?? [])
+    }
+    load()
+    const t = setInterval(load, 15000)
+    return () => { off = true; clearInterval(t) }
+  }, [sosAlertIdForResponses])
+  async function respondSOS() {
+    if (!sosAlertIdForResponses) return
+    const { error } = await supabase.from('emergency_responses').insert({ alert_id: sosAlertIdForResponses, owner_id: ownerId, name: fullName })
+    if (error) { setRespondsOk(false); return }
+    setSosResponders(prev => [...prev, { user_id: user?.id, name: fullName }])
+    track('sos_yo_voy')
+  }
   const lastActivity = sections.flatMap(s => s.events)
     .filter(e => ['MED_CONFIRMED', 'VOICE_MEMORY', 'NOTE', 'EXPENSE'].includes(e.type))
     .sort((a, b) => b.timestamp - a.timestamp)[0] ?? null
@@ -3646,17 +3715,29 @@ export default function Dashboard() {
           </div>
         )}
         {hasActiveSOS && (
-          <div style={{ margin: '12px 16px 0', background: 'linear-gradient(135deg,#7F1D1D,#991B1B)', borderRadius: 16, padding: '16px 18px', boxShadow: '0 4px 24px rgba(185,28,28,0.4)', display: 'flex', alignItems: 'center', gap: 14, animation: 'fadeInUp 0.3s ease both' }}>
-            <span style={{ fontSize: 26, flexShrink: 0, animation: 'sos-ring 1.4s ease-in-out infinite' }}>🚨</span>
-            <div style={{ flex: 1 }}>
-              <p style={{ margin: 0, fontSize: 16, fontWeight: 800, color: 'white' }}>Alerta SOS activa</p>
-              <p style={{ margin: '3px 0 0', fontSize: 14, color: 'rgba(255,255,255,0.75)' }}>
-                {activeSosEvent?.triggeredBy ? `Activada por ${activeSosEvent.triggeredBy.split(' ')[0]}` : 'Emergencia familiar'}
-              </p>
+          <div style={{ margin: '12px 16px 0', background: 'linear-gradient(135deg,#7F1D1D,#991B1B)', borderRadius: 16, padding: '16px 18px', boxShadow: '0 4px 24px rgba(185,28,28,0.4)', animation: 'fadeInUp 0.3s ease both' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <span style={{ fontSize: 26, flexShrink: 0, animation: 'sos-ring 1.4s ease-in-out infinite' }}>🚨</span>
+              <div style={{ flex: 1 }}>
+                <p style={{ margin: 0, fontSize: 17, fontWeight: 800, color: 'white' }}>Emergencia activa</p>
+                <p style={{ margin: '3px 0 0', fontSize: 15, color: 'rgba(255,255,255,0.85)' }}>
+                  {activeSosEvent?.triggeredBy ? `Avisó ${activeSosEvent.triggeredBy.split(' ')[0]}` : 'Emergencia familiar'}
+                  {sosResponders.length > 0 ? ` · Van: ${sosResponders.map(r => (r.name || '').split(' ')[0]).join(', ')}` : ' · Nadie ha dicho que va todavía'}
+                </p>
+              </div>
             </div>
-            <button onClick={dismissSOS} style={{ flexShrink: 0, padding: '7px 14px', borderRadius: 10, border: 'none', background: 'rgba(255,255,255,0.18)', color: 'white', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
-              Resolver
-            </button>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 14 }}>
+              {respondsOk && !sosResponders.some(r => r.user_id === user?.id) && (
+                <button onClick={respondSOS} style={{ gridColumn: '1 / -1', padding: '13px', borderRadius: 12, border: 'none', background: 'white', color: '#991B1B', fontSize: 17, fontWeight: 800, cursor: 'pointer' }}>
+                  🚗 Yo voy
+                </button>
+              )}
+              <a href="tel:911" style={{ padding: '12px', borderRadius: 12, background: 'rgba(255,255,255,0.18)', color: 'white', fontSize: 16, fontWeight: 700, textDecoration: 'none', textAlign: 'center' }}>📞 Llamar al 911</a>
+              <button onClick={() => setFichaOpen(true)} style={{ padding: '12px', borderRadius: 12, border: 'none', background: 'rgba(255,255,255,0.18)', color: 'white', fontSize: 16, fontWeight: 700, cursor: 'pointer' }}>📋 Ficha médica</button>
+              <button onClick={dismissSOS} style={{ gridColumn: '1 / -1', padding: '10px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.35)', background: 'transparent', color: 'white', fontSize: 15, fontWeight: 700, cursor: 'pointer' }}>
+                Ya está resuelta
+              </button>
+            </div>
           </div>
         )}
         {renewalAlerts.map(med => {
@@ -3926,6 +4007,27 @@ export default function Dashboard() {
         <HospitalModeModal open={showHospitalModal} onClose={() => setShowHospitalModal(false)} />
         <CompanionChat externalOpen={showCompanion} onExternalClose={() => setShowCompanion(false)} bottomOffset={80} />
       </div>
+
+      {/* Ficha médica (solo lectura) */}
+      <SosConfirmSheet
+        open={fichaOpen}
+        viewOnly
+        onClose={() => setFichaOpen(false)}
+        onConfirm={() => {}}
+        patientProfile={patientProfile}
+        patientName={dashPatientName}
+        medsList={medsList}
+        emergencyContact={emergencyContact}
+        primaryDoctor={primaryDoctor}
+      />
+
+      {/* Deshacer una medicina marcada por error (8 s) */}
+      {undoMed && (
+        <div role="status" style={{ position: 'fixed', left: 12, right: 12, bottom: 92, zIndex: 320, maxWidth: 456, margin: '0 auto', background: '#14303D', color: 'white', borderRadius: 14, padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 8px 24px rgba(0,0,0,0.3)' }}>
+          <span style={{ flex: 1, fontSize: 15 }}>✓ {undoMed.medName} marcada como dada</span>
+          <button onClick={undoConfirm} style={{ background: 'none', border: 'none', color: '#4FD0E0', fontSize: 16, fontWeight: 800, cursor: 'pointer', padding: '6px 4px' }}>Deshacer</button>
+        </div>
+      )}
 
       {/* ── SOS confirm dialog ────────────────────────────────────────────── */}
       <SosConfirmSheet
