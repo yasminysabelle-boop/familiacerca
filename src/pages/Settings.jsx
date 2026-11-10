@@ -35,18 +35,18 @@ const PLAN_FEATURES = {
 
 function ToggleRow({ icon, label, subtitle, checked, onChange }) {
   return (
-    <div style={{
-      display: 'flex', alignItems: 'center', gap: 12,
+    <div onClick={() => onChange(!checked)} style={{
+      display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer',
       padding: '14px 16px', borderBottom: '1px solid #F5F0EA',
     }}>
       <span style={{ fontSize: 18 }}>{icon}</span>
       <div style={{ flex: 1 }}>
-        <p style={{ fontSize: 14, fontWeight: 600, color: '#14303D', margin: 0 }}>{label}</p>
-        {subtitle && <p style={{ fontSize: 13, color: '#5E7480', margin: '1px 0 0' }}>{subtitle}</p>}
+        <p style={{ fontSize: 16, fontWeight: 600, color: '#14303D', margin: 0 }}>{label}</p>
+        {subtitle && <p style={{ fontSize: 14, color: '#5E7480', margin: '1px 0 0' }}>{subtitle}</p>}
       </div>
       <button
-        role="switch" aria-checked={checked}
-        onClick={() => onChange(!checked)}
+        role="switch" aria-checked={checked} aria-label={label}
+        onClick={e => { e.stopPropagation(); onChange(!checked) }}
         style={{
           width: 44, height: 26, borderRadius: 13, border: 'none',
           background: checked ? '#0A5A82' : '#D1D5DB',
