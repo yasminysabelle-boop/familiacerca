@@ -233,7 +233,7 @@ export default function CompanionChat({ bottomOffset = 140, externalOpen = false
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}
         >
-          💬
+          🐾
         </button>
 
         {selecting && <SelectionCard onPick={pick} onClose={() => setSelecting(false)} />}

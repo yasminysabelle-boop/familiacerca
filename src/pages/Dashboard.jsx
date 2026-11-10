@@ -1969,7 +1969,7 @@ function RecentActivity({ items, onViewAll, onSelect, firstName, summaryText, su
         <div style={{ padding: '6px 0 2px' }}>
           <p style={{ color: '#7C8698', fontSize: 14, margin: '0 0 4px', fontWeight: 500 }}>Todavía no hay nada marcado hoy</p>
           <p style={{ color: '#5E7480', fontSize: 15, margin: 0, lineHeight: 1.6 }}>
-            Cuando alguien confirme un medicamento,<br />suba una foto o escriba una nota,<br />aparecerá aquí.
+            Cuando alguien dé una medicina,<br />suba una foto o escriba una nota,<br />aparecerá aquí.
           </p>
         </div>
       ) : (
@@ -3708,6 +3708,13 @@ export default function Dashboard() {
                   onMedsClick={() => navigate(medTotal === 0 ? '/medications?add=1' : '/medications')}
                   onRoutineClick={() => navigate('/cuidado')}
                   onFamilyClick={() => navigate(isAdmin && familyCount <= 1 ? '/familia?invitar=1' : '/familia')}
+                  // Lo próximo, en concreto (UX nov 2026): no "Algo pendiente", sino qué falta
+                  statusText={
+                    medTotal === 0 ? 'Agrega sus medicinas'
+                    : (pendingCount > 0 || _isRetrasado) ? (nextPendingMed?.medName ? `Falta dar ${nextPendingMed.medName}` : 'Faltan medicinas')
+                    : overdueRoutinesCount > 0 ? (overdueRoutinesCount === 1 ? 'Falta 1 cuidado' : `Faltan ${overdueRoutinesCount} cuidados`)
+                    : isSetup ? 'Por empezar' : 'Todo al día'
+                  }
                   onStatusClick={() => navigate(
                     (pendingCount > 0 || _isRetrasado) ? '/medications'
                     : overdueRoutinesCount > 0 ? '/cuidado'
@@ -3715,17 +3722,45 @@ export default function Dashboard() {
                     : '/medications')}
                 />
 
-                {/* ══ SOLO TÚ — empujar a invitar (sin familia no hay avisos ni razón para volver) ══ */}
-                {isAdmin && !!realPatientName && familyCount <= 1 && (
-                  <div style={{ marginTop: 14, background: 'white', borderRadius: 20, padding: '16px 16px', border: '1px solid #E6E3DB', boxShadow: '0 6px 18px -10px rgba(10,74,107,0.25)', display: 'flex', alignItems: 'center', gap: 14 }}>
-                    <span style={{ flex: 'none', width: 46, height: 46, borderRadius: 14, background: '#E3F1F8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>👨‍👩‍👧</span>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#14303D' }}>Solo tú por ahora</p>
-                      <p style={{ margin: '2px 0 0', fontSize: 15, color: '#4E6470', lineHeight: 1.4 }}>Invita a tu familia para que todos vean el cuidado y reciban los avisos.</p>
-                    </div>
-                    <button onClick={() => navigate('/familia?invitar=1')} style={{ flex: 'none', padding: '10px 14px', borderRadius: 12, background: '#BF513C', color: 'white', fontSize: 15, fontWeight: 700, border: 'none', cursor: 'pointer' }}>Invitar</button>
-                  </div>
-                )}
+                {/* ══ PRIMEROS PASOS (UX nov 2026): una lista clara de 3 cosas, con la siguiente resaltada ══ */}
+                {isAdmin && !!realPatientName && (medTotal === 0 || !routineActive || familyCount <= 1) && (() => {
+                  const who = patientFirstName || 'tu familiar'
+                  const steps = [
+                    { done: medTotal > 0,     emoji: '💊', title: `Agrega las medicinas de ${who}`, sub: 'Con una foto de la receta es más rápido', go: () => navigate('/medications?add=1') },
+                    { done: routineActive,    emoji: '📋', title: 'Marca el primer cuidado del día', sub: 'Baño, comidas, dientes… lo que toque', go: () => navigate('/cuidado') },
+                    { done: familyCount > 1,  emoji: '👨‍👩‍👧', title: 'Invita a tu familia', sub: 'Para que todos vean y reciban los avisos', go: () => navigate('/familia?invitar=1') },
+                  ]
+                  const doneCount = steps.filter(x => x.done).length
+                  const nextIdx = steps.findIndex(x => !x.done)
+                  return (
+                    <section aria-label="Primeros pasos" style={{ marginTop: 14, background: 'white', borderRadius: 20, padding: 16, border: '1px solid #E6E3DB', boxShadow: '0 6px 18px -10px rgba(10,74,107,0.25)' }}>
+                      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 8 }}>
+                        <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: '#14303D' }}>Primeros pasos</h2>
+                        <span style={{ fontSize: 15, fontWeight: 700, color: '#0C6C9C' }}>{doneCount} de 3</span>
+                      </div>
+                      <div style={{ height: 8, borderRadius: 8, background: '#E3F1F8', overflow: 'hidden', marginBottom: 12 }}>
+                        <div style={{ width: `${(doneCount / 3) * 100}%`, height: '100%', background: '#0C6C9C', borderRadius: 8, transition: 'width .4s ease' }} />
+                      </div>
+                      {steps.map((st, k) => {
+                        const isNext = k === nextIdx
+                        return (
+                          <button key={k} onClick={st.go} disabled={st.done}
+                            style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, textAlign: 'left', padding: '12px 12px', marginTop: k ? 8 : 0, borderRadius: 14, cursor: st.done ? 'default' : 'pointer',
+                              background: isNext ? '#E3F1F8' : 'white', border: isNext ? '2px solid #0C6C9C' : '1px solid #E6E3DB', opacity: st.done ? 0.65 : 1 }}>
+                            <span style={{ flex: 'none', width: 40, height: 40, borderRadius: '50%', background: st.done ? '#0C6C9C' : 'white', border: st.done ? 'none' : '2px solid #CDE8F3', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: st.done ? 20 : 20, fontWeight: 800 }}>
+                              {st.done ? '✓' : st.emoji}
+                            </span>
+                            <span style={{ flex: 1, minWidth: 0 }}>
+                              <span style={{ display: 'block', fontSize: 16, fontWeight: 700, color: '#14303D', textDecoration: st.done ? 'line-through' : 'none' }}>{st.title}</span>
+                              {!st.done && <span style={{ display: 'block', fontSize: 14, color: '#4E6470', marginTop: 2 }}>{st.sub}</span>}
+                            </span>
+                            {isNext && <span style={{ flex: 'none', padding: '8px 12px', borderRadius: 10, background: '#0C6C9C', color: 'white', fontSize: 15, fontWeight: 700 }}>Empezar</span>}
+                          </button>
+                        )
+                      })}
+                    </section>
+                  )
+                })()}
 
                 {/* ══ LA FAMILIA HOY — caritas, como los estados de WhatsApp ══ */}
                 {familyMembers.length > 1 && (

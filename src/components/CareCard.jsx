@@ -60,6 +60,7 @@ export default function CareCard({
   onRoutineClick,
   onFamilyClick,
   onStatusClick,
+  statusText,
 }) {
   const s = STATUS[status] ?? STATUS.ok
   // Sin paciente real, `name` es el texto del CTA ("Agregar familiar"), no una
@@ -140,7 +141,7 @@ export default function CareCard({
                 cursor: onStatusClick ? 'pointer' : 'default',
               }}>
               <span style={{ width: 11, height: 11, borderRadius: '50%', background: s.dot, boxShadow: `0 0 0 4px ${s.glow}` }} />
-              <span style={{ fontFamily: SANS, color: '#fff', fontSize: 15, fontWeight: 600 }}>{s.label}</span>
+              <span style={{ fontFamily: SANS, color: '#fff', fontSize: 15, fontWeight: 600 }}>{statusText || s.label}</span>
               {onStatusClick && <span aria-hidden="true" style={{ color: 'rgba(255,255,255,0.8)', fontSize: 16, lineHeight: 1 }}>›</span>}
             </span>
           </div>
