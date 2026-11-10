@@ -120,7 +120,6 @@ function PriceCard({ name, price, annualPrice, period, highlight, badge, groups,
 export default function Landing() {
   const { user, loading } = useAuth()
   const { installed, isIOS, isAndroid, canPrompt, install, isMobile } = usePWAInstall()
-  const [pwaTab, setPwaTab] = useState(() => isAndroid ? 'android' : 'iphone')
   const [pwaInstallClicked, setPwaInstallClicked] = useState(false)
   const [installHelp, setInstallHelp] = useState(() => {
     try { return new URLSearchParams(window.location.search).get('instalar') === '1' } catch { return false }
@@ -248,7 +247,7 @@ export default function Landing() {
     { q: '¿Necesito crear una cuenta para usar FamiliaCerca?', a: 'Sí, necesitas una cuenta gratuita para empezar. El registro tarda menos de un minuto — solo tu correo y contraseña. No pedimos tarjeta de crédito para el plan Gratis.' },
     { q: '¿Cuántas personas pueden usar la misma cuenta familiar?', a: 'El plan Gratis permite hasta 2 miembros. El plan Familiar soporta hasta 6 cuidadores y el plan Cuidado Total es ilimitado. Todos ven actualizaciones en tiempo real.' },
     { q: '¿Funciona sin conexión a internet?', a: 'FamiliaCerca es una PWA (app web progresiva). Una vez instalada, muchas funciones como el checklist del día y los medicamentos están disponibles sin conexión. Los cambios se sincronizan cuando vuelve la señal.' },
-    { q: '¿Cómo se instala en el celular si no está en la App Store?', a: 'En iPhone: abre la página en Safari, toca el botón de compartir (cuadro con flecha) y selecciona "Agregar a inicio". En Android: toca el menú de tres puntos del navegador y selecciona "Instalar aplicación".' },
+    { q: '¿Cómo la descargo en el celular si no está en las tiendas de apps?', a: 'Desde tu teléfono, abre familiacerca.com en Chrome y toca "Descargar la app" en la barra de abajo: se descarga sola. Si no aparece, toca los tres puntitos de Chrome y elige "Instalar aplicación".' },
     { q: '¿Mis datos médicos están protegidos?', a: 'Sí. Tus datos se guardan cifrados y solo los ven los familiares que tú invites. Nunca vendemos ni compartimos tu información, y puedes descargarla o borrarla cuando quieras desde Mi cuenta.' },
     { q: '¿Puedo cancelar mi suscripción en cualquier momento?', a: 'Por supuesto. Puedes cancelar desde Ajustes > Suscripción en cualquier momento. No hay penalizaciones ni contratos. Tu plan baja a Gratis al terminar el período pagado.' },
     { q: '¿Qué pasa cuando terminan los 14 días de prueba?', a: 'Si no eliges un plan, tu familia sigue gratis con lo esencial: medicamentos, rutina, chat, notas y hasta 2 personas. Nada se borra. Solo se pausan los extras, como la videollamada, los gastos y los reportes PDF ilimitados.' },
@@ -781,12 +780,12 @@ export default function Landing() {
               onClick={async () => {
                 if (canPrompt && isMobile) {
                   track('sticky_bar_click', { action: 'install_prompt' })
-                  const outcome = await install()
-                  if (outcome === 'accepted') return
+                  // Igual que antes: un toque y Chrome la descarga sola
+                  await install()
+                  return
                 } else {
                   track('sticky_bar_click', { action: 'install_help', ios: isIOS, android: isAndroid })
                 }
-                setPwaTab(isAndroid ? 'android' : 'iphone')
                 setInstallHelp(true)
               }}
               style={{ color: WHITE, background: 'transparent', border: '1.5px solid rgba(255,255,255,0.85)', borderRadius: 9999, padding: '9px 18px', fontFamily: SANS, fontWeight: 700, fontSize: 'clamp(15px, 2vw, 17px)', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 8 }}
@@ -832,31 +831,14 @@ export default function Landing() {
                 📲 Descargar ahora
               </button>
             )}
-            {!isMobile && <p style={{ margin: '0 0 8px', fontSize: 15, fontWeight: 700, color: '#4E6470' }}>Después, en el teléfono:</p>}
-            <div role="tablist" style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
-              {[['iphone', 'iPhone'], ['android', 'Android']].map(([id, label]) => (
-                <button key={id} role="tab" aria-selected={pwaTab === id} onClick={() => setPwaTab(id)}
-                  style={{ flex: 1, padding: 11, borderRadius: 12, fontSize: 16, fontWeight: 700, cursor: 'pointer', fontFamily: SANS, border: pwaTab === id ? '2px solid #0C6C9C' : '1.5px solid #E6E3DB', background: pwaTab === id ? '#EEF6FA' : WHITE, color: '#14303D' }}>
-                  {label}
-                </button>
-              ))}
-            </div>
+            <p style={{ margin: '0 0 8px', fontSize: 15, fontWeight: 700, color: '#4E6470' }}>
+              {!isMobile ? 'Después, en el teléfono:' : canPrompt ? 'O si prefieres hacerlo a mano:' : 'Tu teléfono no la descargó solo. Hazlo así:'}
+            </p>
             <ol style={{ margin: 0, paddingLeft: 22, fontSize: 16, lineHeight: 1.6 }}>
-              {pwaTab === 'iphone' ? (
-                <>
-                  <li>Abre <strong>familiacerca.com</strong> en <strong>Safari o Chrome</strong>.</li>
-                  <li>Toca el botón de compartir <span aria-hidden="true">(el cuadrito con la flecha hacia arriba)</span>: en Safari está abajo, en Chrome arriba a la derecha.</li>
-                  <li>Baja y toca <strong>"Agregar a pantalla de inicio"</strong>.</li>
-                  <li>Toca <strong>"Agregar"</strong>. Listo, ya está en tu pantalla.</li>
-                </>
-              ) : (
-                <>
-                  <li>Abre <strong>familiacerca.com</strong> en <strong>Chrome</strong>.</li>
-                  <li>Toca los <strong>tres puntitos</strong> de arriba a la derecha.</li>
-                  <li>Toca <strong>"Instalar aplicación"</strong> o <strong>"Agregar a pantalla principal"</strong>.</li>
-                  <li>Confirma. Listo, ya está en tu pantalla.</li>
-                </>
-              )}
+              <li>Abre <strong>familiacerca.com</strong> en <strong>Chrome</strong>.</li>
+              <li>Toca los <strong>tres puntitos</strong> de arriba a la derecha.</li>
+              <li>Toca <strong>"Instalar aplicación"</strong> o <strong>"Agregar a pantalla principal"</strong>.</li>
+              <li>Confirma. Listo, ya está en tu pantalla.</li>
             </ol>
             <p style={{ margin: '14px 0 0', fontSize: 15, color: '#4E6470', lineHeight: 1.45 }}>
               ¿Todavía no tienes cuenta? Puedes descargarla primero y registrarte desde la app.
