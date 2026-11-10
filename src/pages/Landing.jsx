@@ -791,7 +791,7 @@ export default function Landing() {
               }}
               style={{ color: WHITE, background: 'transparent', border: '1.5px solid rgba(255,255,255,0.85)', borderRadius: 9999, padding: '9px 18px', fontFamily: SANS, fontWeight: 700, fontSize: 'clamp(15px, 2vw, 17px)', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 8 }}
             >
-              <span aria-hidden="true">📲</span> Instalar la app
+              <span aria-hidden="true">📲</span> Descargar la app
             </button>
           )}
         </div>
@@ -804,9 +804,9 @@ export default function Landing() {
 
       {/* Cómo instalar la app en el teléfono (sin tiendas) */}
       {installHelp && (
-        <div role="dialog" aria-label="Instalar la app" onClick={() => setInstallHelp(false)} style={{ position: 'fixed', inset: 0, zIndex: 9500, background: 'rgba(8,30,42,0.5)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
+        <div role="dialog" aria-label="Descargar la app" onClick={() => setInstallHelp(false)} style={{ position: 'fixed', inset: 0, zIndex: 9500, background: 'rgba(8,30,42,0.5)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
           <div onClick={e => e.stopPropagation()} style={{ width: '100%', maxWidth: 480, background: WHITE, borderRadius: '24px 24px 0 0', padding: '22px 22px calc(22px + env(safe-area-inset-bottom, 0px))', fontFamily: SANS, color: '#14303D' }}>
-            <h2 style={{ margin: 0, fontSize: 21, fontWeight: 800 }}>Pon FamiliaCerca en tu teléfono</h2>
+            <h2 style={{ margin: 0, fontSize: 21, fontWeight: 800 }}>Descarga FamiliaCerca en tu teléfono</h2>
             <p style={{ margin: '6px 0 14px', fontSize: 16, color: '#4E6470', lineHeight: 1.5 }}>
               Queda con su ícono como cualquier app, sin pasar por la tienda. Es gratis.
             </p>
@@ -816,9 +816,9 @@ export default function Landing() {
                 <div style={{ flex: 1, minWidth: 180 }}>
                   <p style={{ margin: '0 0 6px', fontSize: 17, fontWeight: 800 }}>Escanéalo con tu teléfono</p>
                   <p style={{ margin: '0 0 10px', fontSize: 15, lineHeight: 1.45, color: '#30454F' }}>
-                    Abre la <strong>cámara</strong> del teléfono y apúntala a este código. Toca el enlace que aparece y te mostramos cómo instalarla.
+                    Abre la <strong>cámara</strong> del teléfono y apúntala a este código. Toca el enlace que aparece y te mostramos cómo descargarla.
                   </p>
-                  <a href={`https://wa.me/?text=${encodeURIComponent('Instala FamiliaCerca en tu teléfono: https://familiacerca.com/?instalar=1')}`} target="_blank" rel="noopener noreferrer"
+                  <a href={`https://wa.me/?text=${encodeURIComponent('Descarga FamiliaCerca en tu teléfono: https://familiacerca.com/?instalar=1')}`} target="_blank" rel="noopener noreferrer"
                     onClick={() => track('install_send_whatsapp')}
                     style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '9px 14px', borderRadius: 999, background: '#1E7E43', color: WHITE, fontSize: 15, fontWeight: 700, textDecoration: 'none' }}>
                     Enviarme el enlace por WhatsApp
@@ -829,7 +829,7 @@ export default function Landing() {
             {canPrompt && isMobile && (
               <button onClick={async () => { track('install_sheet_prompt'); const o = await install(); if (o === 'accepted') setInstallHelp(false) }}
                 style={{ width: '100%', marginBottom: 14, padding: 14, borderRadius: 14, border: 'none', background: CORAL, color: WHITE, fontSize: 17, fontWeight: 800, cursor: 'pointer', fontFamily: SANS }}>
-                📲 Instalar ahora
+                📲 Descargar ahora
               </button>
             )}
             {!isMobile && <p style={{ margin: '0 0 8px', fontSize: 15, fontWeight: 700, color: '#4E6470' }}>Después, en el teléfono:</p>}
@@ -859,7 +859,7 @@ export default function Landing() {
               )}
             </ol>
             <p style={{ margin: '14px 0 0', fontSize: 15, color: '#4E6470', lineHeight: 1.45 }}>
-              ¿Todavía no tienes cuenta? Puedes instalarla primero y registrarte desde la app.
+              ¿Todavía no tienes cuenta? Puedes descargarla primero y registrarte desde la app.
             </p>
             <button onClick={() => setInstallHelp(false)} style={{ marginTop: 16, width: '100%', padding: 14, borderRadius: 14, border: 'none', background: '#0C6C9C', color: WHITE, fontSize: 17, fontWeight: 700, cursor: 'pointer', fontFamily: SANS }}>
               Entendido
