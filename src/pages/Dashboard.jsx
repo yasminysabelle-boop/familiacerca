@@ -4177,7 +4177,7 @@ export default function Dashboard() {
         document.body
       )}
 
-      {!loading && <FirstTour />}
+      <FirstTour />
       <HowIsTodaySheet open={showHowIsToday} onClose={() => setShowHowIsToday(false)} patientName={(patientProfile?.nombre_completo || profile?.name || '').split(' ')[0] || undefined} />
     </Layout>
   )

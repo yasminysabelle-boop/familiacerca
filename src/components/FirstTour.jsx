@@ -23,8 +23,13 @@ export default function FirstTour() {
 
   useEffect(() => {
     if (readDone()) return
-    const t = setTimeout(() => setStep(0), 1400)
-    return () => clearTimeout(t)
+    // Espera a que el Inicio termine de cargar (que exista la tarjeta) para empezar.
+    let tries = 0
+    const t = setInterval(() => {
+      tries++
+      if (document.querySelector(STEPS[0].sel) || tries > 20) { clearInterval(t); setStep(0) }
+    }, 500)
+    return () => clearInterval(t)
   }, [])
 
   useEffect(() => {
