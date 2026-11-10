@@ -7,9 +7,13 @@ export default function FamilySwitcher({ isLight = false }) {
   const [open, setOpen] = useState(false)
 
   const patientName = activePatientName || (activeFamilyLabel !== 'Mi familia' ? activeFamilyLabel : null)
-  const displayLabel = patientName ? `Familia de ${patientName}` : 'Mi familia'
+  // Solo el primer nombre: corto, para que el título de la pantalla no se corte
+  const displayLabel = patientName ? patientName.split(' ')[0] : 'Mi familia'
 
   if (!hasMultiple) {
+    // Con una sola familia no hace falta el selector: el título queda limpio
+    return null
+    // eslint-disable-next-line no-unreachable
     if (!patientName) return null
     return (
       <span style={{
