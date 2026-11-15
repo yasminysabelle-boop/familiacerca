@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { usePhotoPicker } from '../components/PhotoPicker'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
@@ -159,6 +160,7 @@ export default function PatientProfile() {
   const [uploading, setUploading] = useState(false)
   const recRef  = useRef(null)
   const fileRef = useRef(null)
+  const photoPick = usePhotoPicker(e => handlePhoto(e), { title: 'Foto de tu familiar' })
 
   const set = (k, v) => setForm(p => ({ ...p, [k]:v }))
 
@@ -348,7 +350,7 @@ export default function PatientProfile() {
           <div style={{ display:'flex', alignItems:'center', gap:16 }}>
             <div style={{ position:'relative', flexShrink:0 }}>
               <div
-                onClick={() => canEdit && fileRef.current?.click()}
+                onClick={() => canEdit && photoPick.open()}
                 style={{
                   width:68, height:68, borderRadius:'50%',
                   border:'3px solid rgba(255,255,255,0.4)', overflow:'hidden',
@@ -368,7 +370,7 @@ export default function PatientProfile() {
                 )}
               </div>
               {canEdit && (
-                <div onClick={() => fileRef.current?.click()} style={{
+                <div onClick={() => photoPick.open()} style={{
                   position:'absolute', bottom:0, right:0, width:22, height:22,
                   borderRadius:'50%', background:'white', border:'2px solid #0A5A82',
                   display:'flex', alignItems:'center', justifyContent:'center',
@@ -392,6 +394,7 @@ export default function PatientProfile() {
         </div>
 
         <input ref={fileRef} type="file" accept="image/*" style={{ display:'none' }} onChange={handlePhoto} />
+{photoPick.element}
 
         {loading ? (
           <div style={{ padding:'40px', textAlign:'center', color:'#5E7480', fontSize:15 }}>Cargando perfil...</div>
