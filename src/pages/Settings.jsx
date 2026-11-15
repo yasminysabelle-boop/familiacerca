@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState } from 'react'
+import { usePhotoPicker } from '../components/PhotoPicker'
 import Cropper from 'react-easy-crop'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
@@ -98,6 +99,7 @@ export default function Settings() {
   const [cancelStep, setCancelStep] = useState(0) // 0=closed 1=milo 2=reason
   const [profileUploading, setProfileUploading] = useState(false)
   const profilePhotoInputRef = useRef(null)
+  const photoPick = usePhotoPicker(e => handleProfilePhotoSelect(e), { title: 'Tu foto' })
   const [profileCropSrc, setProfileCropSrc] = useState(null)
   const [profileCrop, setProfileCrop] = useState({ x: 0, y: 0 })
   const [profileZoom, setProfileZoom] = useState(1)
@@ -265,7 +267,7 @@ export default function Settings() {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             <button
-              onClick={() => profilePhotoInputRef.current?.click()}
+              onClick={() => photoPick.open()}
               disabled={profileUploading}
               style={{
                 width: 52, height: 52, borderRadius: '50%', flexShrink: 0,
@@ -296,6 +298,7 @@ export default function Settings() {
               style={{ display: 'none' }}
               onChange={handleProfilePhotoSelect}
             />
+{photoPick.element}
             <div style={{ minWidth: 0 }}>
               <p style={{ color: 'white', fontSize: 16, fontWeight: 700, fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", margin: 0 }}>
                 {user?.user_metadata?.full_name ?? 'Mi cuenta'}
