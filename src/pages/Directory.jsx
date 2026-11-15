@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { usePhotoPicker } from '../components/PhotoPicker'
 import { useSearchParams, Link } from 'react-router-dom'
 import Cropper from 'react-easy-crop'
 import { useAuth } from '../contexts/AuthContext'
@@ -360,6 +361,7 @@ export default function Directory() {
   const [photoUploading, setPhotoUploading] = useState(false)
   const [photoError, setPhotoError] = useState('')
   const photoInputRef = useRef(null)
+  const photoPick = usePhotoPicker(e => { const f = e.target.files?.[0]; if (f) openCropModal(f) }, { title: 'Foto del contacto' })
   const [cropSrc, setCropSrc] = useState(null)
   const [crop, setCrop] = useState({ x: 0, y: 0 })
   const [zoom, setZoom] = useState(1)
@@ -783,8 +785,9 @@ export default function Directory() {
                         style={{ display: 'none' }}
                         onChange={e => { const f = e.target.files?.[0]; if (f) openCropModal(f) }}
                       />
+{photoPick.element}
                       <div
-                        onClick={() => canEdit && photoInputRef.current?.click()}
+                        onClick={() => canEdit && photoPick.open()}
                         style={{
                           width: 64, height: 64, borderRadius: '50%',
                           overflow: 'hidden', border: '3px solid rgba(255,255,255,0.4)',
@@ -804,7 +807,7 @@ export default function Directory() {
                       </div>
                       {canEdit && (
                         <div
-                          onClick={() => photoInputRef.current?.click()}
+                          onClick={() => photoPick.open()}
                           style={{
                             position: 'absolute', bottom: 0, right: 0,
                             width: 22, height: 22, borderRadius: '50%',
