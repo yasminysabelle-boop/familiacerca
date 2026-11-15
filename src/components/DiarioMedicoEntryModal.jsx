@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { usePhotoPicker } from './PhotoPicker'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
@@ -268,6 +269,7 @@ export default function DiarioMedicoEntryModal({ open, onClose, onSaved }) {
 
   const [saving, setSaving] = useState(false)
   const fileRef = useRef()
+  const photoPick = usePhotoPicker(e => handlePhotoChange(e), { title: 'Agregar foto' })
 
   const supported = !!(window.SpeechRecognition || window.webkitSpeechRecognition)
 
@@ -530,7 +532,7 @@ export default function DiarioMedicoEntryModal({ open, onClose, onSaved }) {
 
                 {/* Photo picker */}
                 <button
-                  onClick={() => fileRef.current?.click()}
+                  onClick={() => photoPick.open()}
                   style={{
                     padding: '20px', borderRadius: 14, border: '2px dashed #D1C9BF',
                     background: photoPreview ? 'transparent' : '#F9F7F4',
@@ -545,7 +547,7 @@ export default function DiarioMedicoEntryModal({ open, onClose, onSaved }) {
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
                         <span style={{ fontSize: 32 }}>📷</span>
                         <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#0C6C9C' }}>
-                          Toca para tomar foto o elegir imagen
+                          Toca para tomar una foto o elegir de la galería
                         </p>
                       </div>
                     )
@@ -558,10 +560,11 @@ export default function DiarioMedicoEntryModal({ open, onClose, onSaved }) {
                   style={{ display: 'none' }}
                   onChange={handlePhotoChange}
                 />
+{photoPick.element}
 
                 {photoPreview && (
                   <button
-                    onClick={() => fileRef.current?.click()}
+                    onClick={() => photoPick.open()}
                     style={{ fontSize: 15, color: '#4E6470', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'center' }}
                   >
                     Cambiar imagen
