@@ -206,9 +206,14 @@ export default function Layout({ children }) {
       {/* Scrollable main — top offset excludes header height when on dashboard */}
       <main style={{
         position: 'fixed', inset: 0, overflowY: 'auto',
+        // Capa de contenido POR ENCIMA del menú de abajo (nov 2026): las
+        // ventanas que se abren dentro de una pantalla (agregar, editar,
+        // detalles, Milo) quedaban tapadas por el menú. El menú no se pisa
+        // con el contenido porque <main> termina justo donde empieza el menú.
+        zIndex: 1,
         background: bg,
         top:           hasOwnHeader ? `calc(${hospitalBarHeight}px + env(safe-area-inset-top))` : `calc(${hospitalBarHeight}px + 56px + env(safe-area-inset-top))`,
-        bottom:        (isSecondary || isHospitalMode || isVideoCall) ? 'env(safe-area-inset-bottom)' : 'calc(64px + env(safe-area-inset-bottom))',
+        bottom:        (isSecondary || isHospitalMode || isVideoCall) ? 'env(safe-area-inset-bottom)' : 'calc(70px + env(safe-area-inset-bottom))',
         paddingBottom: location.pathname === '/chat' ? 0 : 150,
       }}>
         <PWAInstallBanner />
@@ -272,7 +277,7 @@ export default function Layout({ children }) {
       {isVideoCall || isSecondary || isHospitalMode ? null : (
         <>
         <nav style={{
-          position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100,
+          position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 0,
           backgroundColor: '#ffffff',
           borderTop: '1px solid rgba(0,0,0,0.06)',
           boxShadow: '0 -2px 12px rgba(0,0,0,0.05)',
