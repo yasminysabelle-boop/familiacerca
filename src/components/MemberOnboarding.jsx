@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { usePhotoPicker } from './PhotoPicker'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { useFamily } from '../contexts/FamilyContext'
@@ -26,6 +27,7 @@ export default function MemberOnboarding({ onDone }) {
   const [photoFile, setPhotoFile]     = useState(null)
   const [photoPreview, setPhotoPreview] = useState(null)
   const fileInputRef = useRef()
+  const photoPick = usePhotoPicker(e => handlePhotoChange(e), { title: 'Tu foto' })
 
   // Step 2 state
   const [phone, setPhone] = useState('')
@@ -155,7 +157,7 @@ export default function MemberOnboarding({ onDone }) {
             <div style={{ position: 'relative' }}>
               <button
                 type="button"
-                onClick={() => fileInputRef.current?.click()}
+                onClick={() => photoPick.open()}
                 style={{
                   width: 88, height: 88, borderRadius: '50%', border: 'none',
                   background: photoPreview ? 'transparent' : '#E3F1F8',
@@ -186,6 +188,7 @@ export default function MemberOnboarding({ onDone }) {
               style={{ display: 'none' }}
               onChange={handlePhotoChange}
             />
+{photoPick.element}
           </div>
           <p style={{ margin: '-12px 0 18px', textAlign: 'center', fontSize: 14, color: '#5E7480' }}>
             Toca para agregar foto (opcional)
