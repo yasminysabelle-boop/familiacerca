@@ -3895,23 +3895,23 @@ export default function Dashboard() {
                         <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: '#14303D' }}>Primeros pasos</h2>
                         <span style={{ fontSize: 15, fontWeight: 700, color: '#0C6C9C' }}>{doneCount} de 3</span>
                       </div>
-                      <div style={{ height: 8, borderRadius: 8, background: '#E3F1F8', overflow: 'hidden', marginBottom: 12 }}>
+                      <div style={{ height: 8, borderRadius: 8, background: '#E3F1F8', overflow: 'hidden', marginBottom: 10 }}>
                         <div style={{ width: `${(doneCount / 3) * 100}%`, height: '100%', background: '#0C6C9C', borderRadius: 8, transition: 'width .4s ease' }} />
                       </div>
                       {steps.map((st, k) => {
                         const isNext = k === nextIdx
                         return (
                           <button key={k} onClick={st.go} disabled={st.done}
-                            style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, textAlign: 'left', padding: '12px 12px', marginTop: k ? 8 : 0, borderRadius: 14, cursor: st.done ? 'default' : 'pointer',
+                            style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, textAlign: 'left', padding: isNext ? '12px 12px' : '8px 12px', marginTop: k ? 6 : 0, borderRadius: 14, cursor: st.done ? 'default' : 'pointer',
                               background: isNext ? '#E3F1F8' : 'white', border: isNext ? '2px solid #0C6C9C' : '1px solid #E6E3DB', opacity: st.done ? 0.65 : 1 }}>
-                            <span style={{ flex: 'none', width: 40, height: 40, borderRadius: '50%', background: st.done ? '#0C6C9C' : 'white', border: st.done ? 'none' : '2px solid #CDE8F3', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: st.done ? 20 : 20, fontWeight: 800 }}>
-                              {st.done ? <CheckIcon size={20} color="white" strokeWidth={2.8} /> : <st.Ic size={20} color="#0C6C9C" strokeWidth={2.1} />}
+                            <span style={{ flex: 'none', width: isNext ? 40 : 30, height: isNext ? 40 : 30, borderRadius: '50%', background: st.done ? '#0C6C9C' : 'white', border: st.done ? 'none' : '2px solid #CDE8F3', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800 }}>
+                              {st.done ? <CheckIcon size={isNext ? 20 : 16} color="white" strokeWidth={2.8} /> : <st.Ic size={isNext ? 20 : 16} color="#0C6C9C" strokeWidth={2.1} />}
                             </span>
                             <span style={{ flex: 1, minWidth: 0 }}>
                               <span style={{ display: 'block', fontSize: 16, fontWeight: 700, color: '#14303D', textDecoration: st.done ? 'line-through' : 'none' }}>{st.title}</span>
-                              {!st.done && <span style={{ display: 'block', fontSize: 14, color: '#4E6470', marginTop: 2 }}>{st.sub}</span>}
+                              {isNext && <span style={{ display: 'block', fontSize: 14, color: '#4E6470', marginTop: 2 }}>{st.sub}</span>}
                             </span>
-                            {isNext && <span style={{ flex: 'none', padding: '8px 12px', borderRadius: 10, background: '#0C6C9C', color: 'white', fontSize: 15, fontWeight: 700 }}>Empezar</span>}
+                            {isNext && <span aria-hidden="true" style={{ flex: 'none', width: 34, height: 34, borderRadius: '50%', background: '#0C6C9C', color: 'white', fontSize: 22, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', lineHeight: 1 }}>›</span>}
                           </button>
                         )
                       })}
