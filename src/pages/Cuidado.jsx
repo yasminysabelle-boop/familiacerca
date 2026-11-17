@@ -296,7 +296,8 @@ export default function Cuidado() {
     ...ITEMS.filter(i => i.custom).map(i => ({ ...i, active: true })),
   ]
   const isFromTomorrow = i => scheduledBeforeStart(careSchedules[i.key] ?? i.scheduledTime, familyStart)
-  const requiredItems = ITEMS.filter(i => i.category === 'daily' && !isFromTomorrow(i))
+  // Lo que ya se marcó hoy cuenta aunque la rutina empiece "mañana" (nov 2026)
+  const requiredItems = ITEMS.filter(i => i.category === 'daily' && (!isFromTomorrow(i) || !!careLogs[i.key]))
   const completedRequired = requiredItems.filter(i => !!careLogs[i.key]).length
   const allDone = requiredItems.length > 0 && completedRequired === requiredItems.length
 
