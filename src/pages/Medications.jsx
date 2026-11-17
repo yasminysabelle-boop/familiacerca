@@ -1154,7 +1154,7 @@ export default function Medications() {
 
             {/* ── Banner cálido — 3 estados: al día / pendientes / omitidos sin resolver ── */}
             {(() => {
-              const patientFirst = (activePatientName || profile?.name || 'tu familiar').split(' ')[0]
+              const patientFirst = ((activePatientName || profile?.name || '').split(' ')[0] || 'tu familiar')
               const totalPending = pendientesMeds.length + retrasadosMeds.length
               const omitidosCount = medications.filter(med =>
                 (logsByMedId[med.id]?.[today] ?? []).some(l => l.status === 'missed')
@@ -1522,7 +1522,7 @@ export default function Medications() {
               <p style={{ fontSize: 14, color: '#4E6470', margin: 0, lineHeight: 1.55 }}>
                 Cada pequeño cuidado cuenta. Gracias por estar pendiente de{' '}
                 <span style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontStyle: 'italic', color: '#0C6C9C', fontWeight: 600 }}>
-                  {(activePatientName || profile?.name || 'tu familiar').split(' ')[0]}
+                  {((activePatientName || profile?.name || '').split(' ')[0] || 'tu familiar')}
                 </span>.
               </p>
             </div>
@@ -1594,7 +1594,7 @@ export default function Medications() {
                 <p style={{ fontSize: 15, color: '#5C6B78', margin: '0 0 8px', lineHeight: 1.5 }}>
                   Cuéntanos qué medicina toma{' '}
                   <span style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", fontStyle: 'italic', color: '#0C6C9C', fontWeight: 600 }}>
-                    {(activePatientName || profile?.name || 'tu familiar').split(' ')[0]}
+                    {((activePatientName || profile?.name || '').split(' ')[0] || 'tu familiar')}
                   </span>, como prefieras.
                 </p>
                 {[
