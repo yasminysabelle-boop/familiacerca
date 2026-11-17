@@ -86,11 +86,13 @@ export function FamilyProvider({ children }) {
 
       const built = []
 
-      if (ownData) {
+      // También cuenta como familia propia quien llenó el perfil del familiar
+      // sin pasar por la bienvenida (no tiene care_profiles todavía, nov 2026).
+      if (ownData || ownPatient?.nombre_completo) {
         built.push({
           ownerId: user.id,
-          patientName: ownPatient?.nombre_completo || ownData.name || null,
-          patientPhotoUrl: ownData.photo_url ?? null,
+          patientName: ownPatient?.nombre_completo || ownData?.name || null,
+          patientPhotoUrl: ownData?.photo_url ?? null,
           role: null,
           profile: ownData,
         })
