@@ -214,7 +214,9 @@ export default function Layout({ children }) {
         background: bg,
         top:           hasOwnHeader ? `calc(${hospitalBarHeight}px + env(safe-area-inset-top))` : `calc(${hospitalBarHeight}px + 56px + env(safe-area-inset-top))`,
         bottom:        (isSecondary || isHospitalMode || isVideoCall) ? 'env(safe-area-inset-bottom)' : 'calc(70px + env(safe-area-inset-bottom))',
-        paddingBottom: location.pathname === '/chat' ? 0 : 150,
+        // Pantallas con su propio scroll interno (alto 100%): sin relleno extra,
+        // o su lista queda cortada 150px antes del menú (nov 2026)
+        paddingBottom: ['/chat', '/cuidado', '/historial'].includes(location.pathname) ? 0 : 150,
       }}>
         <PWAInstallBanner />
         <OfflineBanner />
