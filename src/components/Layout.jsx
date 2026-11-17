@@ -213,7 +213,7 @@ export default function Layout({ children }) {
         zIndex: 1,
         background: bg,
         top:           hasOwnHeader ? `calc(${hospitalBarHeight}px + env(safe-area-inset-top))` : `calc(${hospitalBarHeight}px + 56px + env(safe-area-inset-top))`,
-        bottom:        (isSecondary || isHospitalMode || isVideoCall) ? 'env(safe-area-inset-bottom)' : 'calc(70px + env(safe-area-inset-bottom))',
+        bottom:        (isSecondary || isHospitalMode || isVideoCall) ? 'env(safe-area-inset-bottom)' : 'calc(72px + env(safe-area-inset-bottom))',
         // Pantallas con su propio scroll interno (alto 100%): sin relleno extra,
         // o su lista queda cortada 150px antes del menú (nov 2026)
         paddingBottom: ['/chat', '/cuidado', '/historial'].includes(location.pathname) ? 0 : 150,
