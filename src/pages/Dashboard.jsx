@@ -2189,6 +2189,7 @@ export default function Dashboard() {
     }
     if (searchParams.get('ficha') === '1') {
       setSearchParams({}, { replace: true })
+      try { sessionStorage.setItem('fc_open_ficha', '1') } catch { /* */ }
       setFichaOpen(true)
     }
   }, [])
@@ -2527,7 +2528,11 @@ export default function Dashboard() {
     })
   }, [loading, ownerId, profile?.name])
 
+  // Solo vale la respuesta de la última carga: si llegan dos a la vez (el
+  // contexto de familia recarga), una vieja ya no pisa a la nueva (nov 2026)
+  const fetchSeqRef = useRef(0)
   async function fetchTimeline() {
+    const seq = ++fetchSeqRef.current
     setLoading(true)
     setTimelineError('')
     // Safety net: if any Supabase query hangs on slow mobile, unblock after 12 s
@@ -2622,6 +2627,7 @@ export default function Dashboard() {
         .limit(1)
         .maybeSingle(),
     ])
+    if (seq !== fetchSeqRef.current) { clearTimeout(timeoutTimer); return }
 
     setMedTotal((meds ?? []).length)
     setMedsList(meds ?? [])
@@ -3279,7 +3285,8 @@ export default function Dashboard() {
   }
 
   // Emergencia completa (nov 2026): quién va, 911 y ficha médica
-  const [fichaOpen, setFichaOpen] = useState(false)
+  // Sobrevive si el Inicio se vuelve a montar mientras carga (?ficha=1)
+  const [fichaOpen, setFichaOpen] = useState(() => { try { return sessionStorage.getItem('fc_open_ficha') === '1' } catch { return false } })
   const [sosResponders, setSosResponders] = useState([])
   const [respondsOk, setRespondsOk] = useState(true)
   useEffect(() => {
@@ -4042,7 +4049,7 @@ export default function Dashboard() {
       <SosConfirmSheet
         open={fichaOpen}
         viewOnly
-        onClose={() => setFichaOpen(false)}
+        onClose={() => { try { sessionStorage.removeItem('fc_open_ficha') } catch { /* */ } setFichaOpen(false) }}
         onConfirm={() => {}}
         patientProfile={patientProfile}
         patientName={dashPatientName}
