@@ -43,6 +43,9 @@ export default function Login() {
         navigate('/join?token=' + pending, { replace: true })
         return
       }
+      // Volver a donde iba (ej. /empresa) si llegó aquí desde una página protegida
+      const next = new URLSearchParams(window.location.search).get('next')
+      if (next && next.startsWith('/') && !next.startsWith('//')) { navigate(next, { replace: true }); return }
       const completed = data?.user?.user_metadata?.onboarding_completed
       navigate(completed ? '/permisos' : '/onboarding')
     }
