@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, Navigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
+import { demoOrgs, demoDashboard, demoPeopleFor, money, ESTADOS } from '../lib/empresaDemo'
 
 // Panel para empresas (nov 2026). Solo para administradores de una empresa
 // cliente. Muestra TOTALES de uso (org_dashboard en Supabase), nunca datos de
@@ -19,26 +20,6 @@ const FEATURES = [
   ['milo', 'Preguntas a Milo y Luna'],
   ['emergencias', 'Alertas de emergencia'],
 ]
-
-function demoData() {
-  const weeks = [18, 22, 27, 31, 34, 38, 41, 43]
-  const today = new Date()
-  return {
-    org: { nombre: 'Empresa Ejemplo S.A.', tipo: 'empresa', plan: 'Empresa', licencias: 60, desde: '2026-09-01', renueva: '2027-09-01', codigo: 'DEMO24' },
-    miembros: 52, familias: 47, grupo_minimo: 5, detalle_oculto: false, activas_7: 43, activas_30: 45, dias: 30,
-    semanas: weeks.map((f, i) => { const d = new Date(today); d.setDate(d.getDate() - (7 - i) * 7); return { semana: d.toISOString().slice(0, 10), familias: f } }),
-    funciones: { medicinas: 1240, rutina: 2105, tareas: 410, notas: 286, gastos: 173, milo: 352, emergencias: 3, horas_turno: 0 },
-  }
-}
-
-function demoPeople() {
-  const names = ['Ana Rivera', 'Carlos Méndez', 'Lucía Torres', 'José Ramírez', 'María Gómez', 'Pedro Castillo']
-  return {
-    miembros: names.map((n, i) => ({ user_id: 'd' + i, nombre: n, email: n.normalize('NFD').toLowerCase().replace(/[^a-z ]/g, '').replace(' ', '.') + '@empresaejemplo.com', desde: new Date(Date.now() - (i + 2) * 6 * 864e5).toISOString() })),
-    invitados: ['laura.diaz@empresaejemplo.com', 'miguel.santos@empresaejemplo.com'].map((e, i) => ({ email: e, desde: new Date(Date.now() - (i + 1) * 2 * 864e5).toISOString() })),
-    admins: [{ user_id: 'a0', nombre: 'Recursos Humanos', email: 'rrhh@empresaejemplo.com' }],
-  }
-}
 
 const fmtShort = d => d ? new Date(d).toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'
 const fmtDate = d => d ? new Date(d + 'T12:00:00').toLocaleDateString('es', { day: 'numeric', month: 'long', year: 'numeric' }) : '—'
@@ -110,9 +91,10 @@ export default function EmpresaPanel() {
   const [inviting, setInviting] = useState(false)
   const [adminEmail, setAdminEmail] = useState('')
   const [adminMsg, setAdminMsg] = useState(null)
+  const [billing, setBilling] = useState(null)
 
   useEffect(() => {
-    if (demo) { setData(demoData()); return }
+    if (demo) { const l = demoOrgs(); setOrgs(l.map(x => ({ id: x.id, name: x.nombre }))); setOrgId(id => id || (l.some(x => x.id === params.get('org')) ? params.get('org') : l[0].id)); return }
     if (!user) return
     supabase.from('organization_admins').select('org_id, organizations(name)').eq('user_id', user.id)
       .then(({ data, error }) => {
@@ -123,19 +105,26 @@ export default function EmpresaPanel() {
   }, [user, demo])
 
   useEffect(() => {
-    if (demo || !orgId) return
+    if (!orgId) return
+    setBilling(null); setPeople(null)
+    if (demo) { setData(demoDashboard(orgId)); return }
     setData(null); setError('')
     supabase.rpc('org_dashboard', { p_org: orgId, p_days: days })
       .then(({ data, error }) => error ? setError('No se pudo cargar el panel. Intenta de nuevo en un rato.') : setData(data))
   }, [orgId, days, demo])
 
   async function loadPeople() {
-    if (demo) { setPeople(demoPeople()); return }
+    if (demo) { setPeople(demoPeopleFor(orgId)); return }
     if (!orgId) return
     const { data, error } = await supabase.rpc('org_people', { p_org: orgId })
     setPeople(error ? { miembros: [], invitados: [], admins: [], error: true } : data)
   }
-  useEffect(() => { if (tab !== 'resumen') loadPeople() }, [tab, orgId, demo]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (tab === 'empleados' || tab === 'admins') loadPeople() }, [tab, orgId, demo]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (tab !== 'facturacion' || !orgId) return
+    if (demo) { setBilling(demoDashboard(orgId).billing); return }
+    supabase.rpc('org_billing', { p_org: orgId }).then(({ data, error }) => setBilling(error ? { error: true, facturas: [] } : data))
+  }, [tab, orgId, demo])
 
   async function invite() {
     const list = [...new Set(emailsText.split(/[\s,;]+/).map(e => e.trim().toLowerCase()).filter(Boolean))]
@@ -240,13 +229,13 @@ export default function EmpresaPanel() {
       <main style={{ maxWidth: 1100, margin: '0 auto', padding: '22px 16px 48px' }}>
         {demo && (
           <p style={{ margin: '0 0 16px', padding: '12px 16px', borderRadius: 14, background: '#FDF3DF', color: '#7A5410', fontSize: 15, fontWeight: 600 }}>
-            Datos de ejemplo para presentaciones. Una empresa real ve aquí los totales de su propio uso.
+            Datos de ejemplo con empresas ficticias, para presentaciones. Cambia de empresa arriba a la derecha. Una empresa real solo ve la suya.
           </p>
         )}
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10, marginBottom: 14 }}>
           <div role="tablist" style={{ display: 'flex', gap: 6, background: 'white', border: `1px solid ${C.line}`, borderRadius: 999, padding: 4 }}>
-            {[['resumen', 'Resumen'], ['empleados', 'Empleados'], ['admins', 'Administradores']].map(([k, l]) => (
+            {[['resumen', 'Resumen'], ['empleados', 'Empleados'], ['facturacion', 'Facturación'], ['admins', 'Administradores']].map(([k, l]) => (
               <button key={k} role="tab" aria-selected={tab === k} onClick={() => setTab(k)} style={{ padding: '9px 16px', borderRadius: 999, border: 'none', background: tab === k ? C.blue : 'transparent', color: tab === k ? 'white' : C.ink, fontWeight: 700, fontSize: 15, cursor: 'pointer', fontFamily: SANS }}>{l}</button>
             ))}
           </div>
@@ -362,6 +351,50 @@ export default function EmpresaPanel() {
               </Card>
             )}
           </>
+        )}
+
+        {tab === 'facturacion' && (
+          !billing ? <p style={{ color: C.sub }}>Cargando…</p> : (() => {
+            const cur = billing.moneda || 'USD'
+            const mensual = (billing.licencias || 0) * (billing.precio || 0)
+            const porCobrar = billing.facturas.filter(f => f.estado !== 'pagada').reduce((t, f) => t + Number(f.monto), 0)
+            const pagado = billing.facturas.filter(f => f.estado === 'pagada').reduce((t, f) => t + Number(f.monto), 0)
+            return (
+              <>
+                <div style={grid}>
+                  <Tile label="Costo mensual" value={money(mensual, cur)} sub={`${num(billing.licencias)} licencias × ${money(billing.precio, cur)}`} accent={C.blue} />
+                  <Tile label={billing.ciclo === 'anual' ? 'Se factura al año' : 'Se factura cada mes'} value={money(billing.ciclo === 'anual' ? mensual * 12 : mensual, cur)} sub={`Renovación: ${fmtDate(billing.renueva)}`} />
+                  <Tile label="Saldo pendiente" value={money(porCobrar, cur)} sub={porCobrar ? 'Ver facturas abajo' : 'Están al día ✓'} accent={porCobrar ? C.coral : '#1E6B3E'} />
+                  <Tile label="Pagado a la fecha" value={money(pagado, cur)} />
+                </div>
+                <Card title="Facturas" subtitle={billing.correo ? `Se envían a ${billing.correo}` : 'Escríbannos a hola@familiacerca.com para recibirlas por correo'} style={{ marginTop: 14 }}>
+                  {billing.facturas.length === 0 ? <p style={{ margin: 0, color: C.sub }}>Todavía no hay facturas.</p> : (
+                    <div style={{ overflowX: 'auto' }}>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 15, minWidth: 520 }}>
+                        <thead><tr style={{ textAlign: 'left', color: C.sub, fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                          {['Factura', 'Período', 'Licencias', 'Monto', 'Estado'].map(h => <th key={h} style={{ padding: '8px 6px', fontWeight: 700 }}>{h}</th>)}
+                        </tr></thead>
+                        <tbody>
+                          {billing.facturas.map(f => (
+                            <tr key={f.id} style={{ borderTop: `1px solid ${C.line}` }}>
+                              <td style={{ padding: '10px 6px', fontWeight: 700 }}>{f.numero}</td>
+                              <td style={{ padding: '10px 6px' }}>{fmtShort(f.desde + 'T12:00:00')} – {fmtShort(f.hasta + 'T12:00:00')}</td>
+                              <td style={{ padding: '10px 6px' }}>{num(f.licencias)}</td>
+                              <td style={{ padding: '10px 6px', fontWeight: 700 }}>{money(f.monto, cur)}</td>
+                              <td style={{ padding: '10px 6px' }}>
+                                <span style={{ padding: '4px 10px', borderRadius: 999, fontSize: 13, fontWeight: 700, background: ESTADOS[f.estado]?.bg, color: ESTADOS[f.estado]?.fg }}>{ESTADOS[f.estado]?.label || f.estado}</span>
+                                {f.estado !== 'pagada' && f.vence && <span style={{ display: 'block', fontSize: 13, color: C.sub, marginTop: 4 }}>vence {fmtShort(f.vence + 'T12:00:00')}</span>}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </Card>
+              </>
+            )
+          })()
         )}
 
         {tab === 'admins' && (
