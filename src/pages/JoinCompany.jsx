@@ -63,7 +63,7 @@ export default function JoinCompany() {
           <h1 style={{ fontSize: 24, fontWeight: 800, margin: '14px 0 8px' }}>Tu empresa te regala FamiliaCerca</h1>
           <p style={{ fontSize: 16, color: '#4E6470', lineHeight: 1.5, margin: '0 0 22px' }}>Para organizar el cuidado de tu familiar entre todos. Primero crea tu cuenta gratis o entra, y te unimos al beneficio.</p>
           <button onClick={() => navigate('/register')} style={{ width: '100%', padding: 15, borderRadius: 14, border: 'none', background: '#BF513C', color: 'white', fontSize: 17, fontWeight: 800, cursor: 'pointer', fontFamily: SANS, marginBottom: 10 }}>Crear mi cuenta</button>
-          <button onClick={() => navigate('/login')} style={{ width: '100%', padding: 15, borderRadius: 14, border: '1.5px solid #0C6C9C', background: 'white', color: '#0C6C9C', fontSize: 17, fontWeight: 800, cursor: 'pointer', fontFamily: SANS }}>Ya tengo cuenta</button>
+          <button onClick={() => navigate('/login?next=/unirme-empresa')} style={{ width: '100%', padding: 15, borderRadius: 14, border: '1.5px solid #0C6C9C', background: 'white', color: '#0C6C9C', fontSize: 17, fontWeight: 800, cursor: 'pointer', fontFamily: SANS }}>Ya tengo cuenta</button>
         </div>
       </div>
     )
