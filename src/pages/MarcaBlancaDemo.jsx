@@ -133,13 +133,85 @@ function Phone({ brand, start = 'inicio' }) {
   )
 }
 
+// ── El panel de la agencia (lo que ve la dueña o la coordinadora) ───────────
+function AgencyPanel({ b, families, price }) {
+  const soft = mix(b.color, 0.88)
+  const box = { background: 'white', border: `1px solid ${LINE}`, borderRadius: 20, padding: 20 }
+  const tile = (l, v, sub, accent) => (
+    <div style={{ background: 'white', border: `1px solid ${LINE}`, borderRadius: 18, padding: '16px 18px' }}>
+      <p style={{ margin: 0, fontSize: 14, color: SUB, fontWeight: 600 }}>{l}</p>
+      <p style={{ margin: '6px 0 2px', fontSize: 28, fontWeight: 800, color: accent || INK }}>{v}</p>
+      {sub && <p style={{ margin: 0, fontSize: 13, color: SUB }}>{sub}</p>}
+    </div>
+  )
+  const growth = [0.42, 0.53, 0.64, 0.74, 0.86, 1].map(f => Math.round(families * f))
+  const months = growth.map((_, i) => { const d = new Date(); d.setDate(1); d.setMonth(d.getMonth() - 5 + i); return d.toLocaleDateString('es', { month: 'short' }) })
+  const max = Math.max(1, ...growth)
+  const atrasadas = Math.max(1, Math.round(families * 0.04))
+  const SUBS = [['Familia Rivera', 'hace 2 días', 'al día'], ['Familia Gómez', 'hace 4 días', 'al día'], ['Familia Torres', 'hace 1 semana', 'atrasado'], ['Familia Méndez', 'hace 1 semana', 'al día'], ['Familia Castillo', 'hace 2 semanas', 'al día']]
+  const VIS = [['Marisol', 'Doña Rosa · Familia Rivera', 'En casa desde 8:02 am', '#1E6B3E'], ['Yolanda', 'Don Pedro · Familia Gómez', 'En casa desde 7:55 am', '#1E6B3E'], ['Carmen L.', 'Doña Luz · Familia Torres', 'Terminó 12:30 pm', SUB], ['Rafael', 'Don Julio · Familia Méndez', 'Llega a las 2:00 pm', '#7A5410']]
+  const USO = [['Cuidados de la rutina marcados', 4120], ['Medicinas marcadas', 2890], ['Notas de las cuidadoras', 1340], ['Mensajes entre familias', 860], ['Alertas de emergencia', 4]]
+  return (
+    <div style={{ gridColumn: '1 / -1' }}>
+      <div style={{ display: 'grid', gap: 12, gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))' }}>
+        {tile('Familias suscritas', families.toLocaleString('es'), `+${growth[5] - growth[4]} este mes`, b.color)}
+        {tile('Ingreso este mes', money(families * (price || 0)), `${money(price)} por familia`)}
+        {tile('Pagos atrasados', atrasadas, `${money(atrasadas * (price || 0))} por cobrar`, '#A3452F')}
+        {tile('Horas de cuidado este mes', Math.round(families * 26).toLocaleString('es'), 'Registradas por sus cuidadoras')}
+        {tile('Visitas a tiempo', '96%', 'Llegada dentro de 10 min')}
+      </div>
+      <div style={{ display: 'grid', gap: 14, gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', marginTop: 14 }}>
+        <div style={box}>
+          <p style={{ margin: 0, fontSize: 17, fontWeight: 800 }}>Familias suscritas por mes</p>
+          <svg viewBox="0 0 360 190" style={{ width: '100%', height: 'auto', marginTop: 10 }} role="img" aria-label="Familias suscritas por mes">
+            {growth.map((v, i) => { const h = (v / max) * 140; const x = 12 + i * 58; return (
+              <g key={i}>
+                <rect x={x} y={160 - h} width={40} height={h} rx="6" fill={i === 5 ? b.color : mix(b.color, 0.6)} />
+                <text x={x + 20} y={154 - h} fontSize="12" fontWeight="700" textAnchor="middle" fill={INK}>{v}</text>
+                <text x={x + 20} y={178} fontSize="11" textAnchor="middle" fill={SUB}>{months[i]}</text>
+              </g>) })}
+          </svg>
+        </div>
+        <div style={box}>
+          <p style={{ margin: '0 0 8px', fontSize: 17, fontWeight: 800 }}>Visitas de hoy</p>
+          {VIS.map(([c, f, st, col]) => (
+            <div key={c} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0', borderTop: `1px solid ${LINE}` }}>
+              <span style={{ width: 34, height: 34, borderRadius: '50%', background: soft, color: b.color, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{c[0]}</span>
+              <span style={{ flex: 1, minWidth: 0 }}><strong style={{ display: 'block', fontSize: 15 }}>{c}</strong><span style={{ fontSize: 13, color: SUB }}>{f}</span></span>
+              <span style={{ fontSize: 13, fontWeight: 700, color: col, textAlign: 'right' }}>{st}</span>
+            </div>
+          ))}
+        </div>
+        <div style={box}>
+          <p style={{ margin: '0 0 8px', fontSize: 17, fontWeight: 800 }}>Suscriptores recientes</p>
+          {SUBS.map(([n, d, st]) => (
+            <div key={n} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0', borderTop: `1px solid ${LINE}` }}>
+              <span style={{ flex: 1 }}><strong style={{ display: 'block', fontSize: 15 }}>{n}</strong><span style={{ fontSize: 13, color: SUB }}>Plan Familia · se unió {d}</span></span>
+              <span style={{ padding: '4px 10px', borderRadius: 999, fontSize: 13, fontWeight: 700, background: st === 'al día' ? '#E3F4EA' : '#FBEAE4', color: st === 'al día' ? '#1E6B3E' : '#A3452F' }}>{st === 'al día' ? 'Al día' : 'Atrasado'}</span>
+            </div>
+          ))}
+        </div>
+        <div style={box}>
+          <p style={{ margin: '0 0 12px', fontSize: 17, fontWeight: 800 }}>Lo que más usan las familias</p>
+          {USO.map(([l, n]) => (
+            <div key={l} style={{ marginBottom: 12 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 15, marginBottom: 4 }}><span style={{ fontWeight: 600 }}>{l}</span><strong>{n.toLocaleString('es')}</strong></div>
+              <div style={{ height: 10, borderRadius: 6, background: soft }}><div style={{ width: `${Math.max(2, (n / USO[0][1]) * 100)}%`, height: '100%', borderRadius: 6, background: b.color }} /></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function MarcaBlancaDemo() {
   const { code } = useParams()
   const [brand, setBrand] = useState(code === 'ejemplo' ? EJEMPLO : null)
   const [missing, setMissing] = useState(false)
   const [view, setView] = useState('app')
   const [price, setPrice] = useState(null)
-  const [families, setFamilies] = useState(40)
+  const [families, setFamilies] = useState(120)
 
   useEffect(() => {
     if (code === 'ejemplo') return
@@ -170,11 +242,12 @@ export default function MarcaBlancaDemo() {
         </p>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 18 }}>
           <button onClick={() => setView('app')} style={tabBtn('app')}>La app para sus familias</button>
+          <button onClick={() => setView('panel')} style={tabBtn('panel')}>Su panel</button>
           <button onClick={() => setView('precio')} style={tabBtn('precio')}>Su precio y sus ingresos</button>
         </div>
 
         <div style={{ display: 'grid', gap: 24, gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', alignItems: 'start' }}>
-          {view === 'app' ? (
+          {view === 'panel' ? <AgencyPanel b={b} families={families} price={price} /> : view === 'app' ? (
             <div style={box}>
               <h1 style={{ margin: '0 0 12px', fontSize: 24, fontWeight: 800 }}>Lo que reciben las familias de sus pacientes</h1>
               {[['🟢', 'Ven la visita en vivo', 'Saben cuándo llegó y se fue la cuidadora, y leen sus notas del día.'],
@@ -210,7 +283,7 @@ export default function MarcaBlancaDemo() {
               <p style={{ margin: '14px 0 0', fontSize: 13, color: SUB }}>Cálculo de ejemplo: familias × precio. No incluye costos ni comisiones.</p>
             </div>
           )}
-          <Phone key={view} brand={b} start={view === 'precio' ? 'plan' : 'inicio'} />
+          {view !== 'panel' && <Phone key={view} brand={b} start={view === 'precio' ? 'plan' : 'inicio'} />}
         </div>
       </main>
     </div>
