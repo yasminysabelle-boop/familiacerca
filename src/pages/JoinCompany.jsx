@@ -26,6 +26,7 @@ export default function JoinCompany() {
   const [mine, setMine] = useState(null)
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState(null)
+  const [invites, setInvites] = useState([])
 
   useEffect(() => {
     if (!user) return
@@ -33,7 +34,12 @@ export default function JoinCompany() {
     try { localStorage.removeItem('fc_org_code') } catch { /* */ }
     supabase.from('organization_members').select('org_id, organizations(name)').limit(1)
       .then(({ data, error }) => setMine(error ? false : (data?.[0]?.organizations?.name ?? '')))
-  }, [user])
+    supabase.rpc('my_org_invites').then(({ data }) => {
+      const list = Array.isArray(data) ? data : []
+      setInvites(list)
+      if (list[0] && !code) setCode(list[0].codigo)
+    })
+  }, [user]) // eslint-disable-line react-hooks/exhaustive-deps
 
   async function join() {
     setBusy(true); setMsg(null)
@@ -84,6 +90,7 @@ export default function JoinCompany() {
           </div>
         ) : (
           <div style={box}>
+            {invites[0] && <p style={{ margin: '0 0 12px', fontSize: 16, fontWeight: 700 }}>🎁 {invites[0].org} te invitó. Ya pusimos su código:</p>}
             <label style={{ display: 'block', fontSize: 15, fontWeight: 700, marginBottom: 6 }}>Código de tu empresa</label>
             <input value={code} onChange={e => setCode(e.target.value.toUpperCase())} placeholder="Ej: A1B2C3" maxLength={12}
               style={{ width: '100%', boxSizing: 'border-box', padding: '14px 16px', borderRadius: 14, border: '1.5px solid #E6E3DB', fontSize: 20, fontWeight: 800, letterSpacing: '0.15em', fontFamily: SANS, color: '#14303D' }} />
@@ -98,10 +105,10 @@ export default function JoinCompany() {
 
         <div style={{ ...box, background: '#EEF6FA', border: 'none' }}>
           <p style={{ margin: '0 0 8px', fontSize: 16, fontWeight: 800 }}>🔒 Lo que tu empresa ve y lo que no</p>
-          <p style={{ margin: '0 0 6px', fontSize: 15, lineHeight: 1.5 }}><strong>Ve:</strong> cuántas personas usan el beneficio y qué partes de la app se usan más, en totales.</p>
-          <p style={{ margin: 0, fontSize: 15, lineHeight: 1.5 }}><strong>Nunca ve:</strong> tu nombre en el uso, el de tu familiar, sus medicinas, notas, gastos ni nada de su salud.</p>
+          <p style={{ margin: '0 0 6px', fontSize: 15, lineHeight: 1.5 }}><strong>Ve:</strong> que tienes el beneficio (tu nombre y correo) y cuánto se usa la app en total, sumando a todos.</p>
+          <p style={{ margin: 0, fontSize: 15, lineHeight: 1.5 }}><strong>Nunca ve:</strong> lo que tú haces en la app, el nombre de tu familiar, sus medicinas, notas, gastos ni nada de su salud.</p>
         </div>
-        {!mine && <p style={{ fontSize: 14, color: '#5E7480', lineHeight: 1.45, margin: 0 }}>Al tocar "Unirme" aceptas que tu empresa vea ese uso anónimo. Puedes salirte cuando quieras.</p>}
+        {!mine && <p style={{ fontSize: 14, color: '#5E7480', lineHeight: 1.45, margin: 0 }}>Al tocar "Unirme" aceptas que tu empresa vea eso. Puedes salirte cuando quieras.</p>}
       </div>
     </div>
   )
