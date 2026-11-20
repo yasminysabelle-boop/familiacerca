@@ -3,6 +3,7 @@ import { Link, Navigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { demoOrgs, money, ESTADOS } from '../lib/empresaDemo'
+import MarcaBlancaConsola from '../components/MarcaBlancaConsola'
 
 // Consola de FamiliaCerca (nov 2026): solo para el equipo de FamiliaCerca
 // (cuentas con rol "admin"). Empresas clientes, licencias, cobro y facturas,
@@ -207,6 +208,8 @@ export default function ConsolaEmpresas() {
             )}
           </>
         )}
+
+        <MarcaBlancaConsola demo={demo} />
 
         {form && (
           <div style={{ ...card, marginBottom: 16, border: `1.5px solid ${C.blue}` }}>
