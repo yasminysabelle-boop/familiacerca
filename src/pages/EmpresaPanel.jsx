@@ -31,6 +31,16 @@ function demoData() {
   }
 }
 
+function demoPeople() {
+  const names = ['Ana Rivera', 'Carlos Méndez', 'Lucía Torres', 'José Ramírez', 'María Gómez', 'Pedro Castillo']
+  return {
+    miembros: names.map((n, i) => ({ user_id: 'd' + i, nombre: n, email: n.toLowerCase().replace(/[^a-z ]/g, '').replace(' ', '.') + '@empresaejemplo.com', desde: new Date(Date.now() - (i + 2) * 6 * 864e5).toISOString() })),
+    invitados: ['laura.diaz@empresaejemplo.com', 'miguel.santos@empresaejemplo.com'].map((e, i) => ({ email: e, desde: new Date(Date.now() - (i + 1) * 2 * 864e5).toISOString() })),
+    admins: [{ user_id: 'a0', nombre: 'Recursos Humanos', email: 'rrhh@empresaejemplo.com' }],
+  }
+}
+
+const fmtShort = d => d ? new Date(d).toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'
 const fmtDate = d => d ? new Date(d + 'T12:00:00').toLocaleDateString('es', { day: 'numeric', month: 'long', year: 'numeric' }) : '—'
 const num = n => (n ?? 0).toLocaleString('es')
 
@@ -93,6 +103,13 @@ export default function EmpresaPanel() {
   const [data, setData] = useState(null)
   const [error, setError] = useState('')
   const [copied, setCopied] = useState(false)
+  const [tab, setTab] = useState('resumen')
+  const [people, setPeople] = useState(null)
+  const [emailsText, setEmailsText] = useState('')
+  const [inviteMsg, setInviteMsg] = useState(null)
+  const [inviting, setInviting] = useState(false)
+  const [adminEmail, setAdminEmail] = useState('')
+  const [adminMsg, setAdminMsg] = useState(null)
 
   useEffect(() => {
     if (demo) { setData(demoData()); return }
@@ -111,6 +128,56 @@ export default function EmpresaPanel() {
     supabase.rpc('org_dashboard', { p_org: orgId, p_days: days })
       .then(({ data, error }) => error ? setError('No se pudo cargar el panel. Intenta de nuevo en un rato.') : setData(data))
   }, [orgId, days, demo])
+
+  async function loadPeople() {
+    if (demo) { setPeople(demoPeople()); return }
+    if (!orgId) return
+    const { data, error } = await supabase.rpc('org_people', { p_org: orgId })
+    setPeople(error ? { miembros: [], invitados: [], admins: [], error: true } : data)
+  }
+  useEffect(() => { if (tab !== 'resumen') loadPeople() }, [tab, orgId, demo]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  async function invite() {
+    const list = [...new Set(emailsText.split(/[\s,;]+/).map(e => e.trim().toLowerCase()).filter(Boolean))]
+    if (!list.length) return
+    if (demo) { setInviteMsg({ ok: true, text: `En una empresa real se mandarían ${list.length} invitaciones por correo.` }); return }
+    setInviting(true); setInviteMsg(null)
+    const { data, error } = await supabase.rpc('org_invite', { p_org: orgId, p_emails: list })
+    if (error) { setInviting(false); setInviteMsg({ ok: false, text: 'No se pudieron guardar las invitaciones. Revisa los correos e intenta de nuevo.' }); return }
+    const valid = list.filter(e => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e))
+    let sentTxt = ''
+    if (data.invitados > 0) {
+      const { data: sent, error: sendErr } = await supabase.functions.invoke('send-org-invite', { body: { orgId, emails: valid.slice(0, 100) } })
+      sentTxt = sendErr || !sent ? ' No se pudo mandar el correo: compartan el enlace de invitación.' : ` Se mandó el correo a ${sent.sent}.`
+    }
+    const parts = [`${data.invitados} invitados.`]
+    if (data.ya_eran) parts.push(`${data.ya_eran} ya tenían el beneficio.`)
+    if (data.invalidos) parts.push(`${data.invalidos} correos no eran válidos.`)
+    setInviting(false); setEmailsText(''); setInviteMsg({ ok: true, text: parts.join(' ') + sentTxt }); loadPeople()
+  }
+
+  async function removeMember(m) {
+    if (!window.confirm(`¿Quitar la licencia de ${m.nombre}? Su cuenta y su familia siguen igual; solo deja de tener el beneficio.`)) return
+    if (demo) return
+    await supabase.rpc('org_remove_member', { p_org: orgId, p_user: m.user_id }); loadPeople()
+  }
+  async function cancelInvite(i) {
+    if (demo) return
+    await supabase.rpc('org_cancel_invite', { p_org: orgId, p_email: i.email }); loadPeople()
+  }
+  async function addAdmin() {
+    const e = adminEmail.trim().toLowerCase(); if (!e) return
+    if (demo) { setAdminMsg({ ok: true, text: 'En una empresa real, esa persona ya podría entrar al panel.' }); return }
+    const { data, error } = await supabase.rpc('org_add_admin', { p_org: orgId, p_email: e })
+    if (error || !data?.ok) { setAdminMsg({ ok: false, text: data?.error === 'sin_cuenta' ? 'Esa persona todavía no tiene cuenta. Que se registre gratis en familiacerca.com con ese correo y luego la agregan.' : 'No se pudo agregar.' }); return }
+    setAdminEmail(''); setAdminMsg({ ok: true, text: 'Listo. Ya puede entrar a familiacerca.com/empresa con su cuenta.' }); loadPeople()
+  }
+  async function removeAdmin(a) {
+    if (demo || !window.confirm(`¿Quitar a ${a.nombre} como administrador?`)) return
+    const { data } = await supabase.rpc('org_remove_admin', { p_org: orgId, p_user: a.user_id })
+    if (data && !data.ok) setAdminMsg({ ok: false, text: 'Tiene que quedar al menos un administrador.' })
+    loadPeople()
+  }
 
   const feats = useMemo(() => {
     if (!data?.funciones) return []
@@ -178,8 +245,12 @@ export default function EmpresaPanel() {
         )}
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10, marginBottom: 14 }}>
-          <h1 style={{ margin: 0, fontSize: 24, fontWeight: 800 }}>Resumen</h1>
-          {!demo && (
+          <div role="tablist" style={{ display: 'flex', gap: 6, background: 'white', border: `1px solid ${C.line}`, borderRadius: 999, padding: 4 }}>
+            {[['resumen', 'Resumen'], ['empleados', 'Empleados'], ['admins', 'Administradores']].map(([k, l]) => (
+              <button key={k} role="tab" aria-selected={tab === k} onClick={() => setTab(k)} style={{ padding: '9px 16px', borderRadius: 999, border: 'none', background: tab === k ? C.blue : 'transparent', color: tab === k ? 'white' : C.ink, fontWeight: 700, fontSize: 15, cursor: 'pointer', fontFamily: SANS }}>{l}</button>
+            ))}
+          </div>
+          {!demo && tab === 'resumen' && (
             <div style={{ display: 'flex', gap: 6 }}>
               {[30, 90].map(d => (
                 <button key={d} onClick={() => setDays(d)} style={{ padding: '8px 14px', borderRadius: 999, border: `1.5px solid ${days === d ? C.blue : C.line}`, background: days === d ? C.blue : 'white', color: days === d ? 'white' : C.ink, fontWeight: 700, fontSize: 14, cursor: 'pointer', fontFamily: SANS }}>
@@ -190,6 +261,7 @@ export default function EmpresaPanel() {
           )}
         </div>
 
+        {tab === 'resumen' && (<>
         <div style={grid}>
           <Tile label="Licencias en uso" value={`${num(inUse)} de ${num(o.licencias)}`} sub={`${pct}% del plan · ${num(Math.max(0, o.licencias - inUse))} libres`} />
           <Tile label="Familias cuidando con la app" value={num(data.familias)} sub="Empleados y sus familiares" />
@@ -246,9 +318,75 @@ export default function EmpresaPanel() {
           </Card>
         </div>
 
+        </>)}
+
+        {tab === 'empleados' && (
+          <>
+            <div style={grid}>
+              <Tile label="Con el beneficio" value={people ? num(people.miembros.length) : '…'} sub={`de ${num(o.licencias)} licencias`} accent={C.blue} />
+              <Tile label="Invitados sin activar" value={people ? num(people.invitados.length) : '…'} sub="Recibieron la invitación" />
+              <Tile label="Licencias libres" value={num(Math.max(0, o.licencias - inUse))} />
+            </div>
+            <Card title="Invitar empleados" subtitle="Peguen uno o varios correos (separados por coma o uno por línea). Les llega un correo para activar su beneficio." style={{ marginTop: 14 }}>
+              <textarea value={emailsText} onChange={e => setEmailsText(e.target.value)} rows={4} placeholder={'ana@empresa.com\ncarlos@empresa.com'}
+                style={{ width: '100%', boxSizing: 'border-box', padding: 14, borderRadius: 14, border: `1.5px solid ${C.line}`, fontSize: 15, fontFamily: SANS, color: C.ink, resize: 'vertical' }} />
+              <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap', marginTop: 10 }}>
+                <button onClick={invite} disabled={inviting || !emailsText.trim()} style={{ padding: '12px 20px', borderRadius: 12, border: 'none', background: emailsText.trim() ? C.coral : '#C9D6DB', color: 'white', fontWeight: 800, fontSize: 15, cursor: 'pointer', fontFamily: SANS }}>
+                  {inviting ? 'Invitando…' : 'Mandar invitaciones'}
+                </button>
+                <span style={{ fontSize: 14, color: C.sub }}>También pueden compartir el código <strong style={{ color: C.blue, letterSpacing: '0.1em' }}>{o.codigo}</strong></span>
+              </div>
+              {inviteMsg && <p style={{ margin: '12px 0 0', padding: '10px 14px', borderRadius: 12, background: inviteMsg.ok ? C.soft : '#FBEAE4', fontSize: 15 }}>{inviteMsg.text}</p>}
+            </Card>
+            <Card title="Quién tiene el beneficio" subtitle="Aquí ven quién lo tiene, no lo que hace en la app." style={{ marginTop: 14 }}>
+              {!people ? <p style={{ color: C.sub }}>Cargando…</p> : people.miembros.length === 0 ? <p style={{ margin: 0, color: C.sub }}>Todavía nadie lo activó.</p> : people.miembros.map(m => (
+                <div key={m.user_id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderTop: `1px solid ${C.line}` }}>
+                  <span style={{ width: 36, height: 36, borderRadius: '50%', background: C.soft, color: C.blue, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{(m.nombre || '?')[0].toUpperCase()}</span>
+                  <span style={{ flex: 1, minWidth: 0 }}>
+                    <span style={{ display: 'block', fontWeight: 700, fontSize: 15 }}>{m.nombre}</span>
+                    <span style={{ display: 'block', fontSize: 14, color: C.sub, overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.email} · desde {fmtShort(m.desde)}</span>
+                  </span>
+                  <button onClick={() => removeMember(m)} style={{ background: 'none', border: `1.5px solid ${C.line}`, borderRadius: 10, padding: '7px 12px', color: '#A3452F', fontWeight: 700, fontSize: 14, cursor: 'pointer', fontFamily: SANS }}>Quitar licencia</button>
+                </div>
+              ))}
+            </Card>
+            {people?.invitados?.length > 0 && (
+              <Card title="Invitados que no han activado" style={{ marginTop: 14 }}>
+                {people.invitados.map(i => (
+                  <div key={i.email} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderTop: `1px solid ${C.line}` }}>
+                    <span style={{ flex: 1, minWidth: 0, fontSize: 15 }}>{i.email} <span style={{ color: C.sub, fontSize: 14 }}>· invitado el {fmtShort(i.desde)}</span></span>
+                    <button onClick={() => cancelInvite(i)} style={{ background: 'none', border: 'none', color: C.sub, fontWeight: 700, fontSize: 14, cursor: 'pointer', fontFamily: SANS }}>Cancelar</button>
+                  </div>
+                ))}
+              </Card>
+            )}
+          </>
+        )}
+
+        {tab === 'admins' && (
+          <Card title="Administradores del panel" subtitle="Personas de su empresa que pueden ver este panel e invitar empleados.">
+            {(people?.admins || []).map(a => (
+              <div key={a.user_id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderTop: `1px solid ${C.line}` }}>
+                <span style={{ flex: 1, minWidth: 0 }}>
+                  <span style={{ display: 'block', fontWeight: 700, fontSize: 15 }}>{a.nombre}{a.user_id === user?.id ? ' (tú)' : ''}</span>
+                  <span style={{ display: 'block', fontSize: 14, color: C.sub }}>{a.email}</span>
+                </span>
+                {a.user_id !== user?.id && <button onClick={() => removeAdmin(a)} style={{ background: 'none', border: 'none', color: '#A3452F', fontWeight: 700, fontSize: 14, cursor: 'pointer', fontFamily: SANS }}>Quitar</button>}
+              </div>
+            ))}
+            <div style={{ display: 'flex', gap: 8, marginTop: 14, flexWrap: 'wrap' }}>
+              <input value={adminEmail} onChange={e => setAdminEmail(e.target.value)} placeholder="correo@empresa.com" type="email"
+                style={{ flex: 1, minWidth: 220, padding: '12px 14px', borderRadius: 12, border: `1.5px solid ${C.line}`, fontSize: 15, fontFamily: SANS }} />
+              <button onClick={addAdmin} style={{ padding: '12px 18px', borderRadius: 12, border: 'none', background: C.blue, color: 'white', fontWeight: 800, fontSize: 15, cursor: 'pointer', fontFamily: SANS }}>Agregar administrador</button>
+            </div>
+            <p style={{ margin: '10px 0 0', fontSize: 14, color: C.sub }}>La persona necesita una cuenta de FamiliaCerca con ese correo (registrarse es gratis).</p>
+            {adminMsg && <p style={{ margin: '12px 0 0', padding: '10px 14px', borderRadius: 12, background: adminMsg.ok ? C.soft : '#FBEAE4', fontSize: 15 }}>{adminMsg.text}</p>}
+          </Card>
+        )}
+
         <Card title="Privacidad de sus empleados" style={{ marginTop: 14, background: C.soft, border: 'none' }}>
           <p style={{ margin: 0, fontSize: 15, lineHeight: 1.55, color: C.ink }}>
-            Este panel muestra solo totales. Nunca muestra nombres, ni de los empleados ni de sus familiares, ni medicinas, notas, gastos o datos de salud.
+            El uso de la app se muestra solo en totales. En Empleados ven quién tiene el beneficio, pero nunca lo que hace cada uno, ni el nombre de sus familiares, medicinas, notas, gastos o datos de salud.
             El detalle por semana y por función aparece solo cuando al menos {data.grupo_minimo} personas usan el beneficio. Cada empleado lo acepta al unirse y puede salirse cuando quiera.
           </p>
         </Card>
