@@ -2156,6 +2156,11 @@ export default function Dashboard() {
   const [expandedDays, setExpandedDays] = useState(() => new Set([new Date().toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' })]))
   const [selectedDayTab, setSelectedDayTab] = useState(() => new Date().toLocaleDateString('en-CA', { timeZone: 'America/Puerto_Rico' }))
   const [showCompanion, setShowCompanion] = useState(false)
+  // Código de empresa pendiente (llegó por el enlace antes de tener cuenta)
+  useEffect(() => {
+    try { const c = localStorage.getItem('fc_org_code'); if (c) navigate(`/unirme-empresa?codigo=${c}`) } catch { /* */ }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   // Inicio a la medida (nov 2026): cada persona ve primero lo que usa.
   const [myNeeds, setMyNeeds] = useState(() => needsFor(user, memberRole, isAdmin))
   const [needsPicked, setNeedsPicked] = useState(() => storedNeeds(user) !== null)
