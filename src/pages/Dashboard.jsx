@@ -2160,6 +2160,11 @@ export default function Dashboard() {
   useEffect(() => {
     try { const c = localStorage.getItem('fc_org_code'); if (c) navigate(`/unirme-empresa?codigo=${c}`) } catch { /* */ }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  // Invitación de su empresa (la mandó Recursos Humanos por correo)
+  const [orgInvite, setOrgInvite] = useState(null)
+  useEffect(() => {
+    supabase.rpc('my_org_invites').then(({ data }) => { if (Array.isArray(data) && data[0]) setOrgInvite(data[0]) })
+  }, [])
 
   // Inicio a la medida (nov 2026): cada persona ve primero lo que usa.
   const [myNeeds, setMyNeeds] = useState(() => needsFor(user, memberRole, isAdmin))
@@ -3869,6 +3874,17 @@ export default function Dashboard() {
                 />
 
                 {memberRole === 'cuidador' && ownerId && <CaregiverShift ownerId={ownerId} compact />}
+
+                {orgInvite && (
+                  <button onClick={() => navigate(`/unirme-empresa?codigo=${orgInvite.codigo}`)} style={{ marginTop: 14, width: '100%', display: 'flex', alignItems: 'center', gap: 12, textAlign: 'left', padding: '14px 16px', borderRadius: 18, border: '1.5px solid #BF513C', background: '#FBEAE4', cursor: 'pointer' }}>
+                    <span style={{ fontSize: 26 }}>🎁</span>
+                    <span style={{ flex: 1 }}>
+                      <span style={{ display: 'block', fontSize: 16, fontWeight: 800, color: '#14303D' }}>{orgInvite.org} te regala FamiliaCerca</span>
+                      <span style={{ display: 'block', fontSize: 14, color: '#4E6470', marginTop: 2 }}>Toca para activar tu beneficio</span>
+                    </span>
+                    <span style={{ fontSize: 22, color: '#BF513C', fontWeight: 800 }}>›</span>
+                  </button>
+                )}
 
                 {/* ══ ¿QUÉ QUIERES TENER A MANO? — una vez, y cuando lo pidan ══ */}
                 {(needsOpen || (!needsPicked && !needsSkipped && !(isAdmin && !!realPatientName && (medTotal === 0 || !routineActive || familyCount <= 1)))) && (
