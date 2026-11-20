@@ -122,7 +122,7 @@ export default function EmpresaPanel() {
 
   const page = { minHeight: '100vh', background: C.cream, fontFamily: SANS, color: C.ink }
   // La demo se ve sin cuenta (para presentaciones); el panel real pide entrar
-  if (!demo && !authLoading && !user) return <Navigate to="/login" replace />
+  if (!demo && !authLoading && !user) return <Navigate to="/login?next=/empresa" replace />
   const header = (
     <header style={{ background: `linear-gradient(135deg, ${C.blue}, ${C.dark})`, color: 'white', padding: '18px 24px' }}>
       <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
