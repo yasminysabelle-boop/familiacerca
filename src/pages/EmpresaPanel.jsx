@@ -34,7 +34,7 @@ function demoData() {
 function demoPeople() {
   const names = ['Ana Rivera', 'Carlos Méndez', 'Lucía Torres', 'José Ramírez', 'María Gómez', 'Pedro Castillo']
   return {
-    miembros: names.map((n, i) => ({ user_id: 'd' + i, nombre: n, email: n.toLowerCase().replace(/[^a-z ]/g, '').replace(' ', '.') + '@empresaejemplo.com', desde: new Date(Date.now() - (i + 2) * 6 * 864e5).toISOString() })),
+    miembros: names.map((n, i) => ({ user_id: 'd' + i, nombre: n, email: n.normalize('NFD').toLowerCase().replace(/[^a-z ]/g, '').replace(' ', '.') + '@empresaejemplo.com', desde: new Date(Date.now() - (i + 2) * 6 * 864e5).toISOString() })),
     invitados: ['laura.diaz@empresaejemplo.com', 'miguel.santos@empresaejemplo.com'].map((e, i) => ({ email: e, desde: new Date(Date.now() - (i + 1) * 2 * 864e5).toISOString() })),
     admins: [{ user_id: 'a0', nombre: 'Recursos Humanos', email: 'rrhh@empresaejemplo.com' }],
   }
@@ -323,7 +323,7 @@ export default function EmpresaPanel() {
         {tab === 'empleados' && (
           <>
             <div style={grid}>
-              <Tile label="Con el beneficio" value={people ? num(people.miembros.length) : '…'} sub={`de ${num(o.licencias)} licencias`} accent={C.blue} />
+              <Tile label="Con el beneficio" value={num(inUse)} sub={`de ${num(o.licencias)} licencias`} accent={C.blue} />
               <Tile label="Invitados sin activar" value={people ? num(people.invitados.length) : '…'} sub="Recibieron la invitación" />
               <Tile label="Licencias libres" value={num(Math.max(0, o.licencias - inUse))} />
             </div>
@@ -339,6 +339,7 @@ export default function EmpresaPanel() {
               {inviteMsg && <p style={{ margin: '12px 0 0', padding: '10px 14px', borderRadius: 12, background: inviteMsg.ok ? C.soft : '#FBEAE4', fontSize: 15 }}>{inviteMsg.text}</p>}
             </Card>
             <Card title="Quién tiene el beneficio" subtitle="Aquí ven quién lo tiene, no lo que hace en la app." style={{ marginTop: 14 }}>
+              {demo && <p style={{ margin: '0 0 8px', fontSize: 14, color: C.sub }}>Ejemplo: aquí aparece la lista completa.</p>}
               {!people ? <p style={{ color: C.sub }}>Cargando…</p> : people.miembros.length === 0 ? <p style={{ margin: 0, color: C.sub }}>Todavía nadie lo activó.</p> : people.miembros.map(m => (
                 <div key={m.user_id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderTop: `1px solid ${C.line}` }}>
                   <span style={{ width: 36, height: 36, borderRadius: '50%', background: C.soft, color: C.blue, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{(m.nombre || '?')[0].toUpperCase()}</span>
