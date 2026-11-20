@@ -679,6 +679,7 @@ export default function Settings() {
           {[
             { label: 'Equipo e invitaciones', sub: 'Quién está en la familia, invitar o quitar', to: isAdmin ? '/admin?tab=team' : '/familia', icon: '👥' },
             { label: 'Quién ve qué', sub: 'Lo que puede ver y hacer cada rol', to: '/roles', icon: '🛡️' },
+            { label: 'Beneficio de tu empresa', sub: 'Si tu empresa te da FamiliaCerca, pon aquí su código', to: '/unirme-empresa', icon: '🏢' },
             ...(isAdmin ? [
               { label: 'Actividad', sub: 'Lo último que hizo cada quien', to: '/admin?tab=activity', icon: '📋' },
               { label: 'Plan y pagos', sub: 'Tu plan, facturas y método de pago', to: '/admin?tab=account', icon: '💳' },
