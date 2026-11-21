@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { demoOrgs, demoDashboard, demoPeopleFor, demoPatients, money, ESTADOS } from '../lib/empresaDemo'
 import AgenciaPanel from './AgenciaPanel'
+import { negocio } from '../lib/negocios'
 
 // Panel para empresas (nov 2026). Solo para administradores de una empresa
 // cliente. Muestra TOTALES de uso (org_dashboard en Supabase), nunca datos de
@@ -93,6 +94,7 @@ export default function EmpresaPanel() {
   const [adminEmail, setAdminEmail] = useState('')
   const [adminMsg, setAdminMsg] = useState(null)
   const [billing, setBilling] = useState(null)
+  const [menu, setMenu] = useState(false)
 
   useEffect(() => {
     if (demo) { const l = demoOrgs(); setOrgs(l.map(x => ({ id: x.id, name: x.nombre, kind: x.tipo }))); setOrgId(id => id || (l.some(x => x.id === params.get('org')) ? params.get('org') : l[0].id)); return }
@@ -227,22 +229,54 @@ export default function EmpresaPanel() {
   const joinUrl = `${window.location.origin}/unirme-empresa?codigo=${o.codigo}`
   const grid = { display: 'grid', gap: 14, gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }
 
+  const neg = negocio(demo ? demoOrgs().find(x => x.id === orgId)?.negocio : null, 'empresa')
+  const NAV = [['resumen', '📊', 'Dashboard'], ['empleados', '👥', neg.k === 'aseguradora' ? 'Afiliados' : 'Empleados'], ['facturacion', '🧾', 'Facturación'], ['admins', '🔑', 'Administradores']]
+  const navBtn = k => ({ display: 'flex', alignItems: 'center', gap: 12, width: '100%', textAlign: 'left', padding: '11px 14px', borderRadius: 12, border: 'none', background: tab === k ? C.soft : 'transparent', color: tab === k ? C.ink : C.sub, fontWeight: tab === k ? 800 : 600, fontSize: 15, cursor: 'pointer', fontFamily: SANS, marginBottom: 2 })
   return (
-    <div style={page}>
-      {header}
-      <main style={{ maxWidth: 1100, margin: '0 auto', padding: '22px 16px 48px' }}>
+    <div style={page} className="fc-shell">
+      <style>{`.fc-shell{display:flex}.fc-side{width:264px;flex-shrink:0;background:white;border-right:1px solid ${C.line};position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column;box-sizing:border-box}.fc-main{flex:1;min-width:0}.fc-mob{display:none}@media(max-width:820px){.fc-shell{display:block}.fc-side{position:fixed;left:0;top:0;z-index:60;transform:translateX(-100%);transition:transform .2s}.fc-side.open{transform:none;box-shadow:0 0 40px rgba(0,0,0,.25)}.fc-mob{display:flex}}`}</style>
+      <aside className={`fc-side${menu ? ' open' : ''}`}>
+        <div style={{ background: `linear-gradient(135deg, ${C.blue}, ${C.dark})`, color: 'white', padding: '18px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
+          <img src="/logo.png" alt="" width="44" height="44" style={{ background: 'white', borderRadius: 12, padding: 4, flexShrink: 0 }} />
+          <span style={{ minWidth: 0 }}>
+            <span style={{ display: 'block', fontSize: 16, fontWeight: 800, lineHeight: 1.25 }}>{o.nombre}</span>
+            <span style={{ display: 'block', fontSize: 12, opacity: 0.85, marginTop: 2 }}>{neg.label}</span>
+          </span>
+        </div>
+        <nav style={{ padding: 12, flex: 1 }}>
+          {NAV.map(([k, ic, l]) => (
+            <button key={k} onClick={() => { setTab(k); setMenu(false) }} style={navBtn(k)}>
+              <span style={{ fontSize: 18, width: 24, textAlign: 'center' }}>{ic}</span>{l}
+            </button>
+          ))}
+        </nav>
+        <div style={{ padding: 14, borderTop: `1px solid ${C.line}` }}>
+          {orgs?.length > 1 && (
+            <>
+              <p style={{ margin: '0 0 6px', fontSize: 12, fontWeight: 700, color: C.sub, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{demo ? 'Cliente de ejemplo' : 'Cambiar de cliente'}</p>
+              <select value={orgId || ''} onChange={e => setOrgId(e.target.value)} style={{ width: '100%', padding: '9px 10px', borderRadius: 12, border: `1.5px solid ${C.line}`, fontFamily: SANS, fontSize: 14, marginBottom: 10 }}>
+                {orgs.map(x => <option key={x.id} value={x.id}>{x.name}</option>)}
+              </select>
+            </>
+          )}
+          <p style={{ margin: 0, fontSize: 12, color: C.sub }}>FamiliaCerca para empresas</p>
+        </div>
+      </aside>
+      {menu && <div className="fc-mob" onClick={() => setMenu(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.3)', zIndex: 55 }} />}
+      <div className="fc-main">
+        <div className="fc-mob" style={{ alignItems: 'center', gap: 12, padding: '12px 16px', background: C.blue, color: 'white', position: 'sticky', top: 0, zIndex: 30 }}>
+          <button onClick={() => setMenu(true)} aria-label="Abrir menú" style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: 10, width: 40, height: 40, color: 'white', fontSize: 20, cursor: 'pointer' }}>☰</button>
+          <span style={{ fontWeight: 800, fontSize: 16, flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{o.nombre}</span>
+        </div>
+      <main style={{ maxWidth: 1100, margin: '0 auto', padding: '24px 20px 48px' }}>
         {demo && (
           <p style={{ margin: '0 0 16px', padding: '12px 16px', borderRadius: 14, background: '#FDF3DF', color: '#7A5410', fontSize: 15, fontWeight: 600 }}>
-            Datos de ejemplo con empresas ficticias, para presentaciones. Cambia de empresa arriba a la derecha. Una empresa real solo ve la suya.
+            Datos de ejemplo con clientes ficticios, para presentaciones. Cambia de cliente abajo en el menú de la izquierda. Un cliente real solo ve lo suyo.
           </p>
         )}
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10, marginBottom: 14 }}>
-          <div role="tablist" style={{ display: 'flex', gap: 6, background: 'white', border: `1px solid ${C.line}`, borderRadius: 999, padding: 4 }}>
-            {[['resumen', 'Resumen'], ['empleados', 'Empleados'], ['facturacion', 'Facturación'], ['admins', 'Administradores']].map(([k, l]) => (
-              <button key={k} role="tab" aria-selected={tab === k} onClick={() => setTab(k)} style={{ padding: '9px 16px', borderRadius: 999, border: 'none', background: tab === k ? C.blue : 'transparent', color: tab === k ? 'white' : C.ink, fontWeight: 700, fontSize: 15, cursor: 'pointer', fontFamily: SANS }}>{l}</button>
-            ))}
-          </div>
+          <h1 style={{ margin: 0, fontSize: 26, fontWeight: 800 }}>{NAV.find(n => n[0] === tab)?.[2]}</h1>
           {!demo && tab === 'resumen' && (
             <div style={{ display: 'flex', gap: 6 }}>
               {[30, 90].map(d => (
@@ -429,6 +463,7 @@ export default function EmpresaPanel() {
           </p>
         </Card>
       </main>
+      </div>
     </div>
   )
 }
