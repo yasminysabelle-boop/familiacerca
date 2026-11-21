@@ -3,6 +3,7 @@ import { Link, Navigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { REQ, ROLES, BrandPanel } from '../components/MarcaBlancaGestion'
+import { negocio } from '../lib/negocios'
 
 // Panel REAL de una agencia de cuidado en casa (nov 2026).
 // Familias conectadas (con su permiso), cuidadoras asignadas, personal con
@@ -184,7 +185,7 @@ function Staff({ org, color }) {
   )
 }
 
-export default function AgenciaPanel() {
+export default function AgenciaPanel({ startOrgId }) {
   const { user, loading } = useAuth()
   const [orgs, setOrgs] = useState(null)
   const [orgId, setOrgId] = useState(null)
@@ -197,19 +198,19 @@ export default function AgenciaPanel() {
     if (!user) return
     supabase.from('organization_admins').select('org_id, organizations(name, kind)').eq('user_id', user.id).then(({ data }) => {
       const l = (data || []).filter(r => r.organizations?.kind === 'agencia').map(r => ({ id: r.org_id, name: r.organizations.name }))
-      setOrgs(l); if (l[0]) setOrgId(l[0].id)
+      setOrgs(l); if (l[0]) setOrgId(l.some(x => x.id === startOrgId) ? startOrgId : l[0].id)
     })
   }, [user])
   useEffect(() => {
     if (!orgId) return
     supabase.rpc('agency_brand_get', { p_org: orgId }).then(({ data }) => {
       if (!data) return
-      setOrg({ id: orgId, nombre: data.nombre, codigo: data.codigo })
+      setOrg({ id: orgId, nombre: data.nombre, codigo: data.codigo, negocio: negocio(data.negocio, data.tipo) })
       setBrand({ nombre: data.nombre, color: data.color || '#0C6C9C', logo: data.logo })
     })
   }, [orgId])
 
-  if (!loading && !user) return <Navigate to="/login?next=/agencia" replace />
+  if (!loading && !user) return <Navigate to="/login?next=/empresa" replace />
   const page = { minHeight: '100vh', background: '#F7F6F2', fontFamily: SANS, color: INK }
   if (orgs && orgs.length === 0) return (
     <div style={page}><div style={{ maxWidth: 560, margin: '60px auto', padding: '0 16px' }}><div style={box}>
@@ -231,7 +232,7 @@ export default function AgenciaPanel() {
           {brand.logo ? <img src={brand.logo} alt="" style={{ height: 44, background: 'white', borderRadius: 12, padding: 4 }} /> : <span style={{ width: 44, height: 44, borderRadius: 12, background: 'white', color, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>{org.nombre[0]}</span>}
           <div style={{ flex: 1 }}>
             <p style={{ margin: 0, fontSize: 19, fontWeight: 800 }}>{org.nombre}</p>
-            <p style={{ margin: 0, fontSize: 13, opacity: 0.85 }}>Panel de la agencia · FamiliaCerca</p>
+            <p style={{ margin: 0, fontSize: 13, opacity: 0.85 }}>{org.negocio.label} · FamiliaCerca</p>
           </div>
           {orgs?.length > 1 && <select value={orgId} onChange={e => setOrgId(e.target.value)} style={{ padding: '8px 12px', borderRadius: 10, border: 'none', fontFamily: SANS, fontSize: 15 }}>{orgs.map(o => <option key={o.id} value={o.id}>{o.name}</option>)}</select>}
         </div>
