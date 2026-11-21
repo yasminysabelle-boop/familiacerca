@@ -134,7 +134,8 @@ export default function ConsolaEmpresas() {
     if (demo) { setOrgs(l => l.map(x => x.id === orgId ? { ...x, admins: [...x.admins, e] } : x)); setAdminFor(null); setAdminEmail(''); return }
     const { data, error } = await supabase.rpc('org_add_admin', { p_org: orgId, p_email: e })
     if (error || !data?.ok) { setMsg({ ok: false, text: data?.error === 'sin_cuenta' ? `${e} no tiene cuenta todavía. Pídele que se registre gratis en familiacerca.com y vuelve a agregarlo.` : 'No se pudo agregar.' }); return }
-    setMsg({ ok: true, text: `${e} ya administra esa empresa. Entra en familiacerca.com/empresa.` })
+    const esAgencia = orgs.find(x => x.id === orgId)?.tipo === 'agencia'
+    setMsg({ ok: true, text: esAgencia ? `${e} ya administra esa agencia. Entra en familiacerca.com/agencia.` : `${e} ya administra esa empresa. Entra en familiacerca.com/empresa.` })
     setAdminEmail(''); setAdminFor(null); load()
   }
 
