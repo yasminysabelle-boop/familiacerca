@@ -9,6 +9,7 @@ import { useFamily } from '../contexts/FamilyContext'
 import { useBillingAccount } from '../contexts/BillingAccountContext'
 import { useFamilyPlan } from '../contexts/FamilyPlanContext'
 import { supabase } from '../lib/supabase'
+import AgencyBadge from '../components/AgencyBadge'
 import Layout from '../components/Layout'
 import CareCard from '../components/CareCard'
 import HowIsTodaySheet from '../components/HowIsTodaySheet'
@@ -3874,6 +3875,8 @@ export default function Dashboard() {
                 />
 
                 {memberRole === 'cuidador' && ownerId && <CaregiverShift ownerId={ownerId} compact />}
+
+                <AgencyBadge ownerId={ownerId} isOwner={ownerId === user?.id} />
 
                 {orgInvite && (
                   <button onClick={() => navigate(`/unirme-empresa?codigo=${orgInvite.codigo}`)} style={{ marginTop: 14, width: '100%', display: 'flex', alignItems: 'center', gap: 12, textAlign: 'left', padding: '14px 16px', borderRadius: 18, border: '1.5px solid #BF513C', background: '#FBEAE4', cursor: 'pointer' }}>
