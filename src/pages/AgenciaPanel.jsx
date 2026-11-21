@@ -32,12 +32,14 @@ function Families({ org, color }) {
   const link = `${window.location.origin}/unirme-agencia?codigo=${org.codigo}`
   const fg = onColor(color)
   async function load() {
+    if (org.demo) { setList(l => l || org.demo.familias); return }
     const { data, error } = await supabase.rpc('agency_families_list', { p_org: org.id })
     setList(error ? [] : data)
   }
   useEffect(() => { load() }, [org.id]) // eslint-disable-line react-hooks/exhaustive-deps
   async function assign(f) {
     const e = email.trim().toLowerCase(); if (!e) return
+    if (org.demo) { setList(l => l.map(x => x.owner_id === f.owner_id ? { ...x, cuidadoras: [...x.cuidadoras, { user_id: e, nombre: e.split('@')[0], email: e }] } : x)); setMsg({ ok: true, text: `Demo: ${e} quedó asignada a ${f.paciente}. En la real, ella ya vería a este paciente en su app.` }); setEmail(''); return }
     const { data } = await supabase.rpc('agency_assign_caregiver', { p_org: org.id, p_owner: f.owner_id, p_email: e })
     const errs = { sin_cuenta: `${e} no tiene cuenta. Que se registre gratis en familiacerca.com con ese correo y vuelva a intentarlo.`, familia_no_conectada: 'Esa familia ya no está conectada.', es_la_duena: 'Ese correo es de la dueña de la familia.' }
     setMsg(data?.ok ? { ok: true, text: `Listo: ${e} ya es cuidadora de ${f.paciente} y ve su información en la app.` } : { ok: false, text: errs[data?.error] || 'No se pudo asignar.' })
@@ -45,6 +47,7 @@ function Families({ org, color }) {
   }
   async function unassign(f, c) {
     if (!window.confirm(`¿Quitar a ${c.nombre} de la familia de ${f.paciente}?`)) return
+    if (org.demo) { setList(l => l.map(x => x.owner_id === f.owner_id ? { ...x, cuidadoras: x.cuidadoras.filter(y => y.user_id !== c.user_id) } : x)); return }
     await supabase.rpc('agency_unassign_caregiver', { p_org: org.id, p_owner: f.owner_id, p_user: c.user_id }); load()
   }
   const total = list?.length || 0
@@ -111,15 +114,16 @@ function Staff({ org, color }) {
   const [form, setForm] = useState(null)
   const [j, setJ] = useState('pr')
   const fg = onColor(color)
-  async function load() { const { data, error } = await supabase.rpc('agency_staff_list', { p_org: org.id }); setList(error ? [] : data) }
+  async function load() { if (org.demo) { setList(l => l || org.demo.staff); return } const { data, error } = await supabase.rpc('agency_staff_list', { p_org: org.id }); setList(error ? [] : data) }
   useEffect(() => { load() }, [org.id]) // eslint-disable-line react-hooks/exhaustive-deps
   async function save() {
     if (!form.nombre.trim()) return
     const docs = Object.fromEntries(REQ[form.jurisdiccion].filter(r => form.docs[r.k]?.ok).map(r => [r.k, { ok: true, vence: form.docs[r.k].vence || null }]))
+    if (org.demo) { const p = { ...form, id: form.id || 'n' + Date.now(), docs }; setList(l => form.id ? l.map(x => x.id === form.id ? p : x) : [p, ...l]); setForm(null); return }
     await supabase.rpc('agency_staff_save', { p_org: org.id, p_id: form.id || null, p_nombre: form.nombre, p_rol: form.rol, p_telefono: form.telefono || '', p_correo: form.correo || '', p_jur: form.jurisdiccion, p_docs: docs })
     setForm(null); load()
   }
-  async function remove(p) { if (!window.confirm(`¿Borrar a ${p.nombre} del personal?`)) return; await supabase.rpc('agency_staff_delete', { p_org: org.id, p_id: p.id }); load() }
+  async function remove(p) { if (!window.confirm(`¿Borrar a ${p.nombre} del personal?`)) return; if (org.demo) { setList(l => l.filter(x => x.id !== p.id)); return } await supabase.rpc('agency_staff_delete', { p_org: org.id, p_id: p.id }); load() }
   const status = p => { const reqs = REQ[p.jurisdiccion || 'pr']; const falta = reqs.filter(r => !p.docs?.[r.k]); const pronto = reqs.filter(r => r.vence && p.docs?.[r.k]?.vence && p.docs[r.k].vence <= soon); return { falta, pronto } }
   const tog = k => ({ padding: '8px 14px', borderRadius: 999, border: `1.5px solid ${(form?.jurisdiccion || j) === k ? color : LINE}`, background: (form?.jurisdiccion || j) === k ? color : 'white', color: (form?.jurisdiccion || j) === k ? fg : INK, fontWeight: 700, fontSize: 14, cursor: 'pointer', fontFamily: SANS })
   const all = list || []
@@ -185,7 +189,7 @@ function Staff({ org, color }) {
   )
 }
 
-export default function AgenciaPanel({ startOrgId }) {
+export default function AgenciaPanel({ startOrgId, demo }) {
   const { user, loading } = useAuth()
   const [orgs, setOrgs] = useState(null)
   const [orgId, setOrgId] = useState(null)
@@ -195,6 +199,7 @@ export default function AgenciaPanel({ startOrgId }) {
   const [saved, setSaved] = useState('')
 
   useEffect(() => {
+    if (demo) { setOrgs(demo.orgs); setOrgId(demo.orgId); return }
     if (!user) return
     supabase.from('organization_admins').select('org_id, organizations(name, kind)').eq('user_id', user.id).then(({ data }) => {
       const l = (data || []).filter(r => r.organizations?.kind === 'agencia').map(r => ({ id: r.org_id, name: r.organizations.name }))
@@ -203,6 +208,7 @@ export default function AgenciaPanel({ startOrgId }) {
   }, [user])
   useEffect(() => {
     if (!orgId) return
+    if (demo) { const d = demo.data; setOrg({ id: orgId, nombre: d.brand.nombre, codigo: d.brand.codigo, negocio: negocio(d.negocio, 'agencia'), demo: d }); setBrand({ ...d.brand }); return }
     supabase.rpc('agency_brand_get', { p_org: orgId }).then(({ data }) => {
       if (!data) return
       setOrg({ id: orgId, nombre: data.nombre, codigo: data.codigo, negocio: negocio(data.negocio, data.tipo) })
@@ -210,7 +216,7 @@ export default function AgenciaPanel({ startOrgId }) {
     })
   }, [orgId])
 
-  if (!loading && !user) return <Navigate to="/login?next=/empresa" replace />
+  if (!demo && !loading && !user) return <Navigate to="/login?next=/empresa" replace />
   const page = { minHeight: '100vh', background: '#F7F6F2', fontFamily: SANS, color: INK }
   if (orgs && orgs.length === 0) return (
     <div style={page}><div style={{ maxWidth: 560, margin: '60px auto', padding: '0 16px' }}><div style={box}>
@@ -222,6 +228,7 @@ export default function AgenciaPanel({ startOrgId }) {
   const color = brand.color, fg = onColor(color)
   const tabBtn = k => ({ padding: '10px 18px', borderRadius: 999, border: 'none', background: tab === k ? color : 'white', color: tab === k ? fg : INK, fontWeight: 800, fontSize: 15, cursor: 'pointer', fontFamily: SANS })
   async function saveBrand() {
+    if (demo) { setSaved('Demo: en la versión real esto se guarda y sus familias ven su marca al instante.'); return }
     const { data } = await supabase.rpc('agency_brand_save', { p_org: org.id, p_color: brand.color, p_logo: brand.logo })
     setSaved(data?.ok ? 'Guardado. Sus familias ya ven su marca en la app.' : 'No se pudo guardar.')
   }
@@ -234,10 +241,11 @@ export default function AgenciaPanel({ startOrgId }) {
             <p style={{ margin: 0, fontSize: 19, fontWeight: 800 }}>{org.nombre}</p>
             <p style={{ margin: 0, fontSize: 13, opacity: 0.85 }}>{org.negocio.label} · FamiliaCerca</p>
           </div>
-          {orgs?.length > 1 && <select value={orgId} onChange={e => setOrgId(e.target.value)} style={{ padding: '8px 12px', borderRadius: 10, border: 'none', fontFamily: SANS, fontSize: 15 }}>{orgs.map(o => <option key={o.id} value={o.id}>{o.name}</option>)}</select>}
+          {orgs?.length > 1 && <select value={orgId} onChange={e => demo ? demo.onSwitch(e.target.value) : setOrgId(e.target.value)} style={{ padding: '8px 12px', borderRadius: 10, border: 'none', fontFamily: SANS, fontSize: 15 }}>{orgs.map(o => <option key={o.id} value={o.id}>{o.name}</option>)}</select>}
         </div>
       </header>
       <main style={{ maxWidth: 1080, margin: '0 auto', padding: '20px 16px 48px' }}>
+        {demo && <p style={{ margin: '0 0 16px', padding: '12px 16px', borderRadius: 14, background: '#FDF3DF', color: '#7A5410', fontSize: 15, fontWeight: 600 }}>Datos de ejemplo con clientes ficticios. Así ve su panel {org.negocio.corto}: sus pacientes, sus cuidadoras, su personal y su marca. Cambie de cliente arriba a la derecha; nada se guarda.</p>}
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 18 }}>
           <button onClick={() => setTab('familias')} style={tabBtn('familias')}>Sus pacientes</button>
           <button onClick={() => setTab('personal')} style={tabBtn('personal')}>Su personal</button>
