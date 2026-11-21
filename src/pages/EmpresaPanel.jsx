@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, Navigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
-import { demoOrgs, demoDashboard, demoPeopleFor, money, ESTADOS } from '../lib/empresaDemo'
+import { demoOrgs, demoDashboard, demoPeopleFor, demoPatients, money, ESTADOS } from '../lib/empresaDemo'
 import AgenciaPanel from './AgenciaPanel'
 
 // Panel para empresas (nov 2026). Solo para administradores de una empresa
@@ -95,7 +95,7 @@ export default function EmpresaPanel() {
   const [billing, setBilling] = useState(null)
 
   useEffect(() => {
-    if (demo) { const l = demoOrgs(); setOrgs(l.map(x => ({ id: x.id, name: x.nombre }))); setOrgId(id => id || (l.some(x => x.id === params.get('org')) ? params.get('org') : l[0].id)); return }
+    if (demo) { const l = demoOrgs(); setOrgs(l.map(x => ({ id: x.id, name: x.nombre, kind: x.tipo }))); setOrgId(id => id || (l.some(x => x.id === params.get('org')) ? params.get('org') : l[0].id)); return }
     if (!user) return
     supabase.from('organization_admins').select('org_id, organizations(name, kind)').eq('user_id', user.id)
       .then(({ data, error }) => {
@@ -182,6 +182,7 @@ export default function EmpresaPanel() {
   if (!demo && !authLoading && !user) return <Navigate to="/login?next=/empresa" replace />
   // Los que cuidan pacientes (agencia, hospital, clínica, hogar) ven su panel de pacientes
   if (!demo && orgs?.find(x => x.id === orgId)?.kind === 'agencia') return <AgenciaPanel startOrgId={orgId} />
+  if (demo && orgs?.find(x => x.id === orgId)?.kind === 'agencia') return <AgenciaPanel key={orgId} demo={{ orgs, orgId, onSwitch: setOrgId, data: demoPatients(orgId) }} />
   const header = (
     <header style={{ background: `linear-gradient(135deg, ${C.blue}, ${C.dark})`, color: 'white', padding: '18px 24px' }}>
       <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
