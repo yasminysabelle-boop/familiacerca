@@ -95,6 +95,8 @@ export default function EmpresaPanel() {
   const [adminMsg, setAdminMsg] = useState(null)
   const [billing, setBilling] = useState(null)
   const [menu, setMenu] = useState(false)
+  const [calcN, setCalcN] = useState(60)
+  const [calcP, setCalcP] = useState(4)
 
   useEffect(() => {
     if (demo) { const l = demoOrgs(); setOrgs(l.map(x => ({ id: x.id, name: x.nombre, kind: x.tipo }))); setOrgId(id => id || (l.some(x => x.id === params.get('org')) ? params.get('org') : l[0].id)); return }
@@ -405,6 +407,28 @@ export default function EmpresaPanel() {
                   <Tile label="Saldo pendiente" value={money(porCobrar, cur)} sub={porCobrar ? 'Ver facturas abajo' : 'Están al día ✓'} accent={porCobrar ? C.coral : '#1E6B3E'} />
                   <Tile label="Pagado a la fecha" value={money(pagado, cur)} />
                 </div>
+                {demo && (
+                  <Card title="Calcule su plan" subtitle="Escriba cuántos empleados quiere cubrir y el precio por licencia: el total sale solo." style={{ marginTop: 14 }}>
+                    <div style={{ display: 'grid', gap: 14, gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', alignItems: 'end' }}>
+                      <label style={{ fontSize: 14, fontWeight: 700, color: C.sub }}>Empleados (licencias)
+                        <input type="number" min="1" value={calcN} onChange={e => setCalcN(Math.max(0, Number(e.target.value) || 0))} style={{ display: 'block', width: '100%', boxSizing: 'border-box', marginTop: 6, padding: '12px 14px', borderRadius: 12, border: `1.5px solid ${C.line}`, fontSize: 22, fontWeight: 800, fontFamily: SANS, color: C.ink }} />
+                      </label>
+                      <label style={{ fontSize: 14, fontWeight: 700, color: C.sub }}>Precio por licencia al mes (USD)
+                        <input type="number" min="0" step="0.5" value={calcP} onChange={e => setCalcP(Math.max(0, Number(e.target.value) || 0))} style={{ display: 'block', width: '100%', boxSizing: 'border-box', marginTop: 6, padding: '12px 14px', borderRadius: 12, border: `1.5px solid ${C.line}`, fontSize: 22, fontWeight: 800, fontFamily: SANS, color: C.blue }} />
+                      </label>
+                      <div style={{ background: C.soft, borderRadius: 16, padding: 16 }}>
+                        <p style={{ margin: 0, fontSize: 14, color: C.sub, fontWeight: 600 }}>Total al mes</p>
+                        <p style={{ margin: '4px 0 0', fontSize: 26, fontWeight: 800, color: C.ink }}>{money(calcN * calcP)}</p>
+                      </div>
+                      <div style={{ background: C.soft, borderRadius: 16, padding: 16 }}>
+                        <p style={{ margin: 0, fontSize: 14, color: C.sub, fontWeight: 600 }}>Total al año</p>
+                        <p style={{ margin: '4px 0 0', fontSize: 26, fontWeight: 800, color: C.ink }}>{money(calcN * calcP * 12)}</p>
+                      </div>
+                    </div>
+                    <input type="range" min="5" max="1000" step="5" value={calcN} onChange={e => setCalcN(Number(e.target.value))} style={{ width: '100%', marginTop: 14, accentColor: C.blue }} aria-label="Cantidad de empleados" />
+                    <p style={{ margin: '8px 0 0', fontSize: 13, color: C.sub }}>Cálculo de ejemplo. El precio final se acuerda con cada empresa.</p>
+                  </Card>
+                )}
                 <Card title="Facturas" subtitle={billing.correo ? `Se envían a ${billing.correo}` : 'Escríbannos a hola@familiacerca.com para recibirlas por correo'} style={{ marginTop: 14 }}>
                   {billing.facturas.length === 0 ? <p style={{ margin: 0, color: C.sub }}>Todavía no hay facturas.</p> : (
                     <div style={{ overflowX: 'auto' }}>
