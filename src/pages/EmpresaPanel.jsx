@@ -3,6 +3,7 @@ import { Link, Navigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { demoOrgs, demoDashboard, demoPeopleFor, money, ESTADOS } from '../lib/empresaDemo'
+import AgenciaPanel from './AgenciaPanel'
 
 // Panel para empresas (nov 2026). Solo para administradores de una empresa
 // cliente. Muestra TOTALES de uso (org_dashboard en Supabase), nunca datos de
@@ -96,10 +97,10 @@ export default function EmpresaPanel() {
   useEffect(() => {
     if (demo) { const l = demoOrgs(); setOrgs(l.map(x => ({ id: x.id, name: x.nombre }))); setOrgId(id => id || (l.some(x => x.id === params.get('org')) ? params.get('org') : l[0].id)); return }
     if (!user) return
-    supabase.from('organization_admins').select('org_id, organizations(name)').eq('user_id', user.id)
+    supabase.from('organization_admins').select('org_id, organizations(name, kind)').eq('user_id', user.id)
       .then(({ data, error }) => {
         if (error) { setOrgs([]); return }
-        const list = (data ?? []).map(r => ({ id: r.org_id, name: r.organizations?.name }))
+        const list = (data ?? []).map(r => ({ id: r.org_id, name: r.organizations?.name, kind: r.organizations?.kind }))
         setOrgs(list); if (list[0]) setOrgId(list[0].id)
       })
   }, [user, demo])
@@ -179,6 +180,8 @@ export default function EmpresaPanel() {
   const page = { minHeight: '100vh', background: C.cream, fontFamily: SANS, color: C.ink }
   // La demo se ve sin cuenta (para presentaciones); el panel real pide entrar
   if (!demo && !authLoading && !user) return <Navigate to="/login?next=/empresa" replace />
+  // Los que cuidan pacientes (agencia, hospital, clínica, hogar) ven su panel de pacientes
+  if (!demo && orgs?.find(x => x.id === orgId)?.kind === 'agencia') return <AgenciaPanel startOrgId={orgId} />
   const header = (
     <header style={{ background: `linear-gradient(135deg, ${C.blue}, ${C.dark})`, color: 'white', padding: '18px 24px' }}>
       <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
