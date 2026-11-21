@@ -190,12 +190,90 @@ function Staff({ org, color }) {
   )
 }
 
+// Dashboard real: totales de los pacientes conectados (con permiso de cada familia)
+function RealDashboard({ org, color, goTo }) {
+  const [d, setD] = useState(null)
+  const [err, setErr] = useState(false)
+  useEffect(() => {
+    supabase.rpc('agency_dashboard', { p_org: org.id }).then(({ data, error }) => { if (error) setErr(true); else setD(data) })
+  }, [org.id])
+  if (err) return <div style={{ ...box, gridColumn: '1 / -1' }}><p style={{ margin: 0, color: SUB }}>No se pudo cargar el dashboard. Intenta de nuevo en un rato.</p></div>
+  if (!d) return <p style={{ color: SUB }}>Cargando…</p>
+  const tile = (l, v, sub, c) => (
+    <div style={{ ...box, padding: '16px 18px' }}>
+      <p style={{ margin: 0, fontSize: 14, color: SUB, fontWeight: 600 }}>{l}</p>
+      <p style={{ margin: '6px 0 2px', fontSize: 28, fontWeight: 800, color: c || INK }}>{v}</p>
+      {sub && <p style={{ margin: 0, fontSize: 13, color: SUB }}>{sub}</p>}
+    </div>
+  )
+  const meses = d.por_mes || []
+  const max = Math.max(1, ...meses.map(m => m.pacientes))
+  const uso = [['Cuidados de la rutina marcados', d.uso_30?.rutina || 0], ['Medicinas marcadas', d.uso_30?.medicinas || 0], ['Notas del día', d.uso_30?.notas || 0], ['Alertas de emergencia', d.uso_30?.emergencias || 0]]
+  const maxUso = Math.max(1, ...uso.map(u => u[1]))
+  const hora = t => t ? new Date(t).toLocaleTimeString('es', { hour: 'numeric', minute: '2-digit' }) : ''
+  const visitas = d.visitas_hoy || []
+  const sinAct = d.sin_actividad || []
+  return (
+    <div style={{ gridColumn: '1 / -1' }}>
+      <div style={{ display: 'grid', gap: 12, gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))' }}>
+        {tile('Pacientes conectados', d.pacientes, d.nuevos_mes ? `+${d.nuevos_mes} este mes` : 'Conecte familias con su enlace', color)}
+        {tile('Cuidadora en casa ahora', d.en_casa ?? 0, 'Según “Llegué / Me voy”', '#1E6B3E')}
+        {tile('Horas de cuidado este mes', d.horas_mes ?? 0, 'Registradas por sus cuidadoras')}
+        {tile('Necesitan atención', sinAct.length, 'Sin actividad en 3 días', sinAct.length ? '#A3452F' : INK)}
+        {tile('Documentos por vencer', d.docs_por_vencer, `De ${d.personal} en su personal · 45 días`, d.docs_por_vencer ? '#7A5410' : INK)}
+      </div>
+      <div style={{ display: 'grid', gap: 14, gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', marginTop: 14 }}>
+        <div style={box}>
+          <p style={{ margin: 0, fontSize: 17, fontWeight: 800 }}>Pacientes conectados por mes</p>
+          <svg viewBox="0 0 360 190" style={{ width: '100%', height: 'auto', marginTop: 10 }} role="img" aria-label="Pacientes conectados por mes">
+            {meses.map((m, i) => { const h = (m.pacientes / max) * 140; const x = 12 + i * 58; return (
+              <g key={m.mes}>
+                <rect x={x} y={160 - h} width={40} height={Math.max(h, 1)} rx="6" fill={i === meses.length - 1 ? color : mix(color, 0.6)} />
+                <text x={x + 20} y={154 - h} fontSize="12" fontWeight="700" textAnchor="middle" fill={INK}>{m.pacientes}</text>
+                <text x={x + 20} y={178} fontSize="11" textAnchor="middle" fill={SUB}>{new Date(m.mes + '-15').toLocaleDateString('es', { month: 'short' })}</text>
+              </g>) })}
+          </svg>
+        </div>
+        <div style={box}>
+          <p style={{ margin: '0 0 8px', fontSize: 17, fontWeight: 800 }}>Visitas de hoy</p>
+          {visitas.length === 0 ? <p style={{ margin: 0, fontSize: 15, color: SUB }}>Todavía no hay visitas hoy. Las cuidadoras marcan “Llegué” en la app al llegar a la casa.</p> : visitas.map((v, i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0', borderTop: `1px solid ${LINE}` }}>
+              <span style={{ width: 34, height: 34, borderRadius: '50%', background: mix(color, 0.86), color, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{v.cuidadora[0]}</span>
+              <span style={{ flex: 1, minWidth: 0 }}><strong style={{ display: 'block', fontSize: 15 }}>{v.cuidadora}</strong><span style={{ fontSize: 13, color: SUB }}>{v.paciente}</span></span>
+              <span style={{ fontSize: 13, fontWeight: 700, color: v.se_fue ? SUB : '#1E6B3E', textAlign: 'right' }}>{v.se_fue ? `${hora(v.llego)} – ${hora(v.se_fue)}` : `En casa desde ${hora(v.llego)}`}</span>
+            </div>
+          ))}
+        </div>
+        <div style={box}>
+          <p style={{ margin: '0 0 12px', fontSize: 17, fontWeight: 800 }}>Lo que más se hizo (30 días)</p>
+          {uso.map(([l, n]) => (
+            <div key={l} style={{ marginBottom: 12 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 15, marginBottom: 4 }}><span style={{ fontWeight: 600 }}>{l}</span><strong>{n.toLocaleString('es')}</strong></div>
+              <div style={{ height: 10, borderRadius: 6, background: mix(color, 0.88) }}><div style={{ width: `${Math.max(2, (n / maxUso) * 100)}%`, height: '100%', borderRadius: 6, background: l.startsWith('Alertas') ? '#BF513C' : color }} /></div>
+            </div>
+          ))}
+        </div>
+        <div style={box}>
+          <p style={{ margin: '0 0 8px', fontSize: 17, fontWeight: 800 }}>Necesitan atención</p>
+          {sinAct.length === 0 ? <p style={{ margin: 0, fontSize: 15, color: SUB }}>✅ Todos sus pacientes tuvieron actividad en los últimos 3 días.</p> : sinAct.slice(0, 8).map((p, i) => (
+            <p key={i} style={{ margin: 0, padding: '9px 0', borderTop: `1px solid ${LINE}`, fontSize: 15, display: 'flex', justifyContent: 'space-between', gap: 10 }}>
+              <strong>{p.paciente}</strong><span style={{ color: '#A3452F', fontSize: 13, fontWeight: 700 }}>{p.ultima ? `Sin actividad ${ago(p.ultima)}` : 'Nunca ha registrado nada'}</span>
+            </p>
+          ))}
+          {sinAct.length > 0 && <button onClick={() => goTo('familias')} style={{ marginTop: 10, background: 'none', border: 'none', padding: 0, color, fontWeight: 700, fontSize: 15, cursor: 'pointer', fontFamily: SANS }}>Ver pacientes ›</button>}
+        </div>
+      </div>
+      {d.pacientes === 0 && <p style={{ margin: '14px 0 0', padding: '12px 16px', borderRadius: 14, background: mix(color, 0.9), fontSize: 15 }}>Todavía no hay pacientes conectados. En <strong>Pacientes</strong> está el enlace para mandárselo a las familias.</p>}
+    </div>
+  )
+}
+
 export default function AgenciaPanel({ startOrgId, demo }) {
   const { user, loading } = useAuth()
   const [orgs, setOrgs] = useState(null)
   const [orgId, setOrgId] = useState(null)
   const [org, setOrg] = useState(null)
-  const [tab, setTab] = useState(demo ? 'resumen' : 'familias')
+  const [tab, setTab] = useState('resumen')
   const [price, setPrice] = useState(19.99)
   const [families, setFamilies] = useState(120)
   const [brand, setBrand] = useState(null)
@@ -240,7 +318,7 @@ export default function AgenciaPanel({ startOrgId, demo }) {
   }
   const NAV = demo
     ? [['resumen', '📊', 'Dashboard'], ['familias', '🧑‍🦳', 'Pacientes'], ['app', '📱', 'App de las familias'], ['personal', '🪪', 'Personal'], ['facturacion', '🧾', 'Facturación'], ['precio', '💲', 'Precio'], ['marca', '🎨', 'Marca y colores']]
-    : [['familias', '🧑‍🦳', 'Pacientes'], ['personal', '🪪', 'Personal'], ['marca', '🎨', 'Marca y colores'], ['cobros', '🧾', 'Cobros']]
+    : [['resumen', '📊', 'Dashboard'], ['familias', '🧑‍🦳', 'Pacientes'], ['personal', '🪪', 'Personal'], ['marca', '🎨', 'Marca y colores'], ['cobros', '🧾', 'Cobros']]
   const title = NAV.find(n => n[0] === tab)?.[2]
   async function uploadLogo(file) {
     if (!file?.type?.startsWith('image/')) return
@@ -319,7 +397,7 @@ export default function AgenciaPanel({ startOrgId, demo }) {
         {demo && <p style={{ margin: '0 0 16px', padding: '12px 16px', borderRadius: 14, background: '#FDF3DF', color: '#7A5410', fontSize: 15, fontWeight: 600 }}>Datos de ejemplo con clientes ficticios: así ve su panel {org.negocio.corto}. Toque el logo o el nombre del menú para cambiarlos. Nada se guarda.</p>}
         <h1 style={{ margin: '0 0 18px', fontSize: 26, fontWeight: 800 }}>{title}</h1>
         <div style={{ display: 'grid', gap: 24, gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', alignItems: 'start' }}>
-          {tab === 'resumen' && <AgencyPanel b={pb} families={families} price={price} />}
+          {tab === 'resumen' && (demo ? <AgencyPanel b={pb} families={families} price={price} /> : <RealDashboard org={org} color={color} goTo={setTab} />)}
           {tab === 'facturacion' && <BillingPanel b={pb} families={families} price={price} />}
           {tab === 'app' && (
             <div style={box}>
