@@ -23,7 +23,7 @@ function Logo({ brand, size = 40 }) {
 }
 
 // ── La app como la ven las familias ─────────────────────────────────────────
-function Phone({ brand, start = 'inicio' }) {
+export function Phone({ brand, start = 'inicio' }) {
   const [tab, setTab] = useState(start)
   const [meds, setMeds] = useState([true, false, false])
   const [rutina, setRutina] = useState([true, true, true, false, false, false])
@@ -135,7 +135,7 @@ function Phone({ brand, start = 'inicio' }) {
 }
 
 // ── El panel de la agencia (lo que ve la dueña o la coordinadora) ───────────
-function AgencyPanel({ b, families, price }) {
+export function AgencyPanel({ b, families, price }) {
   const soft = mix(b.color, 0.88)
   const box = { background: 'white', border: `1px solid ${LINE}`, borderRadius: 20, padding: 20 }
   const tile = (l, v, sub, accent) => (
