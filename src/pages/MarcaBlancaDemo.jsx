@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { StaffPanel, BillingPanel, BrandPanel } from '../components/MarcaBlancaGestion'
 
 // Demo de marca blanca para agencias de cuidado en casa (nov 2026).
 // /demo/<código> muestra la app con el nombre, logo y color de la agencia,
@@ -238,16 +239,19 @@ export default function MarcaBlancaDemo() {
       </header>
       <main style={{ maxWidth: 1080, margin: '0 auto', padding: '20px 16px 48px' }}>
         <p style={{ margin: '0 0 16px', padding: '12px 16px', borderRadius: 14, background: '#FDF3DF', color: '#7A5410', fontSize: 15, fontWeight: 600 }}>
-          Demo con datos de ejemplo: así se vería la app con la marca de {b.nombre}. Toque las pantallas del teléfono para probarla.
+          Demo con datos de ejemplo: así se vería la app con la marca de {b.nombre}. Toque las pantallas y pruebe cada pestaña; nada se guarda.
         </p>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 18 }}>
           <button onClick={() => setView('app')} style={tabBtn('app')}>La app para sus familias</button>
           <button onClick={() => setView('panel')} style={tabBtn('panel')}>Su panel</button>
-          <button onClick={() => setView('precio')} style={tabBtn('precio')}>Su precio y sus ingresos</button>
+          <button onClick={() => setView('personal')} style={tabBtn('personal')}>Su personal</button>
+          <button onClick={() => setView('facturacion')} style={tabBtn('facturacion')}>Facturación</button>
+          <button onClick={() => setView('precio')} style={tabBtn('precio')}>Su precio</button>
+          <button onClick={() => setView('marca')} style={tabBtn('marca')}>Su marca</button>
         </div>
 
         <div style={{ display: 'grid', gap: 24, gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', alignItems: 'start' }}>
-          {view === 'panel' ? <AgencyPanel b={b} families={families} price={price} /> : view === 'app' ? (
+          {view === 'panel' ? <AgencyPanel b={b} families={families} price={price} /> : view === 'personal' ? <StaffPanel b={b} /> : view === 'facturacion' ? <BillingPanel b={b} families={families} price={price || 0} /> : view === 'marca' ? <BrandPanel b={b} onChange={ch => setBrand(x => ({ ...x, ...ch }))} /> : view === 'app' ? (
             <div style={box}>
               <h1 style={{ margin: '0 0 12px', fontSize: 24, fontWeight: 800 }}>Lo que reciben las familias de sus pacientes</h1>
               {[['🟢', 'Ven la visita en vivo', 'Saben cuándo llegó y se fue la cuidadora, y leen sus notas del día.'],
@@ -283,7 +287,7 @@ export default function MarcaBlancaDemo() {
               <p style={{ margin: '14px 0 0', fontSize: 13, color: SUB }}>Cálculo de ejemplo: familias × precio. No incluye costos ni comisiones.</p>
             </div>
           )}
-          {view !== 'panel' && <Phone key={view} brand={b} start={view === 'precio' ? 'plan' : 'inicio'} />}
+          {['app', 'precio', 'marca'].includes(view) && <Phone key={view} brand={b} start={view === 'precio' ? 'plan' : 'inicio'} />}
         </div>
       </main>
     </div>
