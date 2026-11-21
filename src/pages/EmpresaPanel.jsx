@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { demoOrgs, demoDashboard, demoPeopleFor, demoPatients, money, ESTADOS } from '../lib/empresaDemo'
 import AgenciaPanel from './AgenciaPanel'
 import { negocio } from '../lib/negocios'
+import { BrandPanel } from '../components/MarcaBlancaGestion'
 
 // Panel para empresas (nov 2026). Solo para administradores de una empresa
 // cliente. Muestra TOTALES de uso (org_dashboard en Supabase), nunca datos de
@@ -26,6 +27,9 @@ const FEATURES = [
 const fmtShort = d => d ? new Date(d).toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'
 const fmtDate = d => d ? new Date(d + 'T12:00:00').toLocaleDateString('es', { day: 'numeric', month: 'long', year: 'numeric' }) : '—'
 const num = n => (n ?? 0).toLocaleString('es')
+const hexRgb = c => [1, 3, 5].map(i => parseInt(c.slice(i, i + 2), 16))
+const onColor = c => { const [r, g, b] = hexRgb(c); return (0.299 * r + 0.587 * g + 0.114 * b) > 170 ? C.ink : 'white' }
+const mix = (c, w) => { const [r, g, b] = hexRgb(c); const m = v => Math.round(v + (255 - v) * w).toString(16).padStart(2, '0'); return `#${m(r)}${m(g)}${m(b)}` }
 
 function Tile({ label, value, sub, accent }) {
   return (
@@ -97,6 +101,10 @@ export default function EmpresaPanel() {
   const [menu, setMenu] = useState(false)
   const [calcN, setCalcN] = useState(60)
   const [calcP, setCalcP] = useState(4)
+  const [brand, setBrand] = useState(null)
+  const [editName, setEditName] = useState(false)
+  const [nameDraft, setNameDraft] = useState('')
+  const [brandMsg, setBrandMsg] = useState('')
 
   useEffect(() => {
     if (demo) { const l = demoOrgs(); setOrgs(l.map(x => ({ id: x.id, name: x.nombre, kind: x.tipo }))); setOrgId(id => id || (l.some(x => x.id === params.get('org')) ? params.get('org') : l[0].id)); return }
@@ -130,6 +138,13 @@ export default function EmpresaPanel() {
     if (demo) { setBilling(demoDashboard(orgId).billing); return }
     supabase.rpc('org_billing', { p_org: orgId }).then(({ data, error }) => setBilling(error ? { error: true, facturas: [] } : data))
   }, [tab, orgId, demo])
+  // Marca del cliente (logo, nombre y color): se ve en su menú
+  useEffect(() => {
+    if (!orgId) return
+    setBrand(null); setEditName(false); setBrandMsg('')
+    if (demo) { const d = demoOrgs().find(x => x.id === orgId); setBrand({ nombre: d?.nombre, color: d?.color || '#0C6C9C', logo: null }); return }
+    supabase.rpc('agency_brand_get', { p_org: orgId }).then(({ data: b }) => setBrand({ nombre: b?.nombre, color: b?.color || '#0C6C9C', logo: b?.logo || null }))
+  }, [orgId, demo])
 
   async function invite() {
     const list = [...new Set(emailsText.split(/[\s,;]+/).map(e => e.trim().toLowerCase()).filter(Boolean))]
@@ -232,18 +247,60 @@ export default function EmpresaPanel() {
   const grid = { display: 'grid', gap: 14, gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }
 
   const neg = negocio(demo ? demoOrgs().find(x => x.id === orgId)?.negocio : null, 'empresa')
-  const NAV = [['resumen', '📊', 'Dashboard'], ['empleados', '👥', neg.k === 'aseguradora' ? 'Afiliados' : 'Empleados'], ['facturacion', '🧾', 'Facturación'], ['admins', '🔑', 'Administradores']]
-  const navBtn = k => ({ display: 'flex', alignItems: 'center', gap: 12, width: '100%', textAlign: 'left', padding: '11px 14px', borderRadius: 12, border: 'none', background: tab === k ? C.soft : 'transparent', color: tab === k ? C.ink : C.sub, fontWeight: tab === k ? 800 : 600, fontSize: 15, cursor: 'pointer', fontFamily: SANS, marginBottom: 2 })
+  const NAV = [['resumen', '📊', 'Dashboard'], ['empleados', '👥', neg.k === 'aseguradora' ? 'Afiliados' : 'Empleados'], ['facturacion', '🧾', 'Facturación'], ['admins', '🔑', 'Administradores'], ['marca', '🎨', 'Marca y colores']]
+  const bc = brand?.color || C.blue, bfg = onColor(bc)
+  const shownName = brand?.nombre || o.nombre
+  async function saveBrand(nb) {
+    if (demo) { setBrandMsg('Demo: en la versión real esto se guarda.'); return }
+    const { data: r } = await supabase.rpc('agency_brand_save', { p_org: orgId, p_color: nb.color, p_logo: nb.logo })
+    setBrandMsg(r?.ok ? 'Guardado.' : 'No se pudo guardar.')
+  }
+  function uploadLogo(file) {
+    if (!file?.type?.startsWith('image/')) return
+    const img = new Image()
+    img.onload = () => {
+      const sc = Math.min(1, 256 / Math.max(img.width, img.height))
+      const cv = document.createElement('canvas'); cv.width = Math.round(img.width * sc); cv.height = Math.round(img.height * sc)
+      cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height)
+      URL.revokeObjectURL(img.src)
+      const nb = { ...brand, logo: cv.toDataURL('image/png') }
+      setBrand(nb); saveBrand(nb)
+    }
+    img.src = URL.createObjectURL(file)
+  }
+  async function saveName() {
+    const n = nameDraft.trim(); if (!n) return
+    if (!demo) { const { data: r } = await supabase.rpc('agency_name_save', { p_org: orgId, p_name: n }); if (!r?.ok) { setBrandMsg('No se pudo cambiar el nombre.'); return } }
+    setBrand(b => ({ ...b, nombre: n })); setEditName(false)
+  }
+  const navBtn = k => ({ display: 'flex', alignItems: 'center', gap: 12, width: '100%', textAlign: 'left', padding: '11px 14px', borderRadius: 12, border: 'none', background: tab === k ? mix(bc, 0.86) : 'transparent', color: tab === k ? C.ink : C.sub, fontWeight: tab === k ? 800 : 600, fontSize: 15, cursor: 'pointer', fontFamily: SANS, marginBottom: 2 })
   return (
     <div style={page} className="fc-shell">
       <style>{`.fc-shell{display:flex}.fc-side{width:264px;flex-shrink:0;background:white;border-right:1px solid ${C.line};position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column;box-sizing:border-box}.fc-main{flex:1;min-width:0}.fc-mob{display:none}@media(max-width:820px){.fc-shell{display:block}.fc-side{position:fixed;left:0;top:0;z-index:60;transform:translateX(-100%);transition:transform .2s}.fc-side.open{transform:none;box-shadow:0 0 40px rgba(0,0,0,.25)}.fc-mob{display:flex}}`}</style>
       <aside className={`fc-side${menu ? ' open' : ''}`}>
-        <div style={{ background: `linear-gradient(135deg, ${C.blue}, ${C.dark})`, color: 'white', padding: '18px 16px', display: 'flex', alignItems: 'center', gap: 12 }}>
-          <img src="/logo.png" alt="" width="44" height="44" style={{ background: 'white', borderRadius: 12, padding: 4, flexShrink: 0 }} />
-          <span style={{ minWidth: 0 }}>
-            <span style={{ display: 'block', fontSize: 16, fontWeight: 800, lineHeight: 1.25 }}>{o.nombre}</span>
-            <span style={{ display: 'block', fontSize: 12, opacity: 0.85, marginTop: 2 }}>{neg.label}</span>
-          </span>
+        <div style={{ background: bc, color: bfg, padding: '18px 16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <label title="Cambiar logo" style={{ position: 'relative', cursor: 'pointer', flexShrink: 0 }}>
+              {brand?.logo ? <img src={brand.logo} alt="" style={{ width: 48, height: 48, objectFit: 'contain', background: 'white', borderRadius: 12, padding: 4, boxSizing: 'border-box' }} /> : <span style={{ width: 48, height: 48, borderRadius: 12, background: 'white', color: bc, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>{shownName[0]}</span>}
+              <span style={{ position: 'absolute', right: -6, bottom: -6, width: 22, height: 22, borderRadius: '50%', background: 'white', color: C.ink, fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 1px 4px rgba(0,0,0,.25)' }}>📷</span>
+              <input type="file" accept="image/*" onChange={e => uploadLogo(e.target.files?.[0])} style={{ display: 'none' }} />
+            </label>
+            {editName ? (
+              <span style={{ flex: 1, minWidth: 0 }}>
+                <input autoFocus value={nameDraft} maxLength={80} onChange={e => setNameDraft(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') saveName(); if (e.key === 'Escape') setEditName(false) }} style={{ width: '100%', boxSizing: 'border-box', padding: '6px 8px', borderRadius: 8, border: 'none', fontSize: 15, fontFamily: SANS }} />
+                <span style={{ display: 'flex', gap: 10, marginTop: 6 }}>
+                  <button onClick={saveName} style={{ background: 'white', color: C.ink, border: 'none', borderRadius: 8, padding: '4px 10px', fontWeight: 800, fontSize: 13, cursor: 'pointer', fontFamily: SANS }}>Guardar</button>
+                  <button onClick={() => setEditName(false)} style={{ background: 'none', color: bfg, border: 'none', fontWeight: 700, fontSize: 13, cursor: 'pointer', fontFamily: SANS }}>Cancelar</button>
+                </span>
+              </span>
+            ) : (
+              <button onClick={() => { setNameDraft(shownName); setEditName(true) }} title="Cambiar nombre" style={{ flex: 1, minWidth: 0, textAlign: 'left', background: 'none', border: 'none', padding: 0, color: bfg, cursor: 'pointer', fontFamily: SANS }}>
+                <span style={{ display: 'block', fontSize: 16, fontWeight: 800, lineHeight: 1.25 }}>{shownName} <span style={{ fontSize: 13, opacity: 0.8 }}>✏️</span></span>
+                <span style={{ display: 'block', fontSize: 12, opacity: 0.85, marginTop: 2 }}>{neg.label}</span>
+              </button>
+            )}
+          </div>
+          {brandMsg && <p style={{ margin: '10px 0 0', fontSize: 12, opacity: 0.9 }}>{brandMsg}</p>}
         </div>
         <nav style={{ padding: 12, flex: 1 }}>
           {NAV.map(([k, ic, l]) => (
@@ -266,9 +323,9 @@ export default function EmpresaPanel() {
       </aside>
       {menu && <div className="fc-mob" onClick={() => setMenu(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.3)', zIndex: 55 }} />}
       <div className="fc-main">
-        <div className="fc-mob" style={{ alignItems: 'center', gap: 12, padding: '12px 16px', background: C.blue, color: 'white', position: 'sticky', top: 0, zIndex: 30 }}>
-          <button onClick={() => setMenu(true)} aria-label="Abrir menú" style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: 10, width: 40, height: 40, color: 'white', fontSize: 20, cursor: 'pointer' }}>☰</button>
-          <span style={{ fontWeight: 800, fontSize: 16, flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{o.nombre}</span>
+        <div className="fc-mob" style={{ alignItems: 'center', gap: 12, padding: '12px 16px', background: bc, color: bfg, position: 'sticky', top: 0, zIndex: 30 }}>
+          <button onClick={() => setMenu(true)} aria-label="Abrir menú" style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: 10, width: 40, height: 40, color: bfg, fontSize: 20, cursor: 'pointer' }}>☰</button>
+          <span style={{ fontWeight: 800, fontSize: 16, flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{shownName}</span>
         </div>
       <main style={{ maxWidth: 1100, margin: '0 auto', padding: '24px 20px 48px' }}>
         {demo && (
@@ -391,6 +448,14 @@ export default function EmpresaPanel() {
               </Card>
             )}
           </>
+        )}
+
+        {tab === 'marca' && brand && (
+          <div style={{ maxWidth: 560 }}>
+            <BrandPanel real b={{ ...brand, nombre: shownName }} onChange={ch => { setBrandMsg(''); setBrand(x => ({ ...x, ...ch, nombre: x.nombre })) }} />
+            <button onClick={() => saveBrand(brand)} style={{ marginTop: 12, padding: '12px 20px', borderRadius: 12, border: 'none', background: bc, color: bfg, fontWeight: 800, fontSize: 15, cursor: 'pointer', fontFamily: SANS }}>Guardar mi marca</button>
+            {brandMsg && <p style={{ margin: '10px 0 0', fontSize: 15 }}>{brandMsg}</p>}
+          </div>
         )}
 
         {tab === 'facturacion' && (
