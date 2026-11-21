@@ -21,7 +21,7 @@ const fmt = d => d ? new Date(d + 'T12:00:00').toLocaleDateString('es', { day: '
 
 // ── Requisitos comunes del personal de cuidado en casa ─────────────────────
 // Referencia general; cada estado y cada programa (Medicare, Medicaid, seguros) puede pedir más.
-const REQ = {
+export const REQ = {
   pr: [
     { k: 'penales', l: 'Certificado de Antecedentes Penales', d: 'Policía de Puerto Rico. Se renueva periódicamente.', vence: true },
     { k: 'ley300', l: 'Verificación de historial delictivo (Ley 300-1999)', d: 'Para quienes cuidan a niños o personas de edad avanzada. Incluye el Registro de Ofensores Sexuales.', vence: true },
@@ -41,7 +41,7 @@ const REQ = {
     { k: 'hipaa', l: 'Adiestramiento de privacidad (HIPAA)', d: 'Manejo de la información de salud de los pacientes.', vence: false },
   ],
 }
-const ROLES = ['Cuidadora / asistente de cuidado personal', 'Asistente de salud en el hogar (HHA)', 'Asistente de enfermería (CNA)', 'Enfermera práctica (LPN)', 'Enfermera graduada (RN)', 'Coordinadora']
+export const ROLES = ['Cuidadora / asistente de cuidado personal', 'Asistente de salud en el hogar (HHA)', 'Asistente de enfermería (CNA)', 'Enfermera práctica (LPN)', 'Enfermera graduada (RN)', 'Coordinadora']
 
 // Personal de ejemplo: qué documentos tiene y cuándo vencen
 function demoStaff(j) {
@@ -216,7 +216,7 @@ export function BillingPanel({ b, families, price }) {
 }
 
 // ── Su marca: logo, nombre y color (la agencia lo cambia sola) ─────────────
-export function BrandPanel({ b, onChange }) {
+export function BrandPanel({ b, onChange, real }) {
   const [err, setErr] = useState('')
   async function upload(file) {
     setErr('')
@@ -234,7 +234,7 @@ export function BrandPanel({ b, onChange }) {
   return (
     <div style={box}>
       <h1 style={{ margin: '0 0 6px', fontSize: 24, fontWeight: 800 }}>Su marca</h1>
-      <p style={{ margin: '0 0 18px', fontSize: 15, color: SUB }}>Cambien el logo, el nombre y el color: la app de sus familias se actualiza al instante (vea el teléfono).</p>
+      <p style={{ margin: '0 0 18px', fontSize: 15, color: SUB }}>{real ? 'Suban su logo y escojan su color.' : 'Cambien el logo, el nombre y el color: la app de sus familias se actualiza al instante (vea el teléfono).'}</p>
       <label style={label}>Logo</label>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 16 }}>
         <span style={{ width: 64, height: 64, borderRadius: 16, background: b.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -246,8 +246,8 @@ export function BrandPanel({ b, onChange }) {
         {b.logo && <button onClick={() => onChange({ logo: null })} style={{ background: 'none', border: 'none', color: SUB, fontWeight: 700, cursor: 'pointer', fontFamily: SANS }}>Quitar</button>}
       </div>
       {err && <p style={{ margin: '-8px 0 12px', fontSize: 14, color: '#A3452F' }}>{err}</p>}
-      <label style={label}>Nombre que ven las familias</label>
-      <input style={{ ...field, marginBottom: 16 }} value={b.nombre} maxLength={60} onChange={e => onChange({ nombre: e.target.value || ' ' })} />
+      {!real && <label style={label}>Nombre que ven las familias</label>}
+      {!real && <input style={{ ...field, marginBottom: 16 }} value={b.nombre} maxLength={60} onChange={e => onChange({ nombre: e.target.value || ' ' })} />}
       <label style={label}>Color principal</label>
       <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
         <input type="color" value={b.color} onChange={e => onChange({ color: e.target.value })} style={{ width: 56, height: 44, border: 'none', background: 'none', cursor: 'pointer' }} />
@@ -255,7 +255,7 @@ export function BrandPanel({ b, onChange }) {
           <button key={c} onClick={() => onChange({ color: c })} aria-label={`Color ${c}`} style={{ width: 32, height: 32, borderRadius: '50%', background: c, border: b.color === c ? '3px solid #14303D' : '2px solid white', boxShadow: '0 0 0 1px #E6E3DB', cursor: 'pointer' }} />
         ))}
       </div>
-      <p style={{ margin: '18px 0 0', fontSize: 13, color: SUB }}>En la demo los cambios solo se ven en esta pantalla. En la versión real se guardan y se aplican a la app de todas sus familias.</p>
+      <p style={{ margin: '18px 0 0', fontSize: 13, color: SUB }}>{real ? 'Sus familias ven este logo y este color dentro de la app. Para cambiar el nombre, escríbanos.' : 'En la demo los cambios solo se ven en esta pantalla. En la versión real se guardan y se aplican a la app de todas sus familias.'}</p>
     </div>
   )
 }
