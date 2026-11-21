@@ -42,6 +42,8 @@ const EmpresaPanel = lazy(() => import('./pages/EmpresaPanel'))
 const JoinCompany = lazy(() => import('./pages/JoinCompany'))
 const ConsolaEmpresas = lazy(() => import('./pages/ConsolaEmpresas'))
 const MarcaBlancaDemo = lazy(() => import('./pages/MarcaBlancaDemo'))
+const AgenciaPanel = lazy(() => import('./pages/AgenciaPanel'))
+const JoinAgency = lazy(() => import('./pages/JoinAgency'))
 import { supabase } from './lib/supabase'
 import imgFamilia from './assets/images/familia-inicio.webp'
 
@@ -165,6 +167,8 @@ function AppShell() {
         <Route path="/unirme-empresa"     element={<JoinCompany />} />
         <Route path="/consola"            element={<ConsolaEmpresas />} />
         <Route path="/demo/:code"         element={<MarcaBlancaDemo />} />
+        <Route path="/agencia"            element={<AgenciaPanel />} />
+        <Route path="/unirme-agencia"     element={<JoinAgency />} />
         <Route path="/diario-medico"      element={<P><DiarioMedico /></P>} />
         <Route path="/registros"          element={<P><CareRecord /></P>} />
         <Route path="/incidentes"         element={<Navigate to="/notes" replace />} />
