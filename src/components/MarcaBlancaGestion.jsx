@@ -255,7 +255,7 @@ export function BrandPanel({ b, onChange, real }) {
           <button key={c} onClick={() => onChange({ color: c })} aria-label={`Color ${c}`} style={{ width: 32, height: 32, borderRadius: '50%', background: c, border: b.color === c ? '3px solid #14303D' : '2px solid white', boxShadow: '0 0 0 1px #E6E3DB', cursor: 'pointer' }} />
         ))}
       </div>
-      <p style={{ margin: '18px 0 0', fontSize: 13, color: SUB }}>{real ? 'Sus familias ven este logo y este color dentro de la app. Para cambiar el nombre, escríbanos.' : 'En la demo los cambios solo se ven en esta pantalla. En la versión real se guardan y se aplican a la app de todas sus familias.'}</p>
+      <p style={{ margin: '18px 0 0', fontSize: 13, color: SUB }}>{real ? 'Sus familias ven este logo y este color dentro de la app. El logo y el nombre también se cambian tocándolos en el menú de la izquierda.' : 'En la demo los cambios solo se ven en esta pantalla. En la versión real se guardan y se aplican a la app de todas sus familias.'}</p>
     </div>
   )
 }
