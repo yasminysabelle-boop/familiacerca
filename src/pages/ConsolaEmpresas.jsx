@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { demoOrgs, money, ESTADOS } from '../lib/empresaDemo'
 import MarcaBlancaConsola from '../components/MarcaBlancaConsola'
+import { NEGOCIOS, negocio, kindOf } from '../lib/negocios'
 
 // Consola de FamiliaCerca (nov 2026): solo para el equipo de FamiliaCerca
 // (cuentas con rol "admin"). Empresas clientes, licencias, cobro y facturas,
@@ -12,7 +13,7 @@ import MarcaBlancaConsola from '../components/MarcaBlancaConsola'
 const SANS = "'Plus Jakarta Sans', system-ui, sans-serif"
 const C = { blue: '#0C6C9C', dark: '#0A4A6B', ink: '#14303D', sub: '#4E6470', line: '#E6E3DB', cream: '#F7F6F2', soft: '#EEF6FA', coral: '#BF513C', light: '#9CCBE0' }
 const today = () => new Date().toISOString().slice(0, 10)
-const empty = { id: null, nombre: '', tipo: 'empresa', plan: 'Empresa', licencias: 25, desde: today(), renueva: '', precio: 4, ciclo: 'mensual', moneda: 'USD', correo_cobro: '' }
+const empty = { id: null, nombre: '', negocio: 'agencia', tipo: 'agencia', plan: 'Empresa', licencias: 25, desde: today(), renueva: '', precio: 4, ciclo: 'mensual', moneda: 'USD', correo_cobro: '' }
 const field = { width: '100%', boxSizing: 'border-box', padding: '11px 12px', borderRadius: 12, border: `1.5px solid ${C.line}`, fontSize: 15, fontFamily: SANS, color: C.ink, background: 'white' }
 const label = { display: 'block', fontSize: 13, fontWeight: 700, color: C.sub, margin: '0 0 4px', textTransform: 'uppercase', letterSpacing: '0.04em' }
 const btn = (bg, fg = 'white') => ({ padding: '10px 16px', borderRadius: 12, border: bg === 'white' ? `1.5px solid ${C.line}` : 'none', background: bg, color: fg, fontWeight: 800, fontSize: 15, cursor: 'pointer', fontFamily: SANS })
@@ -118,9 +119,10 @@ export default function ConsolaEmpresas() {
     }
     setBusy(true)
     const { data, error } = await supabase.rpc('admin_org_save', {
-      p_id: form.id, p_name: form.nombre.trim(), p_kind: form.tipo, p_plan: form.plan, p_seats: Number(form.licencias) || 0,
+      p_id: form.id, p_name: form.nombre.trim(), p_kind: kindOf(form.negocio), p_plan: form.plan, p_seats: Number(form.licencias) || 0,
       p_started: form.desde || null, p_renews: form.renueva || null,
     })
+    if (!error && data?.ok) await supabase.rpc('admin_org_type_save', { p_id: data.id, p_type: form.negocio })
     if (!error && data?.ok) await supabase.rpc('admin_org_billing_save', { p_id: data.id, p_price: Number(form.precio) || 0, p_cycle: form.ciclo, p_currency: form.moneda, p_email: form.correo_cobro || '' })
     setBusy(false)
     if (error || !data?.ok) { setMsg({ ok: false, text: 'No se pudo guardar.' }); return }
@@ -134,8 +136,7 @@ export default function ConsolaEmpresas() {
     if (demo) { setOrgs(l => l.map(x => x.id === orgId ? { ...x, admins: [...x.admins, e] } : x)); setAdminFor(null); setAdminEmail(''); return }
     const { data, error } = await supabase.rpc('org_add_admin', { p_org: orgId, p_email: e })
     if (error || !data?.ok) { setMsg({ ok: false, text: data?.error === 'sin_cuenta' ? `${e} no tiene cuenta todavía. Pídele que se registre gratis en familiacerca.com y vuelve a agregarlo.` : 'No se pudo agregar.' }); return }
-    const esAgencia = orgs.find(x => x.id === orgId)?.tipo === 'agencia'
-    setMsg({ ok: true, text: esAgencia ? `${e} ya administra esa agencia. Entra en familiacerca.com/agencia.` : `${e} ya administra esa empresa. Entra en familiacerca.com/empresa.` })
+    setMsg({ ok: true, text: `${e} ya puede entrar a su panel en familiacerca.com/empresa con su cuenta.` })
     setAdminEmail(''); setAdminFor(null); load()
   }
 
@@ -217,7 +218,8 @@ export default function ConsolaEmpresas() {
             <p style={{ margin: '0 0 14px', fontSize: 18, fontWeight: 800 }}>{form.id ? 'Editar empresa' : 'Nueva empresa'}</p>
             <div style={{ display: 'grid', gap: 12, gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
               <div style={{ gridColumn: '1 / -1' }}><label style={label}>Nombre</label><input style={field} value={form.nombre} onChange={e => setForm({ ...form, nombre: e.target.value })} placeholder="Nombre de la empresa" /></div>
-              <div><label style={label}>Tipo</label><select style={field} value={form.tipo} onChange={e => setForm({ ...form, tipo: e.target.value })}><option value="empresa">Empresa (beneficio a empleados)</option><option value="agencia">Agencia de cuidadoras</option></select></div>
+              <div style={{ gridColumn: '1 / -1' }}><label style={label}>Tipo de negocio</label><select style={field} value={form.negocio} onChange={e => setForm({ ...form, negocio: e.target.value, tipo: kindOf(e.target.value) })}>{NEGOCIOS.map(n => <option key={n.k} value={n.k}>{n.label}</option>)}</select>
+                <p style={{ margin: '6px 0 0', fontSize: 13, color: C.sub }}>{negocio(form.negocio).modo === 'pacientes' ? 'Cuida a los pacientes: ve a cada paciente con el permiso de su familia, asigna cuidadoras, lleva su personal y pone su marca.' : 'Lo da como beneficio: solo ve totales de uso, nunca la información de una familia.'}</p></div>
               <div><label style={label}>Plan</label><input style={field} value={form.plan} onChange={e => setForm({ ...form, plan: e.target.value })} /></div>
               <div><label style={label}>Licencias</label><input style={field} type="number" min="0" value={form.licencias} onChange={e => setForm({ ...form, licencias: e.target.value })} /></div>
               <div><label style={label}>Cliente desde</label><input style={field} type="date" value={form.desde || ''} onChange={e => setForm({ ...form, desde: e.target.value })} /></div>
@@ -243,13 +245,13 @@ export default function ConsolaEmpresas() {
                 <div key={o.id} style={card}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', alignItems: 'flex-start' }}>
                     <div>
-                      <p style={{ margin: 0, fontSize: 18, fontWeight: 800 }}>{o.nombre} <span style={{ fontSize: 13, fontWeight: 700, color: C.sub, textTransform: 'uppercase' }}>· {o.tipo}</span></p>
+                      <p style={{ margin: 0, fontSize: 18, fontWeight: 800 }}>{o.nombre} <span style={{ fontSize: 13, fontWeight: 700, color: C.sub, textTransform: 'uppercase' }}>· {negocio(o.negocio, o.tipo).label}</span></p>
                       <p style={{ margin: '4px 0 0', fontSize: 14, color: C.sub }}>Plan {o.plan} · desde {fmt(o.desde)} · renueva {fmt(o.renueva)} · código <strong style={{ color: C.blue, letterSpacing: '0.08em' }}>{o.codigo}</strong></p>
                     </div>
-                    <button onClick={() => setForm({ ...o, renueva: o.renueva || '', correo_cobro: o.correo_cobro || '', moneda: o.moneda || 'USD', ciclo: o.ciclo || 'mensual', precio: o.precio ?? 0 })} style={{ ...btn('white', C.ink), padding: '8px 14px', fontSize: 14 }}>Editar</button>
+                    <button onClick={() => setForm({ ...o, negocio: negocio(o.negocio, o.tipo).k, renueva: o.renueva || '', correo_cobro: o.correo_cobro || '', moneda: o.moneda || 'USD', ciclo: o.ciclo || 'mensual', precio: o.precio ?? 0 })} style={{ ...btn('white', C.ink), padding: '8px 14px', fontSize: 14 }}>Editar</button>
                   </div>
                   <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', margin: '12px 0 0', fontSize: 15 }}>
-                    <span><strong>{o.en_uso}</strong> de {o.licencias} licencias en uso</span>
+                    <span><strong>{o.en_uso}</strong> de {o.licencias} {o.tipo === 'agencia' ? 'pacientes conectados' : 'licencias en uso'}</span>
                     <span><strong>{o.invitados}</strong> invitados sin activar</span>
                     <span><strong>{money(mrr(o), o.moneda)}</strong> al mes ({money(o.precio, o.moneda)} × licencia, cobro {o.ciclo || 'mensual'})</span>
                     {pend.length > 0 && <span style={{ color: pend.some(f => f.estado === 'vencida') ? C.coral : '#7A5410', fontWeight: 700 }}>{money(pend.reduce((t, f) => t + Number(f.monto), 0), o.moneda)} por cobrar</span>}
