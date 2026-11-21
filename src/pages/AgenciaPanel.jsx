@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
-import { REQ, ROLES, BrandPanel } from '../components/MarcaBlancaGestion'
+import { REQ, ROLES, BrandPanel, BillingPanel } from '../components/MarcaBlancaGestion'
+import { Phone, AgencyPanel } from './MarcaBlancaDemo'
 import { negocio } from '../lib/negocios'
 
 // Panel REAL de una agencia de cuidado en casa (nov 2026).
@@ -194,7 +195,9 @@ export default function AgenciaPanel({ startOrgId, demo }) {
   const [orgs, setOrgs] = useState(null)
   const [orgId, setOrgId] = useState(null)
   const [org, setOrg] = useState(null)
-  const [tab, setTab] = useState('familias')
+  const [tab, setTab] = useState(demo ? 'resumen' : 'familias')
+  const [price, setPrice] = useState(19.99)
+  const [families, setFamilies] = useState(120)
   const [brand, setBrand] = useState(null)
   const [saved, setSaved] = useState('')
 
@@ -226,6 +229,7 @@ export default function AgenciaPanel({ startOrgId, demo }) {
   )
   if (!org || !brand) return <div style={{ ...page, padding: 40, textAlign: 'center', color: SUB }}>Cargando…</div>
   const color = brand.color, fg = onColor(color)
+  const pb = { ...brand, nombre: org.nombre, precio: price }
   const tabBtn = k => ({ padding: '10px 18px', borderRadius: 999, border: 'none', background: tab === k ? color : 'white', color: tab === k ? fg : INK, fontWeight: 800, fontSize: 15, cursor: 'pointer', fontFamily: SANS })
   async function saveBrand() {
     if (demo) { setSaved('Demo: en la versión real esto se guarda y sus familias ven su marca al instante.'); return }
@@ -245,14 +249,48 @@ export default function AgenciaPanel({ startOrgId, demo }) {
         </div>
       </header>
       <main style={{ maxWidth: 1080, margin: '0 auto', padding: '20px 16px 48px' }}>
-        {demo && <p style={{ margin: '0 0 16px', padding: '12px 16px', borderRadius: 14, background: '#FDF3DF', color: '#7A5410', fontSize: 15, fontWeight: 600 }}>Datos de ejemplo con clientes ficticios. Así ve su panel {org.negocio.corto}: sus pacientes, sus cuidadoras, su personal y su marca. Cambie de cliente arriba a la derecha; nada se guarda.</p>}
+        {demo && <p style={{ margin: '0 0 16px', padding: '12px 16px', borderRadius: 14, background: '#FDF3DF', color: '#7A5410', fontSize: 15, fontWeight: 600 }}>Datos de ejemplo con clientes ficticios. Así ve su panel {org.negocio.corto}: su resumen, sus pacientes, la app de sus familias, su personal, su facturación, su precio y su marca. Cambie de cliente arriba a la derecha; nada se guarda.</p>}
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 18 }}>
-          <button onClick={() => setTab('familias')} style={tabBtn('familias')}>Sus pacientes</button>
-          <button onClick={() => setTab('personal')} style={tabBtn('personal')}>Su personal</button>
-          <button onClick={() => setTab('marca')} style={tabBtn('marca')}>Su marca</button>
-          <button onClick={() => setTab('cobros')} style={tabBtn('cobros')}>Cobros</button>
+          {(demo ? [['resumen', 'Resumen'], ['familias', 'Sus pacientes'], ['app', 'La app de sus familias'], ['personal', 'Su personal'], ['facturacion', 'Facturación'], ['precio', 'Su precio'], ['marca', 'Su marca']]
+            : [['familias', 'Sus pacientes'], ['personal', 'Su personal'], ['marca', 'Su marca'], ['cobros', 'Cobros']]).map(([k, l]) => (
+            <button key={k} onClick={() => setTab(k)} style={tabBtn(k)}>{l}</button>
+          ))}
         </div>
         <div style={{ display: 'grid', gap: 24, gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', alignItems: 'start' }}>
+          {tab === 'resumen' && <AgencyPanel b={pb} families={families} price={price} />}
+          {tab === 'facturacion' && <BillingPanel b={pb} families={families} price={price} />}
+          {tab === 'app' && (
+            <div style={box}>
+              <p style={{ margin: '0 0 12px', fontSize: 22, fontWeight: 800 }}>Lo que reciben las familias de sus pacientes</p>
+              {[['🟢', 'Ven la visita en vivo', 'Saben cuándo llegó y se fue la cuidadora, y leen sus notas del día.'], ['💊', 'Medicinas y rutina al día', 'Todos ven qué se dio y qué falta. La app avisa si algo se olvida.'], ['👨‍👩‍👧', 'Toda la familia conectada', 'Los hijos que viven lejos se reparten tareas y gastos.'], ['🚨', 'Emergencias', `Un botón avisa a la familia y a ${org.negocio.corto} al instante.`], ['⭐', 'Con su marca', `Su logo y su color. Las familias se suscriben a ${org.nombre}.`]].map(([i, t, d]) => (
+                <div key={t} style={{ display: 'flex', gap: 12, padding: '10px 0', borderTop: `1px solid ${LINE}` }}>
+                  <span style={{ fontSize: 24 }}>{i}</span>
+                  <span><strong style={{ display: 'block', fontSize: 16 }}>{t}</strong><span style={{ fontSize: 15, color: SUB, lineHeight: 1.5 }}>{d}</span></span>
+                </div>
+              ))}
+              <p style={{ margin: '10px 0 0', fontSize: 14, color: SUB }}>Toque las pantallas del teléfono para probarla.</p>
+            </div>
+          )}
+          {tab === 'precio' && (
+            <div style={box}>
+              <p style={{ margin: '0 0 6px', fontSize: 22, fontWeight: 800 }}>Ustedes ponen el precio</p>
+              <p style={{ margin: '0 0 16px', fontSize: 15, color: SUB }}>Cambie el precio y vea al lado cómo lo ven las familias en la pantalla “Plan”.</p>
+              <label style={label}>Precio por familia al mes (USD)</label>
+              <input type="number" min="0" step="0.5" value={price} onChange={e => setPrice(Number(e.target.value) || 0)} style={{ ...field, fontSize: 22, fontWeight: 800, color }} />
+              <label style={{ ...label, marginTop: 16 }}>Familias suscritas: <strong style={{ color: INK }}>{families}</strong></label>
+              <input type="range" min="5" max="500" step="5" value={families} onChange={e => setFamilies(Number(e.target.value))} style={{ width: '100%', accentColor: color }} />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 16 }}>
+                {[['Ingreso al mes', families * price], ['Ingreso al año', families * price * 12]].map(([l, v]) => (
+                  <div key={l} style={{ background: mix(color, 0.88), borderRadius: 16, padding: 16 }}>
+                    <p style={{ margin: 0, fontSize: 14, color: SUB, fontWeight: 600 }}>{l}</p>
+                    <p style={{ margin: '4px 0 0', fontSize: 24, fontWeight: 800 }}>{v.toLocaleString('es', { style: 'currency', currency: 'USD' })}</p>
+                  </div>
+                ))}
+              </div>
+              <p style={{ margin: '12px 0 0', fontSize: 13, color: SUB }}>Cálculo de ejemplo: familias × precio. No incluye costos ni comisiones.</p>
+            </div>
+          )}
+          {demo && ['app', 'precio', 'marca'].includes(tab) && <Phone key={tab} brand={pb} start={tab === 'precio' ? 'plan' : 'inicio'} />}
           {tab === 'familias' && <Families org={org} color={color} />}
           {tab === 'personal' && <Staff org={org} color={color} />}
           {tab === 'marca' && (
