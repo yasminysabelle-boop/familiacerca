@@ -200,6 +200,9 @@ export default function AgenciaPanel({ startOrgId, demo }) {
   const [families, setFamilies] = useState(120)
   const [brand, setBrand] = useState(null)
   const [saved, setSaved] = useState('')
+  const [menu, setMenu] = useState(false)
+  const [editName, setEditName] = useState(false)
+  const [nameDraft, setNameDraft] = useState('')
 
   useEffect(() => {
     if (demo) { setOrgs(demo.orgs); setOrgId(demo.orgId); return }
@@ -230,32 +233,91 @@ export default function AgenciaPanel({ startOrgId, demo }) {
   if (!org || !brand) return <div style={{ ...page, padding: 40, textAlign: 'center', color: SUB }}>Cargando…</div>
   const color = brand.color, fg = onColor(color)
   const pb = { ...brand, nombre: org.nombre, precio: price }
-  const tabBtn = k => ({ padding: '10px 18px', borderRadius: 999, border: 'none', background: tab === k ? color : 'white', color: tab === k ? fg : INK, fontWeight: 800, fontSize: 15, cursor: 'pointer', fontFamily: SANS })
-  async function saveBrand() {
+  async function saveBrand(nb = brand) {
     if (demo) { setSaved('Demo: en la versión real esto se guarda y sus familias ven su marca al instante.'); return }
-    const { data } = await supabase.rpc('agency_brand_save', { p_org: org.id, p_color: brand.color, p_logo: brand.logo })
+    const { data } = await supabase.rpc('agency_brand_save', { p_org: org.id, p_color: nb.color, p_logo: nb.logo })
     setSaved(data?.ok ? 'Guardado. Sus familias ya ven su marca en la app.' : 'No se pudo guardar.')
   }
+  const NAV = demo
+    ? [['resumen', '📊', 'Dashboard'], ['familias', '🧑‍🦳', 'Pacientes'], ['app', '📱', 'App de las familias'], ['personal', '🪪', 'Personal'], ['facturacion', '🧾', 'Facturación'], ['precio', '💲', 'Precio'], ['marca', '🎨', 'Marca y colores']]
+    : [['familias', '🧑‍🦳', 'Pacientes'], ['personal', '🪪', 'Personal'], ['marca', '🎨', 'Marca y colores'], ['cobros', '🧾', 'Cobros']]
+  const title = NAV.find(n => n[0] === tab)?.[2]
+  async function uploadLogo(file) {
+    if (!file?.type?.startsWith('image/')) return
+    const img = new Image()
+    img.onload = async () => {
+      const sc = Math.min(1, 256 / Math.max(img.width, img.height))
+      const cv = document.createElement('canvas'); cv.width = Math.round(img.width * sc); cv.height = Math.round(img.height * sc)
+      cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height)
+      URL.revokeObjectURL(img.src)
+      const nb = { ...brand, logo: cv.toDataURL('image/png') }
+      setBrand(nb); await saveBrand(nb)
+    }
+    img.src = URL.createObjectURL(file)
+  }
+  async function saveName() {
+    const n = nameDraft.trim(); if (!n) return
+    if (!demo) {
+      const { data } = await supabase.rpc('agency_name_save', { p_org: org.id, p_name: n })
+      if (!data?.ok) { setSaved('No se pudo cambiar el nombre.'); return }
+    }
+    setOrg(o => ({ ...o, nombre: n })); setEditName(false)
+  }
+  const navBtn = k => ({ display: 'flex', alignItems: 'center', gap: 12, width: '100%', textAlign: 'left', padding: '11px 14px', borderRadius: 12, border: 'none', background: tab === k ? mix(color, 0.86) : 'transparent', color: tab === k ? INK : SUB, fontWeight: tab === k ? 800 : 600, fontSize: 15, cursor: 'pointer', fontFamily: SANS, marginBottom: 2 })
   return (
-    <div style={page}>
-      <header style={{ background: color, color: fg, padding: '16px 20px' }}>
-        <div style={{ maxWidth: 1080, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-          {brand.logo ? <img src={brand.logo} alt="" style={{ height: 44, background: 'white', borderRadius: 12, padding: 4 }} /> : <span style={{ width: 44, height: 44, borderRadius: 12, background: 'white', color, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>{org.nombre[0]}</span>}
-          <div style={{ flex: 1 }}>
-            <p style={{ margin: 0, fontSize: 19, fontWeight: 800 }}>{org.nombre}</p>
-            <p style={{ margin: 0, fontSize: 13, opacity: 0.85 }}>{org.negocio.label} · FamiliaCerca</p>
+    <div style={page} className="fc-shell">
+      <style>{`.fc-shell{display:flex}.fc-side{width:264px;flex-shrink:0;background:white;border-right:1px solid ${LINE};position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column;box-sizing:border-box}.fc-main{flex:1;min-width:0}.fc-mob{display:none}@media(max-width:820px){.fc-shell{display:block}.fc-side{position:fixed;left:0;top:0;z-index:60;transform:translateX(-100%);transition:transform .2s}.fc-side.open{transform:none;box-shadow:0 0 40px rgba(0,0,0,.25)}.fc-mob{display:flex}}`}</style>
+      <aside className={`fc-side${menu ? ' open' : ''}`}>
+        <div style={{ background: color, color: fg, padding: '18px 16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <label title="Cambiar logo" style={{ position: 'relative', cursor: 'pointer', flexShrink: 0 }}>
+              {brand.logo ? <img src={brand.logo} alt="" style={{ width: 48, height: 48, objectFit: 'contain', background: 'white', borderRadius: 12, padding: 4, boxSizing: 'border-box' }} /> : <span style={{ width: 48, height: 48, borderRadius: 12, background: 'white', color, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>{org.nombre[0]}</span>}
+              <span style={{ position: 'absolute', right: -6, bottom: -6, width: 22, height: 22, borderRadius: '50%', background: 'white', color: INK, fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 1px 4px rgba(0,0,0,.25)' }}>📷</span>
+              <input type="file" accept="image/*" onChange={e => uploadLogo(e.target.files?.[0])} style={{ display: 'none' }} />
+            </label>
+            {editName ? (
+              <span style={{ flex: 1, minWidth: 0 }}>
+                <input autoFocus value={nameDraft} maxLength={80} onChange={e => setNameDraft(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') saveName(); if (e.key === 'Escape') setEditName(false) }} style={{ width: '100%', boxSizing: 'border-box', padding: '6px 8px', borderRadius: 8, border: 'none', fontSize: 15, fontFamily: SANS }} />
+                <span style={{ display: 'flex', gap: 10, marginTop: 6 }}>
+                  <button onClick={saveName} style={{ background: 'white', color: INK, border: 'none', borderRadius: 8, padding: '4px 10px', fontWeight: 800, fontSize: 13, cursor: 'pointer', fontFamily: SANS }}>Guardar</button>
+                  <button onClick={() => setEditName(false)} style={{ background: 'none', color: fg, border: 'none', fontWeight: 700, fontSize: 13, cursor: 'pointer', fontFamily: SANS }}>Cancelar</button>
+                </span>
+              </span>
+            ) : (
+              <button onClick={() => { setNameDraft(org.nombre); setEditName(true) }} title="Cambiar nombre" style={{ flex: 1, minWidth: 0, textAlign: 'left', background: 'none', border: 'none', padding: 0, color: fg, cursor: 'pointer', fontFamily: SANS }}>
+                <span style={{ display: 'block', fontSize: 16, fontWeight: 800, lineHeight: 1.25 }}>{org.nombre} <span style={{ fontSize: 13, opacity: 0.8 }}>✏️</span></span>
+                <span style={{ display: 'block', fontSize: 12, opacity: 0.85, marginTop: 2 }}>{org.negocio.label}</span>
+              </button>
+            )}
           </div>
-          {orgs?.length > 1 && <select value={orgId} onChange={e => demo ? demo.onSwitch(e.target.value) : setOrgId(e.target.value)} style={{ padding: '8px 12px', borderRadius: 10, border: 'none', fontFamily: SANS, fontSize: 15 }}>{orgs.map(o => <option key={o.id} value={o.id}>{o.name}</option>)}</select>}
+          {saved && <p style={{ margin: '10px 0 0', fontSize: 12, opacity: 0.9 }}>{saved}</p>}
         </div>
-      </header>
-      <main style={{ maxWidth: 1080, margin: '0 auto', padding: '20px 16px 48px' }}>
-        {demo && <p style={{ margin: '0 0 16px', padding: '12px 16px', borderRadius: 14, background: '#FDF3DF', color: '#7A5410', fontSize: 15, fontWeight: 600 }}>Datos de ejemplo con clientes ficticios. Así ve su panel {org.negocio.corto}: su resumen, sus pacientes, la app de sus familias, su personal, su facturación, su precio y su marca. Cambie de cliente arriba a la derecha; nada se guarda.</p>}
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 18 }}>
-          {(demo ? [['resumen', 'Resumen'], ['familias', 'Sus pacientes'], ['app', 'La app de sus familias'], ['personal', 'Su personal'], ['facturacion', 'Facturación'], ['precio', 'Su precio'], ['marca', 'Su marca']]
-            : [['familias', 'Sus pacientes'], ['personal', 'Su personal'], ['marca', 'Su marca'], ['cobros', 'Cobros']]).map(([k, l]) => (
-            <button key={k} onClick={() => setTab(k)} style={tabBtn(k)}>{l}</button>
+        <nav style={{ padding: 12, flex: 1 }}>
+          {NAV.map(([k, ic, l]) => (
+            <button key={k} onClick={() => { setTab(k); setMenu(false) }} style={navBtn(k)}>
+              <span style={{ fontSize: 18, width: 24, textAlign: 'center' }}>{ic}</span>{l}
+            </button>
           ))}
+        </nav>
+        <div style={{ padding: 14, borderTop: `1px solid ${LINE}` }}>
+          {orgs?.length > 1 && (
+            <>
+              <p style={{ margin: '0 0 6px', fontSize: 12, fontWeight: 700, color: SUB, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{demo ? 'Cliente de ejemplo' : 'Cambiar de cliente'}</p>
+              <select value={orgId} onChange={e => demo ? demo.onSwitch(e.target.value) : setOrgId(e.target.value)} style={{ ...field, padding: '9px 10px', fontSize: 14, marginBottom: 10 }}>{orgs.map(o => <option key={o.id} value={o.id}>{o.name}</option>)}</select>
+            </>
+          )}
+          <p style={{ margin: 0, fontSize: 12, color: SUB }}>Con la tecnología de <strong>FamiliaCerca</strong></p>
         </div>
+      </aside>
+      {menu && <div className="fc-mob" onClick={() => setMenu(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.3)', zIndex: 55 }} />}
+      <div className="fc-main">
+        <div className="fc-mob" style={{ alignItems: 'center', gap: 12, padding: '12px 16px', background: color, color: fg, position: 'sticky', top: 0, zIndex: 30 }}>
+          <button onClick={() => setMenu(true)} aria-label="Abrir menú" style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: 10, width: 40, height: 40, color: fg, fontSize: 20, cursor: 'pointer' }}>☰</button>
+          <span style={{ fontWeight: 800, fontSize: 16, flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{org.nombre}</span>
+        </div>
+      <main style={{ maxWidth: 1080, margin: '0 auto', padding: '24px 20px 48px' }}>
+        {demo && <p style={{ margin: '0 0 16px', padding: '12px 16px', borderRadius: 14, background: '#FDF3DF', color: '#7A5410', fontSize: 15, fontWeight: 600 }}>Datos de ejemplo con clientes ficticios: así ve su panel {org.negocio.corto}. Toque el logo o el nombre del menú para cambiarlos. Nada se guarda.</p>}
+        <h1 style={{ margin: '0 0 18px', fontSize: 26, fontWeight: 800 }}>{title}</h1>
         <div style={{ display: 'grid', gap: 24, gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', alignItems: 'start' }}>
           {tab === 'resumen' && <AgencyPanel b={pb} families={families} price={price} />}
           {tab === 'facturacion' && <BillingPanel b={pb} families={families} price={price} />}
@@ -296,7 +358,7 @@ export default function AgenciaPanel({ startOrgId, demo }) {
           {tab === 'marca' && (
             <div>
               <BrandPanel real b={{ ...brand, nombre: org.nombre }} onChange={ch => { setSaved(''); setBrand(x => ({ ...x, ...ch, nombre: x.nombre })) }} />
-              <button onClick={saveBrand} style={{ marginTop: 12, padding: '12px 20px', borderRadius: 12, border: 'none', background: color, color: fg, fontWeight: 800, fontSize: 15, cursor: 'pointer', fontFamily: SANS }}>Guardar mi marca</button>
+              <button onClick={() => saveBrand()} style={{ marginTop: 12, padding: '12px 20px', borderRadius: 12, border: 'none', background: color, color: fg, fontWeight: 800, fontSize: 15, cursor: 'pointer', fontFamily: SANS }}>Guardar mi marca</button>
               {saved && <p style={{ margin: '10px 0 0', fontSize: 15 }}>{saved}</p>}
             </div>
           )}
@@ -309,6 +371,7 @@ export default function AgenciaPanel({ startOrgId, demo }) {
         </div>
         <p style={{ margin: '20px 0 0', fontSize: 13, color: SUB, lineHeight: 1.5 }}>🔒 Cada familia aceptó que su agencia vea el cuidado de su paciente y puede quitar el acceso cuando quiera. Esta información es de salud: úsela solo para dar el servicio.</p>
       </main>
+      </div>
     </div>
   )
 }
